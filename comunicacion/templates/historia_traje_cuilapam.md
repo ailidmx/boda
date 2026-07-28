@@ -9,4 +9,3 @@ Mi traje fue confeccionado en Cuilapam de Guerrero, Oaxaca, una comunidad profun
 ## FR
 
 Mon costume a ete confectionne a Cuilapam de Guerrero, dans l'Etat de Oaxaca, une communaute profondement liee a la Danza de la Pluma. Son dessin contemporain en lin integre des broderies dorees inspirees de cette tradition artisanale et ceremonielle.
-
