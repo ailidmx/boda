@@ -86,8 +86,22 @@ function rsvpFormMarkup(t) {
         <legend>${t.groups.attendance}</legend>
         <div class="rsvp-form-grid">
           <div class="form-field">
-            <label for="rsvp-name">${t.fields.name}</label>
-            <input id="rsvp-name" name="name" type="text" autocomplete="name" />
+            <label for="rsvp-first-name">${t.fields.firstName}</label>
+            <input
+              id="rsvp-first-name"
+              name="firstName"
+              type="text"
+              autocomplete="given-name"
+            />
+          </div>
+          <div class="form-field">
+            <label for="rsvp-last-name">${t.fields.lastName}</label>
+            <input
+              id="rsvp-last-name"
+              name="lastName"
+              type="text"
+              autocomplete="family-name"
+            />
           </div>
           <div class="form-field">
             <label for="rsvp-contact">${t.fields.contact}</label>
@@ -105,6 +119,16 @@ function rsvpFormMarkup(t) {
             </select>
           </div>
           <div class="form-field">
+            <label for="rsvp-group-mode">${t.fields.groupMode}</label>
+            <select id="rsvp-group-mode" name="groupMode">
+              ${optionsMarkup(t.options.groupMode)}
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="rsvp-group-name">${t.fields.groupName}</label>
+            <input id="rsvp-group-name" name="groupName" type="text" />
+          </div>
+          <div class="form-field">
             <label for="rsvp-party-size">${t.fields.partySize}</label>
             <input
               id="rsvp-party-size"
@@ -115,7 +139,29 @@ function rsvpFormMarkup(t) {
               value="1"
             />
           </div>
-          <div class="form-field form-field-wide">
+          <div class="form-field">
+            <label for="rsvp-adults">${t.fields.adults}</label>
+            <input
+              id="rsvp-adults"
+              name="adults"
+              type="number"
+              min="1"
+              max="12"
+              value="1"
+            />
+          </div>
+          <div class="form-field">
+            <label for="rsvp-children">${t.fields.children}</label>
+            <input
+              id="rsvp-children"
+              name="children"
+              type="number"
+              min="0"
+              max="12"
+              value="0"
+            />
+          </div>
+          <div class="form-field">
             <label for="rsvp-guests">${t.fields.guests}</label>
             <input id="rsvp-guests" name="guests" type="text" />
           </div>
@@ -220,6 +266,122 @@ function rsvpFormMarkup(t) {
         ${t.button}
       </button>
       <small id="rsvp-preview-note">${t.previewNote}</small>
+    </form>
+  `;
+}
+
+function suggestionFormMarkup(t) {
+  const optionsMarkup = (options) =>
+    options
+      .map(
+        (option) =>
+          `<option value="${option.value}">${option.label}</option>`,
+      )
+      .join("");
+
+  return `
+    <form class="suggestion-form" aria-describedby="suggestion-preview-note">
+      <div class="form-field">
+        <label for="suggestion-name">${t.fields.name}</label>
+        <input
+          id="suggestion-name"
+          name="name"
+          type="text"
+          autocomplete="name"
+        />
+      </div>
+      <div class="form-field">
+        <label for="dessert-vote">${t.fields.dessert}</label>
+        <select id="dessert-vote" name="dessert">
+          ${optionsMarkup(t.options.dessert)}
+        </select>
+      </div>
+      <div class="form-field form-field-wide">
+        <label for="food-suggestion">${t.fields.food}</label>
+        <textarea id="food-suggestion" name="foodSuggestion" rows="3"></textarea>
+      </div>
+      <div class="form-field">
+        <label for="song-title">${t.fields.song}</label>
+        <input id="song-title" name="songTitle" type="text" />
+      </div>
+      <div class="form-field">
+        <label for="song-artist">${t.fields.artist}</label>
+        <input id="song-artist" name="songArtist" type="text" />
+      </div>
+      <div class="form-field form-field-wide">
+        <label for="sing-interest">${t.fields.sing}</label>
+        <select id="sing-interest" name="singInterest">
+          ${optionsMarkup(t.options.sing)}
+        </select>
+      </div>
+      <div class="form-field form-field-wide">
+        <label for="experience-extra">${t.fields.extra}</label>
+        <textarea id="experience-extra" name="extra" rows="3"></textarea>
+      </div>
+      <button class="button button-dark" type="submit" disabled>
+        ${t.button}
+      </button>
+      <small id="suggestion-preview-note">${t.previewNote}</small>
+    </form>
+  `;
+}
+
+function coastFormMarkup(t) {
+  const optionsMarkup = (options) =>
+    options
+      .map(
+        (option) =>
+          `<option value="${option.value}">${option.label}</option>`,
+      )
+      .join("");
+
+  return `
+    <form class="coast-form" aria-describedby="coast-preview-note">
+      <div class="form-field">
+        <label for="coast-name">${t.fields.name}</label>
+        <input id="coast-name" name="name" type="text" autocomplete="name" />
+      </div>
+      <div class="form-field">
+        <label for="coast-interest">${t.fields.interest}</label>
+        <select id="coast-interest" name="interest">
+          ${optionsMarkup(t.options.interest)}
+        </select>
+      </div>
+      <div class="form-field">
+        <label for="coast-party-size">${t.fields.partySize}</label>
+        <input
+          id="coast-party-size"
+          name="partySize"
+          type="number"
+          min="1"
+          max="20"
+          value="1"
+        />
+      </div>
+      <div class="form-field">
+        <label for="coast-nights">${t.fields.nights}</label>
+        <input id="coast-nights" name="nights" type="number" min="0" max="7" />
+      </div>
+      <div class="form-field">
+        <label for="coast-destination">${t.fields.destination}</label>
+        <select id="coast-destination" name="destination">
+          ${optionsMarkup(t.options.destination)}
+        </select>
+      </div>
+      <div class="form-field">
+        <label for="coast-style">${t.fields.style}</label>
+        <select id="coast-style" name="style">
+          ${optionsMarkup(t.options.style)}
+        </select>
+      </div>
+      <div class="form-field form-field-wide">
+        <label for="coast-note">${t.fields.note}</label>
+        <textarea id="coast-note" name="note" rows="3"></textarea>
+      </div>
+      <button class="button button-dark" type="submit" disabled>
+        ${t.button}
+      </button>
+      <small id="coast-preview-note">${t.previewNote}</small>
     </form>
   `;
 }
@@ -420,6 +582,60 @@ function render(language) {
           </div>
         </section>
 
+        <section class="food-section section" id="food">
+          <div class="experience-heading reveal">
+            <p class="eyebrow">${t.food.eyebrow}</p>
+            <h2>${t.food.title}</h2>
+            <p class="lead">${t.food.body}</p>
+          </div>
+          <div class="food-grid">
+            ${t.food.days
+              .map(
+                (day) => `
+                  <article class="food-day reveal">
+                    <p class="food-day-label">${day.day}</p>
+                    <h3>${day.title}</h3>
+                    <ul>
+                      ${day.items.map((item) => `<li>${item}</li>`).join("")}
+                    </ul>
+                  </article>
+                `,
+              )
+              .join("")}
+          </div>
+          <p class="experience-note reveal">${t.food.note}</p>
+        </section>
+
+        <section class="music-section section" id="music">
+          <div class="experience-heading reveal">
+            <p class="eyebrow">${t.music.eyebrow}</p>
+            <h2>${t.music.title}</h2>
+            <p class="lead">${t.music.body}</p>
+          </div>
+          <div class="music-lineup">
+            ${t.music.acts
+              .map(
+                (act, index) => `
+                  <article class="music-act reveal">
+                    <span>0${index + 1}</span>
+                    <p>${act.moment}</p>
+                    <h3>${act.name}</h3>
+                    <small>${act.note}</small>
+                  </article>
+                `,
+              )
+              .join("")}
+          </div>
+          <div class="open-stage reveal">
+            <div>
+              <p class="eyebrow">${t.music.stage.eyebrow}</p>
+              <h3>${t.music.stage.title}</h3>
+              <p>${t.music.stage.body}</p>
+            </div>
+            ${suggestionFormMarkup(t.suggestions)}
+          </div>
+        </section>
+
         <section class="venue-section section" id="venue">
           <div class="venue-visual reveal">
             <div class="venue-horizon" aria-hidden="true"></div>
@@ -442,6 +658,29 @@ function render(language) {
               ${t.venue.map} ↗
             </a>
           </div>
+        </section>
+
+        <section class="facilities-section section" id="facilities">
+          <div class="experience-heading reveal">
+            <p class="eyebrow">${t.facilities.eyebrow}</p>
+            <h2>${t.facilities.title}</h2>
+            <p class="lead">${t.facilities.body}</p>
+          </div>
+          <div class="facilities-grid">
+            ${t.facilities.groups
+              .map(
+                (group) => `
+                  <article class="facility-group reveal">
+                    <h3>${group.title}</h3>
+                    <ul>
+                      ${group.items.map((item) => `<li>${item}</li>`).join("")}
+                    </ul>
+                  </article>
+                `,
+              )
+              .join("")}
+          </div>
+          <p class="facilities-note">${t.facilities.note}</p>
         </section>
 
         <section class="accommodation-section section" id="accommodation">
@@ -537,6 +776,33 @@ function render(language) {
             <h2>${t.attire.title}</h2>
             <p class="lead">${t.attire.body}</p>
             <p class="note">${t.attire.guestNote}</p>
+          </div>
+        </section>
+
+        <section class="coast-section section" id="after">
+          <div class="coast-copy reveal">
+            <p class="eyebrow">${t.coast.eyebrow}</p>
+            <h2>${t.coast.title}</h2>
+            <p class="lead">${t.coast.body}</p>
+            <div class="coast-ideas">
+              ${t.coast.ideas
+                .map(
+                  (idea) => `
+                    <article>
+                      <strong>${idea.title}</strong>
+                      <span>${idea.body}</span>
+                    </article>
+                  `,
+                )
+                .join("")}
+            </div>
+            <p class="coast-note">${t.coast.note}</p>
+          </div>
+          <div class="coast-form-wrap reveal">
+            <p class="eyebrow">${t.coast.form.eyebrow}</p>
+            <h3>${t.coast.form.title}</h3>
+            <p>${t.coast.form.body}</p>
+            ${coastFormMarkup(t.coast.form)}
           </div>
         </section>
 

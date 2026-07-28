@@ -57,6 +57,14 @@ The sticky countdown targets `2027-02-20T00:00:00-06:00`, local time in Jalisco.
 - Public WhatsApp links connect interested guests directly with David or Aydé.
 - The unified RSVP preview collects attendance, accommodation preference and
   optional inbound/outbound flight details for long-distance guests.
+- The RSVP identifies individuals and groups, counts adults and guests under
+  18, and offers only the complete two-night lodging package or no lodging.
+- Food and live-music sections present the draft programme and collect dessert,
+  menu, song, and open-stage suggestions.
+- The facilities section groups the reported Roca Azul services with a clear
+  availability disclaimer.
+- A post-wedding Costalegre survey explores Barra de Navidad, Manzanillo, and
+  flexible shared or independent stay formats.
 - Vite copies only imported approved assets into the production build.
 
 ## Before publication

@@ -67,3 +67,6 @@ Prioridad: `P1` | `P2` | `P3`
 | T-060 | Validar copy trilingue, precios y reglas de asignacion del alojamiento en Roca Azul | David + Ayde | 2026-08-20 | P1 | doing | T-028, T-058 |
 | T-061 | Conectar formulario RSVP privado unificado y definir destino de respuestas | David + Ayde + Copilot | 2026-08-25 | P1 | doing | T-060 |
 | T-062 | Validar campos condicionales y privacidad del RSVP (asistencia, alojamiento y vuelos) | David + Ayde + Copilot | 2026-08-25 | P1 | todo | T-061 |
+| T-063 | Validar overview trilingue de comidas, postres, musica en vivo y escena abierta | David + Ayde | 2026-08-20 | P2 | doing | T-058 |
+| T-064 | Validar y activar sondeo post-boda Costalegre (destino, noches, formato y presupuesto) | David + Ayde + Copilot | 2026-08-25 | P2 | doing | T-061 |
+| T-065 | Implementar gate serverless con clave compartida, cookie segura y limite de intentos | Copilot + David | 2026-09-01 | P1 | todo | T-005, T-061 |

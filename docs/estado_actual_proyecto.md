@@ -14,6 +14,11 @@
 - Alojamiento web: mensaje trilingue añadido para explicar capacidad aproximada de 80 personas, costo para quienes lo utilicen, necesidad de avisar pronto y libertad de organizar una estancia independiente; formulario de interes preparado en modo vista previa.
 - Alojamiento: precio estimado publicado en 500 MXN por persona/noche con dos desayunos del fin de semana; alojamiento regalado a padrinos y contactos WhatsApp directos de David y Ayde autorizados.
 - RSVP: formulario trilingue unificado preparado en vista previa para asistencia, acompanantes, alojamiento y viajes de larga distancia (origen, destino, fechas, horarios, aerolineas, vuelos y escalas).
+- RSVP grupos: identidad separada, nombre de grupo/familia, total, adultos y menores de 18 anadidos; alojamiento limitado a paquete completo de dos noches o alojamiento independiente.
+- Experiencia invitados: overview trilingue de comidas y musica en vivo incorporado, con formularios de sugerencias de postre, menu, canciones y escena abierta.
+- Club: instalaciones publicadas de Roca Azul agrupadas para el sabado, con aviso de disponibilidad, horarios y posibles suplementos.
+- Despues de la boda: sondeo Costalegre preparado para Barra de Navidad, Manzanillo y formatos de estancia compartida o independiente.
+- Acceso: definida arquitectura para clave compartida `vivamexico`; gate solo cliente aceptable para preview, pero publicacion y formularios requieren validacion serverless y secreto fuera de Git.
 - Timeline de viajeros: vista privada por grupos creada; incluye Dimitar + acompañante y Mama Tina (10 febrero-15 marzo, fechas tentativas).
 
 ## FR - Ou on en est aujourd'hui
@@ -30,6 +35,11 @@
 - Hebergement web : texte trilingue ajoute pour expliquer la capacite d’environ 80 personnes, le cout pour celles et ceux qui l’utilisent, la necessite de repondre rapidement et la liberte d’organiser un sejour independant ; formulaire d’interet prepare en mode apercu.
 - Hebergement : tarif estimatif publie a 500 MXN par personne/nuit avec les deux petits-dejeuners du week-end ; hebergement offert aux padrinos et liens WhatsApp directs de David et Ayde autorises.
 - RSVP : formulaire trilingue unifie prepare en apercu pour presence, accompagnants, hebergement et voyages longue distance (origine, destination, dates, horaires, compagnies, vols et escales).
+- RSVP groupes : identite separee, nom du groupe/famille, total, adultes et mineurs de moins de 18 ans ajoutes ; hebergement limite au forfait complet de deux nuits ou a une organisation independante.
+- Experience invites : apercu trilingue des repas et de la musique live ajoute, avec formulaires de suggestions pour dessert, menu, chansons et scene ouverte.
+- Club : installations publiees de Roca Azul regroupees pour le samedi, avec reserve sur disponibilite, horaires et supplements possibles.
+- Apres le mariage : sondage Costalegre prepare pour Barra de Navidad, Manzanillo et des formats de sejour partages ou independants.
+- Acces : architecture definie pour la cle partagee `vivamexico` ; une porte uniquement cote client convient a l’apercu, mais publication et formulaires exigent une validation serverless et un secret hors de Git.
 - Calendrier voyageurs : vue privee par groupes creee ; elle inclut Dimitar + accompagnante et Mama Tina (10 fevrier-15 mars, dates provisoires).
 
 ## ES - Foco inmediato
