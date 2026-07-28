@@ -852,6 +852,31 @@ h2 {
   color: rgb(36 33 25 / 75%);
 }
 
+.accommodation-contacts {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(36 33 25 / 20%);
+}
+
+.accommodation-contacts span {
+  margin-bottom: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.accommodation-contacts a {
+  width: fit-content;
+  padding-bottom: 0.2rem;
+  border-bottom: 1px solid var(--terracotta);
+  color: var(--terracotta);
+  font-family: "Italiana", serif;
+  font-size: 1.15rem;
+}
+
 .accommodation-form-wrap {
   padding: clamp(2rem, 4vw, 4rem);
   background: var(--sand);
@@ -869,20 +894,14 @@ h2 {
   margin-bottom: 2rem;
 }
 
-.accommodation-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
-}
-
 .form-field {
   display: grid;
   gap: 0.45rem;
 }
 
 .form-field-wide,
-.accommodation-form .button,
-.accommodation-form > small {
+.rsvp-form .button,
+.rsvp-form > small {
   grid-column: 1 / -1;
 }
 
@@ -919,9 +938,28 @@ h2 {
   outline-offset: 3px;
 }
 
-.accommodation-form > small {
-  color: rgb(36 33 25 / 65%);
-  text-align: center;
+.accommodation-steps {
+  margin: 2rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.accommodation-steps li {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  border-top: 1px solid rgb(36 33 25 / 20%);
+}
+
+.accommodation-steps span {
+  color: var(--terracotta);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+}
+
+.accommodation-steps p {
+  margin: 0;
 }
 
 .travel-section {
@@ -1088,11 +1126,13 @@ h2 {
 }
 
 .rsvp-frame {
-  width: min(100%, 58rem);
+  width: min(100%, 76rem);
   padding: clamp(3rem, 8vw, 7rem);
-  border: 1px solid var(--terracotta);
-  outline: 1px solid var(--terracotta);
+  border: 1px solid #e4b968;
+  outline: 1px solid #e4b968;
   outline-offset: -0.7rem;
+  background: var(--deep-green);
+  color: var(--white);
 }
 
 .rsvp-frame h2 {
@@ -1104,6 +1144,63 @@ h2 {
   margin: 0 auto 2rem;
 }
 
+.rsvp-form {
+  display: grid;
+  gap: 2.5rem;
+  margin-top: 3rem;
+  text-align: left;
+}
+
+.rsvp-form fieldset {
+  margin: 0;
+  border: 1px solid rgb(255 255 255 / 28%);
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.rsvp-form legend {
+  padding: 0 0.75rem;
+  color: #e4b968;
+  font-family: "Italiana", serif;
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+}
+
+.rsvp-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.rsvp-form .form-field label {
+  color: rgb(255 253 248 / 75%);
+}
+
+.rsvp-form .form-field input,
+.rsvp-form .form-field select,
+.rsvp-form .form-field textarea {
+  border-color: rgb(255 255 255 / 45%);
+  color: var(--white);
+}
+
+.rsvp-form .form-field select option {
+  color: var(--ink);
+}
+
+.rsvp-form .form-field input:focus,
+.rsvp-form .form-field select:focus,
+.rsvp-form .form-field textarea:focus {
+  outline-color: #e4b968;
+}
+
+.fieldset-note {
+  max-width: 46rem;
+  margin: 0 0 1.5rem;
+  color: rgb(255 253 248 / 70%);
+}
+
+.rsvp-form > small {
+  text-align: center;
+}
+
 .rsvp-frame .button {
   margin: 1rem auto;
 }
@@ -1111,7 +1208,7 @@ h2 {
 .rsvp-frame small {
   display: block;
   margin-top: 1rem;
-  color: var(--terracotta);
+  color: #e4b968;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -1326,7 +1423,7 @@ h2 {
   }
 
   .accommodation-facts,
-  .accommodation-form {
+  .rsvp-form-grid {
     grid-template-columns: 1fr;
   }
 
@@ -1342,8 +1439,8 @@ h2 {
 
   .form-field,
   .form-field-wide,
-  .accommodation-form .button,
-  .accommodation-form > small {
+  .rsvp-form .button,
+  .rsvp-form > small {
     grid-column: 1;
   }
 

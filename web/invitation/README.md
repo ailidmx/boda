@@ -51,8 +51,12 @@ The sticky countdown targets `2027-02-20T00:00:00-06:00`, local time in Jalisco.
   manual selection and pause controls.
 - The header monogram alternates between `D. & A.` (“DNA”) and `A. & D.`
   (“Aydé”), while respecting reduced-motion preferences.
-- The accommodation section explains the approximate 80-person capacity and
-  includes a non-submitting interest-form preview in all three languages.
+- The accommodation section explains the approximate 80-person capacity,
+  estimated price, included breakfasts, allocation process, and padrino gift
+  in all three languages.
+- Public WhatsApp links connect interested guests directly with David or Aydé.
+- The unified RSVP preview collects attendance, accommodation preference and
+  optional inbound/outbound flight details for long-distance guests.
 - Vite copies only imported approved assets into the production build.
 
 ## Before publication

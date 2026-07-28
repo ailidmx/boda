@@ -71,61 +71,155 @@ function scheduleMarkup(items) {
     .join("");
 }
 
-function accommodationFormMarkup(t) {
+function rsvpFormMarkup(t) {
+  const optionsMarkup = (options) =>
+    options
+      .map(
+        (option) =>
+          `<option value="${option.value}">${option.label}</option>`,
+      )
+      .join("");
+
   return `
-    <form class="accommodation-form reveal" aria-describedby="stay-form-note">
-      <div class="form-field">
-        <label for="stay-name">${t.fields.name}</label>
-        <input id="stay-name" name="name" type="text" autocomplete="name" />
-      </div>
-      <div class="form-field">
-        <label for="stay-contact">${t.fields.contact}</label>
-        <input
-          id="stay-contact"
-          name="contact"
-          type="text"
-          autocomplete="email"
-        />
-      </div>
-      <div class="form-field">
-        <label for="stay-party-size">${t.fields.partySize}</label>
-        <input
-          id="stay-party-size"
-          name="partySize"
-          type="number"
-          min="1"
-          max="12"
-          value="1"
-        />
-      </div>
-      <div class="form-field">
-        <label for="stay-plan">${t.fields.plan}</label>
-        <select id="stay-plan" name="plan">
-          ${t.options
-            .map(
-              (option) =>
-                `<option value="${option.value}">${option.label}</option>`,
-            )
-            .join("")}
-        </select>
-      </div>
-      <div class="form-field form-field-wide">
-        <label for="stay-nights">${t.fields.nights}</label>
-        <input
-          id="stay-nights"
-          name="nights"
-          type="text"
-          placeholder="${t.fields.nightsPlaceholder}"
-        />
-      </div>
-      <div class="form-field form-field-wide">
-        <label for="stay-note">${t.fields.note}</label>
-        <textarea id="stay-note" name="note" rows="4"></textarea>
-      </div>
-      <button class="button button-dark" type="submit" disabled>
+    <form class="rsvp-form" aria-describedby="rsvp-preview-note">
+      <fieldset>
+        <legend>${t.groups.attendance}</legend>
+        <div class="rsvp-form-grid">
+          <div class="form-field">
+            <label for="rsvp-name">${t.fields.name}</label>
+            <input id="rsvp-name" name="name" type="text" autocomplete="name" />
+          </div>
+          <div class="form-field">
+            <label for="rsvp-contact">${t.fields.contact}</label>
+            <input
+              id="rsvp-contact"
+              name="contact"
+              type="text"
+              autocomplete="email"
+            />
+          </div>
+          <div class="form-field">
+            <label for="rsvp-attendance">${t.fields.attendance}</label>
+            <select id="rsvp-attendance" name="attendance">
+              ${optionsMarkup(t.options.attendance)}
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="rsvp-party-size">${t.fields.partySize}</label>
+            <input
+              id="rsvp-party-size"
+              name="partySize"
+              type="number"
+              min="1"
+              max="12"
+              value="1"
+            />
+          </div>
+          <div class="form-field form-field-wide">
+            <label for="rsvp-guests">${t.fields.guests}</label>
+            <input id="rsvp-guests" name="guests" type="text" />
+          </div>
+          <div class="form-field form-field-wide">
+            <label for="rsvp-accommodation">${t.fields.accommodation}</label>
+            <select id="rsvp-accommodation" name="accommodation">
+              ${optionsMarkup(t.options.accommodation)}
+            </select>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>${t.groups.travel}</legend>
+        <p class="fieldset-note">${t.travelNote}</p>
+        <div class="rsvp-form-grid">
+          <div class="form-field form-field-wide">
+            <label for="travel-status">${t.fields.travelStatus}</label>
+            <select id="travel-status" name="travelStatus">
+              ${optionsMarkup(t.options.travelStatus)}
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="arrival-from">${t.fields.arrivalFrom}</label>
+            <input id="arrival-from" name="arrivalFrom" type="text" />
+          </div>
+          <div class="form-field">
+            <label for="arrival-to">${t.fields.arrivalTo}</label>
+            <input
+              id="arrival-to"
+              name="arrivalTo"
+              type="text"
+              placeholder="GDL"
+            />
+          </div>
+          <div class="form-field">
+            <label for="arrival-date">${t.fields.arrivalDate}</label>
+            <input id="arrival-date" name="arrivalDate" type="date" />
+          </div>
+          <div class="form-field">
+            <label for="arrival-time">${t.fields.arrivalTime}</label>
+            <input id="arrival-time" name="arrivalTime" type="time" />
+          </div>
+          <div class="form-field">
+            <label for="arrival-airline">${t.fields.arrivalAirline}</label>
+            <input id="arrival-airline" name="arrivalAirline" type="text" />
+          </div>
+          <div class="form-field">
+            <label for="arrival-flight">${t.fields.arrivalFlight}</label>
+            <input id="arrival-flight" name="arrivalFlight" type="text" />
+          </div>
+          <div class="form-field">
+            <label for="departure-from">${t.fields.departureFrom}</label>
+            <input
+              id="departure-from"
+              name="departureFrom"
+              type="text"
+              placeholder="GDL"
+            />
+          </div>
+          <div class="form-field">
+            <label for="departure-to">${t.fields.departureTo}</label>
+            <input id="departure-to" name="departureTo" type="text" />
+          </div>
+          <div class="form-field">
+            <label for="departure-date">${t.fields.departureDate}</label>
+            <input id="departure-date" name="departureDate" type="date" />
+          </div>
+          <div class="form-field">
+            <label for="departure-time">${t.fields.departureTime}</label>
+            <input id="departure-time" name="departureTime" type="time" />
+          </div>
+          <div class="form-field">
+            <label for="departure-airline">${t.fields.departureAirline}</label>
+            <input id="departure-airline" name="departureAirline" type="text" />
+          </div>
+          <div class="form-field">
+            <label for="departure-flight">${t.fields.departureFlight}</label>
+            <input id="departure-flight" name="departureFlight" type="text" />
+          </div>
+          <div class="form-field form-field-wide">
+            <label for="travel-route">${t.fields.route}</label>
+            <input
+              id="travel-route"
+              name="route"
+              type="text"
+              placeholder="${t.fields.routePlaceholder}"
+            />
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>${t.groups.notes}</legend>
+        <div class="form-field">
+          <label for="rsvp-notes">${t.fields.notes}</label>
+          <textarea id="rsvp-notes" name="notes" rows="4"></textarea>
+        </div>
+      </fieldset>
+
+      <button class="button button-light" type="submit" disabled>
         ${t.button}
       </button>
-      <small id="stay-form-note">${t.previewNote}</small>
+      <small id="rsvp-preview-note">${t.previewNote}</small>
     </form>
   `;
 }
@@ -368,12 +462,42 @@ function render(language) {
                 .join("")}
             </div>
             <p class="accommodation-note">${t.accommodation.specialNote}</p>
+            <div class="accommodation-contacts">
+              <span>${t.accommodation.contactPrompt}</span>
+              ${Object.values(EVENT.contacts)
+                .map(
+                  (contact) => `
+                    <a
+                      href="${contact.whatsapp}"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      ${contact.label} · ${contact.phone} ↗
+                    </a>
+                  `,
+                )
+                .join("")}
+            </div>
           </div>
           <div class="accommodation-form-wrap">
-            <p class="eyebrow">${t.accommodation.form.eyebrow}</p>
-            <h3>${t.accommodation.form.title}</h3>
-            <p>${t.accommodation.form.body}</p>
-            ${accommodationFormMarkup(t.accommodation.form)}
+            <p class="eyebrow">${t.accommodation.plan.eyebrow}</p>
+            <h3>${t.accommodation.plan.title}</h3>
+            <p>${t.accommodation.plan.body}</p>
+            <ol class="accommodation-steps">
+              ${t.accommodation.plan.steps
+                .map(
+                  (step, index) => `
+                    <li>
+                      <span>0${index + 1}</span>
+                      <p>${step}</p>
+                    </li>
+                  `,
+                )
+                .join("")}
+            </ol>
+            <a class="button button-dark" href="#rsvp">
+              ${t.accommodation.plan.button}
+            </a>
           </div>
         </section>
 
@@ -421,10 +545,7 @@ function render(language) {
             <p class="eyebrow">${t.rsvp.eyebrow}</p>
             <h2>${t.rsvp.title}</h2>
             <p>${t.rsvp.body}</p>
-            <button class="button button-light" type="button" disabled>
-              ${t.rsvp.button}
-            </button>
-            <small>${t.rsvp.dateNote}</small>
+            ${rsvpFormMarkup(t.rsvp)}
           </div>
         </section>
       </main>
@@ -441,6 +562,20 @@ function render(language) {
   bindHeroSlideshow(t.hero);
   observeReveals();
   updateCountdown(language);
+
+  const hashTarget = document.getElementById(window.location.hash.slice(1));
+  if (hashTarget) {
+    hashTarget
+      .querySelectorAll(".reveal")
+      .forEach((element) => element.classList.add("is-visible"));
+    window.requestAnimationFrame(() =>
+      hashTarget.scrollIntoView({ block: "start" }),
+    );
+    window.setTimeout(
+      () => hashTarget.scrollIntoView({ block: "start" }),
+      500,
+    );
+  }
 }
 
 function setLanguage(language) {

@@ -8,6 +8,18 @@ export const EVENT = {
   place: "Jocotepec · Jalisco · México",
   mapUrl:
     "https://www.google.com/maps/search/?api=1&query=Club+Roca+Azul+Jocotepec",
+  contacts: {
+    david: {
+      label: "David",
+      phone: "+52 33 3201 7504",
+      whatsapp: "https://wa.me/523332017504",
+    },
+    ayde: {
+      label: "Aydé",
+      phone: "+52 33 3661 6738",
+      whatsapp: "https://wa.me/523336616738",
+    },
+  },
 };
 
 export const content = {
@@ -106,33 +118,24 @@ export const content = {
         "Contamos con alojamiento en el lugar para aproximadamente 80 personas. Como necesitamos distribuir las cabañas y las habitaciones con cuidado, les pedimos que nos indiquen cuanto antes si desean aprovechar esta opción.",
       facts: [
         { value: "≈ 80", label: "lugares disponibles" },
-        { value: "2", label: "noches principales" },
-        { value: "19–21", label: "febrero de 2027" },
+        { value: "$500 MXN", label: "por persona y noche" },
+        { value: "2", label: "desayunos incluidos" },
       ],
       specialNote:
-        "El alojamiento tiene un costo para quienes elijan este plan. Cualquier invitación o acuerdo especial con padrinos y patrocinadores se comunicará directamente. La mayoría de quienes viajan desde lejos ya está considerando hospedarse aquí; si prefieren organizar su estancia por su cuenta, no hay ningún problema: solo necesitamos saberlo con anticipación.",
-      form: {
-        eyebrow: "Interés de alojamiento",
-        title: "Cuéntennos su plan",
+        "El precio estimado es de $500 MXN por persona y por noche e incluye los dos desayunos del fin de semana; compartiremos más detalles próximamente. Nuestros queridos padrinos tienen el alojamiento de regalo. La mayoría de quienes viajan desde lejos ya está considerando hospedarse aquí; si prefieren organizar su estancia por su cuenta, no hay ningún problema: solo necesitamos saberlo con anticipación.",
+      contactPrompt:
+        "Si les interesa este plan, escríbannos directamente por WhatsApp:",
+      plan: {
+        eyebrow: "¿Cómo funciona?",
+        title: "Díganos qué prefieren",
         body:
-          "Esta respuesta nos ayudará a estimar la demanda. No constituye todavía una reserva ni un cobro.",
-        fields: {
-          name: "Nombre completo",
-          contact: "Correo o WhatsApp",
-          partySize: "Personas en su grupo",
-          plan: "Plan preferido",
-          nights: "Noches que necesitarían",
-          nightsPlaceholder: "Ej. viernes 19 y sábado 20",
-          note: "Comentarios, niñas/niños o necesidades especiales",
-        },
-        options: [
-          { value: "onsite", label: "Me interesa alojarme en Roca Azul" },
-          { value: "independent", label: "Organizaré mi propio alojamiento" },
-          { value: "undecided", label: "Todavía no lo sé" },
+          "Su respuesta nos permitirá reservar las cabañas de manera justa y organizada.",
+        steps: [
+          "Indiquen su preferencia de alojamiento en el RSVP.",
+          "Organizaremos las cabañas según grupos, fechas y disponibilidad.",
+          "Confirmaremos directamente la asignación, el precio final y la forma de pago.",
         ],
-        button: "Enviar mi interés",
-        previewNote:
-          "Vista previa: el envío se habilitará cuando abramos el formulario privado.",
+        button: "Responder al RSVP",
       },
     },
     travel: {
@@ -160,9 +163,61 @@ export const content = {
       eyebrow: "RSVP",
       title: "¿Nos acompañan?",
       body:
-        "La confirmación privada se abrirá pronto. Mientras tanto, por favor reserven el fin de semana completo.",
-      button: "RSVP próximamente",
-      dateNote: "20 de febrero de 2027 · Roca Azul",
+        "Una sola respuesta nos permitirá organizar su asistencia, alojamiento y viaje. Si todavía no tienen sus vuelos, podrán enviarlos más adelante.",
+      groups: {
+        attendance: "Asistencia y alojamiento",
+        travel: "Vengo desde lejos",
+        notes: "Un último detalle",
+      },
+      travelNote:
+        "Completen esta parte únicamente si viajan desde otra ciudad o país. Necesitamos los datos del trayecto de llegada y de regreso para coordinar los traslados.",
+      fields: {
+        name: "Nombre completo",
+        contact: "Correo o WhatsApp",
+        attendance: "¿Nos acompañan?",
+        partySize: "Personas en su grupo",
+        guests: "Nombres de acompañantes",
+        accommodation: "Plan de alojamiento",
+        travelStatus: "Situación de su viaje",
+        arrivalFrom: "Llegada desde",
+        arrivalTo: "Llegada a",
+        arrivalDate: "Fecha de llegada",
+        arrivalTime: "Hora estimada de llegada",
+        arrivalAirline: "Compañía de llegada",
+        arrivalFlight: "Número de vuelo de llegada",
+        departureFrom: "Regreso desde",
+        departureTo: "Regreso a",
+        departureDate: "Fecha de regreso",
+        departureTime: "Hora estimada de salida",
+        departureAirline: "Compañía de regreso",
+        departureFlight: "Número de vuelo de regreso",
+        route: "Ruta completa y escalas",
+        routePlaceholder: "Ej. Málaga → Madrid → Guadalajara",
+        notes: "Restricciones alimentarias, movilidad o comentarios",
+      },
+      options: {
+        attendance: [
+          { value: "yes", label: "Sí, con mucho gusto" },
+          { value: "no", label: "No podré acompañarlos" },
+          { value: "maybe", label: "Todavía no lo sé" },
+        ],
+        accommodation: [
+          { value: "onsite", label: "Me interesa alojarme en Roca Azul" },
+          { value: "independent", label: "Organizaré mi propio alojamiento" },
+          { value: "undecided", label: "Todavía no lo sé" },
+        ],
+        travelStatus: [
+          { value: "booked", label: "Viajo desde lejos y ya tengo billetes" },
+          {
+            value: "planning",
+            label: "Viajo desde lejos, pero aún estoy organizándolo",
+          },
+          { value: "local", label: "No necesito coordinación de viaje" },
+        ],
+      },
+      button: "Enviar mi respuesta",
+      previewNote:
+        "Vista previa: conectaremos el envío privado antes de publicar la invitación.",
     },
     footer: {
       line: "Con amor, desde México y Francia",
@@ -264,33 +319,24 @@ export const content = {
         "Nous disposons d’environ 80 places sur le lieu. Comme les cabanes et les chambres doivent être réparties avec soin, merci de nous indiquer dès que possible si cette option vous intéresse.",
       facts: [
         { value: "≈ 80", label: "places disponibles" },
-        { value: "2", label: "nuits principales" },
-        { value: "19–21", label: "février 2027" },
+        { value: "500 MXN", label: "par personne et par nuit" },
+        { value: "2", label: "petits-déjeuners inclus" },
       ],
       specialNote:
-        "L’hébergement est payant pour les personnes qui choisissent cette formule. Toute invitation ou disposition particulière avec les padrinos et sponsors sera communiquée directement. La plupart des personnes venant de loin envisagent déjà de loger sur place ; si vous préférez organiser votre séjour de votre côté, aucun souci : nous avons simplement besoin de le savoir à l’avance.",
-      form: {
-        eyebrow: "Intérêt hébergement",
-        title: "Parlez-nous de votre projet",
+        "Le tarif estimatif est de 500 MXN par personne et par nuit et comprend les deux petits-déjeuners du week-end ; davantage de détails suivront prochainement. L’hébergement est offert à nos chers padrinos. La plupart des personnes venant de loin envisagent déjà de loger sur place ; si vous préférez organiser votre séjour de votre côté, aucun souci : nous avons simplement besoin de le savoir à l’avance.",
+      contactPrompt:
+        "Si cette formule vous intéresse, écrivez-nous directement sur WhatsApp :",
+      plan: {
+        eyebrow: "Comment ça marche ?",
+        title: "Dites-nous ce que vous préférez",
         body:
-          "Cette réponse nous aidera à estimer les besoins. Elle ne constitue pas encore une réservation ni un paiement.",
-        fields: {
-          name: "Nom complet",
-          contact: "E-mail ou WhatsApp",
-          partySize: "Personnes dans votre groupe",
-          plan: "Option envisagée",
-          nights: "Nuits dont vous auriez besoin",
-          nightsPlaceholder: "Ex. vendredi 19 et samedi 20",
-          note: "Commentaires, enfants ou besoins particuliers",
-        },
-        options: [
-          { value: "onsite", label: "Je souhaite loger à Roca Azul" },
-          { value: "independent", label: "J’organiserai mon propre hébergement" },
-          { value: "undecided", label: "Je ne sais pas encore" },
+          "Votre réponse nous permettra de répartir les cabanes de façon juste et organisée.",
+        steps: [
+          "Indiquez votre préférence d’hébergement dans le RSVP.",
+          "Nous organiserons les cabanes selon les groupes, les dates et les disponibilités.",
+          "Nous confirmerons directement l’attribution, le tarif final et le paiement.",
         ],
-        button: "Envoyer mon intérêt",
-        previewNote:
-          "Aperçu : l’envoi sera activé à l’ouverture du formulaire privé.",
+        button: "Répondre au RSVP",
       },
     },
     travel: {
@@ -318,9 +364,61 @@ export const content = {
       eyebrow: "RSVP",
       title: "Serez-vous avec nous ?",
       body:
-        "La confirmation privée ouvrira bientôt. En attendant, merci de réserver le week-end complet.",
-      button: "RSVP prochainement",
-      dateNote: "20 février 2027 · Roca Azul",
+        "Une seule réponse nous permettra d’organiser votre présence, votre hébergement et votre voyage. Si vos vols ne sont pas encore réservés, vous pourrez nous les transmettre plus tard.",
+      groups: {
+        attendance: "Présence et hébergement",
+        travel: "Je viens de loin",
+        notes: "Un dernier détail",
+      },
+      travelNote:
+        "Remplissez cette partie uniquement si vous venez d’une autre ville ou d’un autre pays. Nous avons besoin des trajets aller et retour pour organiser les transferts.",
+      fields: {
+        name: "Nom complet",
+        contact: "E-mail ou WhatsApp",
+        attendance: "Serez-vous avec nous ?",
+        partySize: "Personnes dans votre groupe",
+        guests: "Noms des accompagnants",
+        accommodation: "Projet d’hébergement",
+        travelStatus: "État de votre voyage",
+        arrivalFrom: "Arrivée depuis",
+        arrivalTo: "Arrivée à",
+        arrivalDate: "Date d’arrivée",
+        arrivalTime: "Heure d’arrivée estimée",
+        arrivalAirline: "Compagnie à l’arrivée",
+        arrivalFlight: "Numéro du vol d’arrivée",
+        departureFrom: "Retour depuis",
+        departureTo: "Retour vers",
+        departureDate: "Date de retour",
+        departureTime: "Heure de départ estimée",
+        departureAirline: "Compagnie au retour",
+        departureFlight: "Numéro du vol retour",
+        route: "Itinéraire complet et escales",
+        routePlaceholder: "Ex. Málaga → Madrid → Guadalajara",
+        notes: "Régime alimentaire, mobilité ou commentaires",
+      },
+      options: {
+        attendance: [
+          { value: "yes", label: "Oui, avec grand plaisir" },
+          { value: "no", label: "Je ne pourrai pas être présent·e" },
+          { value: "maybe", label: "Je ne sais pas encore" },
+        ],
+        accommodation: [
+          { value: "onsite", label: "Je souhaite loger à Roca Azul" },
+          { value: "independent", label: "J’organiserai mon propre hébergement" },
+          { value: "undecided", label: "Je ne sais pas encore" },
+        ],
+        travelStatus: [
+          { value: "booked", label: "Je viens de loin et mes billets sont réservés" },
+          {
+            value: "planning",
+            label: "Je viens de loin, mais mon voyage est encore en préparation",
+          },
+          { value: "local", label: "Je n’ai pas besoin de coordination de voyage" },
+        ],
+      },
+      button: "Envoyer ma réponse",
+      previewNote:
+        "Aperçu : l’envoi privé sera connecté avant la publication de l’invitation.",
     },
     footer: {
       line: "Avec amour, depuis le Mexique et la France",
@@ -421,33 +519,24 @@ export const content = {
         "We have accommodation at the venue for approximately 80 people. As the cabins and rooms need to be allocated carefully, please let us know as soon as possible if you would like to use this option.",
       facts: [
         { value: "≈ 80", label: "places available" },
-        { value: "2", label: "main nights" },
-        { value: "19–21", label: "February 2027" },
+        { value: "MXN 500", label: "per person, per night" },
+        { value: "2", label: "breakfasts included" },
       ],
       specialNote:
-        "Accommodation has a cost for guests choosing this plan. Any invitation or special arrangement with padrinos and sponsors will be communicated directly. Most guests travelling from afar are already considering staying here; if you prefer to arrange your own accommodation, that is absolutely fine—we simply need to know in advance.",
-      form: {
-        eyebrow: "Accommodation interest",
-        title: "Tell us your plan",
+        "The estimated price is MXN 500 per person, per night and includes both weekend breakfasts; more details will follow soon. Accommodation is our gift to our beloved padrinos. Most guests travelling from afar are already considering staying here; if you prefer to arrange your own accommodation, that is absolutely fine—we simply need to know in advance.",
+      contactPrompt:
+        "If you are interested in this plan, contact us directly on WhatsApp:",
+      plan: {
+        eyebrow: "How does it work?",
+        title: "Tell us what you prefer",
         body:
-          "This response will help us estimate demand. It is not yet a booking or a payment.",
-        fields: {
-          name: "Full name",
-          contact: "Email or WhatsApp",
-          partySize: "People in your group",
-          plan: "Preferred plan",
-          nights: "Nights you would need",
-          nightsPlaceholder: "E.g. Friday 19 and Saturday 20",
-          note: "Comments, children, or special requirements",
-        },
-        options: [
-          { value: "onsite", label: "I’m interested in staying at Roca Azul" },
-          { value: "independent", label: "I’ll arrange my own accommodation" },
-          { value: "undecided", label: "I’m not sure yet" },
+          "Your response will help us allocate the cabins fairly and thoughtfully.",
+        steps: [
+          "Select your accommodation preference in the RSVP.",
+          "We will arrange cabins according to groups, dates, and availability.",
+          "We will confirm the allocation, final price, and payment details directly.",
         ],
-        button: "Send my interest",
-        previewNote:
-          "Preview: submissions will open with the private form.",
+        button: "Answer the RSVP",
       },
     },
     travel: {
@@ -474,9 +563,61 @@ export const content = {
       eyebrow: "RSVP",
       title: "Will you join us?",
       body:
-        "Private confirmations will open soon. For now, please save the entire weekend.",
-      button: "RSVP coming soon",
-      dateNote: "February 20, 2027 · Roca Azul",
+        "One response will help us organise your attendance, accommodation, and journey. If your flights are not booked yet, you can share them later.",
+      groups: {
+        attendance: "Attendance and accommodation",
+        travel: "Coming from afar",
+        notes: "One last detail",
+      },
+      travelNote:
+        "Complete this part only if you are travelling from another city or country. We need both arrival and return details to coordinate transfers.",
+      fields: {
+        name: "Full name",
+        contact: "Email or WhatsApp",
+        attendance: "Will you join us?",
+        partySize: "People in your group",
+        guests: "Names of accompanying guests",
+        accommodation: "Accommodation plan",
+        travelStatus: "Travel status",
+        arrivalFrom: "Arriving from",
+        arrivalTo: "Arriving at",
+        arrivalDate: "Arrival date",
+        arrivalTime: "Estimated arrival time",
+        arrivalAirline: "Arrival airline",
+        arrivalFlight: "Arrival flight number",
+        departureFrom: "Returning from",
+        departureTo: "Returning to",
+        departureDate: "Return date",
+        departureTime: "Estimated departure time",
+        departureAirline: "Return airline",
+        departureFlight: "Return flight number",
+        route: "Full route and connections",
+        routePlaceholder: "E.g. Málaga → Madrid → Guadalajara",
+        notes: "Dietary, mobility, or other comments",
+      },
+      options: {
+        attendance: [
+          { value: "yes", label: "Yes, with pleasure" },
+          { value: "no", label: "I won’t be able to attend" },
+          { value: "maybe", label: "I’m not sure yet" },
+        ],
+        accommodation: [
+          { value: "onsite", label: "I’m interested in staying at Roca Azul" },
+          { value: "independent", label: "I’ll arrange my own accommodation" },
+          { value: "undecided", label: "I’m not sure yet" },
+        ],
+        travelStatus: [
+          { value: "booked", label: "I’m travelling from afar and have tickets" },
+          {
+            value: "planning",
+            label: "I’m travelling from afar but still planning",
+          },
+          { value: "local", label: "I don’t need travel coordination" },
+        ],
+      },
+      button: "Send my response",
+      previewNote:
+        "Preview: private submissions will be connected before publication.",
     },
     footer: {
       line: "With love, from Mexico and France",

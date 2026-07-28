@@ -65,4 +65,5 @@ Prioridad: `P1` | `P2` | `P3`
 | T-058 | Aprobar contenido ES/FR/EN, rotacion de cuatro fotografias del hero y horario objetivo del contador | David + Ayde | 2026-08-15 | P1 | doing | T-004 |
 | T-059 | Confirmar viaje de Mama Tina del 10 de febrero al 15 de marzo: fechas, vuelos, estancias y traslados | Ayde + Mama Tina | 2026-08-15 | P1 | blocked | T-020, T-021 |
 | T-060 | Validar copy trilingue, precios y reglas de asignacion del alojamiento en Roca Azul | David + Ayde | 2026-08-20 | P1 | doing | T-028, T-058 |
-| T-061 | Conectar formulario privado de interes de alojamiento y definir destino de respuestas | David + Ayde + Copilot | 2026-08-25 | P1 | todo | T-060 |
+| T-061 | Conectar formulario RSVP privado unificado y definir destino de respuestas | David + Ayde + Copilot | 2026-08-25 | P1 | doing | T-060 |
+| T-062 | Validar campos condicionales y privacidad del RSVP (asistencia, alojamiento y vuelos) | David + Ayde + Copilot | 2026-08-25 | P1 | todo | T-061 |
