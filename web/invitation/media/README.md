@@ -22,4 +22,3 @@ This directory stores submitted source material. Files here are never imported d
 ## Privacy rule
 
 Images containing phone numbers, addresses, reservation codes or other personal information remain `source_only` unless public publication is explicitly approved. Never connect an original directly to the invitation.
-
