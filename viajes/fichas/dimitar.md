@@ -41,4 +41,3 @@
 ## FR - Points a confirmer
 
 Nous devons encore recevoir les quatre segments du billet, les horaires definitifs, les bagages, le contact WhatsApp, les hebergements avant et apres le mariage et la confirmation que Dimitar +1 suit le meme itineraire.
-

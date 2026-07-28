@@ -41,4 +41,3 @@ We are already organizing your arrival for the wedding. Please send us:
 - any mobility requirements.
 
 We do not need your passport, ticket number, or booking reference.
-

@@ -35,4 +35,3 @@ No guardar aqui pasaporte, fecha de nacimiento, numero de boleto, localizador de
 ## FR - Principe
 
 Chaque invite venant de loin aura une fiche reliee a ses vols, ses hebergements et ses transferts. Les donnees sensibles comme le passeport, le numero de billet ou le code de reservation ne doivent pas etre enregistrees dans le depot.
-

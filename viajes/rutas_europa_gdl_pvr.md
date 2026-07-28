@@ -34,4 +34,3 @@ Toda ruta eventual desde Helsinki, Frankfurt, Londres, Manchester u otra ciudad 
 ## FR - Resume
 
 La liaison prioritaire confirmee pour fevrier 2027 est Madrid-Guadalajara sans escale avec Aeromexico. Aucune liaison Europe-Puerto Vallarta sans escale n'a encore ete confirmee pour les dates du mariage; PVR reste une alternative avec correspondance.
-
