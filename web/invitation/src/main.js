@@ -70,6 +70,23 @@ function scheduleMarkup(items) {
     .join("");
 }
 
+function galleryMarkup(images, alternativeTexts) {
+  return images
+    .map(
+      (image, index) => `
+        <figure class="gallery-photo gallery-photo-${index + 1} reveal">
+          <img
+            src="${image}"
+            alt="${alternativeTexts[index] || alternativeTexts[0]}"
+            loading="lazy"
+            decoding="async"
+          />
+        </figure>
+      `,
+    )
+    .join("");
+}
+
 function languageSwitcherMarkup(activeLanguage) {
   return SUPPORTED_LANGUAGES.map(
     (language) => `
@@ -95,7 +112,7 @@ function render(language) {
     ?.setAttribute("content", t.metaDescription);
   document.querySelector(".skip-link").textContent = t.skip;
   const heroMedia = MEDIA.hero
-    ? `<img class="hero-photo" src="${MEDIA.hero}" alt="${t.hero.imageAlt}" />`
+    ? `<img class="hero-photo" src="${MEDIA.hero}" alt="${t.hero.imageAlt}" fetchpriority="high" />`
     : `<span class="hero-image-note">${t.hero.imageNote}</span>`;
 
   app.innerHTML = `
@@ -151,6 +168,17 @@ function render(language) {
             <h2>${t.story.title}</h2>
             <p class="lead">${t.story.body}</p>
             <p class="handwritten">${t.story.note}</p>
+          </div>
+        </section>
+
+        <section class="gallery-section section" aria-labelledby="gallery-title">
+          <div class="gallery-heading reveal">
+            <p class="eyebrow">${t.gallery.eyebrow}</p>
+            <h2 id="gallery-title">${t.gallery.title}</h2>
+            <p>${t.gallery.body}</p>
+          </div>
+          <div class="photo-gallery">
+            ${galleryMarkup(MEDIA.gallery, t.gallery.alts)}
           </div>
         </section>
 

@@ -22,3 +22,8 @@ This directory stores submitted source material. Files here are never imported d
 ## Privacy rule
 
 Images containing phone numbers, addresses, reservation codes or other personal information remain `source_only` unless public publication is explicitly approved. Never connect an original directly to the invitation.
+
+The source set `INV-002` through `INV-018` was approved by the couple for use
+in the invitation on 2026-07-28. Public WebP derivatives are resized,
+auto-oriented and stripped of EXIF/GPS metadata. The source files remain
+private and outside the Vite build.

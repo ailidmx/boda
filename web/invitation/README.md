@@ -12,9 +12,12 @@ One-page public wedding invitation inspired by the visual simplicity of the Squa
 ## Local use
 
 ```bash
+cd /Users/aydejuarez/boda/web/invitation
 npm install
 npm run dev
 ```
+
+Then open `http://localhost:5173/?lang=fr` (or use `es` / `en`).
 
 Production check:
 
@@ -48,7 +51,7 @@ The sticky countdown targets `2027-02-20T00:00:00-06:00`, local time in Jalisco.
 
 ## Before publication
 
-- Replace the graphic hero placeholder with the selected couple photograph.
+- Validate the current mountain hero and seven-photo story gallery.
 - Review and approve all three language versions.
 - Confirm public schedule details.
 - Connect RSVP to a private form.
