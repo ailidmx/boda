@@ -1,0 +1,223 @@
+No,Nombre,Apellido,Email,Se envió invitación ,Confirmado,Hospadeje,Grupo,Adulto/Niño,Hombre/Mujer,Confirmado el ,Hospedaje,% occupacion
+1,David,Aïli,,TRUE,TRUE,TRUE,Novios,Adulto,H,dom 25 ene 26,HORTENCIA - 2p,100%
+2,Aydé,Juárez,,TRUE,TRUE,TRUE,Novios,Adulto,M,dom 25 ene 26,HORTENCIA - 2p,100%
+3,Sébastien,Cécillon,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,H,,AZALEA - 12p,100%
+4,Moni,Quezada,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,M,,AZALEA - 12p,100%
+5,Iyali,Cécillon,,FALSE,FALSE,TRUE,PetanclubGDL,Niño,M,,AZALEA - 12p,100%
+6,Amélie,Cécillon,,FALSE,FALSE,TRUE,PetanclubGDL,Niño,M,,AZALEA - 12p,100%
+7,Pierre,Wanecque,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,H,,AZALEA - 12p,100%
+8,Monica,García,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,M,,AZALEA - 12p,100%
+9,Pablo,Wanecque,,FALSE,FALSE,FALSE,PetanclubGDL,Niño,H,,,
+10,Emmanuel,Jourdain,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,H,,AZALEA - 12p,100%
+11,Carolina,Saldana Suarez,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,M,,AZALEA - 12p,100%
+12,Julien,Bac,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,H,,AZALEA - 12p,100%
+13,Javier,Etcheverria,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,H,,AZALEA - 12p,100%
+14,Fabian,Castellanos,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,H,,AZALEA - 12p,100%
+15,Diego,Hernandez,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,H,,DALIA - 10p,70%
+16,Esposa,de Diego Matraz,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,M,,DALIA - 10p,70%
+17,Hija 1,Diego Matras,,FALSE,FALSE,FALSE,PetanclubGDL,Niño,M,,,
+18,Hija 2,Hija de Diego Matras,,FALSE,FALSE,FALSE,PetanclubGDL,Niño,M,,,
+19,Mika,Rako,,TRUE,TRUE,TRUE,PetanclubGDL,Adulto,H,,,
+20,Corine,Rako,,TRUE,TRUE,TRUE,PetanclubGDL,Adulto,M,,,
+21,Livier,Rako,,TRUE,TRUE,TRUE,PetanclubGDL,Adulto,M,,,
+21,Cathy,Rako,,TRUE,TRUE,TRUE,PetanclubGDL,Adulto,M,,,
+21,Morgane,Rako,,TRUE,TRUE,TRUE,PetanclubGDL,Adulto,M,,,
+22,Leo,Rako,,FALSE,FALSE,FALSE,PetanclubGDL,Niño,H,,,
+23,Niña,Rako,,FALSE,FALSE,FALSE,PetanclubGDL,Niño,M,,,
+24,Esposa/esposo Corine,Rako,,TRUE,TRUE,TRUE,PetanclubGDL,Adulto,H,,,
+25,Aldo,Díaz de Sandi ,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,H,,MARGARITA - 10p,100%
+26,Iopoch,Díaz de Sandi ,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,H,,MARGARITA - 10p,100%
+27,Esposa Iopoch,Díaz de Sandi ,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,M,,MARGARITA - 10p,100%
+28,Hija,Díaz de Sandi ,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,M,,MARGARITA - 10p,100%
+29,Santino,Díaz de Sandi ,,FALSE,FALSE,TRUE,PetanclubGDL,Niño,H,,MARGARITA - 10p,100%
+30,Manu,Vázquez,,FALSE,FALSE,TRUE,PetanclubGDL,Niño,H,,MARGARITA - 10p,100%
+31,Novia,Vázquez,,FALSE,FALSE,TRUE,PetanclubGDL,Niño,M,,MARGARITA - 10p,100%
+32,Ro Arana,Arana,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,H,,MARGARITA - 10p,100%
+33,Mariana,,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,M,,MARGARITA - 10p,100%
+34,Tania,Gallardo,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,M,,DALIA - 10p,70%
+35,Ana,Farías,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,M,,DALIA - 10p,70%
+36,Marcia,,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,M,,DALIA - 10p,70%
+37,Clément,Diguet,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,H,,CABAÑA_5 - 6p,100%
+38,Esposa,Clément,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,M,,CABAÑA_5 - 6p,100%
+39,Edward,,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,H,,MARGARITA - 10p,100%
+40,Charles,Pinet,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,H,,DALIA - 10p,70%
+41,Lea,Pinet,,FALSE,FALSE,FALSE,PetanclubGDL,Niño,M,,,
+42,Dylan,Maringolo,,TRUE,FALSE,TRUE,PetanclubGDL,Adulto,H,,DALIA - 10p,70%
+43,Jeff,,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,H,,,
+44,Esposa,de Jeff,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,H,,,
+45,Hija,de Jeff,,FALSE,FALSE,,PetanclubGDL,Adulto,M,,,
+46,Denis,,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,H,,CABAÑA_5 - 6p,100%
+47,Esposa,de Denis,,FALSE,FALSE,TRUE,PetanclubGDL,Adulto,M,,CABAÑA_5 - 6p,100%
+48,Benjamin,Bert,,FALSE,FALSE,TRUE,Amigos de David,Adulto,H,,AZALEA - 12p,100%
+49,Raoul,Le Bas,,FALSE,FALSE,TRUE,Amigos de David,Adulto,H,,CABAÑA_5 - 6p,100%
+50,Cynthia,Cobarrubias,,FALSE,FALSE,TRUE,Amigos de David,Adulto,M,,CABAÑA_5 - 6p,100%
+51,Anne Sophie,,,FALSE,FALSE,FALSE,Amigos de David,Adulto,M,,,
+52,Aswhin,,,TRUE,TRUE,FALSE,Amigos de Aydé,Adulto,H,,,
+53,Selene,,,TRUE,TRUE,FALSE,Amigos de Aydé,Adulto,M,,,
+54,Niño 1,Ashwin y Selene,,FALSE,FALSE,FALSE,Amigos de Aydé,Niño,H,,,
+55,Niño 2,Ashwin y Selene,,FALSE,FALSE,FALSE,Amigos de Aydé,Niño,H,,,
+56,Niño 3,Ashwin y Selene,,FALSE,FALSE,FALSE,Amigos de Aydé,Niño,H,,,
+57,Thierry,AÏLI,,TRUE,TRUE,TRUE,Familia de David,Adulto,H,, CABAÑAS_MADERA_34_2_ADULTOS,100%
+58,Joséphine,ROSA,,TRUE,TRUE,TRUE,Familia de David,Adulto,M,, CABAÑAS_MADERA_34_2_ADULTOS,100%
+59,Catherine,Lemery,,TRUE,TRUE,TRUE,Familia de David,Adulto,M,,CABAÑA_4 - 8p,113%
+60,Jean-Pierre,Rigollet,,TRUE,TRUE,TRUE,Familia de David,Adulto,H,,CABAÑA_4 - 8p,113%
+61,Stéphane,AÏLI,,TRUE,TRUE,TRUE,Familia de David,Adulto,H,,CABAÑA_4 - 8p,113%
+62,Wendy,AÏLI,,TRUE,TRUE,TRUE,Familia de David,Adulto,M,,CABAÑA_4 - 8p,113%
+63,Hugo,AÏLI,,TRUE,TRUE,TRUE,Familia de David,Adulto,H,,CABAÑA_4 - 8p,113%
+64,Lisa,AÏLI,,TRUE,TRUE,TRUE,Familia de David,Adulto,M,,CABAÑA_4 - 8p,113%
+65,Diego,AÏLI VAZQUEZ,,TRUE,TRUE,TRUE,Familia de David,Niño,H,dom 25 ene 26,CABAÑA_4 - 8p,113%
+66,Oscar,AÏLI VAZQUEZ,,TRUE,TRUE,TRUE,Familia de David,Niño,H,dom 25 ene 26,CABAÑA_4 - 8p,113%
+67,Christophe,RIGOLLET,,TRUE,TRUE,TRUE,Familia de David,Adulto,H,,CABAÑA_4 - 8p,113%
+68,Brigitte,Lemery,,TRUE,TRUE,TRUE,Familia de David,Adulto,M,,,
+69,Gilles,de Brigitte,,TRUE,FALSE,FALSE,Familia de David,Adulto,H,,,
+70,Frederic,Bonpart,,TRUE,FALSE,FALSE,Familia de David,Adulto,H,,,
+71,Novia,de Fred Bonpart,,TRUE,FALSE,FALSE,Familia de David,Adulto,M,,,
+72,Niño,Bonpart,,TRUE,FALSE,FALSE,Familia de David,Adulto,H,,,
+73,Maël,Bonpart,,TRUE,FALSE,FALSE,Familia de David,Adulto,H,,,
+74,Virginie,Bonpart,,TRUE,FALSE,FALSE,Familia de David,Adulto,M,,,
+75,Damien,Bonpart,,TRUE,FALSE,FALSE,Familia de David,Adulto,H,,,
+76,Lilou,Bonpart,,TRUE,FALSE,FALSE,Familia de David,Adulto,M,,,
+77,Romane,Bonpart,,TRUE,FALSE,FALSE,Familia de David,Adulto,H,,,
+78,Touta,Mut,,TRUE,FALSE,FALSE,Familia de David,Adulto,H,,,
+79,Novia de,Touta Mut,,TRUE,FALSE,FALSE,Familia de David,Adulto,M,,,
+80,Arsene,Mut,,TRUE,FALSE,FALSE,Familia de David,Adulto,H,,,
+81,Carmen,Mut,,TRUE,FALSE,FALSE,Familia de David,Adulto,M,,,
+82,Novio,de Mut,,TRUE,FALSE,FALSE,Familia de David,Adulto,H,,,
+83,Jacques,Lemery,,TRUE,TRUE,TRUE,Familia de David,Adulto,H,,,
+84,Krystel,Vazquez,,TRUE,TRUE,FALSE,Amigos de David,Adulto,M,,,
+85,Elvira,Guadalupe,,TRUE,TRUE,TRUE,Familia de Aydé,Adulto,M,dom 25 ene 26,CASONA - 18p,100%
+86,Eduardo,de Guadalupe,,TRUE,TRUE,TRUE,Familia de Aydé,Adulto,H,dom 25 ene 26,CASONA - 18p,100%
+87,Sofía,de Guadalupe,,FALSE,FALSE,TRUE,Familia de Aydé,Niño,M,,CASONA - 18p,100%
+88,Jesus,de Guadalupe,,FALSE,FALSE,TRUE,Familia de Aydé,Niño,H,,CASONA - 18p,100%
+89,Mama Tina,Guadalupe,,TRUE,TRUE,TRUE,Familia de Aydé,Adulto,M,dom 25 ene 26,CASONA - 18p,100%
+90,Papa Kao,Guadalupe,,TRUE,TRUE,TRUE,Familia de Aydé,Adulto,H,dom 25 ene 26,CASONA - 18p,100%
+91,Isabel,Guadalupe,,TRUE,FALSE,TRUE,Familia de Aydé,Adulto,M,dom 25 ene 26,CASONA - 18p,100%
+92,Diana,Ramírez,,FALSE,FALSE,TRUE,Familia de Aydé,Adulto,M,,CASONA - 18p,100%
+93,Noel Omar,Guadalupe,,TRUE,FALSE,TRUE,Familia de Aydé,Adulto,H,,CASONA - 18p,100%
+94,Carmen,de Juárez,,FALSE,FALSE,TRUE,Familia de Aydé,Adulto,M,,CASONA - 18p,100%
+95,Yadira,de Juárez,,FALSE,FALSE,TRUE,Familia de Aydé,Adulto,M,,CASONA - 18p,100%
+96,Valentina,de Juárez,,FALSE,FALSE,TRUE,Familia de Aydé,Adulto,M,,CASONA - 18p,100%
+97,Jaime,Juárez,,TRUE,TRUE,TRUE,Familia de Aydé,Adulto,M,dom 25 ene 26,CASONA - 18p,100%
+98,Irma,Juárez,,TRUE,TRUE,TRUE,Familia de Aydé,Adulto,M,dom 25 ene 26,CASONA - 18p,100%
+99,Erik,,,TRUE,TRUE,TRUE,Familia de Aydé,Adulto,H,,CASONA - 18p,100%
+100,Esposa de,Erik,,TRUE,TRUE,TRUE,Familia de Aydé,Adulto,M,,CASONA - 18p,100%
+101,Olaf,,,TRUE,TRUE,TRUE,Familia de Aydé,Adulto,H,dom 25 ene 26,CASONA - 18p,100%
+102,Novio de,Olaf,,FALSE,FALSE,TRUE,Familia de Aydé,Adulto,H,,CASONA - 18p,100%
+103,Adriana,Martínez,,TRUE,TRUE,TRUE,Amigos de Aydé,Adulto,M,dom 25 ene 26,,
+104,Fernanda,,,TRUE,TRUE,TRUE,Amigos de Aydé,Adulto,M,dom 25 ene 26,,
+105,Adriana,Agris,,TRUE,TRUE,TRUE,Amigos de Aydé,Adulto,M,dom 25 ene 26,,
+106,Susana,Díaz,,TRUE,TRUE,TRUE,Amigos de Aydé,Adulto,M,dom 25 ene 26,,
+107,Gabriela,,,TRUE,TRUE,TRUE,Amigos de Aydé,Adulto,M,dom 25 ene 26,,
+108,Tania,,,TRUE,TRUE,TRUE,Amigos de Aydé,Adulto,M,dom 25 ene 26,,
+109,Aili,,,TRUE,TRUE,TRUE,Amigos de Aydé,Adulto,M,dom 25 ene 26,,
+110,Natalia,,,TRUE,TRUE,TRUE,Amigos de Aydé,Adulto,M,dom 25 ene 26,,
+111,Diego,Salmerón,,TRUE,TRUE,TRUE,Golden,Adulto,H,dom 25 ene 26,,
+112,Ana Manager,Peregrina,,FALSE,FALSE,FALSE,Golden,Adulto,M,,,
+113,Andrea,de Salmerón,,TRUE,TRUE,TRUE,Golden,Adulto,M,dom 25 ene 26,,
+114,Tere,tía de Diego,,FALSE,FALSE,FALSE,Golden,Adulto,M,,,
+115,Samuel,López,,TRUE,TRUE,TRUE,Golden,Adulto,H,,,
+116,Rodrigo,,,TRUE,TRUE,TRUE,Golden,Adulto,H,dom 25 ene 26,,
+117,Aldo,,,TRUE,TRUE,TRUE,Golden,Adulto,H,dom 25 ene 26,,
+118,Karime,,,FALSE,FALSE,FALSE,Golden,Adulto,M,,,
+119,Renata,,,FALSE,FALSE,FALSE,Golden,Adulto,M,,,
+120,Cristian,,,FALSE,FALSE,FALSE,Golden,Adulto,H,,,
+121,Alejandro,,,FALSE,FALSE,FALSE,Golden,Adulto,H,,,
+122,Manu,,,FALSE,FALSE,FALSE,Golden,Adulto,H,,,
+123,Fanny,,,FALSE,FALSE,FALSE,Golden,Adulto,M,,,
+124,Novio de,Fanny,,FALSE,FALSE,FALSE,Golden,Adulto,H,,,
+125,Lorena,,,FALSE,FALSE,FALSE,Golden,Adulto,M,,,
+126,Genesio,,,TRUE,FALSE,FALSE,Golden,Adulto,H,,,
+127,Federica,esposa de Genesio,,FALSE,FALSE,FALSE,Golden,Adulto,M,,,
+128,Alex,,,FALSE,FALSE,FALSE,Golden,Adulto,H,,,
+129,Pau,,,FALSE,FALSE,FALSE,Golden,Adulto,M,,,
+130,Lorenzo,,,FALSE,FALSE,FALSE,Golden,Adulto,H,,,
+131,Monteserrat,,,FALSE,FALSE,FALSE,Golden,Adulto,M,,,
+132,Gaetane,Lefranc,,TRUE,FALSE,FALSE,Familia de David,Adulto,M,,,
+133,Stéphane,Bon,,TRUE,FALSE,FALSE,Familia de David,Adulto,H,,,
+134,Ange,Bon,,TRUE,FALSE,FALSE,Familia de David,Adulto,M,,,
+135,Cyrielle,Rigollet,,TRUE,TRUE,TRUE,Familia de David,Adulto,M,,,
+136,Julien,Rigollet,,TRUE,TRUE,TRUE,Familia de David,Adulto,H,,,
+137,Fabio,Rigollet,,TRUE,TRUE,TRUE,Familia de David,Niño,H,,,
+138,Lenzo,Rigollet,,TRUE,TRUE,TRUE,Familia de David,Niño,H,,,
+139,Timeo,Rigollet,,TRUE,TRUE,TRUE,Familia de David,Niño,H,,,
+140,Abraham,Burciaga,,TRUE,TRUE,TRUE,Pintura,Adulto,H,,,
+141,Mauricio,Vargas,,TRUE,TRUE,TRUE,Pintura,Adulto,H,,,
+142,Esposa de,Mauricio Vargas,,TRUE,TRUE,TRUE,Pintura,Adulto,M,,,
+143,Hija de,Mauricio Vargas,,FALSE,FALSE,FALSE,Pintura,Niño,M,,,
+144,Victor,Segoviano,,TRUE,TRUE,TRUE,Pintura,Adulto,H,dom 25 ene 26,,
+145,Esposa de,Victor Segoviano,,TRUE,TRUE,TRUE,Pintura,Adulto,M,dom 25 ene 26,,
+146,Juan Ignacio,Sánchez,,TRUE,TRUE,TRUE,Pintura,Adulto,H,,,
+147,Esposa de Juan,de Sánchez,,TRUE,TRUE,TRUE,Pintura,Adulto,M,,,
+148,Tracy,,,TRUE,FALSE,FALSE,Pintura,Adulto,M,,,
+149,Esposo de Tracy,,,FALSE,FALSE,FALSE,Pintura,Adulto,H,,,
+150,Julio,,,TRUE,FALSE,FALSE,Pintura,Adulto,H,,,
+151,Erik,Montañez,,TRUE,TRUE,TRUE,Pintura,Adulto,H,dom 25 ene 26,,
+152,Treviño,,,TRUE,FALSE,FALSE,Pintura,Adulto,H,,,
+153,Jimena,,,FALSE,FALSE,FALSE,Pintura,Adulto,M,,,
+154,Endy,Angiano,,TRUE,FALSE,FALSE,Pintura,Adulto,H,,,
+155,Manuel,Amezcua,,TRUE,FALSE,FALSE,Amigos de Aydé,Adulto,H,,,
+156,Ismael,,,TRUE,TRUE,TRUE,Amigos de Aydé,Adulto,H,dom 25 ene 26,,
+157,Lupita,,,TRUE,TRUE,TRUE,Amigos de Aydé,Adulto,M,dom 25 ene 26,,
+158,Fabiola,García,,TRUE,TRUE,TRUE,Amigos de Aydé,Adulto,M,dom 25 ene 26,,
+159,Pablo,García,,TRUE,TRUE,TRUE,Amigos de Aydé,Adulto,H,dom 25 ene 26,,
+160,Hija de,Fabiola,,FALSE,FALSE,FALSE,Amigos de Aydé,Adulto,M,,,
+161,Fanny,,,FALSE,FALSE,FALSE,Amigos de David,Adulto,M,,,
+162,Hijo ,,,FALSE,FALSE,FALSE,Amigos de David,Niño,H,,,
+163,René,Linares,,FALSE,FALSE,FALSE,Pintura,Adulto,H,,,
+164,Esposa de,René,,FALSE,FALSE,FALSE,Pintura,Adulto,M,,,
+165,Carlos,"""la pelona""",,FALSE,FALSE,FALSE,Golden,Adulto,M,,,
+166,Alberto,Trejo,,FALSE,FALSE,FALSE,Golden,Adulto,M,,,
+167,Spomenka,Petrovic,,TRUE,TRUE,TRUE,Amigos de David,Adulto,M,dom 25 ene 26,CABAÑAS_MADERA_31_2_ADULTOS,100%
+168,Guilhem,Petrovic,,TRUE,TRUE,TRUE,Amigos de David,Adulto,H,dom 25 ene 26,CABAÑAS_MADERA_31_2_ADULTOS,100%
+169,Pierre,Berthelon,,TRUE,FALSE,TRUE,Amigos de David,Adulto,H,,,
+170,Titis,Berthelon,,TRUE,FALSE,TRUE,Amigos de David,Adulto,M,,,
+171,Sian,Habell-Aïli,sianaili@hotmail.com,TRUE,FALSE,TRUE,Familia de David,Adulto,M,,,
+172,Robin,Green,robinjames.green@gmail.com,TRUE,FALSE,TRUE,Familia de David,Adulto,H,,,
+173,Eliso,Habell Aïli,,TRUE,FALSE,TRUE,Familia de David,Niño,H,,,
+174,Wolf,Habell Aïli,,TRUE,FALSE,TRUE,Familia de David,Niño,H,,,
+175,Mael,Habell Aïli,mael.habell@gmail.com,TRUE,FALSE,TRUE,Familia de David,Adulto,H,,,
+176,Emma,Habell Aïli,?,TRUE,FALSE,TRUE,Familia de David,Adulto,M,,,
+177,Sebastien,Passelande,,TRUE,FALSE,TRUE,Familia de David,Adulto,H,,,
+178,Esposa de ,Sebastien ,,TRUE,FALSE,TRUE,Familia de David,Adulto,M,,,
+179,Ben,,,TRUE,FALSE,TRUE,Amigos de David,Adulto,H,,,
+180,America,,,TRUE,FALSE,TRUE,Amigos de David,Adulto,M,,,
+181,Nino ,,,TRUE,FALSE,TRUE,Amigos de David,Niño,H,,,
+182,Nino 2,,,TRUE,FALSE,TRUE,Amigos de David,Niño,H,,,
+183,Tristan,,,TRUE,TRUE,TRUE,Amigos de David,Adulto,H,,CABAÑA_6 - 4p,100%
+184,Yari,,,TRUE,TRUE,TRUE,Amigos de David,Adulto,M,,CABAÑA_6 - 4p,100%
+185,Nino 1,,,TRUE,TRUE,TRUE,Amigos de David,Niño,H,,CABAÑA_6 - 4p,100%
+186,Niño 2,,,TRUE,TRUE,TRUE,Amigos de David,Niño,H,,CABAÑA_6 - 4p,100%
+187,Frederic,Bousquet,,TRUE,FALSE,TRUE,38 Tonnes,Adulto,H,,,
+188,Chang,Tao,,TRUE,FALSE,TRUE,38 Tonnes,Adulto,H,,,
+189,Esposa de ,Chang Tao,,TRUE,FALSE,TRUE,38 Tonnes,Adulto,H,,,
+190,Alex,,,TRUE,FALSE,TRUE,38 Tonnes,Adulto,H,,,
+191,Floof,,,FALSE,FALSE,TRUE,38 Tonnes,Adulto,H,,,
+192,Beb,,,FALSE,FALSE,TRUE,38 Tonnes,Adulto,H,,,
+193,Vincent,,,FALSE,FALSE,TRUE,38 Tonnes,Adulto,H,,,
+194,Celia,,,FALSE,FALSE,TRUE,38 Tonnes,Adulto,M,,,
+195,Ben,,,FALSE,FALSE,TRUE,38 Tonnes,Adulto,H,,,
+196,George ,Mickael,,FALSE,FALSE,TRUE,38 Tonnes,Adulto,H,,,
+197,René,Orozco,,FALSE,FALSE,FALSE,Amigos de Aydé,Adulto,H,,,
+198,Denisse,,,FALSE,FALSE,FALSE,Amigos de Aydé,Adulto,M,,,
+199,Sophie,Petot-Rosa,s.petot.rosa@gmail.com,TRUE,FALSE,TRUE,Familia de David,Adulto,M,,,
+200,Thomas,Lesbros,thomas.lesbros@gmail.com,TRUE,FALSE,TRUE,Familia de David,Adulto,H,,,
+201,Myriam,Lefranc,myriamlefranc@gmail. com,TRUE,TRUE,TRUE,Familia de David,Adulto,M,,,
+202,Pierre,Soubeyrat,pierre.soubeyrat@wanadoo.fr,TRUE,FALSE,TRUE,Familia de David,Adulto,H,,,
+203,Fabrice,Aïli,Fabrice.aili@aol.com,TRUE,TRUE,TRUE,Familia de David,Adulto,H,,,
+204,Mireille,Rives,Mireille.rives@icloud.com,TRUE,TRUE,TRUE,Familia de David,Adulto,M,,,
+202,Simon,Aïli,,TRUE,TRUE,FALSE,Familia de David,Adulto,H,,,
+203,Sandra,Aïli,Sandra.aili@icloud.com,TRUE,TRUE,FALSE,Familia de David,Adulto,M,,,
+204,Johanna,Aïli,Johanna.aili@icloud.com,TRUE,FALSE,FALSE,Familia de David,Adulto,M,,,
+205,Chantal,Anselmo,chantal.anselmo@outlook.fr,TRUE,FALSE,FALSE,Familia de David,Adulto,M,,,
+206,Patrick,Anselmo,patrick.anselmo@orange.fr,TRUE,FALSE,FALSE,Familia de David,Adulto,H,,,
+206,Patricia,Habell-Aïli,habellaili@gmail.com,TRUE,FALSE,FALSE,Familia de David,Adulto,M,,,
+207,Martin,Habell,habellmartin@aol.com,TRUE,FALSE,FALSE,Familia de David,Adulto,H,,,
+205,Francois,Lemery,,TRUE,TRUE,TRUE,Familia de David,Adulto,H,sáb 27 jun 26,CABAÑAS_MADERA_32_2_ADULTOS,100%
+206,Mireille,Lemery,,TRUE,TRUE,TRUE,Familia de David,Adulto,M,sáb 27 jun 26,CABAÑAS_MADERA_32_2_ADULTOS,100%
+207,Gilles,Giraud,,TRUE,FALSE,TRUE,Familia de David,Adulto,H,,,
+208,Habiba,Giraud,,TRUE,FALSE,TRUE,Familia de David,Adulto,M,,,
+209,Diego,Henao,,TRUE,TRUE,FALSE,Amigos de David,Adulto,H,,,
+210,Ana,García,,TRUE,TRUE,FALSE,Amigos de David,Adulto,M,,,
+211,Dimitar,,,TRUE,TRUE,TRUE,Amigos de David,Adulto,H,,CABAÑAS_MADERA_33_2_ADULTOS,100%
+212,Dimitar +1,,,TRUE,TRUE,TRUE,Amigos de David,Adulto,M,,CABAÑAS_MADERA_33_2_ADULTOS,100%
+213,Jenny,Di Fonzo,,TRUE,FALSE,FALSE,Amigos de David,Adulto,M,,,

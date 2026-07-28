@@ -1,0 +1,43 @@
+id,nombre_completo,grupo,cabana,prioridad_alojamiento,status,notas
+67,Christophe Rigollet,Familia de David,AZALEA - 12p,alta,propuesta_v2_reubicar,Salida de CABAÑA_4 para eliminar sobrecupo (9->8)
+19,Mika Rako,PetanclubGDL,DALIA - 10p,alta,propuesta_v2,Asignacion por bloque Petanclub
+20,Corine Rako,PetanclubGDL,DALIA - 10p,alta,propuesta_v2,Asignacion por bloque Petanclub
+21,Livier Rako,PetanclubGDL,DALIA - 10p,alta,propuesta_v2,Asignacion por bloque Petanclub
+21,Cathy Rako,PetanclubGDL,DALIA - 10p,alta,propuesta_v2,Asignacion por bloque Petanclub
+21,Morgane Rako,PetanclubGDL,DALIA - 10p,alta,propuesta_v2,Asignacion por bloque Petanclub
+24,Esposa/esposo Corine Rako,PetanclubGDL,DALIA - 10p,alta,propuesta_v2,Asignacion por bloque Petanclub
+140,Abraham Burciaga,Pintura,DALIA - 10p,media,propuesta_v2,Completa cupo DALIA con bloque Pintura
+141,Mauricio Vargas,Pintura,DALIA - 10p,media,propuesta_v2,Completa cupo DALIA con bloque Pintura
+142,Esposa de Mauricio Vargas,Pintura,DALIA - 10p,media,propuesta_v2,Completa cupo DALIA con bloque Pintura
+151,Erik Montañez,Pintura,DALIA - 10p,media,propuesta_v2,Completa cupo DALIA con bloque Pintura
+68,Brigitte Lemery,Familia de David,AZALEA - 12p,alta,propuesta_v2,Bloque familiar David
+83,Jacques Lemery,Familia de David,AZALEA - 12p,alta,propuesta_v2,Bloque familiar David
+135,Cyrielle Rigollet,Familia de David,AZALEA - 12p,alta,propuesta_v2,Bloque familiar David
+136,Julien Rigollet,Familia de David,AZALEA - 12p,alta,propuesta_v2,Bloque familiar David
+137,Fabio Rigollet,Familia de David,AZALEA - 12p,alta,propuesta_v2,Bloque familiar David
+138,Lenzo Rigollet,Familia de David,AZALEA - 12p,alta,propuesta_v2,Bloque familiar David
+139,Timeo Rigollet,Familia de David,AZALEA - 12p,alta,propuesta_v2,Bloque familiar David
+201,Myriam Lefranc,Familia de David,AZALEA - 12p,alta,propuesta_v2,Bloque familiar David
+203,Fabrice Aili,Familia de David,AZALEA - 12p,alta,propuesta_v2,Bloque familiar David
+204,Mireille Rives,Familia de David,AZALEA - 12p,alta,propuesta_v2,Bloque familiar David
+103,Adriana Martinez,Amigos de Ayde,MARGARITA - 10p,alta,propuesta_v2,Bloque Amigos de Ayde
+104,Fernanda,Amigos de Ayde,MARGARITA - 10p,alta,propuesta_v2,Bloque Amigos de Ayde
+105,Adriana Agris,Amigos de Ayde,MARGARITA - 10p,alta,propuesta_v2,Bloque Amigos de Ayde
+106,Susana Diaz,Amigos de Ayde,MARGARITA - 10p,alta,propuesta_v2,Bloque Amigos de Ayde
+107,Gabriela,Amigos de Ayde,MARGARITA - 10p,alta,propuesta_v2,Bloque Amigos de Ayde
+108,Tania,Amigos de Ayde,MARGARITA - 10p,alta,propuesta_v2,Bloque Amigos de Ayde
+109,Aili,Amigos de Ayde,MARGARITA - 10p,alta,propuesta_v2,Bloque Amigos de Ayde
+110,Natalia,Amigos de Ayde,MARGARITA - 10p,alta,propuesta_v2,Bloque Amigos de Ayde
+156,Ismael,Amigos de Ayde,MARGARITA - 10p,alta,propuesta_v2,Bloque Amigos de Ayde
+157,Lupita,Amigos de Ayde,MARGARITA - 10p,alta,propuesta_v2,Bloque Amigos de Ayde
+111,Diego Salmeron,Golden,CABAÑA_5 - 6p,media,propuesta_v2,Bloque Golden
+113,Andrea de Salmeron,Golden,CABAÑA_5 - 6p,media,propuesta_v2,Bloque Golden
+115,Samuel Lopez,Golden,CABAÑA_5 - 6p,media,propuesta_v2,Bloque Golden
+116,Rodrigo,Golden,CABAÑA_5 - 6p,media,propuesta_v2,Bloque Golden
+117,Aldo,Golden,CABAÑA_5 - 6p,media,propuesta_v2,Bloque Golden
+144,Victor Segoviano,Pintura,CASONA - 18p,media,propuesta_v2,Ubicacion adicional por disponibilidad funcional
+145,Esposa de Victor Segoviano,Pintura,CASONA - 18p,media,propuesta_v2,Ubicacion adicional por disponibilidad funcional
+146,Juan Ignacio Sanchez,Pintura,CASONA - 18p,media,propuesta_v2,Ubicacion adicional por disponibilidad funcional
+147,Esposa de Juan de Sanchez,Pintura,CASONA - 18p,media,propuesta_v2,Ubicacion adicional por disponibilidad funcional
+158,Fabiola Garcia,Amigos de Ayde,CASONA - 18p,media,propuesta_v2,Ubicacion adicional por disponibilidad funcional
+159,Pablo Garcia,Amigos de Ayde,CASONA - 18p,media,propuesta_v2,Ubicacion adicional por disponibilidad funcional

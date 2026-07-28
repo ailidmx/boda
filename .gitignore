@@ -1,0 +1,24 @@
+# Local operating-system files
+.DS_Store
+
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+
+# JavaScript
+node_modules/
+dist/
+
+# Local configuration and credentials
+.env
+.env.*
+!.env.example
+service_account.json
+*.pem
+*.key
+
+# Editor files
+.idea/
+.vscode/
+*.swp

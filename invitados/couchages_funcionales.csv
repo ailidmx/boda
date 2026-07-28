@@ -1,0 +1,15 @@
+cabana_key,capacidad_nominal,couchages_funcionales_estimados,delta_vs_nominal,observaciones
+AZALEA - 12p,12,11,-1,3er cuarto reportado como 3 camas individuales; aparece con signo de interrogacion en evidencia reciente
+DALIA - 10p,10,10,0,Configuracion consistente con capacidad nominal
+MARGARITA - 10p,10,10,0,Configuracion consistente con capacidad nominal
+LAVANDA - 4p,4,4,0,Configuracion consistente con capacidad nominal
+HORTENCIA - 2p,2,3,1,King (2) + sofa cama individual (1)
+CABAÑAS_MADERA_31_2_ADULTOS,2,4,2,King (2) + sofa cama matrimonial (2)
+CABAÑAS_MADERA_32_2_ADULTOS,2,4,2,King (2) + sofa cama matrimonial (2)
+CABAÑAS_MADERA_33_2_ADULTOS,2,4,2,King (2) + sofa cama matrimonial (2)
+CABAÑAS_MADERA_34_2_ADULTOS,2,4,2,King (2) + sofa cama matrimonial (2)
+CABAÑA_6 - 4p,4,4,0,2 camas matrimoniales
+CABAÑA_5 - 6p,6,5,-1,King (2) + individual (1) + matrimonial (2)
+CABAÑA_4 - 8p,8,8,0,Se asume litera individual = 2 plazas individuales
+CASONA - 18p,18,17,-1,Conteo de camas reportadas da 17 plazas funcionales
+TOTAL,82,88,6,Couchages extra netos aplicados sobre capacidad nominal

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Planning Prive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../shared/styles.css" />
+    <script src="../shared/data.js" defer></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const d = window.BODA_DATA;
+        document.querySelector('#venue').textContent = d.event.venue;
+        document.querySelector('#weekend').textContent = d.event.weekend;
+        document.querySelector('#music-end').textContent = d.event.musicEnd;
+        document.querySelector('#confirmed').textContent = d.metrics.confirmed;
+        document.querySelector('#lodging').textContent = d.metrics.lodgingNeeded;
+        document.querySelector('#capacity').textContent = d.metrics.selectedCapacity;
+        document.querySelector('#free').textContent = d.metrics.freeSpots;
+        document.querySelector('#stay').textContent = d.cabanasEngine.stay;
+        document.querySelector('#breakfast').textContent = d.cabanasEngine.breakfast;
+        document.querySelector('#special-rate').textContent = d.cabanasEngine.specialRate;
+
+        const fill = (sel, arr) => {
+          const ul = document.querySelector(sel);
+          ul.innerHTML = '';
+          arr.forEach(x => {
+            const li = document.createElement('li');
+            li.textContent = x;
+            ul.appendChild(li);
+          });
+        };
+
+        fill('#friday-food', d.foodMusic.friday);
+        fill('#sat-food', d.foodMusic.saturdayFood);
+        fill('#sat-music', d.foodMusic.saturdayMusic);
+        fill('#cabanas-units', d.cabanasEngine.units);
+      });
+    </script>
+  </head>
+  <body>
+    <main class="shell reveal">
+      <div class="nav">
+        <span class="title">Planning prive</span>
+        <a class="btn" href="../index.html">Retour portail</a>
+      </div>
+
+      <section class="hero">
+        <span class="kicker">Control Tower</span>
+        <h1>Wedding planning operation board</h1>
+        <p><strong>Venue:</strong> <span id="venue"></span> | <strong>Weekend:</strong> <span id="weekend"></span> | <strong>Music end:</strong> <span id="music-end"></span></p>
+      </section>
+
+      <section class="grid three" style="margin-top:14px;">
+        <article class="card metric"><span class="label">Confirmes</span><span class="value" id="confirmed">0</span></article>
+        <article class="card metric"><span class="label">Besoin logement</span><span class="value" id="lodging">0</span></article>
+        <article class="card metric"><span class="label">Capacite cabanas</span><span class="value" id="capacity">0</span></article>
+      </section>
+
+      <section class="grid two" style="margin-top:14px;">
+        <article class="card">
+          <h3>Delta logement</h3>
+          <p class="note">Spots libres actuels</p>
+          <p style="font-size:30px;margin:6px 0;"><strong id="free">0</strong></p>
+        </article>
+        <article class="card">
+          <h3>Modele couts invite</h3>
+          <p class="note">Invite paie: 2 nuits + 2 petits dejeuners. Le reste est offert par les maries.</p>
+          <p class="note"><strong>Sejour:</strong> <span id="stay"></span></p>
+          <p class="note"><strong>Breakfast:</strong> <span id="breakfast"></span></p>
+          <p class="note"><strong>Special rate:</strong> <span id="special-rate"></span></p>
+        </article>
+      </section>
+
+      <section class="grid two" style="margin-top:14px;">
+        <article class="card">
+          <h3>Vendredi soir</h3>
+          <ul id="friday-food"></ul>
+        </article>
+        <article class="card">
+          <h3>Samedi food flow</h3>
+          <ul id="sat-food"></ul>
+        </article>
+      </section>
+
+      <section class="card" style="margin-top:14px;">
+        <h3>Samedi musique</h3>
+        <ul id="sat-music"></ul>
+      </section>
+
+      <section class="card" style="margin-top:14px;">
+        <h3>Cabanas engine (units)</h3>
+        <ul id="cabanas-units"></ul>
+      </section>
+    </main>
+  </body>
+</html>

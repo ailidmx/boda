@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "google-sheets": {
+      "command": "/opt/homebrew/bin/uvx",
+      "args": [
+        "mcp-google-sheets@latest",
+        "--include-tools",
+        "list_spreadsheets,list_sheets,get_sheet_data,update_cells,batch_update_cells"
+      ],
+      "env": {
+        "SERVICE_ACCOUNT_PATH": "/Users/aydejuarez/boda/integraciones/google_sheets/service_account.json",
+        "DRIVE_FOLDER_ID": "YOUR_DRIVE_FOLDER_ID",
+        "GOOGLE_CLOUD_PROJECT": "boda-500805"
+      }
+    }
+  }
+}

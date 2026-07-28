@@ -1,0 +1,358 @@
+{
+  "brand": "D&A | Wedding operations + Guests",
+  "nav": {
+    "portal": "Portal",
+    "planning": "Private planning",
+    "guests": "Guest site"
+  },
+  "language": {
+    "switcher": "Language switcher",
+    "fr": "Français",
+    "es": "Español",
+    "en": "English"
+  },
+  "labels": {
+    "venue": "Venue",
+    "weekend": "Weekend",
+    "musicEnd": "Music cutoff"
+  },
+  "portal": {
+    "kicker": "DNA David & Ayde",
+    "title": "A real web stack: multilingual, elegant, and signed D&A",
+    "subtitle": "React + Vite + strict i18n foundation for internal operations and guest experience, with zero translation shortcuts.",
+    "primaryCta": "Open private planning",
+    "secondaryCta": "Open guest site",
+    "cardOpsTitle": "Operational command",
+    "cardOpsBody": "Food, music, cabins, international transport, and vendors: everything centralized for smooth execution.",
+    "cardGuestTitle": "Guest communication",
+    "cardGuestBody": "Clear information, transparent cost model, and travel support in three high-quality languages."
+  },
+  "planning": {
+    "kicker": "Planning | Control tower",
+    "title": "Operational board for the wedding weekend",
+    "metrics": {
+      "confirmed": "Confirmed guests",
+      "lodgingNeeded": "Need lodging",
+      "selectedCapacity": "Selected capacity",
+      "freeSpots": "Open spots"
+    },
+    "fridayTitle": "Friday evening",
+    "saturdayFoodTitle": "Saturday | Food flow",
+    "saturdayMusicTitle": "Saturday | Music flow",
+    "fridayItems": [
+      "Welcome pizzas: Manu + Ismael"
+    ],
+    "saturdayFoodItems": [
+      "Carnitas (lunch)",
+      "Taquiza (night) - final contact pending with Manu",
+      "Tejuino service - detail pending"
+    ],
+    "saturdayMusicItems": [
+      "Mariachi 2h",
+      "Marimba 2h",
+      "Norteño 2h",
+      "Karaoke 2 x 1h",
+      "Live emotion session with Norteño",
+      "Operational music cutoff: 2:00"
+    ],
+    "programTitle": "Detailed run of show (planning version)",
+    "programStatus": "Status: operational draft to be validated in wedding planning first before final publication.",
+    "programTimeline": [
+      "Saturday 18:00 - Ceremony at the Faro, led by Moni and Tía Mili (proposed, pending validation).",
+      "Saturday 19:15 - Transition cocktail and group photos (timing to confirm).",
+      "Saturday 20:30 - Main dinner service (service order to finalize).",
+      "Saturday 22:00 - Live music block + dance floor opening.",
+      "Sunday morning - Breakfast and progressive check-out by cabin."
+    ],
+    "cabinsTitle": "Detailed cabin walkthrough (planning version)",
+    "cabinsSummary": "Baseline adult capacity: 82. Mixed family capacity with allowed extra couchage: 90 (optional 91 with Hortencia sofa for one child).",
+    "cabinRules": [
+      "Strict rule: extra couchage via sofa bed is for families with children, not for couples.",
+      "Wood Cabins 31/32/33/34: base 2 adults, optional extension to 2 adults + 2 children.",
+      "Any capacity extension must be validated in wedding planning before guest publication."
+    ],
+    "cabins": [
+      {
+        "name": "CASONA",
+        "capacity": "Capacity: 18 guests",
+        "price": "Price: MXN 16,980 (2 nights)",
+        "rooms": [
+          "Room 1: 2 double beds",
+          "Room 2: 1 king-size bed",
+          "Room 3: 2 double beds + 1 bunk bed (double + single)",
+          "Room 4: 1 double bed",
+          "Room 5: 1 double bed"
+        ]
+      },
+      {
+        "name": "CABAÑA 4",
+        "capacity": "Capacity: 8 guests",
+        "price": "Price: MXN 9,640 (2 nights)",
+        "rooms": [
+          "Room 1: 1 double bed",
+          "Room 2: 1 double bed + 1 single bunk bed",
+          "Room 3: 1 single bunk bed"
+        ]
+      },
+      {
+        "name": "CABAÑA 5",
+        "capacity": "Capacity: 6 guests",
+        "price": "Price: MXN 7,210 (2 nights)",
+        "rooms": [
+          "Entry area: 1 king-size bed + 1 single bed",
+          "Inner room: 1 bedroom with 1 double bed"
+        ]
+      },
+      {
+        "name": "CABAÑA 6",
+        "capacity": "Capacity: 4 guests",
+        "price": "Price: MXN 5,980 (2 nights)",
+        "rooms": [
+          "1 room: 2 double beds"
+        ]
+      },
+      {
+        "name": "WOOD CABINS 31/32/33/34",
+        "capacity": "Capacity: 2 adults (up to 2 adults + 2 children in family mode)",
+        "price": "Price: MXN 5,310 (2 adults)",
+        "familyRate": "Family rate: MXN 5,790 (2 adults + 2 children)",
+        "rooms": [
+          "1 room: 1 king-size bed + 1 double sofa bed"
+        ],
+        "extraRule": "Double sofa bed is reserved for children, family setups only."
+      },
+      {
+        "name": "HORTENCIA",
+        "capacity": "Capacity: 2 adults",
+        "price": "Price: MXN 5,310 (2 nights)",
+        "rooms": [
+          "1 room: 1 king-size bed + 1 single sofa bed"
+        ],
+        "extraRule": "Single sofa bed may host 1 child if validated in planning."
+      },
+      {
+        "name": "LAVANDA",
+        "capacity": "Capacity: 4 guests",
+        "price": "Price: MXN 5,980 (2 nights)",
+        "rooms": [
+          "1 room: 2 double beds"
+        ]
+      },
+      {
+        "name": "MARGARITA",
+        "capacity": "Capacity: 10 guests",
+        "price": "Price: MXN 11,150 (2 nights)",
+        "rooms": [
+          "Room 1: 2 double beds",
+          "Room 2: 4 single beds (bunks)",
+          "Room 3: 1 double bed"
+        ]
+      },
+      {
+        "name": "DALIA",
+        "capacity": "Capacity: 10 guests",
+        "price": "Price: MXN 11,150 (2 nights)",
+        "rooms": [
+          "Room 1: 2 double beds",
+          "Room 2: 4 single beds (bunks)",
+          "Room 3: 1 double bed"
+        ]
+      },
+      {
+        "name": "AZALEA",
+        "capacity": "Capacity: 12 guests",
+        "price": "Price: MXN 8,470 (2 nights)",
+        "rooms": [
+          "Room 1: 2 double beds",
+          "Room 2: 2 double beds",
+          "Room 3: 3 single beds"
+        ]
+      }
+    ]
+  },
+  "guests": {
+    "kicker": "Guests | Practical information",
+    "awayTitle": "Coming from far away",
+    "awayBody": "Special airport support, flight help, and personalized assistance throughout the entire stay.",
+    "favoritesTitle": "Our Mexico favorites",
+    "favoritesBody": "Personal guides for flights, transfers, visits, and trusted recommendations.",
+    "guestPaysTitle": "What the guest pays",
+    "coupleCoversTitle": "What we cover",
+    "benefitsTitle": "Club Roca Azul highlights",
+    "benefitsNote": "List based on web research. Final validation with the venue is recommended.",
+    "programTitle": "Weekend program",
+    "programNote": "Program details may shift slightly. Final timings will be confirmed from wedding planning.",
+    "programTimeline": [
+      "Saturday 18:00 - Ceremony at the Faro with Moni and Tía Mili.",
+      "Then - Cocktail, dinner, and music celebration.",
+      "Sunday morning - Breakfast and departure."
+    ],
+    "cabinsTitle": "Detailed cabin walkthrough",
+    "cabinsSummary": "Bed distribution and capacity by unit. Extra couchage options are reserved for families with children.",
+    "cabinRules": [
+      "Extra couchage setups are validated case by case by the planning team.",
+      "Double sofa bed in Wood Cabins is for families with children only.",
+      "Our goal is comfort and coherent group placement in each cabin."
+    ],
+    "cabins": [
+      {
+        "name": "CASONA",
+        "capacity": "Capacity: 18 guests",
+        "price": "Price: MXN 16,980 (2 nights)",
+        "rooms": [
+          "Room 1: 2 double beds",
+          "Room 2: 1 king-size bed",
+          "Room 3: 2 double beds + 1 bunk bed (double + single)",
+          "Room 4: 1 double bed",
+          "Room 5: 1 double bed"
+        ]
+      },
+      {
+        "name": "CABAÑA 4",
+        "capacity": "Capacity: 8 guests",
+        "price": "Price: MXN 9,640 (2 nights)",
+        "rooms": [
+          "Room 1: 1 double bed",
+          "Room 2: 1 double bed + 1 single bunk bed",
+          "Room 3: 1 single bunk bed"
+        ]
+      },
+      {
+        "name": "CABAÑA 5",
+        "capacity": "Capacity: 6 guests",
+        "price": "Price: MXN 7,210 (2 nights)",
+        "rooms": [
+          "Entry area: 1 king-size bed + 1 single bed",
+          "Inner room: 1 bedroom with 1 double bed"
+        ]
+      },
+      {
+        "name": "CABAÑA 6",
+        "capacity": "Capacity: 4 guests",
+        "price": "Price: MXN 5,980 (2 nights)",
+        "rooms": [
+          "1 room: 2 double beds"
+        ]
+      },
+      {
+        "name": "WOOD CABINS 31/32/33/34",
+        "capacity": "Capacity: 2 adults (up to 2 adults + 2 children in family mode)",
+        "price": "Price: MXN 5,310 (2 adults)",
+        "familyRate": "Family rate: MXN 5,790 (2 adults + 2 children)",
+        "rooms": [
+          "1 room: 1 king-size bed + 1 double sofa bed"
+        ],
+        "extraRule": "Double sofa bed reserved for children in family setups."
+      },
+      {
+        "name": "HORTENCIA",
+        "capacity": "Capacity: 2 adults",
+        "price": "Price: MXN 5,310 (2 nights)",
+        "rooms": [
+          "1 room: 1 king-size bed + 1 single sofa bed"
+        ]
+      },
+      {
+        "name": "LAVANDA",
+        "capacity": "Capacity: 4 guests",
+        "price": "Price: MXN 5,980 (2 nights)",
+        "rooms": [
+          "1 room: 2 double beds"
+        ]
+      },
+      {
+        "name": "MARGARITA",
+        "capacity": "Capacity: 10 guests",
+        "price": "Price: MXN 11,150 (2 nights)",
+        "rooms": [
+          "Room 1: 2 double beds",
+          "Room 2: 4 single beds (bunks)",
+          "Room 3: 1 double bed"
+        ]
+      },
+      {
+        "name": "DALIA",
+        "capacity": "Capacity: 10 guests",
+        "price": "Price: MXN 11,150 (2 nights)",
+        "rooms": [
+          "Room 1: 2 double beds",
+          "Room 2: 4 single beds (bunks)",
+          "Room 3: 1 double bed"
+        ]
+      },
+      {
+        "name": "AZALEA",
+        "capacity": "Capacity: 12 guests",
+        "price": "Price: MXN 8,470 (2 nights)",
+        "rooms": [
+          "Room 1: 2 double beds",
+          "Room 2: 2 double beds",
+          "Room 3: 3 single beds"
+        ]
+      }
+    ],
+    "guestPays": [
+      "2 nights of accommodation",
+      "2 breakfasts (included with lodging)"
+    ],
+    "coupleCovers": [
+      "Main meals and dinner",
+      "Venue and operations",
+      "Vendors and entertainment"
+    ],
+    "benefits": [
+      "Cabins for 2 to 12 guests",
+      "Villas and rooms",
+      "Large recreational pool",
+      "Thermal-water pool",
+      "Changing rooms with steam bath",
+      "Multiple sports courts",
+      "Conference hall for 100 guests",
+      "Event gardens",
+      "Camping areas and RV park",
+      "Grills and tables in green areas",
+      "Bar with TV",
+      "Private parking",
+      "Iconic Roca Azul lighthouse"
+    ]
+  },
+  "dna": {
+    "kicker": "Visual signature",
+    "title": "DNA David & Ayde | Tone and decoration",
+    "subtitle": "Complete D&A signature variations to keep a refined, lively, and coherent atmosphere across the whole experience.",
+    "signatureTitle": "D&A signature expressions",
+    "phrases": [
+      "D&A Signature",
+      "DNA David & Ayde",
+      "D&A Celebration Code",
+      "D&A Ritual",
+      "House of D&A"
+    ],
+    "modes": [
+      {
+        "code": "D&A CLASSIC",
+        "title": "Editorial elegance",
+        "body": "Refined, calm, and precise tone. Ideal for official information and sensitive logistics.",
+        "decor": "Decor: textured ivory, warm copper, couture serif typography, and subtle monogram accents."
+      },
+      {
+        "code": "D&A FIESTA",
+        "title": "Chic Mexican warmth",
+        "body": "Sunny, welcoming, and festive tone without falling into caricature.",
+        "decor": "Decor: terracotta, cactus green, golden accents, and rhythmic background motifs."
+      },
+      {
+        "code": "D&A NOMAD",
+        "title": "International travel support",
+        "body": "Reassuring tone for long-distance guests: clear, practical, and support-oriented.",
+        "decor": "Decor: stylized maps, route lines, and language badges with flags."
+      },
+      {
+        "code": "D&A AFTERGLOW",
+        "title": "Contemporary romance",
+        "body": "Intimate, soft, and poetic tone for emotional storytelling and memory pages.",
+        "decor": "Decor: rose-to-wine gradients, luminous halos, and subtle reveal motion."
+      }
+    ]
+  }
+}

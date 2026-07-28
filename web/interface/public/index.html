@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="fr" data-lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Site Invites</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Sora:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="../shared/styles.css" />
+    <script src="../shared/data.js" defer></script>
+    <script src="../shared/ui.js" defer></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', () => {
+        const d = window.BODA_DATA;
+        document.querySelector('#couple').textContent = d.event.couple;
+        document.querySelector('#venue').textContent = d.event.venue;
+        UI.fillList('#benefits', d.rocaAzulBenefits);
+        UI.fillList('#guest-pays', d.offerModel.guestPays);
+        UI.fillList('#couple-offers', d.offerModel.coupleOffers);
+        UI.setLang('fr');
+
+        document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+          btn.addEventListener('click', () => UI.setLang(btn.getAttribute('data-lang-btn')));
+        });
+      });
+    </script>
+  </head>
+  <body>
+    <main class="shell reveal">
+      <div class="nav">
+        <span class="title" data-i18n="publicTitle">Site invites</span>
+        <a class="btn" href="../index.html">Retour portail</a>
+      </div>
+
+      <section class="hero">
+        <span class="kicker">Public Facing</span>
+        <h1 id="couple"></h1>
+        <p><strong>Venue:</strong> <span id="venue"></span></p>
+        <div class="stack">
+          <button class="btn" data-lang-btn="fr">FR</button>
+          <button class="btn" data-lang-btn="es">ES</button>
+          <button class="btn" data-lang-btn="en">EN</button>
+        </div>
+      </section>
+
+      <section class="grid two" style="margin-top:14px;">
+        <article class="card">
+          <h3 data-i18n="awayTitle">Je viens de loin</h3>
+          <p data-i18n="awayBody"></p>
+        </article>
+        <article class="card">
+          <h3 data-i18n="favTitle">Nos coups de coeur au Mexique</h3>
+          <p class="note" data-i18n="favBody">Guides perso pour vols, transferts, visites et bons plans.</p>
+        </article>
+      </section>
+
+      <section class="grid two" style="margin-top:14px;">
+        <article class="card">
+          <h3 data-i18n="flightHighlightsTitle">Analyse vols internationaux (GDL / PVR)</h3>
+          <ul id="flight-highlights"></ul>
+        </article>
+        <article class="card">
+          <h3 data-i18n="buyTimingTitle">Quand acheter et a quel prix dire GO</h3>
+          <ul id="buy-windows"></ul>
+          <p class="note" style="margin-top:10px;"><strong>GO / NO-GO</strong></p>
+          <ul id="go-buy-rules"></ul>
+        </article>
+      </section>
+
+      <section class="grid two" style="margin-top:14px;">
+        <article class="card">
+          <h3 data-i18n="nonstopMatrixTitle">Hubs directs a surveiller (indicatif)</h3>
+          <p class="note"><strong>GDL (Guadalajara)</strong></p>
+          <ul id="nonstop-gdl"></ul>
+        </article>
+        <article class="card">
+          <h3 data-i18n="nonstopMatrixTitle">Hubs directs a surveiller (indicatif)</h3>
+          <p class="note"><strong>PVR (Puerto Vallarta)</strong></p>
+          <ul id="nonstop-pvr"></ul>
+        </article>
+      </section>
+
+      <section class="grid two" style="margin-top:14px;">
+        <article class="card">
+          <h3 data-i18n="planningTitle">Organiser selon votre situation</h3>
+          <p class="note"><strong>J ai peu de temps</strong></p>
+          <ul id="time-short"></ul>
+          <p class="note" style="margin-top:10px;"><strong>J ai du temps</strong></p>
+          <ul id="time-long"></ul>
+        </article>
+        <article class="card">
+          <h3>Proche ou loin</h3>
+          <ul id="near-far"></ul>
+        </article>
+      </section>
+
+      <section class="card" style="margin-top:14px;">
+        <h3 data-i18n="mapsTitle">Cartes utiles (aeroports, gares, venue)</h3>
+        <ul id="map-links"></ul>
+        <p class="note" data-i18n="mapsNote">Astuce: enregistrez ces points dans Google Maps avant de partir (mode hors ligne).</p>
+      </section>
+
+      <section class="grid two" style="margin-top:14px;">
+        <article class="card">
+          <h3 data-i18n="favoritesNearbyTitle">Que visiter pres de Jocotepec</h3>
+          <ul id="favorites-nearby"></ul>
+        </article>
+        <article class="card">
+          <h3 data-i18n="favoritesTripsTitle">Idees selon temps disponible</h3>
+          <ul id="favorites-trips"></ul>
+        </article>
+      </section>
+
+      <section class="grid two" style="margin-top:14px;">
+        <article class="card">
+          <h3>Ce que paie l invite</h3>
+          <ul id="guest-pays"></ul>
+        </article>
+        <article class="card">
+          <h3>Ce qui est offert par les maries</h3>
+          <ul id="couple-offers"></ul>
+        </article>
+      </section>
+
+      <section class="card" style="margin-top:14px;">
+        <h3>Benefices Club Roca Azul</h3>
+        <ul id="benefits"></ul>
+        <p class="note">Liste basee sur web scrape. Validation finale avec le venue recommandee.</p>
+      </section>
+    </main>
+  </body>
+</html>
