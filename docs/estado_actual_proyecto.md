@@ -16,6 +16,7 @@
 - RSVP: formulario trilingue unificado preparado en vista previa para asistencia, acompanantes, alojamiento y viajes de larga distancia (origen, destino, fechas, horarios, aerolineas, vuelos y escalas).
 - RSVP grupos: identidad separada, nombre de grupo/familia, total, adultos y menores de 18 anadidos; alojamiento limitado a paquete completo de dos noches o alojamiento independiente.
 - Experiencia invitados: overview trilingue de comidas y musica en vivo incorporado, con formularios de sugerencias de postre, menu, canciones y escena abierta.
+- Playlists: enlaces Spotify de ambiente general y karaoke integrados en la seccion de musica; se eliminaron parametros temporales y tokens de colaboracion de las URLs publicas.
 - Club: instalaciones publicadas de Roca Azul agrupadas para el sabado, con aviso de disponibilidad, horarios y posibles suplementos.
 - Despues de la boda: sondeo Costalegre preparado para Barra de Navidad, Manzanillo y formatos de estancia compartida o independiente.
 - Acceso: definida arquitectura para clave compartida `vivamexico`; gate solo cliente aceptable para preview, pero publicacion y formularios requieren validacion serverless y secreto fuera de Git.
@@ -37,6 +38,7 @@
 - RSVP : formulaire trilingue unifie prepare en apercu pour presence, accompagnants, hebergement et voyages longue distance (origine, destination, dates, horaires, compagnies, vols et escales).
 - RSVP groupes : identite separee, nom du groupe/famille, total, adultes et mineurs de moins de 18 ans ajoutes ; hebergement limite au forfait complet de deux nuits ou a une organisation independante.
 - Experience invites : apercu trilingue des repas et de la musique live ajoute, avec formulaires de suggestions pour dessert, menu, chansons et scene ouverte.
+- Playlists : liens Spotify pour l’ambiance generale et le karaoke integres a la section musique ; parametres temporaires et jetons de collaboration retires des URL publiques.
 - Club : installations publiees de Roca Azul regroupees pour le samedi, avec reserve sur disponibilite, horaires et supplements possibles.
 - Apres le mariage : sondage Costalegre prepare pour Barra de Navidad, Manzanillo et des formats de sejour partages ou independants.
 - Acces : architecture definie pour la cle partagee `vivamexico` ; une porte uniquement cote client convient a l’apercu, mais publication et formulaires exigent une validation serverless et un secret hors de Git.

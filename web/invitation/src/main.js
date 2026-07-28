@@ -626,6 +626,40 @@ function render(language) {
               )
               .join("")}
           </div>
+          <div class="playlist-section reveal">
+            <div class="playlist-heading">
+              <p class="eyebrow">${t.music.playlists.eyebrow}</p>
+              <h3>${t.music.playlists.title}</h3>
+              <p>${t.music.playlists.body}</p>
+            </div>
+            <div class="playlist-grid">
+              ${[
+                ["general", EVENT.playlists.general],
+                ["karaoke", EVENT.playlists.karaoke],
+              ]
+                .map(
+                  ([playlist, url], index) => `
+                    <article class="playlist-card">
+                      <span class="playlist-number">0${index + 1}</span>
+                      <div class="spotify-mark" aria-hidden="true">
+                        <i></i><i></i><i></i>
+                      </div>
+                      <h4>${t.music.playlists[playlist].title}</h4>
+                      <p>${t.music.playlists[playlist].body}</p>
+                      <a
+                        class="text-link"
+                        href="${url}"
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        ${t.music.playlists.button} ↗
+                      </a>
+                    </article>
+                  `,
+                )
+                .join("")}
+            </div>
+          </div>
           <div class="open-stage reveal">
             <div>
               <p class="eyebrow">${t.music.stage.eyebrow}</p>

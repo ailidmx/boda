@@ -20,6 +20,10 @@ export const EVENT = {
       whatsapp: "https://wa.me/523336616738",
     },
   },
+  playlists: {
+    general: "https://open.spotify.com/playlist/4izmJJXTOnsUz3BQsrkZBh",
+    karaoke: "https://open.spotify.com/playlist/6hmu5velXNH68JAhQ3xaU4",
+  },
 };
 
 export const content = {
@@ -170,6 +174,21 @@ export const content = {
         title: "¿Hay una canción que quieran cantar?",
         body:
           "Mándennos su sugerencia. Quizá podamos aprovechar a alguno de los músicos en vivo para acompañarlos y convertirla en un momento inolvidable.",
+      },
+      playlists: {
+        eyebrow: "Escuchen desde ahora",
+        title: "La banda sonora empieza aquí",
+        body:
+          "Dos playlists para entrar en ambiente, descubrir canciones y empezar a preparar sus grandes interpretaciones.",
+        general: {
+          title: "Ambiente de la boda",
+          body: "La selección general para viajar, brindar, convivir y bailar.",
+        },
+        karaoke: {
+          title: "Karaoke",
+          body: "Las canciones candidatas para tomar el micrófono y cantar juntos.",
+        },
+        button: "Abrir en Spotify",
       },
     },
     suggestions: {
@@ -589,6 +608,21 @@ export const content = {
         body:
           "Envoyez-nous votre suggestion. Nous pourrons peut-être profiter de la présence des musiciens pour vous accompagner et en faire un moment inoubliable.",
       },
+      playlists: {
+        eyebrow: "À écouter dès maintenant",
+        title: "La bande-son commence ici",
+        body:
+          "Deux playlists pour se mettre dans l’ambiance, découvrir des chansons et préparer vos plus belles interprétations.",
+        general: {
+          title: "Ambiance du mariage",
+          body: "La sélection générale pour voyager, trinquer, se retrouver et danser.",
+        },
+        karaoke: {
+          title: "Karaoké",
+          body: "Les chansons candidates pour prendre le micro et chanter ensemble.",
+        },
+        button: "Ouvrir dans Spotify",
+      },
     },
     suggestions: {
       fields: {
@@ -1005,6 +1039,21 @@ export const content = {
         title: "Is there a song you would like to sing?",
         body:
           "Send us your suggestion. We may be able to invite one of the live musicians to accompany you and turn it into an unforgettable moment.",
+      },
+      playlists: {
+        eyebrow: "Listen from now",
+        title: "The soundtrack starts here",
+        body:
+          "Two playlists to set the mood, discover songs, and prepare your greatest performances.",
+        general: {
+          title: "Wedding atmosphere",
+          body: "The general selection for travelling, toasting, connecting, and dancing.",
+        },
+        karaoke: {
+          title: "Karaoke",
+          body: "Candidate songs for taking the microphone and singing together.",
+        },
+        button: "Open in Spotify",
       },
     },
     suggestions: {

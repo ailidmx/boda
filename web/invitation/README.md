@@ -61,6 +61,8 @@ The sticky countdown targets `2027-02-20T00:00:00-06:00`, local time in Jalisco.
   18, and offers only the complete two-night lodging package or no lodging.
 - Food and live-music sections present the draft programme and collect dessert,
   menu, song, and open-stage suggestions.
+- Canonical listening links expose the general wedding and karaoke playlists
+  without publishing temporary Spotify collaboration tokens.
 - The facilities section groups the reported Roca Azul services with a clear
   availability disclaimer.
 - A post-wedding Costalegre survey explores Barra de Navidad, Manzanillo, and

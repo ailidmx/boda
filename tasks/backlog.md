@@ -37,7 +37,7 @@ Prioridad: `P1` | `P2` | `P3`
 | T-030 | Confirmar lista exhaustiva de beneficios Club Roca Azul desde web scrape | Copilot + David | 2026-07-08 | P1 | todo | T-003 |
 | T-031 | Cerrar corrida musical: Mariachi 2h + Marimba 2h + Norteno 2h + Karaoke 2x1h | David + Ayde + Musica | 2026-07-15 | P1 | todo | T-012 |
 | T-032 | Disenar sesion emociones con canciones live de Norteno | David + Ayde + Musica | 2026-07-20 | P1 | todo | T-031 |
-| T-033 | Integrar playlists Spotify (karaoke + especiales) via API | David + Copilot | 2026-07-20 | P1 | todo | T-031 |
+| T-033 | Integrar playlists Spotify (ambiente + karaoke): enlaces publicos listos, colaboracion/API pendiente de decidir | David + Copilot | 2026-07-20 | P1 | doing | T-031 |
 | T-034 | Validar que desayuno este cubierto por hospedaje para 2 mananas | David + Venue | 2026-07-05 | P1 | todo | T-003 |
 | T-035 | Construir interfaz web core (planning privado + public facing) | Copilot + David + Ayde | 2026-07-05 | P1 | doing | T-005, T-022, T-029 |
 | T-036 | Desarrollar concepto confirmado: estetica oaxaquena coordinada para ambos novios | Ayde + David | 2026-07-12 | P2 | doing | T-004 |
