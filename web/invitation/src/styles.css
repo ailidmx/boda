@@ -157,8 +157,68 @@ a:focus-visible {
 }
 
 .monogram {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.16em;
   font-family: "Italiana", serif;
   font-size: 1.25rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.monogram-initial {
+  display: inline-grid;
+  min-width: 1.28em;
+  overflow: hidden;
+  text-align: center;
+}
+
+.monogram-initial > span {
+  grid-area: 1 / 1;
+}
+
+.monogram-initial > span:first-child {
+  animation: monogram-primary 10s ease-in-out infinite;
+}
+
+.monogram-initial > span:last-child {
+  animation: monogram-secondary 10s ease-in-out infinite;
+}
+
+.monogram-ampersand {
+  color: #e4b968;
+  font-size: 0.78em;
+  font-style: italic;
+}
+
+@keyframes monogram-primary {
+  0%,
+  42%,
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  50%,
+  92% {
+    opacity: 0;
+    transform: translateY(-0.35em);
+  }
+}
+
+@keyframes monogram-secondary {
+  0%,
+  42%,
+  100% {
+    opacity: 0;
+    transform: translateY(0.35em);
+  }
+
+  50%,
+  92% {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .desktop-nav {
@@ -1150,5 +1210,13 @@ h2 {
   *::after {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .monogram-initial > span {
+    animation: none;
+  }
+
+  .monogram-initial > span:last-child {
+    display: none;
   }
 }

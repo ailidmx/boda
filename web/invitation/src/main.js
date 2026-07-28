@@ -141,6 +141,20 @@ function heroMarkup(images, labels) {
   `;
 }
 
+function monogramMarkup() {
+  return `
+    <span class="monogram-initial" aria-hidden="true">
+      <span>D.</span>
+      <span>A.</span>
+    </span>
+    <span class="monogram-ampersand" aria-hidden="true">&</span>
+    <span class="monogram-initial" aria-hidden="true">
+      <span>A.</span>
+      <span>D.</span>
+    </span>
+  `;
+}
+
 function languageSwitcherMarkup(activeLanguage) {
   return SUPPORTED_LANGUAGES.map(
     (language) => `
@@ -183,7 +197,9 @@ function render(language) {
 
       <section class="hero" id="top">
         <header class="site-header">
-          <a class="monogram" href="#top" aria-label="${EVENT.couple}">D · A</a>
+          <a class="monogram" href="#top" aria-label="${EVENT.couple}">
+            ${monogramMarkup()}
+          </a>
           <nav class="desktop-nav" aria-label="Primary">
             <a href="#story">${t.nav.story}</a>
             <a href="#weekend">${t.nav.weekend}</a>
@@ -327,7 +343,7 @@ function render(language) {
       </main>
 
       <footer class="site-footer">
-        <div class="footer-monogram">D · A</div>
+        <div class="footer-monogram">D. & A.</div>
         <p>${t.footer.line}</p>
         <small>${t.footer.privacy}</small>
       </footer>
