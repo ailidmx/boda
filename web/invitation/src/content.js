@@ -37,6 +37,7 @@ export const content = {
       invitation: "Queremos celebrar este momento con ustedes",
       scroll: "Descubrir la invitación",
       imageNote: "Aquí irá nuestra fotografía",
+      imageAlt: "David y Aydé juntos",
     },
     story: {
       eyebrow: "Nuestra invitación",
@@ -139,6 +140,7 @@ export const content = {
       invitation: "Nous voulons vivre ce moment avec vous",
       scroll: "Découvrir l’invitation",
       imageNote: "Notre photographie viendra ici",
+      imageAlt: "David et Aydé ensemble",
     },
     story: {
       eyebrow: "Notre invitation",
@@ -241,6 +243,7 @@ export const content = {
       invitation: "We want to celebrate this moment with you",
       scroll: "Discover the invitation",
       imageNote: "Our photograph will go here",
+      imageAlt: "David and Aydé together",
     },
     story: {
       eyebrow: "Our invitation",

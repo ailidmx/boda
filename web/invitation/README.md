@@ -38,6 +38,14 @@ The visible language control always allows guests to override detection.
 
 The sticky countdown targets `2027-02-20T00:00:00-06:00`, local time in Jalisco. Update `EVENT.date` in `src/content.js` once the official ceremony time is confirmed.
 
+## Photographs and visual assets
+
+- Submitted originals live in `media/originals/` and are not deployed.
+- Privacy and approval status live in `media/catalog.csv`.
+- Approved web derivatives live in `src/assets/approved/`.
+- `src/media.js` connects approved images to page slots.
+- Vite copies only imported approved assets into the production build.
+
 ## Before publication
 
 - Replace the graphic hero placeholder with the selected couple photograph.

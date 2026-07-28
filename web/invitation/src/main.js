@@ -4,6 +4,7 @@ import {
   EVENT,
   SUPPORTED_LANGUAGES,
 } from "./content.js";
+import { MEDIA } from "./media.js";
 
 const LANGUAGE_STORAGE_KEY = "boda-language";
 const app = document.querySelector("#app");
@@ -93,6 +94,9 @@ function render(language) {
     .querySelector('meta[name="description"]')
     ?.setAttribute("content", t.metaDescription);
   document.querySelector(".skip-link").textContent = t.skip;
+  const heroMedia = MEDIA.hero
+    ? `<img class="hero-photo" src="${MEDIA.hero}" alt="${t.hero.imageAlt}" />`
+    : `<span class="hero-image-note">${t.hero.imageNote}</span>`;
 
   app.innerHTML = `
     <div class="site-shell">
@@ -118,11 +122,11 @@ function render(language) {
           <a class="header-rsvp" href="#rsvp">${t.nav.rsvp}</a>
         </header>
 
-        <div class="hero-art" aria-hidden="true">
+        <div class="hero-art${MEDIA.hero ? " has-photo" : ""}">
+          ${heroMedia}
           <div class="sun-disc"></div>
           <div class="motif motif-left"></div>
           <div class="motif motif-right"></div>
-          <span class="hero-image-note">${t.hero.imageNote}</span>
         </div>
 
         <div class="hero-content">
