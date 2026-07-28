@@ -22,6 +22,7 @@ Este repo es la base documental y operativa de la boda:
 - `invitados/`: base de datos de invitados y mesas
 - `comunicacion/`: mensajes y plantillas para invitados
 - `proveedores/`: evaluacion, contratos y checklists
+- `vestuario/`: concepto y decisiones de vestuario de los novios
 - `operacion_evento/`: runbook del dia de boda
 - `web/`: contenido y activos de la web publica
 

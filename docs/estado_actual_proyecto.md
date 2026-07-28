@@ -7,6 +7,7 @@
 - Interfaz web core creada (planning privado + sitio publico).
 - Integracion Google Sheets activa (pull/push funcional).
 - Cabanas: despues de la baja de Gaetane + Stephane + Ange, demanda de alojamiento baja a 72.
+- Vestuario: confirmado un concepto oaxaqueno coordinado para ambos novios; faltan definir sus elementos concretos.
 
 ## FR - Ou on en est aujourd'hui
 - Lieu et base hebergement confirmes a Roca Azul.
@@ -15,6 +16,7 @@
 - Interface web core creee (planning prive + site public).
 - Integration Google Sheets active (pull/push fonctionnel).
 - Cabanes : apres le desistement de Gaetane + Stephane + Ange, besoin logement descend a 72.
+- Tenues : concept oaxaqueno coordonne confirme pour les deux maries ; les elements precis restent a definir.
 
 ## ES - Foco inmediato
 1. Cerrar puzzle de vestuario novios.

@@ -5,7 +5,7 @@ Prioridad: P1 | P2 | P3
 
 | ID | Prioridad | Estado | Tema | Pregunta | Owner | Tarea ligada |
 |---|---|---|---|---|---|---|
-| Q-001 | P2 | blocked | Vestuario novios | Que elementos exactos definen el estilo Oaxaca + parures para ambos? | Ayde | T-036 |
+| Q-001 | P2 | doing | Vestuario novios | Que elementos compartidos concretaran la estetica oaxaquena coordinada para ambos? | Ayde + David | T-036 |
 | Q-002 | P2 | blocked | Vestuario monsieur | Cuales 3 lineas de accesorios para monsieur probamos primero? | Ayde + David | T-038 |
 | Q-003 | P1 | open | Proveedor taquiza | Cual es el contacto final y condiciones de taquiza del sabado noche? | Manu | T-025 |
 | Q-004 | P1 | open | Tejuino | Quien provee tejuino, en que horario y con que volumen? | David + Manu | T-026 |
