@@ -41,7 +41,7 @@ Prioridad: `P1` | `P2` | `P3`
 | T-034 | Validar que desayuno este cubierto por hospedaje para 2 mananas | David + Venue | 2026-07-05 | P1 | todo | T-003 |
 | T-035 | Construir interfaz web core (planning privado + public facing) | Copilot + David + Ayde | 2026-07-05 | P1 | doing | T-005, T-022, T-029 |
 | T-036 | Desarrollar concepto confirmado: estetica oaxaquena coordinada para ambos novios | Ayde + David | 2026-07-12 | P2 | doing | T-004 |
-| T-037 | Armar shortlist de atelier/sastre para conjunto a medida de ambos | Ayde | 2026-07-18 | P2 | blocked | T-036 |
+| T-037 | Registrar artesano/taller de Cuilapam y validar tecnica, materiales, autoria e iconografia del traje | Ayde + David | 2026-07-18 | P2 | doing | T-036 |
 | T-038 | Proponer accesorios coordinados (zapatos, cinturon, joyeria, reloj, boutonniere, chal) | Ayde + David | 2026-07-14 | P2 | blocked | T-036 |
 | T-039 | Cerrar primer fitting de vestuario novios | Ayde | 2026-08-20 | P2 | blocked | T-037 |
 | T-040 | Bagues: estado validado, pendiente de detalles finales | David + Ayde | 2026-06-28 | P2 | done | - |
@@ -58,3 +58,4 @@ Prioridad: `P1` | `P2` | `P3`
 | T-051 | Activar protocolo de ejecucion autonoma (auto-integrado sin confirmaciones intermedias) | Copilot + David + Ayde | 2026-06-28 | P1 | done | - |
 | T-052 | Aplicar couchages extra en todas las cabanas (incluye CASONA) y recalcular capacidad funcional | Copilot + David + Ayde | 2026-06-28 | P1 | done | T-008 |
 | T-053 | Generar propuesta v2 de asignacion por cabanas para confirmados con hospedaje (73/88) | Copilot + David + Ayde | 2026-06-28 | P1 | done | T-008, T-052 |
+| T-054 | Crear registro fotografico del traje de Cuilapam (prenda completa, bordados y acabados) | Ayde + David | 2026-08-20 | P2 | todo | T-037, T-039 |

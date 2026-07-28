@@ -5,12 +5,16 @@
 - Los dos novios llevaran una estetica oaxaquena coordinada.
 - El objetivo es que ambos atuendos se lean como una pareja visual, sin que tengan que ser identicos.
 - La ejecucion concreta sigue abierta: prendas, textiles, bordados, paleta, siluetas, accesorios y atelier.
+- Uno de los trajes sera una pieza contemporanea de lino procedente de Cuilapam de Guerrero, con bordados y detalles dorados.
+- Ficha cultural y de produccion: `vestuario/traje_cuilapam.md`.
 
 ## FR - Concept confirme
 
 - Les deux maries porteront une esthetique oaxaquena coordonnee.
 - L'objectif est que les deux tenues forment un ensemble visuel coherent, sans devoir etre identiques.
 - La realisation precise reste a definir : pieces, textiles, broderies, palette, silhouettes, accessoires et atelier.
+- L'un des costumes sera une piece contemporaine en lin provenant de Cuilapam de Guerrero, avec des broderies et des details dores.
+- Fiche culturelle et de production : `vestuario/traje_cuilapam.md`.
 
 ## ES - Decisiones por cerrar
 
@@ -38,4 +42,3 @@
 - Tareas: `tasks/backlog.md` (T-036 a T-039)
 - Preguntas abiertas: `tasks/preguntas_puzzle.md`
 - Timeline: `docs/timeline_master.md`
-
