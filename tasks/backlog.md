@@ -24,8 +24,8 @@ Prioridad: `P1` | `P2` | `P3`
 | T-017 | Validar cue sheet comida-musica con proveedores | Coord. + Catering + DJ | 2027-02-10 | P1 | todo | T-015, T-016 |
 | T-018 | Confirmar llegada temprana viernes 15:00 con wedding planners | David + Planner | 2026-07-05 | P1 | todo | T-003 |
 | T-019 | Disenar operativa torneo amistoso de petanca del viernes | David + Ayde + Planner | 2026-07-15 | P1 | todo | T-018 |
-| T-020 | Crear protocolo de recepcion internacional (Francia y otros) | Copilot + David + Ayde | 2026-07-10 | P1 | todo | T-002 |
-| T-021 | Definir flujo de traslados aeropuerto durante toda la estancia | David + Logistica | 2026-07-20 | P1 | todo | T-020 |
+| T-020 | Crear protocolo de recepcion internacional (Europa y otros origenes) | Copilot + David + Ayde | 2026-08-05 | P1 | doing | T-002 |
+| T-021 | Definir flujo de traslados aeropuerto durante toda la estancia | David + Logistica | 2026-08-10 | P1 | doing | T-020 |
 | T-022 | Publicar seccion web "Je viens de loin" + guia de vuelos | Copilot + David + Ayde | 2026-07-20 | P1 | done | T-020 |
 | T-023 | Publicar seccion "Nos coups de coeur au Mexique" | Copilot + David + Ayde | 2026-07-25 | P2 | done | T-022 |
 | T-024 | Confirmar operativo pizzas viernes noche (Manu + Ismael) | Manu + Ismael | 2026-07-05 | P1 | todo | T-019 |
@@ -59,3 +59,6 @@ Prioridad: `P1` | `P2` | `P3`
 | T-052 | Aplicar couchages extra en todas las cabanas (incluye CASONA) y recalcular capacidad funcional | Copilot + David + Ayde | 2026-06-28 | P1 | done | T-008 |
 | T-053 | Generar propuesta v2 de asignacion por cabanas para confirmados con hospedaje (73/88) | Copilot + David + Ayde | 2026-06-28 | P1 | done | T-008, T-052 |
 | T-054 | Crear registro fotografico del traje de Cuilapam (prenda completa, bordados y acabados) | Ayde + David | 2026-08-20 | P2 | todo | T-037, T-039 |
+| T-055 | Cotejar los cuatro tramos del billete de Dimitar y cerrar horarios de llegada y salida | David + Dimitar | 2026-08-02 | P1 | blocked | T-020 |
+| T-056 | Confirmar estancias de Dimitar del 14-19 y 21-28 de febrero | David + Dimitar | 2026-08-05 | P1 | blocked | T-055 |
+| T-057 | Asignar recogida GDL y regreso al aeropuerto para Dimitar | David + Logistica | 2026-08-10 | P1 | blocked | T-055, T-056, T-021 |

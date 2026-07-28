@@ -16,6 +16,8 @@ Prioridad: P1 | P2 | P3
 | Q-009 | P2 | open | Beneficios club | Cual es la lista final validada con venue de beneficios incluidos? | David + Copilot | T-030 |
 | Q-010 | P2 | open | Bagues | Que detalles finales faltan registrar sobre bagues para cerrar ficha? | David + Ayde | T-040 |
 | Q-011 | P2 | open | Traje de Cuilapam | Cual es el nombre del artesano o taller y que tecnica, materiales y autoria tiene cada bordado dorado? | Ayde + David | T-037 |
+| Q-012 | P1 | open | Viaje Dimitar | Cuales son los cuatro vuelos exactos del billete de Dimitar, con numeros y horarios locales? | David + Dimitar | T-055 |
+| Q-013 | P1 | open | Estancia Dimitar | Donde se hospedara del 14 al 19 y del 21 al 28, y Dimitar +1 comparte vuelos y estancias? | David + Dimitar | T-056 |
 
 ## Proximo sprint de 5 preguntas (recomendado)
 1. Q-003

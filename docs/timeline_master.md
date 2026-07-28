@@ -15,6 +15,7 @@
 ## Checklist por mes
 - [ ] 2026-07: Definir presupuesto tope y lista preliminar de invitados con datos de viaje
 - [ ] 2026-08: Shortlist de proveedores clave
+- [ ] 2026-08: Centralizar vuelos, estancias y necesidades de traslado de quienes vienen de lejos
 - [x] 2026-09: Cerrar venue y fecha exacta de ceremonia
 - [ ] 2026-10: Cerrar foto/video y musica
 - [ ] 2026-10: Cerrar foto/video y musica + direccion de vestuario novios

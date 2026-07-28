@@ -1,0 +1,5 @@
+traveler_id,segmento,direccion,estado,fecha_salida,origen,destino,aerolinea,numero_vuelo,salida_local,fecha_llegada,llegada_local,terminal_salida,terminal_llegada,fuente_horario,verificado_el,notas
+V-001,1,ida,pending_ticket,2027-02-14,AGP,MAD,,,,2027-02-14,,,,,,"Confirmar en billete de Dimitar"
+V-001,2,ida,probable_pending_ticket,2027-02-14,MAD,GDL,Aeromexico,AM39,13:30,2027-02-14,19:20,T1,T1,https://www.flight.info/AM39,2026-07-28,"Horario publicado para domingos de febrero de 2027; no sustituye el billete"
+V-001,3,vuelta,probable_pending_ticket,2027-02-28,GDL,MAD,Aeromexico,AM36,11:15,2027-03-01,05:00,T1,T1,https://www.flight.info/AM36,2026-07-28,"Horario publicado para domingos hasta 2027-02-28; no sustituye el billete"
+V-001,4,vuelta,pending_ticket,2027-03-01,MAD,AGP,,,,2027-03-01,,,,,,"Fecha inferida por llegada transatlantica; confirmar tramo y horario en billete"

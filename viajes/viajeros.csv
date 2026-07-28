@@ -1,0 +1,2 @@
+traveler_id,guest_id,nombre,ciudad_origen,pais_origen,fecha_inicio_viaje,fecha_fin_viaje,aeropuerto_llegada,estado_vuelos,estado_estancias,estado_traslados,notas
+V-001,211,Dimitar,Malaga,Espana,2027-02-14,2027-02-28,GDL,booked_pending_ticket_details,partial,planning,"Primer invitado con vuelo reservado; ruta declarada AGP-MAD-GDL"

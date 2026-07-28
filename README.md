@@ -20,6 +20,7 @@ Este repo es la base documental y operativa de la boda:
 - `docs/`: estrategia, decisiones y planes maestros
 - `tasks/`: backlog y seguimiento de tareas
 - `invitados/`: base de datos de invitados y mesas
+- `viajes/`: vuelos, estancias y traslados de invitados que vienen de lejos
 - `comunicacion/`: mensajes y plantillas para invitados
 - `proveedores/`: evaluacion, contratos y checklists
 - `vestuario/`: concepto y decisiones de vestuario de los novios
