@@ -1,0 +1,3 @@
+group_id,nombre_grupo,fecha_llegada,fecha_salida,estado_fechas,estado_asistencia,origen,aeropuerto_llegada,total_personas,coordinador,notas
+G-001,Dimitar + acompañante,2027-02-14,2027-02-28,partial,confirmed,Malaga,GDL,2,Dimitar,"Dimitar reservado; falta confirmar si Dimitar +1 comparte el itinerario"
+G-002,Mama Tina,2027-02-10,2027-03-15,tentative,confirmed,,,1,Mama Tina,"Asistencia a la boda confirmada; fechas de viaje aun no confirmadas"

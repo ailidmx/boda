@@ -2,3 +2,4 @@ traveler_id,bloque,check_in,check_out,ciudad,lugar,direccion,estado,contacto,not
 V-001,1,2027-02-14,2027-02-19,,,,"pending",,"Primera estancia local por definir"
 V-001,2,2027-02-19,2027-02-21,Jocotepec,Roca Azul,,"confirmed",,"Cabana CABAÑAS_MADERA_33_2_ADULTOS"
 V-001,3,2027-02-21,2027-02-28,,,,"pending",,"Estancia posterior a la boda por definir"
+V-002,1,2027-02-10,2027-03-15,,,,"tentative_pending",,"Fechas y alojamiento completos por confirmar"

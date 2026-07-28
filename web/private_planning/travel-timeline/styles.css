@@ -1,0 +1,444 @@
+:root {
+  color: #26231d;
+  background: #f2ede4;
+  font-family:
+    Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+}
+
+button {
+  font: inherit;
+}
+
+.page {
+  width: min(100% - 2rem, 92rem);
+  margin: 0 auto;
+  padding: 4rem 0 2rem;
+}
+
+.page-header {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 2rem;
+  align-items: start;
+}
+
+.kicker {
+  margin: 0 0 0.8rem;
+  color: #9c4c34;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+h1 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(3rem, 7vw, 6.5rem);
+  font-weight: 400;
+  letter-spacing: -0.06em;
+  line-height: 0.9;
+}
+
+.intro {
+  max-width: 50rem;
+  margin: 1.75rem 0 0;
+  color: #625d53;
+  font-size: 1.05rem;
+}
+
+.language-switch {
+  display: flex;
+  gap: 0.2rem;
+  padding: 0.2rem;
+  border: 1px solid #aaa294;
+  border-radius: 999px;
+}
+
+.language-switch button {
+  border: 0;
+  border-radius: 999px;
+  padding: 0.5rem 0.7rem;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.language-switch button[aria-pressed="true"] {
+  background: #293b35;
+  color: white;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin: 3.5rem 0 2rem;
+  border: 1px solid #d2c9bb;
+  background: #faf7f1;
+}
+
+.metrics article {
+  display: flex;
+  min-height: 7.5rem;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.25rem;
+  border-right: 1px solid #d2c9bb;
+}
+
+.metrics article:last-child {
+  border-right: 0;
+}
+
+.metrics strong {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.4rem;
+  font-weight: 400;
+}
+
+.metrics span {
+  color: #6c665c;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legend-swatch {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 2px;
+}
+
+.legend-swatch.booked {
+  background: #2d6256;
+}
+
+.legend-swatch.partial {
+  background: #c58a2a;
+}
+
+.legend-swatch.tentative {
+  border: 1px dashed #a54d35;
+  background: #f5d9d0;
+}
+
+.legend-swatch.wedding {
+  background: #d9c5ec;
+}
+
+.timeline-scroll {
+  overflow-x: auto;
+  padding-bottom: 1rem;
+}
+
+.timeline {
+  min-width: 62rem;
+  border: 1px solid #d2c9bb;
+  background: #faf7f1;
+}
+
+.timeline-axis {
+  display: grid;
+  grid-template-columns: var(--label-width) 1fr;
+  min-height: 3.25rem;
+  border-bottom: 1px solid #d2c9bb;
+}
+
+.axis-spacer {
+  border-right: 1px solid #d2c9bb;
+}
+
+.axis-track,
+.group-track {
+  position: relative;
+}
+
+.timeline-tick {
+  position: absolute;
+  bottom: 0.65rem;
+  color: #7a7368;
+  font-size: 0.62rem;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+
+.timeline-tick::after {
+  position: absolute;
+  top: 1.5rem;
+  left: 50%;
+  width: 1px;
+  height: 1rem;
+  background: #d2c9bb;
+  content: "";
+}
+
+.timeline-tick.is-wedding {
+  color: #71499a;
+  font-weight: 800;
+}
+
+.group-row {
+  display: grid;
+  grid-template-columns: var(--label-width) 1fr;
+  border-bottom: 1px solid #d2c9bb;
+}
+
+.group-row:last-child {
+  border-bottom: 0;
+}
+
+.group-summary {
+  position: relative;
+  min-height: 9rem;
+  padding: 1.25rem;
+  border-right: 1px solid #d2c9bb;
+}
+
+.group-summary > div {
+  display: flex;
+  align-items: baseline;
+  gap: 0.65rem;
+}
+
+.group-id {
+  color: #9c4c34;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.group-summary h2 {
+  margin: 0;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.35rem;
+  font-weight: 400;
+}
+
+.group-summary p {
+  margin: 1rem 0;
+  color: #686158;
+  font-size: 0.76rem;
+}
+
+.status {
+  display: inline-flex;
+  border-radius: 999px;
+  padding: 0.35rem 0.55rem;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.status-booked {
+  background: #d2e5df;
+  color: #244d43;
+}
+
+.status-partial {
+  background: #f1dfbd;
+  color: #795314;
+}
+
+.status-tentative {
+  background: #f2d8cf;
+  color: #813b28;
+}
+
+.group-track {
+  min-height: 9rem;
+  overflow: hidden;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0 calc(10% - 1px),
+    #eee7dc calc(10% - 1px) 10%
+  );
+}
+
+.wedding-band {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  bottom: 0;
+  background: rgb(193 166 219 / 25%);
+}
+
+.wedding-day {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #8857b4;
+}
+
+.travel-bar {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  display: flex;
+  min-width: 1.5rem;
+  height: 2.4rem;
+  align-items: center;
+  justify-content: flex-end;
+  border-radius: 0.3rem;
+  padding: 0.35rem;
+  transform: translateY(-50%);
+}
+
+.travel-bar span {
+  display: grid;
+  width: 1.55rem;
+  height: 1.55rem;
+  place-items: center;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 80%);
+  font-size: 0.65rem;
+  font-weight: 800;
+}
+
+.travel-bar-booked {
+  background: #2d6256;
+}
+
+.travel-bar-partial {
+  background: #c58a2a;
+}
+
+.travel-bar-tentative {
+  border: 2px dashed #a54d35;
+  background: #f5d9d0;
+}
+
+.group-details {
+  grid-column: 1 / -1;
+  padding: 0.75rem 1.25rem;
+  background: #f2ede4;
+}
+
+.group-details summary {
+  cursor: pointer;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.group-details dl {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.group-details dl div {
+  padding: 0.75rem;
+  background: #faf7f1;
+}
+
+.group-details dt {
+  color: #7a7368;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.group-details dd {
+  margin: 0.4rem 0 0;
+}
+
+.group-details ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+
+.group-details li {
+  display: flex;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid #d2c9bb;
+  background: #faf7f1;
+}
+
+.group-details li small {
+  color: #7a7368;
+}
+
+.group-details > p {
+  color: #686158;
+  font-size: 0.82rem;
+}
+
+footer {
+  padding: 2rem 0;
+  color: #6c665c;
+  font-size: 0.78rem;
+}
+
+footer p {
+  margin-bottom: 0.25rem;
+}
+
+@media (max-width: 720px) {
+  .page {
+    padding-top: 2rem;
+  }
+
+  .page-header {
+    grid-template-columns: 1fr;
+  }
+
+  .language-switch {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+  }
+
+  .metrics {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .metrics article:nth-child(2) {
+    border-right: 0;
+  }
+
+  .metrics article:nth-child(-n + 2) {
+    border-bottom: 1px solid #d2c9bb;
+  }
+
+  .group-details dl {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}

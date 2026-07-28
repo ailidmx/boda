@@ -11,6 +11,7 @@
 - Viajes: creado seguimiento individual de vuelos, estancias y traslados; Dimitar es el primer viajero registrado, del 14 al 28 de febrero via Malaga-Madrid-Guadalajara.
 - Invitacion web: primera version one-page ES/FR/EN construida con deteccion automatica de idioma y contador fijo; pendiente contenido final, fotografia, RSVP y publicacion.
 - Activos web: pipeline de originales privados y derivados publicos creado; `INV-001` recibido como referencia, todavia no aprobado para publicacion por incluir telefonos visibles.
+- Timeline de viajeros: vista privada por grupos creada; incluye Dimitar + acompañante y Mama Tina (10 febrero-15 marzo, fechas tentativas).
 
 ## FR - Ou on en est aujourd'hui
 - Lieu et base hebergement confirmes a Roca Azul.
@@ -23,6 +24,7 @@
 - Voyages : suivi individuel des vols, hebergements et transferts cree ; Dimitar est le premier voyageur enregistre, du 14 au 28 fevrier via Malaga-Madrid-Guadalajara.
 - Invitation web : premiere version one-page ES/FR/EN construite avec detection automatique de langue et compte a rebours fixe ; contenus finaux, photo, RSVP et publication encore a valider.
 - Medias web : pipeline cree pour separer originaux prives et derives publics ; `INV-001` recu comme reference, pas encore approuve pour publication car des numeros de telephone sont visibles.
+- Calendrier voyageurs : vue privee par groupes creee ; elle inclut Dimitar + accompagnante et Mama Tina (10 fevrier-15 mars, dates provisoires).
 
 ## ES - Foco inmediato
 1. Completar billete, estancias y traslados de Dimitar como primer caso del sistema de viajeros.

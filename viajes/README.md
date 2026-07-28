@@ -13,11 +13,14 @@ Modulo operativo para acompanar a quienes vienen de lejos desde la compra del vu
 ## Archivos
 
 - `viajeros.csv`: resumen del viaje por persona.
+- `grupos_viaje.csv`: una barra temporal por familia o grupo que viaja junto.
+- `grupo_miembros.csv`: relacion entre grupos, invitados y fichas individuales.
 - `vuelos.csv`: un registro por tramo aereo.
 - `estancias.csv`: alojamiento noche por noche o por bloques.
 - `traslados.csv`: recogidas y regresos al aeropuerto.
 - `rutas_europa_gdl_pvr.md`: conexiones sin escala utiles desde Europa.
 - `fichas/`: resumen legible y decisiones pendientes de cada viajero.
+- `generate_timeline.py`: genera los datos de la vista privada en `web/private_planning/travel-timeline/`.
 
 ## Flujo por invitado
 
@@ -27,6 +30,16 @@ Modulo operativo para acompanar a quienes vienen de lejos desde la compra del vu
 4. Cargar la estancia completa en `estancias.csv`, incluyendo noches fuera de Roca Azul.
 5. Crear los dos movimientos principales en `traslados.csv`: llegada y regreso.
 6. Revisar cambios de horario 30 dias, 7 dias, 72 horas y 24 horas antes de cada vuelo.
+
+## Vista timeline por grupos
+
+Regenerar la vista despues de editar `grupos_viaje.csv` o `grupo_miembros.csv`:
+
+```bash
+python3 viajes/generate_timeline.py
+```
+
+La vista es privada y no debe formar parte del deploy de la invitacion publica.
 
 ## Regla de privacidad
 

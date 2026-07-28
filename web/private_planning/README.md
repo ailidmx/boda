@@ -2,6 +2,10 @@
 
 ## ES
 Esta seccion es para uso interno de novios y equipo de planeacion.
+
+## Vistas
+
+- `travel-timeline/`: calendario visual de presencia en Mexico por grupo de invitados.
 Contenido recomendado:
 - Tracking de tareas operativas
 - Versiones de asignacion de cabañas

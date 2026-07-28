@@ -1,0 +1,4 @@
+group_id,guest_id,traveler_id,nombre,rol,estado_viaje
+G-001,211,V-001,Dimitar,principal,booked
+G-001,212,,Dimitar +1,acompanante,unknown
+G-002,89,V-002,Mama Tina,principal,tentative
