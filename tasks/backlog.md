@@ -9,7 +9,7 @@ Prioridad: `P1` | `P2` | `P3`
 | T-002 | Definir lista preliminar de invitados (incluye ciudad/pais/origen) | David + Ayde | 2026-07-15 | P1 | doing | T-001 |
 | T-003 | Venue Roca Azul confirmado (Jocotepec, Jalisco) | David | 2026-06-27 | P1 | done | - |
 | T-004 | Crear brief de estilo para web e invitacion | Ayde | 2026-08-05 | P2 | todo | - |
-| T-005 | Publicar version 1 de la web | David | 2026-12-01 | P2 | todo | T-002, T-004 |
+| T-005 | Publicar version 1 de la invitacion web publica | David | 2026-12-01 | P2 | doing | T-002, T-004, T-058 |
 | T-006 | Cargar inventario real de cabanas (capacidad por cabana) | David | 2026-07-05 | P1 | done | T-003 |
 | T-007 | Etiquetar prioridad de alojamiento por invitado | David + Ayde | 2026-07-12 | P1 | todo | T-002 |
 | T-008 | Crear propuesta v1 de acomodo en cabanas | Copilot + David + Ayde | 2026-07-20 | P1 | doing | T-006, T-007 |
@@ -62,3 +62,4 @@ Prioridad: `P1` | `P2` | `P3`
 | T-055 | Cotejar los cuatro tramos del billete de Dimitar y cerrar horarios de llegada y salida | David + Dimitar | 2026-08-02 | P1 | blocked | T-020 |
 | T-056 | Confirmar estancias de Dimitar del 14-19 y 21-28 de febrero | David + Dimitar | 2026-08-05 | P1 | blocked | T-055 |
 | T-057 | Asignar recogida GDL y regreso al aeropuerto para Dimitar | David + Logistica | 2026-08-10 | P1 | blocked | T-055, T-056, T-021 |
+| T-058 | Aprobar contenido ES/FR/EN, fotografia principal y horario objetivo del contador | David + Ayde | 2026-08-15 | P1 | doing | T-004 |

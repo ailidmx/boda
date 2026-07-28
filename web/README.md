@@ -1,9 +1,10 @@
 # Arquitectura Web Boda
 
 ## ES
-La carpeta web ahora se divide en dos superficies:
+La carpeta web se divide en tres superficies:
 - private_planning: acceso restringido para planeacion interna
 - public_site: acceso publico para invitados
+- invitation: invitacion publica one-page ES/FR/EN
 
 Idiomas activos para sitio publico:
 - ES
@@ -11,9 +12,10 @@ Idiomas activos para sitio publico:
 - EN
 
 ## FR
-Le dossier web est maintenant divise en deux surfaces :
+Le dossier web est divise en trois surfaces :
 - private_planning : acces restreint pour la planification interne
 - public_site : acces public pour les invites
+- invitation : invitation publique one-page ES/FR/EN
 
 Langues actives pour le site public :
 - ES
@@ -21,9 +23,10 @@ Langues actives pour le site public :
 - EN
 
 ## EN
-The web folder is now split into two surfaces:
+The web folder is split into three surfaces:
 - private_planning: restricted access for internal planning
 - public_site: public access for guests
+- invitation: public one-page invitation in ES/FR/EN
 
 Active languages for the public site:
 - ES
