@@ -38,6 +38,9 @@ export const content = {
       scroll: "Descubrir la invitación",
       imageNote: "Aquí irá nuestra fotografía",
       imageAlt: "David y Aydé juntos",
+      selectImage: "Mostrar fotografía",
+      pause: "Pausar fotos",
+      play: "Reanudar fotos",
     },
     story: {
       eyebrow: "Nuestra invitación",
@@ -156,6 +159,9 @@ export const content = {
       scroll: "Découvrir l’invitation",
       imageNote: "Notre photographie viendra ici",
       imageAlt: "David et Aydé ensemble",
+      selectImage: "Afficher la photographie",
+      pause: "Pause photos",
+      play: "Relancer les photos",
     },
     story: {
       eyebrow: "Notre invitation",
@@ -274,6 +280,9 @@ export const content = {
       scroll: "Discover the invitation",
       imageNote: "Our photograph will go here",
       imageAlt: "David and Aydé together",
+      selectImage: "Show photograph",
+      pause: "Pause photos",
+      play: "Resume photos",
     },
     story: {
       eyebrow: "Our invitation",

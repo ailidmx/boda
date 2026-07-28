@@ -13,7 +13,7 @@ import couple018 from "./assets/approved/couple-018.webp";
  * later compositions without exposing the private originals.
  */
 export const MEDIA = {
-  hero: couple013,
+  hero: [couple014, couple018, couple003, couple013],
   gallery: [
     couple003,
     couple009,

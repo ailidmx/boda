@@ -9,6 +9,7 @@ import { MEDIA } from "./media.js";
 const LANGUAGE_STORAGE_KEY = "boda-language";
 const app = document.querySelector("#app");
 let currentLanguage = "es";
+let heroSlideInterval = null;
 
 function normalizeLanguage(value) {
   if (!value) return null;
@@ -87,6 +88,59 @@ function galleryMarkup(images, alternativeTexts) {
     .join("");
 }
 
+function heroMarkup(images, labels) {
+  if (!images.length) {
+    return `<span class="hero-image-note">${labels.imageNote}</span>`;
+  }
+
+  const photos = images
+    .map(
+      (image, index) => `
+        <img
+          class="hero-photo${index === 0 ? " is-active" : ""}"
+          src="${image}"
+          alt=""
+          aria-hidden="true"
+          ${index === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}
+          decoding="async"
+        />
+      `,
+    )
+    .join("");
+
+  const dots = images
+    .map(
+      (_, index) => `
+        <button
+          class="hero-slide-dot"
+          type="button"
+          data-hero-slide="${index}"
+          aria-label="${labels.selectImage} ${index + 1}"
+          aria-current="${index === 0}"
+        ></button>
+      `,
+    )
+    .join("");
+
+  return `
+    <div class="hero-slides" role="img" aria-label="${labels.imageAlt}">
+      ${photos}
+    </div>
+    ${
+      images.length > 1
+        ? `
+          <div class="hero-slideshow-controls">
+            <div class="hero-slide-dots">${dots}</div>
+            <button class="hero-pause-button" type="button" data-hero-pause>
+              ${labels.pause}
+            </button>
+          </div>
+        `
+        : ""
+    }
+  `;
+}
+
 function languageSwitcherMarkup(activeLanguage) {
   return SUPPORTED_LANGUAGES.map(
     (language) => `
@@ -111,9 +165,12 @@ function render(language) {
     .querySelector('meta[name="description"]')
     ?.setAttribute("content", t.metaDescription);
   document.querySelector(".skip-link").textContent = t.skip;
-  const heroMedia = MEDIA.hero
-    ? `<img class="hero-photo" src="${MEDIA.hero}" alt="${t.hero.imageAlt}" fetchpriority="high" />`
-    : `<span class="hero-image-note">${t.hero.imageNote}</span>`;
+  const heroImages = Array.isArray(MEDIA.hero)
+    ? MEDIA.hero
+    : MEDIA.hero
+      ? [MEDIA.hero]
+      : [];
+  const heroMedia = heroMarkup(heroImages, t.hero);
 
   app.innerHTML = `
     <div class="site-shell">
@@ -139,7 +196,7 @@ function render(language) {
           <a class="header-rsvp" href="#rsvp">${t.nav.rsvp}</a>
         </header>
 
-        <div class="hero-art${MEDIA.hero ? " has-photo" : ""}">
+        <div class="hero-art${heroImages.length ? " has-photo" : ""}">
           ${heroMedia}
           <div class="sun-disc"></div>
           <div class="motif motif-left"></div>
@@ -278,6 +335,7 @@ function render(language) {
   `;
 
   bindLanguageSwitcher();
+  bindHeroSlideshow(t.hero);
   observeReveals();
   updateCountdown(language);
 }
@@ -297,6 +355,64 @@ function bindLanguageSwitcher() {
   document.querySelectorAll("[data-language]").forEach((button) => {
     button.addEventListener("click", () => setLanguage(button.dataset.language));
   });
+}
+
+function bindHeroSlideshow(labels) {
+  window.clearInterval(heroSlideInterval);
+  heroSlideInterval = null;
+
+  const photos = [...document.querySelectorAll(".hero-photo")];
+  const dots = [...document.querySelectorAll("[data-hero-slide]")];
+  const pauseButton = document.querySelector("[data-hero-pause]");
+  if (photos.length < 2 || !pauseButton) return;
+
+  let activeIndex = 0;
+  let paused = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const showSlide = (index) => {
+    activeIndex = (index + photos.length) % photos.length;
+    photos.forEach((photo, photoIndex) => {
+      photo.classList.toggle("is-active", photoIndex === activeIndex);
+    });
+    dots.forEach((dot, dotIndex) => {
+      dot.setAttribute("aria-current", String(dotIndex === activeIndex));
+    });
+  };
+
+  const stopRotation = () => {
+    window.clearInterval(heroSlideInterval);
+    heroSlideInterval = null;
+  };
+
+  const startRotation = () => {
+    stopRotation();
+    if (paused) return;
+    heroSlideInterval = window.setInterval(
+      () => showSlide(activeIndex + 1),
+      6500,
+    );
+  };
+
+  const updatePauseButton = () => {
+    pauseButton.textContent = paused ? labels.play : labels.pause;
+    pauseButton.setAttribute("aria-pressed", String(paused));
+  };
+
+  dots.forEach((dot, index) => {
+    dot.addEventListener("click", () => {
+      showSlide(index);
+      startRotation();
+    });
+  });
+
+  pauseButton.addEventListener("click", () => {
+    paused = !paused;
+    updatePauseButton();
+    startRotation();
+  });
+
+  updatePauseButton();
+  startRotation();
 }
 
 function getTimeRemaining() {

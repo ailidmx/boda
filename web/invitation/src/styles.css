@@ -229,7 +229,7 @@ a:focus-visible {
 
 .hero-art {
   position: absolute;
-  z-index: -1;
+  z-index: 0;
   inset: 0;
   overflow: hidden;
   background:
@@ -244,6 +244,57 @@ a:focus-visible {
   height: 100%;
   object-fit: cover;
   object-position: center;
+  opacity: 0;
+  transform: scale(1.025);
+  transition:
+    opacity 1.2s ease,
+    transform 7s ease;
+}
+
+.hero-photo.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hero-slideshow-controls {
+  position: absolute;
+  z-index: 4;
+  right: clamp(1rem, 4vw, 4rem);
+  bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.hero-slide-dots {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.hero-slide-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border: 1px solid var(--white);
+  border-radius: 50%;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.hero-slide-dot[aria-current="true"] {
+  background: var(--white);
+}
+
+.hero-pause-button {
+  border: 0;
+  padding: 0.25rem 0;
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .hero-art.has-photo::before {
@@ -337,6 +388,8 @@ a:focus-visible {
 }
 
 .hero-content {
+  position: relative;
+  z-index: 2;
   align-self: center;
   width: min(92%, 78rem);
   margin: 0 auto;
@@ -1042,6 +1095,11 @@ h2 {
 
   .scroll-cue {
     display: none;
+  }
+
+  .hero-slideshow-controls {
+    right: 1rem;
+    bottom: 1rem;
   }
 
   .section {

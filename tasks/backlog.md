@@ -62,5 +62,5 @@ Prioridad: `P1` | `P2` | `P3`
 | T-055 | Cotejar los cuatro tramos del billete de Dimitar y cerrar horarios de llegada y salida | David + Dimitar | 2026-08-02 | P1 | blocked | T-020 |
 | T-056 | Confirmar estancias de Dimitar del 14-19 y 21-28 de febrero | David + Dimitar | 2026-08-05 | P1 | blocked | T-055 |
 | T-057 | Asignar recogida GDL y regreso al aeropuerto para Dimitar | David + Logistica | 2026-08-10 | P1 | blocked | T-055, T-056, T-021 |
-| T-058 | Aprobar contenido ES/FR/EN, fotografia principal y horario objetivo del contador (primera propuesta foto + galeria lista) | David + Ayde | 2026-08-15 | P1 | doing | T-004 |
+| T-058 | Aprobar contenido ES/FR/EN, rotacion de cuatro fotografias del hero y horario objetivo del contador | David + Ayde | 2026-08-15 | P1 | doing | T-004 |
 | T-059 | Confirmar viaje de Mama Tina del 10 de febrero al 15 de marzo: fechas, vuelos, estancias y traslados | Ayde + Mama Tina | 2026-08-15 | P1 | blocked | T-020, T-021 |

@@ -47,6 +47,8 @@ The sticky countdown targets `2027-02-20T00:00:00-06:00`, local time in Jalisco.
 - Privacy and approval status live in `media/catalog.csv`.
 - Approved web derivatives live in `src/assets/approved/`.
 - `src/media.js` connects approved images to page slots.
+- The hero rotates through four photographs every 6.5 seconds and includes
+  manual selection and pause controls.
 - Vite copies only imported approved assets into the production build.
 
 ## Before publication

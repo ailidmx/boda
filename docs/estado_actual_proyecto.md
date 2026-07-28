@@ -9,7 +9,7 @@
 - Cabanas: despues de la baja de Gaetane + Stephane + Ange, demanda de alojamiento baja a 72.
 - Vestuario: confirmado un concepto oaxaqueno coordinado para ambos novios; uno de los trajes sera de lino, procedente de Cuilapam de Guerrero, con bordados dorados.
 - Viajes: creado seguimiento individual de vuelos, estancias y traslados; Dimitar es el primer viajero registrado, del 14 al 28 de febrero via Malaga-Madrid-Guadalajara.
-- Invitacion web: primera version one-page ES/FR/EN construida con deteccion automatica de idioma, contador fijo, fotografia principal y galeria; pendiente contenido final, RSVP y publicacion.
+- Invitacion web: primera version one-page ES/FR/EN construida con deteccion automatica de idioma, contador fijo, hero rotativo de cuatro fotografias y galeria; pendiente contenido final, RSVP y publicacion.
 - Activos web: 17 fotografias de pareja (`INV-002` a `INV-018`) importadas como originales privados y convertidas a derivados WebP sin metadatos; primera seleccion conectada al hero y a la galeria.
 - Timeline de viajeros: vista privada por grupos creada; incluye Dimitar + acompañante y Mama Tina (10 febrero-15 marzo, fechas tentativas).
 
@@ -22,7 +22,7 @@
 - Cabanes : apres le desistement de Gaetane + Stephane + Ange, besoin logement descend a 72.
 - Tenues : concept oaxaqueno coordonne confirme pour les deux maries ; l'un des costumes sera en lin, realise a Cuilapam de Guerrero, avec des broderies dorees.
 - Voyages : suivi individuel des vols, hebergements et transferts cree ; Dimitar est le premier voyageur enregistre, du 14 au 28 fevrier via Malaga-Madrid-Guadalajara.
-- Invitation web : premiere version one-page ES/FR/EN construite avec detection automatique de langue, compte a rebours fixe, photographie principale et galerie ; contenus finaux, RSVP et publication encore a valider.
+- Invitation web : premiere version one-page ES/FR/EN construite avec detection automatique de langue, compte a rebours fixe, hero rotatif de quatre photographies et galerie ; contenus finaux, RSVP et publication encore a valider.
 - Medias web : 17 photographies du couple (`INV-002` a `INV-018`) importees comme originaux prives et converties en derives WebP sans metadonnees ; premiere selection reliee au hero et a la galerie.
 - Calendrier voyageurs : vue privee par groupes creee ; elle inclut Dimitar + accompagnante et Mama Tina (10 fevrier-15 mars, dates provisoires).
 
