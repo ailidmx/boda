@@ -20,6 +20,7 @@ export const content = {
       story: "Nosotros",
       weekend: "El fin de semana",
       venue: "El lugar",
+      accommodation: "Alojamiento",
       travel: "Vengo de lejos",
       attire: "Vestuario",
       rsvp: "Confirmar",
@@ -98,6 +99,42 @@ export const content = {
       visualTitle: "Lago de Chapala",
       visualBody: "Jardines, agua y atardeceres de Jalisco",
     },
+    accommodation: {
+      eyebrow: "Alojamiento",
+      title: "Dormir cerca, organizarnos a tiempo",
+      body:
+        "Contamos con alojamiento en el lugar para aproximadamente 80 personas. Como necesitamos distribuir las cabañas y las habitaciones con cuidado, les pedimos que nos indiquen cuanto antes si desean aprovechar esta opción.",
+      facts: [
+        { value: "≈ 80", label: "lugares disponibles" },
+        { value: "2", label: "noches principales" },
+        { value: "19–21", label: "febrero de 2027" },
+      ],
+      specialNote:
+        "El alojamiento tiene un costo para quienes elijan este plan. Cualquier invitación o acuerdo especial con padrinos y patrocinadores se comunicará directamente. La mayoría de quienes viajan desde lejos ya está considerando hospedarse aquí; si prefieren organizar su estancia por su cuenta, no hay ningún problema: solo necesitamos saberlo con anticipación.",
+      form: {
+        eyebrow: "Interés de alojamiento",
+        title: "Cuéntennos su plan",
+        body:
+          "Esta respuesta nos ayudará a estimar la demanda. No constituye todavía una reserva ni un cobro.",
+        fields: {
+          name: "Nombre completo",
+          contact: "Correo o WhatsApp",
+          partySize: "Personas en su grupo",
+          plan: "Plan preferido",
+          nights: "Noches que necesitarían",
+          nightsPlaceholder: "Ej. viernes 19 y sábado 20",
+          note: "Comentarios, niñas/niños o necesidades especiales",
+        },
+        options: [
+          { value: "onsite", label: "Me interesa alojarme en Roca Azul" },
+          { value: "independent", label: "Organizaré mi propio alojamiento" },
+          { value: "undecided", label: "Todavía no lo sé" },
+        ],
+        button: "Enviar mi interés",
+        previewNote:
+          "Vista previa: el envío se habilitará cuando abramos el formulario privado.",
+      },
+    },
     travel: {
       eyebrow: "Vengo de lejos",
       title: "Su viaje también forma parte de la celebración",
@@ -141,6 +178,7 @@ export const content = {
       story: "Nous",
       weekend: "Le week-end",
       venue: "Le lieu",
+      accommodation: "Hébergement",
       travel: "Je viens de loin",
       attire: "Tenues",
       rsvp: "Répondre",
@@ -219,6 +257,42 @@ export const content = {
       visualTitle: "Lac de Chapala",
       visualBody: "Jardins, eau et couchers de soleil du Jalisco",
     },
+    accommodation: {
+      eyebrow: "Hébergement",
+      title: "Dormir sur place, nous organiser à temps",
+      body:
+        "Nous disposons d’environ 80 places sur le lieu. Comme les cabanes et les chambres doivent être réparties avec soin, merci de nous indiquer dès que possible si cette option vous intéresse.",
+      facts: [
+        { value: "≈ 80", label: "places disponibles" },
+        { value: "2", label: "nuits principales" },
+        { value: "19–21", label: "février 2027" },
+      ],
+      specialNote:
+        "L’hébergement est payant pour les personnes qui choisissent cette formule. Toute invitation ou disposition particulière avec les padrinos et sponsors sera communiquée directement. La plupart des personnes venant de loin envisagent déjà de loger sur place ; si vous préférez organiser votre séjour de votre côté, aucun souci : nous avons simplement besoin de le savoir à l’avance.",
+      form: {
+        eyebrow: "Intérêt hébergement",
+        title: "Parlez-nous de votre projet",
+        body:
+          "Cette réponse nous aidera à estimer les besoins. Elle ne constitue pas encore une réservation ni un paiement.",
+        fields: {
+          name: "Nom complet",
+          contact: "E-mail ou WhatsApp",
+          partySize: "Personnes dans votre groupe",
+          plan: "Option envisagée",
+          nights: "Nuits dont vous auriez besoin",
+          nightsPlaceholder: "Ex. vendredi 19 et samedi 20",
+          note: "Commentaires, enfants ou besoins particuliers",
+        },
+        options: [
+          { value: "onsite", label: "Je souhaite loger à Roca Azul" },
+          { value: "independent", label: "J’organiserai mon propre hébergement" },
+          { value: "undecided", label: "Je ne sais pas encore" },
+        ],
+        button: "Envoyer mon intérêt",
+        previewNote:
+          "Aperçu : l’envoi sera activé à l’ouverture du formulaire privé.",
+      },
+    },
     travel: {
       eyebrow: "Je viens de loin",
       title: "Votre voyage fait aussi partie de la fête",
@@ -262,6 +336,7 @@ export const content = {
       story: "Us",
       weekend: "The weekend",
       venue: "The venue",
+      accommodation: "Accommodation",
       travel: "Coming from afar",
       attire: "Attire",
       rsvp: "RSVP",
@@ -338,6 +413,42 @@ export const content = {
       map: "Open in Google Maps",
       visualTitle: "Lake Chapala",
       visualBody: "Gardens, water, and Jalisco sunsets",
+    },
+    accommodation: {
+      eyebrow: "Accommodation",
+      title: "Stay close, help us plan ahead",
+      body:
+        "We have accommodation at the venue for approximately 80 people. As the cabins and rooms need to be allocated carefully, please let us know as soon as possible if you would like to use this option.",
+      facts: [
+        { value: "≈ 80", label: "places available" },
+        { value: "2", label: "main nights" },
+        { value: "19–21", label: "February 2027" },
+      ],
+      specialNote:
+        "Accommodation has a cost for guests choosing this plan. Any invitation or special arrangement with padrinos and sponsors will be communicated directly. Most guests travelling from afar are already considering staying here; if you prefer to arrange your own accommodation, that is absolutely fine—we simply need to know in advance.",
+      form: {
+        eyebrow: "Accommodation interest",
+        title: "Tell us your plan",
+        body:
+          "This response will help us estimate demand. It is not yet a booking or a payment.",
+        fields: {
+          name: "Full name",
+          contact: "Email or WhatsApp",
+          partySize: "People in your group",
+          plan: "Preferred plan",
+          nights: "Nights you would need",
+          nightsPlaceholder: "E.g. Friday 19 and Saturday 20",
+          note: "Comments, children, or special requirements",
+        },
+        options: [
+          { value: "onsite", label: "I’m interested in staying at Roca Azul" },
+          { value: "independent", label: "I’ll arrange my own accommodation" },
+          { value: "undecided", label: "I’m not sure yet" },
+        ],
+        button: "Send my interest",
+        previewNote:
+          "Preview: submissions will open with the private form.",
+      },
     },
     travel: {
       eyebrow: "Coming from afar",

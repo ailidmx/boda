@@ -11,6 +11,7 @@
 - Viajes: creado seguimiento individual de vuelos, estancias y traslados; Dimitar es el primer viajero registrado, del 14 al 28 de febrero via Malaga-Madrid-Guadalajara.
 - Invitacion web: primera version one-page ES/FR/EN construida con deteccion automatica de idioma, contador fijo, monograma animado `D. & A.` / `A. & D.`, hero rotativo de cuatro fotografias y galeria; pendiente contenido final, RSVP y publicacion.
 - Activos web: 17 fotografias de pareja (`INV-002` a `INV-018`) importadas como originales privados y convertidas a derivados WebP sin metadatos; primera seleccion conectada al hero y a la galeria.
+- Alojamiento web: mensaje trilingue añadido para explicar capacidad aproximada de 80 personas, costo para quienes lo utilicen, necesidad de avisar pronto y libertad de organizar una estancia independiente; formulario de interes preparado en modo vista previa.
 - Timeline de viajeros: vista privada por grupos creada; incluye Dimitar + acompañante y Mama Tina (10 febrero-15 marzo, fechas tentativas).
 
 ## FR - Ou on en est aujourd'hui
@@ -24,6 +25,7 @@
 - Voyages : suivi individuel des vols, hebergements et transferts cree ; Dimitar est le premier voyageur enregistre, du 14 au 28 fevrier via Malaga-Madrid-Guadalajara.
 - Invitation web : premiere version one-page ES/FR/EN construite avec detection automatique de langue, compte a rebours fixe, monogramme anime `D. & A.` / `A. & D.`, hero rotatif de quatre photographies et galerie ; contenus finaux, RSVP et publication encore a valider.
 - Medias web : 17 photographies du couple (`INV-002` a `INV-018`) importees comme originaux prives et converties en derives WebP sans metadonnees ; premiere selection reliee au hero et a la galerie.
+- Hebergement web : texte trilingue ajoute pour expliquer la capacite d’environ 80 personnes, le cout pour celles et ceux qui l’utilisent, la necessite de repondre rapidement et la liberte d’organiser un sejour independant ; formulaire d’interet prepare en mode apercu.
 - Calendrier voyageurs : vue privee par groupes creee ; elle inclut Dimitar + accompagnante et Mama Tina (10 fevrier-15 mars, dates provisoires).
 
 ## ES - Foco inmediato

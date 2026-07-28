@@ -71,6 +71,65 @@ function scheduleMarkup(items) {
     .join("");
 }
 
+function accommodationFormMarkup(t) {
+  return `
+    <form class="accommodation-form reveal" aria-describedby="stay-form-note">
+      <div class="form-field">
+        <label for="stay-name">${t.fields.name}</label>
+        <input id="stay-name" name="name" type="text" autocomplete="name" />
+      </div>
+      <div class="form-field">
+        <label for="stay-contact">${t.fields.contact}</label>
+        <input
+          id="stay-contact"
+          name="contact"
+          type="text"
+          autocomplete="email"
+        />
+      </div>
+      <div class="form-field">
+        <label for="stay-party-size">${t.fields.partySize}</label>
+        <input
+          id="stay-party-size"
+          name="partySize"
+          type="number"
+          min="1"
+          max="12"
+          value="1"
+        />
+      </div>
+      <div class="form-field">
+        <label for="stay-plan">${t.fields.plan}</label>
+        <select id="stay-plan" name="plan">
+          ${t.options
+            .map(
+              (option) =>
+                `<option value="${option.value}">${option.label}</option>`,
+            )
+            .join("")}
+        </select>
+      </div>
+      <div class="form-field form-field-wide">
+        <label for="stay-nights">${t.fields.nights}</label>
+        <input
+          id="stay-nights"
+          name="nights"
+          type="text"
+          placeholder="${t.fields.nightsPlaceholder}"
+        />
+      </div>
+      <div class="form-field form-field-wide">
+        <label for="stay-note">${t.fields.note}</label>
+        <textarea id="stay-note" name="note" rows="4"></textarea>
+      </div>
+      <button class="button button-dark" type="submit" disabled>
+        ${t.button}
+      </button>
+      <small id="stay-form-note">${t.previewNote}</small>
+    </form>
+  `;
+}
+
 function galleryMarkup(images, alternativeTexts) {
   return images
     .map(
@@ -204,6 +263,7 @@ function render(language) {
             <a href="#story">${t.nav.story}</a>
             <a href="#weekend">${t.nav.weekend}</a>
             <a href="#venue">${t.nav.venue}</a>
+            <a href="#accommodation">${t.nav.accommodation}</a>
             <a href="#travel">${t.nav.travel}</a>
           </nav>
           <div class="language-switcher" aria-label="Language">
@@ -287,6 +347,33 @@ function render(language) {
             >
               ${t.venue.map} ↗
             </a>
+          </div>
+        </section>
+
+        <section class="accommodation-section section" id="accommodation">
+          <div class="accommodation-copy reveal">
+            <p class="eyebrow">${t.accommodation.eyebrow}</p>
+            <h2>${t.accommodation.title}</h2>
+            <p class="lead">${t.accommodation.body}</p>
+            <div class="accommodation-facts">
+              ${t.accommodation.facts
+                .map(
+                  (fact) => `
+                    <article>
+                      <strong>${fact.value}</strong>
+                      <span>${fact.label}</span>
+                    </article>
+                  `,
+                )
+                .join("")}
+            </div>
+            <p class="accommodation-note">${t.accommodation.specialNote}</p>
+          </div>
+          <div class="accommodation-form-wrap">
+            <p class="eyebrow">${t.accommodation.form.eyebrow}</p>
+            <h3>${t.accommodation.form.title}</h3>
+            <p>${t.accommodation.form.body}</p>
+            ${accommodationFormMarkup(t.accommodation.form)}
           </div>
         </section>
 

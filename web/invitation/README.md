@@ -51,6 +51,8 @@ The sticky countdown targets `2027-02-20T00:00:00-06:00`, local time in Jalisco.
   manual selection and pause controls.
 - The header monogram alternates between `D. & A.` (“DNA”) and `A. & D.`
   (“Aydé”), while respecting reduced-motion preferences.
+- The accommodation section explains the approximate 80-person capacity and
+  includes a non-submitting interest-form preview in all three languages.
 - Vite copies only imported approved assets into the production build.
 
 ## Before publication
