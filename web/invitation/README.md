@@ -6,7 +6,7 @@ One-page public wedding invitation inspired by the visual simplicity of the Squa
 
 - Vite as build tooling.
 - Vanilla JavaScript and CSS.
-- No production runtime dependencies.
+- Firebase Web SDK for Authentication and Firestore.
 - Authored ES, FR and EN content in `src/content.js`.
 
 ## Local use
@@ -55,7 +55,7 @@ The sticky countdown targets `2027-02-20T00:00:00-06:00`, local time in Jalisco.
   estimated price, included breakfasts, allocation process, and padrino gift
   in all three languages.
 - Public WhatsApp links connect interested guests directly with David or Aydé.
-- The unified RSVP preview collects attendance, accommodation preference and
+- The unified RSVP collects attendance, accommodation preference and
   optional inbound/outbound flight details for long-distance guests.
 - The RSVP identifies individuals and groups, counts adults and guests under
   18, and offers only the complete two-night lodging package or no lodging.
@@ -69,11 +69,29 @@ The sticky countdown targets `2027-02-20T00:00:00-06:00`, local time in Jalisco.
   flexible shared or independent stay formats.
 - Vite copies only imported approved assets into the production build.
 
-## Before publication
+## Published backend
+
+- Production (`master`): `https://boda-david-y-ayde.web.app`
+- Development (`develop`): `https://boda-500805.web.app`
+- Firebase Authentication validates the shared guest access key.
+- Cloud Firestore stores RSVP, suggestion, and coast-interest submissions.
+- Firestore rules allow guest creation only and deny all guest reads.
+
+## Automated deployments
+
+GitHub Actions builds the Vite invitation and deploys only the Hosting target
+assigned to the pushed branch:
+
+- `master` → `invitation-named` → production.
+- `develop` → `invitation-primary` → development.
+
+The workflow can also be run manually with an explicit environment choice. It
+uses the repository secret `FIREBASE_SERVICE_ACCOUNT_BODA_500805`.
+
+## Remaining editorial checks
 
 - Validate the current mountain hero and seven-photo story gallery.
 - Review and approve all three language versions.
 - Confirm public schedule details.
-- Connect RSVP to a private form.
-- Add a private travel-information form without exposing guest records.
-- Test the final domain, sharing preview and analytics/privacy settings.
+- Test the future custom domain and social sharing preview.
+- Decide whether analytics should remain disabled or be added with consent.

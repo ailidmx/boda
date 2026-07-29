@@ -1,0 +1,57 @@
+{
+  "id": "azalea",
+  "nombre": "Azalea",
+  "venue": "Club Roca Azul",
+  "capacidad_anunciada": 12,
+  "habitaciones": 3,
+  "camas": {
+    "matrimoniales": 4,
+    "individuales": 3,
+    "total_fisico": 7,
+    "couchages_descritos": 11
+  },
+  "distribucion": [
+    {
+      "habitacion": 1,
+      "camas_matrimoniales": 2,
+      "camas_individuales": 0
+    },
+    {
+      "habitacion": 2,
+      "camas_matrimoniales": 2,
+      "camas_individuales": 0
+    },
+    {
+      "habitacion": 3,
+      "camas_matrimoniales": 0,
+      "camas_individuales": 3
+    }
+  ],
+  "espacios_observados_en_fotos": [
+    "sala",
+    "comedor",
+    "cocina",
+    "barra",
+    "baño con ducha"
+  ],
+  "fotos": [
+    "CAB-AZA-01",
+    "CAB-AZA-02",
+    "CAB-AZA-03",
+    "CAB-AZA-04",
+    "CAB-AZA-05",
+    "CAB-AZA-06",
+    "CAB-AZA-07",
+    "CAB-AZA-08",
+    "CAB-AZA-09"
+  ],
+  "estado": "confirmacion_parcial",
+  "pendiente": [
+    "Confirmar con el venue dónde duerme la persona 12 o si existe un couchage adicional no descrito."
+  ],
+  "fuente": {
+    "tipo": "mensaje_y_fotos_del_venue",
+    "fecha_material": "2026-02-18",
+    "registrado": "2026-07-29"
+  }
+}

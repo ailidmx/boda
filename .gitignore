@@ -9,6 +9,11 @@ __pycache__/
 # JavaScript
 node_modules/
 dist/
+.firebase/
+firebase-debug.log
+
+# Media awaiting explicit publication approval
+web/invitation/media/originals/cabins/pending-lavanda/
 
 # Local configuration and credentials
 .env

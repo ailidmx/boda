@@ -2,18 +2,23 @@
 
 ## ES
 ### Viernes (dia de llegada)
-- 15:00: Llegada temprana permitida (pendiente confirmar con wedding planners y venue).
-- 16:00 - 18:00: Check-in cabanas + bienvenida de invitados.
+- Los novios ya estaran en Roca Azul desde el jueves.
+- Desde aproximadamente 12:00: llegada permitida de invitados y check-in escalonado.
 - 18:30: Torneo de petanca amistoso en el venue.
 - 20:30: Pizzas de bienvenida (operativo: Manu + Ismael).
 - 21:30: Convivencia relajada de apertura.
 
 ### Sabado (dia principal)
-- Comida: carnitas.
-- Servicio especial: tejuino (detalle por confirmar).
-- Cena/noche: taquiza (contacto a confirmar por Manu).
-- Musica por bloques: Mariachi 2h + Marimba 2h + Norteno 2h + Karaoke 2x1h.
-- Ceremonia, coctel, cena y fiesta segun runbook principal.
+- 13:00: cita y llegada de todos los invitados.
+- 14:00: ceremonia civil.
+- Al terminar: marimba en vivo.
+- Despues: comida de carnitas y tejuino.
+- 18:00: ceremonia en el faro.
+- Al terminar: mariachi para abrir la cena.
+- Despues de cenar: norteno para abrir el baile y la fiesta.
+- Mas tarde: karaoke y playlist de baile.
+- Advertencia transporte: salir con mucha anticipacion desde Guadalajara; los
+  accesos hacia Jocotepec pueden congestionarse facilmente.
 
 ### Domingo (salida)
 - Desayuno final (cubierto con hospedaje).
@@ -22,18 +27,23 @@
 
 ## FR
 ### Vendredi (jour d'arrivee)
-- 15h00 : arrivee anticipee possible (a confirmer avec les wedding planners et le lieu).
-- 16h00 - 18h00 : check-in cabanes + accueil des invites.
+- Les maries seront deja a Roca Azul depuis le jeudi.
+- A partir d'environ 12h00 : arrivee des invites et check-in echelonne.
 - 18h30 : tournoi amical de petanque sur place.
 - 20h30 : pizzas de bienvenue (operationnel : Manu + Ismael).
 - 21h30 : soiree d'ouverture conviviale.
 
 ### Samedi (jour principal)
-- Dejeuner : carnitas.
-- Service special : tejuino (detail a confirmer).
-- Soir : taquiza (contact a confirmer par Manu).
-- Musique par blocs : Mariachi 2h + Marimba 2h + Norteno 2h + Karaoke 2x1h.
-- Ceremonie, cocktail, diner et fete selon le runbook principal.
+- 13h00 : rendez-vous et arrivee de tous les invites.
+- 14h00 : ceremonie civile.
+- A la suite : marimba live.
+- Puis : dejeuner de carnitas et tejuino.
+- 18h00 : ceremonie au phare.
+- A la suite : mariachi pour ouvrir le diner.
+- Apres diner : norteno pour ouvrir la danse et la fete.
+- Plus tard : karaoke et playlist dansante.
+- Transport : partir tres en avance de Guadalajara, car les acces vers
+  Jocotepec peuvent facilement etre embouteilles.
 
 ### Dimanche (depart)
 - Petit dejeuner final (couvert avec l'hebergement).

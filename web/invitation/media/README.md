@@ -5,6 +5,8 @@ This directory stores submitted source material. Files here are never imported d
 ## Structure
 
 - `originals/`: unchanged files supplied by David and Ayde.
+- `external/`: source images from the venue and reusable licensed libraries.
+- `external-credits.md`: sources, authors and licenses for external images.
 - `catalog.csv`: asset identity, dimensions, privacy classification and approval state.
 - `../src/assets/approved/`: web-ready derivatives approved for public use.
 - `../src/media.js`: the only place where approved assets are connected to page slots.

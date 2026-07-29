@@ -1,0 +1,52 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isInvitedGuest() {
+      return request.auth != null
+        && request.auth.uid == "yfu7MMCmFaPCK7UW4czr5c3x7Aa2";
+    }
+
+    function hasCommonFields() {
+      return request.resource.data.schemaVersion == 1
+        && request.resource.data.language in ["es", "fr", "en"]
+        && request.resource.data.createdAt == request.time;
+    }
+
+    function isShortText(field, maximum) {
+      return field is string && field.size() <= maximum;
+    }
+
+    match /rsvp_submissions/{submissionId} {
+      allow create: if isInvitedGuest()
+        && hasCommonFields()
+        && isShortText(request.resource.data.firstName, 100)
+        && isShortText(request.resource.data.lastName, 100)
+        && isShortText(request.resource.data.contact, 200)
+        && isShortText(request.resource.data.notes, 2000);
+      allow read, update, delete: if false;
+    }
+
+    match /experience_suggestions/{submissionId} {
+      allow create: if isInvitedGuest()
+        && hasCommonFields()
+        && isShortText(request.resource.data.name, 150)
+        && isShortText(request.resource.data.songTitle, 300)
+        && isShortText(request.resource.data.songArtist, 300)
+        && isShortText(request.resource.data.extra, 2000);
+      allow read, update, delete: if false;
+    }
+
+    match /coast_interest/{submissionId} {
+      allow create: if isInvitedGuest()
+        && hasCommonFields()
+        && isShortText(request.resource.data.name, 150)
+        && isShortText(request.resource.data.note, 2000);
+      allow read, update, delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
