@@ -1,0 +1,131 @@
+name: Deploy wedding invitation
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+    paths:
+      - "web/invitation/**"
+      - "firebase.json"
+      - ".firebaserc"
+      - ".github/workflows/deploy-invitation.yml"
+  pull_request:
+    branches:
+      - master
+      - develop
+    paths:
+      - "web/invitation/**"
+      - "firebase.json"
+      - ".firebaserc"
+      - ".github/workflows/deploy-invitation.yml"
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Firebase Hosting destination
+        required: true
+        type: choice
+        default: development
+        options:
+          - development
+          - production
+
+permissions:
+  contents: read
+
+concurrency:
+  group: firebase-hosting-${{ github.event_name == 'workflow_dispatch' && inputs.environment || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  validate-pull-request:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/invitation/package-lock.json
+
+      - name: Install dependencies
+        working-directory: web/invitation
+        run: npm ci
+
+      - name: Build invitation
+        working-directory: web/invitation
+        run: npm run build
+
+  deploy-development:
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/develop') ||
+      (github.event_name == 'workflow_dispatch' && inputs.environment == 'development')
+    environment:
+      name: development
+      url: https://boda-500805.web.app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/invitation/package-lock.json
+
+      - name: Install dependencies
+        working-directory: web/invitation
+        run: npm ci
+
+      - name: Build invitation
+        working-directory: web/invitation
+        run: npm run build
+
+      - name: Deploy development
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BODA_500805 }}
+          projectId: boda-500805
+          target: invitation-primary
+          channelId: live
+
+  deploy-production:
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+      (github.event_name == 'workflow_dispatch' && inputs.environment == 'production')
+    environment:
+      name: production
+      url: https://boda-david-y-ayde.web.app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/invitation/package-lock.json
+
+      - name: Install dependencies
+        working-directory: web/invitation
+        run: npm ci
+
+      - name: Build invitation
+        working-directory: web/invitation
+        run: npm run build
+
+      - name: Deploy production
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BODA_500805 }}
+          projectId: boda-500805
+          target: invitation-named
+          channelId: live

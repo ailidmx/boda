@@ -9,7 +9,7 @@
 - Cabanas: despues de la baja de Gaetane + Stephane + Ange, demanda de alojamiento baja a 72.
 - Vestuario: confirmado un concepto oaxaqueno coordinado para ambos novios; uno de los trajes sera de lino, procedente de Cuilapam de Guerrero, con bordados dorados.
 - Viajes: creado seguimiento individual de vuelos, estancias y traslados; Dimitar es el primer viajero registrado, del 14 al 28 de febrero via Malaga-Madrid-Guadalajara.
-- Invitacion web: primera version one-page ES/FR/EN construida con deteccion automatica de idioma, contador fijo, monograma animado `D. & A.` / `A. & D.`, hero rotativo de cuatro fotografias y galeria; pendiente contenido final, RSVP y publicacion.
+- Invitacion web: one-page ES/FR/EN publicada en Firebase Hosting con deteccion automatica de idioma, contador fijo, monograma animado `D. & A.` / `A. & D.`, hero rotativo y galeria.
 - Activos web: 17 fotografias de pareja (`INV-002` a `INV-018`) importadas como originales privados y convertidas a derivados WebP sin metadatos; primera seleccion conectada al hero y a la galeria.
 - Alojamiento web: mensaje trilingue añadido para explicar capacidad aproximada de 80 personas, costo para quienes lo utilicen, necesidad de avisar pronto y libertad de organizar una estancia independiente; formulario de interes preparado en modo vista previa.
 - Alojamiento: precio estimado publicado en 500 MXN por persona/noche con dos desayunos del fin de semana; alojamiento regalado a padrinos y contactos WhatsApp directos de David y Ayde autorizados.
@@ -19,7 +19,7 @@
 - Playlists: enlaces Spotify de ambiente general y karaoke integrados en la seccion de musica; se eliminaron parametros temporales y tokens de colaboracion de las URLs publicas.
 - Club: instalaciones publicadas de Roca Azul agrupadas para el sabado, con aviso de disponibilidad, horarios y posibles suplementos.
 - Despues de la boda: sondeo Costalegre preparado para Barra de Navidad, Manzanillo y formatos de estancia compartida o independiente.
-- Acceso: definida arquitectura para clave compartida `vivamexico`; gate solo cliente aceptable para preview, pero publicacion y formularios requieren validacion serverless y secreto fuera de Git.
+- Acceso y backend: clave compartida `vivamexico` validada por Firebase Authentication; RSVP, sugerencias y sondeo Costalegre activos en Firestore con escritura autenticada y lectura denegada a invitados.
 - Timeline de viajeros: vista privada por grupos creada; incluye Dimitar + acompañante y Mama Tina (10 febrero-15 marzo, fechas tentativas).
 
 ## FR - Ou on en est aujourd'hui
@@ -31,7 +31,7 @@
 - Cabanes : apres le desistement de Gaetane + Stephane + Ange, besoin logement descend a 72.
 - Tenues : concept oaxaqueno coordonne confirme pour les deux maries ; l'un des costumes sera en lin, realise a Cuilapam de Guerrero, avec des broderies dorees.
 - Voyages : suivi individuel des vols, hebergements et transferts cree ; Dimitar est le premier voyageur enregistre, du 14 au 28 fevrier via Malaga-Madrid-Guadalajara.
-- Invitation web : premiere version one-page ES/FR/EN construite avec detection automatique de langue, compte a rebours fixe, monogramme anime `D. & A.` / `A. & D.`, hero rotatif de quatre photographies et galerie ; contenus finaux, RSVP et publication encore a valider.
+- Invitation web : one-page ES/FR/EN publiee sur Firebase Hosting avec detection automatique de langue, compte a rebours fixe, monogramme anime `D. & A.` / `A. & D.`, hero rotatif et galerie.
 - Medias web : 17 photographies du couple (`INV-002` a `INV-018`) importees comme originaux prives et converties en derives WebP sans metadonnees ; premiere selection reliee au hero et a la galerie.
 - Hebergement web : texte trilingue ajoute pour expliquer la capacite d’environ 80 personnes, le cout pour celles et ceux qui l’utilisent, la necessite de repondre rapidement et la liberte d’organiser un sejour independant ; formulaire d’interet prepare en mode apercu.
 - Hebergement : tarif estimatif publie a 500 MXN par personne/nuit avec les deux petits-dejeuners du week-end ; hebergement offert aux padrinos et liens WhatsApp directs de David et Ayde autorises.
@@ -41,7 +41,7 @@
 - Playlists : liens Spotify pour l’ambiance generale et le karaoke integres a la section musique ; parametres temporaires et jetons de collaboration retires des URL publiques.
 - Club : installations publiees de Roca Azul regroupees pour le samedi, avec reserve sur disponibilite, horaires et supplements possibles.
 - Apres le mariage : sondage Costalegre prepare pour Barra de Navidad, Manzanillo et des formats de sejour partages ou independants.
-- Acces : architecture definie pour la cle partagee `vivamexico` ; une porte uniquement cote client convient a l’apercu, mais publication et formulaires exigent une validation serverless et un secret hors de Git.
+- Acces et backend : cle partagee `vivamexico` validee par Firebase Authentication ; RSVP, suggestions et sondage Costalegre actifs dans Firestore, avec ecriture authentifiee et lecture refusee aux invites.
 - Calendrier voyageurs : vue privee par groupes creee ; elle inclut Dimitar + accompagnante et Mama Tina (10 fevrier-15 mars, dates provisoires).
 
 ## ES - Foco inmediato

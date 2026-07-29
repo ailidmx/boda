@@ -1,0 +1,17 @@
+{
+  "projects": {
+    "default": "boda-500805"
+  },
+  "targets": {
+    "boda-500805": {
+      "hosting": {
+        "invitation-primary": [
+          "boda-500805"
+        ],
+        "invitation-named": [
+          "boda-david-y-ayde"
+        ]
+      }
+    }
+  }
+}

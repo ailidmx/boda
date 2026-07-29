@@ -1,0 +1,51 @@
+{
+  "id": "madera-31-34",
+  "nombre": "Cabañas de madera 31–34",
+  "venue": "Club Roca Azul",
+  "unidades": [31, 32, 33, 34],
+  "cantidad_unidades": 4,
+  "configuracion_por_unidad": {
+    "capacidad_base": {
+      "adultos": 2,
+      "menores": 0
+    },
+    "capacidad_familiar": {
+      "adultos": 2,
+      "menores": 2
+    },
+    "habitaciones": 1,
+    "camas": {
+      "king_size": 1,
+      "sofa_cama_matrimonial": 1,
+      "couchages_funcionales": 4
+    }
+  },
+  "precio_por_unidad": {
+    "total_2_noches_2_adultos_mxn": 5310,
+    "total_2_noches_2_adultos_2_menores_mxn": 5790,
+    "incluye_desayunos": true,
+    "uso": "interno_hasta_confirmacion_final"
+  },
+  "espacios_observados_en_fotos_y_video": [
+    "terraza exterior",
+    "cama king size",
+    "sofá cama matrimonial",
+    "refrigerador",
+    "lavabo",
+    "televisión"
+  ],
+  "fotos": [
+    "CAB-WOOD-01",
+    "CAB-WOOD-02",
+    "CAB-WOOD-03",
+    "CAB-WOOD-04"
+  ],
+  "video": "CAB-WOOD-VID",
+  "estado": "confirmado",
+  "pendiente": [],
+  "fuente": {
+    "tipo": "mensaje_fotos_y_video_del_venue",
+    "fecha_material": "2026-02-18",
+    "registrado": "2026-07-29"
+  }
+}

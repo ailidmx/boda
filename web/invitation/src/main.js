@@ -1,15 +1,64 @@
 import "./styles.css";
 import {
+  browserLocalPersistence,
+  onAuthStateChanged,
+  setPersistence,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
   content,
   EVENT,
   SUPPORTED_LANGUAGES,
 } from "./content.js";
+import { auth, db } from "./firebase.js";
 import { MEDIA } from "./media.js";
 
 const LANGUAGE_STORAGE_KEY = "boda-language";
+const GUEST_EMAIL = "invitados@boda-500805.firebaseapp.com";
+const GUEST_UID = "yfu7MMCmFaPCK7UW4czr5c3x7Aa2";
 const app = document.querySelector("#app");
 let currentLanguage = "es";
 let heroSlideInterval = null;
+
+const interfaceText = {
+  es: {
+    gateEyebrow: "Invitación privada",
+    gateTitle: "David & Aydé",
+    gateBody: "Escribe la clave que compartimos contigo para abrir la invitación.",
+    gateLabel: "Clave de acceso",
+    gateButton: "Entrar",
+    gateWorking: "Abriendo…",
+    gateError: "La clave no es correcta. Inténtalo de nuevo.",
+    submitWorking: "Enviando…",
+    submitSuccess: "¡Gracias! Recibimos tu respuesta.",
+    submitError: "No pudimos enviar la respuesta. Revisa tu conexión e inténtalo de nuevo.",
+  },
+  fr: {
+    gateEyebrow: "Invitation privée",
+    gateTitle: "David & Aydé",
+    gateBody: "Saisissez la clé que nous vous avons envoyée pour ouvrir l’invitation.",
+    gateLabel: "Clé d’accès",
+    gateButton: "Entrer",
+    gateWorking: "Ouverture…",
+    gateError: "La clé n’est pas correcte. Veuillez réessayer.",
+    submitWorking: "Envoi…",
+    submitSuccess: "Merci ! Nous avons bien reçu votre réponse.",
+    submitError: "L’envoi a échoué. Vérifiez votre connexion et réessayez.",
+  },
+  en: {
+    gateEyebrow: "Private invitation",
+    gateTitle: "David & Aydé",
+    gateBody: "Enter the access key we shared with you to open the invitation.",
+    gateLabel: "Access key",
+    gateButton: "Enter",
+    gateWorking: "Opening…",
+    gateError: "That key is not correct. Please try again.",
+    submitWorking: "Sending…",
+    submitSuccess: "Thank you! We received your response.",
+    submitError: "We could not send your response. Check your connection and try again.",
+  },
+};
 
 function normalizeLanguage(value) {
   if (!value) return null;
@@ -71,6 +120,20 @@ function scheduleMarkup(items) {
     .join("");
 }
 
+function routeGroupMarkup(items) {
+  return items
+    .map(
+      (item) => `
+        <article class="route-node">
+          <strong>${item.place}</strong>
+          <span>${item.duration}</span>
+          <small>${item.detail}</small>
+        </article>
+      `,
+    )
+    .join("");
+}
+
 function rsvpFormMarkup(t) {
   const optionsMarkup = (options) =>
     options
@@ -81,7 +144,7 @@ function rsvpFormMarkup(t) {
       .join("");
 
   return `
-    <form class="rsvp-form" aria-describedby="rsvp-preview-note">
+    <form class="rsvp-form" data-form-kind="rsvp" aria-describedby="rsvp-preview-note">
       <fieldset>
         <legend>${t.groups.attendance}</legend>
         <div class="rsvp-form-grid">
@@ -92,6 +155,7 @@ function rsvpFormMarkup(t) {
               name="firstName"
               type="text"
               autocomplete="given-name"
+              required
             />
           </div>
           <div class="form-field">
@@ -101,15 +165,28 @@ function rsvpFormMarkup(t) {
               name="lastName"
               type="text"
               autocomplete="family-name"
+              required
             />
           </div>
           <div class="form-field">
-            <label for="rsvp-contact">${t.fields.contact}</label>
+            <label for="rsvp-email">${t.fields.email}</label>
             <input
-              id="rsvp-contact"
-              name="contact"
-              type="text"
+              id="rsvp-email"
+              name="email"
+              type="email"
               autocomplete="email"
+              required
+            />
+          </div>
+          <div class="form-field">
+            <label for="rsvp-whatsapp">${t.fields.whatsapp}</label>
+            <input
+              id="rsvp-whatsapp"
+              name="whatsapp"
+              type="tel"
+              autocomplete="tel"
+              inputmode="tel"
+              required
             />
           </div>
           <div class="form-field">
@@ -169,6 +246,28 @@ function rsvpFormMarkup(t) {
             <label for="rsvp-accommodation">${t.fields.accommodation}</label>
             <select id="rsvp-accommodation" name="accommodation">
               ${optionsMarkup(t.options.accommodation)}
+            </select>
+          </div>
+          <div class="form-field" data-independent-stay hidden>
+            <label for="rsvp-independent-arrival">
+              ${t.fields.independentArrival}
+            </label>
+            <select
+              id="rsvp-independent-arrival"
+              name="independentArrival"
+              disabled
+            >
+              ${optionsMarkup(t.options.independentArrival)}
+            </select>
+          </div>
+          <div class="form-field" data-independent-stay hidden>
+            <label for="rsvp-sunday-morning">${t.fields.sundayMorning}</label>
+            <select
+              id="rsvp-sunday-morning"
+              name="sundayMorning"
+              disabled
+            >
+              ${optionsMarkup(t.options.sundayMorning)}
             </select>
           </div>
         </div>
@@ -262,10 +361,10 @@ function rsvpFormMarkup(t) {
         </div>
       </fieldset>
 
-      <button class="button button-light" type="submit" disabled>
+      <button class="button button-light" type="submit">
         ${t.button}
       </button>
-      <small id="rsvp-preview-note">${t.previewNote}</small>
+      <small id="rsvp-preview-note" data-form-status>${t.previewNote}</small>
     </form>
   `;
 }
@@ -280,7 +379,7 @@ function suggestionFormMarkup(t) {
       .join("");
 
   return `
-    <form class="suggestion-form" aria-describedby="suggestion-preview-note">
+    <form class="suggestion-form" data-form-kind="suggestions" aria-describedby="suggestion-preview-note">
       <div class="form-field">
         <label for="suggestion-name">${t.fields.name}</label>
         <input
@@ -288,6 +387,7 @@ function suggestionFormMarkup(t) {
           name="name"
           type="text"
           autocomplete="name"
+          required
         />
       </div>
       <div class="form-field">
@@ -318,10 +418,10 @@ function suggestionFormMarkup(t) {
         <label for="experience-extra">${t.fields.extra}</label>
         <textarea id="experience-extra" name="extra" rows="3"></textarea>
       </div>
-      <button class="button button-dark" type="submit" disabled>
+      <button class="button button-dark" type="submit">
         ${t.button}
       </button>
-      <small id="suggestion-preview-note">${t.previewNote}</small>
+      <small id="suggestion-preview-note" data-form-status>${t.previewNote}</small>
     </form>
   `;
 }
@@ -336,10 +436,10 @@ function coastFormMarkup(t) {
       .join("");
 
   return `
-    <form class="coast-form" aria-describedby="coast-preview-note">
+    <form class="coast-form" data-form-kind="coast" aria-describedby="coast-preview-note">
       <div class="form-field">
         <label for="coast-name">${t.fields.name}</label>
-        <input id="coast-name" name="name" type="text" autocomplete="name" />
+        <input id="coast-name" name="name" type="text" autocomplete="name" required />
       </div>
       <div class="form-field">
         <label for="coast-interest">${t.fields.interest}</label>
@@ -378,10 +478,10 @@ function coastFormMarkup(t) {
         <label for="coast-note">${t.fields.note}</label>
         <textarea id="coast-note" name="note" rows="3"></textarea>
       </div>
-      <button class="button button-dark" type="submit" disabled>
+      <button class="button button-dark" type="submit">
         ${t.button}
       </button>
-      <small id="coast-preview-note">${t.previewNote}</small>
+      <small id="coast-preview-note" data-form-status>${t.previewNote}</small>
     </form>
   `;
 }
@@ -401,6 +501,74 @@ function galleryMarkup(images, alternativeTexts) {
       `,
     )
     .join("");
+}
+
+function cabinUnitMarkup(cabin, eyebrow) {
+  const photos = MEDIA.cabins[cabin.key];
+  const video = MEDIA.cabinVideos[cabin.key];
+
+  return `
+    <article class="cabin-unit">
+      <div class="cabin-profile reveal">
+        <div class="cabin-profile-heading">
+          <p class="eyebrow">${eyebrow}</p>
+          <h2>${cabin.title}</h2>
+          <p class="lead">${cabin.intro}</p>
+        </div>
+        <div class="cabin-profile-details">
+          <div class="cabin-profile-facts">
+            <strong>${cabin.capacity}</strong>
+            <span>${cabin.roomsLabel}</span>
+            <span>${cabin.bedsLabel}</span>
+          </div>
+          <ul>${cabin.rooms.map((room) => `<li>${room}</li>`).join("")}</ul>
+          <p>${cabin.amenities}</p>
+        </div>
+      </div>
+      <div class="cabin-gallery" aria-label="${cabin.galleryLabel}">
+        ${photos
+          .map(
+            (photo, index) => `
+              <figure class="cabin-gallery-photo reveal">
+                <img
+                  src="${photo}"
+                  alt="${cabin.photoAlts[index]}"
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>
+                  <span>${cabin.title}</span>
+                  <small>${String(index + 1).padStart(2, "0")} / ${String(photos.length).padStart(2, "0")}</small>
+                </figcaption>
+              </figure>
+            `,
+          )
+          .join("")}
+        ${
+          video
+            ? `
+              <figure class="cabin-gallery-photo cabin-gallery-video reveal">
+                <video
+                  controls
+                  playsinline
+                  preload="metadata"
+                  poster="${photos[0]}"
+                  aria-label="${cabin.videoLabel}"
+                >
+                  <source src="${video}" type="video/mp4" />
+                </video>
+                <figcaption>
+                  <span>${cabin.title}</span>
+                  <small>${cabin.videoLabel}</small>
+                </figcaption>
+              </figure>
+            `
+            : ""
+        }
+      </div>
+      <p class="cabin-profile-note reveal">${cabin.note}</p>
+    </article>
+  `;
 }
 
 function heroMarkup(images, labels) {
@@ -580,6 +748,78 @@ function render(language) {
           <div class="schedule-grid">
             ${scheduleMarkup(t.weekend.items)}
           </div>
+          <div class="saturday-program reveal">
+            <div class="saturday-program-heading">
+              <p class="eyebrow">${t.weekend.saturday.eyebrow}</p>
+              <h3>${t.weekend.saturday.title}</h3>
+              <p class="arrival-warning">${t.weekend.saturday.warning}</p>
+            </div>
+            <ol class="saturday-timeline">
+              ${t.weekend.saturday.items
+                .map(
+                  (item) => `
+                    <li>
+                      <time>${item.time}</time>
+                      <div>
+                        <h4>${item.title}</h4>
+                        <p>${item.body}</p>
+                      </div>
+                    </li>
+                  `,
+                )
+                .join("")}
+            </ol>
+          </div>
+        </section>
+
+        <section class="weather-section section" id="weather">
+          <div class="weather-heading reveal">
+            <div>
+              <p class="eyebrow">${t.weather.eyebrow}</p>
+              <h2>${t.weather.title}</h2>
+            </div>
+            <p class="lead">${t.weather.body}</p>
+            <div class="weather-sun" aria-hidden="true">
+              <span></span>
+            </div>
+          </div>
+          <div class="weather-facts">
+            ${t.weather.facts
+              .map(
+                (fact) => `
+                  <article class="weather-fact reveal">
+                    <strong>${fact.value}</strong>
+                    <span>${fact.label}</span>
+                    <small>${fact.note}</small>
+                  </article>
+                `,
+              )
+              .join("")}
+          </div>
+          <div class="weather-day reveal">
+            <ol class="weather-moments">
+              ${t.weather.moments
+                .map(
+                  (moment) => `
+                    <li>
+                      <time>${moment.time}</time>
+                      <div>
+                        <h3>${moment.title}</h3>
+                        <p>${moment.body}</p>
+                      </div>
+                    </li>
+                  `,
+                )
+                .join("")}
+            </ol>
+            <aside class="weather-advice">
+              <h3>${t.weather.adviceTitle}</h3>
+              <ul>
+                ${t.weather.advice.map((item) => `<li>${item}</li>`).join("")}
+              </ul>
+            </aside>
+          </div>
+          <p class="weather-disclaimer">${t.weather.disclaimer}</p>
         </section>
 
         <section class="food-section section" id="food">
@@ -588,6 +828,40 @@ function render(language) {
             <h2>${t.food.title}</h2>
             <p class="lead">${t.food.body}</p>
           </div>
+          <div class="flavours-heading reveal">
+            <p class="eyebrow">${t.food.flavoursEyebrow}</p>
+            <h3>${t.food.flavoursTitle}</h3>
+          </div>
+          <div class="flavours-grid">
+            ${t.food.flavours
+              .map(
+                (flavour) => `
+                  <article class="flavour-card reveal">
+                    <img
+                      src="${MEDIA.food[flavour.key]}"
+                      alt="${flavour.title}"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <div>
+                      <h3>${flavour.title}</h3>
+                      <p>${flavour.body}</p>
+                    </div>
+                  </article>
+                `,
+              )
+              .join("")}
+          </div>
+          <details class="photo-credits reveal">
+            <summary>${t.food.photoCredits}</summary>
+            <p>
+              <a href="https://commons.wikimedia.org/wiki/File:Taco_de_carnitas.jpg" target="_blank" rel="noreferrer">Carnitas — Padaguan, CC BY-SA 3.0</a> ·
+              <a href="https://commons.wikimedia.org/wiki/File:Taquiza_en_el_DF.jpg" target="_blank" rel="noreferrer">Taquiza — El Mono Español, CC BY-SA 3.0</a> ·
+              <a href="https://commons.wikimedia.org/wiki/File:Tejuino_tapat%C3%ADo_y_sus_complementos.jpg" target="_blank" rel="noreferrer">Tejuino — Salvador alc, CC BY-SA 4.0</a> ·
+              <a href="https://commons.wikimedia.org/wiki/File:Nopalitos_(cactus_salad).jpg" target="_blank" rel="noreferrer">Nopalitos — Madman2001, CC BY-SA 4.0</a> ·
+              <a href="https://commons.wikimedia.org/wiki/File:Guacamole_-_La_Casa_Restaurant_-_January_2023_-_Sarah_Stierch.jpg" target="_blank" rel="noreferrer">Guacamole — Sarah Stierch, CC BY 4.0</a>
+            </p>
+          </details>
           <div class="food-grid">
             ${t.food.days
               .map(
@@ -604,6 +878,12 @@ function render(language) {
               .join("")}
           </div>
           <p class="experience-note reveal">${t.food.note}</p>
+          <article class="drinks-policy reveal">
+            <p class="eyebrow">${t.food.drinks.eyebrow}</p>
+            <h3>${t.food.drinks.title}</h3>
+            <p>${t.food.drinks.body}</p>
+            <p class="drinks-policy-note">${t.food.drinks.note}</p>
+          </article>
         </section>
 
         <section class="music-section section" id="music">
@@ -700,6 +980,29 @@ function render(language) {
             <h2>${t.facilities.title}</h2>
             <p class="lead">${t.facilities.body}</p>
           </div>
+          <div class="venue-gallery">
+            ${t.facilities.gallery
+              .map(
+                (image) => `
+                  <figure class="venue-gallery-card reveal">
+                    <img
+                      src="${MEDIA.venue[image.key]}"
+                      alt="${image.alt}"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <figcaption>${image.title}</figcaption>
+                  </figure>
+                `,
+              )
+              .join("")}
+          </div>
+          <a
+            class="venue-gallery-source"
+            href="https://www.clubrocaazul.com/"
+            target="_blank"
+            rel="noreferrer"
+          >${t.facilities.gallerySource} ↗</a>
           <div class="facilities-grid">
             ${t.facilities.groups
               .map(
@@ -774,6 +1077,21 @@ function render(language) {
           </div>
         </section>
 
+        <section class="cabins-showcase section" id="cabins">
+          ${cabinUnitMarkup(
+            t.accommodation.cabinsShowcase,
+            t.accommodation.cabinsShowcase.eyebrow,
+          )}
+          ${t.accommodation.cabinsShowcase.additionalUnits
+            .map((cabin) =>
+              cabinUnitMarkup(
+                cabin,
+                t.accommodation.cabinsShowcase.eyebrow,
+              ),
+            )
+            .join("")}
+        </section>
+
         <section class="travel-section section" id="travel">
           <div class="travel-heading reveal">
             <p class="eyebrow">${t.travel.eyebrow}</p>
@@ -799,6 +1117,27 @@ function render(language) {
               <span class="travel-route">GDL</span>
               <a class="button button-dark" href="#rsvp">${t.travel.cta}</a>
               <small>${t.travel.ctaNote}</small>
+            </div>
+          </div>
+          <div class="route-map reveal" aria-labelledby="route-map-title">
+            <div class="route-map-heading">
+              <p class="eyebrow">${t.travel.routes.eyebrow}</p>
+              <h3 id="route-map-title">${t.travel.routes.title}</h3>
+              <p>${t.travel.routes.note}</p>
+            </div>
+            <div class="route-map-diagram">
+              <section class="route-group route-origins">
+                <h4>${t.travel.routes.originsLabel}</h4>
+                ${routeGroupMarkup(t.travel.routes.origins)}
+              </section>
+              <div class="route-venue">
+                <span aria-hidden="true">◆</span>
+                <strong>${t.travel.routes.venue}</strong>
+              </div>
+              <section class="route-group route-destinations">
+                <h4>${t.travel.routes.destinationsLabel}</h4>
+                ${routeGroupMarkup(t.travel.routes.destinations)}
+              </section>
             </div>
           </div>
         </section>
@@ -860,6 +1199,8 @@ function render(language) {
 
   bindLanguageSwitcher();
   bindHeroSlideshow(t.hero);
+  bindRsvpConditionalFields();
+  bindSubmissionForms();
   observeReveals();
   updateCountdown(language);
 
@@ -886,12 +1227,161 @@ function setLanguage(language) {
   const url = new URL(window.location.href);
   url.searchParams.set("lang", normalized);
   window.history.replaceState({}, "", url);
-  render(normalized);
+  if (auth.currentUser?.uid === GUEST_UID) {
+    render(normalized);
+  } else {
+    renderGate(normalized);
+  }
 }
 
 function bindLanguageSwitcher() {
   document.querySelectorAll("[data-language]").forEach((button) => {
     button.addEventListener("click", () => setLanguage(button.dataset.language));
+  });
+}
+
+function bindRsvpConditionalFields() {
+  const form = document.querySelector('[data-form-kind="rsvp"]');
+  const accommodation = form?.querySelector("#rsvp-accommodation");
+  const conditionalFields = form?.querySelectorAll(
+    "[data-independent-stay]",
+  );
+
+  if (!form || !accommodation || !conditionalFields?.length) return;
+
+  const syncFields = () => {
+    const isIndependent = accommodation.value === "independent";
+
+    conditionalFields.forEach((field) => {
+      field.hidden = !isIndependent;
+      const control = field.querySelector("select, input, textarea");
+      if (!control) return;
+      control.disabled = !isIndependent;
+      control.required = isIndependent;
+    });
+  };
+
+  accommodation.addEventListener("change", syncFields);
+  form.addEventListener("reset", () => window.setTimeout(syncFields, 0));
+  syncFields();
+}
+
+function formValues(form) {
+  return Object.fromEntries(
+    [...new FormData(form).entries()].map(([key, value]) => [
+      key,
+      typeof value === "string" ? value.trim() : value,
+    ]),
+  );
+}
+
+function bindSubmissionForms() {
+  const collections = {
+    rsvp: "rsvp_submissions",
+    suggestions: "experience_suggestions",
+    coast: "coast_interest",
+  };
+
+  document.querySelectorAll("[data-form-kind]").forEach((form) => {
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!form.reportValidity()) return;
+
+      const kind = form.dataset.formKind;
+      const targetCollection = collections[kind];
+      const button = form.querySelector('button[type="submit"]');
+      const status = form.querySelector("[data-form-status]");
+      const labels = interfaceText[currentLanguage];
+      const originalButtonLabel = button.textContent;
+
+      button.disabled = true;
+      button.textContent = labels.submitWorking;
+      status.textContent = labels.submitWorking;
+      status.dataset.state = "working";
+
+      try {
+        await addDoc(collection(db, targetCollection), {
+          ...formValues(form),
+          language: currentLanguage,
+          schemaVersion: kind === "rsvp" ? 3 : 1,
+          createdAt: serverTimestamp(),
+        });
+        form.reset();
+        status.textContent = labels.submitSuccess;
+        status.dataset.state = "success";
+      } catch (error) {
+        console.error("Firebase form submission failed", error);
+        status.textContent = labels.submitError;
+        status.dataset.state = "error";
+      } finally {
+        button.disabled = false;
+        button.textContent = originalButtonLabel;
+      }
+    });
+  });
+}
+
+function renderGate(language, hasError = false) {
+  currentLanguage = language;
+  document.documentElement.lang = language;
+  const t = interfaceText[language];
+
+  app.innerHTML = `
+    <main class="access-gate">
+      <section class="access-card">
+        <div class="gate-monogram" aria-hidden="true">D. <i>&</i> A.</div>
+        <p class="eyebrow">${t.gateEyebrow}</p>
+        <h1>${t.gateTitle}</h1>
+        <p>${t.gateBody}</p>
+        <form data-access-form>
+          <label for="access-key">${t.gateLabel}</label>
+          <input
+            id="access-key"
+            name="accessKey"
+            type="password"
+            autocomplete="current-password"
+            required
+            autofocus
+          />
+          <button class="button button-dark" type="submit">${t.gateButton}</button>
+          <small data-access-status data-state="${hasError ? "error" : ""}">
+            ${hasError ? t.gateError : ""}
+          </small>
+        </form>
+        <div class="gate-languages" aria-label="Language">
+          ${languageSwitcherMarkup(language)}
+        </div>
+      </section>
+    </main>
+  `;
+
+  bindLanguageSwitcher();
+  const form = document.querySelector("[data-access-form]");
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const button = form.querySelector("button");
+    const status = form.querySelector("[data-access-status]");
+    const accessKey = new FormData(form).get("accessKey");
+
+    button.disabled = true;
+    button.textContent = t.gateWorking;
+    status.textContent = "";
+
+    try {
+      await setPersistence(auth, browserLocalPersistence);
+      const credential = await signInWithEmailAndPassword(
+        auth,
+        GUEST_EMAIL,
+        accessKey,
+      );
+      if (credential.user.uid !== GUEST_UID) {
+        await auth.signOut();
+        throw new Error("Unexpected guest account");
+      }
+    } catch (error) {
+      console.warn("Invitation access rejected", error.code || error.message);
+      renderGate(currentLanguage, true);
+    }
   });
 }
 
@@ -1005,5 +1495,14 @@ function observeReveals() {
 }
 
 const initialLanguage = getInitialLanguage();
-render(initialLanguage);
+currentLanguage = initialLanguage;
+onAuthStateChanged(auth, async (user) => {
+  if (user?.uid === GUEST_UID) {
+    render(currentLanguage);
+    return;
+  }
+
+  if (user) await auth.signOut();
+  renderGate(currentLanguage);
+});
 window.setInterval(() => updateCountdown(currentLanguage), 1000);

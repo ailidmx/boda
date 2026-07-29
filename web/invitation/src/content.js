@@ -86,17 +86,17 @@ export const content = {
       eyebrow: "Guarden la fecha",
       title: "Tres días para celebrar",
       intro:
-        "La celebración comienza el viernes y termina el domingo. Los horarios definitivos se publicarán aquí.",
+        "Nosotros estaremos en Roca Azul desde el jueves. Los invitados pueden llegar desde el viernes alrededor del mediodía y la celebración principal será una boda de tarde el sábado.",
       items: [
         {
-          day: "Viernes 19",
+          day: "Viernes 19 · desde mediodía",
           title: "Llegada y bienvenida",
-          body: "Check-in, petanca, pizzas y un primer encuentro relajado.",
+          body: "Llegadas, check-in, petanca, pizzas y un primer encuentro relajado.",
         },
         {
-          day: "Sábado 20",
-          title: "El gran día",
-          body: "Ceremonia, comida, música y una larga noche para bailar.",
+          day: "Sábado 20 · cita 13:00",
+          title: "Una boda de tarde",
+          body: "Civil, marimba, carnitas, ceremonia en el faro, cena y baile.",
         },
         {
           day: "Domingo 21",
@@ -104,12 +104,81 @@ export const content = {
           body: "Una última mañana juntos antes de los regresos.",
         },
       ],
+      saturday: {
+        eyebrow: "Sábado 20 · programa",
+        title: "La tarde, paso a paso",
+        warning:
+          "Quienes vengan desde Guadalajara: salgan con bastante anticipación. Los accesos hacia Jocotepec pueden congestionarse fácilmente y necesitamos que todos estén en Roca Azul a las 13:00.",
+        items: [
+          { time: "13:00", title: "Llegada de invitados", body: "Bienvenida y tiempo para instalarnos." },
+          { time: "14:00", title: "Ceremonia civil", body: "El primer sí del día." },
+          { time: "Al terminar", title: "Marimba", body: "Música en vivo para brindar y convivir." },
+          { time: "Después", title: "Comida de carnitas", body: "Una comida mexicana antes de la ceremonia en el faro." },
+          { time: "18:00", title: "Ceremonia en el faro", body: "El gran momento de la tarde." },
+          { time: "Al terminar", title: "Mariachi y cena", body: "El mariachi abrirá la cena y el siguiente capítulo de la celebración." },
+          { time: "Después de cenar", title: "Norteño y baile", body: "El norteño abrirá la pista y la fiesta." },
+        ],
+      },
+    },
+    weather: {
+      eyebrow: "El clima esperado",
+      title: "Sol de tarde, noche fresca",
+      body:
+        "A finales de febrero, Jocotepec suele vivir días secos, luminosos y templados. La boda comenzará con calor agradable y continuará con un descenso claro de temperatura después del atardecer.",
+      facts: [
+        { value: "≈ 27 °C", label: "máxima habitual", note: "Durante la tarde" },
+        { value: "≈ 8–10 °C", label: "mínima habitual", note: "Al final de la noche" },
+        { value: "3–5 %", label: "probabilidad climática de lluvia", note: "En un día típico de febrero" },
+        { value: "≈ 18:55", label: "puesta de sol", note: "Muy cerca de la ceremonia en el faro" },
+      ],
+      moments: [
+        { time: "13:00–17:30", title: "Tarde luminosa", body: "Sol y temperatura agradable a cálida; convienen protector solar, lentes y agua." },
+        { time: "18:00", title: "Ceremonia y atardecer", body: "La luz comenzará a bajar durante la ceremonia en el faro." },
+        { time: "Desde 19:00", title: "La noche refresca", body: "La temperatura puede bajar rápido junto al lago." },
+      ],
+      adviceTitle: "Qué traer",
+      advice: [
+        "Una capa ligera, saco, suéter o chal para la cena y el baile.",
+        "Protector solar y lentes de sol para las primeras horas.",
+        "Calzado cómodo para jardines y espacios exteriores.",
+      ],
+      disclaimer:
+        "Esto es una referencia climática, no un pronóstico. Publicaremos aquí la previsión real aproximadamente diez días antes de la boda.",
     },
     food: {
       eyebrow: "A la mesa",
       title: "Un fin de semana para probar, brindar y compartir",
       body:
         "Queremos que cada comida sea sencilla, generosa y muy mexicana. Este es el menú que estamos imaginando; todavía puede crecer con sus ideas.",
+      flavoursEyebrow: "Sabores de Jalisco y México",
+      flavoursTitle: "¿Qué vamos a probar?",
+      flavours: [
+        {
+          key: "carnitas",
+          title: "Carnitas",
+          body: "Cerdo cocido lentamente hasta quedar tierno y dorado, servido con tortillas, cebolla, cilantro, salsas y limón.",
+        },
+        {
+          key: "taquiza",
+          title: "Taquiza",
+          body: "Una mesa con varios guisos mexicanos, tortillas calientes y acompañamientos para que cada quien arme sus propios tacos.",
+        },
+        {
+          key: "tejuino",
+          title: "Tejuino",
+          body: "Bebida tapatía de maíz fermentado, dulce y ácida, servida muy fría con limón y sal. También habrá tejuino loco con tequila o mezcal.",
+        },
+        {
+          key: "nopales",
+          title: "Ensalada de nopales",
+          body: "Nopal tierno con tomate, cebolla, hierbas y queso: una opción fresca, mexicana y vegetariana.",
+        },
+        {
+          key: "guacamole",
+          title: "Guacamole y opciones vegetarianas",
+          body: "Habrá guacamole, tortillas, salsas y otros acompañamientos sin carne. Podrán indicar sus restricciones en el RSVP.",
+        },
+      ],
       days: [
         {
           day: "Viernes por la noche",
@@ -141,6 +210,15 @@ export const content = {
       ],
       note:
         "Los detalles siguen en preparación. También estamos considerando agua, bebidas sin alcohol, café, opciones para niñas y niños y necesidades alimentarias especiales.",
+      photoCredits: "Créditos de las fotografías",
+      drinks: {
+        eyebrow: "Para brindar",
+        title: "La política de municiones",
+        body:
+          "Tendremos una cantidad razonable de alcohol por invitado, principalmente cerveza y tequila, además de refrescos y opciones sin alcohol.",
+        note:
+          "Si quieren asegurarse de que su noche quede especialmente bien regada, pueden traer sus propias municiones para compartir y disfrutar responsablemente.",
+      },
     },
     music: {
       eyebrow: "Música en vivo",
@@ -149,14 +227,14 @@ export const content = {
         "La música acompañará cada cambio de energía del sábado, desde el final de la ceremonia hasta la pista de baile.",
       acts: [
         {
-          moment: "Después de la ceremonia",
+          moment: "Después del civil",
           name: "Marimba",
-          note: "Para acompañar el encuentro y las primeras copas.",
+          note: "Para acompañar el primer brindis antes de las carnitas.",
         },
         {
-          moment: "Aperitivo o apertura de la cena",
+          moment: "Después de la ceremonia en el faro",
           name: "Mariachi",
-          note: "Una entrada festiva antes de sentarnos a la mesa.",
+          note: "Una entrada festiva para abrir la cena.",
         },
         {
           moment: "Después de la cena",
@@ -173,7 +251,7 @@ export const content = {
         eyebrow: "Escena abierta",
         title: "¿Hay una canción que quieran cantar?",
         body:
-          "Mándennos su sugerencia. Quizá podamos aprovechar a alguno de los músicos en vivo para acompañarlos y convertirla en un momento inolvidable.",
+          "Agreguen aquí sus títulos para el ambiente, el baile o el karaoke. Quizá podamos aprovechar a alguno de los músicos en vivo para acompañarlos y convertir una canción en un momento inolvidable.",
       },
       playlists: {
         eyebrow: "Escuchen desde ahora",
@@ -216,7 +294,7 @@ export const content = {
       },
       button: "Enviar mis sugerencias",
       previewNote:
-        "Vista previa: las sugerencias se enviarán al mismo sistema privado del RSVP.",
+        "Sus canciones, votos e ideas se guardarán de forma privada.",
     },
     venue: {
       eyebrow: "El lugar",
@@ -233,6 +311,13 @@ export const content = {
       title: "Todo el club para disfrutar",
       body:
         "Entre un momento y otro, cada quien podrá convivir con sus vecinos, explorar las instalaciones o simplemente descansar en su alojamiento.",
+      gallery: [
+        { key: "cabins", title: "Cabañas", alt: "Cabañas y habitaciones de Roca Azul" },
+        { key: "pool", title: "Albercas", alt: "Alberca y jardines del Club Roca Azul" },
+        { key: "courts", title: "Deporte", alt: "Canchas deportivas de Roca Azul" },
+        { key: "gardens", title: "Jardines", alt: "Áreas verdes del Club Roca Azul" },
+      ],
+      gallerySource: "Fotografías del lugar: Club Roca Azul",
       groups: [
         {
           title: "Agua y bienestar",
@@ -289,6 +374,122 @@ export const content = {
         "El alojamiento se reserva únicamente como paquete completo de dos noches, del viernes 19 al domingo 21: no es posible reservar una sola noche. El precio estimado es de $500 MXN por persona y por noche e incluye los dos desayunos del fin de semana; compartiremos más detalles próximamente. Nuestros queridos padrinos tienen el alojamiento de regalo. Si prefieren organizar su estancia por su cuenta, no hay ningún problema: solo necesitamos saberlo con anticipación.",
       contactPrompt:
         "Si les interesa este plan, escríbannos directamente por WhatsApp:",
+      cabinsShowcase: {
+        eyebrow: "Conozcan las cabañas",
+        key: "azalea",
+        title: "Azalea",
+        intro:
+          "La primera cabaña de nuestro catálogo: amplia, con espacios comunes para convivir y capacidad anunciada para 12 personas.",
+        capacity: "12 personas",
+        roomsLabel: "3 habitaciones",
+        bedsLabel: "7 camas descritas",
+        rooms: [
+          "Habitación 1 · 2 camas matrimoniales",
+          "Habitación 2 · 2 camas matrimoniales",
+          "Habitación 3 · 3 camas individuales",
+        ],
+        amenities:
+          "Las fotografías muestran sala, comedor, cocina, barra y baño con ducha.",
+        galleryLabel: "Galería de Azalea",
+        photoAlts: [
+          "Comedor y espacio común de la cabaña Azalea",
+          "Sala y comedor de la cabaña Azalea",
+          "Sala de la cabaña Azalea",
+          "Habitación con dos camas matrimoniales en Azalea",
+          "Segunda habitación con dos camas matrimoniales en Azalea",
+          "Habitación con tres camas individuales en Azalea",
+          "Baño con ducha de la cabaña Azalea",
+          "Cocina equipada de la cabaña Azalea",
+          "Barra y cocina de la cabaña Azalea",
+        ],
+        note:
+          "La distribución final de huéspedes será confirmada directamente por nosotros.",
+        additionalUnits: [
+          {
+            key: "dalia",
+            title: "Dalia",
+            intro:
+              "Una cabaña luminosa junto a la alberca, con tres habitaciones y diez couchages perfectamente identificados.",
+            capacity: "10 personas",
+            roomsLabel: "3 habitaciones",
+            bedsLabel: "7 camas · 10 lugares",
+            rooms: [
+              "Habitación 1 · 2 camas matrimoniales",
+              "Habitación 2 · 4 camas individuales en 2 literas",
+              "Habitación 3 · 1 cama matrimonial",
+            ],
+            amenities:
+              "Las fotografías muestran sala, comedor, baño con ducha y vista hacia la alberca.",
+            galleryLabel: "Galería de Dalia",
+            photoAlts: [
+              "Comedor de la cabaña Dalia junto a la alberca",
+              "Sala de la cabaña Dalia",
+              "Habitación con dos camas matrimoniales en Dalia",
+              "Habitación con cuatro camas individuales en literas en Dalia",
+              "Habitación con una cama matrimonial en Dalia",
+              "Baño con ducha de la cabaña Dalia",
+              "Segunda vista del baño con ducha de la cabaña Dalia",
+            ],
+            note:
+              "El costo interno registrado es de $11,150 MXN por las dos noches; la asignación y el importe final por persona serán confirmados directamente.",
+          },
+          {
+            key: "margarita",
+            title: "Margarita",
+            intro:
+              "Una cabaña alegre en tonos amarillos, con tres habitaciones, espacios comunes luminosos y jardín con fogatero.",
+            capacity: "10 personas",
+            roomsLabel: "3 habitaciones",
+            bedsLabel: "7 camas · 10 lugares",
+            rooms: [
+              "Habitación 1 · 2 camas matrimoniales",
+              "Habitación 2 · 4 camas individuales en 2 literas",
+              "Habitación 3 · 1 cama matrimonial",
+            ],
+            amenities:
+              "Las fotografías muestran sala-comedor, cocina con barra, baño con ducha, jardín y fogatero exterior.",
+            galleryLabel: "Galería de Margarita",
+            photoAlts: [
+              "Área común interior de la cabaña Margarita",
+              "Habitación con cuatro camas individuales en literas en Margarita",
+              "Baño con ducha de la cabaña Margarita",
+              "Habitación con dos camas matrimoniales en Margarita",
+              "Cocina con barra de la cabaña Margarita",
+              "Comedor de la cabaña Margarita",
+              "Habitación con una cama matrimonial en Margarita",
+              "Jardín y fogatero exterior de la cabaña Margarita",
+            ],
+            note:
+              "El costo interno registrado es de $11,150 MXN por las dos noches; la asignación y el importe final por persona serán confirmados directamente.",
+          },
+          {
+            key: "wooden",
+            title: "Cabañas de madera 31–34",
+            intro:
+              "Cuatro cabañas independientes entre los árboles, ideales para parejas o familias pequeñas que quieren un espacio más íntimo.",
+            capacity: "4 cabañas",
+            roomsLabel: "2 adultos por unidad",
+            bedsLabel: "Hasta 2 menores",
+            rooms: [
+              "Unidades disponibles · 31, 32, 33 y 34",
+              "Cada unidad · 1 cama king size",
+              "Cada unidad · 1 sofá cama matrimonial",
+            ],
+            amenities:
+              "Las fotografías y el video muestran terraza, refrigerador, lavabo, televisión y un interior completamente revestido de madera.",
+            galleryLabel: "Galería de las cabañas de madera 31 a 34",
+            photoAlts: [
+              "Exterior de una cabaña de madera entre los árboles",
+              "Entrada de la cabaña de madera número 34",
+              "Cama king size dentro de una cabaña de madera",
+              "Sofá cama y equipamiento interior de una cabaña de madera",
+            ],
+            videoLabel: "Recorrido en video · 16 s",
+            note:
+              "Tarifa interna por unidad y por las dos noches: $5,310 MXN para 2 adultos, o $5,790 MXN para 2 adultos y 2 menores. Confirmaremos directamente la asignación y el importe final.",
+          },
+        ],
+      },
       plan: {
         eyebrow: "¿Cómo funciona?",
         title: "Díganos qué prefieren",
@@ -312,8 +513,39 @@ export const content = {
         "Coordinaremos las recogidas cuando tengamos sus números de vuelo.",
         "Cada viajero tendrá un itinerario de llegada, estancia y regreso.",
       ],
+      routes: {
+        eyebrow: "Mapa de trayectos",
+        title: "Llegar a Roca Azul y seguir hacia la costa",
+        note:
+          "Tiempos aproximados en sábado y sujetos a tráfico. Las rutas de llegada indicadas son libres; los importes de casetas son estimaciones por trayecto.",
+        venue: "Roca Azul · Jocotepec",
+        originsLabel: "Hacia la boda",
+        destinationsLabel: "Después de la boda",
+        origins: [
+          { place: "Centro de Guadalajara", duration: "≈ 1 h 30", detail: "Ruta libre" },
+          { place: "Nuestra casa · Tesistán", duration: "≈ 1 h 45", detail: "Ruta libre" },
+          { place: "Aeropuerto GDL", duration: "≈ 1 h", detail: "Ruta libre" },
+        ],
+        destinations: [
+          {
+            place: "Barra de Navidad",
+            duration: "≈ 5 h",
+            detail: "Libre · Cocula → Autlán → Barra",
+          },
+          {
+            place: "Barra de Navidad",
+            duration: "≈ 4 h 45",
+            detail: "Vía Manzanillo · casetas ≈ $500 MXN",
+          },
+          {
+            place: "Manzanillo",
+            duration: "≈ 4 h 30",
+            detail: "Casetas ≈ $500 MXN",
+          },
+        ],
+      },
       cta: "Compartir mis datos de viaje",
-      ctaNote: "El formulario privado estará disponible próximamente.",
+      ctaNote: "El formulario privado ya está disponible más abajo.",
     },
     attire: {
       eyebrow: "Vestuario",
@@ -396,7 +628,8 @@ export const content = {
       fields: {
         firstName: "Nombre",
         lastName: "Apellidos",
-        contact: "Correo o WhatsApp",
+        email: "Correo electrónico (para un futuro acceso web)",
+        whatsapp: "WhatsApp (para las comunicaciones posteriores)",
         attendance: "¿Nos acompañan?",
         groupMode: "¿Responden solos o en grupo?",
         groupName: "Nombre del grupo o familia",
@@ -405,6 +638,8 @@ export const content = {
         children: "Menores de 18 años",
         guests: "Nombres de acompañantes",
         accommodation: "Plan de alojamiento",
+        independentArrival: "¿Cuándo piensan llegar a Roca Azul?",
+        sundayMorning: "¿Nos veremos el domingo por la mañana?",
         travelStatus: "Situación de su viaje",
         arrivalFrom: "Llegada desde",
         arrivalTo: "Llegada a",
@@ -442,6 +677,15 @@ export const content = {
             label: "No: organizaré todo mi alojamiento por mi cuenta",
           },
         ],
+        independentArrival: [
+          { value: "friday", label: "Desde el viernes" },
+          { value: "saturday", label: "Únicamente el sábado" },
+        ],
+        sundayMorning: [
+          { value: "yes", label: "Sí, estaremos ahí" },
+          { value: "no", label: "No, nos iremos antes" },
+          { value: "maybe", label: "Todavía no lo sabemos" },
+        ],
         travelStatus: [
           { value: "booked", label: "Viajo desde lejos y ya tengo billetes" },
           {
@@ -453,11 +697,11 @@ export const content = {
       },
       button: "Enviar mi respuesta",
       previewNote:
-        "Vista previa: conectaremos el envío privado antes de publicar la invitación.",
+        "Su respuesta se guardará de forma privada y solo los novios podrán consultarla.",
     },
     footer: {
       line: "Con amor, desde México y Francia",
-      privacy: "Sitio público · Sin información privada de invitados",
+      privacy: "Invitación privada · Respuestas protegidas",
     },
   },
   fr: {
@@ -519,17 +763,17 @@ export const content = {
       eyebrow: "Réservez la date",
       title: "Trois jours pour célébrer",
       intro:
-        "La célébration commence le vendredi et se termine le dimanche. Les horaires définitifs seront publiés ici.",
+        "Nous serons à Roca Azul dès le jeudi. Les invités pourront arriver à partir du vendredi vers midi, et la célébration principale sera un mariage d’après-midi le samedi.",
       items: [
         {
-          day: "Vendredi 19",
+          day: "Vendredi 19 · dès midi",
           title: "Arrivée et bienvenue",
           body: "Check-in, pétanque, pizzas et premières retrouvailles.",
         },
         {
-          day: "Samedi 20",
-          title: "Le grand jour",
-          body: "Cérémonie, repas, musique et une longue nuit de fête.",
+          day: "Samedi 20 · rendez-vous 13 h",
+          title: "Un mariage d’après-midi",
+          body: "Cérémonie civile, marimba, carnitas, cérémonie au phare, dîner et danse.",
         },
         {
           day: "Dimanche 21",
@@ -537,12 +781,81 @@ export const content = {
           body: "Une dernière matinée ensemble avant les départs.",
         },
       ],
+      saturday: {
+        eyebrow: "Samedi 20 · programme",
+        title: "L’après-midi, pas à pas",
+        warning:
+          "Pour celles et ceux qui viennent de Guadalajara : partez très en avance. Les accès vers Jocotepec peuvent facilement être embouteillés et nous avons besoin que tout le monde soit à Roca Azul à 13 h.",
+        items: [
+          { time: "13 h", title: "Arrivée des invités", body: "Accueil et temps pour s’installer." },
+          { time: "14 h", title: "Cérémonie civile", body: "Le premier oui de la journée." },
+          { time: "À la suite", title: "Marimba", body: "Musique live pour trinquer et se retrouver." },
+          { time: "Puis", title: "Déjeuner de carnitas", body: "Un repas mexicain avant la cérémonie au phare." },
+          { time: "18 h", title: "Cérémonie au phare", body: "Le grand moment de l’après-midi." },
+          { time: "À la suite", title: "Mariachi et dîner", body: "Le mariachi ouvrira le dîner et la suite de la célébration." },
+          { time: "Après dîner", title: "Norteño et danse", body: "Le norteño ouvrira la piste et la fête." },
+        ],
+      },
+    },
+    weather: {
+      eyebrow: "La météo habituelle",
+      title: "Soleil l’après-midi, fraîcheur le soir",
+      body:
+        "Fin février, Jocotepec connaît généralement des journées sèches, lumineuses et douces. Le mariage commencera sous une chaleur agréable, puis la température baissera nettement après le coucher du soleil.",
+      facts: [
+        { value: "≈ 27 °C", label: "maximale habituelle", note: "Pendant l’après-midi" },
+        { value: "≈ 8–10 °C", label: "minimale habituelle", note: "En fin de nuit" },
+        { value: "3–5 %", label: "risque climatique de pluie", note: "Pour une journée typique de février" },
+        { value: "≈ 18 h 55", label: "coucher du soleil", note: "Presque au même moment que la cérémonie au phare" },
+      ],
+      moments: [
+        { time: "13 h–17 h 30", title: "Après-midi lumineuse", body: "Soleil et douceur à chaleur ; crème solaire, lunettes et eau seront utiles." },
+        { time: "18 h", title: "Cérémonie et coucher du soleil", body: "La lumière commencera à baisser pendant la cérémonie au phare." },
+        { time: "Dès 19 h", title: "La soirée se rafraîchit", body: "La température peut baisser rapidement au bord du lac." },
+      ],
+      adviceTitle: "À prévoir",
+      advice: [
+        "Une veste légère, un pull ou un châle pour le dîner et la danse.",
+        "De la crème solaire et des lunettes pour les premières heures.",
+        "Des chaussures confortables pour les jardins et les espaces extérieurs.",
+      ],
+      disclaimer:
+        "Il s’agit d’une tendance climatique, pas d’une prévision. La météo réelle sera publiée ici environ dix jours avant le mariage.",
     },
     food: {
       eyebrow: "À table",
       title: "Un week-end pour goûter, trinquer et partager",
       body:
         "Nous voulons que chaque repas soit simple, généreux et profondément mexicain. Voici le menu que nous imaginons ; il peut encore évoluer grâce à vos idées.",
+      flavoursEyebrow: "Saveurs du Jalisco et du Mexique",
+      flavoursTitle: "Qu’allons-nous goûter ?",
+      flavours: [
+        {
+          key: "carnitas",
+          title: "Carnitas",
+          body: "Du porc longuement confit jusqu’à devenir tendre et doré, servi avec tortillas, oignon, coriandre, sauces et citron vert.",
+        },
+        {
+          key: "taquiza",
+          title: "Taquiza",
+          body: "Une table de plusieurs plats mijotés mexicains, tortillas chaudes et garnitures pour que chacun compose ses propres tacos.",
+        },
+        {
+          key: "tejuino",
+          title: "Tejuino",
+          body: "Une boisson typique de Guadalajara à base de maïs fermenté, douce et acidulée, servie très fraîche avec citron vert et sel. Version « loco » à la tequila ou au mezcal en option.",
+        },
+        {
+          key: "nopales",
+          title: "Salade de nopales",
+          body: "Du cactus nopal tendre avec tomate, oignon, herbes et fromage : une option fraîche, mexicaine et végétarienne.",
+        },
+        {
+          key: "guacamole",
+          title: "Guacamole et options végétariennes",
+          body: "Il y aura du guacamole, des tortillas, des sauces et d’autres accompagnements sans viande. Vous pourrez préciser vos restrictions dans le RSVP.",
+        },
+      ],
       days: [
         {
           day: "Vendredi soir",
@@ -574,6 +887,15 @@ export const content = {
       ],
       note:
         "Les détails sont encore en préparation. Nous pensons aussi à l’eau, aux boissons sans alcool, au café, aux options pour les enfants et aux besoins alimentaires particuliers.",
+      photoCredits: "Crédits photographiques",
+      drinks: {
+        eyebrow: "Pour trinquer",
+        title: "La politique des munitions",
+        body:
+          "Nous prévoirons une quantité raisonnable d’alcool par invité, principalement de la bière et de la tequila, ainsi que des sodas et des boissons sans alcool.",
+        note:
+          "Si vous voulez être certains que la soirée soit particulièrement bien arrosée, vous pouvez apporter vos propres munitions, à partager et à savourer avec modération.",
+      },
     },
     music: {
       eyebrow: "Musique live",
@@ -582,14 +904,14 @@ export const content = {
         "La musique accompagnera chaque changement d’énergie du samedi, de la fin de la cérémonie jusqu’à la piste de danse.",
       acts: [
         {
-          moment: "Après la cérémonie",
+          moment: "Après la cérémonie civile",
           name: "Marimba",
-          note: "Pour accompagner les retrouvailles et les premiers verres.",
+          note: "Pour accompagner le premier verre avant les carnitas.",
         },
         {
-          moment: "Apéritif ou ouverture du dîner",
+          moment: "Après la cérémonie au phare",
           name: "Mariachi",
-          note: "Une entrée festive avant de passer à table.",
+          note: "Une entrée festive pour ouvrir le dîner.",
         },
         {
           moment: "Après le dîner",
@@ -606,7 +928,7 @@ export const content = {
         eyebrow: "Scène ouverte",
         title: "Une chanson que vous aimeriez chanter ?",
         body:
-          "Envoyez-nous votre suggestion. Nous pourrons peut-être profiter de la présence des musiciens pour vous accompagner et en faire un moment inoubliable.",
+          "Ajoutez ici vos titres pour l’ambiance, la danse ou le karaoké. Nous pourrons peut-être profiter de la présence des musiciens pour vous accompagner et en faire un moment inoubliable.",
       },
       playlists: {
         eyebrow: "À écouter dès maintenant",
@@ -649,7 +971,7 @@ export const content = {
       },
       button: "Envoyer mes suggestions",
       previewNote:
-        "Aperçu : les suggestions rejoindront le même système privé que le RSVP.",
+        "Vos chansons, votes et idées seront enregistrés de façon privée.",
     },
     venue: {
       eyebrow: "Le lieu",
@@ -666,6 +988,13 @@ export const content = {
       title: "Tout le club à votre disposition",
       body:
         "Entre deux moments, chacun pourra retrouver ses voisins, profiter des installations ou simplement se reposer dans son hébergement.",
+      gallery: [
+        { key: "cabins", title: "Cabanes", alt: "Cabanes et chambres de Roca Azul" },
+        { key: "pool", title: "Piscines", alt: "Piscine et jardins du Club Roca Azul" },
+        { key: "courts", title: "Sport", alt: "Terrains de sport de Roca Azul" },
+        { key: "gardens", title: "Jardins", alt: "Espaces verts du Club Roca Azul" },
+      ],
+      gallerySource: "Photos du lieu : Club Roca Azul",
       groups: [
         {
           title: "Eau et bien-être",
@@ -722,6 +1051,122 @@ export const content = {
         "L’hébergement se réserve uniquement sous la forme d’un forfait complet de deux nuits, du vendredi 19 au dimanche 21 : une seule nuit n’est pas possible. Le tarif estimatif est de 500 MXN par personne et par nuit et comprend les deux petits-déjeuners du week-end ; davantage de détails suivront prochainement. L’hébergement est offert à nos chers padrinos. Si vous préférez organiser votre séjour de votre côté, aucun souci : nous avons simplement besoin de le savoir à l’avance.",
       contactPrompt:
         "Si cette formule vous intéresse, écrivez-nous directement sur WhatsApp :",
+      cabinsShowcase: {
+        eyebrow: "Découvrez les cabanes",
+        key: "azalea",
+        title: "Azalea",
+        intro:
+          "La première cabane de notre catalogue : spacieuse, avec de belles pièces communes et une capacité annoncée de 12 personnes.",
+        capacity: "12 personnes",
+        roomsLabel: "3 chambres",
+        bedsLabel: "7 lits décrits",
+        rooms: [
+          "Chambre 1 · 2 lits doubles",
+          "Chambre 2 · 2 lits doubles",
+          "Chambre 3 · 3 lits simples",
+        ],
+        amenities:
+          "Les photos montrent un salon, une salle à manger, une cuisine, un comptoir et une salle de bain avec douche.",
+        galleryLabel: "Galerie d’Azalea",
+        photoAlts: [
+          "Salle à manger et espace commun de la cabane Azalea",
+          "Salon et salle à manger de la cabane Azalea",
+          "Salon de la cabane Azalea",
+          "Chambre avec deux lits doubles dans Azalea",
+          "Deuxième chambre avec deux lits doubles dans Azalea",
+          "Chambre avec trois lits simples dans Azalea",
+          "Salle de bain avec douche de la cabane Azalea",
+          "Cuisine équipée de la cabane Azalea",
+          "Comptoir et cuisine de la cabane Azalea",
+        ],
+        note:
+          "Nous confirmerons directement la répartition finale des invités.",
+        additionalUnits: [
+          {
+            key: "dalia",
+            title: "Dalia",
+            intro:
+              "Une cabane lumineuse près de la piscine, avec trois chambres et dix couchages parfaitement identifiés.",
+            capacity: "10 personnes",
+            roomsLabel: "3 chambres",
+            bedsLabel: "7 lits · 10 couchages",
+            rooms: [
+              "Chambre 1 · 2 lits doubles",
+              "Chambre 2 · 4 lits simples dans 2 lits superposés",
+              "Chambre 3 · 1 lit double",
+            ],
+            amenities:
+              "Les photos montrent un salon, une salle à manger, une salle de bain avec douche et une vue vers la piscine.",
+            galleryLabel: "Galerie de Dalia",
+            photoAlts: [
+              "Salle à manger de la cabane Dalia près de la piscine",
+              "Salon de la cabane Dalia",
+              "Chambre avec deux lits doubles dans Dalia",
+              "Chambre avec quatre lits simples superposés dans Dalia",
+              "Chambre avec un lit double dans Dalia",
+              "Salle de bain avec douche de Dalia",
+              "Deuxième vue de la salle de bain avec douche de Dalia",
+            ],
+            note:
+              "Le coût interne enregistré est de 11 150 MXN pour les deux nuits ; l’attribution et le montant final par personne seront confirmés directement.",
+          },
+          {
+            key: "margarita",
+            title: "Margarita",
+            intro:
+              "Une cabane joyeuse aux tons jaunes, avec trois chambres, des espaces communs lumineux et un jardin avec foyer extérieur.",
+            capacity: "10 personnes",
+            roomsLabel: "3 chambres",
+            bedsLabel: "7 lits · 10 couchages",
+            rooms: [
+              "Chambre 1 · 2 lits doubles",
+              "Chambre 2 · 4 lits simples dans 2 lits superposés",
+              "Chambre 3 · 1 lit double",
+            ],
+            amenities:
+              "Les photos montrent un salon-salle à manger, une cuisine avec comptoir, une salle de bain avec douche, un jardin et un foyer extérieur.",
+            galleryLabel: "Galerie de Margarita",
+            photoAlts: [
+              "Espace commun intérieur de la cabane Margarita",
+              "Chambre avec quatre lits simples superposés dans Margarita",
+              "Salle de bain avec douche de Margarita",
+              "Chambre avec deux lits doubles dans Margarita",
+              "Cuisine avec comptoir de la cabane Margarita",
+              "Salle à manger de la cabane Margarita",
+              "Chambre avec un lit double dans Margarita",
+              "Jardin et foyer extérieur de la cabane Margarita",
+            ],
+            note:
+              "Le coût interne enregistré est de 11 150 MXN pour les deux nuits ; l’attribution et le montant final par personne seront confirmés directement.",
+          },
+          {
+            key: "wooden",
+            title: "Cabanes en bois 31–34",
+            intro:
+              "Quatre cabanes indépendantes sous les arbres, idéales pour les couples ou petites familles qui souhaitent un espace plus intime.",
+            capacity: "4 cabanes",
+            roomsLabel: "2 adultes par unité",
+            bedsLabel: "Jusqu’à 2 mineurs",
+            rooms: [
+              "Unités disponibles · 31, 32, 33 et 34",
+              "Dans chaque unité · 1 lit king size",
+              "Dans chaque unité · 1 canapé-lit double",
+            ],
+            amenities:
+              "Les photos et la vidéo montrent une terrasse, un réfrigérateur, un lavabo, une télévision et un intérieur entièrement habillé de bois.",
+            galleryLabel: "Galerie des cabanes en bois 31 à 34",
+            photoAlts: [
+              "Extérieur d’une cabane en bois sous les arbres",
+              "Entrée de la cabane en bois numéro 34",
+              "Lit king size dans une cabane en bois",
+              "Canapé-lit et équipements intérieurs d’une cabane en bois",
+            ],
+            videoLabel: "Visite vidéo · 16 s",
+            note:
+              "Tarif interne par unité pour les deux nuits : 5 310 MXN pour 2 adultes, ou 5 790 MXN pour 2 adultes et 2 mineurs. Nous confirmerons directement l’attribution et le montant final.",
+          },
+        ],
+      },
       plan: {
         eyebrow: "Comment ça marche ?",
         title: "Dites-nous ce que vous préférez",
@@ -745,8 +1190,39 @@ export const content = {
         "Nous coordonnerons les accueils dès réception de vos numéros de vol.",
         "Chaque voyageur aura un itinéraire d’arrivée, de séjour et de retour.",
       ],
+      routes: {
+        eyebrow: "Schéma des trajets",
+        title: "Rejoindre Roca Azul, puis continuer vers la côte",
+        note:
+          "Durées approximatives un samedi et variables selon la circulation. Les itinéraires d’arrivée indiqués sont gratuits ; les montants de péage sont estimés par trajet.",
+        venue: "Roca Azul · Jocotepec",
+        originsLabel: "Vers le mariage",
+        destinationsLabel: "Après le mariage",
+        origins: [
+          { place: "Centre de Guadalajara", duration: "≈ 1 h 30", detail: "Route gratuite" },
+          { place: "Notre maison · Tesistán", duration: "≈ 1 h 45", detail: "Route gratuite" },
+          { place: "Aéroport GDL", duration: "≈ 1 h", detail: "Route gratuite" },
+        ],
+        destinations: [
+          {
+            place: "Barra de Navidad",
+            duration: "≈ 5 h",
+            detail: "Sans péage · Cocula → Autlán → Barra",
+          },
+          {
+            place: "Barra de Navidad",
+            duration: "≈ 4 h 45",
+            detail: "Via Manzanillo · péages ≈ 500 MXN",
+          },
+          {
+            place: "Manzanillo",
+            duration: "≈ 4 h 30",
+            detail: "Péages ≈ 500 MXN",
+          },
+        ],
+      },
       cta: "Partager mes informations de voyage",
-      ctaNote: "Le formulaire privé sera bientôt disponible.",
+      ctaNote: "Le formulaire privé est maintenant disponible plus bas.",
     },
     attire: {
       eyebrow: "Tenues",
@@ -829,7 +1305,8 @@ export const content = {
       fields: {
         firstName: "Prénom",
         lastName: "Nom de famille",
-        contact: "E-mail ou WhatsApp",
+        email: "E-mail (pour un futur accès au site)",
+        whatsapp: "WhatsApp (pour les communications à venir)",
         attendance: "Serez-vous avec nous ?",
         groupMode: "Répondez-vous seul·e ou en groupe ?",
         groupName: "Nom du groupe ou de la famille",
@@ -838,6 +1315,8 @@ export const content = {
         children: "Mineurs de moins de 18 ans",
         guests: "Noms des accompagnants",
         accommodation: "Projet d’hébergement",
+        independentArrival: "Quand pensez-vous arriver à Roca Azul ?",
+        sundayMorning: "Nous verrons-nous dimanche matin ?",
         travelStatus: "État de votre voyage",
         arrivalFrom: "Arrivée depuis",
         arrivalTo: "Arrivée à",
@@ -875,6 +1354,15 @@ export const content = {
             label: "Non : j’organiserai tout mon hébergement de mon côté",
           },
         ],
+        independentArrival: [
+          { value: "friday", label: "Dès le vendredi" },
+          { value: "saturday", label: "Uniquement le samedi" },
+        ],
+        sundayMorning: [
+          { value: "yes", label: "Oui, nous serons là" },
+          { value: "no", label: "Non, nous partirons avant" },
+          { value: "maybe", label: "Nous ne le savons pas encore" },
+        ],
         travelStatus: [
           { value: "booked", label: "Je viens de loin et mes billets sont réservés" },
           {
@@ -886,11 +1374,11 @@ export const content = {
       },
       button: "Envoyer ma réponse",
       previewNote:
-        "Aperçu : l’envoi privé sera connecté avant la publication de l’invitation.",
+        "Votre réponse sera enregistrée de façon privée et accessible uniquement aux mariés.",
     },
     footer: {
       line: "Avec amour, depuis le Mexique et la France",
-      privacy: "Site public · Aucune donnée privée des invités",
+      privacy: "Invitation privée · Réponses protégées",
     },
   },
   en: {
@@ -951,17 +1439,17 @@ export const content = {
       eyebrow: "Save the date",
       title: "Three days to celebrate",
       intro:
-        "The celebration starts on Friday and ends on Sunday. Final timings will be published here.",
+        "We will be at Roca Azul from Thursday. Guests may arrive from around midday on Friday, and Saturday’s main celebration will be an afternoon wedding.",
       items: [
         {
-          day: "Friday 19",
+          day: "Friday 19 · from midday",
           title: "Arrival and welcome",
           body: "Check-in, pétanque, pizzas, and a relaxed first evening together.",
         },
         {
-          day: "Saturday 20",
-          title: "The big day",
-          body: "Ceremony, food, music, and a long night of dancing.",
+          day: "Saturday 20 · arrive at 1 pm",
+          title: "An afternoon wedding",
+          body: "Civil ceremony, marimba, carnitas, lighthouse ceremony, dinner, and dancing.",
         },
         {
           day: "Sunday 21",
@@ -969,12 +1457,81 @@ export const content = {
           body: "One final morning together before the journeys home.",
         },
       ],
+      saturday: {
+        eyebrow: "Saturday 20 · programme",
+        title: "The afternoon, step by step",
+        warning:
+          "If you are travelling from Guadalajara, please leave plenty of time. The roads into Jocotepec can become congested very easily, and everyone needs to be at Roca Azul by 1 pm.",
+        items: [
+          { time: "1 pm", title: "Guest arrival", body: "Welcome and time to settle in." },
+          { time: "2 pm", title: "Civil ceremony", body: "The first “I do” of the day." },
+          { time: "Afterwards", title: "Marimba", body: "Live music for drinks and time together." },
+          { time: "Then", title: "Carnitas lunch", body: "A Mexican meal before the lighthouse ceremony." },
+          { time: "6 pm", title: "Lighthouse ceremony", body: "The defining moment of the afternoon." },
+          { time: "Afterwards", title: "Mariachi and dinner", body: "Mariachi will open dinner and the next chapter of the celebration." },
+          { time: "After dinner", title: "Norteño and dancing", body: "Norteño will open the dance floor and the party." },
+        ],
+      },
+    },
+    weather: {
+      eyebrow: "Typical weather",
+      title: "Afternoon sunshine, a cool evening",
+      body:
+        "Late February in Jocotepec is usually dry, bright, and mild. The wedding should begin in pleasant warmth, followed by a noticeable temperature drop after sunset.",
+      facts: [
+        { value: "≈ 27 °C", label: "typical high", note: "During the afternoon" },
+        { value: "≈ 8–10 °C", label: "typical low", note: "Late at night" },
+        { value: "3–5%", label: "climatological rain chance", note: "On a typical February day" },
+        { value: "≈ 6:55 pm", label: "sunset", note: "Very close to the lighthouse ceremony" },
+      ],
+      moments: [
+        { time: "1–5:30 pm", title: "A bright afternoon", body: "Sunny and pleasantly warm; sunscreen, sunglasses, and water will help." },
+        { time: "6 pm", title: "Ceremony and sunset", body: "The light will begin to fade during the lighthouse ceremony." },
+        { time: "From 7 pm", title: "A cooler evening", body: "Temperatures can fall quickly beside the lake." },
+      ],
+      adviceTitle: "What to bring",
+      advice: [
+        "A light jacket, sweater, or wrap for dinner and dancing.",
+        "Sunscreen and sunglasses for the first part of the day.",
+        "Comfortable shoes for gardens and outdoor areas.",
+      ],
+      disclaimer:
+        "This is a climate guide, not a forecast. We will publish the actual weather outlook here around ten days before the wedding.",
     },
     food: {
       eyebrow: "At the table",
       title: "A weekend to taste, toast, and share",
       body:
         "We want every meal to feel simple, generous, and unmistakably Mexican. This is the menu we are imagining, and it can still grow with your ideas.",
+      flavoursEyebrow: "Flavours of Jalisco and Mexico",
+      flavoursTitle: "What will we be tasting?",
+      flavours: [
+        {
+          key: "carnitas",
+          title: "Carnitas",
+          body: "Pork cooked slowly until tender and golden, served with tortillas, onion, coriander, salsa, and lime.",
+        },
+        {
+          key: "taquiza",
+          title: "Taquiza",
+          body: "A spread of Mexican stews, warm tortillas, and toppings so everyone can assemble their own tacos.",
+        },
+        {
+          key: "tejuino",
+          title: "Tejuino",
+          body: "A sweet-and-tangy Guadalajara drink made from fermented corn, served ice-cold with lime and salt. A tequila or mezcal “tejuino loco” will also be available.",
+        },
+        {
+          key: "nopales",
+          title: "Nopal cactus salad",
+          body: "Tender nopal cactus with tomato, onion, herbs, and cheese: a fresh, Mexican, vegetarian option.",
+        },
+        {
+          key: "guacamole",
+          title: "Guacamole and vegetarian options",
+          body: "There will be guacamole, tortillas, salsas, and other meat-free sides. You can share dietary restrictions in the RSVP.",
+        },
+      ],
       days: [
         {
           day: "Friday evening",
@@ -1006,6 +1563,15 @@ export const content = {
       ],
       note:
         "Details are still being prepared. We are also considering water, alcohol-free drinks, coffee, children’s options, and special dietary needs.",
+      photoCredits: "Photo credits",
+      drinks: {
+        eyebrow: "For the toast",
+        title: "Our drinks policy",
+        body:
+          "We will provide a reasonable amount of alcohol per guest, mainly beer and tequila, together with soft drinks and alcohol-free options.",
+        note:
+          "If you want to make absolutely sure your evening is especially well supplied, you are welcome to bring your own ammunition to share and enjoy responsibly.",
+      },
     },
     music: {
       eyebrow: "Live music",
@@ -1014,14 +1580,14 @@ export const content = {
         "Music will accompany every shift in energy on Saturday, from the end of the ceremony to the dance floor.",
       acts: [
         {
-          moment: "After the ceremony",
+          moment: "After the civil ceremony",
           name: "Marimba",
-          note: "For reconnecting and enjoying the first drinks.",
+          note: "For the first toast before the carnitas.",
         },
         {
-          moment: "Aperitif or dinner opening",
+          moment: "After the lighthouse ceremony",
           name: "Mariachi",
-          note: "A festive entrance before everyone sits down to eat.",
+          note: "A festive opening to dinner.",
         },
         {
           moment: "After dinner",
@@ -1038,7 +1604,7 @@ export const content = {
         eyebrow: "Open stage",
         title: "Is there a song you would like to sing?",
         body:
-          "Send us your suggestion. We may be able to invite one of the live musicians to accompany you and turn it into an unforgettable moment.",
+          "Add your tracks here for the atmosphere, dancing, or karaoke. We may be able to invite one of the live musicians to accompany you and turn a song into an unforgettable moment.",
       },
       playlists: {
         eyebrow: "Listen from now",
@@ -1081,7 +1647,7 @@ export const content = {
       },
       button: "Send my suggestions",
       previewNote:
-        "Preview: suggestions will use the same private system as the RSVP.",
+        "Your songs, votes, and ideas will be saved privately.",
     },
     venue: {
       eyebrow: "The venue",
@@ -1098,6 +1664,13 @@ export const content = {
       title: "The whole club to enjoy",
       body:
         "Between shared moments, everyone can spend time with their neighbours, explore the facilities, or simply rest in their accommodation.",
+      gallery: [
+        { key: "cabins", title: "Cabins", alt: "Cabins and guest rooms at Roca Azul" },
+        { key: "pool", title: "Pools", alt: "Pool and gardens at Club Roca Azul" },
+        { key: "courts", title: "Sport", alt: "Sports courts at Roca Azul" },
+        { key: "gardens", title: "Gardens", alt: "Green spaces at Club Roca Azul" },
+      ],
+      gallerySource: "Venue photographs: Club Roca Azul",
       groups: [
         {
           title: "Water and wellness",
@@ -1154,6 +1727,122 @@ export const content = {
         "Accommodation is available only as a complete two-night package, from Friday 19 to Sunday 21; one-night bookings are not possible. The estimated price is MXN 500 per person, per night and includes both weekend breakfasts; more details will follow soon. Accommodation is our gift to our beloved padrinos. If you prefer to arrange your own accommodation, that is absolutely fine—we simply need to know in advance.",
       contactPrompt:
         "If you are interested in this plan, contact us directly on WhatsApp:",
+      cabinsShowcase: {
+        eyebrow: "Explore the cabins",
+        key: "azalea",
+        title: "Azalea",
+        intro:
+          "The first cabin in our catalogue: spacious, with generous shared areas and an advertised capacity of 12 guests.",
+        capacity: "12 guests",
+        roomsLabel: "3 bedrooms",
+        bedsLabel: "7 listed beds",
+        rooms: [
+          "Bedroom 1 · 2 double beds",
+          "Bedroom 2 · 2 double beds",
+          "Bedroom 3 · 3 single beds",
+        ],
+        amenities:
+          "The photographs show a living room, dining room, kitchen, breakfast bar, and bathroom with shower.",
+        galleryLabel: "Azalea gallery",
+        photoAlts: [
+          "Dining room and shared area in the Azalea cabin",
+          "Living and dining room in the Azalea cabin",
+          "Living room in the Azalea cabin",
+          "Bedroom with two double beds in Azalea",
+          "Second bedroom with two double beds in Azalea",
+          "Bedroom with three single beds in Azalea",
+          "Bathroom with shower in the Azalea cabin",
+          "Equipped kitchen in the Azalea cabin",
+          "Breakfast bar and kitchen in the Azalea cabin",
+        ],
+        note:
+          "We will confirm the final guest allocation directly.",
+        additionalUnits: [
+          {
+            key: "dalia",
+            title: "Dalia",
+            intro:
+              "A bright cabin beside the pool, with three bedrooms and ten clearly identified sleeping places.",
+            capacity: "10 guests",
+            roomsLabel: "3 bedrooms",
+            bedsLabel: "7 beds · sleeps 10",
+            rooms: [
+              "Bedroom 1 · 2 double beds",
+              "Bedroom 2 · 4 single beds in 2 bunk beds",
+              "Bedroom 3 · 1 double bed",
+            ],
+            amenities:
+              "The photographs show a living room, dining room, bathroom with shower, and a view towards the pool.",
+            galleryLabel: "Dalia gallery",
+            photoAlts: [
+              "Dining room in the Dalia cabin beside the pool",
+              "Living room in the Dalia cabin",
+              "Bedroom with two double beds in Dalia",
+              "Bedroom with four single bunk beds in Dalia",
+              "Bedroom with one double bed in Dalia",
+              "Bathroom with shower in Dalia",
+              "Second view of the bathroom with shower in Dalia",
+            ],
+            note:
+              "The recorded internal cost is MXN 11,150 for both nights; allocation and the final per-person amount will be confirmed directly.",
+          },
+          {
+            key: "margarita",
+            title: "Margarita",
+            intro:
+              "A cheerful yellow-toned cabin with three bedrooms, bright shared spaces, and a garden with an outdoor fire pit.",
+            capacity: "10 guests",
+            roomsLabel: "3 bedrooms",
+            bedsLabel: "7 beds · sleeps 10",
+            rooms: [
+              "Bedroom 1 · 2 double beds",
+              "Bedroom 2 · 4 single beds in 2 bunk beds",
+              "Bedroom 3 · 1 double bed",
+            ],
+            amenities:
+              "The photographs show a living-dining room, kitchen with breakfast bar, bathroom with shower, garden, and outdoor fire pit.",
+            galleryLabel: "Margarita gallery",
+            photoAlts: [
+              "Indoor shared area in the Margarita cabin",
+              "Bedroom with four single bunk beds in Margarita",
+              "Bathroom with shower in Margarita",
+              "Bedroom with two double beds in Margarita",
+              "Kitchen with breakfast bar in Margarita",
+              "Dining room in the Margarita cabin",
+              "Bedroom with one double bed in Margarita",
+              "Garden and outdoor fire pit at the Margarita cabin",
+            ],
+            note:
+              "The recorded internal cost is MXN 11,150 for both nights; allocation and the final per-person amount will be confirmed directly.",
+          },
+          {
+            key: "wooden",
+            title: "Wooden cabins 31–34",
+            intro:
+              "Four independent cabins beneath the trees, ideal for couples or small families looking for a more private space.",
+            capacity: "4 cabins",
+            roomsLabel: "2 adults per unit",
+            bedsLabel: "Up to 2 minors",
+            rooms: [
+              "Available units · 31, 32, 33, and 34",
+              "Each unit · 1 king-size bed",
+              "Each unit · 1 double sofa bed",
+            ],
+            amenities:
+              "The photographs and video show a terrace, refrigerator, washbasin, television, and a fully wood-lined interior.",
+            galleryLabel: "Wooden cabins 31 to 34 gallery",
+            photoAlts: [
+              "Exterior of a wooden cabin beneath the trees",
+              "Entrance to wooden cabin number 34",
+              "King-size bed inside a wooden cabin",
+              "Sofa bed and interior amenities in a wooden cabin",
+            ],
+            videoLabel: "Video tour · 16 sec",
+            note:
+              "Internal rate per unit for both nights: MXN 5,310 for 2 adults, or MXN 5,790 for 2 adults and 2 minors. Allocation and the final amount will be confirmed directly.",
+          },
+        ],
+      },
       plan: {
         eyebrow: "How does it work?",
         title: "Tell us what you prefer",
@@ -1177,8 +1866,39 @@ export const content = {
         "We will coordinate airport pickups once we have your flight numbers.",
         "Every traveller will have an arrival, stay, and return itinerary.",
       ],
+      routes: {
+        eyebrow: "Journey map",
+        title: "Getting to Roca Azul, then travelling on to the coast",
+        note:
+          "Approximate Saturday driving times, subject to traffic. The listed arrival routes are toll-free; toll amounts are estimates per journey.",
+        venue: "Roca Azul · Jocotepec",
+        originsLabel: "To the wedding",
+        destinationsLabel: "After the wedding",
+        origins: [
+          { place: "Central Guadalajara", duration: "≈ 1 hr 30", detail: "Toll-free route" },
+          { place: "Our home · Tesistán", duration: "≈ 1 hr 45", detail: "Toll-free route" },
+          { place: "GDL Airport", duration: "≈ 1 hr", detail: "Toll-free route" },
+        ],
+        destinations: [
+          {
+            place: "Barra de Navidad",
+            duration: "≈ 5 hr",
+            detail: "Toll-free · Cocula → Autlán → Barra",
+          },
+          {
+            place: "Barra de Navidad",
+            duration: "≈ 4 hr 45",
+            detail: "Via Manzanillo · tolls ≈ MXN 500",
+          },
+          {
+            place: "Manzanillo",
+            duration: "≈ 4 hr 30",
+            detail: "Tolls ≈ MXN 500",
+          },
+        ],
+      },
       cta: "Share my travel details",
-      ctaNote: "The private form will be available soon.",
+      ctaNote: "The private form is now available below.",
     },
     attire: {
       eyebrow: "Attire",
@@ -1260,7 +1980,8 @@ export const content = {
       fields: {
         firstName: "First name",
         lastName: "Last name",
-        contact: "Email or WhatsApp",
+        email: "Email (for future website access)",
+        whatsapp: "WhatsApp (for further communication)",
         attendance: "Will you join us?",
         groupMode: "Are you replying alone or as a group?",
         groupName: "Group or family name",
@@ -1269,6 +1990,8 @@ export const content = {
         children: "Children under 18",
         guests: "Names of accompanying guests",
         accommodation: "Accommodation plan",
+        independentArrival: "When do you plan to arrive at Roca Azul?",
+        sundayMorning: "Will we see you on Sunday morning?",
         travelStatus: "Travel status",
         arrivalFrom: "Arriving from",
         arrivalTo: "Arriving at",
@@ -1306,6 +2029,15 @@ export const content = {
             label: "No: I’ll arrange all accommodation independently",
           },
         ],
+        independentArrival: [
+          { value: "friday", label: "From Friday" },
+          { value: "saturday", label: "Saturday only" },
+        ],
+        sundayMorning: [
+          { value: "yes", label: "Yes, we’ll be there" },
+          { value: "no", label: "No, we’ll leave beforehand" },
+          { value: "maybe", label: "We don’t know yet" },
+        ],
         travelStatus: [
           { value: "booked", label: "I’m travelling from afar and have tickets" },
           {
@@ -1317,11 +2049,11 @@ export const content = {
       },
       button: "Send my response",
       previewNote:
-        "Preview: private submissions will be connected before publication.",
+        "Your response will be stored privately and only the couple can view it.",
     },
     footer: {
       line: "With love, from Mexico and France",
-      privacy: "Public site · No private guest information",
+      privacy: "Private invitation · Protected responses",
     },
   },
 };
