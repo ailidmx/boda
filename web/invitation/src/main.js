@@ -155,6 +155,24 @@ function getInitialLanguage() {
   return "es";
 }
 
+/**
+ * Whether the visitor has explicitly chosen a language (via the ?lang= query
+ * parameter or a previously saved localStorage preference). When neither is
+ * present, the guest's own preferred language (guest.lang) should take
+ * priority over the browser default.
+ */
+function hasExplicitLanguagePreference() {
+  const queryLanguage = normalizeLanguage(
+    new URLSearchParams(window.location.search).get("lang"),
+  );
+  if (queryLanguage) return true;
+
+  return Boolean(
+    normalizeLanguage(window.localStorage.getItem(LANGUAGE_STORAGE_KEY)),
+  );
+}
+
+
 function countdownMarkup(labels) {
   const units = [
     ["years", labels.years],
@@ -2038,29 +2056,30 @@ function render(language) {
         <section class="gift-section section" id="photos" style="background: var(--ink);">
           <div class="gift-copy reveal">
             <p class="eyebrow">${t.nav.photos}</p>
-            <h2>Comparte tus fotos</h2>
-            <p class="lead">Queremos ver la boda a través de tus ojos. Hemos creado dos álbumes compartidos de Google Photos donde puedes subir tus fotos.</p>
+            <h2>${t.photos.title}</h2>
+            <p class="lead">${t.photos.lead}</p>
 
 
             <div style="margin-top: 2rem; display: grid; gap: 1.5rem;">
               <div style="background: rgba(255,255,255,0.06); border-radius: 0.75rem; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.12);">
-                <p style="font-weight: 600; font-size: 1rem; margin: 0 0 0.5rem; color: var(--marigold);">📸 Antes de la boda</p>
-                <p style="margin: 0 0 1rem; font-size: 0.9rem; opacity: 0.8;">Comparte tus fotos favoritas de nosotros antes del gran día.</p>
+                <p style="font-weight: 600; font-size: 1rem; margin: 0 0 0.5rem; color: var(--marigold);">${t.photos.beforeTitle}</p>
+                <p style="margin: 0 0 1rem; font-size: 0.9rem; opacity: 0.8;">${t.photos.beforeBody}</p>
                 <a class="button button-light" href="https://photos.app.goo.gl/Vhg2AY3gXzXL2iKp8" target="_blank" rel="noreferrer" style="text-decoration: none;">
-                  Subir fotos ↗
+                  ${t.photos.upload}
                 </a>
               </div>
               <div style="background: rgba(255,255,255,0.06); border-radius: 0.75rem; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.12);">
-                <p style="font-weight: 600; font-size: 1rem; margin: 0 0 0.5rem; color: var(--marigold);">🎉 La boda vista por los invitados</p>
-                <p style="margin: 0 0 1rem; font-size: 0.9rem; opacity: 0.8;">Después de la boda, comparte aquí las fotos que tomaste durante la celebración.</p>
+                <p style="font-weight: 600; font-size: 1rem; margin: 0 0 0.5rem; color: var(--marigold);">${t.photos.duringTitle}</p>
+                <p style="margin: 0 0 1rem; font-size: 0.9rem; opacity: 0.8;">${t.photos.duringBody}</p>
                 <a class="button button-light" href="https://photos.app.goo.gl/Df3QwjTKQTGVEqEU6" target="_blank" rel="noreferrer" style="text-decoration: none;">
-                  Subir fotos ↗
+                  ${t.photos.upload}
                 </a>
               </div>
             </div>
-            <p class="note" style="margin-top: 2rem;">Solicita acceso al álbum haciendo clic en "Subir fotos". Una vez dentro, podrás subir todas las fotos que quieras. ¡Gracias por capturar estos momentos con nosotros!</p>
+            <p class="note" style="margin-top: 2rem;">${t.photos.note}</p>
           </div>
         </section>
+
       </main>
 
       <footer class="site-footer">
@@ -2511,8 +2530,23 @@ if (isDashboardRoute) {
         return;
       }
 
+      // When the visitor has not explicitly chosen a language (no ?lang=
+      // query parameter and no saved localStorage preference), default to the
+      // guest's own preferred language (guest.lang) instead of the browser
+      // default. This ensures e.g. French guests see the invitation in French
+      // on their first visit.
+      if (!hasExplicitLanguagePreference()) {
+        const guestLanguage = normalizeLanguage(
+          currentInvitationProfile?.guest?.lang,
+        );
+        if (guestLanguage) {
+          currentLanguage = guestLanguage;
+        }
+      }
+
       render(currentLanguage);
       return;
+
     }
 
 
