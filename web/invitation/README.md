@@ -45,10 +45,34 @@ The sticky countdown targets `2027-02-20T00:00:00-06:00`, local time in Jalisco.
 
 - Submitted originals live in `media/originals/` and are not deployed.
 - Privacy and approval status live in `media/catalog.csv`.
-- Approved web derivatives live in `src/assets/approved/`.
-- `src/media.js` connects approved images to page slots.
+- Approved web derivatives live in `src/assets/approved/` and are the source
+  for the Cloudinary upload script.
+- **All public photos and videos are hosted on Cloudinary** (cloud name
+  `k2ajcgxv`) under the `boda/` folder, tagged by section (HERO, NOVIOS,
+  ROCA_AZUL, COMIDA, CABANAS, VESTUARIO, LAGO_DE_CHAPALA, ...).
+- Cabin photos carry an extra **per-cabin tag** (`CABANA_AZALEA`,
+  `CABANA_DALIA`, `CABANA_MARGARITA`, `CABANA_MADERA`) so the right photos can
+  be fetched dynamically for each cabin.
+- `src/cloudinary.js` builds optimized delivery URLs (resize, auto-format,
+  auto-quality) at render time.
+- `src/media.js` connects approved images to page slots via Cloudinary URLs.
+- `src/rocaAzulGallery.js` re-hosts the Roca Azul venue gallery and the
+  Lake Chapala / Jocotepec highlights on Cloudinary.
+- `scripts/upload-to-cloudinary.mjs` uploads the approved derivatives plus the
+  remote venue/Chapala images. It reads credentials from `web/invitation/.env`
+  (see `.env.example`); the real `.env` is git-ignored.
+- `scripts/generate-media-manifest.mjs` is a **build-time step** that queries
+  Cloudinary by per-cabin tag and reads the cabin database
+  (`invitados/cabanas/*.json`) to write `src/generated-media.js`. It runs
+  automatically before every `npm run build` (or manually via `npm run
+  manifest`). To add a cabin photo, tag it in Cloudinary and re-run the build.
+- `src/generated-media.js` is a generated file (do not edit by hand) exposing
+  `CABIN_PHOTOS`, `CABIN_VIDEOS`, and `CABIN_DB` (cabin metadata straight from
+  the database).
 - The hero rotates through four photographs every 6.5 seconds and includes
   manual selection and pause controls.
+
+
 - The header monogram alternates between `D. & A.` (“DNA”) and `A. & D.`
   (“Aydé”), while respecting reduced-motion preferences.
 - The accommodation section explains the approximate 80-person capacity,

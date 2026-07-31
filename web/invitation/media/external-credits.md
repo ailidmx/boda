@@ -28,3 +28,20 @@ Venue photographs were downloaded from the official Club Roca Azul website on
 - Guacamole: “Guacamole - La Casa Restaurant - January 2023 - Sarah
   Stierch,” Sarah Stierch, [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/),
   [source page](https://commons.wikimedia.org/wiki/File:Guacamole_-_La_Casa_Restaurant_-_January_2023_-_Sarah_Stierch.jpg)
+
+## Oaxaca textiles (Vestuario section)
+
+Close-up details of indigenous weaving photographed at the Museo Textil de
+Oaxaca. All four are by the same author and licensed [CC BY-SA
+2.0](https://creativecommons.org/licenses/by-sa/2.0/). Used as square WebP
+derivatives in the Vestuario section.
+
+- “Detail of Indigenous Weaving - Textile Museum - Oaxaca - Mexico - 01,”
+  [source page](https://commons.wikimedia.org/wiki/File:Detail_of_Indigenous_Weaving_-_Textile_Museum_-_Oaxaca_-_Mexico_-_01_(15176485070).jpg)
+- “Detail of Indigenous Weaving - Textile Museum - Oaxaca - Mexico - 02,”
+  [source page](https://commons.wikimedia.org/wiki/File:Detail_of_Indigenous_Weaving_-_Textile_Museum_-_Oaxaca_-_Mexico_-_02_(15176467480).jpg)
+- “Detail of Indigenous Weaving - Textile Museum - Oaxaca - Mexico - 04,”
+  [source page](https://commons.wikimedia.org/wiki/File:Detail_of_Indigenous_Weaving_-_Textile_Museum_-_Oaxaca_-_Mexico_-_04_(15340098656).jpg)
+- “Detail of Indigenous Weaving - Textile Museum - Oaxaca - Mexico - 05,”
+  [source page](https://commons.wikimedia.org/wiki/File:Detail_of_Indigenous_Weaving_-_Textile_Museum_-_Oaxaca_-_Mexico_-_05_(15176404040).jpg)
+

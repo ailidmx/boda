@@ -11,6 +11,7 @@ node_modules/
 dist/
 .firebase/
 firebase-debug.log
+firestore-debug.log
 
 # Media awaiting explicit publication approval
 web/invitation/media/originals/cabins/pending-lavanda/
@@ -22,6 +23,10 @@ web/invitation/media/originals/cabins/pending-lavanda/
 service_account.json
 *.pem
 *.key
+
+# Firebase Auth user export (contains password hashes/salts)
+users.json
+
 
 # Editor files
 .idea/
