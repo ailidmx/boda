@@ -1173,121 +1173,67 @@ h2 {
    A thin, self-contained strip that cycles through short facts. It is
    generic so it can be dropped into any section with a different set of
    facts. */
-.fun-fact-carousel {
-  display: grid;
-  grid-template-columns: auto auto 1fr auto;
-  grid-template-areas:
-    "label prev viewport next"
-    "dots dots dots dots";
-  align-items: center;
-  gap: 0.5rem 0.75rem;
+.fun-fact-list {
   margin-top: 1.5rem;
-  padding: 0.6rem 0.9rem;
+  padding: 1.25rem 1.4rem;
   border: 1px solid rgb(36 33 25 / 14%);
-  border-radius: 999px;
+  border-radius: 1rem;
   background: rgb(255 255 255 / 45%);
   max-width: 46rem;
 }
 
+.fun-fact-list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
 .fun-fact-label {
-  grid-area: label;
   font-family: var(--font-body);
-  font-size: 0.62rem;
+  font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--terracotta);
-  white-space: nowrap;
 }
 
-.fun-fact-viewport {
-  grid-area: viewport;
-  overflow: hidden;
-  min-width: 0;
+.fun-fact-divider {
+  margin: 0.85rem 0 1rem;
+  border: none;
+  border-top: 1px solid rgb(36 33 25 / 16%);
 }
 
-.fun-fact-track {
-  display: flex;
-  transition: transform 600ms ease;
-}
-
-.fun-fact-slide {
-  flex: 0 0 100%;
+.fun-fact-rows {
+  list-style: none;
   margin: 0;
-  padding: 0 0.25rem;
-  font-family: var(--font-body);
-  font-size: 0.82rem;
-  line-height: 1.4;
-  color: var(--ink);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.fun-fact-arrow {
-  grid-area: auto;
-  width: 1.6rem;
-  height: 1.6rem;
-  display: grid;
-  place-items: center;
-  border: none;
-  border-radius: 50%;
-  background: transparent;
-  color: var(--ink);
-  font-size: 1.1rem;
-  line-height: 1;
-  cursor: pointer;
-  transition: background 200ms ease, color 200ms ease;
-}
-
-.fun-fact-arrow:hover {
-  background: var(--marigold);
-  color: var(--white);
-}
-
-.fun-fact-arrow--prev {
-  grid-area: prev;
-}
-
-.fun-fact-arrow--next {
-  grid-area: next;
-}
-
-.fun-fact-dots {
-  grid-area: dots;
-  display: flex;
-  justify-content: center;
-  gap: 0.4rem;
-  padding-top: 0.35rem;
-}
-
-.fun-fact-dot {
-  width: 0.45rem;
-  height: 0.45rem;
   padding: 0;
-  border: none;
-  border-radius: 50%;
-  background: rgb(36 33 25 / 22%);
-  cursor: pointer;
-  transition: background 200ms ease, transform 200ms ease;
+  display: grid;
+  gap: 0.85rem;
 }
 
-.fun-fact-dot[aria-current="true"] {
-  background: var(--terracotta);
-  transform: scale(1.25);
+.fun-fact-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: 0.9rem;
 }
 
-@media (max-width: 560px) {
-  .fun-fact-carousel {
-    grid-template-areas:
-      "label prev next"
-      "viewport viewport viewport"
-      "dots dots dots";
-    border-radius: 1rem;
-  }
-  .fun-fact-slide {
-    white-space: normal;
-  }
+.fun-fact-row-index {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--marigold);
+  padding-top: 0.15rem;
+}
+
+.fun-fact-row p {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--ink);
 }
 
 .gallery-section {

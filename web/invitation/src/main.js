@@ -879,133 +879,54 @@ function galleryMarkup() {
 }
 
 /**
- * Reusable "fun fact" carousel.
+ * Reusable "fun facts" list.
  *
- * Renders a thin, self-contained strip that cycles through a list of short
- * facts. It is intentionally generic so it can be dropped into any section
- * with a different set of facts (e.g. the story, the venue, the food…).
+ * Renders a vertical list of short facts with an optional title on top and a
+ * separator line between the title and the content. It is intentionally
+ * generic so it can be dropped into any section with a different set of
+ * facts (e.g. the story, the venue, the food…).
  *
- * @param {string[]} facts - short strings to cycle through
- * @param {string} id - unique id so multiple carousels can coexist on a page
- * @param {string} [label] - optional small label shown before the facts
+ * @param {string[]} facts - short strings to display as rows
+ * @param {string} id - unique id so multiple lists can coexist on a page
+ * @param {string} [label] - optional title shown on the first row
  * @returns {string} markup
  */
 function funFactCarouselMarkup(facts, id, label = "") {
   if (!facts || !facts.length) return "";
   return `
-    <div class="fun-fact-carousel" data-fun-fact-carousel="${id}" aria-label="${label || "Fun facts"}">
+    <div class="fun-fact-list" data-fun-fact-list="${id}" aria-label="${label || "Fun facts"}">
       ${
         label
-          ? `<span class="fun-fact-label" aria-hidden="true">${label}</span>`
+          ? `
+            <div class="fun-fact-list-heading">
+              <span class="fun-fact-label" aria-hidden="true">${label}</span>
+            </div>
+            <hr class="fun-fact-divider" aria-hidden="true" />
+          `
           : ""
       }
-      <button
-        class="fun-fact-arrow fun-fact-arrow--prev"
-        type="button"
-        data-fun-fact-prev="${id}"
-        aria-label="Previous"
-      >‹</button>
-      <div class="fun-fact-viewport">
-        <div class="fun-fact-track" data-fun-fact-track="${id}">
-          ${facts
-            .map(
-              (fact, index) => `
-                <p class="fun-fact-slide" data-fun-fact-slide="${id}" ${index === 0 ? 'aria-current="true"' : ""}>
-                  ${fact}
-                </p>
-              `,
-            )
-            .join("")}
-        </div>
-      </div>
-      <button
-        class="fun-fact-arrow fun-fact-arrow--next"
-        type="button"
-        data-fun-fact-next="${id}"
-        aria-label="Next"
-      >›</button>
-      <div class="fun-fact-dots" data-fun-fact-dots="${id}">
+      <ol class="fun-fact-rows">
         ${facts
           .map(
-            (_, index) => `
-              <button
-                class="fun-fact-dot"
-                type="button"
-                data-fun-fact-dot="${id}"
-                data-index="${index}"
-                aria-label="Fact ${index + 1}"
-                ${index === 0 ? 'aria-current="true"' : ""}
-              ></button>
+            (fact, index) => `
+              <li class="fun-fact-row">
+                <span class="fun-fact-row-index" aria-hidden="true">${String(index + 1).padStart(2, "0")}</span>
+                <p>${fact}</p>
+              </li>
             `,
           )
           .join("")}
-      </div>
+      </ol>
     </div>
   `;
 }
 
 /**
- * Wire up all fun-fact carousels currently in the DOM.
- * Each carousel auto-rotates and supports prev/next arrows and dots.
+ * Fun-fact lists are static (no carousel behaviour needed), so this is a
+ * no-op kept for compatibility with the render pipeline.
  */
 function bindFunFactCarousels() {
-  document.querySelectorAll("[data-fun-fact-carousel]").forEach((carousel) => {
-    const id = carousel.dataset.funFactCarousel;
-    const track = carousel.querySelector(`[data-fun-fact-track="${id}"]`);
-    const slides = [...carousel.querySelectorAll(`[data-fun-fact-slide="${id}"]`)];
-    const dots = [...carousel.querySelectorAll(`[data-fun-fact-dot="${id}"]`)];
-    const prev = carousel.querySelector(`[data-fun-fact-prev="${id}"]`);
-    const next = carousel.querySelector(`[data-fun-fact-next="${id}"]`);
-    if (!track || slides.length < 2) return;
-
-    let index = 0;
-    let timer = null;
-
-    const show = (nextIndex) => {
-      index = (nextIndex + slides.length) % slides.length;
-      track.style.transform = `translateX(-${index * 100}%)`;
-      slides.forEach((slide, i) => {
-        slide.setAttribute("aria-current", String(i === index));
-      });
-      dots.forEach((dot, i) => {
-        dot.setAttribute("aria-current", String(i === index));
-      });
-    };
-
-    const stop = () => {
-      if (timer) window.clearInterval(timer);
-      timer = null;
-    };
-
-    const start = () => {
-      stop();
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-      timer = window.setInterval(() => show(index + 1), 6000);
-    };
-
-    prev?.addEventListener("click", () => {
-      show(index - 1);
-      start();
-    });
-    next?.addEventListener("click", () => {
-      show(index + 1);
-      start();
-    });
-    dots.forEach((dot) => {
-      dot.addEventListener("click", () => {
-        show(Number(dot.dataset.index));
-        start();
-      });
-    });
-
-    // Pause while the user is hovering or focusing the carousel.
-    carousel.addEventListener("mouseenter", stop);
-    carousel.addEventListener("mouseleave", start);
-    carousel.addEventListener("focusin", stop);
-    carousel.addEventListener("focusout", start);
-
-    start();
-  });
+  // Intentionally empty: facts are rendered as a static vertical list.
 }
 
 // Maps a guest's assigned unit to the corresponding cabin-showcase key.
