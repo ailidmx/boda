@@ -4,16 +4,18 @@ import React, { useState } from "react";
 const FUN_FACT_PAGE_SIZE = 1;
 
 /**
- * Normalise a fact entry into { text, avatar }.
- * Accepts either a plain string or an object { text, avatar }.
+ * Normalise a fact entry into { title, text, avatar }.
+ * Accepts either a plain string or an object { title, text, avatar }.
  */
 function normalizeFact(fact) {
-  if (typeof fact === "string") return { text: fact, avatar: null };
+  if (typeof fact === "string") return { title: "", text: fact, avatar: null };
   return {
+    title: fact?.title || "",
     text: fact?.text || "",
     avatar: fact?.avatar || null,
   };
 }
+
 
 export function FunFactCarousel({ facts, id, label = "" }) {
   const [pageIndex, setPageIndex] = useState(0);
@@ -67,12 +69,16 @@ export function FunFactCarousel({ facts, id, label = "" }) {
                     />
                   </span>
                 )}
-                <span className="fun-fact-row-index" aria-hidden="true">
-                  {String(pageIndex * FUN_FACT_PAGE_SIZE + index + 1).padStart(2, "0")}
-                </span>
-                <p>{fact.text}</p>
+                <div className="fun-fact-row-body">
+                  <span className="fun-fact-row-index" aria-hidden="true">
+                    {String(pageIndex * FUN_FACT_PAGE_SIZE + index + 1).padStart(2, "0")}
+                  </span>
+                  {fact.title && <h3 className="fun-fact-row-title">{fact.title}</h3>}
+                  <p>{fact.text}</p>
+                </div>
               </li>
             ))}
+
           </ol>
         </div>
       </div>

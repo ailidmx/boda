@@ -1249,8 +1249,14 @@ h2 {
 .fun-fact-row {
   display: grid;
   grid-template-columns: auto 1fr;
-  align-items: baseline;
+  align-items: start;
   gap: 0.9rem;
+}
+
+.fun-fact-row-body {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
 }
 
 .fun-fact-row-index {
@@ -1262,6 +1268,15 @@ h2 {
   padding-top: 0.15rem;
 }
 
+.fun-fact-row-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ink);
+}
+
 .fun-fact-row p {
   margin: 0;
   font-family: var(--font-body);
@@ -1269,6 +1284,7 @@ h2 {
   line-height: 1.5;
   color: var(--ink);
 }
+
 
 .fun-fact-controls {
   display: flex;

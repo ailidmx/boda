@@ -18,11 +18,15 @@ export function Story() {
   const guest = profile?.guest;
   const guestAvatar = guest ? resolveGuestPhoto(guest) : null;
   const anecdotes = chapalaAnecdotes(language).map((anecdote, index) => ({
-    text: `${anecdote.icon} ${anecdote.title} — ${anecdote.text}`,
+    // Title (emoji + bold heading) is shown on its own line, with the
+    // anecdote text below it.
+    title: `${anecdote.icon} ${anecdote.title}`,
+    text: anecdote.text,
     // Alternate between the guest's own avatar (if uploaded) and the default
     // set so the carousel feels varied.
     avatar: guestAvatar || DEFAULT_AVATARS[index % DEFAULT_AVATARS.length],
   }));
+
 
 
   return (
