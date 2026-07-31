@@ -1204,7 +1204,18 @@ h2 {
   border-top: 1px solid rgb(36 33 25 / 16%);
 }
 
+.fun-fact-viewport {
+  overflow: hidden;
+}
+
+.fun-fact-track {
+  display: flex;
+  transition: transform 500ms ease;
+}
+
 .fun-fact-rows {
+  flex: 0 0 100%;
+  min-width: 0;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -1234,6 +1245,56 @@ h2 {
   font-size: 0.9rem;
   line-height: 1.5;
   color: var(--ink);
+}
+
+.fun-fact-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1.1rem;
+}
+
+.fun-fact-arrow {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgb(36 33 25 / 22%);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+.fun-fact-arrow:hover {
+  background: var(--marigold);
+  border-color: var(--marigold);
+  color: var(--white);
+}
+
+.fun-fact-dots {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.fun-fact-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgb(36 33 25 / 22%);
+  cursor: pointer;
+  transition: background 200ms ease, transform 200ms ease;
+}
+
+.fun-fact-dot[aria-current="true"] {
+  background: var(--terracotta);
+  transform: scale(1.25);
 }
 
 .gallery-section {

@@ -879,22 +879,32 @@ function galleryMarkup() {
 }
 
 /**
- * Reusable "fun facts" list.
+ * Reusable "fun facts" carousel.
  *
  * Renders a vertical list of short facts with an optional title on top and a
- * separator line between the title and the content. It is intentionally
- * generic so it can be dropped into any section with a different set of
- * facts (e.g. the story, the venue, the food…).
+ * separator line between the title and the content. Only a fixed number of
+ * rows (PAGE_SIZE) is shown at a time; prev/next arrows and dots page through
+ * the remaining facts. It is intentionally generic so it can be dropped into
+ * any section with a different set of facts (e.g. the story, the venue, the
+ * food…).
  *
  * @param {string[]} facts - short strings to display as rows
- * @param {string} id - unique id so multiple lists can coexist on a page
+ * @param {string} id - unique id so multiple carousels can coexist on a page
  * @param {string} [label] - optional title shown on the first row
  * @returns {string} markup
  */
+const FUN_FACT_PAGE_SIZE = 5;
+
 function funFactCarouselMarkup(facts, id, label = "") {
   if (!facts || !facts.length) return "";
+  const pages = [];
+  for (let i = 0; i < facts.length; i += FUN_FACT_PAGE_SIZE) {
+    pages.push(facts.slice(i, i + FUN_FACT_PAGE_SIZE));
+  }
+  const pageCount = pages.length;
+
   return `
-    <div class="fun-fact-list" data-fun-fact-list="${id}" aria-label="${label || "Fun facts"}">
+    <div class="fun-fact-list" data-fun-fact-carousel="${id}" aria-label="${label || "Fun facts"}">
       ${
         label
           ? `
@@ -905,28 +915,103 @@ function funFactCarouselMarkup(facts, id, label = "") {
           `
           : ""
       }
-      <ol class="fun-fact-rows">
-        ${facts
-          .map(
-            (fact, index) => `
-              <li class="fun-fact-row">
-                <span class="fun-fact-row-index" aria-hidden="true">${String(index + 1).padStart(2, "0")}</span>
-                <p>${fact}</p>
-              </li>
-            `,
-          )
-          .join("")}
-      </ol>
+      <div class="fun-fact-viewport">
+        <div class="fun-fact-track" data-fun-fact-track="${id}">
+          ${pages
+            .map(
+              (page, pageIndex) => `
+                <ol class="fun-fact-rows" data-fun-fact-page="${id}" ${pageIndex === 0 ? 'aria-current="true"' : ""}>
+                  ${page
+                    .map(
+                      (fact, index) => `
+                        <li class="fun-fact-row">
+                          <span class="fun-fact-row-index" aria-hidden="true">${String(pageIndex * FUN_FACT_PAGE_SIZE + index + 1).padStart(2, "0")}</span>
+                          <p>${fact}</p>
+                        </li>
+                      `,
+                    )
+                    .join("")}
+                </ol>
+              `,
+            )
+            .join("")}
+        </div>
+      </div>
+      ${
+        pageCount > 1
+          ? `
+            <div class="fun-fact-controls">
+              <button
+                class="fun-fact-arrow fun-fact-arrow--prev"
+                type="button"
+                data-fun-fact-prev="${id}"
+                aria-label="Previous"
+              >‹</button>
+              <div class="fun-fact-dots" data-fun-fact-dots="${id}">
+                ${pages
+                  .map(
+                    (_, index) => `
+                      <button
+                        class="fun-fact-dot"
+                        type="button"
+                        data-fun-fact-dot="${id}"
+                        data-index="${index}"
+                        aria-label="Page ${index + 1}"
+                        ${index === 0 ? 'aria-current="true"' : ""}
+                      ></button>
+                    `,
+                  )
+                  .join("")}
+              </div>
+              <button
+                class="fun-fact-arrow fun-fact-arrow--next"
+                type="button"
+                data-fun-fact-next="${id}"
+                aria-label="Next"
+              >›</button>
+            </div>
+          `
+          : ""
+      }
     </div>
   `;
 }
 
 /**
- * Fun-fact lists are static (no carousel behaviour needed), so this is a
- * no-op kept for compatibility with the render pipeline.
+ * Wire up all fun-fact carousels currently in the DOM.
+ * Each carousel pages through its rows with prev/next arrows and dots.
  */
 function bindFunFactCarousels() {
-  // Intentionally empty: facts are rendered as a static vertical list.
+  document.querySelectorAll("[data-fun-fact-carousel]").forEach((carousel) => {
+    const id = carousel.dataset.funFactCarousel;
+    const track = carousel.querySelector(`[data-fun-fact-track="${id}"]`);
+    const pages = [
+      ...carousel.querySelectorAll(`[data-fun-fact-page="${id}"]`),
+    ];
+    const dots = [...carousel.querySelectorAll(`[data-fun-fact-dot="${id}"]`)];
+    const prev = carousel.querySelector(`[data-fun-fact-prev="${id}"]`);
+    const next = carousel.querySelector(`[data-fun-fact-next="${id}"]`);
+    if (!track || pages.length < 2) return;
+
+    let index = 0;
+
+    const show = (nextIndex) => {
+      index = (nextIndex + pages.length) % pages.length;
+      track.style.transform = `translateX(-${index * 100}%)`;
+      pages.forEach((page, i) => {
+        page.setAttribute("aria-current", String(i === index));
+      });
+      dots.forEach((dot, i) => {
+        dot.setAttribute("aria-current", String(i === index));
+      });
+    };
+
+    prev?.addEventListener("click", () => show(index - 1));
+    next?.addEventListener("click", () => show(index + 1));
+    dots.forEach((dot) => {
+      dot.addEventListener("click", () => show(Number(dot.dataset.index)));
+    });
+  });
 }
 
 // Maps a guest's assigned unit to the corresponding cabin-showcase key.
