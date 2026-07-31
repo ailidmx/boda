@@ -6,11 +6,17 @@ import { InitialsSwap } from "./ui.jsx";
 import { FunFactCarousel } from "./FunFactCarousel.jsx";
 import { resolveGuestPhoto } from "../guest-profiles.js";
 
-// Default avatar images used for the fun-fact carousel. Guests can replace
-// these with their own close-up photo (uploaded via the identity section).
+// Default avatar images used for the fun-fact carousel. These are the
+// children's photos (hosted on Cloudinary). Guests can replace them with
+// their own close-up photo (uploaded via the identity section). The carousel
+// cycles through them so each anecdote gets a different avatar.
 const DEFAULT_AVATARS = [
   "https://res.cloudinary.com/k2ajcgxv/image/upload/v1785537262/rounndnios.jpg",
+  "https://res.cloudinary.com/k2ajcgxv/image/upload/v1785537262/nios.jpg",
+  "https://res.cloudinary.com/k2ajcgxv/image/upload/v1785537262/20260227_144454_bgpfnj.jpg",
+  "https://res.cloudinary.com/k2ajcgxv/image/upload/v1785537262/PXL_20240210_213129736_matjyo.jpg",
 ];
+
 
 export function Story() {
   const { t, language, profile } = useApp();
