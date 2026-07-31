@@ -1,7 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 // One fact per slide so each card stays thin and focused.
 const FUN_FACT_PAGE_SIZE = 1;
+
+// How long each slide stays before auto-advancing (ms).
+const AUTOPLAY_INTERVAL = 6000;
 
 /**
  * Normalise a fact entry into { title, text, avatar }.
@@ -19,6 +22,8 @@ function normalizeFact(fact) {
 
 export function FunFactCarousel({ facts, id, label = "" }) {
   const [pageIndex, setPageIndex] = useState(0);
+  const [paused, setPaused] = useState(false);
+  const timerRef = useRef(null);
 
   if (!facts || !facts.length) return null;
 
@@ -34,11 +39,26 @@ export function FunFactCarousel({ facts, id, label = "" }) {
     setPageIndex((index + pageCount) % pageCount);
   };
 
+  // Autoplay: advance every AUTOPLAY_INTERVAL ms unless paused. The timer is
+  // reset whenever the user navigates manually (pageIndex changes) so it never
+  // drifts or double-fires.
+  useEffect(() => {
+    if (paused || pageCount <= 1) return undefined;
+    timerRef.current = window.setTimeout(() => {
+      setPageIndex((prev) => (prev + 1) % pageCount);
+    }, AUTOPLAY_INTERVAL);
+    return () => window.clearTimeout(timerRef.current);
+  }, [pageIndex, paused, pageCount]);
+
   return (
     <div
       className="fun-fact-list"
       data-fun-fact-carousel={id}
       aria-label={label || "Fun facts"}
+      onMouseEnter={() => setPaused(true)}
+      onMouseLeave={() => setPaused(false)}
+      onFocus={() => setPaused(true)}
+      onBlur={() => setPaused(false)}
     >
       {label && (
         <>
@@ -58,7 +78,10 @@ export function FunFactCarousel({ facts, id, label = "" }) {
             aria-current="true"
           >
             {activePage.map((fact, index) => (
-              <li className="fun-fact-row" key={index}>
+              <li
+                className={`fun-fact-row${fact.avatar ? " fun-fact-row--avatar" : ""}`}
+                key={index}
+              >
                 {fact.avatar && (
                   <span className="fun-fact-avatar" aria-hidden="true">
                     <img

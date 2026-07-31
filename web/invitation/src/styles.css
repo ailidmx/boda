@@ -1341,10 +1341,18 @@ h2 {
   width: 2.6rem;
   height: 2.6rem;
   border-radius: 50%;
-  object-fit: cover;
   border: 2px solid var(--marigold);
   box-shadow: 0 2px 8px rgb(36 33 25 / 18%);
   flex-shrink: 0;
+  overflow: hidden;
+  display: inline-flex;
+}
+
+.fun-fact-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .fun-fact-row--avatar {
