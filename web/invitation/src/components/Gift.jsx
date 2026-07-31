@@ -7,7 +7,7 @@ export function Gift() {
   const gift = t.gift || {};
 
   return (
-    <section className="gift-section section" id="gift">
+    <section className="gift-section section">
       <div className="gift-copy reveal">
         <p className="eyebrow">{gift.eyebrow}</p>
         <h2>{gift.title}</h2>

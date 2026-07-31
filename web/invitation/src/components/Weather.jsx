@@ -6,7 +6,7 @@ export function Weather() {
   const weather = t.weather || {};
 
   return (
-    <section className="weather-section section" id="weather">
+    <section className="weather-section section">
       <div className="weather-heading reveal">
         <div>
           <p className="eyebrow">{weather.eyebrow}</p>

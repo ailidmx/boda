@@ -6,7 +6,7 @@ export function Photos() {
   const photos = t.photos || {};
 
   return (
-    <section className="photos-section section" id="photos">
+    <section className="photos-section section">
       <div className="photos-heading reveal">
         <h2>{photos.title}</h2>
         <p className="lead">{photos.lead}</p>

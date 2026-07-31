@@ -9,7 +9,7 @@ export function Venue() {
   const facilities = t.facilities || {};
 
   return (
-    <section className="facilities-section section" id="venue">
+    <section className="facilities-section section">
       <div className="experience-heading reveal">
         <p className="eyebrow">{facilities.eyebrow}</p>
         <h2>{facilities.title}</h2>

@@ -7,7 +7,7 @@ export function Weekend() {
   const weekend = t.weekend || {};
 
   return (
-    <section className="weekend-section section" id="weekend">
+    <section className="weekend-section section">
       <div className="weekend-banner">
         <img src={MEDIA.weekendBanner} alt="" loading="lazy" decoding="async" />
         <div className="weekend-banner-content">

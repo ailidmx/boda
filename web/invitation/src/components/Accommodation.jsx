@@ -7,7 +7,7 @@ export function Accommodation() {
   const accommodation = t.accommodation || {};
 
   return (
-    <section className="accommodation-section section" id="accommodation">
+    <section className="accommodation-section section">
       <div className="accommodation-copy reveal">
         <p className="eyebrow">{accommodation.eyebrow}</p>
         <h2>{accommodation.title}</h2>

@@ -7,7 +7,7 @@ export function Attire() {
   const attire = t.attire || {};
 
   return (
-    <section className="attire-section section" id="attire">
+    <section className="attire-section section">
       <div className="oaxaca-grid" aria-label={attire.eyebrow}>
         {MEDIA.oaxaca.map((src, i) => (
           <img

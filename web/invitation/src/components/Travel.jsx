@@ -41,7 +41,7 @@ export function Travel() {
   const routes = travel.routes || {};
 
   return (
-    <section className="travel-section section" id="travel">
+    <section className="travel-section section">
       <div className="travel-heading reveal">
         <p className="eyebrow">{travel.eyebrow}</p>
         <h2>{travel.title}</h2>
