@@ -1375,6 +1375,8 @@ function render(language) {
                 `,
               ).join("")}
             </div>
+          </div>
+          <div class="story-footer">
             ${funFactCarouselMarkup(
               chapalaAnecdotes(language).map(
                 (anecdote) => `${anecdote.icon} ${anecdote.title} — ${anecdote.text}`,
