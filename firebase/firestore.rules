@@ -7,8 +7,17 @@ service cloud.firestore {
         && request.auth.uid == "yfu7MMCmFaPCK7UW4czr5c3x7Aa2";
     }
 
-    function hasCommonFields() {
-      return request.resource.data.schemaVersion == 1
+    function isCouple() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in [
+          "david.aili.mx@gmail.com",
+          "aydemiss@gmail.com"
+        ];
+    }
+
+    function hasSubmissionMetadata(version) {
+      return request.resource.data.schemaVersion == version
         && request.resource.data.language in ["es", "fr", "en"]
         && request.resource.data.createdAt == request.time;
     }
@@ -17,36 +26,167 @@ service cloud.firestore {
       return field is string && field.size() <= maximum;
     }
 
+    function hasValidInvitationCode() {
+      return !request.resource.data.keys().hasAny(["invitationCode"])
+        || request.resource.data.invitationCode in [
+          "hortencia_privada_pagada",
+          "cabaña_33_privada_porpagar",
+          "azalea_compartida_porpagar",
+          "sin_cabaña",
+          "cabaña_5_privada_porpagar",
+          "cabaña_34_privada_pagada",
+          "cabaña_4_compartida_pagada",
+          "lavanda_compartida_porpagar",
+          "casona_compartida_pagada",
+          "margarita_compartida_porpagar",
+          "cabaña_6_privada_porpagar",
+          "dalia_compartida_porpagar",
+          "cabaña_31_privada_porpagar",
+          "cabaña_32_privada_porpagar"
+        ];
+    }
+
+    function hasValidRsvpFields() {
+      return request.resource.data.keys().hasAll([
+          "firstName", "lastName", "email", "whatsapp", "attendance",
+          "groupMode", "groupName", "partySize", "adults", "children",
+          "guests", "accommodation", "travelStatus", "arrivalFrom",
+          "arrivalTo", "arrivalDate", "arrivalTime", "arrivalAirline",
+          "arrivalFlight", "departureFrom", "departureTo", "departureDate",
+          "departureTime", "departureAirline", "departureFlight", "route",
+          "notes", "language", "schemaVersion", "createdAt"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "firstName", "lastName", "email", "whatsapp", "attendance",
+          "groupMode", "groupName", "partySize", "adults", "children",
+          "guests", "accommodation", "independentArrival", "sundayMorning",
+          "travelStatus", "arrivalFrom", "arrivalTo", "arrivalDate",
+          "arrivalTime", "arrivalAirline", "arrivalFlight", "departureFrom",
+          "departureTo", "departureDate", "departureTime",
+          "departureAirline", "departureFlight", "route", "notes",
+          "invitationCode", "language", "schemaVersion", "createdAt"
+        ])
+        && isShortText(request.resource.data.firstName, 100)
+        && request.resource.data.firstName.size() > 0
+        && isShortText(request.resource.data.lastName, 100)
+        && request.resource.data.lastName.size() > 0
+        && isShortText(request.resource.data.email, 254)
+        && request.resource.data.email.size() > 0
+        && isShortText(request.resource.data.whatsapp, 50)
+        && request.resource.data.whatsapp.size() > 0
+        && isShortText(request.resource.data.attendance, 30)
+        && isShortText(request.resource.data.groupMode, 30)
+        && isShortText(request.resource.data.groupName, 150)
+        && isShortText(request.resource.data.partySize, 2)
+        && isShortText(request.resource.data.adults, 2)
+        && isShortText(request.resource.data.children, 2)
+        && isShortText(request.resource.data.guests, 1000)
+        && isShortText(request.resource.data.accommodation, 30)
+        && (!request.resource.data.keys().hasAny(["independentArrival"])
+          || isShortText(request.resource.data.independentArrival, 30))
+        && (!request.resource.data.keys().hasAny(["sundayMorning"])
+          || isShortText(request.resource.data.sundayMorning, 30))
+        && isShortText(request.resource.data.travelStatus, 30)
+        && isShortText(request.resource.data.arrivalFrom, 150)
+        && isShortText(request.resource.data.arrivalTo, 150)
+        && isShortText(request.resource.data.arrivalDate, 10)
+        && isShortText(request.resource.data.arrivalTime, 5)
+        && isShortText(request.resource.data.arrivalAirline, 100)
+        && isShortText(request.resource.data.arrivalFlight, 30)
+        && isShortText(request.resource.data.departureFrom, 150)
+        && isShortText(request.resource.data.departureTo, 150)
+        && isShortText(request.resource.data.departureDate, 10)
+        && isShortText(request.resource.data.departureTime, 5)
+        && isShortText(request.resource.data.departureAirline, 100)
+        && isShortText(request.resource.data.departureFlight, 30)
+        && isShortText(request.resource.data.route, 500)
+        && isShortText(request.resource.data.notes, 2000);
+    }
+
     match /rsvp_submissions/{submissionId} {
       allow create: if isInvitedGuest()
-        && hasCommonFields()
-        && isShortText(request.resource.data.firstName, 100)
-        && isShortText(request.resource.data.lastName, 100)
-        && isShortText(request.resource.data.contact, 200)
-        && isShortText(request.resource.data.notes, 2000);
-      allow read, update, delete: if false;
+        && hasSubmissionMetadata(3)
+        && hasValidInvitationCode()
+        && hasValidRsvpFields();
+      allow read: if true;
+      allow update, delete: if false;
     }
 
     match /experience_suggestions/{submissionId} {
       allow create: if isInvitedGuest()
-        && hasCommonFields()
+        && hasSubmissionMetadata(1)
+        && request.resource.data.keys().hasOnly([
+          "name", "dessert", "foodSuggestion", "songTitle", "songArtist",
+          "singInterest", "extra", "invitationCode", "language",
+          "schemaVersion", "createdAt"
+        ])
+        && hasValidInvitationCode()
         && isShortText(request.resource.data.name, 150)
+        && request.resource.data.name.size() > 0
+        && isShortText(request.resource.data.dessert, 50)
+        && isShortText(request.resource.data.foodSuggestion, 2000)
         && isShortText(request.resource.data.songTitle, 300)
         && isShortText(request.resource.data.songArtist, 300)
+        && isShortText(request.resource.data.singInterest, 50)
         && isShortText(request.resource.data.extra, 2000);
-      allow read, update, delete: if false;
+      allow read: if true;
+      allow update, delete: if false;
     }
 
     match /coast_interest/{submissionId} {
       allow create: if isInvitedGuest()
-        && hasCommonFields()
+        && hasSubmissionMetadata(1)
+        && request.resource.data.keys().hasOnly([
+          "name", "interest", "partySize", "nights", "destination", "style",
+          "note", "invitationCode", "language", "schemaVersion", "createdAt"
+        ])
+        && hasValidInvitationCode()
         && isShortText(request.resource.data.name, 150)
+        && request.resource.data.name.size() > 0
+        && isShortText(request.resource.data.interest, 50)
+        && isShortText(request.resource.data.partySize, 2)
+        && isShortText(request.resource.data.nights, 1)
+        && isShortText(request.resource.data.destination, 100)
+        && isShortText(request.resource.data.style, 100)
         && isShortText(request.resource.data.note, 2000);
-      allow read, update, delete: if false;
+      allow read: if true;
+      allow update, delete: if false;
     }
 
+    match /petanque_participation/{submissionId} {
+      allow create: if isInvitedGuest()
+        && request.resource.data.keys().hasOnly([
+          "petanqueParticipation", "petanquePartySize", "petanqueNames",
+          "petanqueOwnBoules", "invitationCode", "language",
+          "schemaVersion", "createdAt"
+        ])
+        && hasValidInvitationCode()
+        && isShortText(request.resource.data.petanqueParticipation, 30)
+        && isShortText(request.resource.data.petanquePartySize, 2)
+        && isShortText(request.resource.data.petanqueNames, 500)
+        && isShortText(request.resource.data.petanqueOwnBoules, 30);
+      allow read: if true;
+      allow update, delete: if false;
+    }
+
+    match /guests/{guestId} {
+      allow read: if true;
+      allow write: if isCouple();
+    }
+
+    match /invitation_groups/{groupId} {
+      allow read: if true;
+      allow write: if isCouple();
+    }
+
+    // ── Default deny ────────────────────────────────────────────────────────
+    // Any collection not explicitly listed above gets:
+    //   - read: public (guests can see data)
+    //   - write: only the couple (david & aydé)
+    // This ensures isCouple() applies by default to ALL collections.
     match /{document=**} {
-      allow read, write: if false;
+      allow read: if true;
+      allow write: if isCouple();
     }
   }
 }

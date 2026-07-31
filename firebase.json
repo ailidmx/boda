@@ -90,5 +90,23 @@
   "firestore": {
     "rules": "firebase/firestore.rules",
     "indexes": "firebase/firestore.indexes.json"
+  },
+  "auth": {
+    "providers": {
+      "emailPassword": true,
+      "googleSignIn": {
+        "oAuthBrandDisplayName": "Boda David y Aydé",
+        "supportEmail": "david.aili.mx@gmail.com",
+        "authorizedRedirectUris": [
+          "https://boda-500805.web.app",
+          "https://boda-david-y-ayde.web.app"
+        ]
+      }
+    }
+  },
+  "emulators": {
+    "firestore": {
+      "port": 8080
+    }
   }
 }
