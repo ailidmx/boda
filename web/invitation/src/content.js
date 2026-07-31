@@ -70,8 +70,31 @@ export const content = {
       pause: "Pausar fotos",
       play: "Reanudar fotos",
     },
+    identity: {
+      eyebrow: "Antes de empezar",
+      title: "¿Está bien escrito tu nombre?",
+      body:
+        "Queremos que cada invitado se sienta reconocido. Si tu nombre o el de alguien de tu grupo está mal escrito, corrígelo aquí y lo usaremos en la invitación y en la mesa.",
+      note:
+        "También puedes subir una foto de tu rostro para que te reconozcamos más fácilmente en el fin de semana.",
+      you: "Tú",
+      firstName: "Nombre",
+      lastName: "Apellido",
+      editName: "Corregir nombre",
+      addPhoto: "Subir foto",
+      uploading: "Subiendo…",
+      save: "Guardar",
+      saving: "Guardando…",
+      cancel: "Cancelar",
+      saved: "¡Listo! Lo actualizamos.",
+      saveError: "No pudimos guardar. Revisa tu conexión e inténtalo de nuevo.",
+      nameRequired: "Escribe al menos tu nombre.",
+      photoSaved: "¡Foto guardada! Gracias.",
+      photoError: "No pudimos subir la foto. Inténtalo de nuevo.",
+    },
     story: {
       eyebrow: "Nuestra invitación",
+
       title: "Un fin de semana para encontrarnos",
       body:
         "Entre México y Francia, entre nuestras familias y amistades, elegimos reunirnos junto al lago de Chapala para celebrar el amor, la amistad y todo lo que nos trajo hasta aquí.",
@@ -887,8 +910,31 @@ export const content = {
       pause: "Pause photos",
       play: "Relancer les photos",
     },
+    identity: {
+      eyebrow: "Avant de commencer",
+      title: "Votre nom est-il bien écrit ?",
+      body:
+        "Nous voulons que chaque invité se sente reconnu. Si votre nom ou celui d’un membre de votre groupe est mal orthographié, corrigez-le ici et nous l’utiliserons dans l’invitation et à table.",
+      note:
+        "Vous pouvez aussi déposer une photo de votre visage pour que nous vous reconnaissions plus facilement pendant le week-end.",
+      you: "Vous",
+      firstName: "Prénom",
+      lastName: "Nom",
+      editName: "Corriger le nom",
+      addPhoto: "Déposer une photo",
+      uploading: "Envoi…",
+      save: "Enregistrer",
+      saving: "Enregistrement…",
+      cancel: "Annuler",
+      saved: "C’est fait ! Nous l’avons mis à jour.",
+      saveError: "Impossible d’enregistrer. Vérifiez votre connexion et réessayez.",
+      nameRequired: "Écrivez au moins votre prénom.",
+      photoSaved: "Photo enregistrée ! Merci.",
+      photoError: "Impossible de déposer la photo. Réessayez.",
+    },
     story: {
       eyebrow: "Notre invitation",
+
       title: "Un week-end pour se retrouver",
       body:
         "Entre le Mexique et la France, entre nos familles et nos amis, nous avons choisi de nous réunir à Jocotepec, au bord du lac de Chapala, pour célébrer l’amour, l’amitié et tout ce qui nous a conduits jusqu’ici.",
@@ -1706,8 +1752,31 @@ export const content = {
       pause: "Pause photos",
       play: "Resume photos",
     },
+    identity: {
+      eyebrow: "Before we begin",
+      title: "Is your name spelled correctly?",
+      body:
+        "We want every guest to feel recognised. If your name or someone in your group is misspelled, correct it here and we will use it in the invitation and at the table.",
+      note:
+        "You can also upload a photo of your face so we can recognise you more easily over the weekend.",
+      you: "You",
+      firstName: "First name",
+      lastName: "Last name",
+      editName: "Correct name",
+      addPhoto: "Upload photo",
+      uploading: "Uploading…",
+      save: "Save",
+      saving: "Saving…",
+      cancel: "Cancel",
+      saved: "Done! We updated it.",
+      saveError: "We could not save. Check your connection and try again.",
+      nameRequired: "Please enter at least your first name.",
+      photoSaved: "Photo saved! Thank you.",
+      photoError: "We could not upload the photo. Please try again.",
+    },
     story: {
       eyebrow: "Our invitation",
+
       title: "A weekend to come together",
       body:
         "Between Mexico and France, surrounded by our families and friends, we chose the shores of Lake Chapala to celebrate love, friendship, and everything that brought us here.",

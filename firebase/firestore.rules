@@ -169,7 +169,53 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // ── Guest profile overrides (name corrections + avatar photos) ──────────
+    // Each guest signs in with their own Firebase Auth account. The
+    // `guest_auth/{uid}` collection maps a UID to its guestId and invitation
+    // group (populated by scripts/provision-guest-auth.mjs). A guest may only
+    // write a profile override for a member of their own invitation group.
+    function hasValidProfileFields() {
+      return request.resource.data.keys().hasAll([
+          "guestId", "firstName", "lastName", "invitationGroup",
+          "updatedBy", "updatedAt"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "guestId", "firstName", "lastName", "invitationGroup",
+          "photoUrl", "updatedBy", "updatedAt"
+        ])
+        && isShortText(request.resource.data.guestId, 100)
+        && request.resource.data.guestId.size() > 0
+        && isShortText(request.resource.data.firstName, 100)
+        && request.resource.data.firstName.size() > 0
+        && isShortText(request.resource.data.lastName, 100)
+        && isShortText(request.resource.data.invitationGroup, 150)
+        && isShortText(request.resource.data.updatedBy, 100)
+        && request.resource.data.updatedAt == request.time
+        && (!request.resource.data.keys().hasAny(["photoUrl"])
+          || (request.resource.data.photoUrl is string
+            && request.resource.data.photoUrl.size() <= 500
+            && request.resource.data.photoUrl.matches('^https://res\\.cloudinary\\.com/.*$')));
+    }
+
+    function editorInvitationGroup() {
+      return get(/databases/$(database)/documents/guest_auth/$(request.auth.uid)).data.invitationGroup;
+    }
+
+    match /guest_auth/{uid} {
+      allow read: if true;
+      allow write: if isCouple();
+    }
+
+    match /guest_profiles/{guestId} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && hasValidProfileFields()
+        && editorInvitationGroup() == request.resource.data.invitationGroup;
+      allow delete: if false;
+    }
+
     match /guests/{guestId} {
+
       allow read: if true;
       allow write: if isCouple();
     }

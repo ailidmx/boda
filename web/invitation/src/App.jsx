@@ -9,7 +9,9 @@ import { LazySection } from "./components/LazySection.jsx";
 // Below-the-fold sections are code-split and only mounted (and their JS chunk
 // fetched) when they scroll into view. This keeps the initial bundle small and
 // the first paint fast on a long one-page invitation.
+const IdentitySection = lazy(() => import("./components/IdentitySection.jsx"));
 const Story = lazy(() => import("./components/Story.jsx"));
+
 const Venue = lazy(() => import("./components/Venue.jsx"));
 const Weekend = lazy(() => import("./components/Weekend.jsx"));
 const Accommodation = lazy(() => import("./components/Accommodation.jsx"));
@@ -42,11 +44,17 @@ function Invitation() {
       <Countdown />
       <main>
         <Hero />
+        <LazySection id="identity" className="lazy-section">
+          <Suspense fallback={null}>
+            <IdentitySection />
+          </Suspense>
+        </LazySection>
         <LazySection id="story" className="lazy-section">
           <Suspense fallback={null}>
             <Story />
           </Suspense>
         </LazySection>
+
         <LazySection id="venue" className="lazy-section">
           <Suspense fallback={null}>
             <Venue />

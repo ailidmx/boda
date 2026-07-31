@@ -4,13 +4,26 @@ import { chapalaAnecdotes } from "../chapalaAnecdotes.js";
 import { useApp } from "../context/AppContext.jsx";
 import { InitialsSwap } from "./ui.jsx";
 import { FunFactCarousel } from "./FunFactCarousel.jsx";
+import { resolveGuestPhoto } from "../guest-profiles.js";
+
+// Default avatar images used for the fun-fact carousel. Guests can replace
+// these with their own close-up photo (uploaded via the identity section).
+const DEFAULT_AVATARS = [
+  "https://res.cloudinary.com/k2ajcgxv/image/upload/v1785537262/rounndnios.jpg",
+];
 
 export function Story() {
-  const { t, language } = useApp();
+  const { t, language, profile } = useApp();
   const story = t.story || {};
-  const anecdotes = chapalaAnecdotes(language).map(
-    (anecdote) => `${anecdote.icon} ${anecdote.title} — ${anecdote.text}`,
-  );
+  const guest = profile?.guest;
+  const guestAvatar = guest ? resolveGuestPhoto(guest) : null;
+  const anecdotes = chapalaAnecdotes(language).map((anecdote, index) => ({
+    text: `${anecdote.icon} ${anecdote.title} — ${anecdote.text}`,
+    // Alternate between the guest's own avatar (if uploaded) and the default
+    // set so the carousel feels varied.
+    avatar: guestAvatar || DEFAULT_AVATARS[index % DEFAULT_AVATARS.length],
+  }));
+
 
   return (
     <section className="story-section section">

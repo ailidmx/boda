@@ -1,15 +1,29 @@
 import React, { useState } from "react";
 
-const FUN_FACT_PAGE_SIZE = 5;
+// One fact per slide so each card stays thin and focused.
+const FUN_FACT_PAGE_SIZE = 1;
+
+/**
+ * Normalise a fact entry into { text, avatar }.
+ * Accepts either a plain string or an object { text, avatar }.
+ */
+function normalizeFact(fact) {
+  if (typeof fact === "string") return { text: fact, avatar: null };
+  return {
+    text: fact?.text || "",
+    avatar: fact?.avatar || null,
+  };
+}
 
 export function FunFactCarousel({ facts, id, label = "" }) {
   const [pageIndex, setPageIndex] = useState(0);
 
   if (!facts || !facts.length) return null;
 
+  const normalized = facts.map(normalizeFact);
   const pages = [];
-  for (let i = 0; i < facts.length; i += FUN_FACT_PAGE_SIZE) {
-    pages.push(facts.slice(i, i + FUN_FACT_PAGE_SIZE));
+  for (let i = 0; i < normalized.length; i += FUN_FACT_PAGE_SIZE) {
+    pages.push(normalized.slice(i, i + FUN_FACT_PAGE_SIZE));
   }
   const pageCount = pages.length;
   const activePage = pages[pageIndex % pages.length];
@@ -43,10 +57,20 @@ export function FunFactCarousel({ facts, id, label = "" }) {
           >
             {activePage.map((fact, index) => (
               <li className="fun-fact-row" key={index}>
+                {fact.avatar && (
+                  <span className="fun-fact-avatar" aria-hidden="true">
+                    <img
+                      src={fact.avatar}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </span>
+                )}
                 <span className="fun-fact-row-index" aria-hidden="true">
                   {String(pageIndex * FUN_FACT_PAGE_SIZE + index + 1).padStart(2, "0")}
                 </span>
-                <p>{fact}</p>
+                <p>{fact.text}</p>
               </li>
             ))}
           </ol>

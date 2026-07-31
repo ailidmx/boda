@@ -9,6 +9,8 @@ import { auth } from "../firebase.js";
 import { content, SUPPORTED_LANGUAGES } from "../content.js";
 import { AUTH_EMAIL_DOMAIN, getGuestByEmail } from "../guests.js";
 import { getCustomContent, loadGroupCustomContent } from "../invitation-profile.js";
+import { loadGuestProfiles } from "../guest-profiles.js";
+
 
 const LANGUAGE_STORAGE_KEY = "boda-language";
 const USERNAME_STORAGE_KEY = "boda-username";
@@ -105,7 +107,10 @@ export function AppProvider({ children }) {
         const guest = getGuestByEmail(user.email);
         const storedUsername = window.localStorage.getItem(USERNAME_STORAGE_KEY);
         const username = storedUsername || guest?.username || "";
-        const custom = await loadGroupCustomContent();
+        const [custom] = await Promise.all([
+          loadGroupCustomContent(),
+          loadGuestProfiles(),
+        ]);
         setProfile({
           guest,
           username,
@@ -113,6 +118,7 @@ export function AppProvider({ children }) {
           email: user.email,
         });
         setAuthState("signedIn");
+
       } catch (error) {
         console.warn("Failed to load guest profile", error);
         setAuthState("signedOut");
