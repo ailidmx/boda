@@ -340,7 +340,7 @@ const MAP_IMAGES = {
   ],
   beach: [
     {
-      src: "https://res.cloudinary.com/k2ajcgxv/image/upload/v1785521649/Captura_de_pantalla_2026-07-31_a_la_s_11.59.30_a.m._t05ski.png",
+      src: "https://res.cloudinary.com/k2ajcgxv/image/upload/v1785521647/Captura_de_pantalla_2026-07-31_a_la_s_11.59.57_a.m._lenxjn.png",
       alt: "Mapa · ruta hacia Barra de Navidad",
     },
   ],
@@ -1841,30 +1841,50 @@ function render(language) {
               <h3 id="route-map-title">${t.travel.routes.title}</h3>
               <p>${t.travel.routes.note}</p>
             </div>
-            <div class="route-map-diagram">
-              <section class="route-group route-origins">
+
+            <section class="route-subsection">
+              <div class="route-subsection-heading">
                 <h4>${t.travel.routes.originsLabel}</h4>
-                ${routeGroupMarkup(t.travel.routes.origins)}
-              </section>
-              <div class="route-venue">
-                <span aria-hidden="true">◆</span>
-                <strong>${t.travel.routes.venue}</strong>
+                <p>${t.travel.routes.maps.venueLabel}</p>
               </div>
-              <section class="route-group route-destinations">
+              <div class="route-map-diagram">
+                <section class="route-group route-origins">
+                  ${routeGroupMarkup(t.travel.routes.origins)}
+                </section>
+                <div class="route-venue">
+                  <span aria-hidden="true">◆</span>
+                  <strong>${t.travel.routes.venue}</strong>
+                </div>
+              </div>
+              ${mapCarouselMarkup([
+                {
+                  label: t.travel.routes.maps.venueLabel,
+                  images: MAP_IMAGES.venue,
+                },
+              ])}
+            </section>
+
+            <section class="route-subsection">
+              <div class="route-subsection-heading">
                 <h4>${t.travel.routes.destinationsLabel}</h4>
-                ${routeGroupMarkup(t.travel.routes.destinations)}
-              </section>
-            </div>
-            ${mapCarouselMarkup([
-              {
-                label: t.travel.routes.maps.venueLabel,
-                images: MAP_IMAGES.venue,
-              },
-              {
-                label: t.travel.routes.maps.beachLabel,
-                images: MAP_IMAGES.beach,
-              },
-            ])}
+                <p>${t.travel.routes.maps.beachLabel}</p>
+              </div>
+              <div class="route-map-diagram">
+                <div class="route-venue">
+                  <span aria-hidden="true">◆</span>
+                  <strong>${t.travel.routes.venue}</strong>
+                </div>
+                <section class="route-group route-destinations">
+                  ${routeGroupMarkup(t.travel.routes.destinations)}
+                </section>
+              </div>
+              ${mapCarouselMarkup([
+                {
+                  label: t.travel.routes.maps.beachLabel,
+                  images: MAP_IMAGES.beach,
+                },
+              ])}
+            </section>
 
           </div>
 

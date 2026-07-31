@@ -580,7 +580,7 @@ export const content = {
         eyebrow: "Mapa de trayectos",
         title: "Llegar a Roca Azul y seguir hacia la costa",
         note:
-          "Tiempos aproximados en sábado y sujetos a tráfico. Las rutas de llegada indicadas son libres; los importes de casetas son estimaciones por trayecto.",
+          "Las duraciones indicadas son orientativas y pueden variar enormemente. Sean previsores y, mejor aún, estén en el lugar con anticipación reservando un alojamiento si pueden.",
         venue: "Roca Azul · Jocotepec",
         originsLabel: "Hacia la boda",
         destinationsLabel: "Después de la boda",
@@ -1384,7 +1384,7 @@ export const content = {
         eyebrow: "Schéma des trajets",
         title: "Rejoindre Roca Azul, puis continuer vers la côte",
         note:
-          "Durées approximatives un samedi et variables selon la circulation. Les itinéraires d’arrivée indiqués sont gratuits ; les montants de péage sont estimés par trajet.",
+          "Les durées indiquées sont indicatives et peuvent varier énormément. Soyez prévoyants et, encore mieux, soyez sur place en avance en réservant un logement si vous pouvez.",
         venue: "Roca Azul · Jocotepec",
         originsLabel: "Vers le mariage",
         destinationsLabel: "Après le mariage",
@@ -2187,7 +2187,7 @@ export const content = {
         eyebrow: "Journey map",
         title: "Getting to Roca Azul, then travelling on to the coast",
         note:
-          "Approximate Saturday driving times, subject to traffic. The listed arrival routes are toll-free; toll amounts are estimates per journey.",
+          "The times shown are indicative and can vary enormously. Please plan ahead and, even better, arrive early by booking accommodation if you can.",
         venue: "Roca Azul · Jocotepec",
         originsLabel: "To the wedding",
         destinationsLabel: "After the wedding",
