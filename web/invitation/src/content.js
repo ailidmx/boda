@@ -3,7 +3,10 @@ export const SUPPORTED_LANGUAGES = ["es", "fr", "en"];
 export const EVENT = {
   couple: "David & Aydé",
   date: "2027-02-20T00:00:00-06:00",
+  // Anchor for the "married since" reverse counter (20/02 at 2 PM Mexico time)
+  weddingDate: "2027-02-20T14:00:00-06:00",
   dateShort: "20 · 02 · 2027",
+
   venue: "Roca Azul",
   place: "Jocotepec · Jalisco · México",
   mapUrl:
@@ -23,7 +26,9 @@ export const EVENT = {
   playlists: {
     general: "https://open.spotify.com/playlist/4izmJJXTOnsUz3BQsrkZBh",
     karaoke: "https://open.spotify.com/playlist/6hmu5velXNH68JAhQ3xaU4",
+    shared: "https://open.spotify.com/playlist/4izmJJXTOnsUz3BQsrkZBh",
   },
+
 };
 
 export const content = {
@@ -39,16 +44,22 @@ export const content = {
       accommodation: "Alojamiento",
       travel: "Vengo de lejos",
       attire: "Vestuario",
+      gift: "Regalos",
+      photos: "Fotos",
       rsvp: "Confirmar",
+      dashboard: "Panel",
     },
     countdown: {
-      prefix: "Faltan",
+      prefix: "Nos casamos en",
+      years: "años",
+      months: "meses",
       days: "días",
       hours: "horas",
       minutes: "min",
-      seconds: "seg",
       arrived: "Hoy celebramos",
     },
+
+
     hero: {
       eyebrow: "Nos casamos",
       invitation: "Queremos celebrar este momento con ustedes",
@@ -66,7 +77,23 @@ export const content = {
         "Entre México y Francia, entre nuestras familias y amistades, elegimos reunirnos junto al lago de Chapala para celebrar el amor, la amistad y todo lo que nos trajo hasta aquí.",
       note:
         "Nos hará inmensamente felices compartir este fin de semana con ustedes.",
+      photosLabel: "Vistas del lago de Chapala y de Jocotepec",
+      photoAlts: [
+        "Atardecer sobre el lago de Chapala",
+        "Vista del lago de Chapala",
+        "Iglesia de Jocotepec",
+        "Panorámica del lago de Chapala",
+      ],
+      funFacts: [
+        "El lago de Chapala es el lago más grande de México.",
+        "Jocotepec significa «lugar de jocotes» en náhuatl.",
+        "Nos conocimos entre México y Francia, a miles de kilómetros de distancia.",
+        "Roca Azul está a orillas del lago, con vistas al atardecer.",
+      ],
+      anecdotesLabel: "El lago de Chapala en 12 anécdotas",
+
     },
+
     gallery: {
       eyebrow: "Nuestro camino",
       title: "Una historia hecha de viajes y pequeños instantes",
@@ -96,8 +123,9 @@ export const content = {
         {
           day: "Sábado 20 · cita 13:00",
           title: "Una boda de tarde",
-          body: "Civil, marimba, carnitas, ceremonia en el faro, cena y baile.",
+          body: "Aperitivo, marimba, carnitas, ceremonia en el faro, cena y baile.",
         },
+
         {
           day: "Domingo 21",
           title: "Desayuno y despedida",
@@ -108,10 +136,11 @@ export const content = {
         eyebrow: "Sábado 20 · programa",
         title: "La tarde, paso a paso",
         warning:
-          "Quienes vengan desde Guadalajara: salgan con bastante anticipación. Los accesos hacia Jocotepec pueden congestionarse fácilmente y necesitamos que todos estén en Roca Azul a las 13:00.",
+          "Quienes vengan desde Guadalajara: salgan con bastante anticipación. Los accesos hacia Jocotepec pueden congestionarse fácilmente y necesitamos que todos estén en Roca Azul a las 13:00. Mejor aún: si pueden, quédense en el lugar y compartan el viernes con nosotros. Hay muchas opciones de alojamiento, de todos los precios y todas las gamas, alrededor del lago de Chapala.",
         items: [
           { time: "13:00", title: "Llegada de invitados", body: "Bienvenida y tiempo para instalarnos." },
-          { time: "14:00", title: "Ceremonia civil", body: "El primer sí del día." },
+          { time: "14:00", title: "Aperitivo", body: "El primer brindis del día." },
+
           { time: "Al terminar", title: "Marimba", body: "Música en vivo para brindar y convivir." },
           { time: "Después", title: "Comida de carnitas", body: "Una comida mexicana antes de la ceremonia en el faro." },
           { time: "18:00", title: "Ceremonia en el faro", body: "El gran momento de la tarde." },
@@ -227,10 +256,11 @@ export const content = {
         "La música acompañará cada cambio de energía del sábado, desde el final de la ceremonia hasta la pista de baile.",
       acts: [
         {
-          moment: "Después del civil",
+          moment: "Después del aperitivo",
           name: "Marimba",
           note: "Para acompañar el primer brindis antes de las carnitas.",
         },
+
         {
           moment: "Después de la ceremonia en el faro",
           name: "Mariachi",
@@ -257,7 +287,7 @@ export const content = {
         eyebrow: "Escuchen desde ahora",
         title: "La banda sonora empieza aquí",
         body:
-          "Dos playlists para entrar en ambiente, descubrir canciones y empezar a preparar sus grandes interpretaciones.",
+          "Tres playlists para entrar en ambiente, descubrir canciones y empezar a preparar sus grandes interpretaciones.",
         general: {
           title: "Ambiente de la boda",
           body: "La selección general para viajar, brindar, convivir y bailar.",
@@ -265,6 +295,10 @@ export const content = {
         karaoke: {
           title: "Karaoke",
           body: "Las canciones candidatas para tomar el micrófono y cantar juntos.",
+        },
+        shared: {
+          title: "Playlist colaborativa",
+          body: "Una lista abierta para que todos agreguen sus canciones favoritas.",
         },
         button: "Abrir en Spotify",
       },
@@ -278,7 +312,31 @@ export const content = {
         artist: "Artista o versión",
         sing: "¿Quieren cantarla?",
         extra: "Otra idea para la fiesta",
+        genres: "¿Qué géneros no pueden faltar?",
       },
+      genres: [
+        "Cumbia",
+        "Salsa",
+        "Bachata",
+        "Reggaetón",
+        "Norteño",
+        "Banda",
+        "Mariachi",
+        "Ranchera",
+        "Pop",
+        "Rock",
+        "Electrónica",
+        "Hip-hop",
+        "Jazz",
+        "Soul / Funk",
+        "Disco",
+        "Música francesa",
+        "Música de los 80",
+        "Música de los 90",
+        "Baladas",
+        "Karaoke",
+      ],
+
       options: {
         dessert: [
           { value: "jericalla", label: "Jericalla" },
@@ -296,21 +354,16 @@ export const content = {
       previewNote:
         "Sus canciones, votos e ideas se guardarán de forma privada.",
     },
-    venue: {
-      eyebrow: "El lugar",
-      title: "Roca Azul",
-      body:
-        "Nos encontraremos en Jocotepec, a orillas del lago de Chapala. El alojamiento del fin de semana estará organizado en las cabañas del lugar.",
-      location: "Jocotepec, Jalisco, México",
-      map: "Abrir en Google Maps",
-      visualTitle: "Lago de Chapala",
-      visualBody: "Jardines, agua y atardeceres de Jalisco",
-    },
     facilities: {
-      eyebrow: "El sábado a su ritmo",
+      eyebrow: "El lugar",
       title: "Todo el club para disfrutar",
       body:
         "Entre un momento y otro, cada quien podrá convivir con sus vecinos, explorar las instalaciones o simplemente descansar en su alojamiento.",
+      videoTitle: "Video de presentación de Roca Azul",
+      privacyTitle: "Privacidad",
+      privacyBody:
+        "Todas las cabañas estarán rentadas por los invitados de la boda, unas 80 a 90 personas. Además, otros invitados del matrimonio se alojarán cerca, quizá no muy lejos, o vendrán solo por el día: unas 60 personas según las estimaciones actuales. Aun así, el club no será completamente privado ese fin de semana: algunos espacios aún albergan tiendas de campaña o casas rodantes. Compartiremos el lugar y respetaremos el descanso. La música podrá sonar hasta las 2 de la madrugada; después continuaremos en las cabañas.",
+
       gallery: [
         { key: "cabins", title: "Cabañas", alt: "Cabañas y habitaciones de Roca Azul" },
         { key: "pool", title: "Albercas", alt: "Alberca y jardines del Club Roca Azul" },
@@ -318,6 +371,15 @@ export const content = {
         { key: "gardens", title: "Jardines", alt: "Áreas verdes del Club Roca Azul" },
       ],
       gallerySource: "Fotografías del lugar: Club Roca Azul",
+      rocaGalleryLabel: "Galería de fotografías del Club Roca Azul",
+      rocaGalleryAlts: [
+        "Vista del Club Roca Azul",
+        "Jardines del Club Roca Azul",
+        "Alberca del Club Roca Azul",
+        "Cabañas del Club Roca Azul",
+        "Lago de Chapala desde Roca Azul",
+        "Atardecer en Roca Azul",
+      ],
       groups: [
         {
           title: "Agua y bienestar",
@@ -334,7 +396,6 @@ export const content = {
             "Pista y equipamiento de tenis",
             "Tours a pie y en bicicleta",
             "Billar con costo adicional",
-            "Campo de golf a menos de 3 km, con costo adicional",
           ],
         },
         {
@@ -376,6 +437,8 @@ export const content = {
         "Si les interesa este plan, escríbannos directamente por WhatsApp:",
       cabinsShowcase: {
         eyebrow: "Conozcan las cabañas",
+        privateVideoEyebrow: "Video privado",
+        privateVideoTitle: "Un recorrido por las cabañas",
         key: "azalea",
         title: "Azalea",
         intro:
@@ -517,12 +580,15 @@ export const content = {
         eyebrow: "Mapa de trayectos",
         title: "Llegar a Roca Azul y seguir hacia la costa",
         note:
-          "Tiempos aproximados en sábado y sujetos a tráfico. Las rutas de llegada indicadas son libres; los importes de casetas son estimaciones por trayecto.",
+          "Las duraciones indicadas son orientativas y pueden variar enormemente. Sean previsores y, mejor aún, estén en el lugar con anticipación reservando un alojamiento si pueden.",
         venue: "Roca Azul · Jocotepec",
         originsLabel: "Hacia la boda",
         destinationsLabel: "Después de la boda",
+        mapLabel: "Mapa de Roca Azul y sus alrededores",
+        directionsLabel: "Cómo llegar (rutas en Google Maps)",
         origins: [
           { place: "Centro de Guadalajara", duration: "≈ 1 h 30", detail: "Ruta libre" },
+
           { place: "Nuestra casa · Tesistán", duration: "≈ 1 h 45", detail: "Ruta libre" },
           { place: "Aeropuerto GDL", duration: "≈ 1 h", detail: "Ruta libre" },
         ],
@@ -537,55 +603,93 @@ export const content = {
             duration: "≈ 4 h 45",
             detail: "Vía Manzanillo · casetas ≈ $500 MXN",
           },
-          {
-            place: "Manzanillo",
-            duration: "≈ 4 h 30",
-            detail: "Casetas ≈ $500 MXN",
-          },
-        ],
+        {
+          place: "Manzanillo",
+          duration: "≈ 4 h 30",
+          detail: "Casetas ≈ $500 MXN",
+        },
+      ],
+      maps: {
+        venueLabel: "Cómo llegar al lugar",
+        beachLabel: "Cómo llegar a la playa",
       },
+    },
       cta: "Compartir mis datos de viaje",
+
       ctaNote: "El formulario privado ya está disponible más abajo.",
     },
     attire: {
       eyebrow: "Vestuario",
-      title: "Una celebración con raíz oaxaqueña",
+      title: "Estética mexicana y código de vestimenta",
       body:
-        "Nuestros atuendos dialogarán a través de una estética oaxaqueña coordinada. Queremos que la celebración se sienta elegante, festiva y profundamente nuestra.",
+        "Hemos elegido una estética mexicana para nuestra boda como un homenaje a la cultura, la comida, la música y el lugar que nos reúne. Queremos que todo se sienta festivo, colorido y profundamente mexicano.",
+      dressCode: {
+        title: "No hay código de vestimenta",
+        body:
+          "Queremos que se sientan ustedes mismos, sin disfraces. Si quieren ser elegantes, sean elegantes; si quieren ir relajados, vayan relajados. Lo importante es que se sientan cómodos. Tengan en cuenta que necesitarán un conjunto completo de ropa: habrá natación, baño de vapor, deportes, la ceremonia, el baile y, si la noche se alarga junto a la fogata, un suéter ligero.",
+      },
       guestNote:
-        "El código de vestimenta para invitados se confirmará más adelante.",
+        "Lo más importante es que se sientan cómodos y celebren con nosotros. Si tienen dudas, escríbanos.",
+
+    },
+    gift: {
+      eyebrow: "Regalos",
+      title: "Lo más importante es su presencia",
+      body:
+        "Su compañía es el mejor regalo que podemos recibir. Si además desean hacernos un detalle, agradecemos cualquier contribución para nuestra luna de miel o nuestros proyectos de pareja.",
+      note:
+        "No hay ninguna obligación ni expectativa — lo que realmente nos hace felices es compartir este fin de semana con ustedes.",
+      accounts: {
+        eur: {
+          title: "Transferencia en EUR (SEPA)",
+          details: [
+            "Nombre: David AILI",
+            "IBAN: BE43 9671 3798 6001",
+            "Swift/BIC: TRWIBEB1XXX",
+            "Banco: Wise, Rue du Trône 100, 3rd floor, Brussels, 1050, Belgium",
+          ],
+          note: "Solo para transferencias SEPA en EUR.",
+        },
+        mx: {
+          title: "Transferencia en MXN",
+          details: [
+            "Cuenta Clave: 012 320 01559313382 0",
+            "Banco: BBVA",
+            "Nombre: David AILI",
+          ],
+        },
+      },
+      cta: "Hablar con los novios",
     },
     coast: {
       eyebrow: "¿Y después?",
       title: "Prolongar el gusto de estar juntos",
       body:
-        "Para quienes puedan y quieran, estamos imaginando salir directamente el domingo hacia un lugar cercano, bonito, relajado y accesible de Costalegre, como Barra de Navidad o Manzanillo. Sin compromiso: primero queremos saber a quién le interesaría.",
-      ideas: [
+        "La fiesta no termina el domingo. Hemos preparado dos planes para seguir disfrutando juntos, y cada quien elige el que mejor le venga.",
+      plans: [
         {
-          title: "Juntos bajo el mismo techo",
-          body: "Buscar un hotel o varias casas y Airbnb cercanos.",
+          title: "Plan 1 · Quedarse en Roca Azul",
+          body:
+            "Rentar una cabaña dos noches más, del domingo al martes, para seguir conviviendo en el lugar. Si les interesa, indíquenlo en el RSVP y organizaremos la cabaña para su grupo.",
         },
         {
-          title: "Cada quien a su ritmo",
-          body: "Reservar por su cuenta y encontrarnos para algunos momentos.",
-        },
-        {
-          title: "Un programa muy ligero",
-          body: "Una tarde en la playa, una cena en el malecón y tiempo libre.",
+          title: "Plan 2 · La playa",
+          body:
+            "Del martes al sábado nos vamos a la costa. No es luna de miel — están todos cordialmente invitados a seguir la fiesta en Barra de Navidad. Podemos organizar transportes en común.",
         },
       ],
       note:
-        "El destino, las fechas exactas, el transporte y el presupuesto dependerán del número de personas interesadas.",
+        "Las fechas exactas, el transporte y el presupuesto dependerán del número de personas interesadas. Una noche de hotel en Barra de Navidad en esta temporada ronda los $1,200–$2,500 MXN por persona.",
       form: {
         eyebrow: "Sondeo sin compromiso",
-        title: "¿Les interesa la playa?",
+        title: "¿Se apuntan?",
         body:
-          "Cuéntennos qué formato les gustaría para diseñar una propuesta sencilla.",
+          "Cuéntennos qué plan les interesa para ir organizando la logística.",
         fields: {
           name: "Nombre",
           interest: "Nivel de interés",
           partySize: "Personas interesadas",
-          nights: "Noches posibles",
+          plan: "Plan que les interesa",
           destination: "Destino preferido",
           style: "Forma de alojarse",
           note: "Fechas, presupuesto o comentarios",
@@ -596,10 +700,13 @@ export const content = {
             { value: "maybe", label: "Tal vez, quiero más detalles" },
             { value: "no", label: "No esta vez" },
           ],
+          plan: [
+            { value: "venue", label: "Plan 1 · Quedarme en Roca Azul (dom–mar)" },
+            { value: "playa", label: "Plan 2 · La playa (mar–sáb)" },
+            { value: "both", label: "Ambos planes" },
+          ],
           destination: [
             { value: "barra", label: "Barra de Navidad" },
-            { value: "manzanillo", label: "Manzanillo" },
-            { value: "either", label: "Cualquiera de los dos" },
             { value: "other", label: "Tengo otra idea" },
           ],
           style: [
@@ -613,6 +720,7 @@ export const content = {
           "Vista previa: este sondeo se activará junto con el RSVP privado.",
       },
     },
+
     rsvp: {
       eyebrow: "RSVP",
       title: "¿Nos acompañan?",
@@ -623,13 +731,36 @@ export const content = {
         travel: "Vengo desde lejos",
         notes: "Un último detalle",
       },
+      petanque: {
+        eyebrow: "Torneo de petanca",
+        intro: "El viernes por la tarde organizaremos un torneo de petanca. ¿Se apuntan?",
+        organizerLabel: "Organiza: David",
+        organizerWhatsapp: "https://wa.me/523332017504",
+        fields: {
+          participation: "¿Participan en el torneo?",
+          partySize: "¿Cuántas personas?",
+          names: "Nombres de los participantes",
+          namesPlaceholder: "Ej. David, Aydé, Dimitar…",
+          ownBoules: "¿Traen sus propias boules?",
+        },
+        options: {
+          participation: [
+            { value: "yes", label: "Sí, queremos jugar" },
+            { value: "no", label: "No esta vez" },
+            { value: "maybe", label: "Tal vez, decidan por nosotros" },
+          ],
+          ownBoules: [
+            { value: "yes", label: "Sí, traemos" },
+            { value: "no", label: "No, necesitamos" },
+          ],
+        },
+      },
       travelNote:
         "Completen esta parte únicamente si viajan desde otra ciudad o país. Necesitamos los datos del trayecto de llegada y de regreso para coordinar los traslados.",
       fields: {
-        firstName: "Nombre",
-        lastName: "Apellidos",
-        email: "Correo electrónico (para un futuro acceso web)",
+        fullName: "Nombre completo",
         whatsapp: "WhatsApp (para las comunicaciones posteriores)",
+
         attendance: "¿Nos acompañan?",
         groupMode: "¿Responden solos o en grupo?",
         groupName: "Nombre del grupo o familia",
@@ -716,16 +847,22 @@ export const content = {
       accommodation: "Hébergement",
       travel: "Je viens de loin",
       attire: "Tenues",
+      gift: "Cadeaux",
+      photos: "Photos",
       rsvp: "Répondre",
+      dashboard: "Tableau",
     },
     countdown: {
-      prefix: "Plus que",
+      prefix: "Mariés dans",
+      years: "ans",
+      months: "mois",
       days: "jours",
       hours: "heures",
       minutes: "min",
-      seconds: "sec",
       arrived: "Aujourd’hui, on célèbre",
     },
+
+
     hero: {
       eyebrow: "Nous nous marions",
       invitation: "Nous voulons vivre ce moment avec vous",
@@ -740,10 +877,27 @@ export const content = {
       eyebrow: "Notre invitation",
       title: "Un week-end pour se retrouver",
       body:
-        "Entre le Mexique et la France, entre nos familles et nos amis, nous avons choisi de nous réunir au bord du lac de Chapala pour célébrer l’amour, l’amitié et tout ce qui nous a conduits jusqu’ici.",
+        "Entre le Mexique et la France, entre nos familles et nos amis, nous avons choisi de nous réunir à Jocotepec, au bord du lac de Chapala, pour célébrer l’amour, l’amitié et tout ce qui nous a conduits jusqu’ici.",
+
       note:
         "Nous serons immensément heureux de partager ce week-end avec vous.",
+      photosLabel: "Vues du lac de Chapala et de Jocotepec",
+      photoAlts: [
+        "Coucher de soleil sur le lac de Chapala",
+        "Vue du lac de Chapala",
+        "Église de Jocotepec",
+        "Panorama du lac de Chapala",
+      ],
+      funFacts: [
+        "Le lac de Chapala est le plus grand lac du Mexique.",
+        "Jocotepec signifie « lieu des jocotes » en nahuatl.",
+        "Nous nous sommes rencontrés entre le Mexique et la France, à des milliers de kilomètres.",
+        "Roca Azul se trouve au bord du lac, face au coucher de soleil.",
+      ],
+      anecdotesLabel: "Le lac de Chapala en 12 anecdotes",
+
     },
+
     gallery: {
       eyebrow: "Notre chemin",
       title: "Une histoire faite de voyages et de petits instants",
@@ -773,8 +927,9 @@ export const content = {
         {
           day: "Samedi 20 · rendez-vous 13 h",
           title: "Un mariage d’après-midi",
-          body: "Cérémonie civile, marimba, carnitas, cérémonie au phare, dîner et danse.",
+          body: "Apéro, marimba, carnitas, cérémonie au phare, dîner et danse.",
         },
+
         {
           day: "Dimanche 21",
           title: "Petit-déjeuner et au revoir",
@@ -785,10 +940,11 @@ export const content = {
         eyebrow: "Samedi 20 · programme",
         title: "L’après-midi, pas à pas",
         warning:
-          "Pour celles et ceux qui viennent de Guadalajara : partez très en avance. Les accès vers Jocotepec peuvent facilement être embouteillés et nous avons besoin que tout le monde soit à Roca Azul à 13 h.",
+          "Pour celles et ceux qui viennent de Guadalajara : partez très en avance. Les accès vers Jocotepec peuvent facilement être embouteillés et nous avons besoin que tout le monde soit à Roca Azul à 13 h. Encore mieux : si vous le pouvez, restez sur place et partagez le vendredi avec nous. Il y a de nombreuses offres d’hébergement, à tous les prix et toutes les gammes, autour du lac de Chapala.",
         items: [
           { time: "13 h", title: "Arrivée des invités", body: "Accueil et temps pour s’installer." },
-          { time: "14 h", title: "Cérémonie civile", body: "Le premier oui de la journée." },
+          { time: "14 h", title: "Apéro", body: "Le premier toast de la journée." },
+
           { time: "À la suite", title: "Marimba", body: "Musique live pour trinquer et se retrouver." },
           { time: "Puis", title: "Déjeuner de carnitas", body: "Un repas mexicain avant la cérémonie au phare." },
           { time: "18 h", title: "Cérémonie au phare", body: "Le grand moment de l’après-midi." },
@@ -904,10 +1060,11 @@ export const content = {
         "La musique accompagnera chaque changement d’énergie du samedi, de la fin de la cérémonie jusqu’à la piste de danse.",
       acts: [
         {
-          moment: "Après la cérémonie civile",
+          moment: "Après l’apéro",
           name: "Marimba",
           note: "Pour accompagner le premier verre avant les carnitas.",
         },
+
         {
           moment: "Après la cérémonie au phare",
           name: "Mariachi",
@@ -934,7 +1091,7 @@ export const content = {
         eyebrow: "À écouter dès maintenant",
         title: "La bande-son commence ici",
         body:
-          "Deux playlists pour se mettre dans l’ambiance, découvrir des chansons et préparer vos plus belles interprétations.",
+          "Trois playlists pour se mettre dans l’ambiance, découvrir des chansons et préparer vos plus belles interprétations.",
         general: {
           title: "Ambiance du mariage",
           body: "La sélection générale pour voyager, trinquer, se retrouver et danser.",
@@ -942,6 +1099,10 @@ export const content = {
         karaoke: {
           title: "Karaoké",
           body: "Les chansons candidates pour prendre le micro et chanter ensemble.",
+        },
+        shared: {
+          title: "Playlist collaborative",
+          body: "Une liste ouverte pour que chacun ajoute ses chansons préférées.",
         },
         button: "Ouvrir dans Spotify",
       },
@@ -955,7 +1116,31 @@ export const content = {
         artist: "Artiste ou version",
         sing: "Souhaitez-vous la chanter ?",
         extra: "Une autre idée pour la fête",
+        genres: "Quels genres ne peuvent pas manquer ?",
       },
+      genres: [
+        "Cumbia",
+        "Salsa",
+        "Bachata",
+        "Reggaeton",
+        "Norteño",
+        "Banda",
+        "Mariachi",
+        "Ranchera",
+        "Pop",
+        "Rock",
+        "Électro",
+        "Hip-hop",
+        "Jazz",
+        "Soul / Funk",
+        "Disco",
+        "Musique française",
+        "Années 80",
+        "Années 90",
+        "Ballades",
+        "Karaoké",
+      ],
+
       options: {
         dessert: [
           { value: "jericalla", label: "Jericalla" },
@@ -973,21 +1158,16 @@ export const content = {
       previewNote:
         "Vos chansons, votes et idées seront enregistrés de façon privée.",
     },
-    venue: {
-      eyebrow: "Le lieu",
-      title: "Roca Azul",
-      body:
-        "Nous nous retrouverons à Jocotepec, au bord du lac de Chapala. L’hébergement du week-end sera organisé dans les cabanes du lieu.",
-      location: "Jocotepec, Jalisco, Mexique",
-      map: "Ouvrir dans Google Maps",
-      visualTitle: "Lac de Chapala",
-      visualBody: "Jardins, eau et couchers de soleil du Jalisco",
-    },
     facilities: {
-      eyebrow: "Le samedi à votre rythme",
+      eyebrow: "Le lieu",
       title: "Tout le club à votre disposition",
       body:
         "Entre deux moments, chacun pourra retrouver ses voisins, profiter des installations ou simplement se reposer dans son hébergement.",
+      videoTitle: "Vidéo de présentation de Roca Azul",
+      privacyTitle: "Intimité",
+      privacyBody:
+        "Toutes les cabanes seront louées par les invités du mariage, environ 80 à 90 personnes. En outre, d’autres invités du mariage seront logés non loin, peut-être à proximité, ou viendront seulement pour la journée : environ 60 personnes selon les estimations actuelles. Le club ne sera toutefois pas entièrement privé ce week-end : certains espaces accueillent encore des tentes ou des caravanes. Nous partagerons les lieux et respecterons le calme. La musique pourra jouer jusqu’à 2 h du matin, puis nous continuerons dans les cabanes.",
+
       gallery: [
         { key: "cabins", title: "Cabanes", alt: "Cabanes et chambres de Roca Azul" },
         { key: "pool", title: "Piscines", alt: "Piscine et jardins du Club Roca Azul" },
@@ -995,6 +1175,15 @@ export const content = {
         { key: "gardens", title: "Jardins", alt: "Espaces verts du Club Roca Azul" },
       ],
       gallerySource: "Photos du lieu : Club Roca Azul",
+      rocaGalleryLabel: "Galerie de photos du Club Roca Azul",
+      rocaGalleryAlts: [
+        "Vue du Club Roca Azul",
+        "Jardins du Club Roca Azul",
+        "Piscine du Club Roca Azul",
+        "Cabanes du Club Roca Azul",
+        "Lac de Chapala depuis Roca Azul",
+        "Coucher de soleil à Roca Azul",
+      ],
       groups: [
         {
           title: "Eau et bien-être",
@@ -1011,7 +1200,6 @@ export const content = {
             "Court et équipement de tennis",
             "Promenades à pied et à vélo",
             "Billard avec supplément",
-            "Golf à moins de 3 km, avec supplément",
           ],
         },
         {
@@ -1053,6 +1241,8 @@ export const content = {
         "Si cette formule vous intéresse, écrivez-nous directement sur WhatsApp :",
       cabinsShowcase: {
         eyebrow: "Découvrez les cabanes",
+        privateVideoEyebrow: "Vidéo privée",
+        privateVideoTitle: "Une visite des cabanes",
         key: "azalea",
         title: "Azalea",
         intro:
@@ -1194,12 +1384,15 @@ export const content = {
         eyebrow: "Schéma des trajets",
         title: "Rejoindre Roca Azul, puis continuer vers la côte",
         note:
-          "Durées approximatives un samedi et variables selon la circulation. Les itinéraires d’arrivée indiqués sont gratuits ; les montants de péage sont estimés par trajet.",
+          "Les durées indiquées sont indicatives et peuvent varier énormément. Soyez prévoyants et, encore mieux, soyez sur place en avance en réservant un logement si vous pouvez.",
         venue: "Roca Azul · Jocotepec",
         originsLabel: "Vers le mariage",
         destinationsLabel: "Après le mariage",
+        mapLabel: "Carte de Roca Azul et de ses environs",
+        directionsLabel: "Itinéraires (routes sur Google Maps)",
         origins: [
           { place: "Centre de Guadalajara", duration: "≈ 1 h 30", detail: "Route gratuite" },
+
           { place: "Notre maison · Tesistán", duration: "≈ 1 h 45", detail: "Route gratuite" },
           { place: "Aéroport GDL", duration: "≈ 1 h", detail: "Route gratuite" },
         ],
@@ -1220,49 +1413,88 @@ export const content = {
             detail: "Péages ≈ 500 MXN",
           },
         ],
+        maps: {
+          venueLabel: "Comment rejoindre le lieu",
+          beachLabel: "Comment rejoindre la plage",
+        },
       },
       cta: "Partager mes informations de voyage",
+
       ctaNote: "Le formulaire privé est maintenant disponible plus bas.",
     },
     attire: {
       eyebrow: "Tenues",
-      title: "Une célébration aux racines oaxaqueñas",
+      title: "Esthétique mexicaine et code vestimentaire",
       body:
-        "Nos tenues dialogueront à travers une esthétique oaxaqueña coordonnée. Nous souhaitons une célébration élégante, festive et profondément personnelle.",
+        "Nous avons choisi une esthétique mexicaine pour notre mariage en hommage à la culture, la cuisine, la musique et le lieu qui nous réunit. Nous voulons que tout soit festif, coloré et profondément mexicain.",
+      dressCode: {
+        title: "Pas de code vestimentaire",
+        body:
+          "Nous voulons que vous soyez vous-mêmes, sans déguisement. Si vous voulez être élégants, soyez élégants ; si vous préférez être décontractés, soyez décontractés. L’important est que vous vous sentiez à l’aise. Prévoyez une tenue complète : il y aura de la natation, un bain de vapeur, du sport, la cérémonie, la danse et, si la soirée se prolonge autour du feu, un pull léger.",
+      },
       guestNote:
-        "Le code vestimentaire des invités sera confirmé ultérieurement.",
+        "Le plus important est que vous soyez à l'aise et que vous célébriez avec nous. Si vous avez des questions, écrivez-nous.",
+
+    },
+    gift: {
+      eyebrow: "Cadeaux",
+      title: "Le plus beau cadeau, c'est votre présence",
+
+      body:
+        "Votre présence est le plus beau cadeau que nous puissions recevoir. Si vous souhaitez tout de même nous faire un geste, nous serons touchés par toute contribution pour notre lune de miel ou nos projets de couple.",
+      note:
+        "Il n'y a aucune obligation ni attente — ce qui nous rend vraiment heureux, c'est de partager ce week-end avec vous.",
+      accounts: {
+        eur: {
+          title: "Virement en EUR (SEPA)",
+          details: [
+            "Nom : David AILI",
+            "IBAN : BE43 9671 3798 6001",
+            "Swift/BIC : TRWIBEB1XXX",
+            "Banque : Wise, Rue du Trône 100, 3rd floor, Brussels, 1050, Belgium",
+          ],
+          note: "Uniquement pour les virements SEPA en EUR.",
+        },
+        mx: {
+          title: "Virement en MXN",
+          details: [
+            "Cuenta Clave : 012 320 01559313382 0",
+            "Banque : BBVA",
+            "Nom : David AILI",
+          ],
+        },
+      },
+      cta: "Parler aux mariés",
     },
     coast: {
       eyebrow: "Et après ?",
       title: "Prolonger le plaisir d’être ensemble",
       body:
-        "Pour celles et ceux qui le peuvent et le souhaitent, nous imaginons partir directement le dimanche vers un endroit proche, joli, détendu et accessible de la Costalegre, comme Barra de Navidad ou Manzanillo. Sans engagement : nous voulons d’abord connaître les personnes intéressées.",
-      ideas: [
+        "La fête ne s’arrête pas dimanche. Nous avons préparé deux plans pour continuer à profiter ensemble, et chacun choisit celui qui lui convient le mieux.",
+      plans: [
         {
-          title: "Ensemble sous le même toit",
-          body: "Chercher un hôtel ou plusieurs maisons et Airbnb proches.",
+          title: "Plan 1 · Rester à Roca Azul",
+          body:
+            "Louer une cabane deux nuits de plus, du dimanche au mardi, pour continuer à se retrouver sur place. Si cela vous intéresse, indiquez-le dans le RSVP et nous organiserons la cabane pour votre groupe.",
         },
         {
-          title: "Chacun à son rythme",
-          body: "Réserver de son côté et se retrouver pour certains moments.",
-        },
-        {
-          title: "Un programme très léger",
-          body: "Un après-midi à la plage, un dîner sur le malecón et du temps libre.",
+          title: "Plan 2 · La plage",
+          body:
+            "Du mardi au samedi, nous partons sur la côte. Ce n’est pas une lune de miel — vous êtes tous cordialement invités à continuer la fête à Barra de Navidad. Nous pouvons organiser des transports en commun.",
         },
       ],
       note:
-        "La destination, les dates exactes, le transport et le budget dépendront du nombre de personnes intéressées.",
+        "Les dates exactes, le transport et le budget dépendront du nombre de personnes intéressées. Une nuit d’hôtel à Barra de Navidad à cette saison coûte environ 1 200–2 500 MXN par personne.",
       form: {
         eyebrow: "Sondage sans engagement",
-        title: "La plage vous tente ?",
+        title: "Vous vous inscrivez ?",
         body:
-          "Dites-nous quelle formule vous plairait pour construire une proposition simple.",
+          "Dites-nous quel plan vous intéresse pour qu’on commence à organiser la logistique.",
         fields: {
           name: "Nom",
           interest: "Niveau d’intérêt",
           partySize: "Personnes intéressées",
-          nights: "Nuits possibles",
+          plan: "Plan qui vous intéresse",
           destination: "Destination préférée",
           style: "Formule d’hébergement",
           note: "Dates, budget ou commentaires",
@@ -1273,10 +1505,13 @@ export const content = {
             { value: "maybe", label: "Peut-être, j’aimerais plus de détails" },
             { value: "no", label: "Pas cette fois" },
           ],
+          plan: [
+            { value: "venue", label: "Plan 1 · Rester à Roca Azul (dim–mar)" },
+            { value: "playa", label: "Plan 2 · La plage (mar–sam)" },
+            { value: "both", label: "Les deux plans" },
+          ],
           destination: [
             { value: "barra", label: "Barra de Navidad" },
-            { value: "manzanillo", label: "Manzanillo" },
-            { value: "either", label: "L’un ou l’autre" },
             { value: "other", label: "J’ai une autre idée" },
           ],
           style: [
@@ -1290,6 +1525,7 @@ export const content = {
           "Aperçu : ce sondage sera activé avec le RSVP privé.",
       },
     },
+
     rsvp: {
       eyebrow: "RSVP",
       title: "Serez-vous avec nous ?",
@@ -1300,13 +1536,36 @@ export const content = {
         travel: "Je viens de loin",
         notes: "Un dernier détail",
       },
+      petanque: {
+        eyebrow: "Tournoi de pétanque",
+        intro: "Le vendredi après-midi, nous organiserons un tournoi de pétanque. Vous participez ?",
+        organizerLabel: "Organise : David",
+        organizerWhatsapp: "https://wa.me/523332017504",
+        fields: {
+          participation: "Participez-vous au tournoi ?",
+          partySize: "Combien de personnes ?",
+          names: "Noms des participants",
+          namesPlaceholder: "Ex. David, Aydé, Dimitar…",
+          ownBoules: "Apportez-vous vos propres boules ?",
+        },
+        options: {
+          participation: [
+            { value: "yes", label: "Oui, nous voulons jouer" },
+            { value: "no", label: "Pas cette fois" },
+            { value: "maybe", label: "Peut-être, décidez pour nous" },
+          ],
+          ownBoules: [
+            { value: "yes", label: "Oui, nous apportons" },
+            { value: "no", label: "Non, nous avons besoin" },
+          ],
+        },
+      },
       travelNote:
         "Remplissez cette partie uniquement si vous venez d’une autre ville ou d’un autre pays. Nous avons besoin des trajets aller et retour pour organiser les transferts.",
       fields: {
-        firstName: "Prénom",
-        lastName: "Nom de famille",
-        email: "E-mail (pour un futur accès au site)",
+        fullName: "Nom complet",
         whatsapp: "WhatsApp (pour les communications à venir)",
+
         attendance: "Serez-vous avec nous ?",
         groupMode: "Répondez-vous seul·e ou en groupe ?",
         groupName: "Nom du groupe ou de la famille",
@@ -1393,16 +1652,22 @@ export const content = {
       accommodation: "Accommodation",
       travel: "Coming from afar",
       attire: "Attire",
+      gift: "Gifts",
+      photos: "Photos",
       rsvp: "RSVP",
+      dashboard: "Dashboard",
     },
     countdown: {
-      prefix: "Only",
+      prefix: "Married in",
+      years: "years",
+      months: "months",
       days: "days",
       hours: "hours",
       minutes: "min",
-      seconds: "sec",
       arrived: "Today we celebrate",
     },
+
+
     hero: {
       eyebrow: "We are getting married",
       invitation: "We want to celebrate this moment with you",
@@ -1419,7 +1684,23 @@ export const content = {
       body:
         "Between Mexico and France, surrounded by our families and friends, we chose the shores of Lake Chapala to celebrate love, friendship, and everything that brought us here.",
       note: "It will make us immensely happy to share this weekend with you.",
+      photosLabel: "Views of Lake Chapala and Jocotepec",
+      photoAlts: [
+        "Sunset over Lake Chapala",
+        "View of Lake Chapala",
+        "Jocotepec church",
+        "Panorama of Lake Chapala",
+      ],
+      funFacts: [
+        "Lake Chapala is the largest lake in Mexico.",
+        "Jocotepec means “place of jocotes” in Nahuatl.",
+        "We met between Mexico and France, thousands of kilometres apart.",
+        "Roca Azul sits on the lake shore, facing the sunset.",
+      ],
+      anecdotesLabel: "Lake Chapala in 12 anecdotes",
+
     },
+
     gallery: {
       eyebrow: "Our journey",
       title: "A story made of travels and little moments",
@@ -1449,8 +1730,9 @@ export const content = {
         {
           day: "Saturday 20 · arrive at 1 pm",
           title: "An afternoon wedding",
-          body: "Civil ceremony, marimba, carnitas, lighthouse ceremony, dinner, and dancing.",
+          body: "Aperitif, marimba, carnitas, lighthouse ceremony, dinner, and dancing.",
         },
+
         {
           day: "Sunday 21",
           title: "Breakfast and farewell",
@@ -1461,10 +1743,11 @@ export const content = {
         eyebrow: "Saturday 20 · programme",
         title: "The afternoon, step by step",
         warning:
-          "If you are travelling from Guadalajara, please leave plenty of time. The roads into Jocotepec can become congested very easily, and everyone needs to be at Roca Azul by 1 pm.",
+          "If you are travelling from Guadalajara, please leave plenty of time. The roads into Jocotepec can become congested very easily, and everyone needs to be at Roca Azul by 1 pm. Even better: if you can, stay on site and share Friday with us. There are plenty of accommodation options, at every price and in every range, around Lake Chapala.",
         items: [
           { time: "1 pm", title: "Guest arrival", body: "Welcome and time to settle in." },
-          { time: "2 pm", title: "Civil ceremony", body: "The first “I do” of the day." },
+          { time: "2 pm", title: "Aperitif", body: "The first toast of the day." },
+
           { time: "Afterwards", title: "Marimba", body: "Live music for drinks and time together." },
           { time: "Then", title: "Carnitas lunch", body: "A Mexican meal before the lighthouse ceremony." },
           { time: "6 pm", title: "Lighthouse ceremony", body: "The defining moment of the afternoon." },
@@ -1580,10 +1863,11 @@ export const content = {
         "Music will accompany every shift in energy on Saturday, from the end of the ceremony to the dance floor.",
       acts: [
         {
-          moment: "After the civil ceremony",
+          moment: "After the aperitif",
           name: "Marimba",
           note: "For the first toast before the carnitas.",
         },
+
         {
           moment: "After the lighthouse ceremony",
           name: "Mariachi",
@@ -1610,7 +1894,7 @@ export const content = {
         eyebrow: "Listen from now",
         title: "The soundtrack starts here",
         body:
-          "Two playlists to set the mood, discover songs, and prepare your greatest performances.",
+          "Three playlists to set the mood, discover songs, and prepare your greatest performances.",
         general: {
           title: "Wedding atmosphere",
           body: "The general selection for travelling, toasting, connecting, and dancing.",
@@ -1618,6 +1902,10 @@ export const content = {
         karaoke: {
           title: "Karaoke",
           body: "Candidate songs for taking the microphone and singing together.",
+        },
+        shared: {
+          title: "Collaborative playlist",
+          body: "An open list for everyone to add their favourite songs.",
         },
         button: "Open in Spotify",
       },
@@ -1631,7 +1919,31 @@ export const content = {
         artist: "Artist or version",
         sing: "Would you like to sing it?",
         extra: "Another idea for the celebration",
+        genres: "Which genres are a must?",
       },
+      genres: [
+        "Cumbia",
+        "Salsa",
+        "Bachata",
+        "Reggaeton",
+        "Norteño",
+        "Banda",
+        "Mariachi",
+        "Ranchera",
+        "Pop",
+        "Rock",
+        "Electronic",
+        "Hip-hop",
+        "Jazz",
+        "Soul / Funk",
+        "Disco",
+        "French music",
+        "80s music",
+        "90s music",
+        "Ballads",
+        "Karaoke",
+      ],
+
       options: {
         dessert: [
           { value: "jericalla", label: "Jericalla" },
@@ -1649,21 +1961,16 @@ export const content = {
       previewNote:
         "Your songs, votes, and ideas will be saved privately.",
     },
-    venue: {
-      eyebrow: "The venue",
-      title: "Roca Azul",
-      body:
-        "We will meet in Jocotepec, on the shores of Lake Chapala. Weekend accommodation will be arranged in the venue’s cabins.",
-      location: "Jocotepec, Jalisco, Mexico",
-      map: "Open in Google Maps",
-      visualTitle: "Lake Chapala",
-      visualBody: "Gardens, water, and Jalisco sunsets",
-    },
     facilities: {
-      eyebrow: "Saturday at your own pace",
+      eyebrow: "The venue",
       title: "The whole club to enjoy",
       body:
         "Between shared moments, everyone can spend time with their neighbours, explore the facilities, or simply rest in their accommodation.",
+      videoTitle: "Roca Azul presentation video",
+      privacyTitle: "Privacy",
+      privacyBody:
+        "All the cabins will be rented by guests of the wedding, around 80 to 90 people. In addition, other wedding guests will be staying nearby, perhaps not far away, or will come only for the day: around 60 people according to current estimates. Even so, the club will not be entirely private that weekend: some areas still host tents or trailers. We will share the space and respect the quiet. Music can play until 2 am, after which we will continue in the cabins.",
+
       gallery: [
         { key: "cabins", title: "Cabins", alt: "Cabins and guest rooms at Roca Azul" },
         { key: "pool", title: "Pools", alt: "Pool and gardens at Club Roca Azul" },
@@ -1671,6 +1978,15 @@ export const content = {
         { key: "gardens", title: "Gardens", alt: "Green spaces at Club Roca Azul" },
       ],
       gallerySource: "Venue photographs: Club Roca Azul",
+      rocaGalleryLabel: "Club Roca Azul photo gallery",
+      rocaGalleryAlts: [
+        "View of Club Roca Azul",
+        "Gardens at Club Roca Azul",
+        "Pool at Club Roca Azul",
+        "Cabins at Club Roca Azul",
+        "Lake Chapala from Roca Azul",
+        "Sunset at Roca Azul",
+      ],
       groups: [
         {
           title: "Water and wellness",
@@ -1687,7 +2003,6 @@ export const content = {
             "Tennis court and equipment",
             "Walking and cycling tours",
             "Billiards at an additional cost",
-            "Golf less than 3 km away, at an additional cost",
           ],
         },
         {
@@ -1729,6 +2044,8 @@ export const content = {
         "If you are interested in this plan, contact us directly on WhatsApp:",
       cabinsShowcase: {
         eyebrow: "Explore the cabins",
+        privateVideoEyebrow: "Private video",
+        privateVideoTitle: "A tour of the cabins",
         key: "azalea",
         title: "Azalea",
         intro:
@@ -1870,12 +2187,15 @@ export const content = {
         eyebrow: "Journey map",
         title: "Getting to Roca Azul, then travelling on to the coast",
         note:
-          "Approximate Saturday driving times, subject to traffic. The listed arrival routes are toll-free; toll amounts are estimates per journey.",
+          "The times shown are indicative and can vary enormously. Please plan ahead and, even better, arrive early by booking accommodation if you can.",
         venue: "Roca Azul · Jocotepec",
         originsLabel: "To the wedding",
         destinationsLabel: "After the wedding",
+        mapLabel: "Map of Roca Azul and its surroundings",
+        directionsLabel: "Getting there (routes on Google Maps)",
         origins: [
           { place: "Central Guadalajara", duration: "≈ 1 hr 30", detail: "Toll-free route" },
+
           { place: "Our home · Tesistán", duration: "≈ 1 hr 45", detail: "Toll-free route" },
           { place: "GDL Airport", duration: "≈ 1 hr", detail: "Toll-free route" },
         ],
@@ -1896,48 +2216,87 @@ export const content = {
             detail: "Tolls ≈ MXN 500",
           },
         ],
+        maps: {
+          venueLabel: "Getting to the venue",
+          beachLabel: "Getting to the beach",
+        },
       },
       cta: "Share my travel details",
+
       ctaNote: "The private form is now available below.",
     },
     attire: {
       eyebrow: "Attire",
-      title: "A celebration with Oaxacan roots",
+      title: "Mexican aesthetic and dress code",
       body:
-        "Our outfits will speak to one another through a coordinated Oaxacan aesthetic. We want the celebration to feel elegant, festive, and deeply personal.",
-      guestNote: "The guest dress code will be confirmed later.",
+        "We have chosen a Mexican aesthetic for our wedding as a tribute to the culture, the food, the music, and the place that brings us together. We want everything to feel festive, colorful, and deeply Mexican.",
+      dressCode: {
+        title: "No dress code",
+        body:
+          "We want you to be yourselves, not dressed up. If you want to be elegant, be elegant; if you prefer to be relaxed, be relaxed. What matters is that you feel comfortable. Do bring a full set of clothes: there will be swimming, a steam bath, sports, the ceremony, dancing, and, if the night runs long around the fire, a light sweater.",
+      },
+      guestNote:
+        "The most important thing is that you feel comfortable and celebrate with us. If you have any questions, write to us.",
+
+    },
+    gift: {
+      eyebrow: "Gifts",
+      title: "Your presence is the greatest gift",
+      body:
+        "Your company is the best present we could receive. If you would also like to give a token of affection, we would be grateful for any contribution towards our honeymoon or our shared projects as a couple.",
+      note:
+        "There is absolutely no obligation or expectation — what truly makes us happy is sharing this weekend with you.",
+      accounts: {
+        eur: {
+          title: "Transfer in EUR (SEPA)",
+          details: [
+            "Name: David AILI",
+            "IBAN: BE43 9671 3798 6001",
+            "Swift/BIC: TRWIBEB1XXX",
+            "Bank: Wise, Rue du Trône 100, 3rd floor, Brussels, 1050, Belgium",
+          ],
+          note: "For SEPA transfers in EUR only.",
+        },
+        mx: {
+          title: "Transfer in MXN",
+          details: [
+            "Cuenta Clave: 012 320 01559313382 0",
+            "Bank: BBVA",
+            "Name: David AILI",
+          ],
+        },
+      },
+      cta: "Talk to the couple",
     },
     coast: {
       eyebrow: "And afterwards?",
       title: "Keep enjoying being together",
       body:
-        "For those who can and would like to, we are imagining leaving directly on Sunday for somewhere nearby, beautiful, relaxed, and affordable on Costalegre, such as Barra de Navidad or Manzanillo. There is no commitment—we first want to know who might be interested.",
-      ideas: [
+        "The party doesn’t end on Sunday. We have prepared two plans to keep enjoying time together, and everyone chooses whichever suits them best.",
+      plans: [
         {
-          title: "Together under one roof",
-          body: "Find one hotel or several nearby houses and Airbnbs.",
+          title: "Plan 1 · Stay at Roca Azul",
+          body:
+            "Rent a cabin for two more nights, from Sunday to Tuesday, to keep spending time together at the venue. If you are interested, let us know in the RSVP and we will arrange a cabin for your group.",
         },
         {
-          title: "Everyone at their own pace",
-          body: "Book independently and meet for a few shared moments.",
-        },
-        {
-          title: "A very light programme",
-          body: "An afternoon at the beach, dinner on the malecón, and free time.",
+          title: "Plan 2 · The beach",
+          body:
+            "From Tuesday to Saturday we head to the coast. It’s not a honeymoon — everyone is cordially invited to keep the party going in Barra de Navidad. We can organise shared transport.",
         },
       ],
       note:
-        "The destination, exact dates, transport, and budget will depend on the number of interested guests.",
+        "The exact dates, transport, and budget will depend on the number of interested guests. A hotel night in Barra de Navidad during this season is around MXN 1,200–2,500 per person.",
       form: {
         eyebrow: "No-obligation survey",
-        title: "Would you like to join us at the beach?",
+        title: "Are you in?",
         body:
-          "Tell us what format would suit you so we can design a simple proposal.",
+          "Tell us which plan interests you so we can start organising the logistics.",
         fields: {
           name: "Name",
           interest: "Interest level",
           partySize: "Interested guests",
-          nights: "Possible nights",
+          plan: "Plan you are interested in",
           destination: "Preferred destination",
           style: "Accommodation style",
           note: "Dates, budget, or comments",
@@ -1948,10 +2307,13 @@ export const content = {
             { value: "maybe", label: "Maybe—I’d like more details" },
             { value: "no", label: "Not this time" },
           ],
+          plan: [
+            { value: "venue", label: "Plan 1 · Stay at Roca Azul (Sun–Tue)" },
+            { value: "playa", label: "Plan 2 · The beach (Tue–Sat)" },
+            { value: "both", label: "Both plans" },
+          ],
           destination: [
             { value: "barra", label: "Barra de Navidad" },
-            { value: "manzanillo", label: "Manzanillo" },
-            { value: "either", label: "Either one" },
             { value: "other", label: "I have another idea" },
           ],
           style: [
@@ -1965,6 +2327,7 @@ export const content = {
           "Preview: this survey will open with the private RSVP.",
       },
     },
+
     rsvp: {
       eyebrow: "RSVP",
       title: "Will you join us?",
@@ -1975,13 +2338,36 @@ export const content = {
         travel: "Coming from afar",
         notes: "One last detail",
       },
+      petanque: {
+        eyebrow: "Pétanque tournament",
+        intro: "On Friday afternoon we will organise a pétanque tournament. Would you like to join?",
+        organizerLabel: "Organised by: David",
+        organizerWhatsapp: "https://wa.me/523332017504",
+        fields: {
+          participation: "Will you participate in the tournament?",
+          partySize: "How many people?",
+          names: "Names of participants",
+          namesPlaceholder: "E.g. David, Aydé, Dimitar…",
+          ownBoules: "Will you bring your own boules?",
+        },
+        options: {
+          participation: [
+            { value: "yes", label: "Yes, we want to play" },
+            { value: "no", label: "Not this time" },
+            { value: "maybe", label: "Maybe—decide for us" },
+          ],
+          ownBoules: [
+            { value: "yes", label: "Yes, we bring our own" },
+            { value: "no", label: "No, we need some" },
+          ],
+        },
+      },
       travelNote:
         "Complete this part only if you are travelling from another city or country. We need both arrival and return details to coordinate transfers.",
       fields: {
-        firstName: "First name",
-        lastName: "Last name",
-        email: "Email (for future website access)",
+        fullName: "Full name",
         whatsapp: "WhatsApp (for further communication)",
+
         attendance: "Will you join us?",
         groupMode: "Are you replying alone or as a group?",
         groupName: "Group or family name",

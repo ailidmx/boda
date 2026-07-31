@@ -12,48 +12,118 @@ import {
   SUPPORTED_LANGUAGES,
 } from "./content.js";
 import { auth, db } from "./firebase.js";
+import {
+  getCustomContent,
+  getGroupTag,
+  invitationProfileText,
+  loadGroupCustomContent,
+  parseInvitationProfile,
+} from "./invitation-profile.js";
+
+
+import {
+  AUTH_EMAIL_DOMAIN,
+  getGuest,
+  getGuestByEmail,
+  getGuestByUsername,
+  getGuestsByUnit,
+  loadDeletedGuestIds,
+  SHARED_PASSWORD,
+} from "./guests.js";
+
+import { getRoom } from "./rooms.js";
+
+
+
 import { MEDIA } from "./media.js";
+import {
+  CHAPALA_HIGHLIGHTS,
+  ROCA_AZUL_GALLERY,
+  wixUrl,
+} from "./rocaAzulGallery.js";
+import { chapalaAnecdotes } from "./chapalaAnecdotes.js";
+
 
 const LANGUAGE_STORAGE_KEY = "boda-language";
-const GUEST_EMAIL = "invitados@boda-500805.firebaseapp.com";
-const GUEST_UID = "yfu7MMCmFaPCK7UW4czr5c3x7Aa2";
+const INVITATION_PROFILE_STORAGE_KEY = "boda-invitation-profile-v1";
+// The guest username is kept in localStorage so guests don't have to re-enter
+// it on every visit. This is the only persistence available to a static PWA;
+// it is cleared automatically if the account ever stops working.
+const USERNAME_STORAGE_KEY = "boda-username";
+
+
 const app = document.querySelector("#app");
+const isDashboardRoute =
+  window.location.pathname.replace(/\/+$/, "") === "/dashboard" ||
+  new URLSearchParams(window.location.search).has("dashboard");
 let currentLanguage = "es";
 let heroSlideInterval = null;
+let currentInvitationProfile = getStoredInvitationProfile();
+
 
 const interfaceText = {
   es: {
     gateEyebrow: "Invitación privada",
-    gateTitle: "David & Aydé",
-    gateBody: "Escribe la clave que compartimos contigo para abrir la invitación.",
-    gateLabel: "Clave de acceso",
+    gateBody:
+      "Escribe tu usuario y la contraseña que compartimos contigo para abrir la invitación.",
+    gateUsernameLabel: "Usuario",
+    gateUsernamePlaceholder: "Tu usuario",
+    gateLabel: "Contraseña",
     gateButton: "Entrar",
     gateWorking: "Abriendo…",
-    gateError: "La clave no es correcta. Inténtalo de nuevo.",
+    gateError:
+      "El usuario o la contraseña no son correctos. Revisa que los hayas escrito bien o pide que te los reenviemos.",
+    gateNoProfile:
+      "No encontramos un invitado con este usuario. Revisa que lo hayas escrito bien o escríbenos para ayudarte.",
+
+
+
+    gateLost: "¿Perdiste tu usuario o contraseña? Escríbenos y te los reenviaremos.",
+
     submitWorking: "Enviando…",
     submitSuccess: "¡Gracias! Recibimos tu respuesta.",
     submitError: "No pudimos enviar la respuesta. Revisa tu conexión e inténtalo de nuevo.",
   },
   fr: {
     gateEyebrow: "Invitation privée",
-    gateTitle: "David & Aydé",
-    gateBody: "Saisissez la clé que nous vous avons envoyée pour ouvrir l’invitation.",
-    gateLabel: "Clé d’accès",
+    gateBody:
+      "Saisissez votre identifiant et le mot de passe que nous vous avons envoyés pour ouvrir l’invitation.",
+    gateUsernameLabel: "Identifiant",
+    gateUsernamePlaceholder: "Votre identifiant",
+    gateLabel: "Mot de passe",
     gateButton: "Entrer",
     gateWorking: "Ouverture…",
-    gateError: "La clé n’est pas correcte. Veuillez réessayer.",
+    gateError:
+      "L’identifiant ou le mot de passe n’est pas correct. Vérifiez-les ou demandez-nous de vous les renvoyer.",
+    gateNoProfile:
+      "Aucun invité ne correspond à cet identifiant. Vérifiez-le ou écrivez-nous pour obtenir de l’aide.",
+
+
+
+    gateLost: "Identifiant ou mot de passe perdu ? Écrivez-nous et nous vous les renverrons.",
+
     submitWorking: "Envoi…",
     submitSuccess: "Merci ! Nous avons bien reçu votre réponse.",
     submitError: "L’envoi a échoué. Vérifiez votre connexion et réessayez.",
   },
   en: {
     gateEyebrow: "Private invitation",
-    gateTitle: "David & Aydé",
-    gateBody: "Enter the access key we shared with you to open the invitation.",
-    gateLabel: "Access key",
+    gateBody:
+      "Enter your username and the password we shared with you to open the invitation.",
+    gateUsernameLabel: "Username",
+    gateUsernamePlaceholder: "Your username",
+    gateLabel: "Password",
     gateButton: "Enter",
     gateWorking: "Opening…",
-    gateError: "That key is not correct. Please try again.",
+    gateError:
+      "The username or password is not correct. Check them or ask us to resend them.",
+    gateNoProfile:
+      "We could not find a guest with this username. Check it or message us for help.",
+
+
+    gateLost: "Lost your username or password? Message us and we'll resend them.",
+
+
     submitWorking: "Sending…",
     submitSuccess: "Thank you! We received your response.",
     submitError: "We could not send your response. Check your connection and try again.",
@@ -87,11 +157,14 @@ function getInitialLanguage() {
 
 function countdownMarkup(labels) {
   const units = [
+    ["years", labels.years],
+    ["months", labels.months],
     ["days", labels.days],
     ["hours", labels.hours],
     ["minutes", labels.minutes],
-    ["seconds", labels.seconds],
   ];
+
+
 
   return units
     .map(
@@ -104,6 +177,117 @@ function countdownMarkup(labels) {
     )
     .join("");
 }
+
+function getStoredInvitationProfile() {
+  try {
+    return parseInvitationProfile(
+      window.localStorage.getItem(INVITATION_PROFILE_STORAGE_KEY),
+    );
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Build a profile object (compatible with parseInvitationProfile) from a
+ * guest record. The guest is the source of truth for identity after login.
+ */
+function buildProfileFromGuest(guest) {
+  if (!guest) return null;
+  const room = guest.room ? getRoom(guest.room) : null;
+  return {
+    code: guest.id,
+    hasCabin: guest.hasCabin,
+    unit: guest.unit,
+    occupancy: guest.occupancy,
+    payment: guest.payment,
+    room: guest.room,
+    roomDescription: room?.description || null,
+    guest,
+  };
+}
+
+/**
+ * Resolve the signed-in guest and activate their invitation profile.
+ *
+ * The canonical link between a Firebase Auth account and a guest is the auth
+ * email (guest.firebaseEmail). We match by email first; the username stored
+ * in localStorage is only a fallback for older sessions. Returns true when a
+ * valid identity was found.
+ *
+ * @param {string} [email] - the signed-in user's email
+ */
+function activateGuestProfile(email) {
+  let guest = email ? getGuestByEmail(email) : null;
+  if (!guest) {
+    const username = window.localStorage.getItem(USERNAME_STORAGE_KEY);
+    guest = username ? getGuestByUsername(username) : null;
+  }
+  if (!guest) return false;
+  currentInvitationProfile = buildProfileFromGuest(guest);
+  window.localStorage.setItem(
+    INVITATION_PROFILE_STORAGE_KEY,
+    currentInvitationProfile.code,
+  );
+  return true;
+}
+
+
+
+function invitationProfileMarkup(language) {
+  const profile = invitationProfileText(currentInvitationProfile, language);
+  if (!profile) return "";
+
+  // Personalised greeting when a per-guest code is used
+  const guest = currentInvitationProfile?.guest;
+  const greeting = guest
+    ? `<p class="invitation-greeting">✨ ${guest.firstName} ${guest.lastName}</p>`
+    : "";
+
+  // Dashboard link only for novios
+  const dashboardLink = guest?.isNovio
+    ? `<a class="invitation-dashboard-link" href="/dashboard">📊 Panel de los novios</a>`
+    : "";
+
+  // Custom content from Firestore overrides
+  const custom = getCustomContent(currentInvitationProfile);
+  const customGreeting = custom?.greeting
+    ? `<p class="invitation-custom-greeting">${custom.greeting}</p>`
+    : "";
+  const customMessage = custom?.message
+    ? `<div class="invitation-custom-message">${custom.message}</div>`
+    : "";
+  const customSection = custom?.section
+    ? `<section class="invitation-custom-section section">${custom.section}</section>`
+    : "";
+
+  return `
+    <section class="invitation-profile section" aria-labelledby="invitation-profile-title">
+      <div class="invitation-profile-card reveal">
+        ${customGreeting}
+        ${greeting}
+        <p class="eyebrow">${profile.eyebrow}</p>
+        <h2 id="invitation-profile-title">${profile.title}</h2>
+        <p class="lead">${profile.body}</p>
+        ${
+          profile.facts.length
+            ? `
+              <div class="invitation-profile-facts">
+                ${profile.facts.map((fact) => `<strong>${fact}</strong>`).join("")}
+              </div>
+            `
+            : ""
+        }
+        ${customMessage}
+        <small>${profile.note}</small>
+        ${dashboardLink}
+      </div>
+    </section>
+    ${customSection}
+  `;
+}
+
+
 
 function scheduleMarkup(items) {
   return items
@@ -134,6 +318,144 @@ function routeGroupMarkup(items) {
     .join("");
 }
 
+/**
+ * Screenshots of the driving routes shared with guests. Two groups:
+ * "venue" (how to reach Roca Azul) and "beach" (how to reach Barra de
+ * Navidad). Each group is shown as its own image carousel.
+ */
+const MAP_IMAGES = {
+  venue: [
+    {
+      src: "https://res.cloudinary.com/k2ajcgxv/image/upload/v1785521656/Captura_de_pantalla_2026-07-31_a_la_s_11.58.29_a.m._eqyghk.png",
+      alt: "Mapa 1 · ruta hacia Roca Azul",
+    },
+    {
+      src: "https://res.cloudinary.com/k2ajcgxv/image/upload/v1785521653/Captura_de_pantalla_2026-07-31_a_la_s_11.59.01_a.m._fedfdr.png",
+      alt: "Mapa 2 · ruta hacia Roca Azul",
+    },
+    {
+      src: "https://res.cloudinary.com/k2ajcgxv/image/upload/v1785521649/Captura_de_pantalla_2026-07-31_a_la_s_11.59.30_a.m._t05ski.png",
+      alt: "Mapa 3 · ruta hacia Roca Azul",
+    },
+  ],
+  beach: [
+    {
+      src: "https://res.cloudinary.com/k2ajcgxv/image/upload/v1785521647/Captura_de_pantalla_2026-07-31_a_la_s_11.59.57_a.m._lenxjn.png",
+      alt: "Mapa · ruta hacia Barra de Navidad",
+    },
+  ],
+};
+
+/**
+ * Build the itinerary map carousels. Each group (venue / beach) renders as
+ * its own image carousel with prev/next arrows and dots.
+ * @param {Array<{label: string, images: Array<{src: string, alt: string}>}>} groups
+ * @returns {string}
+ */
+function mapCarouselMarkup(groups) {
+  return groups
+    .map(
+      (group, groupIndex) => `
+        <div class="map-carousel-group">
+          <h4>${group.label}</h4>
+          <div class="map-carousel" data-map-carousel="${groupIndex}">
+            <button
+              class="map-carousel-arrow map-carousel-arrow--prev"
+              type="button"
+              data-map-prev="${groupIndex}"
+              aria-label="Previous"
+            >‹</button>
+            <div class="map-carousel-viewport">
+              <div class="map-carousel-track" data-map-track="${groupIndex}">
+                ${group.images
+                  .map(
+                    (image, index) => `
+                      <figure class="map-carousel-slide" data-map-slide="${groupIndex}">
+                        <img
+                          src="${image.src}"
+                          alt="${image.alt}"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                        <figcaption>
+                          ${String(index + 1).padStart(2, "0")} / ${String(
+                            group.images.length,
+                          ).padStart(2, "0")}
+                        </figcaption>
+                      </figure>
+                    `,
+                  )
+                  .join("")}
+              </div>
+            </div>
+            <button
+              class="map-carousel-arrow map-carousel-arrow--next"
+              type="button"
+              data-map-next="${groupIndex}"
+              aria-label="Next"
+            >›</button>
+            <div class="map-carousel-dots" data-map-dots="${groupIndex}">
+              ${group.images
+                .map(
+                  (_, index) => `
+                    <button
+                      class="map-carousel-dot"
+                      type="button"
+                      data-map-dot="${groupIndex}"
+                      data-index="${index}"
+                      aria-label="Map ${index + 1}"
+                      ${index === 0 ? 'aria-current="true"' : ""}
+                    ></button>
+                  `,
+                )
+                .join("")}
+            </div>
+          </div>
+        </div>
+      `,
+    )
+    .join("");
+}
+
+/**
+ * Wire up all itinerary map carousels currently in the DOM.
+ * Each carousel supports prev/next arrows and dots.
+ */
+function bindMapCarousels() {
+  document.querySelectorAll("[data-map-carousel]").forEach((carousel) => {
+    const id = carousel.dataset.mapCarousel;
+    const track = carousel.querySelector(`[data-map-track="${id}"]`);
+    const slides = [
+      ...carousel.querySelectorAll(`[data-map-slide="${id}"]`),
+    ];
+    const dots = [...carousel.querySelectorAll(`[data-map-dot="${id}"]`)];
+    const prev = carousel.querySelector(`[data-map-prev="${id}"]`);
+    const next = carousel.querySelector(`[data-map-next="${id}"]`);
+    if (!track || slides.length < 2) return;
+
+    let index = 0;
+
+    const show = (nextIndex) => {
+      index = (nextIndex + slides.length) % slides.length;
+      track.style.transform = `translateX(-${index * 100}%)`;
+      slides.forEach((slide, i) => {
+        slide.setAttribute("aria-current", String(i === index));
+      });
+      dots.forEach((dot, i) => {
+        dot.setAttribute("aria-current", String(i === index));
+      });
+    };
+
+    prev?.addEventListener("click", () => show(index - 1));
+    next?.addEventListener("click", () => show(index + 1));
+    dots.forEach((dot) => {
+      dot.addEventListener("click", () => show(Number(dot.dataset.index)));
+    });
+  });
+}
+
+
+
 function rsvpFormMarkup(t) {
   const optionsMarkup = (options) =>
     options
@@ -143,43 +465,27 @@ function rsvpFormMarkup(t) {
       )
       .join("");
 
+  // Conditionally show the travel section based on the guest's origin
+  const showTravelSection = currentInvitationProfile?.guest?.comesFromFar === true;
+
   return `
     <form class="rsvp-form" data-form-kind="rsvp" aria-describedby="rsvp-preview-note">
       <fieldset>
         <legend>${t.groups.attendance}</legend>
         <div class="rsvp-form-grid">
           <div class="form-field">
-            <label for="rsvp-first-name">${t.fields.firstName}</label>
+            <label for="rsvp-full-name">${t.fields.fullName}</label>
             <input
-              id="rsvp-first-name"
-              name="firstName"
+              id="rsvp-full-name"
+              name="fullName"
               type="text"
-              autocomplete="given-name"
-              required
-            />
-          </div>
-          <div class="form-field">
-            <label for="rsvp-last-name">${t.fields.lastName}</label>
-            <input
-              id="rsvp-last-name"
-              name="lastName"
-              type="text"
-              autocomplete="family-name"
-              required
-            />
-          </div>
-          <div class="form-field">
-            <label for="rsvp-email">${t.fields.email}</label>
-            <input
-              id="rsvp-email"
-              name="email"
-              type="email"
-              autocomplete="email"
+              autocomplete="name"
               required
             />
           </div>
           <div class="form-field">
             <label for="rsvp-whatsapp">${t.fields.whatsapp}</label>
+
             <input
               id="rsvp-whatsapp"
               name="whatsapp"
@@ -273,6 +579,9 @@ function rsvpFormMarkup(t) {
         </div>
       </fieldset>
 
+      ${
+        showTravelSection
+          ? `
       <fieldset>
         <legend>${t.groups.travel}</legend>
         <p class="fieldset-note">${t.travelNote}</p>
@@ -351,6 +660,47 @@ function rsvpFormMarkup(t) {
             />
           </div>
         </div>
+      </fieldset>`
+          : ""
+      }
+
+      <fieldset class="petanque-fieldset">
+        <legend>${t.petanque.eyebrow}</legend>
+        <div class="petanque-intro">
+          <p>${t.petanque.intro}</p>
+          <a class="text-link" href="${t.petanque.organizerWhatsapp}" target="_blank" rel="noreferrer">
+            ${t.petanque.organizerLabel} ↗
+          </a>
+        </div>
+        <div class="rsvp-form-grid">
+          <div class="form-field">
+            <label for="petanque-participation">${t.petanque.fields.participation}</label>
+            <select id="petanque-participation" name="petanqueParticipation">
+              ${optionsMarkup(t.petanque.options.participation)}
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="petanque-party-size">${t.petanque.fields.partySize}</label>
+            <input
+              id="petanque-party-size"
+              name="petanquePartySize"
+              type="number"
+              min="0"
+              max="12"
+              value="0"
+            />
+          </div>
+          <div class="form-field form-field-wide">
+            <label for="petanque-names">${t.petanque.fields.names}</label>
+            <input id="petanque-names" name="petanqueNames" type="text" placeholder="${t.petanque.fields.namesPlaceholder}" />
+          </div>
+          <div class="form-field">
+            <label for="petanque-own-boules">${t.petanque.fields.ownBoules}</label>
+            <select id="petanque-own-boules" name="petanqueOwnBoules">
+              ${optionsMarkup(t.petanque.options.ownBoules)}
+            </select>
+          </div>
+        </div>
       </fieldset>
 
       <fieldset>
@@ -415,6 +765,22 @@ function suggestionFormMarkup(t) {
         </select>
       </div>
       <div class="form-field form-field-wide">
+        <span class="form-field-label">${t.fields.genres}</span>
+        <div class="genre-grid">
+          ${t.genres
+            .map(
+              (genre) => `
+                <label class="genre-chip">
+                  <input type="checkbox" name="genres" value="${genre}" />
+                  <span>${genre}</span>
+                </label>
+              `,
+            )
+            .join("")}
+        </div>
+      </div>
+
+      <div class="form-field form-field-wide">
         <label for="experience-extra">${t.fields.extra}</label>
         <textarea id="experience-extra" name="extra" rows="3"></textarea>
       </div>
@@ -459,11 +825,14 @@ function coastFormMarkup(t) {
         />
       </div>
       <div class="form-field">
-        <label for="coast-nights">${t.fields.nights}</label>
-        <input id="coast-nights" name="nights" type="number" min="0" max="7" />
+        <label for="coast-plan">${t.fields.plan}</label>
+        <select id="coast-plan" name="plan">
+          ${optionsMarkup(t.options.plan)}
+        </select>
       </div>
       <div class="form-field">
         <label for="coast-destination">${t.fields.destination}</label>
+
         <select id="coast-destination" name="destination">
           ${optionsMarkup(t.options.destination)}
         </select>
@@ -486,26 +855,183 @@ function coastFormMarkup(t) {
   `;
 }
 
-function galleryMarkup(images, alternativeTexts) {
-  return images
-    .map(
-      (image, index) => `
-        <figure class="gallery-photo gallery-photo-${index + 1} reveal">
-          <img
-            src="${image}"
-            alt="${alternativeTexts[index] || alternativeTexts[0]}"
-            loading="lazy"
-            decoding="async"
-          />
-        </figure>
-      `,
-    )
-    .join("");
+const GALLERY_PHOTOS = MEDIA.gallery;
+
+function galleryMarkup() {
+  const rows = [];
+  for (let i = 0; i < GALLERY_PHOTOS.length; i += 3) {
+    const chunk = GALLERY_PHOTOS.slice(i, i + 3);
+    rows.push(`
+      <div class="gallery-row">
+        ${chunk
+          .map(
+            (src) => `
+          <a class="gallery-item" href="${src}" target="_blank" rel="noreferrer">
+            <img src="${src}" alt="" loading="lazy" decoding="async" />
+          </a>
+        `,
+          )
+          .join("")}
+      </div>
+    `);
+  }
+  return rows.join("");
+}
+
+/**
+ * Reusable "fun facts" carousel.
+ *
+ * Renders a vertical list of short facts with an optional title on top and a
+ * separator line between the title and the content. Only a fixed number of
+ * rows (PAGE_SIZE) is shown at a time; prev/next arrows and dots page through
+ * the remaining facts. It is intentionally generic so it can be dropped into
+ * any section with a different set of facts (e.g. the story, the venue, the
+ * food…).
+ *
+ * @param {string[]} facts - short strings to display as rows
+ * @param {string} id - unique id so multiple carousels can coexist on a page
+ * @param {string} [label] - optional title shown on the first row
+ * @returns {string} markup
+ */
+const FUN_FACT_PAGE_SIZE = 5;
+
+function funFactCarouselMarkup(facts, id, label = "") {
+  if (!facts || !facts.length) return "";
+  const pages = [];
+  for (let i = 0; i < facts.length; i += FUN_FACT_PAGE_SIZE) {
+    pages.push(facts.slice(i, i + FUN_FACT_PAGE_SIZE));
+  }
+  const pageCount = pages.length;
+
+  return `
+    <div class="fun-fact-list" data-fun-fact-carousel="${id}" aria-label="${label || "Fun facts"}">
+      ${
+        label
+          ? `
+            <div class="fun-fact-list-heading">
+              <span class="fun-fact-label" aria-hidden="true">${label}</span>
+            </div>
+            <hr class="fun-fact-divider" aria-hidden="true" />
+          `
+          : ""
+      }
+      <div class="fun-fact-viewport">
+        <div class="fun-fact-track" data-fun-fact-track="${id}">
+          ${pages
+            .map(
+              (page, pageIndex) => `
+                <ol class="fun-fact-rows" data-fun-fact-page="${id}" ${pageIndex === 0 ? 'aria-current="true"' : ""}>
+                  ${page
+                    .map(
+                      (fact, index) => `
+                        <li class="fun-fact-row">
+                          <span class="fun-fact-row-index" aria-hidden="true">${String(pageIndex * FUN_FACT_PAGE_SIZE + index + 1).padStart(2, "0")}</span>
+                          <p>${fact}</p>
+                        </li>
+                      `,
+                    )
+                    .join("")}
+                </ol>
+              `,
+            )
+            .join("")}
+        </div>
+      </div>
+      ${
+        pageCount > 1
+          ? `
+            <div class="fun-fact-controls">
+              <button
+                class="fun-fact-arrow fun-fact-arrow--prev"
+                type="button"
+                data-fun-fact-prev="${id}"
+                aria-label="Previous"
+              >‹</button>
+              <div class="fun-fact-dots" data-fun-fact-dots="${id}">
+                ${pages
+                  .map(
+                    (_, index) => `
+                      <button
+                        class="fun-fact-dot"
+                        type="button"
+                        data-fun-fact-dot="${id}"
+                        data-index="${index}"
+                        aria-label="Page ${index + 1}"
+                        ${index === 0 ? 'aria-current="true"' : ""}
+                      ></button>
+                    `,
+                  )
+                  .join("")}
+              </div>
+              <button
+                class="fun-fact-arrow fun-fact-arrow--next"
+                type="button"
+                data-fun-fact-next="${id}"
+                aria-label="Next"
+              >›</button>
+            </div>
+          `
+          : ""
+      }
+    </div>
+  `;
+}
+
+/**
+ * Wire up all fun-fact carousels currently in the DOM.
+ * Each carousel pages through its rows with prev/next arrows and dots.
+ */
+function bindFunFactCarousels() {
+  document.querySelectorAll("[data-fun-fact-carousel]").forEach((carousel) => {
+    const id = carousel.dataset.funFactCarousel;
+    const track = carousel.querySelector(`[data-fun-fact-track="${id}"]`);
+    const pages = [
+      ...carousel.querySelectorAll(`[data-fun-fact-page="${id}"]`),
+    ];
+    const dots = [...carousel.querySelectorAll(`[data-fun-fact-dot="${id}"]`)];
+    const prev = carousel.querySelector(`[data-fun-fact-prev="${id}"]`);
+    const next = carousel.querySelector(`[data-fun-fact-next="${id}"]`);
+    if (!track || pages.length < 2) return;
+
+    let index = 0;
+
+    const show = (nextIndex) => {
+      index = (nextIndex + pages.length) % pages.length;
+      track.style.transform = `translateX(-${index * 100}%)`;
+      pages.forEach((page, i) => {
+        page.setAttribute("aria-current", String(i === index));
+      });
+      dots.forEach((dot, i) => {
+        dot.setAttribute("aria-current", String(i === index));
+      });
+    };
+
+    prev?.addEventListener("click", () => show(index - 1));
+    next?.addEventListener("click", () => show(index + 1));
+    dots.forEach((dot) => {
+      dot.addEventListener("click", () => show(Number(dot.dataset.index)));
+    });
+  });
+}
+
+// Maps a guest's assigned unit to the corresponding cabin-showcase key.
+// Returns null when the guest has no cabin or their unit is not in the
+// showcase catalogue (e.g. hortencia, lavanda, casona, cabaña_4…6).
+function getGuestCabinKey(profile) {
+
+  if (!profile?.hasCabin) return null;
+  const unit = String(profile.unit || "").toLowerCase();
+  if (unit === "azalea") return "azalea";
+  if (unit === "dalia") return "dalia";
+  if (unit === "margarita") return "margarita";
+  if (/^cabaña_(3[1-4])$/.test(unit)) return "wooden";
+  return null;
 }
 
 function cabinUnitMarkup(cabin, eyebrow) {
   const photos = MEDIA.cabins[cabin.key];
   const video = MEDIA.cabinVideos[cabin.key];
+
 
   return `
     <article class="cabin-unit">
@@ -577,19 +1103,23 @@ function heroMarkup(images, labels) {
   }
 
   const photos = images
-    .map(
-      (image, index) => `
+    .map((image, index) => {
+      const src = typeof image === "string" ? image : image.src;
+      const position = typeof image === "string" ? "" : image.position || "";
+      return `
         <img
           class="hero-photo${index === 0 ? " is-active" : ""}"
-          src="${image}"
+          src="${src}"
           alt=""
           aria-hidden="true"
+          ${position ? `style="object-position: ${position}"` : ""}
           ${index === 0 ? 'fetchpriority="high"' : 'loading="lazy"'}
           decoding="async"
         />
-      `,
-    )
+      `;
+    })
     .join("");
+
 
   const dots = images
     .map(
@@ -624,19 +1154,86 @@ function heroMarkup(images, labels) {
   `;
 }
 
-function monogramMarkup() {
+function initialsSwapMarkup(variant = "", delay = "0s") {
   return `
-    <span class="monogram-initial" aria-hidden="true">
-      <span>D.</span>
-      <span>A.</span>
-    </span>
-    <span class="monogram-ampersand" aria-hidden="true">&</span>
-    <span class="monogram-initial" aria-hidden="true">
-      <span>A.</span>
-      <span>D.</span>
+    <span
+      class="identity-swap identity-swap--initials ${variant}"
+      style="--identity-delay: ${delay}"
+      aria-label="D. & A. — A. & D."
+    >
+      <span class="identity-swap-state identity-swap-state--primary" aria-hidden="true">
+        <span>D.</span><i>&</i><span>A.</span>
+      </span>
+      <span class="identity-swap-state identity-swap-state--secondary" aria-hidden="true">
+        <span>A.</span><i>&</i><span>D.</span>
+      </span>
     </span>
   `;
 }
+
+function coupleNamesMarkup(variant = "", delay = "0s") {
+  const ayde = `Ayd<span class="identity-accent">é</span>`;
+
+  return `
+    <span
+      class="identity-swap identity-swap--names ${variant}"
+      style="--identity-delay: ${delay}"
+      aria-label="David & Aydé — Aydé y David"
+    >
+      <span class="identity-swap-state identity-swap-state--primary" aria-hidden="true">
+        <span class="identity-person">David</span>
+        <i class="identity-connector">&</i>
+        <span class="identity-person">${ayde}</span>
+      </span>
+      <span class="identity-swap-state identity-swap-state--secondary" aria-hidden="true">
+        <span class="identity-person">${ayde}</span>
+        <i class="identity-connector">y</i>
+        <span class="identity-person">David</span>
+      </span>
+    </span>
+  `;
+}
+
+// Cinematic date animation: cycles through the three wedding-weekend days
+// (V 19 · S 20 · D 21) with a day-of-week prefix, reusing the identity-swap
+// reveal pattern. The wedding day (S 20) is emphasised.
+function heroDateMarkup() {
+  const days = [
+    { prefix: "V", day: "19", label: "Viernes" },
+    { prefix: "S", day: "20", label: "Sábado" },
+    { prefix: "D", day: "21", label: "Domingo" },
+  ];
+
+  const state = (day, variant) => `
+    <span
+      class="hero-date-state hero-date-state--${variant}"
+      aria-hidden="true"
+    >
+      <span class="hero-date-prefix">${day.prefix}</span>
+      <span class="hero-date-num">${day.day}</span>
+      <span class="hero-date-sep">·</span>
+      <span class="hero-date-num">02</span>
+      <span class="hero-date-sep">·</span>
+      <span class="hero-date-num">2027</span>
+    </span>
+  `;
+
+  return `
+    <span class="hero-date-swap" aria-label="V 19 · S 20 · D 21 — 20 · 02 · 2027">
+      ${state(days[0], "primary")}
+      ${state(days[1], "secondary")}
+      ${state(days[2], "tertiary")}
+    </span>
+  `;
+}
+
+
+const LANGUAGE_FLAGS = {
+  es: "🇲🇽 ES",
+  fr: "🇫🇷 FR",
+  en: "🇬🇧 EN",
+};
+
 
 function languageSwitcherMarkup(activeLanguage) {
   return SUPPORTED_LANGUAGES.map(
@@ -647,7 +1244,7 @@ function languageSwitcherMarkup(activeLanguage) {
         data-language="${language}"
         aria-pressed="${language === activeLanguage}"
       >
-        ${language.toUpperCase()}
+        ${LANGUAGE_FLAGS[language]}
       </button>
     `,
   ).join("");
@@ -661,7 +1258,6 @@ function render(language) {
   document
     .querySelector('meta[name="description"]')
     ?.setAttribute("content", t.metaDescription);
-  document.querySelector(".skip-link").textContent = t.skip;
   const heroImages = Array.isArray(MEDIA.hero)
     ? MEDIA.hero
     : MEDIA.hero
@@ -670,33 +1266,49 @@ function render(language) {
   const heroMedia = heroMarkup(heroImages, t.hero);
 
   app.innerHTML = `
+    <a class="skip-link" href="#main-content">${t.skip}</a>
     <div class="site-shell">
       <div class="countdown-bar" aria-live="polite">
+        ${
+          currentInvitationProfile?.guest
+            ? `<span class="countdown-guest">${currentInvitationProfile.guest.firstName} ${currentInvitationProfile.guest.lastName}</span>`
+            : ""
+        }
         <span class="countdown-prefix">${t.countdown.prefix}</span>
         <div class="countdown-values">
           ${countdownMarkup(t.countdown)}
         </div>
       </div>
 
-      <section class="hero" id="top">
-        <header class="site-header">
-          <a class="monogram" href="#top" aria-label="${EVENT.couple}">
-            ${monogramMarkup()}
-          </a>
-          <nav class="desktop-nav" aria-label="Primary">
-            <a href="#story">${t.nav.story}</a>
-            <a href="#weekend">${t.nav.weekend}</a>
-            <a href="#venue">${t.nav.venue}</a>
-            <a href="#accommodation">${t.nav.accommodation}</a>
-            <a href="#travel">${t.nav.travel}</a>
-          </nav>
-          <div class="language-switcher" aria-label="Language">
-            ${languageSwitcherMarkup(language)}
-          </div>
-          <a class="header-rsvp" href="#rsvp">${t.nav.rsvp}</a>
-        </header>
+      <header class="site-header">
+        <a class="monogram" href="#top">
+          ${initialsSwapMarkup("identity-swap--header")}
+        </a>
+        <nav class="desktop-nav" aria-label="Primary">
+          <a href="#story">${t.nav.story}</a>
+          <a href="#venue">${t.nav.venue}</a>
+          <a href="#weekend">${t.nav.weekend}</a>
+          <a href="#accommodation">${t.nav.accommodation}</a>
 
+          <a href="#travel">${t.nav.travel}</a>
+          <a href="#attire">${t.nav.attire}</a>
+          <a href="#gift">${t.nav.gift}</a>
+          <a href="#photos">${t.nav.photos}</a>
+          ${
+            currentInvitationProfile?.guest?.isNovio
+              ? `<a class="nav-dashboard-link" href="/dashboard">📊 ${t.nav.dashboard}</a>`
+              : ""
+          }
+        </nav>
+        <div class="language-switcher" aria-label="Language">
+          ${languageSwitcherMarkup(language)}
+        </div>
+        <a class="header-rsvp" href="#rsvp">${t.nav.rsvp}</a>
+      </header>
+
+      <section class="hero" id="top">
         <div class="hero-art${heroImages.length ? " has-photo" : ""}">
+
           ${heroMedia}
           <div class="sun-disc"></div>
           <div class="motif motif-left"></div>
@@ -704,47 +1316,189 @@ function render(language) {
         </div>
 
         <div class="hero-content">
-          <p class="eyebrow">${t.hero.eyebrow}</p>
-          <h1><span>David</span><i>&</i><span>Aydé</span></h1>
-          <p class="hero-date">${EVENT.dateShort}</p>
+          ${
+            currentInvitationProfile?.guest
+              ? `<p class="hero-guest-name">${currentInvitationProfile.guest.firstName} ${currentInvitationProfile.guest.lastName}</p>`
+              : ""
+          }
+          <p class="hero-eyebrow">${t.hero.eyebrow}</p>
+          <h1>${coupleNamesMarkup("identity-swap--hero", "-1.2s")}</h1>
+          <p class="hero-date">
+            ${heroDateMarkup()}
+            <span class="hero-date-label">${EVENT.dateShort}</span>
+          </p>
+
           <p class="hero-place">${EVENT.venue}<br />${EVENT.place}</p>
+          ${
+            currentInvitationProfile?.guest
+              ? `<p class="hero-group-name">${getGroupTag(currentInvitationProfile.guest.invitacionGroup || currentInvitationProfile.guest.group).label}</p>`
+              : ""
+          }
           <p class="hero-invitation">${t.hero.invitation}</p>
         </div>
+
 
         <a class="scroll-cue" href="#story">
           <span>${t.hero.scroll}</span>
           <span aria-hidden="true">↓</span>
         </a>
+
+
       </section>
 
       <main id="main-content">
         <section class="story-section section" id="story">
-          <div class="story-mark" aria-hidden="true">D<span>&</span>A</div>
+          <div class="story-mark">
+            ${initialsSwapMarkup("identity-swap--story", "-3.4s")}
+          </div>
           <div class="story-copy reveal">
             <p class="eyebrow">${t.story.eyebrow}</p>
             <h2>${t.story.title}</h2>
             <p class="lead">${t.story.body}</p>
             <p class="handwritten">${t.story.note}</p>
+            <div class="chapala-photos" aria-label="${t.story.photosLabel}">
+              ${CHAPALA_HIGHLIGHTS.map(
+                (photo, index) => `
+                  <a
+                    class="chapala-photo"
+                    href="${photo.full}"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    <img
+                      src="${photo.src}"
+                      alt="${t.story.photoAlts[index]}"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </a>
+                `,
+              ).join("")}
+            </div>
+          </div>
+          <div class="story-footer">
+            ${funFactCarouselMarkup(
+              chapalaAnecdotes(language).map(
+                (anecdote) => `${anecdote.icon} ${anecdote.title} — ${anecdote.text}`,
+              ),
+              "story-anecdotes",
+              t.story.anecdotesLabel,
+            )}
           </div>
         </section>
 
-        <section class="gallery-section section" aria-labelledby="gallery-title">
-          <div class="gallery-heading reveal">
-            <p class="eyebrow">${t.gallery.eyebrow}</p>
-            <h2 id="gallery-title">${t.gallery.title}</h2>
-            <p>${t.gallery.body}</p>
+
+        <section class="facilities-section section" id="venue">
+
+
+          <div class="experience-heading reveal">
+            <p class="eyebrow">${t.facilities.eyebrow}</p>
+            <h2>${t.facilities.title}</h2>
+            <p class="lead facilities-lead">${t.facilities.body}</p>
+
           </div>
-          <div class="photo-gallery">
-            ${galleryMarkup(MEDIA.gallery, t.gallery.alts)}
+          <a
+            class="venue-location-link reveal"
+            href="https://maps.app.goo.gl/2KvGys1BMDbpiZkF7"
+            target="_blank"
+            rel="noreferrer"
+          >
+            ${EVENT.venue} · ${EVENT.place} ↗
+          </a>
+          <div class="venue-gallery">
+
+            ${t.facilities.gallery
+              .map(
+                (image) => `
+                  <figure class="venue-gallery-card reveal">
+                    <img
+                      src="${MEDIA.venue[image.key]}"
+                      alt="${image.alt}"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                    <figcaption>${image.title}</figcaption>
+                  </figure>
+                `,
+              )
+              .join("")}
           </div>
+          <a
+            class="venue-gallery-source"
+            href="https://www.clubrocaazul.com/"
+            target="_blank"
+            rel="noreferrer"
+          >${t.facilities.gallerySource} ↗</a>
+          <div class="venue-video reveal">
+            <div class="video-frame">
+              <iframe
+                src="https://www.youtube.com/embed/oGOgfQGz9tw"
+                title="${t.facilities.videoTitle}"
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowfullscreen
+              ></iframe>
+            </div>
+          </div>
+          <div class="roca-gallery" aria-label="${t.facilities.rocaGalleryLabel}">
+
+            ${ROCA_AZUL_GALLERY.map(
+              (id, index) => `
+                <a
+                  class="roca-gallery-item"
+                  href="${wixUrl(id, 1600)}"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  <img
+                    src="${wixUrl(id, 500)}"
+                    alt="${t.facilities.rocaGalleryAlts[index % t.facilities.rocaGalleryAlts.length]}"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </a>
+              `,
+            ).join("")}
+          </div>
+          <div class="facilities-grid">
+            ${t.facilities.groups
+              .map(
+                (group) => `
+                  <article class="facility-group reveal">
+                    <h3>${group.title}</h3>
+                    <ul>
+                      ${group.items.map((item) => `<li>${item}</li>`).join("")}
+                    </ul>
+                  </article>
+                `,
+              )
+              .join("")}
+          </div>
+          <div class="venue-privacy reveal">
+            <h3>${t.facilities.privacyTitle}</h3>
+            <p>${t.facilities.privacyBody}</p>
+          </div>
+          <p class="facilities-note">${t.facilities.note}</p>
         </section>
 
         <section class="weekend-section section" id="weekend">
-          <div class="section-heading reveal">
-            <p class="eyebrow">${t.weekend.eyebrow}</p>
-            <h2>${t.weekend.title}</h2>
-            <p>${t.weekend.intro}</p>
+          <div class="weekend-banner">
+            <img
+              src="${MEDIA.weekendBanner}"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+            <div class="weekend-banner-content">
+              <div class="section-heading reveal">
+                <p class="eyebrow">${t.weekend.eyebrow}</p>
+                <h2>${t.weekend.title}</h2>
+                <p>${t.weekend.intro}</p>
+              </div>
+            </div>
           </div>
+
           <div class="schedule-grid">
             ${scheduleMarkup(t.weekend.items)}
           </div>
@@ -772,7 +1526,68 @@ function render(language) {
           </div>
         </section>
 
+        <section class="accommodation-section section" id="accommodation">
+
+          <div class="accommodation-copy reveal">
+            <p class="eyebrow">${t.accommodation.eyebrow}</p>
+            <h2>${t.accommodation.title}</h2>
+            <p class="lead">${t.accommodation.body}</p>
+            <div class="accommodation-facts">
+              ${t.accommodation.facts
+                .map(
+                  (fact) => `
+                    <article>
+                      <strong>${fact.value}</strong>
+                      <span>${fact.label}</span>
+                    </article>
+                  `,
+                )
+                .join("")}
+            </div>
+            <p class="accommodation-note">${t.accommodation.specialNote}</p>
+            <div class="accommodation-contacts">
+              <span>${t.accommodation.contactPrompt}</span>
+              ${Object.values(EVENT.contacts)
+                .map(
+                  (contact) => `
+                    <a
+                      href="${contact.whatsapp}"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      ${contact.label} · ${contact.phone} ↗
+                    </a>
+                  `,
+                )
+                .join("")}
+            </div>
+          </div>
+          <div class="accommodation-form-wrap">
+            <p class="eyebrow">${t.accommodation.plan.eyebrow}</p>
+            <h3>${t.accommodation.plan.title}</h3>
+            <p>${t.accommodation.plan.body}</p>
+            <ol class="accommodation-steps">
+              ${t.accommodation.plan.steps
+                .map(
+                  (step, index) => `
+                    <li>
+                      <span>0${index + 1}</span>
+                      <p>${step}</p>
+                    </li>
+                  `,
+                )
+                .join("")}
+            </ol>
+            <a class="button button-dark" href="#rsvp">
+              ${t.accommodation.plan.button}
+            </a>
+          </div>
+        </section>
+
         <section class="weather-section section" id="weather">
+
+
+
           <div class="weather-heading reveal">
             <div>
               <p class="eyebrow">${t.weather.eyebrow}</p>
@@ -916,7 +1731,9 @@ function render(language) {
               ${[
                 ["general", EVENT.playlists.general],
                 ["karaoke", EVENT.playlists.karaoke],
+                ["shared", EVENT.playlists.shared],
               ]
+
                 .map(
                   ([playlist, url], index) => `
                     <article class="playlist-card">
@@ -950,147 +1767,54 @@ function render(language) {
           </div>
         </section>
 
-        <section class="venue-section section" id="venue">
-          <div class="venue-visual reveal">
-            <div class="venue-horizon" aria-hidden="true"></div>
-            <div class="venue-visual-copy">
-              <span>${t.venue.visualTitle}</span>
-              <small>${t.venue.visualBody}</small>
-            </div>
-          </div>
-          <div class="venue-copy reveal">
-            <p class="eyebrow">${t.venue.eyebrow}</p>
-            <h2>${t.venue.title}</h2>
-            <p class="lead">${t.venue.body}</p>
-            <p class="venue-location">${t.venue.location}</p>
-            <a
-              class="text-link"
-              href="${EVENT.mapUrl}"
-              target="_blank"
-              rel="noreferrer"
-            >
-              ${t.venue.map} ↗
-            </a>
-          </div>
-        </section>
+        ${invitationProfileMarkup(language)}
 
-        <section class="facilities-section section" id="facilities">
-          <div class="experience-heading reveal">
-            <p class="eyebrow">${t.facilities.eyebrow}</p>
-            <h2>${t.facilities.title}</h2>
-            <p class="lead">${t.facilities.body}</p>
-          </div>
-          <div class="venue-gallery">
-            ${t.facilities.gallery
-              .map(
-                (image) => `
-                  <figure class="venue-gallery-card reveal">
-                    <img
-                      src="${MEDIA.venue[image.key]}"
-                      alt="${image.alt}"
+
+        ${
+          (() => {
+            const showcase = t.accommodation.cabinsShowcase;
+            const guestCabinKey = getGuestCabinKey(currentInvitationProfile);
+            // Only guests with lodging see the cabins showcase, filtered to
+            // their own cabin. Guests without a cabin (or whose unit is not in
+            // the catalogue) see nothing here.
+            if (!guestCabinKey) return "";
+
+            const mainUnit =
+              showcase.key === guestCabinKey ? showcase : null;
+            const additionalUnit =
+              mainUnit
+                ? null
+                : showcase.additionalUnits.find(
+                    (cabin) => cabin.key === guestCabinKey,
+                  );
+            const cabinToShow = mainUnit || additionalUnit;
+            if (!cabinToShow) return "";
+
+            return `
+              <section class="cabins-showcase section" id="cabins">
+                ${cabinUnitMarkup(
+                  cabinToShow,
+                  showcase.eyebrow,
+                )}
+                <div class="cabins-private-video reveal">
+                  <p class="eyebrow">${showcase.privateVideoEyebrow}</p>
+                  <h3>${showcase.privateVideoTitle}</h3>
+                  <div class="video-frame">
+                    <iframe
+                      src="https://www.youtube.com/embed/zf0zhZihub4"
+                      title="${showcase.privateVideoTitle}"
                       loading="lazy"
-                      decoding="async"
-                    />
-                    <figcaption>${image.title}</figcaption>
-                  </figure>
-                `,
-              )
-              .join("")}
-          </div>
-          <a
-            class="venue-gallery-source"
-            href="https://www.clubrocaazul.com/"
-            target="_blank"
-            rel="noreferrer"
-          >${t.facilities.gallerySource} ↗</a>
-          <div class="facilities-grid">
-            ${t.facilities.groups
-              .map(
-                (group) => `
-                  <article class="facility-group reveal">
-                    <h3>${group.title}</h3>
-                    <ul>
-                      ${group.items.map((item) => `<li>${item}</li>`).join("")}
-                    </ul>
-                  </article>
-                `,
-              )
-              .join("")}
-          </div>
-          <p class="facilities-note">${t.facilities.note}</p>
-        </section>
+                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                      referrerpolicy="strict-origin-when-cross-origin"
+                      allowfullscreen
+                    ></iframe>
+                  </div>
+                </div>
+              </section>
+            `;
+          })()
+        }
 
-        <section class="accommodation-section section" id="accommodation">
-          <div class="accommodation-copy reveal">
-            <p class="eyebrow">${t.accommodation.eyebrow}</p>
-            <h2>${t.accommodation.title}</h2>
-            <p class="lead">${t.accommodation.body}</p>
-            <div class="accommodation-facts">
-              ${t.accommodation.facts
-                .map(
-                  (fact) => `
-                    <article>
-                      <strong>${fact.value}</strong>
-                      <span>${fact.label}</span>
-                    </article>
-                  `,
-                )
-                .join("")}
-            </div>
-            <p class="accommodation-note">${t.accommodation.specialNote}</p>
-            <div class="accommodation-contacts">
-              <span>${t.accommodation.contactPrompt}</span>
-              ${Object.values(EVENT.contacts)
-                .map(
-                  (contact) => `
-                    <a
-                      href="${contact.whatsapp}"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      ${contact.label} · ${contact.phone} ↗
-                    </a>
-                  `,
-                )
-                .join("")}
-            </div>
-          </div>
-          <div class="accommodation-form-wrap">
-            <p class="eyebrow">${t.accommodation.plan.eyebrow}</p>
-            <h3>${t.accommodation.plan.title}</h3>
-            <p>${t.accommodation.plan.body}</p>
-            <ol class="accommodation-steps">
-              ${t.accommodation.plan.steps
-                .map(
-                  (step, index) => `
-                    <li>
-                      <span>0${index + 1}</span>
-                      <p>${step}</p>
-                    </li>
-                  `,
-                )
-                .join("")}
-            </ol>
-            <a class="button button-dark" href="#rsvp">
-              ${t.accommodation.plan.button}
-            </a>
-          </div>
-        </section>
-
-        <section class="cabins-showcase section" id="cabins">
-          ${cabinUnitMarkup(
-            t.accommodation.cabinsShowcase,
-            t.accommodation.cabinsShowcase.eyebrow,
-          )}
-          ${t.accommodation.cabinsShowcase.additionalUnits
-            .map((cabin) =>
-              cabinUnitMarkup(
-                cabin,
-                t.accommodation.cabinsShowcase.eyebrow,
-              ),
-            )
-            .join("")}
-        </section>
 
         <section class="travel-section section" id="travel">
           <div class="travel-heading reveal">
@@ -1125,30 +1849,140 @@ function render(language) {
               <h3 id="route-map-title">${t.travel.routes.title}</h3>
               <p>${t.travel.routes.note}</p>
             </div>
-            <div class="route-map-diagram">
-              <section class="route-group route-origins">
+
+            <section class="route-subsection">
+              <div class="route-subsection-heading">
                 <h4>${t.travel.routes.originsLabel}</h4>
-                ${routeGroupMarkup(t.travel.routes.origins)}
-              </section>
-              <div class="route-venue">
-                <span aria-hidden="true">◆</span>
-                <strong>${t.travel.routes.venue}</strong>
+                <p>${t.travel.routes.maps.venueLabel}</p>
               </div>
-              <section class="route-group route-destinations">
+              <div class="route-map-diagram">
+                <section class="route-group route-origins">
+                  ${routeGroupMarkup(t.travel.routes.origins)}
+                </section>
+                <div class="route-venue">
+                  <span aria-hidden="true">◆</span>
+                  <strong>${t.travel.routes.venue}</strong>
+                </div>
+              </div>
+              ${mapCarouselMarkup([
+                {
+                  label: t.travel.routes.maps.venueLabel,
+                  images: MAP_IMAGES.venue,
+                },
+              ])}
+            </section>
+
+            <section class="route-subsection">
+              <div class="route-subsection-heading">
                 <h4>${t.travel.routes.destinationsLabel}</h4>
-                ${routeGroupMarkup(t.travel.routes.destinations)}
-              </section>
-            </div>
+                <p>${t.travel.routes.maps.beachLabel}</p>
+              </div>
+              <div class="route-map-diagram">
+                <div class="route-venue">
+                  <span aria-hidden="true">◆</span>
+                  <strong>${t.travel.routes.venue}</strong>
+                </div>
+                <section class="route-group route-destinations">
+                  ${routeGroupMarkup(t.travel.routes.destinations)}
+                </section>
+              </div>
+              ${mapCarouselMarkup([
+                {
+                  label: t.travel.routes.maps.beachLabel,
+                  images: MAP_IMAGES.beach,
+                },
+              ])}
+            </section>
+
           </div>
+
         </section>
 
         <section class="attire-section section" id="attire">
-          <div class="textile-pattern" aria-hidden="true"></div>
+          <div class="oaxaca-grid" aria-label="${t.attire.eyebrow}">
+            ${MEDIA.oaxaca
+              .map(
+                (src, i) => `
+                  <img
+                    class="oaxaca-tile"
+                    src="${src}"
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                    style="--tile-index: ${i}"
+                  />
+                `,
+              )
+              .join("")}
+          </div>
           <div class="attire-copy reveal">
+
             <p class="eyebrow">${t.attire.eyebrow}</p>
             <h2>${t.attire.title}</h2>
             <p class="lead">${t.attire.body}</p>
+            ${
+              t.attire.dressCode
+                ? `
+                  <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.35);">
+                    <p style="font-weight: 600; font-size: 0.9rem; letter-spacing: 0.08em; text-transform: uppercase; margin: 0 0 0.75rem;">${t.attire.dressCode.title}</p>
+                    <p style="font-size: 0.95rem; line-height: 1.6; margin: 0;">${t.attire.dressCode.body}</p>
+                  </div>
+                `
+                : ""
+            }
             <p class="note">${t.attire.guestNote}</p>
+          </div>
+        </section>
+
+        <section class="gift-section section" id="gift">
+          <div class="gift-copy reveal">
+            <p class="eyebrow">${t.gift.eyebrow}</p>
+            <h2>${t.gift.title}</h2>
+            <p class="lead">${t.gift.body}</p>
+            <p class="note">${t.gift.note}</p>
+            ${
+              t.gift.accounts
+                ? `
+                  <div class="gift-accounts">
+                    ${Object.entries(t.gift.accounts)
+                      .map(
+                        ([currency, account]) => `
+                          <details class="gift-account" ${currency === "eur" ? "open" : ""}>
+                            <summary>${account.title}</summary>
+                            <dl>
+                              ${account.details
+                                .map(
+                                  (detail) => `
+                                    <dd>${detail}</dd>
+                                  `,
+                                )
+                                .join("")}
+                            </dl>
+                            ${account.note ? `<small>${account.note}</small>` : ""}
+                          </details>
+                        `,
+                      )
+                      .join("")}
+                  </div>
+                `
+                : ""
+            }
+            <div class="gift-contacts">
+              <span>${t.gift.cta}</span>
+              ${Object.values(EVENT.contacts)
+                .map(
+                  (contact) => `
+                    <a
+                      href="${contact.whatsapp}"
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      ${contact.label} · ${contact.phone} ↗
+                    </a>
+                  `,
+                )
+                .join("")}
+            </div>
           </div>
         </section>
 
@@ -1158,17 +1992,18 @@ function render(language) {
             <h2>${t.coast.title}</h2>
             <p class="lead">${t.coast.body}</p>
             <div class="coast-ideas">
-              ${t.coast.ideas
+              ${t.coast.plans
                 .map(
-                  (idea) => `
+                  (plan) => `
                     <article>
-                      <strong>${idea.title}</strong>
-                      <span>${idea.body}</span>
+                      <strong>${plan.title}</strong>
+                      <span>${plan.body}</span>
                     </article>
                   `,
                 )
                 .join("")}
             </div>
+
             <p class="coast-note">${t.coast.note}</p>
           </div>
           <div class="coast-form-wrap reveal">
@@ -1187,10 +2022,51 @@ function render(language) {
             ${rsvpFormMarkup(t.rsvp)}
           </div>
         </section>
+
+        <section class="gallery-section section" aria-labelledby="gallery-title">
+
+          <div class="gallery-heading reveal">
+            <p class="eyebrow">${t.gallery.eyebrow}</p>
+            <h2 id="gallery-title">${t.gallery.title}</h2>
+            <p>${t.gallery.body}</p>
+          </div>
+          <div class="photo-gallery">
+            ${galleryMarkup()}
+          </div>
+        </section>
+
+        <section class="gift-section section" id="photos" style="background: var(--ink);">
+          <div class="gift-copy reveal">
+            <p class="eyebrow">${t.nav.photos}</p>
+            <h2>Comparte tus fotos</h2>
+            <p class="lead">Queremos ver la boda a través de tus ojos. Hemos creado dos álbumes compartidos de Google Photos donde puedes subir tus fotos.</p>
+
+
+            <div style="margin-top: 2rem; display: grid; gap: 1.5rem;">
+              <div style="background: rgba(255,255,255,0.06); border-radius: 0.75rem; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.12);">
+                <p style="font-weight: 600; font-size: 1rem; margin: 0 0 0.5rem; color: var(--marigold);">📸 Antes de la boda</p>
+                <p style="margin: 0 0 1rem; font-size: 0.9rem; opacity: 0.8;">Comparte tus fotos favoritas de nosotros antes del gran día.</p>
+                <a class="button button-light" href="https://photos.app.goo.gl/Vhg2AY3gXzXL2iKp8" target="_blank" rel="noreferrer" style="text-decoration: none;">
+                  Subir fotos ↗
+                </a>
+              </div>
+              <div style="background: rgba(255,255,255,0.06); border-radius: 0.75rem; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.12);">
+                <p style="font-weight: 600; font-size: 1rem; margin: 0 0 0.5rem; color: var(--marigold);">🎉 La boda vista por los invitados</p>
+                <p style="margin: 0 0 1rem; font-size: 0.9rem; opacity: 0.8;">Después de la boda, comparte aquí las fotos que tomaste durante la celebración.</p>
+                <a class="button button-light" href="https://photos.app.goo.gl/Df3QwjTKQTGVEqEU6" target="_blank" rel="noreferrer" style="text-decoration: none;">
+                  Subir fotos ↗
+                </a>
+              </div>
+            </div>
+            <p class="note" style="margin-top: 2rem;">Solicita acceso al álbum haciendo clic en "Subir fotos". Una vez dentro, podrás subir todas las fotos que quieras. ¡Gracias por capturar estos momentos con nosotros!</p>
+          </div>
+        </section>
       </main>
 
       <footer class="site-footer">
-        <div class="footer-monogram">D. & A.</div>
+        <div class="footer-monogram">
+          ${initialsSwapMarkup("identity-swap--footer", "-5.6s")}
+        </div>
         <p>${t.footer.line}</p>
         <small>${t.footer.privacy}</small>
       </footer>
@@ -1199,10 +2075,14 @@ function render(language) {
 
   bindLanguageSwitcher();
   bindHeroSlideshow(t.hero);
+  bindFunFactCarousels();
+  bindMapCarousels();
   bindRsvpConditionalFields();
   bindSubmissionForms();
   observeReveals();
   updateCountdown(language);
+
+
 
   const hashTarget = document.getElementById(window.location.hash.slice(1));
   if (hashTarget) {
@@ -1227,12 +2107,13 @@ function setLanguage(language) {
   const url = new URL(window.location.href);
   url.searchParams.set("lang", normalized);
   window.history.replaceState({}, "", url);
-  if (auth.currentUser?.uid === GUEST_UID) {
+  if (auth.currentUser) {
     render(normalized);
   } else {
     renderGate(normalized);
   }
 }
+
 
 function bindLanguageSwitcher() {
   document.querySelectorAll("[data-language]").forEach((button) => {
@@ -1261,19 +2142,49 @@ function bindRsvpConditionalFields() {
     });
   };
 
+  if (currentInvitationProfile) {
+    accommodation.value = currentInvitationProfile.hasCabin
+      ? "onsite_two_nights"
+      : "independent";
+  }
+
+  // Auto-fill the full name from the invitation code (guest identity).
+  const fullNameField = form.querySelector("#rsvp-full-name");
+  const guest = currentInvitationProfile?.guest;
+  if (fullNameField && guest) {
+    const fullName = [guest.firstName, guest.lastName]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+    if (fullName) fullNameField.value = fullName;
+  }
+
   accommodation.addEventListener("change", syncFields);
   form.addEventListener("reset", () => window.setTimeout(syncFields, 0));
   syncFields();
 }
 
+
 function formValues(form) {
-  return Object.fromEntries(
-    [...new FormData(form).entries()].map(([key, value]) => [
+  const data = new FormData(form);
+  const values = Object.fromEntries(
+    [...data.entries()].map(([key, value]) => [
       key,
       typeof value === "string" ? value.trim() : value,
     ]),
   );
+
+  // Collect checkbox groups (e.g. music genres) into arrays.
+  const checkboxGroups = new Set(
+    [...data.keys()].filter((key) => data.getAll(key).length > 1),
+  );
+  checkboxGroups.forEach((key) => {
+    values[key] = data.getAll(key).map((value) => value.trim());
+  });
+
+  return values;
 }
+
 
 function bindSubmissionForms() {
   const collections = {
@@ -1299,11 +2210,22 @@ function bindSubmissionForms() {
       status.textContent = labels.submitWorking;
       status.dataset.state = "working";
 
+      const invitationCode = currentInvitationProfile?.code;
+      if (!invitationCode) {
+        status.textContent = labels.submitError;
+        status.dataset.state = "error";
+        button.disabled = false;
+        button.textContent = originalButtonLabel;
+        console.error("Form submission blocked: no invitation code");
+        return;
+      }
+
       try {
         await addDoc(collection(db, targetCollection), {
           ...formValues(form),
           language: currentLanguage,
-          schemaVersion: kind === "rsvp" ? 3 : 1,
+          invitationCode,
+          schemaVersion: kind === "rsvp" ? 4 : 1,
           createdAt: serverTimestamp(),
         });
         form.reset();
@@ -1321,33 +2243,70 @@ function bindSubmissionForms() {
   });
 }
 
-function renderGate(language, hasError = false) {
+function renderGate(language, messageKey = null) {
   currentLanguage = language;
   document.documentElement.lang = language;
   const t = interfaceText[language];
+  const hasError = Boolean(messageKey);
+  const statusMessage = messageKey ? t[messageKey] : "";
+
 
   app.innerHTML = `
     <main class="access-gate">
       <section class="access-card">
-        <div class="gate-monogram" aria-hidden="true">D. <i>&</i> A.</div>
+        <div class="gate-monogram">
+          ${initialsSwapMarkup("identity-swap--gate", "-2.1s")}
+        </div>
         <p class="eyebrow">${t.gateEyebrow}</p>
-        <h1>${t.gateTitle}</h1>
+        <h1>${coupleNamesMarkup("identity-swap--gate-names", "-4.2s")}</h1>
         <p>${t.gateBody}</p>
+
         <form data-access-form>
-          <label for="access-key">${t.gateLabel}</label>
+
+          <label for="access-username">${t.gateUsernameLabel}</label>
           <input
-            id="access-key"
-            name="accessKey"
-            type="password"
-            autocomplete="current-password"
+            id="access-username"
+            name="username"
+            type="text"
+            autocomplete="username"
+            placeholder="${t.gateUsernamePlaceholder}"
             required
             autofocus
           />
+          <label for="access-password">${t.gateLabel}</label>
+          <input
+            id="access-password"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          />
           <button class="button button-dark" type="submit">${t.gateButton}</button>
           <small data-access-status data-state="${hasError ? "error" : ""}">
-            ${hasError ? t.gateError : ""}
+            ${statusMessage}
           </small>
+
         </form>
+
+        <p class="gate-lost-key">${t.gateLost}</p>
+        <div class="gate-contacts">
+          <a
+            class="gate-contact-link"
+            href="${EVENT.contacts.david.whatsapp}"
+            target="_blank"
+            rel="noreferrer"
+          >
+            ${EVENT.contacts.david.label} ↗
+          </a>
+          <a
+            class="gate-contact-link"
+            href="${EVENT.contacts.ayde.whatsapp}"
+            target="_blank"
+            rel="noreferrer"
+          >
+            ${EVENT.contacts.ayde.label} ↗
+          </a>
+        </div>
         <div class="gate-languages" aria-label="Language">
           ${languageSwitcherMarkup(language)}
         </div>
@@ -1361,29 +2320,50 @@ function renderGate(language, hasError = false) {
     event.preventDefault();
     const button = form.querySelector("button");
     const status = form.querySelector("[data-access-status]");
-    const accessKey = new FormData(form).get("accessKey");
+    const data = new FormData(form);
+    const username = String(data.get("username") || "").trim();
+    const password = String(data.get("password") || "");
 
     button.disabled = true;
     button.textContent = t.gateWorking;
     status.textContent = "";
 
+    // Guard against a hanging sign-in (e.g. slow network) so the button never
+    // stays stuck on "Ouverture…". If the request takes too long we reset the
+    // form and show the error message so the guest can try again.
+    const timeout = new Promise((_, reject) =>
+      window.setTimeout(
+        () => reject(new Error("timeout")),
+        15000,
+      ),
+    );
+
     try {
-      await setPersistence(auth, browserLocalPersistence);
-      const credential = await signInWithEmailAndPassword(
-        auth,
-        GUEST_EMAIL,
-        accessKey,
-      );
-      if (credential.user.uid !== GUEST_UID) {
-        await auth.signOut();
-        throw new Error("Unexpected guest account");
-      }
+      const email = `${username}@${AUTH_EMAIL_DOMAIN}`;
+      await Promise.race([
+        (async () => {
+          await setPersistence(auth, browserLocalPersistence);
+          await signInWithEmailAndPassword(auth, email, password);
+        })(),
+        timeout,
+      ]);
+      // Remember the username so the guest doesn't have to re-enter it on
+      // every visit. This is the only persistence available to a static PWA;
+      // it is cleared automatically if the account ever stops working.
+      window.localStorage.setItem(USERNAME_STORAGE_KEY, username);
+      // onAuthStateChanged will fire with the signed-in user and render the
+      // invitation; nothing more to do here.
     } catch (error) {
       console.warn("Invitation access rejected", error.code || error.message);
-      renderGate(currentLanguage, true);
+      renderGate(currentLanguage, "gateError");
     }
   });
 }
+
+
+
+
+
 
 function bindHeroSlideshow(labels) {
   window.clearInterval(heroSlideInterval);
@@ -1443,34 +2423,38 @@ function bindHeroSlideshow(labels) {
   startRotation();
 }
 
-function getTimeRemaining() {
-  const distance = new Date(EVENT.date).getTime() - Date.now();
-  const totalSeconds = Math.max(0, Math.floor(distance / 1000));
+// Countdown to the wedding (20/02 at 2 PM Mexico time).
+// Returns years, months, days, hours and minutes remaining until the wedding.
+function getTimeUntilWedding() {
+  const anchor = new Date(EVENT.weddingDate).getTime();
+  const now = Date.now();
+  const remainingMs = Math.max(0, anchor - now);
 
-  return {
-    distance,
-    days: Math.floor(totalSeconds / 86400),
-    hours: Math.floor((totalSeconds % 86400) / 3600),
-    minutes: Math.floor((totalSeconds % 3600) / 60),
-    seconds: totalSeconds % 60,
-  };
+  const totalMinutes = Math.floor(remainingMs / 60000);
+  const years = Math.floor(totalMinutes / (365 * 24 * 60));
+  const months = Math.floor(
+    (totalMinutes % (365 * 24 * 60)) / (30 * 24 * 60),
+  );
+  const days = Math.floor(
+    (totalMinutes % (30 * 24 * 60)) / (24 * 60),
+  );
+  const hours = Math.floor((totalMinutes % (24 * 60)) / 60);
+  const minutes = totalMinutes % 60;
+
+  return { years, months, days, hours, minutes };
 }
 
 function updateCountdown(language) {
-  const remaining = getTimeRemaining();
+  const timeUntilWedding = getTimeUntilWedding();
   const countdownBar = document.querySelector(".countdown-bar");
 
-  if (remaining.distance <= 0) {
-    countdownBar.innerHTML = `<strong>${content[language].countdown.arrived}</strong>`;
-    return;
-  }
-
-  Object.entries(remaining).forEach(([unit, value]) => {
-    if (unit === "distance") return;
+  Object.entries(timeUntilWedding).forEach(([unit, value]) => {
     const target = document.querySelector(`[data-countdown="${unit}"]`);
     if (target) target.textContent = String(value).padStart(2, "0");
   });
 }
+
+
 
 function observeReveals() {
   const elements = document.querySelectorAll(".reveal");
@@ -1496,13 +2480,83 @@ function observeReveals() {
 
 const initialLanguage = getInitialLanguage();
 currentLanguage = initialLanguage;
-onAuthStateChanged(auth, async (user) => {
-  if (user?.uid === GUEST_UID) {
-    render(currentLanguage);
-    return;
-  }
 
-  if (user) await auth.signOut();
-  renderGate(currentLanguage);
-});
-window.setInterval(() => updateCountdown(currentLanguage), 1000);
+// ── Bootstrap ──────────────────────────────────────────────────────────
+
+// Load deleted guest IDs and group custom content before anything else.
+// Resolves once the guest registry is ready so identity can be resolved
+// reliably from the signed-in auth account.
+const profileReady = Promise.all([
+  loadDeletedGuestIds(),
+  loadGroupCustomContent(),
+]);
+
+
+if (isDashboardRoute) {
+  import("./dashboard.js").then(({ startDashboard }) => {
+    startDashboard(app);
+  });
+} else {
+  onAuthStateChanged(auth, async (user) => {
+    if (user) {
+      // Wait for the guest registry to be ready before deciding identity.
+      await profileReady;
+      // The auth email is the canonical link to a guest (guest.firebaseEmail).
+      // We match by email first, falling back to the remembered username.
+      if (!activateGuestProfile(user.email)) {
+        // No valid guest identity for this account; sign out and show the gate.
+        await auth.signOut();
+        window.localStorage.removeItem(USERNAME_STORAGE_KEY);
+        renderGate(currentLanguage, "gateNoProfile");
+        return;
+      }
+
+      render(currentLanguage);
+      return;
+    }
+
+
+    // Auto sign-in with the username remembered in localStorage so guests
+    // don't have to re-enter it on every visit (e.g. after the Firebase
+    // session expires or the browser clears its auth cookies).
+    const storedUsername = window.localStorage.getItem(USERNAME_STORAGE_KEY);
+    if (storedUsername) {
+      try {
+        await setPersistence(auth, browserLocalPersistence);
+        await signInWithEmailAndPassword(
+          auth,
+          `${storedUsername}@${AUTH_EMAIL_DOMAIN}`,
+          SHARED_PASSWORD,
+        );
+        // onAuthStateChanged will fire again with the signed-in user and
+        // render the invitation; nothing more to do here.
+        return;
+      } catch (error) {
+        // The stored username is no longer valid; clear it and show the gate.
+        console.warn("Stored username rejected", error.code || error.message);
+        window.localStorage.removeItem(USERNAME_STORAGE_KEY);
+      }
+    }
+
+    renderGate(currentLanguage);
+  });
+
+
+
+
+  window.setInterval(() => updateCountdown(currentLanguage), 60000);
+
+}
+
+
+
+
+// ── Service Worker (PWA installability) ────────────────────────────────
+
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(() => {
+      // SW registration is optional; fail silently
+    });
+  });
+}
