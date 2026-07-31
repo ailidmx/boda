@@ -155,6 +155,24 @@ function getInitialLanguage() {
   return "es";
 }
 
+/**
+ * Whether the visitor has explicitly chosen a language (via the ?lang= query
+ * parameter or a previously saved localStorage preference). When neither is
+ * present, the guest's own preferred language (guest.lang) should take
+ * priority over the browser default.
+ */
+function hasExplicitLanguagePreference() {
+  const queryLanguage = normalizeLanguage(
+    new URLSearchParams(window.location.search).get("lang"),
+  );
+  if (queryLanguage) return true;
+
+  return Boolean(
+    normalizeLanguage(window.localStorage.getItem(LANGUAGE_STORAGE_KEY)),
+  );
+}
+
+
 function countdownMarkup(labels) {
   const units = [
     ["years", labels.years],
@@ -2512,8 +2530,23 @@ if (isDashboardRoute) {
         return;
       }
 
+      // When the visitor has not explicitly chosen a language (no ?lang=
+      // query parameter and no saved localStorage preference), default to the
+      // guest's own preferred language (guest.lang) instead of the browser
+      // default. This ensures e.g. French guests see the invitation in French
+      // on their first visit.
+      if (!hasExplicitLanguagePreference()) {
+        const guestLanguage = normalizeLanguage(
+          currentInvitationProfile?.guest?.lang,
+        );
+        if (guestLanguage) {
+          currentLanguage = guestLanguage;
+        }
+      }
+
       render(currentLanguage);
       return;
+
     }
 
 
