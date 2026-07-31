@@ -9,23 +9,59 @@ import { LazySection } from "./components/LazySection.jsx";
 // Below-the-fold sections are code-split and only mounted (and their JS chunk
 // fetched) when they scroll into view. This keeps the initial bundle small and
 // the first paint fast on a long one-page invitation.
-const IdentitySection = lazy(() => import("./components/IdentitySection.jsx"));
-const Story = lazy(() => import("./components/Story.jsx"));
+//
+// The components use named exports, so each lazy() maps the module to its
+// named export via `.then((m) => ({ default: m.X }))` — React.lazy requires a
+// default export.
+const IdentitySection = lazy(() =>
+  import("./components/IdentitySection.jsx").then((m) => ({ default: m.IdentitySection })),
+);
+const Story = lazy(() =>
+  import("./components/Story.jsx").then((m) => ({ default: m.Story })),
+);
 
-const Venue = lazy(() => import("./components/Venue.jsx"));
-const Weekend = lazy(() => import("./components/Weekend.jsx"));
-const Accommodation = lazy(() => import("./components/Accommodation.jsx"));
-const Weather = lazy(() => import("./components/Weather.jsx"));
-const Food = lazy(() => import("./components/Food.jsx"));
-const Music = lazy(() => import("./components/Music.jsx"));
-const Travel = lazy(() => import("./components/Travel.jsx"));
-const Attire = lazy(() => import("./components/Attire.jsx"));
-const Gift = lazy(() => import("./components/Gift.jsx"));
-const Coast = lazy(() => import("./components/Coast.jsx"));
-const RSVP = lazy(() => import("./components/RSVP.jsx"));
-const Gallery = lazy(() => import("./components/Gallery.jsx"));
-const Photos = lazy(() => import("./components/Photos.jsx"));
-const Footer = lazy(() => import("./components/Footer.jsx"));
+const Venue = lazy(() =>
+  import("./components/Venue.jsx").then((m) => ({ default: m.Venue })),
+);
+const Weekend = lazy(() =>
+  import("./components/Weekend.jsx").then((m) => ({ default: m.Weekend })),
+);
+const Accommodation = lazy(() =>
+  import("./components/Accommodation.jsx").then((m) => ({ default: m.Accommodation })),
+);
+const Weather = lazy(() =>
+  import("./components/Weather.jsx").then((m) => ({ default: m.Weather })),
+);
+const Food = lazy(() =>
+  import("./components/Food.jsx").then((m) => ({ default: m.Food })),
+);
+const Music = lazy(() =>
+  import("./components/Music.jsx").then((m) => ({ default: m.Music })),
+);
+const Travel = lazy(() =>
+  import("./components/Travel.jsx").then((m) => ({ default: m.Travel })),
+);
+const Attire = lazy(() =>
+  import("./components/Attire.jsx").then((m) => ({ default: m.Attire })),
+);
+const Gift = lazy(() =>
+  import("./components/Gift.jsx").then((m) => ({ default: m.Gift })),
+);
+const Coast = lazy(() =>
+  import("./components/Coast.jsx").then((m) => ({ default: m.Coast })),
+);
+const RSVP = lazy(() =>
+  import("./components/RSVP.jsx").then((m) => ({ default: m.RSVP })),
+);
+const Gallery = lazy(() =>
+  import("./components/Gallery.jsx").then((m) => ({ default: m.Gallery })),
+);
+const Photos = lazy(() =>
+  import("./components/Photos.jsx").then((m) => ({ default: m.Photos })),
+);
+const Footer = lazy(() =>
+  import("./components/Footer.jsx").then((m) => ({ default: m.Footer })),
+);
 
 function Invitation() {
   const { authState } = useApp();
