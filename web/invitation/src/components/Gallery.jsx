@@ -8,7 +8,7 @@ export function Gallery() {
   const photos = MEDIA.gallery || [];
 
   return (
-    <section className="gallery-section section" id="gallery">
+    <section className="gallery-section section">
       <div className="gallery-heading reveal">
         <p className="eyebrow">{gallery.eyebrow}</p>
         <h2>{gallery.title}</h2>

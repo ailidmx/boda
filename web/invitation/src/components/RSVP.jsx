@@ -16,7 +16,7 @@ export function RSVP() {
   const showTravelSection = profile?.guest?.comesFromFar === true;
 
   return (
-    <section className="rsvp-section section" id="rsvp">
+    <section className="rsvp-section section">
       <div className="rsvp-frame reveal">
         <p className="eyebrow">{rsvp.eyebrow}</p>
         <h2>{rsvp.title}</h2>

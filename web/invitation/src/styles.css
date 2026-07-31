@@ -978,6 +978,15 @@ a:focus-visible {
   padding: clamp(5rem, 10vw, 10rem) clamp(1.25rem, 6vw, 6rem);
 }
 
+/* Lazy-loaded section wrapper: a plain block that does not add layout. */
+.lazy-section {
+  display: block;
+  width: 100%;
+}
+.lazy-section > .section {
+  width: 100%;
+}
+
 h2 {
   max-width: 15ch;
   margin: 0;

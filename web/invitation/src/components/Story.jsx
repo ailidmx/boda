@@ -13,7 +13,7 @@ export function Story() {
   );
 
   return (
-    <section className="story-section section" id="story">
+    <section className="story-section section">
       <div className="story-mark">
         <InitialsSwap variant="identity-swap--story" delay="-3.4s" />
       </div>

@@ -12,7 +12,7 @@ export function Music() {
   ];
 
   return (
-    <section className="music-section section" id="music">
+    <section className="music-section section">
       <div className="experience-heading reveal">
         <p className="eyebrow">{music.eyebrow}</p>
         <h2>{music.title}</h2>

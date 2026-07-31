@@ -7,7 +7,7 @@ export function Food() {
   const food = t.food || {};
 
   return (
-    <section className="food-section section" id="food">
+    <section className="food-section section">
       <div className="experience-heading reveal">
         <p className="eyebrow">{food.eyebrow}</p>
         <h2>{food.title}</h2>
