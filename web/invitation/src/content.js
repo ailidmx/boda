@@ -109,8 +109,22 @@ export const content = {
         "David y Aydé sonríen durante un viaje",
       ],
     },
+    photos: {
+      title: "Comparte tus fotos",
+      lead:
+        "Queremos ver la boda a través de tus ojos. Hemos creado dos álbumes compartidos de Google Photos donde puedes subir tus fotos.",
+      beforeTitle: "📸 Antes de la boda",
+      beforeBody: "Comparte tus fotos favoritas de nosotros antes del gran día.",
+      duringTitle: "🎉 La boda vista por los invitados",
+      duringBody:
+        "Después de la boda, comparte aquí las fotos que tomaste durante la celebración.",
+      upload: "Subir fotos ↗",
+      note:
+        'Solicita acceso al álbum haciendo clic en "Subir fotos". Una vez dentro, podrás subir todas las fotos que quieras. ¡Gracias por capturar estos momentos con nosotros!',
+    },
     weekend: {
       eyebrow: "Guarden la fecha",
+
       title: "Tres días para celebrar",
       intro:
         "Nosotros estaremos en Roca Azul desde el jueves. Los invitados pueden llegar desde el viernes alrededor del mediodía y la celebración principal será una boda de tarde el sábado.",
@@ -913,8 +927,22 @@ export const content = {
         "David et Aydé sourient pendant un voyage",
       ],
     },
+    photos: {
+      title: "Partagez vos photos",
+      lead:
+        "Nous voulons voir le mariage à travers vos yeux. Nous avons créé deux albums Google Photos partagés où vous pouvez déposer vos photos.",
+      beforeTitle: "📸 Avant le mariage",
+      beforeBody: "Partagez vos photos préférées de nous avant le grand jour.",
+      duringTitle: "🎉 Le mariage vu par les invités",
+      duringBody:
+        "Après le mariage, partagez ici les photos que vous avez prises pendant la célébration.",
+      upload: "Déposer des photos ↗",
+      note:
+        'Demandez l’accès à l’album en cliquant sur « Déposer des photos ». Une fois à l’intérieur, vous pourrez déposer toutes les photos que vous voulez. Merci de capturer ces moments avec nous !',
+    },
     weekend: {
       eyebrow: "Réservez la date",
+
       title: "Trois jours pour célébrer",
       intro:
         "Nous serons à Roca Azul dès le jeudi. Les invités pourront arriver à partir du vendredi vers midi, et la célébration principale sera un mariage d’après-midi le samedi.",
@@ -1716,8 +1744,22 @@ export const content = {
         "David and Aydé smile during a trip",
       ],
     },
+    photos: {
+      title: "Share your photos",
+      lead:
+        "We would love to see the wedding through your eyes. We have created two shared Google Photos albums where you can upload your pictures.",
+      beforeTitle: "📸 Before the wedding",
+      beforeBody: "Share your favourite photos of us before the big day.",
+      duringTitle: "🎉 The wedding through guests’ eyes",
+      duringBody:
+        "After the wedding, share the photos you took during the celebration here.",
+      upload: "Upload photos ↗",
+      note:
+        'Request access to the album by clicking “Upload photos”. Once inside, you can upload as many photos as you like. Thank you for capturing these moments with us!',
+    },
     weekend: {
       eyebrow: "Save the date",
+
       title: "Three days to celebrate",
       intro:
         "We will be at Roca Azul from Thursday. Guests may arrive from around midday on Friday, and Saturday’s main celebration will be an afternoon wedding.",
