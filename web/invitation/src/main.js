@@ -2508,7 +2508,24 @@ function observeReveals() {
   );
 
   elements.forEach((element) => observer.observe(element));
+
+  // Safety net: never leave content permanently hidden. If any `.reveal`
+  // element is already in the viewport but the observer missed it (e.g. a
+  // race condition, or it rendered after the observer was set up), force it
+  // visible so text/images are never stuck at opacity 0. Elements below the
+  // fold are left alone so the scroll-in animation still plays.
+  window.setTimeout(() => {
+    document
+      .querySelectorAll(".reveal:not(.is-visible)")
+      .forEach((element) => {
+        const rect = element.getBoundingClientRect();
+        const inViewport = rect.top < window.innerHeight && rect.bottom > 0;
+        if (inViewport) element.classList.add("is-visible");
+      });
+  }, 1200);
 }
+
+
 
 const initialLanguage = getInitialLanguage();
 currentLanguage = initialLanguage;

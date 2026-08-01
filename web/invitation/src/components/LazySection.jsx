@@ -54,14 +54,25 @@ export function LazySection({
     if (!node) return undefined;
 
     const revealEls = node.querySelectorAll(".reveal");
-    revealEls.forEach((el, index) => {
-      window.setTimeout(() => el.classList.add("is-visible"), index * 60);
-    });
+    const timers = revealEls.map((el, index) =>
+      window.setTimeout(() => el.classList.add("is-visible"), index * 60),
+    );
+
+    // Safety net: never leave content permanently hidden. If any `.reveal`
+    // child is still invisible shortly after the section mounts (e.g. a
+    // timer was cleared or the animation was interrupted), force it visible.
+    const fallback = window.setTimeout(() => {
+      node
+        .querySelectorAll(".reveal:not(.is-visible)")
+        .forEach((el) => el.classList.add("is-visible"));
+    }, revealEls.length * 60 + 400);
 
     return () => {
-      revealEls.forEach((el) => el.classList.remove("is-visible"));
+      timers.forEach((timer) => window.clearTimeout(timer));
+      window.clearTimeout(fallback);
     };
   }, [visible]);
+
 
 
   return (
