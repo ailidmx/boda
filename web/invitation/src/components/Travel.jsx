@@ -1,25 +1,26 @@
 import React from "react";
 import { useApp } from "../context/AppContext.jsx";
 import { MapCarousel } from "./MapCarousel.jsx";
+import { cloudinaryImage } from "../cloudinary.js";
 
 const MAP_IMAGES = {
   venue: [
     {
-      src: "https://res.cloudinary.com/k2ajcgxv/image/upload/v1785521656/Captura_de_pantalla_2026-07-31_a_la_s_11.58.29_a.m._eqyghk.png",
+      src: cloudinaryImage("Captura_de_pantalla_2026-07-31_a_la_s_11.58.29_a.m._eqyghk.png", { width: 1200 }),
       alt: "Mapa 1 · ruta hacia Roca Azul",
     },
     {
-      src: "https://res.cloudinary.com/k2ajcgxv/image/upload/v1785521653/Captura_de_pantalla_2026-07-31_a_la_s_11.59.01_a.m._fedfdr.png",
+      src: cloudinaryImage("Captura_de_pantalla_2026-07-31_a_la_s_11.59.01_a.m._fedfdr.png", { width: 1200 }),
       alt: "Mapa 2 · ruta hacia Roca Azul",
     },
     {
-      src: "https://res.cloudinary.com/k2ajcgxv/image/upload/v1785521649/Captura_de_pantalla_2026-07-31_a_la_s_11.59.30_a.m._t05ski.png",
+      src: cloudinaryImage("Captura_de_pantalla_2026-07-31_a_la_s_11.59.30_a.m._t05ski.png", { width: 1200 }),
       alt: "Mapa 3 · ruta hacia Roca Azul",
     },
   ],
   beach: [
     {
-      src: "https://res.cloudinary.com/k2ajcgxv/image/upload/v1785521647/Captura_de_pantalla_2026-07-31_a_la_s_11.59.57_a.m._lenxjn.png",
+      src: cloudinaryImage("Captura_de_pantalla_2026-07-31_a_la_s_11.59.57_a.m._lenxjn.png", { width: 1200 }),
       alt: "Mapa · ruta hacia Barra de Navidad",
     },
   ],
