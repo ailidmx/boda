@@ -44,7 +44,8 @@ export function Story() {
       <div className="story-copy reveal">
         <p className="eyebrow">{story.eyebrow}</p>
         <h2>{story.title}</h2>
-        <p className="lead">{story.body}</p>
+        <p className="lead story-lead">{story.body}</p>
+
         <p className="handwritten">{story.note}</p>
         <div className="chapala-photos" aria-label={story.photosLabel}>
           {CHAPALA_HIGHLIGHTS.map((photo, index) => (
