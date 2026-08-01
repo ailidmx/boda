@@ -16,7 +16,7 @@ export function LazySection({
   id,
   className,
   rootMargin = "600px 0px",
-  placeholder = null,
+  placeholder = <div className="lazy-section-placeholder" aria-hidden="true" />,
 }) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);

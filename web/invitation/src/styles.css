@@ -987,6 +987,14 @@ a:focus-visible {
   width: 100%;
 }
 
+/* Placeholder shown while a lazy section is still below the fold. It gives the
+   wrapper a non-zero height so the IntersectionObserver can detect it (a
+   zero-height element never reports isIntersecting, which left the page empty
+   below the hero). */
+.lazy-section-placeholder {
+  min-height: 60vh;
+}
+
 h2 {
   max-width: 15ch;
   margin: 0;
