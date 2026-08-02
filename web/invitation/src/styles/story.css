@@ -1,0 +1,141 @@
+/* ── Story section ────────────────────────────────────────────────────── */
+
+.story-section {
+  display: grid;
+  grid-template-columns: 0.75fr 1.25fr;
+  align-items: center;
+  align-content: space-between;
+  gap: clamp(2rem, 5vw, 5rem);
+  min-height: calc(100svh - var(--countdown-height) - var(--header-height));
+  padding-block: clamp(2rem, 4vw, 3.5rem);
+  background: var(--cream);
+}
+
+/* Pin the "continue" nav to the bottom of the full-height slide. The margin
+   is kept tight so the link stays visible within the viewport height. */
+.story-section .section-nav {
+  grid-column: 1 / -1;
+  align-self: end;
+  margin-top: clamp(0.5rem, 1.2vw, 1rem);
+}
+
+
+
+
+
+.story-mark {
+  color: var(--terracotta);
+  font-family: var(--font-display);
+  font-size: clamp(8rem, 23vw, 22rem);
+  letter-spacing: -0.13em;
+  line-height: 0.8;
+  opacity: 0.9;
+}
+
+.identity-swap--story .identity-swap-state {
+  gap: 0.02em;
+}
+
+.identity-swap--story .identity-swap-state i {
+  color: #d4af37;
+  font-size: 0.32em;
+}
+
+
+.story-copy {
+  min-width: 0;
+}
+
+.story-copy h2 {
+  margin-bottom: 1rem;
+}
+
+
+/* Lead de la story stylisé comme une citation littéraire. */
+.story-lead {
+  position: relative;
+  max-width: 34rem;
+  margin: 0 0 1.25rem;
+  padding-left: 1.5rem;
+
+  border-left: 2px solid var(--marigold);
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.story-lead::before {
+  content: "“";
+  position: absolute;
+  top: -0.35em;
+  left: -0.15rem;
+  font-family: var(--font-display);
+  font-size: 3.5em;
+  line-height: 1;
+  color: var(--marigold);
+  opacity: 0.35;
+}
+
+
+
+.chapala-photos {
+  display: grid;
+  grid-auto-columns: minmax(15rem, 22vw);
+  grid-auto-flow: column;
+  gap: 0.8rem;
+  margin-top: 1.25rem;
+  overflow-x: auto;
+  padding-bottom: 1.25rem;
+
+  scroll-snap-type: x mandatory;
+  scrollbar-color: var(--terracotta) rgb(36 33 25 / 12%);
+  scrollbar-width: thin;
+}
+
+.chapala-photo {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0.5rem;
+  background: none;
+  cursor: pointer;
+  scroll-snap-align: start;
+}
+
+
+.chapala-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 700ms ease;
+}
+
+.chapala-photo:hover img {
+  transform: scale(1.04);
+}
+
+/* Section footer that hosts the reusable fun-fact carousel. Spans the full
+   width of the section (below the two-column story grid). Spacing is kept
+   tight so the whole slide (including the bottom nav link) fits on screen. */
+.story-footer {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin-top: clamp(0.75rem, 1.5vw, 1.25rem);
+  padding-top: clamp(0.5rem, 1vw, 0.75rem);
+  border-top: 1px solid rgb(36 33 25 / 16%);
+}
+
+
+
+
+.story-footer .fun-fact-list {
+  margin-top: 0;
+  max-width: 100%;
+}

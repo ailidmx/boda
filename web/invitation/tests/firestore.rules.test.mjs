@@ -165,3 +165,77 @@ test("an allowlisted but unverified email cannot read submissions", async () => 
     .firestore();
   await assertFails(getDoc(doc(db, "rsvp_submissions", "valid")));
 });
+
+// ── Guests collection: group members may edit each other's contact ──────
+// The `guests` collection is the source of truth for guest records. Any
+// authenticated guest may update the phone/email of a member of their own
+// invitation group (mapped via guest_auth/{uid}.invitationGroup), but nothing
+// else, and never members of another group.
+
+const editorUid = "editor-uid-1";
+const editorGroup = "Familia de David";
+
+async function seedGuestAuth() {
+  const admin = environment.adminContext().firestore();
+  await setDoc(doc(admin, "guest_auth", editorUid), {
+    guestId: "david_aili",
+    invitationGroup: editorGroup,
+  });
+}
+
+test("a group member can update the phone of another member in their group", async () => {
+  await seedGuestAuth();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "guests", "catherine"), {
+      guestId: "catherine",
+      phone: "+33 6 12 34 56 78",
+      email: "catherine@example.com",
+      invitationGroup: editorGroup,
+      updatedBy: "david_aili",
+      updatedAt: serverTimestamp(),
+    }),
+  );
+});
+
+test("a group member cannot edit non-contact fields of another member", async () => {
+  await seedGuestAuth();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertFails(
+    setDoc(doc(db, "guests", "catherine"), {
+      guestId: "catherine",
+      firstName: "Hacked",
+      invitationGroup: editorGroup,
+      updatedBy: "david_aili",
+      updatedAt: serverTimestamp(),
+    }),
+  );
+});
+
+test("a group member cannot edit a member of a different group", async () => {
+  await seedGuestAuth();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertFails(
+    setDoc(doc(db, "guests", "sebastien"), {
+      guestId: "sebastien",
+      phone: "+33 6 00 00 00 00",
+      invitationGroup: "PetanclubGDL",
+      updatedBy: "david_aili",
+      updatedAt: serverTimestamp(),
+    }),
+  );
+});
+
+test("an unauthenticated visitor cannot edit a guest record", async () => {
+  const db = environment.unauthenticatedContext().firestore();
+  await assertFails(
+    setDoc(doc(db, "guests", "catherine"), {
+      guestId: "catherine",
+      phone: "+33 6 00 00 00 00",
+      invitationGroup: editorGroup,
+      updatedBy: "david_aili",
+      updatedAt: serverTimestamp(),
+    }),
+  );
+});
+

@@ -7,12 +7,15 @@ service cloud.firestore {
         && request.auth.uid == "yfu7MMCmFaPCK7UW4czr5c3x7Aa2";
     }
 
+    // The couple (David & Aydé) sign in with the same per-guest auth accounts
+    // as everyone else (david@ / ayde@). We identify them by looking up their
+    // UID in `guest_auth/{uid}` and checking the guestId. This is stable and
+    // does not depend on email verification or personal Google accounts.
     function isCouple() {
       return request.auth != null
-        && request.auth.token.email_verified == true
-        && request.auth.token.email in [
-          "david.aili.mx@gmail.com",
-          "aydemiss@gmail.com"
+        && get(/databases/$(database)/documents/guest_auth/$(request.auth.uid)).data.guestId in [
+          "david",
+          "ayde"
         ];
     }
 
@@ -201,10 +204,65 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/guest_auth/$(request.auth.uid)).data.invitationGroup;
     }
 
+    // A group member may update the contact details (phone / email) of any
+    // member of their own invitation group on the `guests` collection. Only
+    // those contact fields plus lightweight metadata are allowed.
+    function hasValidGuestContactFields() {
+      return request.resource.data.keys().hasAll([
+          "guestId", "invitationGroup", "updatedBy", "updatedAt"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "guestId", "phone", "email", "invitationGroup", "updatedBy", "updatedAt"
+        ])
+        && isShortText(request.resource.data.guestId, 100)
+        && request.resource.data.guestId.size() > 0
+        && isShortText(request.resource.data.invitationGroup, 150)
+        && isShortText(request.resource.data.updatedBy, 100)
+        && request.resource.data.updatedAt == request.time
+        && (!request.resource.data.keys().hasAny(["phone"])
+          || isShortText(request.resource.data.phone, 50))
+        && (!request.resource.data.keys().hasAny(["email"])
+          || isShortText(request.resource.data.email, 254));
+    }
+
+    // ── Save-the-date attendance responses ────────────────────────────────
+    // Each guest may indicate, for each member of their invitation group,
+    // whether they plan to join on Friday, Saturday and Sunday. Responses are
+    // stored per guest under `attendance_responses/{guestId}`.
+    function hasValidAttendanceFields() {
+      return request.resource.data.keys().hasAll([
+          "guestId", "friday", "saturday", "sunday", "invitationGroup",
+          "updatedBy", "language", "schemaVersion", "updatedAt"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "guestId", "friday", "saturday", "sunday", "invitationGroup",
+          "updatedBy", "language", "schemaVersion", "updatedAt"
+        ])
+        && isShortText(request.resource.data.guestId, 100)
+        && request.resource.data.guestId.size() > 0
+        && request.resource.data.friday in ["yes", "no", "maybe", ""]
+        && request.resource.data.saturday in ["yes", "no", "maybe", ""]
+        && request.resource.data.sunday in ["yes", "no", "maybe", ""]
+        && isShortText(request.resource.data.invitationGroup, 150)
+        && isShortText(request.resource.data.updatedBy, 100)
+        && request.resource.data.language in ["es", "fr", "en"]
+        && request.resource.data.schemaVersion == 1
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    match /attendance_responses/{guestId} {
+      allow read: if true;
+      allow create, update: if request.auth != null
+        && hasValidAttendanceFields()
+        && editorInvitationGroup() == request.resource.data.invitationGroup;
+      allow delete: if false;
+    }
+
     match /guest_auth/{uid} {
       allow read: if true;
       allow write: if isCouple();
     }
+
 
     match /guest_profiles/{guestId} {
       allow read: if true;
@@ -215,10 +273,17 @@ service cloud.firestore {
     }
 
     match /guests/{guestId} {
-
       allow read: if true;
-      allow write: if isCouple();
+      // The couple has full access. Any authenticated guest may update the
+      // contact details (phone / email) of a member of their own invitation
+      // group, but nothing else.
+      allow create, update: if isCouple()
+        || (request.auth != null
+          && hasValidGuestContactFields()
+          && editorInvitationGroup() == request.resource.data.invitationGroup);
+      allow delete: if isCouple();
     }
+
 
     match /invitation_groups/{groupId} {
       allow read: if true;

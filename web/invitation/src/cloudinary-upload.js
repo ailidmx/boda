@@ -26,7 +26,7 @@ export const AVATAR_FOLDER = "boda/avatars";
 /**
  * Upload an image File to Cloudinary (unsigned) and return the secure
  * delivery URL.
- *
+ 
  * @param {File} file  the image file to upload
  * @returns {Promise<string>} secure URL of the uploaded image
  */

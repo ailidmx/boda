@@ -1,0 +1,613 @@
+/* ── Hero ─────────────────────────────────────────────────────────────── */
+
+.hero {
+  position: relative;
+  display: grid;
+  min-height: calc(100svh - var(--countdown-height) - var(--header-height));
+  overflow: hidden;
+
+  background:
+    linear-gradient(90deg, rgb(36 33 25 / 52%), transparent 55%),
+    var(--sand);
+  color: var(--white);
+  isolation: isolate;
+}
+
+.hero-art {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 72% 32%, rgb(231 194 125 / 40%), transparent 23%),
+    linear-gradient(135deg, #9b735e 0%, #6e6857 44%, #33423a 100%);
+}
+
+.hero-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  opacity: 0;
+  transform: scale(1.025);
+  transition:
+    opacity 1.2s ease,
+    transform 7s ease;
+}
+
+.hero-photo.is-active {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.hero-slideshow-controls {
+  position: absolute;
+  z-index: 4;
+  right: clamp(1rem, 4vw, 4rem);
+  bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.hero-slide-dots {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.hero-slide-dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border: 1px solid var(--white);
+  border-radius: 50%;
+  padding: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.hero-slide-dot[aria-current="true"] {
+  background: var(--white);
+}
+
+.hero-pause-button {
+  border: 0;
+  padding: 0.25rem 0;
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.hero-art.has-photo::before {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background:
+    radial-gradient(
+      ellipse at 50% 45%,
+      rgb(16 20 16 / 62%) 0%,
+      rgb(16 20 16 / 38%) 55%,
+      rgb(16 20 16 / 62%) 100%
+    ),
+    linear-gradient(
+      90deg,
+      rgb(28 31 26 / 55%),
+      rgb(28 31 26 / 25%) 55%,
+      rgb(28 31 26 / 55%)
+    );
+  content: "";
+}
+
+.hero-art.has-photo .sun-disc,
+.hero-art.has-photo .motif {
+  display: none;
+}
+
+.hero-art::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 55%, rgb(24 32 28 / 68%)),
+    radial-gradient(circle at 50% 120%, #263a33 0 37%, transparent 38%);
+  content: "";
+}
+
+.sun-disc {
+  position: absolute;
+  top: 16%;
+  right: 13%;
+  width: min(30vw, 23rem);
+  aspect-ratio: 1;
+  border: 1px solid rgb(255 238 194 / 38%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 3rem rgb(255 238 194 / 4%),
+    0 0 0 7rem rgb(255 238 194 / 3%);
+}
+
+.motif {
+  position: absolute;
+  z-index: 2;
+  bottom: -4rem;
+  width: 16rem;
+  height: 32rem;
+  opacity: 0.45;
+  transform: rotate(-12deg);
+}
+
+.motif::before,
+.motif::after {
+  position: absolute;
+  border: 1px solid rgb(255 244 214 / 65%);
+  border-radius: 70% 0 70% 0;
+  content: "";
+}
+
+.motif::before {
+  inset: 0 50% 40% 0;
+  box-shadow:
+    4rem 5rem 0 -0.15rem rgb(255 255 255 / 0%),
+    4rem 5rem 0 0 rgb(255 244 214 / 52%);
+}
+
+.motif::after {
+  inset: 35% 0 0 45%;
+}
+
+.motif-left {
+  left: 6%;
+}
+
+.motif-right {
+  right: 4%;
+  transform: rotate(18deg) scaleX(-1);
+}
+
+.hero-image-note {
+  position: absolute;
+  z-index: 3;
+  right: 2rem;
+  bottom: 2rem;
+  color: rgb(255 255 255 / 62%);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  align-self: center;
+  width: min(92%, 78rem);
+  margin: 0 auto;
+  padding: 2.5rem 0 2rem;
+  text-align: center;
+  overflow: visible;
+}
+
+
+
+
+.hero h1 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.6rem, 2vw, 1.5rem);
+  margin: 0;
+  font-family: var(--font-calligraphy);
+  font-size: clamp(7rem, 18vw, 14rem);
+  font-weight: 400;
+  font-optical-sizing: auto;
+  letter-spacing: 0.02em;
+  line-height: 1.35;
+  overflow: visible;
+}
+
+
+
+
+
+
+
+
+
+.hero h1 i {
+  color: #e4b968;
+  font-size: 0.48em;
+  font-weight: 400;
+}
+
+.hero-date {
+  position: relative;
+  margin: 3rem 0 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+
+
+
+
+.hero-date-swap {
+  --identity-cycle: 12s;
+  --identity-ease: cubic-bezier(0.76, 0, 0.24, 1);
+
+  position: relative;
+  display: grid;
+  width: 100%;
+  margin-inline: auto;
+  place-items: center;
+  isolation: isolate;
+}
+
+/* Ligne de date (jour · mois · année) — Montserrat */
+.hero-date-line {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.14em;
+  font-family: var(--font-body);
+  font-size: clamp(2rem, 5.5vw, 4rem);
+
+
+
+
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  color: #f1d390;
+  text-shadow:
+    0 0 1.5rem rgb(241 211 144 / 35%),
+    0 0 4rem rgb(241 211 144 / 15%);
+  white-space: nowrap;
+}
+
+/* Nom complet du jour — au-dessus des chiffres, très peu haut et très large */
+.hero-date-daynames {
+  display: block;
+  width: 100%;
+  margin: 0 0 0.35rem;
+  text-align: center;
+  pointer-events: none;
+}
+
+.hero-date-dayname {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: clamp(0.7rem, 1.6vw, 1.1rem);
+  font-weight: 500;
+  letter-spacing: 0.55em;
+  line-height: 1;
+  color: rgb(255 255 255 / 0.85);
+  text-transform: uppercase;
+  white-space: nowrap;
+  opacity: 0;
+  filter: blur(0);
+  will-change: opacity, filter, transform;
+}
+
+
+
+
+.hero-date-dayname--primary {
+  animation: dayname-primary var(--identity-cycle) var(--identity-ease)
+    infinite both;
+}
+
+.hero-date-dayname--secondary {
+  animation: dayname-secondary var(--identity-cycle) var(--identity-ease)
+    infinite both;
+}
+
+.hero-date-dayname--tertiary {
+  animation: dayname-tertiary var(--identity-cycle) var(--identity-ease)
+    infinite both;
+}
+
+/* Jour — swap vertical (effet calendrier) */
+.hero-date-day-swap {
+  display: grid;
+  place-items: center;
+}
+
+.hero-date-day {
+  grid-area: 1 / 1;
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  will-change: opacity, transform, filter;
+}
+
+.hero-date-day--primary {
+  animation: day-primary var(--identity-cycle) var(--identity-ease)
+    infinite both;
+}
+
+.hero-date-day--secondary {
+  animation: day-secondary var(--identity-cycle) var(--identity-ease)
+    infinite both;
+}
+
+.hero-date-day--tertiary {
+  animation: day-tertiary var(--identity-cycle) var(--identity-ease)
+    infinite both;
+}
+
+.hero-date-sep {
+  color: rgb(241 211 144 / 55%);
+  font-size: 0.5em;
+}
+
+.hero-date-num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Jour : swap vertical ── */
+@keyframes day-primary {
+  0%,
+  30%,
+  100% {
+    filter: blur(0);
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  34%,
+  96% {
+    filter: blur(0.06em);
+    opacity: 0;
+    transform: translateY(-0.5em);
+  }
+}
+
+@keyframes day-secondary {
+  0%,
+  30% {
+    filter: blur(0.06em);
+    opacity: 0;
+    transform: translateY(0.5em);
+  }
+
+  34%,
+  60% {
+    filter: blur(0);
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  64%,
+  96% {
+    filter: blur(0.06em);
+    opacity: 0;
+    transform: translateY(-0.5em);
+  }
+
+  100% {
+    filter: blur(0.06em);
+    opacity: 0;
+    transform: translateY(0.5em);
+  }
+}
+
+@keyframes day-tertiary {
+  0%,
+  60% {
+    filter: blur(0.06em);
+    opacity: 0;
+    transform: translateY(0.5em);
+  }
+
+  64%,
+  90% {
+    filter: blur(0);
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  94%,
+  100% {
+    filter: blur(0.06em);
+    opacity: 0;
+    transform: translateY(-0.5em);
+  }
+}
+
+/* ── Nom du jour : swap au-dessus des chiffres ── */
+@keyframes dayname-primary {
+  0%,
+  30%,
+  100% {
+    filter: blur(0);
+    opacity: 0.85;
+    transform: translateY(0);
+  }
+
+
+  34%,
+  96% {
+    filter: blur(0.04em);
+    opacity: 0;
+    transform: translateY(-0.4em);
+  }
+}
+
+@keyframes dayname-secondary {
+  0%,
+  30% {
+    filter: blur(0.04em);
+    opacity: 0;
+    transform: translateY(0.4em);
+  }
+
+  34%,
+  60% {
+    filter: blur(0);
+    opacity: 0.85;
+    transform: translateY(0);
+  }
+
+  64%,
+  96% {
+    filter: blur(0.04em);
+    opacity: 0;
+    transform: translateY(-0.4em);
+  }
+
+  100% {
+    filter: blur(0.04em);
+    opacity: 0;
+    transform: translateY(0.4em);
+  }
+}
+
+@keyframes dayname-tertiary {
+  0%,
+  60% {
+    filter: blur(0.04em);
+    opacity: 0;
+    transform: translateY(0.4em);
+  }
+
+  64%,
+  90% {
+    filter: blur(0);
+    opacity: 0.85;
+    transform: translateY(0);
+  }
+
+
+  94%,
+  100% {
+    filter: blur(0.04em);
+    opacity: 0;
+    transform: translateY(-0.4em);
+  }
+}
+
+
+
+
+.hero-date-label {
+  font-size: clamp(1rem, 1.8vw, 1.4rem);
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  color: rgb(241 211 144 / 70%);
+  text-transform: uppercase;
+}
+
+.hero-place {
+  margin: 0 0 3rem;
+  font-size: clamp(0.85rem, 1.4vw, 1.1rem);
+  font-weight: 500;
+  letter-spacing: 0.42em;
+  line-height: 1.9;
+  text-transform: uppercase;
+}
+
+
+
+
+
+
+.hero-guest-name {
+  margin: 0 0 3rem;
+  font-family: var(--font-body);
+  font-size: 4.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.05;
+  color: var(--white);
+  text-shadow: 0 2px 24px rgb(0 0 0 / 45%);
+}
+
+
+.hero-eyebrow {
+  margin: 0 0 2rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 5.6vw, 7rem);
+  font-style: italic;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+  color: #f1d390;
+  text-shadow: 0 2px 24px rgb(0 0 0 / 45%);
+}
+
+
+
+
+
+
+
+
+
+.hero-group-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem auto 0;
+  border: 1px solid rgb(241 211 144 / 55%);
+  border-radius: 999px;
+  padding: 0.45rem 1.2rem;
+  background: rgb(20 24 20 / 45%);
+  color: #f1d390;
+  font-size: clamp(0.8rem, 1.4vw, 1rem);
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  backdrop-filter: blur(6px);
+}
+
+
+.hero-group-name::before {
+  content: "✦";
+  color: #e4b968;
+  font-size: 0.8em;
+}
+
+.hero-invitation {
+  margin: 3rem auto 0;
+  font-family: var(--font-body);
+  font-size: clamp(2.6rem, 5.5vw, 4.2rem);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+  text-shadow: 0 2px 24px rgb(0 0 0 / 45%);
+}
+
+
+
+
+
+
+
+
+
+.scroll-cue {
+  position: absolute;
+  bottom: 1.5rem;
+  left: 50%;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--white);
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transform: translateX(-50%);
+}
+
+.scroll-cue:hover,
+.scroll-cue:focus-visible {
+  text-decoration: underline;
+}
+

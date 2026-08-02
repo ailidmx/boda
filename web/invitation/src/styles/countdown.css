@@ -1,0 +1,107 @@
+/* ── Countdown bar ────────────────────────────────────────────────────── */
+
+.countdown-bar {
+  position: sticky;
+  z-index: 100;
+  top: 0;
+  display: flex;
+  min-height: var(--countdown-height);
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.65rem, 3vw, 2rem);
+  padding: 0.45rem 1rem;
+  background: var(--deep-green);
+  color: var(--white);
+  box-shadow: 0 8px 24px rgb(31 30 23 / 18%);
+  letter-spacing: 0.02em;
+}
+
+.countdown-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  white-space: nowrap;
+}
+
+.countdown-prefix {
+  font-family: var(--font-countdown);
+  font-size: clamp(1rem, 2vw, 1.25rem);
+}
+
+/* Small animated A&D monogram that sits on the same line as the
+   "CASADOS EN / DESDE" label in the countdown bar. */
+.identity-swap--countdown {
+  --identity-cycle: 18s;
+  font-size: clamp(1.1rem, 2.4vw, 1.6rem);
+  line-height: 1;
+}
+
+.identity-swap--countdown .identity-connector {
+  font-size: 0.55em;
+}
+
+.identity-swap--countdown .identity-swap-state i {
+  font-size: 0.6em;
+}
+
+
+
+.countdown-guest {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: 16rem;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: clamp(0.8rem, 1.6vw, 1rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.countdown-guest::before {
+  content: "✦";
+  color: var(--marigold);
+  font-size: 0.7em;
+}
+
+.countdown-values {
+  display: flex;
+  width: min(100%, 32rem);
+  align-items: center;
+  flex: 1;
+  gap: clamp(0.6rem, 2.5vw, 1.5rem);
+}
+
+.countdown-unit {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  white-space: nowrap;
+}
+
+.countdown-unit strong {
+  min-width: 1.3em;
+  font-family: var(--font-countdown);
+  font-size: clamp(1.9rem, 4vw, 3rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: right;
+}
+
+
+.countdown-unit small {
+  color: rgb(255 253 248 / 72%);
+  font-size: clamp(0.8rem, 1.4vw, 1rem);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+

@@ -29,6 +29,10 @@ const Weekend = lazy(() =>
 const Accommodation = lazy(() =>
   import("./components/Accommodation.jsx").then((m) => ({ default: m.Accommodation })),
 );
+const Cabins = lazy(() =>
+  import("./components/Cabins.jsx").then((m) => ({ default: m.Cabins })),
+);
+
 const Weather = lazy(() =>
   import("./components/Weather.jsx").then((m) => ({ default: m.Weather })),
 );
@@ -59,9 +63,17 @@ const Gallery = lazy(() =>
 const Photos = lazy(() =>
   import("./components/Photos.jsx").then((m) => ({ default: m.Photos })),
 );
+const Thanks = lazy(() =>
+  import("./components/Thanks.jsx").then((m) => ({ default: m.Thanks })),
+);
+const GuestCloud = lazy(() =>
+  import("./components/GuestCloud.jsx").then((m) => ({ default: m.GuestCloud })),
+);
 const Footer = lazy(() =>
   import("./components/Footer.jsx").then((m) => ({ default: m.Footer })),
 );
+
+
 
 function Invitation() {
   const { authState } = useApp();
@@ -76,9 +88,10 @@ function Invitation() {
 
   return (
     <>
-      <Nav />
       <Countdown />
+      <Nav />
       <main>
+
         <Hero />
         <LazySection id="identity" className="lazy-section">
           <Suspense fallback={null}>
@@ -101,12 +114,24 @@ function Invitation() {
             <Weekend />
           </Suspense>
         </LazySection>
+        <LazySection id="attire" className="lazy-section">
+          <Suspense fallback={null}>
+            <Attire />
+          </Suspense>
+        </LazySection>
         <LazySection id="accommodation" className="lazy-section">
           <Suspense fallback={null}>
             <Accommodation />
           </Suspense>
         </LazySection>
+
+        <LazySection id="cabins" className="lazy-section">
+          <Suspense fallback={null}>
+            <Cabins />
+          </Suspense>
+        </LazySection>
         <LazySection id="weather" className="lazy-section">
+
           <Suspense fallback={null}>
             <Weather />
           </Suspense>
@@ -126,17 +151,10 @@ function Invitation() {
             <Travel />
           </Suspense>
         </LazySection>
-        <LazySection id="attire" className="lazy-section">
-          <Suspense fallback={null}>
-            <Attire />
-          </Suspense>
-        </LazySection>
-        <LazySection id="gift" className="lazy-section">
-          <Suspense fallback={null}>
-            <Gift />
-          </Suspense>
-        </LazySection>
+
+
         <LazySection id="coast" className="lazy-section">
+
           <Suspense fallback={null}>
             <Coast />
           </Suspense>
@@ -156,8 +174,25 @@ function Invitation() {
             <Photos />
           </Suspense>
         </LazySection>
+        <LazySection id="gift" className="lazy-section">
+          <Suspense fallback={null}>
+            <Gift />
+          </Suspense>
+        </LazySection>
+        <LazySection id="thanks" className="lazy-section">
+          <Suspense fallback={null}>
+            <Thanks />
+          </Suspense>
+        </LazySection>
+        <LazySection id="guests" className="lazy-section">
+          <Suspense fallback={null}>
+            <GuestCloud />
+          </Suspense>
+        </LazySection>
       </main>
+
       <LazySection id="footer" className="lazy-section">
+
         <Suspense fallback={null}>
           <Footer />
         </Suspense>

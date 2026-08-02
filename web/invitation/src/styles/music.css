@@ -1,0 +1,202 @@
+/* ── Music / playlist section ─────────────────────────────────────────── */
+
+.music-section {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.music-lineup {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: clamp(4rem, 8vw, 8rem);
+}
+
+.music-act {
+  min-height: 22rem;
+  padding: 2rem;
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-right: 0;
+}
+
+.music-act:last-child {
+  border-right: 1px solid rgb(255 255 255 / 22%);
+}
+
+.music-act > span {
+  color: #e4b968;
+  font-size: 0.65rem;
+}
+
+.music-act > p {
+  min-height: 3.5rem;
+  margin-top: 4rem;
+  color: rgb(255 255 255 / 62%);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.music-act small {
+  color: rgb(255 255 255 / 70%);
+}
+
+.playlist-section {
+  display: grid;
+  grid-template-columns: 0.7fr 1.3fr;
+  gap: clamp(2rem, 6vw, 6rem);
+  margin-bottom: clamp(4rem, 8vw, 8rem);
+  padding: clamp(2rem, 5vw, 5rem);
+  border: 1px solid rgb(255 255 255 / 22%);
+  background: #182620;
+}
+
+.playlist-heading h3 {
+  max-width: 12ch;
+  margin: 0 0 1.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.3rem, 4vw, 4rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.playlist-heading > p:last-child {
+  max-width: 30rem;
+  color: rgb(255 255 255 / 68%);
+}
+
+.playlist-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.playlist-card {
+  position: relative;
+  min-height: 22rem;
+  padding: 2rem;
+  background: var(--cream);
+  color: var(--ink);
+}
+
+.playlist-number {
+  color: var(--terracotta);
+  font-size: 0.65rem;
+  letter-spacing: 0.12em;
+}
+
+.spotify-mark {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-content: center;
+  gap: 0.18rem;
+  margin: 2.5rem 0 2rem;
+  border-radius: 50%;
+  background: #1ed760;
+}
+
+.spotify-mark i {
+  display: block;
+  width: 1.55rem;
+  height: 0.28rem;
+  border-top: 2px solid #102216;
+  border-radius: 50%;
+  transform: rotate(7deg);
+}
+
+.playlist-card h4 {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 2.5vw, 2.4rem);
+  font-weight: 400;
+}
+
+.playlist-card p {
+  min-height: 4.5rem;
+}
+
+.open-stage {
+  display: grid;
+  grid-template-columns: 0.75fr 1.25fr;
+  gap: clamp(2rem, 6vw, 6rem);
+  padding: clamp(2rem, 5vw, 5rem);
+  background: var(--marigold);
+  color: var(--ink);
+}
+
+.open-stage h3 {
+  max-width: 12ch;
+  font-size: clamp(2.4rem, 5vw, 4.5rem);
+}
+
+.suggestion-form,
+.coast-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.genre-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.genre-chip {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.genre-chip input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.genre-chip span {
+  display: inline-block;
+  border: 1px solid rgb(36 33 25 / 35%);
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  background: rgb(255 253 248 / 55%);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.genre-chip input:checked + span {
+  border-color: var(--terracotta);
+  background: var(--terracotta);
+  color: var(--white);
+}
+
+.genre-chip input:focus-visible + span {
+  outline: 2px solid var(--marigold);
+  outline-offset: 2px;
+}
+
+.genre-chip:hover span {
+  transform: translateY(-1px);
+}
+
+.suggestion-form .button,
+.suggestion-form > small,
+.coast-form .button,
+.coast-form > small {
+  grid-column: 1 / -1;
+}
+
+.suggestion-form > small,
+.coast-form > small {
+  color: rgb(36 33 25 / 65%);
+  text-align: center;
+}

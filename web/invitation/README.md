@@ -5,9 +5,12 @@ One-page public wedding invitation inspired by the visual simplicity of the Squa
 ## Stack
 
 - Vite as build tooling.
-- Vanilla JavaScript and CSS.
+- React 18 (invitation) + a vanilla-JS dashboard booted only on `/dashboard`.
 - Firebase Web SDK for Authentication and Firestore.
-- Authored ES, FR and EN content in `src/content.js`.
+- Authored ES, FR and EN content in `src/locales/`.
+- CSS is split per component under `src/styles/` (base, hero, story, venue,
+  accommodation, cabins, travel, rsvp, footer, responsive, …) and imported in
+  order from `src/main.jsx`.
 
 ## Local use
 

@@ -1,0 +1,439 @@
+/* ── Responsive breakpoints ───────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .cabin-profile {
+    grid-template-columns: 1fr;
+  }
+
+  .cabin-profile-details {
+    max-width: 42rem;
+  }
+
+  .cabin-gallery {
+    grid-auto-columns: minmax(17rem, 48vw);
+  }
+
+  .flavours-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .flavour-card,
+  .flavour-card:nth-child(4),
+  .flavour-card:nth-child(5) {
+    grid-column: auto;
+  }
+
+  .flavour-card:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .venue-gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .site-header {
+    grid-template-columns: 1fr auto;
+    gap: 0.75rem;
+  }
+
+  .desktop-nav-wrap,
+  .nav-underline,
+  .header-rsvp {
+    display: none;
+  }
+
+
+  .mobile-nav-select {
+
+    display: block;
+    grid-column: 1 / -1;
+    width: 100%;
+    border: 1px solid rgb(255 255 255 / 35%);
+    border-radius: 0.5rem;
+    padding: 0.55rem 0.75rem;
+    background: rgb(255 255 255 / 8%);
+    color: var(--white);
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .mobile-nav-select option {
+    color: var(--ink);
+    background: var(--white);
+  }
+
+
+  .story-section,
+  .venue-section,
+  .accommodation-section,
+  .coast-section,
+  .attire-section,
+  .gift-section,
+  .travel-layout,
+  .day-program {
+    grid-template-columns: 1fr;
+  }
+
+  .story-mark {
+    font-size: clamp(8rem, 45vw, 16rem);
+    text-align: center;
+  }
+
+  .section-heading,
+  .travel-heading,
+  .experience-heading,
+  .gallery-heading,
+  .drinks-policy,
+  .route-map-heading,
+  .weather-heading,
+  .weather-day {
+    grid-template-columns: 1fr;
+  }
+
+  .weather-facts {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .weather-fact {
+    border: 1px solid rgb(36 33 25 / 18%);
+  }
+
+  .route-map-diagram {
+    grid-template-columns: 1fr;
+  }
+
+  .route-venue {
+    width: min(12rem, 60vw);
+    min-height: auto;
+    justify-self: center;
+  }
+
+  .route-venue::before,
+  .route-venue::after {
+    top: auto;
+    right: 50%;
+    left: auto;
+    width: 1px;
+    height: 1.5rem;
+  }
+
+  .route-venue::before {
+    bottom: 100%;
+  }
+
+  .route-venue::after {
+    top: 100%;
+  }
+
+  .gallery-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .schedule-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .food-grid,
+  .music-lineup {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .food-day,
+  .music-act {
+    min-height: auto;
+    border: 1px solid rgb(36 33 25 / 20%);
+  }
+
+
+  .music-act {
+    border-color: rgb(255 255 255 / 22%);
+  }
+
+  .food-day:first-child {
+    padding-left: clamp(2rem, 4vw, 4rem);
+  }
+
+
+  .open-stage {
+    grid-template-columns: 1fr;
+  }
+
+  .playlist-section {
+    grid-template-columns: 1fr;
+  }
+
+  .schedule-item {
+    min-height: auto;
+    border-right: 0;
+    border-bottom: 1px solid rgb(36 33 25 / 20%);
+  }
+
+  .schedule-day {
+    margin-top: 2rem;
+  }
+
+  .venue-visual {
+    min-height: 32rem;
+  }
+}
+
+@media (max-width: 600px) {
+  :root {
+    --countdown-height: 3.7rem;
+  }
+
+  .flavours-heading {
+    display: block;
+  }
+
+  .flavours-heading .eyebrow {
+    margin-bottom: 1rem;
+  }
+
+  .flavours-grid,
+  .venue-gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .flavour-card:last-child {
+    grid-column: auto;
+  }
+
+  .flavour-card img,
+  .flavour-card:nth-child(4) img,
+  .flavour-card:nth-child(5) img {
+    height: min(75vw, 23rem);
+  }
+
+  .venue-gallery-card {
+    min-height: min(85vw, 28rem);
+  }
+
+  .cabin-profile-heading h2 {
+    font-size: clamp(4rem, 24vw, 7rem);
+  }
+
+  .cabin-gallery {
+    grid-auto-columns: min(80vw, 22rem);
+  }
+
+  .cabin-gallery-photo,
+  .cabin-gallery-photo:first-child {
+    grid-column: auto;
+    height: min(112vw, 34rem);
+  }
+
+  .countdown-bar {
+    gap: 0.6rem;
+    padding-inline: 0.65rem;
+  }
+
+  .countdown-prefix {
+    display: none;
+  }
+
+  .countdown-values {
+    width: auto;
+    justify-content: space-evenly;
+  }
+
+  .countdown-unit {
+    grid-template-columns: 1fr;
+    gap: 0;
+    text-align: center;
+  }
+
+  .countdown-unit strong {
+    font-size: 0.9rem;
+    text-align: center;
+  }
+
+  .countdown-unit small {
+    font-size: 0.54rem;
+  }
+
+  .site-header {
+    padding: 1rem 1.1rem;
+  }
+
+  .hero h1 {
+    gap: 0.2rem;
+    font-size: clamp(4rem, 23vw, 7rem);
+  }
+
+  .identity-swap--hero .identity-swap-state {
+    flex-direction: column;
+    gap: 0.02em;
+  }
+
+  .hero h1 i {
+    margin: -0.1em 0;
+  }
+
+  .hero-content {
+    padding-top: 9rem;
+  }
+
+  .hero-image-note {
+    right: 1rem;
+    bottom: 4.5rem;
+  }
+
+  .scroll-cue {
+    display: none;
+  }
+
+  .hero-slideshow-controls {
+    right: 1rem;
+    bottom: 1rem;
+  }
+
+  .section {
+    padding: 5rem 1.25rem;
+  }
+
+  .gallery-row {
+    grid-template-columns: 1fr;
+  }
+
+  .venue-visual-copy {
+    align-items: start;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .venue-visual-copy small {
+    text-align: left;
+  }
+
+  .travel-card {
+    min-height: 23rem;
+  }
+
+  .accommodation-facts,
+  .rsvp-form-grid,
+  .suggestion-form,
+  .coast-form {
+    grid-template-columns: 1fr;
+  }
+
+  .accommodation-facts article {
+    padding-inline: 0;
+    border-right: 0;
+    border-bottom: 1px solid rgb(36 33 25 / 20%);
+  }
+
+  .accommodation-facts article:last-child {
+    border-bottom: 0;
+  }
+
+  .form-field,
+  .form-field-wide,
+  .rsvp-form .button,
+  .rsvp-form > small,
+  .suggestion-form .button,
+  .suggestion-form > small,
+  .coast-form .button,
+  .coast-form > small {
+    grid-column: 1;
+  }
+
+  .food-grid,
+  .music-lineup,
+  .playlist-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Facility photo-cards: each slideset slide stacks its three cards
+     vertically on mobile (one card per row) so they stay large and readable.
+     The slideset prev/next + dot navigation switches between the two slides. */
+  .facility-slide {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .facility-card {
+    aspect-ratio: 1 / 1;
+  }
+
+
+
+
+
+  /* On touch, hover doesn't exist, so keep the list visible by default. */
+  .facility-card ul {
+    max-height: none;
+    opacity: 1;
+    transform: none;
+  }
+
+  /* The three day cards collapse into an autoplaying carousel on mobile:
+     they stack on top of each other and only the active card is visible,
+     with the play/pause + counter controls shown below. */
+  .schedule-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .schedule-item {
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: translateY(0.5rem);
+    pointer-events: none;
+  }
+
+  .schedule-item.is-active {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  .schedule-carousel-controls {
+    display: flex;
+  }
+
+  .coast-ideas article {
+    grid-template-columns: 1fr;
+  }
+
+
+  .rsvp-frame {
+    padding: 4rem 1.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .identity-swap-state,
+  .identity-accent::after,
+  .hero-date-day,
+  .hero-date-dayname {
+    animation: none;
+  }
+
+  .identity-swap-state--secondary,
+  .hero-date-day--secondary,
+  .hero-date-day--tertiary,
+  .hero-date-dayname--secondary,
+  .hero-date-dayname--tertiary {
+    display: none;
+  }
+
+  .hero-date-day--primary {
+    opacity: 1;
+  }
+
+  .hero-date-dayname--primary {
+    opacity: 0.34;
+  }
+
+}

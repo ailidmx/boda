@@ -7,20 +7,24 @@ const MAP_IMAGES = {
   venue: [
     {
       src: cloudinaryImage("Captura_de_pantalla_2026-07-31_a_la_s_11.58.29_a.m._eqyghk.png", { width: 1200 }),
+      full: cloudinaryImage("Captura_de_pantalla_2026-07-31_a_la_s_11.58.29_a.m._eqyghk.png", { width: 2000 }),
       alt: "Mapa 1 · ruta hacia Roca Azul",
     },
     {
       src: cloudinaryImage("Captura_de_pantalla_2026-07-31_a_la_s_11.59.01_a.m._fedfdr.png", { width: 1200 }),
+      full: cloudinaryImage("Captura_de_pantalla_2026-07-31_a_la_s_11.59.01_a.m._fedfdr.png", { width: 2000 }),
       alt: "Mapa 2 · ruta hacia Roca Azul",
     },
     {
       src: cloudinaryImage("Captura_de_pantalla_2026-07-31_a_la_s_11.59.30_a.m._t05ski.png", { width: 1200 }),
+      full: cloudinaryImage("Captura_de_pantalla_2026-07-31_a_la_s_11.59.30_a.m._t05ski.png", { width: 2000 }),
       alt: "Mapa 3 · ruta hacia Roca Azul",
     },
   ],
   beach: [
     {
       src: cloudinaryImage("Captura_de_pantalla_2026-07-31_a_la_s_11.59.57_a.m._lenxjn.png", { width: 1200 }),
+      full: cloudinaryImage("Captura_de_pantalla_2026-07-31_a_la_s_11.59.57_a.m._lenxjn.png", { width: 2000 }),
       alt: "Mapa · ruta hacia Barra de Navidad",
     },
   ],
@@ -76,9 +80,10 @@ export function Travel() {
           <p>{routes.note}</p>
         </div>
 
-        <section className="route-subsection">
+        {/* ── GO TO ROCA AZUL: origins → venue ─────────────────────── */}
+        <section className="route-subsection route-subsection--to-venue">
           <div className="route-subsection-heading">
-            <h4>{routes.originsLabel}</h4>
+            <h4>{routes.toVenueLabel}</h4>
             <p>{routes.maps.venueLabel}</p>
           </div>
           <div className="route-map-diagram">
@@ -92,12 +97,19 @@ export function Travel() {
               <strong>{routes.venue}</strong>
             </div>
           </div>
-          <MapCarousel label={routes.maps.venueLabel} images={MAP_IMAGES.venue} />
+          {/* The venue map carousel sits inline on desktop, right after the
+              yellow venue node, so the route and its maps read together. */}
+          <MapCarousel
+            variant="inline"
+            label={routes.maps.venueLabel}
+            images={MAP_IMAGES.venue}
+          />
         </section>
 
-        <section className="route-subsection">
+        {/* ── GO TO THE PLAYA: venue → destinations ────────────────── */}
+        <section className="route-subsection route-subsection--to-beach">
           <div className="route-subsection-heading">
-            <h4>{routes.destinationsLabel}</h4>
+            <h4>{routes.toBeachLabel}</h4>
             <p>{routes.maps.beachLabel}</p>
           </div>
           <div className="route-map-diagram">

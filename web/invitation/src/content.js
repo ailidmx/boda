@@ -5,7 +5,8 @@ export const EVENT = {
   date: "2027-02-20T00:00:00-06:00",
   // Anchor for the "married since" reverse counter (20/02 at 2 PM Mexico time)
   weddingDate: "2027-02-20T14:00:00-06:00",
-  dateShort: "20 · 02 · 2027",
+  dateShort: "20 · 02 · 27",
+
 
   venue: "Roca Azul",
   place: "Jocotepec · Jalisco · México",
@@ -38,32 +39,55 @@ export const content = {
     metaDescription:
       "David y Aydé se casan el 20 de febrero de 2027 en Roca Azul, Jocotepec, Jalisco.",
     nav: {
+      home: "Inicio",
+      you: "Tú",
       story: "Nosotros",
-      weekend: "El fin de semana",
+
+      weekend: "Guarden la fecha",
+      programme: "Programa",
       venue: "El lugar",
       accommodation: "Alojamiento",
       travel: "Vengo de lejos",
       attire: "Vestuario",
       gift: "Regalos",
       photos: "Fotos",
+      thanks: "Gracias",
+      guests: "Invitados",
       rsvp: "Confirmar",
-      dashboard: "Panel",
+
+
+
+      dashboard: "admin",
+      changePassword: "Cambiar contraseña",
+      logout: "Cerrar sesión",
+      newPasswordLabel: "Nueva contraseña",
+      newPasswordPlaceholder: "Mínimo 6 caracteres",
+      passwordError: "La contraseña debe tener al menos 6 caracteres.",
+      passwordSuccess: "¡Contraseña actualizada!",
+      cancel: "Cancelar",
+      save: "Guardar",
+      working: "Guardando…",
     },
+
+
     countdown: {
-      prefix: "Nos casamos en",
+      prefix: "Casados en",
       years: "años",
       months: "meses",
       days: "días",
       hours: "horas",
       minutes: "min",
-      arrived: "Hoy celebramos",
+      arrived: "Casados desde",
     },
 
 
+
     hero: {
-      eyebrow: "Nos casamos",
+      eyebrow: "nos casamos",
       invitation: "Queremos celebrar este momento con ustedes",
-      scroll: "Descubrir la invitación",
+
+      scroll: "Empecemos",
+
       imageNote: "Aquí irá nuestra fotografía",
       imageAlt: "David y Aydé juntos",
       selectImage: "Mostrar fotografía",
@@ -71,17 +95,24 @@ export const content = {
       play: "Reanudar fotos",
     },
     identity: {
-      eyebrow: "Antes de empezar",
+      eyebrow: "Verificación de identidad",
       title: "¿Está bien escrito tu nombre?",
+
       body:
         "Queremos que cada invitado se sienta reconocido. Si tu nombre o el de alguien de tu grupo está mal escrito, corrígelo aquí y lo usaremos en la invitación y en la mesa.",
       note:
-        "También puedes subir una foto de tu rostro para que te reconozcamos más fácilmente en el fin de semana.",
+        "También puedes subir una foto de tu rostro si quieres para el recuerdo (bonito retrato de preferencia).",
+
       you: "Tú",
       firstName: "Nombre",
       lastName: "Apellido",
+      fullName: "Nombre completo",
       editName: "Corregir nombre",
+      correctNumber: "Corregir número",
+
       addPhoto: "Subir foto",
+
+      changePhoto: "Cambiar foto",
       uploading: "Subiendo…",
       save: "Guardar",
       saving: "Guardando…",
@@ -91,9 +122,39 @@ export const content = {
       nameRequired: "Escribe al menos tu nombre.",
       photoSaved: "¡Foto guardada! Gracias.",
       photoError: "No pudimos subir la foto. Inténtalo de nuevo.",
+
+      stepLabel: "Paso",
+      step1Title: "¿Está bien escrito tu nombre?",
+      step2Title: "¿Cuál es tu número de celular?",
+      step3Title: "¿Cuál es tu correo electrónico?",
+      step2Body:
+        "Lo usaremos solo para comunicarnos contigo sobre la boda (confirmaciones, cambios de última hora o coordinación de traslados).",
+      step3Body:
+        "Te enviaremos la invitación formal y cualquier información importante antes del gran día.",
+      contactFor: "Contacto de",
+      phoneLabel: "Número de celular",
+
+      phonePlaceholder: "Ej. 33 1234 5678",
+      emailLabel: "Correo electrónico",
+      emailPlaceholder: "tucorreo@ejemplo.com",
+      phoneRequired: "Escribe tu número de celular.",
+      emailRequired: "Escribe tu correo electrónico.",
+      emailInvalid: "Escribe un correo electrónico válido.",
+      back: "Atrás",
+      next: "Continuar",
+      finish: "Terminar",
+      contactSaved: "¡Listo! Gracias por confirmar tus datos.",
+      whatsappLabel: "Agrégame al grupo de WhatsApp",
+      whatsappHint:
+        "Únete al grupo para recibir avisos, coordinación de traslados y novedades del fin de semana.",
+      whatsappUrl: "https://chat.whatsapp.com/E8LP2oj0sK4GM5Slo1VIFD?s=cl&p=a&ilr=4",
+      navStory: "Descubrir la invitación",
     },
+
     story: {
       eyebrow: "Nuestra invitación",
+
+
 
       title: "Un fin de semana para encontrarnos",
       body:
@@ -114,8 +175,10 @@ export const content = {
         "Roca Azul está a orillas del lago, con vistas al atardecer.",
       ],
       anecdotesLabel: "El lago de Chapala en 12 anécdotas",
+      navNext: "Descubrir el lugar",
 
     },
+
 
     gallery: {
       eyebrow: "Nuestro camino",
@@ -146,11 +209,16 @@ export const content = {
         'Solicita acceso al álbum haciendo clic en "Subir fotos". Una vez dentro, podrás subir todas las fotos que quieras. ¡Gracias por capturar estos momentos con nosotros!',
     },
     weekend: {
-      eyebrow: "Guarden la fecha",
+      eyebrow: "Guarden la(s) fecha(s)",
+
 
       title: "Tres días para celebrar",
       intro:
         "Nosotros estaremos en Roca Azul desde el jueves. Los invitados pueden llegar desde el viernes alrededor del mediodía y la celebración principal será una boda de tarde el sábado.",
+      navSchedule: "Ver los tres días",
+      navProgram: "Programa detallado",
+
+
       items: [
         {
           day: "Viernes 19 · desde mediodía",
@@ -173,7 +241,8 @@ export const content = {
         eyebrow: "Sábado 20 · programa",
         title: "La tarde, paso a paso",
         warning:
-          "Quienes vengan desde Guadalajara: salgan con bastante anticipación. Los accesos hacia Jocotepec pueden congestionarse fácilmente y necesitamos que todos estén en Roca Azul a las 13:00. Mejor aún: si pueden, quédense en el lugar y compartan el viernes con nosotros. Hay muchas opciones de alojamiento, de todos los precios y todas las gamas, alrededor del lago de Chapala.",
+          "Quienes vengan desde Guadalajara: salgan con bastante anticipación. Los accesos hacia Jocotepec pueden congestionarse fácilmente y necesitamos que todos estén en Roca Azul a las 13:00.",
+
         items: [
           { time: "13:00", title: "Llegada de invitados", body: "Bienvenida y tiempo para instalarnos." },
           { time: "14:00", title: "Aperitivo", body: "El primer brindis del día." },
@@ -183,6 +252,26 @@ export const content = {
           { time: "18:00", title: "Ceremonia en el faro", body: "El gran momento de la tarde." },
           { time: "Al terminar", title: "Mariachi y cena", body: "El mariachi abrirá la cena y el siguiente capítulo de la celebración." },
           { time: "Después de cenar", title: "Norteño y baile", body: "El norteño abrirá la pista y la fiesta." },
+        ],
+      },
+      friday: {
+        eyebrow: "Viernes 19 · programa",
+        title: "Llegada y bienvenida",
+        warning:
+          "Un primer encuentro relajado para instalarnos, convivir y empezar el fin de semana sin prisas.",
+        items: [
+          { time: "Desde mediodía", title: "Llegadas y check-in", body: "Bienvenida y tiempo para instalarnos en las cabañas." },
+          { time: "Tarde", title: "Petanca y juegos", body: "Juegos al aire libre para romper el hielo." },
+          { time: "Noche", title: "Pizzas de bienvenida", body: "Una cena informal para encontrarnos sin prisas." },
+        ],
+      },
+      sunday: {
+        eyebrow: "Domingo 21 · programa",
+        title: "Desayuno y despedida",
+        warning: "Una última mañana juntos antes de los regresos.",
+        items: [
+          { time: "Mañana", title: "Desayuno", body: "Desayuno incluido para quienes se hospedan en las cabañas." },
+          { time: "Mediodía", title: "Despedida", body: "Últimos momentos juntos y regresos." },
         ],
       },
     },
@@ -395,17 +484,20 @@ export const content = {
       eyebrow: "El lugar",
       title: "Todo el club para disfrutar",
       body:
-        "Entre un momento y otro, cada quien podrá convivir con sus vecinos, explorar las instalaciones o simplemente descansar en su alojamiento.",
+        "Entre la ceremonia y la fiesta, el club entero es nuestro: piscinas, jardines, canchas y cabañas para convivir, explorar o simplemente descansar.",
+
+
       videoTitle: "Video de presentación de Roca Azul",
       privacyTitle: "Privacidad",
       privacyBody:
         "Todas las cabañas estarán rentadas por los invitados de la boda, unas 80 a 90 personas. Además, otros invitados del matrimonio se alojarán cerca, quizá no muy lejos, o vendrán solo por el día: unas 60 personas según las estimaciones actuales. Aun así, el club no será completamente privado ese fin de semana: algunos espacios aún albergan tiendas de campaña o casas rodantes. Compartiremos el lugar y respetaremos el descanso. La música podrá sonar hasta las 2 de la madrugada; después continuaremos en las cabañas.",
 
       gallery: [
-        { key: "cabins", title: "Cabañas", alt: "Cabañas y habitaciones de Roca Azul" },
         { key: "pool", title: "Albercas", alt: "Alberca y jardines del Club Roca Azul" },
         { key: "courts", title: "Deporte", alt: "Canchas deportivas de Roca Azul" },
         { key: "gardens", title: "Jardines", alt: "Áreas verdes del Club Roca Azul" },
+        { key: "cabins", title: "Cabañas", alt: "Cabañas y habitaciones de Roca Azul" },
+
       ],
       gallerySource: "Fotografías del lugar: Club Roca Azul",
       rocaGalleryLabel: "Galería de fotografías del Club Roca Azul",
@@ -457,21 +549,29 @@ export const content = {
       ],
       note:
         "Lista basada en los servicios publicados por Roca Azul. Algunos espacios, horarios, actividades o suplementos deberán confirmarse cerca de la fecha.",
+      navNext: "Descubrir el lugar",
+      navContinue: "Continuar",
+      navIdentity: "¿Está bien escrito tu nombre?",
     },
     accommodation: {
+
       eyebrow: "Alojamiento",
       title: "Dormir cerca, organizarnos a tiempo",
+      citation:
+        "Nosotros estaremos en Roca Azul desde el jueves. Los invitados pueden llegar desde el viernes alrededor del mediodía y la celebración principal será una boda de tarde el sábado.",
       body:
         "Contamos con alojamiento en el lugar para aproximadamente 80 personas. Como necesitamos distribuir las cabañas y las habitaciones con cuidado, les pedimos que nos indiquen cuanto antes si desean aprovechar esta opción.",
       facts: [
-        { value: "≈ 80", label: "lugares disponibles" },
-        { value: "$500 MXN", label: "por persona y noche" },
+        { value: "≈ 80–90", label: "lugares disponibles" },
+        { value: "$1,200 MXN", label: "por persona · 2 noches" },
         { value: "2", label: "desayunos incluidos" },
       ],
       specialNote:
-        "El alojamiento se reserva únicamente como paquete completo de dos noches, del viernes 19 al domingo 21: no es posible reservar una sola noche. El precio estimado es de $500 MXN por persona y por noche e incluye los dos desayunos del fin de semana; compartiremos más detalles próximamente. Nuestros queridos padrinos tienen el alojamiento de regalo. Si prefieren organizar su estancia por su cuenta, no hay ningún problema: solo necesitamos saberlo con anticipación.",
-      contactPrompt:
-        "Si les interesa este plan, escríbannos directamente por WhatsApp:",
+        "El alojamiento se reserva únicamente como paquete completo de dos noches, del viernes 19 al domingo 21: no es posible reservar una sola noche. El precio estimado es de $1,200 MXN por persona por las dos noches e incluye los dos desayunos del fin de semana.",
+
+
+      contactPrompt: "Más info",
+
       cabinsShowcase: {
         eyebrow: "Conozcan las cabañas",
         privateVideoEyebrow: "Video privado",
@@ -619,6 +719,8 @@ export const content = {
         note:
           "Las duraciones indicadas son orientativas y pueden variar enormemente. Sean previsores y, mejor aún, estén en el lugar con anticipación reservando un alojamiento si pueden.",
         venue: "Roca Azul · Jocotepec",
+        toVenueLabel: "Hacia Roca Azul",
+        toBeachLabel: "Hacia la playa",
         originsLabel: "Hacia la boda",
         destinationsLabel: "Después de la boda",
         mapLabel: "Mapa de Roca Azul y sus alrededores",
@@ -667,10 +769,12 @@ export const content = {
       },
       guestNote:
         "Lo más importante es que se sientan cómodos y celebren con nosotros. Si tienen dudas, escríbanos.",
+      navNext: "Alojamiento",
 
     },
     gift: {
       eyebrow: "Regalos",
+
       title: "Lo más importante es su presencia",
       body:
         "Su compañía es el mejor regalo que podemos recibir. Si además desean hacernos un detalle, agradecemos cualquier contribución para nuestra luna de miel o nuestros proyectos de pareja.",
@@ -698,8 +802,37 @@ export const content = {
       },
       cta: "Hablar con los novios",
     },
+    thanks: {
+      eyebrow: "Agradecimientos",
+      title: "Gracias",
+      subtitle:
+        "Sin nuestros padrinos y ayudantes nada de esto sería posible. Queremos dar su lugar a todos los que ayudaron a que esto sea posible con toda nuestra gratitud a ...",
+
+      credits: [
+        { name: "Manuel Amuezca", role: "Wedding planner" },
+        { name: "Manuel Amuezca", role: "Pizzas del viernes" },
+        { name: "Manuel Amuzeca", role: "Pizzas del viernes" },
+        { name: "Ismael", role: "Pizzas" },
+        { name: "Isabel Guadalupe", role: "Vestuario de los novios" },
+      ],
+      humor: [
+        "Si quieres aparecer aquí, contacta nuestro servicio de programa de afiliación a programa de padrino.",
+        "Apareces aquí y no sabías: te asignaron tarea. Qué pena, pero no hay manera de borrarlo: el admin IT de la página se fue de vacaciones, no lo podemos borrar, así que hay que cumplir.",
+        "Cumpliste apoyo y no apareces. Qué pena. Igual el IT está de vacaciones, pero manda tus quejas a los novios o al wedding planner.",
+      ],
+      cta: "Hablar con los novios",
+      ctaPlanner: "Hablar con el wedding planner",
+      guestCloud: {
+        eyebrow: "Nuestros invitados",
+        title: "Todos los que nos acompañan",
+        subtitle:
+          "Cada nombre es una historia compartida. Gracias por ser parte de este día.",
+      },
+    },
     coast: {
       eyebrow: "¿Y después?",
+
+
       title: "Prolongar el gusto de estar juntos",
       body:
         "La fiesta no termina el domingo. Hemos preparado dos planes para seguir disfrutando juntos, y cada quien elige el que mejor le venga.",
@@ -878,17 +1011,37 @@ export const content = {
     metaDescription:
       "David et Aydé se marient le 20 février 2027 à Roca Azul, Jocotepec, Jalisco.",
     nav: {
+      home: "Accueil",
+      you: "Vous",
       story: "Nous",
-      weekend: "Le week-end",
+
+      weekend: "Réservez la date",
+      programme: "Programme",
       venue: "Le lieu",
       accommodation: "Hébergement",
       travel: "Je viens de loin",
       attire: "Tenues",
       gift: "Cadeaux",
       photos: "Photos",
+      thanks: "Merci",
+      guests: "Invités",
       rsvp: "Répondre",
-      dashboard: "Tableau",
+
+
+
+      dashboard: "admin",
+      changePassword: "Changer le mot de passe",
+      logout: "Se déconnecter",
+      newPasswordLabel: "Nouveau mot de passe",
+      newPasswordPlaceholder: "6 caractères minimum",
+      passwordError: "Le mot de passe doit contenir au moins 6 caractères.",
+      passwordSuccess: "Mot de passe mis à jour !",
+      cancel: "Annuler",
+      save: "Enregistrer",
+      working: "Enregistrement…",
     },
+
+
     countdown: {
       prefix: "Mariés dans",
       years: "ans",
@@ -896,14 +1049,17 @@ export const content = {
       days: "jours",
       hours: "heures",
       minutes: "min",
-      arrived: "Aujourd’hui, on célèbre",
+      arrived: "Mariés depuis",
     },
 
 
+
     hero: {
-      eyebrow: "Nous nous marions",
+      eyebrow: "nous nous marions",
       invitation: "Nous voulons vivre ce moment avec vous",
-      scroll: "Découvrir l’invitation",
+
+      scroll: "Commençons",
+
       imageNote: "Notre photographie viendra ici",
       imageAlt: "David et Aydé ensemble",
       selectImage: "Afficher la photographie",
@@ -911,17 +1067,24 @@ export const content = {
       play: "Relancer les photos",
     },
     identity: {
-      eyebrow: "Avant de commencer",
+      eyebrow: "Vérification d'identité",
       title: "Votre nom est-il bien écrit ?",
+
       body:
         "Nous voulons que chaque invité se sente reconnu. Si votre nom ou celui d’un membre de votre groupe est mal orthographié, corrigez-le ici et nous l’utiliserons dans l’invitation et à table.",
       note:
-        "Vous pouvez aussi déposer une photo de votre visage pour que nous vous reconnaissions plus facilement pendant le week-end.",
+        "Vous pouvez aussi déposer une photo de votre visage si vous le souhaitez, pour le souvenir (un joli portrait de préférence).",
+
       you: "Vous",
       firstName: "Prénom",
       lastName: "Nom",
+      fullName: "Nom complet",
       editName: "Corriger le nom",
+      correctNumber: "Corriger le numéro",
+
       addPhoto: "Déposer une photo",
+
+      changePhoto: "Changer la photo",
       uploading: "Envoi…",
       save: "Enregistrer",
       saving: "Enregistrement…",
@@ -931,9 +1094,39 @@ export const content = {
       nameRequired: "Écrivez au moins votre prénom.",
       photoSaved: "Photo enregistrée ! Merci.",
       photoError: "Impossible de déposer la photo. Réessayez.",
+
+      stepLabel: "Étape",
+      step1Title: "Votre nom est-il bien écrit ?",
+      step2Title: "Quel est votre numéro de portable ?",
+      step3Title: "Quelle est votre adresse e-mail ?",
+      step2Body:
+        "Nous l’utiliserons uniquement pour vous contacter au sujet du mariage (confirmations, changements de dernière minute ou coordination des transferts).",
+      step3Body:
+        "Nous vous enverrons l’invitation officielle et toute information importante avant le grand jour.",
+      contactFor: "Contact de",
+      phoneLabel: "Numéro de portable",
+
+      phonePlaceholder: "Ex. 33 12 34 56 78",
+      emailLabel: "Adresse e-mail",
+      emailPlaceholder: "votrecourriel@exemple.com",
+      phoneRequired: "Écrivez votre numéro de portable.",
+      emailRequired: "Écrivez votre adresse e-mail.",
+      emailInvalid: "Écrivez une adresse e-mail valide.",
+      back: "Retour",
+      next: "Continuer",
+      finish: "Terminer",
+      contactSaved: "C’est fait ! Merci d’avoir confirmé vos coordonnées.",
+      whatsappLabel: "Ajoutez-moi au groupe WhatsApp",
+      whatsappHint:
+        "Rejoignez le groupe pour recevoir les avis, la coordination des transferts et les nouveautés du week-end.",
+      whatsappUrl: "https://chat.whatsapp.com/E8LP2oj0sK4GM5Slo1VIFD?s=cl&p=a&ilr=4",
+      navStory: "Découvrir l’invitation",
     },
+
     story: {
       eyebrow: "Notre invitation",
+
+
 
       title: "Un week-end pour se retrouver",
       body:
@@ -955,8 +1148,10 @@ export const content = {
         "Roca Azul se trouve au bord du lac, face au coucher de soleil.",
       ],
       anecdotesLabel: "Le lac de Chapala en 12 anecdotes",
+      navNext: "Découvrir le lieu",
 
     },
+
 
     gallery: {
       eyebrow: "Notre chemin",
@@ -992,6 +1187,10 @@ export const content = {
       title: "Trois jours pour célébrer",
       intro:
         "Nous serons à Roca Azul dès le jeudi. Les invités pourront arriver à partir du vendredi vers midi, et la célébration principale sera un mariage d’après-midi le samedi.",
+      navSchedule: "Voir les trois jours",
+      navProgram: "Programme détaillé",
+
+
       items: [
         {
           day: "Vendredi 19 · dès midi",
@@ -1014,7 +1213,8 @@ export const content = {
         eyebrow: "Samedi 20 · programme",
         title: "L’après-midi, pas à pas",
         warning:
-          "Pour celles et ceux qui viennent de Guadalajara : partez très en avance. Les accès vers Jocotepec peuvent facilement être embouteillés et nous avons besoin que tout le monde soit à Roca Azul à 13 h. Encore mieux : si vous le pouvez, restez sur place et partagez le vendredi avec nous. Il y a de nombreuses offres d’hébergement, à tous les prix et toutes les gammes, autour du lac de Chapala.",
+          "Pour celles et ceux qui viennent de Guadalajara : partez très en avance. Les accès vers Jocotepec peuvent facilement être embouteillés et nous avons besoin que tout le monde soit à Roca Azul à 13 h.",
+
         items: [
           { time: "13 h", title: "Arrivée des invités", body: "Accueil et temps pour s’installer." },
           { time: "14 h", title: "Apéro", body: "Le premier toast de la journée." },
@@ -1024,6 +1224,26 @@ export const content = {
           { time: "18 h", title: "Cérémonie au phare", body: "Le grand moment de l’après-midi." },
           { time: "À la suite", title: "Mariachi et dîner", body: "Le mariachi ouvrira le dîner et la suite de la célébration." },
           { time: "Après dîner", title: "Norteño et danse", body: "Le norteño ouvrira la piste et la fête." },
+        ],
+      },
+      friday: {
+        eyebrow: "Vendredi 19 · programme",
+        title: "Arrivée et bienvenue",
+        warning:
+          "Un premier moment détendu pour s’installer, se retrouver et commencer le week-end sans se presser.",
+        items: [
+          { time: "Dès midi", title: "Arrivées et check-in", body: "Accueil et temps pour s’installer dans les cabanes." },
+          { time: "Après-midi", title: "Pétanque et jeux", body: "Des jeux en plein air pour briser la glace." },
+          { time: "Soir", title: "Pizzas de bienvenue", body: "Un dîner informel pour se retrouver sans se presser." },
+        ],
+      },
+      sunday: {
+        eyebrow: "Dimanche 21 · programme",
+        title: "Petit-déjeuner et au revoir",
+        warning: "Une dernière matinée ensemble avant les départs.",
+        items: [
+          { time: "Matin", title: "Petit-déjeuner", body: "Petit-déjeuner inclus pour les personnes logées dans les cabanes." },
+          { time: "Midi", title: "Au revoir", body: "Derniers moments ensemble et départs." },
         ],
       },
     },
@@ -1236,17 +1456,19 @@ export const content = {
       eyebrow: "Le lieu",
       title: "Tout le club à votre disposition",
       body:
-        "Entre deux moments, chacun pourra retrouver ses voisins, profiter des installations ou simplement se reposer dans son hébergement.",
+        "Entre cérémonie et célébration, tout le club est à nous : piscines, jardins, terrains et cabanes pour se retrouver, explorer ou simplement se reposer.",
+
       videoTitle: "Vidéo de présentation de Roca Azul",
       privacyTitle: "Intimité",
       privacyBody:
         "Toutes les cabanes seront louées par les invités du mariage, environ 80 à 90 personnes. En outre, d’autres invités du mariage seront logés non loin, peut-être à proximité, ou viendront seulement pour la journée : environ 60 personnes selon les estimations actuelles. Le club ne sera toutefois pas entièrement privé ce week-end : certains espaces accueillent encore des tentes ou des caravanes. Nous partagerons les lieux et respecterons le calme. La musique pourra jouer jusqu’à 2 h du matin, puis nous continuerons dans les cabanes.",
 
       gallery: [
-        { key: "cabins", title: "Cabanes", alt: "Cabanes et chambres de Roca Azul" },
         { key: "pool", title: "Piscines", alt: "Piscine et jardins du Club Roca Azul" },
         { key: "courts", title: "Sport", alt: "Terrains de sport de Roca Azul" },
         { key: "gardens", title: "Jardins", alt: "Espaces verts du Club Roca Azul" },
+        { key: "cabins", title: "Cabanes", alt: "Cabanes et chambres de Roca Azul" },
+
       ],
       gallerySource: "Photos du lieu : Club Roca Azul",
       rocaGalleryLabel: "Galerie de photos du Club Roca Azul",
@@ -1298,21 +1520,29 @@ export const content = {
       ],
       note:
         "Liste fondée sur les services publiés par Roca Azul. Certains espaces, horaires, activités ou suppléments devront être confirmés à l’approche de la date.",
+      navNext: "Découvrir le lieu",
+      navContinue: "Continuer",
+      navIdentity: "Votre nom est-il bien écrit ?",
     },
     accommodation: {
+
       eyebrow: "Hébergement",
       title: "Dormir sur place, nous organiser à temps",
+      citation:
+        "Nous serons à Roca Azul dès le jeudi. Les invités pourront arriver à partir du vendredi vers midi, et la célébration principale sera un mariage d’après-midi le samedi.",
       body:
         "Nous disposons d’environ 80 places sur le lieu. Comme les cabanes et les chambres doivent être réparties avec soin, merci de nous indiquer dès que possible si cette option vous intéresse.",
       facts: [
-        { value: "≈ 80", label: "places disponibles" },
-        { value: "500 MXN", label: "par personne et par nuit" },
+        { value: "≈ 80–90", label: "places disponibles" },
+        { value: "1 200 MXN", label: "par personne · 2 nuits" },
         { value: "2", label: "petits-déjeuners inclus" },
       ],
       specialNote:
-        "L’hébergement se réserve uniquement sous la forme d’un forfait complet de deux nuits, du vendredi 19 au dimanche 21 : une seule nuit n’est pas possible. Le tarif estimatif est de 500 MXN par personne et par nuit et comprend les deux petits-déjeuners du week-end ; davantage de détails suivront prochainement. L’hébergement est offert à nos chers padrinos. Si vous préférez organiser votre séjour de votre côté, aucun souci : nous avons simplement besoin de le savoir à l’avance.",
-      contactPrompt:
-        "Si cette formule vous intéresse, écrivez-nous directement sur WhatsApp :",
+        "L’hébergement se réserve uniquement sous la forme d’un forfait complet de deux nuits, du vendredi 19 au dimanche 21 : une seule nuit n’est pas possible. Le tarif estimatif est de 1 200 MXN par personne pour les deux nuits et comprend les deux petits-déjeuners du week-end.",
+
+
+      contactPrompt: "Plus d'infos",
+
       cabinsShowcase: {
         eyebrow: "Découvrez les cabanes",
         privateVideoEyebrow: "Vidéo privée",
@@ -1460,6 +1690,8 @@ export const content = {
         note:
           "Les durées indiquées sont indicatives et peuvent varier énormément. Soyez prévoyants et, encore mieux, soyez sur place en avance en réservant un logement si vous pouvez.",
         venue: "Roca Azul · Jocotepec",
+        toVenueLabel: "Vers Roca Azul",
+        toBeachLabel: "Vers la plage",
         originsLabel: "Vers le mariage",
         destinationsLabel: "Après le mariage",
         mapLabel: "Carte de Roca Azul et de ses environs",
@@ -1508,10 +1740,12 @@ export const content = {
       },
       guestNote:
         "Le plus important est que vous soyez à l'aise et que vous célébriez avec nous. Si vous avez des questions, écrivez-nous.",
+      navNext: "Hébergement",
 
     },
     gift: {
       eyebrow: "Cadeaux",
+
       title: "Le plus beau cadeau, c'est votre présence",
 
       body:
@@ -1540,8 +1774,36 @@ export const content = {
       },
       cta: "Parler aux mariés",
     },
+    thanks: {
+      eyebrow: "Remerciements",
+      title: "Merci",
+      subtitle:
+        "Sans nos padrinos et nos aides, rien de tout cela ne serait possible. Nous tenons à remercier avec toute notre gratitude…",
+      credits: [
+        { name: "Manuel Amuezca", role: "Wedding planner" },
+        { name: "Manuel Amuezca", role: "Pizzas du vendredi" },
+        { name: "Manuel Amuzeca", role: "Pizzas du vendredi" },
+        { name: "Ismael", role: "Pizzas" },
+        { name: "Isabel Guadalupe", role: "Tenues des mariés" },
+      ],
+      humor: [
+        "Si vous voulez apparaître ici, contactez notre programme d’affiliation au programme de padrino.",
+        "Vous apparaissez ici sans le savoir : une mission vous a été confiée. Dommage, mais il est impossible de l’effacer : l’admin IT de la page est en vacances, on ne peut pas le supprimer, donc il faut s’y tenir.",
+        "Vous avez apporté votre aide et vous n’apparaissez pas. Dommage. L’IT est peut-être en vacances, mais envoyez vos réclamations aux mariés ou au wedding planner.",
+      ],
+      cta: "Parler aux mariés",
+      ctaPlanner: "Parler au wedding planner",
+      guestCloud: {
+        eyebrow: "Nos invités",
+        title: "Tous ceux qui nous accompagnent",
+        subtitle:
+          "Chaque nom est une histoire partagée. Merci de faire partie de ce jour.",
+      },
+    },
     coast: {
       eyebrow: "Et après ?",
+
+
       title: "Prolonger le plaisir d’être ensemble",
       body:
         "La fête ne s’arrête pas dimanche. Nous avons préparé deux plans pour continuer à profiter ensemble, et chacun choisit celui qui lui convient le mieux.",
@@ -1720,17 +1982,37 @@ export const content = {
     metaDescription:
       "David and Aydé are getting married on February 20, 2027 at Roca Azul in Jocotepec, Jalisco.",
     nav: {
+      home: "Home",
+      you: "You",
       story: "Us",
-      weekend: "The weekend",
+
+      weekend: "Save the date",
+      programme: "Programme",
       venue: "The venue",
       accommodation: "Accommodation",
       travel: "Coming from afar",
       attire: "Attire",
       gift: "Gifts",
       photos: "Photos",
+      thanks: "Thanks",
+      guests: "Guests",
       rsvp: "RSVP",
-      dashboard: "Dashboard",
+
+
+
+      dashboard: "admin",
+      changePassword: "Change password",
+      logout: "Log out",
+      newPasswordLabel: "New password",
+      newPasswordPlaceholder: "At least 6 characters",
+      passwordError: "The password must be at least 6 characters.",
+      passwordSuccess: "Password updated!",
+      cancel: "Cancel",
+      save: "Save",
+      working: "Saving…",
     },
+
+
     countdown: {
       prefix: "Married in",
       years: "years",
@@ -1738,14 +2020,17 @@ export const content = {
       days: "days",
       hours: "hours",
       minutes: "min",
-      arrived: "Today we celebrate",
+      arrived: "Married since",
     },
 
 
+
     hero: {
-      eyebrow: "We are getting married",
+      eyebrow: "we are getting married",
       invitation: "We want to celebrate this moment with you",
-      scroll: "Discover the invitation",
+
+      scroll: "Let's begin",
+
       imageNote: "Our photograph will go here",
       imageAlt: "David and Aydé together",
       selectImage: "Show photograph",
@@ -1753,17 +2038,24 @@ export const content = {
       play: "Resume photos",
     },
     identity: {
-      eyebrow: "Before we begin",
+      eyebrow: "Identity check",
       title: "Is your name spelled correctly?",
+
       body:
         "We want every guest to feel recognised. If your name or someone in your group is misspelled, correct it here and we will use it in the invitation and at the table.",
       note:
-        "You can also upload a photo of your face so we can recognise you more easily over the weekend.",
+        "You can also upload a photo of your face if you wish, as a keepsake (a nice portrait preferably).",
+
       you: "You",
       firstName: "First name",
       lastName: "Last name",
+      fullName: "Full name",
       editName: "Correct name",
+      correctNumber: "Correct number",
+
       addPhoto: "Upload photo",
+
+      changePhoto: "Change photo",
       uploading: "Uploading…",
       save: "Save",
       saving: "Saving…",
@@ -1773,9 +2065,39 @@ export const content = {
       nameRequired: "Please enter at least your first name.",
       photoSaved: "Photo saved! Thank you.",
       photoError: "We could not upload the photo. Please try again.",
+
+      stepLabel: "Step",
+      step1Title: "Is your name spelled correctly?",
+      step2Title: "What is your mobile number?",
+      step3Title: "What is your email address?",
+      step2Body:
+        "We will only use it to contact you about the wedding (confirmations, last-minute changes, or transfer coordination).",
+      step3Body:
+        "We will send you the formal invitation and any important information before the big day.",
+      contactFor: "Contact for",
+      phoneLabel: "Mobile number",
+
+      phonePlaceholder: "E.g. 33 1234 5678",
+      emailLabel: "Email address",
+      emailPlaceholder: "you@example.com",
+      phoneRequired: "Please enter your mobile number.",
+      emailRequired: "Please enter your email address.",
+      emailInvalid: "Please enter a valid email address.",
+      back: "Back",
+      next: "Continue",
+      finish: "Finish",
+      contactSaved: "Done! Thank you for confirming your details.",
+      whatsappLabel: "Add me to the WhatsApp group",
+      whatsappHint:
+        "Join the group to receive announcements, transfer coordination, and weekend updates.",
+      whatsappUrl: "https://chat.whatsapp.com/E8LP2oj0sK4GM5Slo1VIFD?s=cl&p=a&ilr=4",
+      navStory: "Discover the invitation",
     },
+
     story: {
       eyebrow: "Our invitation",
+
+
 
       title: "A weekend to come together",
       body:
@@ -1795,10 +2117,12 @@ export const content = {
         "Roca Azul sits on the lake shore, facing the sunset.",
       ],
       anecdotesLabel: "Lake Chapala in 12 anecdotes",
+      navNext: "Discover the venue",
 
     },
 
     gallery: {
+
       eyebrow: "Our journey",
       title: "A story made of travels and little moments",
       body:
@@ -1832,7 +2156,11 @@ export const content = {
       title: "Three days to celebrate",
       intro:
         "We will be at Roca Azul from Thursday. Guests may arrive from around midday on Friday, and Saturday’s main celebration will be an afternoon wedding.",
+      navSchedule: "See the three days",
+      navProgram: "Detailed programme",
+
       items: [
+
         {
           day: "Friday 19 · from midday",
           title: "Arrival and welcome",
@@ -1854,7 +2182,8 @@ export const content = {
         eyebrow: "Saturday 20 · programme",
         title: "The afternoon, step by step",
         warning:
-          "If you are travelling from Guadalajara, please leave plenty of time. The roads into Jocotepec can become congested very easily, and everyone needs to be at Roca Azul by 1 pm. Even better: if you can, stay on site and share Friday with us. There are plenty of accommodation options, at every price and in every range, around Lake Chapala.",
+          "If you are travelling from Guadalajara, please leave plenty of time. The roads into Jocotepec can become congested very easily, and everyone needs to be at Roca Azul by 1 pm.",
+
         items: [
           { time: "1 pm", title: "Guest arrival", body: "Welcome and time to settle in." },
           { time: "2 pm", title: "Aperitif", body: "The first toast of the day." },
@@ -1864,6 +2193,26 @@ export const content = {
           { time: "6 pm", title: "Lighthouse ceremony", body: "The defining moment of the afternoon." },
           { time: "Afterwards", title: "Mariachi and dinner", body: "Mariachi will open dinner and the next chapter of the celebration." },
           { time: "After dinner", title: "Norteño and dancing", body: "Norteño will open the dance floor and the party." },
+        ],
+      },
+      friday: {
+        eyebrow: "Friday 19 · programme",
+        title: "Arrival and welcome",
+        warning:
+          "A relaxed first gathering to settle in, connect, and ease into the weekend.",
+        items: [
+          { time: "From midday", title: "Arrivals and check-in", body: "Welcome and time to settle into the cabins." },
+          { time: "Afternoon", title: "Pétanque and games", body: "Outdoor games to break the ice." },
+          { time: "Evening", title: "Welcome pizzas", body: "An informal dinner to reconnect without rushing." },
+        ],
+      },
+      sunday: {
+        eyebrow: "Sunday 21 · programme",
+        title: "Breakfast and farewell",
+        warning: "One final morning together before the journeys home.",
+        items: [
+          { time: "Morning", title: "Breakfast", body: "Breakfast included for guests staying in the cabins." },
+          { time: "Midday", title: "Farewell", body: "Final moments together and departures." },
         ],
       },
     },
@@ -2076,18 +2425,20 @@ export const content = {
       eyebrow: "The venue",
       title: "The whole club to enjoy",
       body:
-        "Between shared moments, everyone can spend time with their neighbours, explore the facilities, or simply rest in their accommodation.",
+        "Between ceremony and celebration, the whole club is ours: pools, gardens, courts and cabins to gather, explore, or simply unwind.",
+
       videoTitle: "Roca Azul presentation video",
       privacyTitle: "Privacy",
       privacyBody:
         "All the cabins will be rented by guests of the wedding, around 80 to 90 people. In addition, other wedding guests will be staying nearby, perhaps not far away, or will come only for the day: around 60 people according to current estimates. Even so, the club will not be entirely private that weekend: some areas still host tents or trailers. We will share the space and respect the quiet. Music can play until 2 am, after which we will continue in the cabins.",
 
       gallery: [
-        { key: "cabins", title: "Cabins", alt: "Cabins and guest rooms at Roca Azul" },
         { key: "pool", title: "Pools", alt: "Pool and gardens at Club Roca Azul" },
         { key: "courts", title: "Sport", alt: "Sports courts at Roca Azul" },
         { key: "gardens", title: "Gardens", alt: "Green spaces at Club Roca Azul" },
+        { key: "cabins", title: "Cabins", alt: "Cabins and guest rooms at Roca Azul" },
       ],
+
       gallerySource: "Venue photographs: Club Roca Azul",
       rocaGalleryLabel: "Club Roca Azul photo gallery",
       rocaGalleryAlts: [
@@ -2138,21 +2489,29 @@ export const content = {
       ],
       note:
         "This list is based on services published by Roca Azul. Some spaces, opening hours, activities, or supplements will need confirmation closer to the date.",
+      navNext: "Discover the venue",
+      navContinue: "Continue",
+      navIdentity: "Is your name spelled correctly?",
     },
     accommodation: {
+
       eyebrow: "Accommodation",
       title: "Stay close, help us plan ahead",
+      citation:
+        "We will be at Roca Azul from Thursday. Guests may arrive from around midday on Friday, and Saturday’s main celebration will be an afternoon wedding.",
       body:
         "We have accommodation at the venue for approximately 80 people. As the cabins and rooms need to be allocated carefully, please let us know as soon as possible if you would like to use this option.",
       facts: [
-        { value: "≈ 80", label: "places available" },
-        { value: "MXN 500", label: "per person, per night" },
+        { value: "≈ 80–90", label: "places available" },
+        { value: "MXN 1,200", label: "per person · 2 nights" },
         { value: "2", label: "breakfasts included" },
       ],
       specialNote:
-        "Accommodation is available only as a complete two-night package, from Friday 19 to Sunday 21; one-night bookings are not possible. The estimated price is MXN 500 per person, per night and includes both weekend breakfasts; more details will follow soon. Accommodation is our gift to our beloved padrinos. If you prefer to arrange your own accommodation, that is absolutely fine—we simply need to know in advance.",
-      contactPrompt:
-        "If you are interested in this plan, contact us directly on WhatsApp:",
+        "Accommodation is available only as a complete two-night package, from Friday 19 to Sunday 21; one-night bookings are not possible. The estimated price is MXN 1,200 per person for both nights and includes both weekend breakfasts.",
+
+
+      contactPrompt: "More info",
+
       cabinsShowcase: {
         eyebrow: "Explore the cabins",
         privateVideoEyebrow: "Private video",
@@ -2300,6 +2659,8 @@ export const content = {
         note:
           "The times shown are indicative and can vary enormously. Please plan ahead and, even better, arrive early by booking accommodation if you can.",
         venue: "Roca Azul · Jocotepec",
+        toVenueLabel: "GO TO ROCA AZUL",
+        toBeachLabel: "GO TO THE PLAYA",
         originsLabel: "To the wedding",
         destinationsLabel: "After the wedding",
         mapLabel: "Map of Roca Azul and its surroundings",
@@ -2348,10 +2709,12 @@ export const content = {
       },
       guestNote:
         "The most important thing is that you feel comfortable and celebrate with us. If you have any questions, write to us.",
+      navNext: "Accommodation",
 
     },
     gift: {
       eyebrow: "Gifts",
+
       title: "Your presence is the greatest gift",
       body:
         "Your company is the best present we could receive. If you would also like to give a token of affection, we would be grateful for any contribution towards our honeymoon or our shared projects as a couple.",
@@ -2379,8 +2742,36 @@ export const content = {
       },
       cta: "Talk to the couple",
     },
+    thanks: {
+      eyebrow: "Acknowledgements",
+      title: "Thank you",
+      subtitle:
+        "Without our padrinos and helpers, none of this would be possible. We want to thank, with all our gratitude…",
+      credits: [
+        { name: "Manuel Amuezca", role: "Wedding planner" },
+        { name: "Manuel Amuezca", role: "Friday pizzas" },
+        { name: "Manuel Amuzeca", role: "Friday pizzas" },
+        { name: "Ismael", role: "Pizzas" },
+        { name: "Isabel Guadalupe", role: "The couple’s outfits" },
+      ],
+      humor: [
+        "If you would like to appear here, contact our padrino affiliate programme service.",
+        "You appear here without knowing it: you have been assigned a task. Too bad, but there is no way to remove it: the page’s IT admin is on holiday, we cannot delete it, so it has to be done.",
+        "You helped out and you don’t appear. Too bad. The IT guy may be on holiday, but send your complaints to the couple or the wedding planner.",
+      ],
+      cta: "Talk to the couple",
+      ctaPlanner: "Talk to the wedding planner",
+      guestCloud: {
+        eyebrow: "Our guests",
+        title: "Everyone joining us",
+        subtitle:
+          "Every name is a shared story. Thank you for being part of this day.",
+      },
+    },
     coast: {
       eyebrow: "And afterwards?",
+
+
       title: "Keep enjoying being together",
       body:
         "The party doesn’t end on Sunday. We have prepared two plans to keep enjoying time together, and everyone chooses whichever suits them best.",

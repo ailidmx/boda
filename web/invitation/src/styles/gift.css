@@ -1,0 +1,89 @@
+/* ── Gift section ─────────────────────────────────────────────────────── */
+
+.gift-section {
+  display: grid;
+  grid-template-columns: 1fr 0.9fr;
+  gap: clamp(3rem, 8vw, 8rem);
+  align-items: center;
+  background: var(--deep-green);
+  color: var(--white);
+}
+
+.gift-copy h2 {
+  margin-bottom: 2rem;
+}
+
+.gift-copy .note {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(255 255 255 / 35%);
+  font-size: 0.8rem;
+}
+
+.gift-accounts {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.gift-account {
+  background: rgb(255 255 255 / 6%);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgb(255 255 255 / 12%);
+}
+
+.gift-account summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--marigold);
+  padding: 0.25rem 0;
+}
+
+.gift-account dl {
+  margin: 0.75rem 0 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.gift-account dd {
+  margin: 0;
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+  letter-spacing: 0.02em;
+  word-break: break-all;
+}
+
+.gift-account small {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.gift-contacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.5rem;
+  margin-top: 2rem;
+  align-items: center;
+}
+
+.gift-contacts span {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.gift-contacts a {
+  color: var(--marigold);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.gift-contacts a:hover {
+  text-decoration: underline;
+}

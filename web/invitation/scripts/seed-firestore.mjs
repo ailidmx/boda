@@ -145,6 +145,7 @@ async function main() {
       firstName: row["Nombre"] || "",
       lastName: row["Apellido"] || "",
       email: row["Email"] || "",
+      phone: row["Teléfono"] || row["Telefono"] || row["WhatsApp"] || "",
       groupId: row["Grupo"] || "",
       cabinId: cabinCode, // null if no cabin
       isChild: (row["Adulto/Niño"] || "").toLowerCase() === "niño",
@@ -153,6 +154,7 @@ async function main() {
       confirmed: row["Confirmado"] === "TRUE",
       confirmedDate: row["Confirmado el"] || null,
     };
+
   });
 
   // ── 2. GUEST GROUPS ──────────────────────────────────────────────────
