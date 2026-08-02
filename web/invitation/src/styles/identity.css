@@ -1,0 +1,703 @@
+/* ── Identity swap (animated monogram / names) ────────────────────────── */
+
+.identity-swap {
+  --identity-cycle: 18s;
+  --identity-ease: cubic-bezier(0.76, 0, 0.24, 1);
+
+
+  position: relative;
+  display: grid;
+  width: max-content;
+  margin-inline: auto;
+  place-items: center;
+  vertical-align: middle;
+  isolation: isolate;
+}
+
+.identity-swap-state {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.16em;
+  white-space: nowrap;
+  will-change: opacity, transform, filter, clip-path;
+}
+
+.identity-swap-state--primary {
+  animation: identity-primary var(--identity-cycle) var(--identity-ease)
+    var(--identity-delay, 0s) infinite both;
+}
+
+.identity-swap-state--secondary {
+  animation: identity-secondary var(--identity-cycle) var(--identity-ease)
+    var(--identity-delay, 0s) infinite both;
+}
+
+.identity-connector {
+  color: #e4b968;
+  font-family: var(--font-display);
+  font-size: 0.5em;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.identity-swap--initials .identity-swap-state {
+  gap: 0.14em;
+}
+
+.identity-swap--initials .identity-swap-state i {
+  color: #e4b968;
+  font-family: var(--font-display);
+  font-size: 0.72em;
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* Each initial is split into a letter + a golden dot so the dot can be
+   accented independently. */
+.identity-initial {
+  display: inline-flex;
+}
+
+.identity-initial-dot {
+  color: #e4b968;
+}
+
+
+.identity-accent {
+  position: relative;
+}
+
+.identity-accent::after {
+  position: absolute;
+  top: -0.09em;
+  right: 0.03em;
+  width: 0.075em;
+  height: 0.075em;
+  border-radius: 50%;
+  background: #e4b968;
+  box-shadow: 0 0 0.18em rgb(228 185 104 / 70%);
+  content: "";
+  opacity: 0;
+  transform: translate(0.08em, -0.04em) scale(0.35);
+  animation: identity-accent-glint var(--identity-cycle) ease-in-out
+    var(--identity-delay, 0s) infinite both;
+}
+
+@keyframes identity-primary {
+  0%,
+  38%,
+  100% {
+    clip-path: inset(-12% -8% -12% -8%);
+    filter: blur(0);
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+
+  47%,
+  88% {
+    clip-path: inset(0 12% 0 12%);
+    filter: blur(0.08em);
+    opacity: 0;
+    transform: translate(-0.18em, 0.06em) scale(0.985);
+  }
+
+  96% {
+    clip-path: inset(0 12% 0 12%);
+    filter: blur(0.08em);
+    opacity: 0;
+    transform: translate(0.18em, -0.06em) scale(0.985);
+  }
+}
+
+@keyframes identity-secondary {
+  0%,
+  38%,
+  100% {
+    clip-path: inset(0 12% 0 12%);
+    filter: blur(0.08em);
+    opacity: 0;
+    transform: translate(0.18em, -0.06em) scale(0.985);
+  }
+
+  47%,
+  88% {
+    clip-path: inset(-12% -8% -12% -8%);
+    filter: blur(0);
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+
+  96% {
+    clip-path: inset(0 12% 0 12%);
+    filter: blur(0.08em);
+    opacity: 0;
+    transform: translate(-0.18em, 0.06em) scale(0.985);
+  }
+}
+
+@keyframes identity-accent-glint {
+  0%,
+  34%,
+  54%,
+  84%,
+  100% {
+    opacity: 0;
+    transform: translate(0.08em, -0.04em) scale(0.35);
+  }
+
+  43%,
+  93% {
+    opacity: 0.95;
+    transform: translate(0, 0) scale(1);
+  }
+}
+
+/* ── Identity / name-confirmation section ──────────────────────────────
+   Shown right after the hero. Lets a guest confirm or correct their name
+   and upload a face photo that doubles as their fun-fact avatar. */
+.identity-section {
+  /* Keep the section strictly full-height: modest vertical padding so the
+     card fits within the viewport and the next section never peeks in. */
+  padding-block: clamp(1.25rem, 2.5vw, 2rem);
+  background:
+    radial-gradient(circle at 15% 15%, rgb(198 139 43 / 18%), transparent 26rem),
+    radial-gradient(circle at 85% 85%, rgb(169 77 49 / 18%), transparent 30rem),
+    var(--deep-green);
+  color: var(--white);
+}
+
+
+/* The section eyebrow ("Before we begin") sits at the very top of the dark
+   section, above the card, so it reads as the section label. It uses the
+   shared standard eyebrow treatment but in a light tone for contrast against
+   the deep-green background. */
+.identity-section-eyebrow {
+  margin: 0 0 1rem;
+  color: #e4b968;
+}
+
+/* The card is centered vertically in the space above the bottom nav. */
+.identity-center {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 0;
+}
+
+
+.identity-frame {
+  max-width: 46rem;
+  margin-inline: auto;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  border: 1px solid rgb(255 253 248 / 22%);
+  border-radius: 1.5rem;
+  background: rgb(255 253 248 / 92%);
+  box-shadow: 0 18px 44px rgb(0 0 0 / 28%);
+  /* The card is light, so all inherited text (labels, links, buttons) must be
+     dark ink to stay readable — not the white inherited from the section. */
+  color: var(--ink);
+}
+
+
+
+
+
+/* The section eyebrow ("Before we begin") sits inside the light card. It uses
+   the same full-size eyebrow treatment as every other section so the label is
+   consistent across the whole invitation. */
+.identity-frame .eyebrow {
+  margin: 0 0 1rem;
+  color: var(--terracotta);
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.identity-frame h2 {
+  margin: 0.5rem 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 4vw, 2.1rem);
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+
+.identity-frame > .lead {
+  margin: 0 0 1.25rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--ink);
+}
+
+.identity-note {
+  margin: 0 0 1.5rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: rgb(36 33 25 / 72%);
+}
+
+.identity-members {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.identity-member {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid rgb(36 33 25 / 12%);
+}
+
+.identity-member:first-child {
+  border-top: none;
+}
+
+.identity-avatar {
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--marigold);
+  background: rgb(36 33 25 / 8%);
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--terracotta);
+  overflow: hidden;
+}
+
+.identity-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.identity-member-body {
+  min-width: 0;
+}
+
+.identity-member-name {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.identity-member-tag {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a5a12;
+}
+
+
+.identity-member-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1rem;
+  margin-top: 0.5rem;
+}
+
+.identity-photo-label {
+  cursor: pointer;
+}
+
+.identity-name-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+/* Bigger inputs so the guest can clearly read and correct their name. */
+.identity-name-form .form-field input {
+  padding: 0.95rem 0.4rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+
+.identity-name-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.identity-message {
+  margin: 0.75rem 0 0;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.identity-message--success {
+  color: var(--deep-green);
+}
+
+.identity-message--error {
+  color: #b3261e;
+}
+
+/* ── 3-step wizard (name → phone → email) ─────────────────────────────── */
+
+/* Step indicator: three clickable dots + a "Paso n/3" label. */
+.identity-steps {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.identity-step-dot {
+  width: 0.7rem;
+  height: 0.7rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(36 33 25 / 22%);
+  cursor: pointer;
+  transition: background 200ms ease, transform 200ms ease;
+}
+
+.identity-step-dot.is-active {
+  background: var(--terracotta);
+  transform: scale(1.25);
+}
+
+.identity-step-dot.is-done {
+  background: var(--marigold);
+}
+
+.identity-step-count {
+  margin-left: 0.25rem;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgb(36 33 25 / 62%);
+}
+
+/* Step 2 & 3 forms: a single wide field, centered. */
+.identity-step-form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 0.5rem;
+}
+
+/* Context block listing the invitation-group members (whose contact is being
+   collected). The primary guest is highlighted. */
+.identity-step-guests {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 0.6rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgb(36 33 25 / 12%);
+  border-radius: 0.75rem;
+  background: rgb(36 33 25 / 4%);
+}
+
+.identity-step-guests-label {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(36 33 25 / 62%);
+}
+
+.identity-step-guests-list {
+  display: inline;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.identity-step-guest.is-self {
+  color: var(--terracotta);
+}
+
+
+.identity-step-form .form-field input {
+  padding: 1rem 0.5rem;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* ── International phone input ────────────────────────────────────────── */
+.phone-input {
+  position: relative;
+}
+
+.phone-input__field {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid rgb(36 33 25 / 35%);
+  border-radius: 0.5rem;
+  background: var(--white);
+  overflow: hidden;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.phone-input__field:focus-within {
+  border-color: var(--terracotta);
+  box-shadow: 0 0 0 3px rgb(169 77 49 / 18%);
+}
+
+.phone-input__country {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 0;
+  border-right: 1px solid rgb(36 33 25 / 18%);
+  padding: 0 0.75rem;
+  background: rgb(36 33 25 / 4%);
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 150ms ease;
+}
+
+.phone-input__country:hover {
+  background: rgb(36 33 25 / 8%);
+}
+
+.phone-input__flag {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+.phone-input__code {
+  letter-spacing: 0.02em;
+}
+
+.phone-input__caret {
+  color: rgb(36 33 25 / 55%);
+  font-size: 0.7rem;
+  transition: transform 180ms ease;
+}
+
+.phone-input__caret.is-open {
+  transform: rotate(180deg);
+}
+
+.phone-input__number {
+  flex: 1 1 auto;
+  min-width: 0;
+  border: 0;
+  padding: 1rem 0.75rem;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.phone-input__number:focus {
+  outline: none;
+}
+
+/* Country dropdown */
+.phone-input__dropdown {
+  position: absolute;
+  z-index: 130;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  width: min(20rem, 90vw);
+  overflow: hidden;
+  border: 1px solid rgb(36 33 25 / 18%);
+  border-radius: 0.75rem;
+  background: var(--white);
+  box-shadow: 0 18px 40px rgb(0 0 0 / 28%);
+}
+
+.phone-input__search {
+  padding: 0.6rem;
+  border-bottom: 1px solid rgb(36 33 25 / 12%);
+}
+
+.phone-input__search input {
+  width: 100%;
+  border: 1px solid rgb(36 33 25 / 25%);
+  border-radius: 0.4rem;
+  padding: 0.5rem 0.6rem;
+  background: var(--white);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.phone-input__search input:focus {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 1px;
+}
+
+.phone-input__list {
+  max-height: 16rem;
+  margin: 0;
+  padding: 0.3rem;
+  list-style: none;
+  overflow-y: auto;
+}
+
+.phone-input__option {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.6rem;
+  border: 0;
+  border-radius: 0.4rem;
+  padding: 0.5rem 0.6rem;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  transition: background 120ms ease;
+}
+
+.phone-input__option:hover {
+  background: rgb(36 33 25 / 6%);
+}
+
+.phone-input__option.is-active {
+  background: rgb(169 77 49 / 12%);
+  font-weight: 600;
+}
+
+.phone-input__option-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.phone-input__option-code {
+  color: rgb(36 33 25 / 55%);
+  font-weight: 600;
+}
+
+.phone-input__empty {
+  padding: 0.75rem 0.6rem;
+  color: rgb(36 33 25 / 55%);
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+/* Per-member phone form inside the step-2 member cards. */
+.identity-phone-form {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+
+.identity-phone-form .form-field {
+  margin: 0;
+}
+
+.identity-phone-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* WhatsApp group invitation card. */
+.identity-whatsapp {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgb(36 33 25 / 12%);
+}
+
+.identity-whatsapp-link {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid rgb(37 211 102 / 45%);
+  border-radius: 0.9rem;
+  background: rgb(37 211 102 / 10%);
+  color: var(--ink);
+  text-decoration: none;
+  transition: background 150ms ease, border-color 150ms ease, transform 150ms ease;
+}
+
+.identity-whatsapp-link:hover {
+  background: rgb(37 211 102 / 18%);
+  border-color: rgb(37 211 102 / 70%);
+  transform: translateY(-1px);
+}
+
+.identity-whatsapp-icon {
+  font-size: 1.6rem;
+  line-height: 1;
+}
+
+.identity-whatsapp-text {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.identity-whatsapp-text strong {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.identity-whatsapp-text small {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  line-height: 1.4;
+  color: rgb(36 33 25 / 68%);
+}
+
+.identity-whatsapp-arrow {
+  margin-left: auto;
+  color: rgb(37 211 102 / 90%);
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.identity-step-actions {
+
+  display: flex;
+  justify-content: flex-end;
+}
+
+
+/* Bottom navigation row (Atrás / Continuar). */
+.identity-step-nav {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgb(36 33 25 / 12%);
+}
+

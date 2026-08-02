@@ -3,8 +3,10 @@ import React, { useEffect, useRef, useState } from "react";
 // One fact per slide so each card stays thin and focused.
 const FUN_FACT_PAGE_SIZE = 1;
 
-// How long each slide stays before auto-advancing (ms).
-const AUTOPLAY_INTERVAL = 6000;
+// How long each slide stays before auto-advancing (ms). Kept slow so guests
+// have time to read each anecdote before it advances.
+const AUTOPLAY_INTERVAL = 9000;
+
 
 /**
  * Normalise a fact entry into { title, text, avatar }.
@@ -61,15 +63,60 @@ export function FunFactCarousel({ facts, id, label = "" }) {
       onBlur={() => setPaused(false)}
     >
       {label && (
-        <>
-          <div className="fun-fact-list-heading">
-            <span className="fun-fact-label" aria-hidden="true">
-              {label}
-            </span>
-          </div>
-          <hr className="fun-fact-divider" aria-hidden="true" />
-        </>
+        <div className="fun-fact-list-heading">
+          <span className="fun-fact-label" aria-hidden="true">
+            {label}
+          </span>
+          {pageCount > 1 && (
+            <div className="fun-fact-controls">
+              <button
+                className="fun-fact-arrow fun-fact-arrow--prev"
+                type="button"
+                data-fun-fact-prev={id}
+                aria-label="Previous"
+                onClick={() => goTo(pageIndex - 1)}
+              >
+                ‹
+              </button>
+              <div className="fun-fact-dots" data-fun-fact-dots={id}>
+                {pages.map((_, index) => (
+                  <button
+                    key={index}
+                    className="fun-fact-dot"
+                    type="button"
+                    data-fun-fact-dot={id}
+                    data-index={index}
+                    aria-label={`Page ${index + 1}`}
+                    aria-current={index === pageIndex}
+                    onClick={() => goTo(index)}
+                  />
+                ))}
+              </div>
+              <button
+                className="fun-fact-arrow fun-fact-arrow--next"
+                type="button"
+                data-fun-fact-next={id}
+                aria-label="Next"
+                onClick={() => goTo(pageIndex + 1)}
+              >
+                ›
+              </button>
+              <button
+                className="fun-fact-pause"
+                type="button"
+                data-fun-fact-pause={id}
+                aria-pressed={paused}
+                aria-label={paused ? "Play" : "Pause"}
+                onClick={() => setPaused((prev) => !prev)}
+              >
+                {paused ? "▶" : "❚❚"}
+              </button>
+            </div>
+          )}
+
+        </div>
       )}
+      {label && <hr className="fun-fact-divider" aria-hidden="true" />}
       <div className="fun-fact-viewport">
         <div className="fun-fact-track" data-fun-fact-track={id}>
           <ol
@@ -105,42 +152,7 @@ export function FunFactCarousel({ facts, id, label = "" }) {
           </ol>
         </div>
       </div>
-      {pageCount > 1 && (
-        <div className="fun-fact-controls">
-          <button
-            className="fun-fact-arrow fun-fact-arrow--prev"
-            type="button"
-            data-fun-fact-prev={id}
-            aria-label="Previous"
-            onClick={() => goTo(pageIndex - 1)}
-          >
-            ‹
-          </button>
-          <div className="fun-fact-dots" data-fun-fact-dots={id}>
-            {pages.map((_, index) => (
-              <button
-                key={index}
-                className="fun-fact-dot"
-                type="button"
-                data-fun-fact-dot={id}
-                data-index={index}
-                aria-label={`Page ${index + 1}`}
-                aria-current={index === pageIndex}
-                onClick={() => goTo(index)}
-              />
-            ))}
-          </div>
-          <button
-            className="fun-fact-arrow fun-fact-arrow--next"
-            type="button"
-            data-fun-fact-next={id}
-            aria-label="Next"
-            onClick={() => goTo(pageIndex + 1)}
-          >
-            ›
-          </button>
-        </div>
-      )}
     </div>
   );
 }
+

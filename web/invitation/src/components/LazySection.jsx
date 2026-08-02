@@ -45,37 +45,8 @@ export function LazySection({
     return () => observer.disconnect();
   }, [rootMargin]);
 
-  // Once the section is mounted, reveal its `.reveal` children (the scroll-in
-  // animation). This also fixes the reveal animation for lazy sections, which
-  // would otherwise stay at opacity 0.
-  useEffect(() => {
-    if (!visible) return undefined;
-    const node = ref.current;
-    if (!node) return undefined;
-
-    const revealEls = node.querySelectorAll(".reveal");
-    const timers = revealEls.map((el, index) =>
-      window.setTimeout(() => el.classList.add("is-visible"), index * 60),
-    );
-
-    // Safety net: never leave content permanently hidden. If any `.reveal`
-    // child is still invisible shortly after the section mounts (e.g. a
-    // timer was cleared or the animation was interrupted), force it visible.
-    const fallback = window.setTimeout(() => {
-      node
-        .querySelectorAll(".reveal:not(.is-visible)")
-        .forEach((el) => el.classList.add("is-visible"));
-    }, revealEls.length * 60 + 400);
-
-    return () => {
-      timers.forEach((timer) => window.clearTimeout(timer));
-      window.clearTimeout(fallback);
-    };
-  }, [visible]);
-
-
-
   return (
+
     <div ref={ref} id={id} className={className}>
       {visible ? children : placeholder}
     </div>

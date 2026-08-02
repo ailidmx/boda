@@ -1,0 +1,61 @@
+.guest-cloud-section {
+  background:
+    radial-gradient(circle at 12% 18%, rgb(198 139 43 / 14%), transparent 26rem),
+    radial-gradient(circle at 88% 82%, rgb(169 77 49 / 14%), transparent 28rem),
+    var(--cream);
+}
+
+.guest-cloud-frame {
+  width: min(100%, 64rem);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.guest-cloud-title {
+  max-width: none;
+  margin: 0 0 0.75rem;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+.guest-cloud-subtitle {
+  max-width: 42rem;
+  margin: 0 auto 3rem;
+  color: rgb(36 33 25 / 78%);
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+  line-height: 1.6;
+}
+
+.guest-cloud {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem 1.1rem;
+  padding: 2.5rem 1rem;
+  border: 1px solid rgb(36 33 25 / 12%);
+  border-radius: 2rem;
+  background: rgb(255 253 248 / 55%);
+  box-shadow: 0 1.5rem 4rem rgb(36 33 25 / 8%);
+}
+
+.guest-cloud-tag {
+  display: inline-block;
+  padding: 0.1em 0.2em;
+  font-family: var(--font-display);
+  line-height: 1.1;
+  letter-spacing: 0.01em;
+  transition:
+    transform 200ms ease,
+    color 200ms ease,
+    text-shadow 200ms ease;
+  cursor: default;
+}
+
+.guest-cloud-tag:hover {
+  color: var(--terracotta) !important;
+  text-shadow: 0 0 1.5rem rgb(169 77 49 / 35%);
+  transform: rotate(0deg) scale(1.12) !important;
+}

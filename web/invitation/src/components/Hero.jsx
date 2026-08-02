@@ -126,7 +126,6 @@ export function Hero() {
         </h1>
         <p className="hero-date">
           <HeroDate />
-          <span className="hero-date-label">{EVENT.dateShort}</span>
         </p>
         <p className="hero-place">
           {EVENT.venue}
@@ -135,9 +134,12 @@ export function Hero() {
         </p>
         {guest && <p className="hero-group-name">{groupTag}</p>}
         <p className="hero-invitation">{t.hero.invitation}</p>
+        <span className="hero-date-label">{EVENT.dateShort}</span>
+
       </div>
 
-      <a className="scroll-cue" href="#story">
+      <a className="scroll-cue" href="#identity">
+
         <span>{t.hero.scroll}</span>
         <span aria-hidden="true">↓</span>
       </a>

@@ -1,0 +1,11 @@
+{
+  "name": "boda",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build:all": "node scripts/build-all.mjs",
+    "dev:invitation": "npm --prefix web/invitation run dev",
+    "dev:dashboard": "npm --prefix web/dashboard run dev"
+  }
+}

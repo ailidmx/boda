@@ -1,0 +1,192 @@
+/* ── Food / experience section ────────────────────────────────────────── */
+
+.experience-heading {
+  display: grid;
+  grid-template-columns: 0.55fr 1fr 1fr;
+  gap: clamp(1.5rem, 5vw, 5rem);
+  align-items: start;
+  margin-bottom: clamp(3rem, 7vw, 7rem);
+}
+
+.experience-heading .lead {
+  margin-top: 0;
+  margin-bottom: 2rem;
+}
+
+
+.food-section {
+  background: var(--cream);
+}
+
+.flavours-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.flavours-heading h3 {
+  max-width: 34rem;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 4vw, 4.2rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.flavours-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 1rem;
+}
+
+.flavour-card {
+  grid-column: span 2;
+  overflow: hidden;
+  background: #f6f0e5;
+  border: 1px solid rgb(36 33 25 / 14%);
+}
+
+.flavour-card:nth-child(4),
+.flavour-card:nth-child(5) {
+  grid-column: span 3;
+}
+
+.flavour-card img {
+  display: block;
+  width: 100%;
+  height: clamp(15rem, 25vw, 22rem);
+  object-fit: cover;
+}
+
+.flavour-card:nth-child(4) img,
+.flavour-card:nth-child(5) img {
+  height: clamp(17rem, 30vw, 25rem);
+}
+
+.flavour-card > div {
+  padding: clamp(1.4rem, 3vw, 2.4rem);
+}
+
+.flavour-card h3 {
+  margin: 0 0 0.8rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 2.6vw, 2.5rem);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.flavour-card p {
+  margin: 0;
+  color: rgb(36 33 25 / 72%);
+  line-height: 1.65;
+}
+
+.photo-credits {
+  max-width: 60rem;
+  margin: 1rem 0 clamp(3rem, 7vw, 7rem);
+  color: rgb(36 33 25 / 58%);
+  font-size: 0.7rem;
+}
+
+.photo-credits summary {
+  width: max-content;
+  cursor: pointer;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.photo-credits p {
+  line-height: 1.8;
+}
+
+.photo-credits a {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+}
+
+.food-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-block: 1px solid rgb(36 33 25 / 20%);
+}
+
+.food-day {
+  min-height: 27rem;
+  padding: clamp(2rem, 4vw, 4rem);
+  border-right: 1px solid rgb(36 33 25 / 20%);
+}
+
+.food-day:first-child {
+  padding-left: 0;
+}
+
+.food-day:last-child {
+  border-right: 0;
+}
+
+.food-day-label {
+  color: var(--terracotta);
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.food-day h3,
+.music-act h3,
+.open-stage h3,
+.facility-group h3,
+.coast-form-wrap h3 {
+  margin: 1rem 0 1.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.food-day ul,
+.facility-group ul {
+  margin: 0;
+  padding-left: 1.15rem;
+}
+
+.food-day li,
+.facility-group li {
+  margin-bottom: 0.8rem;
+}
+
+.experience-note {
+  max-width: 50rem;
+  margin: 3rem 0 0 auto;
+  color: rgb(36 33 25 / 68%);
+  font-style: italic;
+}
+
+.drinks-policy {
+  display: grid;
+  grid-template-columns: 0.45fr 0.7fr 1fr;
+  gap: clamp(1rem, 4vw, 4rem);
+  align-items: start;
+  margin-top: clamp(3rem, 7vw, 6rem);
+  border-top: 1px solid rgb(36 33 25 / 20%);
+  padding-top: clamp(2rem, 4vw, 4rem);
+}
+
+.drinks-policy h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3.5vw, 3rem);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.drinks-policy p {
+  margin-top: 0;
+}
+
+.drinks-policy-note {
+  color: var(--terracotta);
+  font-weight: 600;
+}

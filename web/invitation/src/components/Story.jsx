@@ -1,40 +1,47 @@
-import React from "react";
+import React, { useState } from "react";
 import { CHAPALA_HIGHLIGHTS } from "../rocaAzulGallery.js";
 import { chapalaAnecdotes } from "../chapalaAnecdotes.js";
 import { useApp } from "../context/AppContext.jsx";
 import { InitialsSwap } from "./ui.jsx";
 import { FunFactCarousel } from "./FunFactCarousel.jsx";
-import { resolveGuestPhoto } from "../guest-profiles.js";
-import { cloudinaryImage } from "../cloudinary.js";
+import { LightboxCarousel } from "./LightboxCarousel.jsx";
 
-// Default avatar images used for the fun-fact carousel. These are the
-// children's photos (hosted on Cloudinary). Guests can replace them with
-// their own close-up photo (uploaded via the identity section). The carousel
-// cycles through them so each anecdote gets a different avatar.
-const DEFAULT_AVATARS = [
-  cloudinaryImage("rounndnios.jpg", { width: 200 }),
-  cloudinaryImage("nios.jpg", { width: 200 }),
-  cloudinaryImage("20260227_144454_bgpfnj.jpg", { width: 200 }),
-  cloudinaryImage("PXL_20240210_213129736_matjyo.jpg", { width: 200 }),
-];
+
+
+
+// The fun-fact carousel always shows the same children's photo as the avatar,
+// so every anecdote is consistently illustrated with the kids' picture.
+const KIDS_AVATAR =
+  "https://res.cloudinary.com/k2ajcgxv/image/upload/v1785536631/nios.jpg";
+
+
+
 
 
 export function Story() {
-  const { t, language, profile } = useApp();
+  const { t, language } = useApp();
   const story = t.story || {};
-  const guest = profile?.guest;
-  const guestAvatar = guest ? resolveGuestPhoto(guest) : null;
   const anecdotes = chapalaAnecdotes(language).map((anecdote, index) => ({
     // Title (emoji + bold heading) is shown on its own line, with the
     // anecdote text below it.
     title: `${anecdote.icon} ${anecdote.title}`,
     text: anecdote.text,
-    // Alternate between the guest's own avatar (if uploaded) and the default
-    // set so the carousel feels varied.
-    avatar: guestAvatar || DEFAULT_AVATARS[index % DEFAULT_AVATARS.length],
+    // Always use the same children's photo so the carousel consistently shows
+    // the kids' avatar rather than the logged-in guest's own photo.
+    avatar: KIDS_AVATAR,
+
   }));
 
 
+  // Full-screen lightbox state for the Chapala photo set.
+  const [lightbox, setLightbox] = useState(null);
+
+  // Build the slide set for the shared lightbox carousel.
+  const chapalaSlides = CHAPALA_HIGHLIGHTS.map((photo, index) => ({
+    src: photo.src,
+    full: photo.full,
+    alt: story.photoAlts[index],
+  }));
 
   return (
     <section className="story-section section">
@@ -49,12 +56,12 @@ export function Story() {
         <p className="handwritten">{story.note}</p>
         <div className="chapala-photos" aria-label={story.photosLabel}>
           {CHAPALA_HIGHLIGHTS.map((photo, index) => (
-            <a
+            <button
               key={index}
+              type="button"
               className="chapala-photo"
-              href={photo.full}
-              target="_blank"
-              rel="noreferrer"
+              onClick={() => setLightbox({ startIndex: index })}
+              aria-label={`${story.photoAlts[index]} — ver en grande`}
             >
               <img
                 src={photo.src}
@@ -62,7 +69,7 @@ export function Story() {
                 loading="lazy"
                 decoding="async"
               />
-            </a>
+            </button>
           ))}
         </div>
       </div>
@@ -73,6 +80,24 @@ export function Story() {
           label={story.anecdotesLabel}
         />
       </div>
+
+      <nav className="section-nav" aria-label="Continue">
+        <a className="section-nav-link" href="#venue">
+          <span>{story.navNext}</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </nav>
+
+      {/* Shared full-screen lightbox carousel */}
+      <LightboxCarousel
+        open={!!lightbox}
+        onClose={() => setLightbox(null)}
+        images={chapalaSlides}
+        startIndex={lightbox ? lightbox.startIndex : 0}
+        label={story.photosLabel}
+      />
     </section>
   );
 }
+
+

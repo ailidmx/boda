@@ -1,0 +1,89 @@
+/* ── Invitation profile (personalised greeting + custom content) ─────── */
+
+.invitation-profile {
+  padding-top: clamp(3rem, 7vw, 6rem);
+  padding-bottom: clamp(3rem, 7vw, 6rem);
+  background:
+    linear-gradient(135deg, rgb(198 139 43 / 10%), transparent 60%),
+    var(--cream);
+}
+
+.invitation-greeting {
+  margin: 0 0 1.5rem;
+  color: var(--terracotta);
+  font-size: clamp(1rem, 2.5vw, 1.25rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.invitation-profile-card {
+  position: relative;
+  width: min(100%, 72rem);
+  margin: 0 auto;
+  border: 1px solid rgb(41 59 53 / 22%);
+  padding: clamp(2rem, 6vw, 5rem);
+  overflow: hidden;
+  background: rgb(255 253 248 / 68%);
+}
+
+.invitation-profile-card::after {
+  position: absolute;
+  top: -5rem;
+  right: -5rem;
+  width: 14rem;
+  height: 14rem;
+  border: 1px solid rgb(198 139 43 / 35%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 2rem rgb(198 139 43 / 7%),
+    0 0 0 4rem rgb(198 139 43 / 5%);
+  content: "";
+}
+
+.invitation-profile-card h2 {
+  max-width: 18ch;
+}
+
+.invitation-profile-card .lead {
+  max-width: 52rem;
+}
+
+.invitation-profile-facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin: 2rem 0;
+}
+
+.invitation-profile-facts strong {
+  border: 1px solid rgb(41 59 53 / 24%);
+  border-radius: 999px;
+  padding: 0.6rem 0.9rem;
+  color: var(--deep-green);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.invitation-profile-card small {
+  display: block;
+  max-width: 48rem;
+  color: rgb(36 33 25 / 68%);
+  line-height: 1.6;
+}
+
+.invitation-dashboard-link {
+  display: inline-block;
+  margin-top: 1.5rem;
+  padding: 0.6rem 1.4rem;
+  background: var(--terracotta);
+  color: var(--cream);
+  border-radius: 2rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.invitation-dashboard-link:hover {
+  background: #8b3d26;
+}

@@ -25,6 +25,7 @@ Doc ID = número de fila del CSV (1-based).
 | `firstName` | `string` | Nombre |
 | `lastName` | `string` | Apellido |
 | `email` | `string` | Correo electrónico |
+| `phone` | `string` | Teléfono / WhatsApp (editable por el grupo vía CRUD) |
 | `groupId` | `string` | Referencia a `guest_groups/{name}` |
 | `cabinId` | `string` o `null` | Referencia a `cabins/{code}`. `null` si no tiene cabaña |
 | `isChild` | `boolean` | `true` si es Niño, `false` si Adulto |
@@ -32,6 +33,12 @@ Doc ID = número de fila del CSV (1-based).
 | `invitationSent` | `boolean` | Si se envió invitación |
 | `confirmed` | `boolean` | Si confirmó asistencia |
 | `confirmedDate` | `string` o `null` | Fecha de confirmación (formato ISO) |
+
+> **Contacto editable:** Los miembros de un grupo de invitación pueden actualizar
+> `phone` y `email` de cualquier miembro de su propio grupo (regla
+> `hasValidGuestContactFields` en `firebase/firestore.rules`). El CRUD de la
+> invitación escribe estos campos en `guests/{guestId}`.
+
 
 **Relaciones:**
 - `groupId` → `guest_groups/{name}`
