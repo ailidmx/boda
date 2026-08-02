@@ -1,0 +1,158 @@
+/* ── Accommodation section ────────────────────────────────────────────── */
+
+.accommodation-section {
+  display: grid;
+  grid-template-columns: 1fr 0.9fr;
+  gap: clamp(3rem, 8vw, 8rem);
+  align-items: start;
+  background: var(--white);
+}
+
+.accommodation-copy h2 {
+  margin-bottom: 2rem;
+}
+
+/* Citation-style lead: large quote mark + left border, echoing the venue's
+   facilities-lead. */
+.accommodation-citation {
+  position: relative;
+  max-width: 34rem;
+  margin: 0 0 2rem;
+  padding-left: 1.5rem;
+  border-left: 2px solid var(--marigold, #d9b36a);
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  font-style: italic;
+  line-height: 1.35;
+}
+
+.accommodation-citation::before {
+  content: "“";
+  position: absolute;
+  top: -0.55em;
+  left: -0.15rem;
+  color: var(--marigold, #d9b36a);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 3.2em;
+  line-height: 1;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+
+.accommodation-facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  margin-top: 3rem;
+  border-block: 1px solid rgb(36 33 25 / 20%);
+}
+
+.accommodation-facts article {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.5rem 1rem;
+  border-right: 1px solid rgb(36 33 25 / 20%);
+}
+
+.accommodation-facts article:first-child {
+  padding-left: 0;
+}
+
+.accommodation-facts article:last-child {
+  border-right: 0;
+}
+
+.accommodation-facts strong {
+  color: var(--terracotta);
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 400;
+}
+
+.accommodation-facts span {
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.accommodation-note {
+  max-width: 44rem;
+  margin-top: 2rem;
+  color: rgb(36 33 25 / 75%);
+}
+
+.accommodation-contacts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(36 33 25 / 20%);
+}
+
+.accommodation-contacts span {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.accommodation-contacts a {
+  color: var(--terracotta);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  text-decoration: none;
+}
+
+
+.accommodation-contact-link {
+  text-decoration: none;
+}
+
+.accommodation-contact-link:hover {
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+
+.accommodation-form-wrap {
+  padding: clamp(2rem, 4vw, 4rem);
+  background: var(--sand);
+}
+
+.accommodation-form-wrap h3 {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.accommodation-form-wrap > p:not(.eyebrow) {
+  margin-bottom: 2rem;
+}
+
+.accommodation-steps {
+  margin: 2rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.accommodation-steps li {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  border-top: 1px solid rgb(36 33 25 / 20%);
+}
+
+.accommodation-steps span {
+  color: var(--terracotta);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+}
+
+.accommodation-steps p {
+  margin: 0;
+}

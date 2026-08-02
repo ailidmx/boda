@@ -4,12 +4,17 @@ import {
   onAuthStateChanged,
   setPersistence,
   signInWithEmailAndPassword,
+  signOut as firebaseSignOut,
+  updatePassword,
 } from "firebase/auth";
+
 import { auth } from "../firebase.js";
 import { content, SUPPORTED_LANGUAGES } from "../content.js";
 import { AUTH_EMAIL_DOMAIN, getGuestByEmail } from "../guests.js";
 import { getCustomContent, loadGroupCustomContent } from "../invitation-profile.js";
 import { loadGuestProfiles } from "../guest-profiles.js";
+import { loadAttendanceResponses } from "../guest-attendance.js";
+
 
 
 const LANGUAGE_STORAGE_KEY = "boda-language";
@@ -110,7 +115,9 @@ export function AppProvider({ children }) {
         const [custom] = await Promise.all([
           loadGroupCustomContent(),
           loadGuestProfiles(),
+          loadAttendanceResponses(),
         ]);
+
         setProfile({
           guest,
           username,
@@ -151,6 +158,22 @@ export function AppProvider({ children }) {
     }
   };
 
+  const signOut = async () => {
+    try {
+      await firebaseSignOut(auth);
+      window.localStorage.removeItem(USERNAME_STORAGE_KEY);
+      // onAuthStateChanged will fire and set authState to signedOut.
+    } catch (error) {
+      console.warn("Sign out failed", error);
+    }
+  };
+
+  const changePassword = async (newPassword) => {
+    const user = auth.currentUser;
+    if (!user) throw new Error("no-user");
+    await updatePassword(user, newPassword);
+  };
+
   const value = useMemo(
     () => ({
       language,
@@ -161,9 +184,12 @@ export function AppProvider({ children }) {
       profile,
       gateError,
       signIn,
+      signOut,
+      changePassword,
     }),
     [language, authState, profile, gateError],
   );
+
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

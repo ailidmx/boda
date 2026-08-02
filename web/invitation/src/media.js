@@ -70,12 +70,15 @@ export const MEDIA = {
     img("couple-new-113160", { width: 900 }),
     img("couple-new-42142cfb-0bf5-42a8-b462-d8af5dc0672c", { width: 900 }),
   ],
+  // Facility cards are square (aspect-ratio 1:1), so the Cloudinary
+  // transformation is forced to a square crop (c_fill) to match the container.
   venue: {
-    cabins: img("venue-cabins", { width: 1200 }),
-    courts: img("venue-courts", { width: 1200 }),
-    gardens: img("venue-gardens", { width: 1200 }),
-    pool: img("venue-pool", { width: 1200 }),
+    cabins: img("venue-cabins", { width: 1200, height: 1200, crop: "fill" }),
+    courts: img("venue-courts", { width: 1200, height: 1200, crop: "fill" }),
+    gardens: img("venue-gardens", { width: 1200, height: 1200, crop: "fill" }),
+    pool: img("venue-pool", { width: 1200, height: 1200, crop: "fill" }),
   },
+
   food: {
     carnitas: img("food-carnitas", { width: 900 }),
     guacamole: img("food-guacamole", { width: 900 }),

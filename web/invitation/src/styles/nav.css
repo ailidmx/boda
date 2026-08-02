@@ -1,0 +1,425 @@
+/* ── Nav (site header, monogram, language switcher) ──────────────────── */
+
+.site-header {
+  position: sticky;
+  z-index: 90;
+  top: var(--countdown-height);
+  right: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 1.25rem;
+
+  padding: 1.25rem clamp(1.25rem, 4vw, 4rem);
+  border-bottom: 1px solid rgb(255 255 255 / 25%);
+  background: rgb(36 33 25 / 88%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgb(31 30 23 / 18%);
+  color: var(--white);
+}
+
+
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  white-space: nowrap;
+}
+
+
+
+.site-header a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.monogram {
+  display: inline-grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.desktop-nav-wrap {
+  display: flex;
+  align-items: stretch;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.desktop-nav {
+  display: flex;
+  align-items: stretch;
+  gap: clamp(1rem, 2.5vw, 2.25rem);
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.desktop-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.desktop-nav a,
+.header-rsvp {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.desktop-nav a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+
+.nav-scroll-btn {
+  display: none;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 8%);
+  color: var(--white);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.nav-scroll-btn:hover {
+  border-color: var(--marigold);
+  background: rgb(255 255 255 / 16%);
+}
+
+.nav-scroll-btn.is-visible {
+  display: inline-flex;
+}
+
+.mobile-nav-select {
+  display: none;
+}
+
+
+
+/* Golden underline that slides under the active/hovered nav link and touches
+   the header's bottom border exactly. It lives outside the scrollable nav so
+   it is never clipped. */
+.nav-underline {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(
+    90deg,
+    rgba(198, 139, 43, 0) 0%,
+    var(--marigold) 18%,
+    #f0c060 50%,
+    var(--marigold) 82%,
+    rgba(198, 139, 43, 0) 100%
+  );
+  box-shadow: 0 0 12px rgb(198 139 43 / 55%), 0 0 26px rgb(198 139 43 / 30%);
+  pointer-events: none;
+  transition: left 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.desktop-nav a.is-active {
+  color: var(--marigold);
+}
+
+
+
+.nav-dashboard-link {
+  color: var(--marigold) !important;
+}
+
+.language-switcher {
+  display: flex;
+  gap: 0.15rem;
+  padding: 0.2rem;
+  border-radius: 999px;
+}
+
+.language-button {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.35rem 0.55rem;
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+
+.language-button:hover {
+  border-color: rgb(255 255 255 / 45%);
+}
+
+.language-button[aria-pressed="true"] {
+  border-color: var(--white);
+  background: var(--white);
+  color: var(--ink);
+}
+
+
+.header-rsvp {
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--white);
+}
+
+/* ── User menu (avatar + dropdown) ───────────────────────────────────── */
+.user-menu {
+  position: relative;
+}
+
+.user-menu__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem 0.3rem 0.35rem;
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+  font: inherit;
+  transition: border-color 180ms ease, background 180ms ease;
+}
+
+.user-menu__trigger:hover {
+  border-color: var(--marigold);
+  background: rgb(255 255 255 / 8%);
+}
+
+.user-menu__avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--marigold);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+}
+
+.user-menu__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+.user-menu__name {
+  max-width: 9rem;
+  overflow: hidden;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Selected language flag shown to the right of the user name. */
+.user-menu__lang {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.user-menu__chevron {
+
+  color: rgb(255 255 255 / 70%);
+  font-size: 0.7rem;
+  transition: transform 180ms ease;
+}
+
+.user-menu__chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.user-menu__dropdown {
+  position: absolute;
+  z-index: 120;
+  top: calc(100% + 0.6rem);
+  right: 0;
+  min-width: 15rem;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 0.75rem;
+  background: var(--ink);
+  box-shadow: 0 18px 40px rgb(0 0 0 / 35%);
+  color: var(--white);
+}
+
+.user-menu__item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.6rem;
+  border: 0;
+  border-bottom: 1px solid rgb(255 255 255 / 10%);
+  padding: 0.8rem 1rem;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-align: left;
+  transition: background 150ms ease;
+}
+
+.user-menu__item:last-child {
+  border-bottom: 0;
+}
+
+.user-menu__item:hover {
+  background: rgb(255 255 255 / 8%);
+}
+
+.user-menu__item--danger {
+  color: #ffb4a2;
+}
+
+.user-menu__item--primary {
+  justify-content: center;
+  border: 1px solid var(--marigold);
+  border-radius: 0.4rem;
+  color: var(--ink);
+  background: var(--marigold);
+  font-weight: 600;
+}
+
+.user-menu__item--primary:hover {
+  background: #d99a3a;
+}
+
+.user-menu__item-icon {
+  width: 1.1rem;
+  text-align: center;
+}
+
+/* Language section inside the user dropdown. */
+.user-menu__section {
+  padding: 0.75rem 1rem 0.85rem;
+  border-bottom: 1px solid rgb(255 255 255 / 10%);
+}
+
+.user-menu__section-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 55%);
+}
+
+.user-menu__langs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.user-menu__lang-option {
+  border: 1px solid rgb(255 255 255 / 25%);
+  border-radius: 999px;
+  padding: 0.35rem 0.6rem;
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.user-menu__lang-option:hover {
+  border-color: var(--marigold);
+}
+
+.user-menu__lang-option.is-active {
+  border-color: var(--marigold);
+  background: var(--marigold);
+  color: var(--ink);
+}
+
+.user-menu__password {
+
+  display: grid;
+  gap: 0.6rem;
+  padding: 1rem;
+}
+
+.user-menu__password label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.user-menu__password input {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid rgb(255 255 255 / 45%);
+  padding: 0.5rem 0.2rem;
+  background: transparent;
+  color: var(--white);
+  font: inherit;
+}
+
+.user-menu__password input:focus {
+  outline: 2px solid var(--marigold);
+  outline-offset: 3px;
+}
+
+.user-menu__password-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.user-menu__password-actions .user-menu__item {
+  width: auto;
+  border: 0;
+  padding: 0.5rem 0.9rem;
+}
+
+.user-menu__status {
+  font-size: 0.72rem;
+}
+
+.user-menu__status--error {
+  color: #ffb4a2;
+}
+
+.user-menu__status--success {
+  color: #9fd6a8;
+}
+

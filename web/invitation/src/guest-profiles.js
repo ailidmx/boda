@@ -1,5 +1,5 @@
 /**
- * Guest profile overrides (names + avatar photos).
+ * Guest profile overrides (names + avatar photos) and contact details.
  *
  * The static guest registry (guests.js) is the source of truth for identity,
  * but guests may correct a misspelled name or upload a close-up avatar photo
@@ -7,16 +7,29 @@
  * `guest_profiles/{guestId}` and are merged over the static registry at
  * runtime.
  *
+ * Contact details (phone / email) live on the `guests` collection, which is
+ * the source of truth for guest records. The legacy `guest_profiles` override
+ * is still read as a fallback so previously saved numbers are not lost.
+ *
  * Firestore rules allow any authenticated guest to update the name/photo of
- * themselves and of the other members of their invitation group (see
- * firebase/firestore.rules).
+ * themselves and of the other members of their invitation group, and to update
+ * the contact details (phone / email) of those same group members on the
+ * `guests` collection (see firebase/firestore.rules).
  */
+
 
 import { collection, doc, getDocs, setDoc, serverTimestamp } from "firebase/firestore";
 import { db } from "./firebase.js";
 
 /** @type {Map<string, Object>} */
 const profileCache = new Map();
+
+/**
+ * Cache of the Firestore `guests` collection (the source of truth for guest
+ * records). Contact details such as `phone` live here, keyed by guest id.
+ * @type {Map<string, Object>}
+ */
+const guestsCache = new Map();
 
 /**
  * Load all guest profile overrides from Firestore into the cache.
@@ -35,7 +48,22 @@ export async function loadGuestProfiles() {
   } catch (error) {
     console.warn("[guest-profiles] Could not load profile overrides", error.message);
   }
+
+  // The `guests` collection is the source of truth for contact details
+  // (phone / email). Load it so the UI can show the current values.
+  try {
+    const snapshot = await getDocs(collection(db, "guests"));
+    snapshot.forEach((docSnap) => {
+      guestsCache.set(docSnap.id, docSnap.data());
+    });
+    if (!snapshot.empty) {
+      console.log(`[guest-profiles] Loaded ${snapshot.size} guest records`);
+    }
+  } catch (error) {
+    console.warn("[guest-profiles] Could not load guest records", error.message);
+  }
 }
+
 
 /**
  * Get the cached override for a guest id (or null).
@@ -123,6 +151,67 @@ export async function saveGuestPhoto(guest, photoUrl, editorGuestId) {
   await setDoc(ref, next, { merge: true });
   profileCache.set(guest.id, { ...existing, ...next });
 }
+
+/**
+ * Resolve the effective phone number for a guest. The `guests` collection is
+ * the source of truth for contact details; the legacy `guest_profiles`
+ * override is used as a fallback so previously saved numbers are not lost.
+ * @param {Object} guest  static guest from guests.js
+ * @returns {string}
+ */
+export function resolveGuestPhone(guest) {
+  if (!guest) return "";
+  const record = guestsCache.get(guest.id);
+  if (record?.phone) return record.phone;
+  const override = profileCache.get(guest.id);
+  return override?.phone || "";
+}
+
+/**
+ * Resolve the effective email address for a guest. The `guests` collection is
+ * the source of truth for contact details; the legacy `guest_profiles`
+ * override is used as a fallback so previously saved emails are not lost.
+ * @param {Object} guest  static guest from guests.js
+ * @returns {string}
+ */
+export function resolveGuestEmail(guest) {
+  if (!guest) return "";
+  const record = guestsCache.get(guest.id);
+  if (record?.email) return record.email;
+  const override = profileCache.get(guest.id);
+  return override?.email || "";
+}
+
+
+/**
+ * Save contact details (phone / email) for a guest. The authenticated user
+ * must be the guest themselves or a member of the same invitation group
+ * (enforced by rules). Contact details are stored on the `guests` collection
+ * (the source of truth for guest records).
+ *
+ * @param {Object} guest  static guest from guests.js
+ * @param {{ phone?: string, email?: string }} contact
+ * @param {string} editorGuestId  the signed-in guest id performing the edit
+ * @returns {Promise<void>}
+ */
+export async function saveGuestContact(guest, contact, editorGuestId) {
+  if (!guest?.id) throw new Error("No guest id");
+  const ref = doc(db, "guests", guest.id);
+  const existing = guestsCache.get(guest.id) || {};
+  const next = {
+    ...existing,
+    guestId: guest.id,
+    phone: contact.phone !== undefined ? String(contact.phone || "").trim() : existing.phone,
+    email: contact.email !== undefined ? String(contact.email || "").trim() : existing.email,
+    invitationGroup: guest.invitacionGroup || guest.group || "",
+    updatedBy: editorGuestId || "",
+    updatedAt: serverTimestamp(),
+  };
+  await setDoc(ref, next, { merge: true });
+  guestsCache.set(guest.id, { ...existing, ...next });
+}
+
+
 
 /**
  * All guests that share an invitation group with the given guest.

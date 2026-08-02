@@ -1,0 +1,87 @@
+/* ── Attire section ───────────────────────────────────────────────────── */
+
+.attire-section {
+  background: var(--terracotta);
+  color: var(--white);
+  padding-top: clamp(3rem, 8vw, 6rem);
+}
+
+.attire-eyebrow {
+  text-align: center;
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+}
+
+.attire-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(3rem, 8vw, 8rem);
+  align-items: center;
+}
+
+.oaxaca-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  padding: 1rem;
+  background: rgb(255 255 255 / 10%);
+  border: 1rem solid rgb(255 255 255 / 10%);
+}
+
+.oaxaca-tile {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+  border-radius: 0.25rem;
+  filter: saturate(0.95);
+  transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.oaxaca-tile:hover {
+  transform: scale(1.03);
+  filter: saturate(1.1);
+}
+
+.attire-copy h2 {
+  margin-bottom: 2rem;
+}
+
+.attire-copy .note {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(255 255 255 / 35%);
+  font-size: 0.8rem;
+}
+
+/* Elegant navigation link at the bottom of the attire section */
+.attire-nav {
+  display: flex;
+  justify-content: center;
+  margin-top: clamp(2.5rem, 6vw, 4rem);
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(255 255 255 / 18%);
+}
+
+.attire-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--white);
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 250ms ease;
+}
+
+.attire-nav-link:hover,
+.attire-nav-link:focus-visible {
+  color: var(--accent, #d9b36a);
+  text-decoration: underline;
+}
+
+@media (max-width: 720px) {
+  .attire-grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,163 @@
+/* ── AuthGate (access gate) ───────────────────────────────────────────── */
+
+.access-gate {
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at 15% 15%, rgb(198 139 43 / 24%), transparent 28rem),
+    radial-gradient(circle at 85% 85%, rgb(169 77 49 / 24%), transparent 30rem),
+    var(--deep-green);
+}
+
+.access-card {
+  width: min(100%, 34rem);
+  border: 1px solid rgb(255 253 248 / 30%);
+  padding: clamp(2rem, 7vw, 5rem);
+  background: var(--cream);
+  box-shadow: 0 2rem 6rem rgb(0 0 0 / 24%);
+  color: var(--ink);
+  text-align: center;
+}
+
+
+.gate-monogram {
+  margin-bottom: 2rem;
+  color: var(--terracotta);
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 8vw, 4rem);
+}
+
+.access-card h1 {
+  margin: 0.4rem 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 8vw, 4.25rem);
+  font-weight: 400;
+  color: var(--ink);
+}
+
+/* "David y Aydé" — typo Ballet en noir */
+.access-card .identity-swap--gate-names {
+  font-family: var(--font-calligraphy);
+  color: var(--ink);
+}
+
+.access-card .identity-swap--gate-names .identity-person {
+  color: var(--ink);
+}
+
+.access-card .identity-swap--gate-names .identity-connector {
+  color: var(--ink);
+  font-family: var(--font-calligraphy);
+  font-size: 0.55em;
+}
+
+.access-card .eyebrow {
+  color: var(--ink);
+  font-size: clamp(0.8rem, 2.5vw, 1rem);
+  letter-spacing: 0.18em;
+}
+
+
+.access-card > p {
+  color: var(--ink);
+}
+
+
+.access-card form {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.gate-profile-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.5rem 0 0;
+  color: var(--deep-green);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.gate-profile-hint::before {
+  color: var(--marigold);
+  content: "◆";
+  font-size: 0.65em;
+}
+
+.access-card form label {
+  color: var(--ink);
+  font-size: 0.67rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+
+.access-card form input {
+  width: 100%;
+  border: 1px solid rgb(36 33 25 / 35%);
+  padding: 0.9rem 1rem;
+  background: var(--white);
+  font: inherit;
+}
+
+.access-card form small {
+  min-height: 1.5rem;
+  color: var(--terracotta);
+  text-align: center;
+}
+
+.gate-lost-key {
+  margin: 1.2rem 0 0.4rem;
+  font-size: 0.78rem;
+  color: var(--ink);
+  opacity: 0.7;
+}
+
+.gate-contacts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem 1.2rem;
+  margin-top: 0.6rem;
+}
+
+.gate-contact-link {
+  color: var(--deep-green);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.gate-contact-link:hover {
+  opacity: 0.7;
+  text-decoration: underline;
+}
+
+.gate-languages {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+
+.gate-languages .language-switcher {
+  border-color: rgb(36 33 25 / 45%);
+}
+
+.gate-languages .language-button {
+  color: var(--ink);
+}
+
+.gate-languages .language-button[aria-pressed="true"] {
+  background: var(--marigold);
+  color: var(--white);
+}
+

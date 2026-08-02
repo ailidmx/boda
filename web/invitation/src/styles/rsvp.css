@@ -1,0 +1,197 @@
+/* ── RSVP section ─────────────────────────────────────────────────────── */
+
+.rsvp-section {
+  display: grid;
+  place-items: center;
+  min-height: 78svh;
+  background: var(--cream);
+  text-align: center;
+}
+
+.rsvp-frame {
+  width: min(100%, 76rem);
+  padding: clamp(3rem, 8vw, 7rem);
+  border: 1px solid #e4b968;
+  outline: 1px solid #e4b968;
+  outline-offset: -0.7rem;
+  background: var(--deep-green);
+  color: var(--white);
+}
+
+.rsvp-frame h2 {
+  margin: 0 auto 2rem;
+}
+
+.rsvp-frame > p:not(.eyebrow) {
+  max-width: 34rem;
+  margin: 0 auto 2rem;
+}
+
+.rsvp-form {
+  display: grid;
+  gap: 2.5rem;
+  margin-top: 3rem;
+  text-align: left;
+}
+
+.rsvp-form fieldset {
+  margin: 0;
+  border: 1px solid rgb(255 255 255 / 28%);
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.rsvp-form legend {
+  padding: 0 0.75rem;
+  color: #e4b968;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+}
+
+.rsvp-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.rsvp-form .form-field label {
+  color: rgb(255 253 248 / 75%);
+}
+
+.rsvp-form .form-field input,
+.rsvp-form .form-field select,
+.rsvp-form .form-field textarea {
+  border-color: rgb(255 255 255 / 45%);
+  color: var(--white);
+}
+
+.rsvp-form .form-field select option {
+  color: var(--ink);
+}
+
+.rsvp-form .form-field input:focus,
+.rsvp-form .form-field select:focus,
+.rsvp-form .form-field textarea:focus {
+  outline-color: #e4b968;
+}
+
+.fieldset-note {
+  max-width: 46rem;
+  margin: 0 0 1.5rem;
+  color: rgb(255 253 248 / 70%);
+}
+
+.rsvp-form > small {
+  text-align: center;
+}
+
+.rsvp-frame .button {
+  margin: 1rem auto;
+}
+
+.rsvp-frame small {
+  display: block;
+  margin-top: 1rem;
+  color: #e4b968;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Pétanque tournament ── */
+.petanque-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 1px solid rgb(36 33 25 / 15%);
+  border-radius: 0.75rem;
+  background: rgb(36 33 25 / 3%);
+}
+
+.petanque-section__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--terracotta);
+  margin: 0 0 0.5rem;
+}
+
+.petanque-section__intro {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 1rem;
+  color: var(--ink);
+}
+
+.petanque-section__organizer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.petanque-section__organizer a {
+  color: var(--terracotta);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.petanque-section__organizer a:hover {
+  color: var(--marigold);
+}
+
+.petanque-section .form-field {
+  margin-bottom: 1rem;
+}
+
+.petanque-section .form-field label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 0.35rem;
+}
+
+.petanque-section .form-field select,
+.petanque-section .form-field input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgb(36 33 25 / 20%);
+  border-radius: 0.375rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: var(--white);
+  color: var(--ink);
+}
+
+.petanque-section .form-field select:focus,
+.petanque-section .form-field input:focus {
+  outline: none;
+  border-color: var(--terracotta);
+  box-shadow: 0 0 0 2px rgb(169 77 49 / 15%);
+}
+
+/* ── Pétanque inside RSVP (dark background) ── */
+.petanque-fieldset {
+  margin: 0;
+  border: 1px solid rgb(255 255 255 / 28%);
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.petanque-fieldset legend {
+  padding: 0 0.75rem;
+  color: #e4b968;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+}
+
+.petanque-intro {
+  margin-bottom: 1.25rem;
+}
+
+.petanque-intro p {
+  margin: 0 0 0.75rem;
+  color: rgb(255 253 248 / 70%);
+}
+
+.petanque-intro a {
+  color: #e4b968;
+}

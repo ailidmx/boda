@@ -1,14 +1,14 @@
-import "./dashboard.css";
 import { collection, getDocs, doc, setDoc, deleteDoc, onSnapshot } from "firebase/firestore";
+
 import { db } from "./firebase.js";
-import { getActiveGuests, getGuestsByUnit, getGuest } from "./guests.js";
+import { getActiveGuests, getGuestsByUnit, getGuest, getGuestByEmail } from "./guests.js";
 import { buildInvitationUrl } from "./invitation-profile.js";
 import { auth } from "./firebase.js";
-import { onAuthStateChanged, signInWithEmailAndPassword, signOut } from "firebase/auth";
+import { onAuthStateChanged, signOut } from "firebase/auth";
 
 
 const DASHBOARD_CODE = "vivelafrance";
-const COUPLE_EMAILS = ["david.aili.mx@gmail.com", "aydemiss@gmail.com"];
+
 
 const COLLECTIONS = {
   rsvps: "rsvp_submissions",
@@ -26,6 +26,7 @@ const state = {
   filterGroup: "",
   filterCabin: "",
   filterQuery: "",
+  groupBy: "group",
   activeTab: "guests",
 };
 
@@ -188,32 +189,20 @@ function showMessage(message, stateName = "") {
   status.dataset.state = stateName;
 }
 
-// ── Persistent auth ─────────────────────────────────────────────────────
-// We use Firebase Auth's built-in persistence (INDEXEDDB_LOCAL) which
-// keeps the user signed in across page reloads via an auth refresh token.
-// No plain-text passwords are ever stored in localStorage.
-// The AUTH_KEY is only used as a fast "has signed in before" flag so we
-// can show the dashboard immediately while Firebase restores the session.
+// ── Access control ─────────────────────────────────────────────────────
+// There is no dedicated admin login. The dashboard reuses the same Firebase
+// Auth session as the invitation and only grants access to guests who belong
+// to the "Novios" group (David and Aydé). Everyone else sees an access-denied
+// screen and is redirected back to the invitation.
 
-const AUTH_KEY = "boda_dashboard_auth_session";
+const NOVIOS_GROUP = "Novios";
 
-function isAuthenticated() {
-  // Fast check: was there a previous session?
-  return localStorage.getItem(AUTH_KEY) === "true";
+function isNovioGuest(guest) {
+  return Boolean(guest && (guest.group === NOVIOS_GROUP || guest.isNovio));
 }
 
-function persistAuth() {
-  localStorage.setItem(AUTH_KEY, "true");
-}
-
-function clearAuth() {
-  localStorage.removeItem(AUTH_KEY);
-}
-
-// ── Login ──────────────────────────────────────────────────────────────
-
-function renderLogin(app, errorMessage = "") {
-  document.title = "Panel de los novios · David & Aydé";
+function renderAccessDenied(app) {
+  document.title = "Acceso restringido · David & Aydé";
   app.innerHTML = `
     <main class="dashboard-login">
       <section class="dashboard-login-card">
@@ -221,73 +210,18 @@ function renderLogin(app, errorMessage = "") {
         <div class="dashboard-login-icon" aria-hidden="true">◆</div>
         <p class="dashboard-eyebrow">Zona privada</p>
         <h1>Panel de los novios</h1>
-        <p class="dashboard-login-desc">Las respuestas, viajes y sugerencias están reservados a David y Aydé.</p>
-        <form data-dashboard-code-form>
-          <div class="dashboard-login-field">
-            <label for="dashboard-email">Correo electrónico</label>
-            <div class="dashboard-login-input-wrap">
-              <span class="dashboard-login-input-icon" aria-hidden="true">✉️</span>
-              <input
-                id="dashboard-email"
-                name="email"
-                type="email"
-                autocomplete="email"
-                required
-                autofocus
-                placeholder="tu@correo.com"
-              />
-            </div>
-          </div>
-          <div class="dashboard-login-field">
-            <label for="dashboard-password">Contraseña</label>
-            <div class="dashboard-login-input-wrap">
-              <span class="dashboard-login-input-icon" aria-hidden="true">🔐</span>
-              <input
-                id="dashboard-password"
-                name="password"
-                type="password"
-                autocomplete="current-password"
-                required
-                placeholder="••••••••"
-              />
-            </div>
-          </div>
-          <button class="dashboard-button" type="submit">Entrar al panel</button>
-          <small data-dashboard-status data-state="${errorMessage ? "error" : ""}">${errorMessage}</small>
-        </form>
+        <p class="dashboard-login-desc">
+          Este panel está reservado a David y Aydé. Si crees que deberías tener
+          acceso, escríbenos directamente.
+        </p>
+        <a class="dashboard-button" href="/">Volver a la invitación</a>
       </section>
     </main>
   `;
-
-  document
-    .querySelector("[data-dashboard-code-form]")
-    .addEventListener("submit", async (event) => {
-      event.preventDefault();
-      const data = new FormData(event.target);
-      const email = data.get("email");
-      const password = data.get("password");
-      const status = document.querySelector("[data-dashboard-status]");
-      try {
-        status.textContent = "Iniciando sesión…";
-        status.dataset.state = "working";
-        const credential = await signInWithEmailAndPassword(auth, email, password);
-        // Only the couple may access the dashboard. Any other account
-        // (e.g. the shared guest account) is signed out and kept at login.
-        if (credential.user && COUPLE_EMAILS.includes(credential.user.email)) {
-          persistAuth();
-          renderDashboard(app);
-        } else {
-          await signOut(auth);
-          renderLogin(app, "Credenciales incorrectas. Inténtalo de nuevo.");
-        }
-      } catch (err) {
-        console.error("Dashboard login failed", err);
-        renderLogin(app, "Credenciales incorrectas. Inténtalo de nuevo.");
-      }
-    });
 }
 
 // ── Guest Manager ──────────────────────────────────────────────────────
+
 
 function getUniqueGuestGroups() {
   const groups = new Set(getActiveGuests().map((g) => g.group || "Sin grupo"));
@@ -295,7 +229,13 @@ function getUniqueGuestGroups() {
 }
 
 function getUniqueCabins() {
-  const cabins = [...new Set(getActiveGuests().filter((g) => g.hasCabin).map((g) => g.unit))];
+  const cabins = [
+    ...new Set(
+      getActiveGuests()
+        .filter((g) => g.hasCabin && g.unit)
+        .map((g) => g.unit),
+    ),
+  ];
   return cabins.sort();
 }
 
@@ -416,6 +356,12 @@ function openGuestEditor(guest) {
           <input id="edit-cabinLabel" name="cabinLabel" value="${guest.cabinLabel || ""}" placeholder="Ej: Cabaña 4" />
         </div>
 
+        <div class="dashboard-modal-field" id="edit-room-field" style="${guest.hasCabin ? "" : "display:none"}">
+          <label for="edit-room">Cuarto / Habitación</label>
+          <input id="edit-room" name="room" value="${guest.room || ""}" placeholder="Ej: VILLA AZALEA-1, SUITE DON CARLOS-2" />
+          <small style="color:#8a7a5f;display:block;margin-top:0.25rem;">Nivel de detalle dentro de la cabaña (cuarto asignado).</small>
+        </div>
+
         <hr class="dashboard-modal-divider" />
 
         <div class="dashboard-modal-field">
@@ -450,11 +396,13 @@ function openGuestEditor(guest) {
   const cabinFields = overlay.querySelector("#edit-cabin-fields");
   const occupancyField = overlay.querySelector("#edit-occupancy-field");
   const paymentField = overlay.querySelector("#edit-payment-field");
+  const roomField = overlay.querySelector("#edit-room-field");
   hasCabinSelect.addEventListener("change", () => {
     const show = hasCabinSelect.value === "true";
     cabinFields.style.display = show ? "" : "none";
     occupancyField.style.display = show ? "" : "none";
     paymentField.style.display = show ? "" : "none";
+    if (roomField) roomField.style.display = show ? "" : "none";
   });
 
   // Close handlers
@@ -505,6 +453,7 @@ function openGuestEditor(guest) {
       occupancy: hasCabin ? data.get("occupancy") || "" : "",
       payment: hasCabin ? data.get("payment") || "" : "",
       cabinLabel: hasCabin ? data.get("cabinLabel") || "" : "",
+      room: hasCabin ? data.get("room") || "" : "",
     };
 
     // Only include customContent if at least one field is non-empty
@@ -814,10 +763,16 @@ function renderGuestManager() {
 
   const filtered = getFilteredGuests();
 
-  // Group by group name
+  // Group by the selected dimension (group / cabin / room)
+  const groupKeyOf = (g) => {
+    if (state.groupBy === "cabin") return g.hasCabin && g.unit ? g.cabinLabel || g.unit : "Sin cabaña";
+    if (state.groupBy === "room") return g.room || "Sin cuarto";
+    return g.group || "Sin grupo";
+  };
+
   const grouped = {};
   filtered.forEach((g) => {
-    const key = g.group || "Sin grupo";
+    const key = groupKeyOf(g);
     if (!grouped[key]) grouped[key] = [];
     grouped[key].push(g);
   });
@@ -861,6 +816,14 @@ function renderGuestManager() {
           value="${state.filterQuery}"
         />
       </div>
+      <div class="dashboard-filter-group">
+        <label for="filter-groupby">Agrupar por</label>
+        <select id="filter-groupby" data-filter-groupby>
+          <option value="group" ${state.groupBy === "group" ? "selected" : ""}>Grupo</option>
+          <option value="cabin" ${state.groupBy === "cabin" ? "selected" : ""}>Cabaña</option>
+          <option value="room" ${state.groupBy === "room" ? "selected" : ""}>Cuarto</option>
+        </select>
+      </div>
       <div class="dashboard-filter-count">
         <strong>${filtered.length}</strong> de <strong>${getActiveGuests().length}</strong> invitados
       </div>
@@ -873,6 +836,7 @@ function renderGuestManager() {
             <th>Nombre</th>
             <th>Grupo</th>
             <th>Cabaña</th>
+            <th>Cuarto</th>
             <th>Estado</th>
             <th>Acciones</th>
           </tr>
@@ -882,7 +846,7 @@ function renderGuestManager() {
             .map(
               (groupName) => `
             <tr class="dashboard-group-header" data-group="${groupName}">
-              <td colspan="6">
+              <td colspan="7">
                 <button class="dashboard-group-toggle" type="button" data-toggle-group="${groupName}" aria-expanded="true">
                   <span class="dashboard-group-arrow">▼</span>
                   <strong>${groupName}</strong>
@@ -922,6 +886,10 @@ function renderGuestManager() {
                     )
                     .join("")}
                 </select>
+              </td>
+              <td>
+                <input class="dashboard-inline-input" type="text" value="${guest.room || ""}"
+                  data-inline-field="room" data-guest-id="${guest.id}" placeholder="—" title="Editar cuarto" />
               </td>
               <td data-guest-status="${guest.id}"></td>
               <td>
@@ -968,6 +936,10 @@ function renderGuestManager() {
   });
   container.querySelector("[data-filter-query]")?.addEventListener("input", (e) => {
     state.filterQuery = e.target.value;
+    renderGuestManager();
+  });
+  container.querySelector("[data-filter-groupby]")?.addEventListener("change", (e) => {
+    state.groupBy = e.target.value;
     renderGuestManager();
   });
 
@@ -1061,6 +1033,20 @@ function renderGuestManager() {
       } catch (err) {
         console.error("Failed to save cabin", err);
         select.style.borderColor = "#a0352c";
+      }
+    });
+  });
+
+  // ── Inline edit: room (cuarto) ──
+  container.querySelectorAll("[data-inline-field='room']").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const guestId = input.dataset.guestId;
+      const ok = await saveGuestInline(guestId, "room", input.value.trim());
+      if (ok) {
+        input.style.borderColor = "#4caf50";
+        setTimeout(() => (input.style.borderColor = ""), 1000);
+      } else {
+        input.style.borderColor = "#a0352c";
       }
     });
   });
@@ -1605,6 +1591,11 @@ function renderDashboard(app) {
     const redirectPath = "/dashboard/invitados";
     window.history.replaceState({ tab: "guests" }, "", redirectPath);
   }
+  // Activate the panel for the initial tab. Without this, the panel stays
+  // hidden (display:none) until the user clicks a tab, which made the guest
+  // table appear empty on first load.
+  switchTab(initialTab);
+
 
   // ── Real-time listener for invitation_groups ──
   const groupsUnsub = onSnapshot(collection(db, "invitation_groups"), (snapshot) => {
@@ -1631,14 +1622,15 @@ function renderDashboard(app) {
     .querySelector("[data-refresh]")
     .addEventListener("click", () => loadDashboardData().catch(showLoadError));
   document.querySelector("[data-sign-out]").addEventListener("click", async () => {
-    clearAuth();
     try {
       await signOut(auth);
     } catch (err) {
       console.warn("Sign out error", err);
     }
-    renderLogin(app);
+    // Return to the invitation, which will show its own access gate.
+    window.location.href = "/";
   });
+
   document.querySelectorAll("[data-export]").forEach((button) => {
     button.addEventListener("click", () => downloadCsv(button.dataset.export));
   });
@@ -1650,14 +1642,22 @@ function renderDashboard(app) {
 }
 
 export function startDashboard(app) {
-  // Strictly require a valid couple session. Anonymous users, the shared
-  // guest account, or any other authenticated account are kept at login.
+  // There is no dedicated admin login. We reuse the current Firebase Auth
+  // session (the same one used by the invitation) and only grant access to
+  // guests who belong to the "Novios" group (David and Aydé). Everyone else
+  // sees an access-denied screen.
   onAuthStateChanged(auth, (user) => {
-    if (user && COUPLE_EMAILS.includes(user.email)) {
-      persistAuth();
+    if (!user) {
+      // No active session: send them to the invitation to sign in first.
+      window.location.href = "/";
+      return;
+    }
+    const guest = getGuestByEmail(user.email);
+    if (isNovioGuest(guest)) {
       renderDashboard(app);
     } else {
-      renderLogin(app);
+      renderAccessDenied(app);
     }
   });
 }
+

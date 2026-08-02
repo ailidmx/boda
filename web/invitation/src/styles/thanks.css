@@ -1,0 +1,146 @@
+/* ── Thanks / Agradecimientos (cinema-credit style) ── */
+
+.thanks-section {
+  background: var(--deep-green);
+  color: var(--white);
+}
+
+.thanks-frame {
+  max-width: 60rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.thanks-frame .eyebrow {
+  color: var(--marigold);
+}
+
+.thanks-quote {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.thanks-quote h2 {
+  max-width: none;
+  margin: 0 0 1.5rem;
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  /* Much bigger on desktop */
+  font-size: clamp(4rem, 12vw, 11rem);
+}
+
+.thanks-subtitle {
+  max-width: 46rem;
+  margin: 0 auto;
+  font-size: clamp(1.05rem, 2vw, 1.4rem);
+  line-height: 1.5;
+  color: rgb(255 253 248 / 85%);
+}
+
+.thanks-credits {
+  list-style: none;
+  margin: clamp(3rem, 6vw, 5rem) 0 0;
+  padding: 0;
+  display: grid;
+  gap: 1rem;
+}
+
+.thanks-credit {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 0.75rem;
+  background: rgb(255 255 255 / 5%);
+  text-align: left;
+}
+
+.thanks-avatar {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border-radius: 50%;
+  background: var(--terracotta);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+.thanks-credit-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.thanks-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--white);
+}
+
+.thanks-role {
+  font-size: 0.85rem;
+  color: var(--marigold);
+}
+
+.thanks-humor {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  display: grid;
+  gap: 1.25rem;
+}
+
+.thanks-humor-line {
+  margin: 0;
+  padding: 1.25rem 1.5rem;
+  border-left: 3px solid var(--marigold);
+  background: rgb(255 255 255 / 4%);
+  text-align: left;
+}
+
+.thanks-humor-line p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: rgb(255 253 248 / 80%);
+  font-style: italic;
+}
+
+.thanks-contacts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1.5rem;
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  align-items: center;
+}
+
+.thanks-contacts span {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.thanks-contacts a {
+  color: var(--marigold);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.thanks-contacts a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .thanks-quote h2 {
+    font-size: clamp(3.25rem, 18vw, 5.5rem);
+  }
+}

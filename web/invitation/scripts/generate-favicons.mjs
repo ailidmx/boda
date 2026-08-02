@@ -32,11 +32,12 @@ const MONOGRAM_SVG = `
   <circle cx="256" cy="256" r="196" fill="none" stroke="#f4eee4" stroke-width="10" opacity="0.9"/>
   <circle cx="256" cy="256" r="176" fill="none" stroke="#c68b2b" stroke-width="3" opacity="0.55"/>
   <text
-    x="256"
+    x="150"
     y="256"
     text-anchor="middle"
+    dominant-baseline="central"
     font-family="sans-serif"
-    font-size="200"
+    font-size="190"
     font-weight="700"
     fill="#f4eee4"
   >D</text>
@@ -44,6 +45,7 @@ const MONOGRAM_SVG = `
     x="256"
     y="256"
     text-anchor="middle"
+    dominant-baseline="central"
     font-family="sans-serif"
     font-size="150"
     font-weight="700"
@@ -51,16 +53,18 @@ const MONOGRAM_SVG = `
     fill="#c68b2b"
   >${AMP_ENTITY}</text>
   <text
-    x="256"
+    x="362"
     y="256"
     text-anchor="middle"
+    dominant-baseline="central"
     font-family="sans-serif"
-    font-size="200"
+    font-size="190"
     font-weight="700"
     fill="#f4eee4"
   >A</text>
 </svg>
 `;
+
 
 const configuration = {
   path: "/",

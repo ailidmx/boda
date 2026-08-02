@@ -11,7 +11,11 @@ export function Accommodation() {
       <div className="accommodation-copy reveal">
         <p className="eyebrow">{accommodation.eyebrow}</p>
         <h2>{accommodation.title}</h2>
+        {accommodation.citation && (
+          <p className="accommodation-citation">{accommodation.citation}</p>
+        )}
         <p className="lead">{accommodation.body}</p>
+
         <div className="accommodation-facts">
           {accommodation.facts.map((fact, index) => (
             <article key={index}>
@@ -26,14 +30,16 @@ export function Accommodation() {
           {Object.values(EVENT.contacts).map((contact, index) => (
             <a
               key={index}
+              className="accommodation-contact-link"
               href={contact.whatsapp}
               target="_blank"
               rel="noreferrer"
             >
-              {contact.label} · {contact.phone} ↗
+              {contact.label} ↗
             </a>
           ))}
         </div>
+
       </div>
 
       <div className="accommodation-form-wrap">
