@@ -1,5 +1,215 @@
 /* ── Nav (site header, monogram, language switcher) ──────────────────── */
 
+/* ── Responsive: mobile-first ──────────────────────────────────────────
+   Base (mobile): the header shows the monogram + actions, and a native
+   <select> replaces the desktop nav links. The desktop nav and RSVP button
+   are hidden until the tablet breakpoint. */
+
+/* Mobile-first: hide desktop nav, show the custom mobile dropdown. */
+.desktop-nav-wrap,
+.nav-underline,
+.header-rsvp {
+  display: none;
+}
+
+/* The mobile nav dropdown lives in the first grid column, on the same row as
+   the user avatar (right column), so the whole header fits on one line. */
+.mobile-nav {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.mobile-nav__trigger {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  gap: 0.45rem;
+  border: 0;
+  padding: 0.35rem 0;
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.mobile-nav__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Arrow indicator: subtle, floating, rotates when open. */
+.mobile-nav__arrow {
+  flex: 0 0 auto;
+  color: var(--marigold);
+  font-size: 0.7rem;
+  line-height: 1;
+  transition: transform 180ms ease;
+}
+
+.mobile-nav__arrow.is-open {
+  transform: rotate(180deg);
+}
+
+/* Borderless, translucent floating panel that mirrors the desktop nav's
+   golden underline treatment. */
+.mobile-nav__dropdown {
+  position: absolute;
+  z-index: 120;
+  top: calc(100% + 0.6rem);
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 13rem;
+  padding: 0.5rem 0;
+  border: 0;
+  border-radius: 0.75rem;
+  background: rgb(36 33 25 / 82%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 18px 40px rgb(0 0 0 / 35%);
+}
+
+.mobile-nav__link {
+  position: relative;
+  display: block;
+  padding: 0.6rem 1.1rem;
+  color: var(--white);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.mobile-nav__link:hover {
+  color: var(--marigold);
+}
+
+/* Large golden underline on the active item, matching the desktop nav. */
+.mobile-nav__link.is-active {
+  color: var(--marigold);
+}
+
+.mobile-nav__link.is-active::after {
+  position: absolute;
+  right: 1.1rem;
+  bottom: 0.15rem;
+  left: 1.1rem;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(198, 139, 43, 0) 0%,
+    var(--marigold) 18%,
+    #f0c060 50%,
+    var(--marigold) 82%,
+    rgba(198, 139, 43, 0) 100%
+  );
+  box-shadow: 0 0 10px rgb(198 139 43 / 55%);
+  content: "";
+}
+
+.mobile-nav__link--dashboard {
+  color: var(--marigold);
+}
+
+
+/* Tablet+: restore the desktop nav and hide the mobile dropdown. */
+@media (min-width: 900px) {
+  .desktop-nav-wrap,
+  .nav-underline,
+  .header-rsvp {
+    display: flex;
+  }
+
+  .mobile-nav {
+    display: none;
+  }
+
+  .site-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1.25rem;
+  }
+}
+
+
+/* Small phones: tighten header padding and compact the user menu so the
+   whole header (nav dropdown + avatar) fits on one line. The reduced
+   vertical padding makes the header thinner on mobile. */
+@media (max-width: 600px) {
+  .site-header {
+    padding: 0.3rem 1.1rem;
+    gap: 0.75rem;
+  }
+
+
+  .user-menu__name,
+  .user-menu__lang {
+    display: none;
+  }
+
+  .user-menu__trigger {
+    padding: 0.2rem 0.5rem 0.2rem 0.25rem;
+  }
+
+  .mobile-nav__trigger {
+    padding: 0.2rem 0;
+  }
+}
+
+/* Mobile sticky header must stay fully opaque at the top.
+   Blur + alpha can look transparent on some mobile browsers while scrolling. */
+@media (max-width: 899px) {
+  .site-header {
+    background: var(--deep-green);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  body.mobile-nav-only .countdown-bar {
+
+    transform: translateY(-100%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  body.mobile-nav-only .site-header {
+    top: 0;
+    background: transparent;
+    border-bottom-color: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  body.mobile-nav-only .site-header::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      linear-gradient(180deg, rgb(18 27 24 / 70%) 0%, rgb(18 27 24 / 42%) 58%, rgb(18 27 24 / 22%) 100%),
+      linear-gradient(90deg, rgb(184 134 11 / 12%) 0%, rgb(184 134 11 / 0%) 55%);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
+}
+
+
+
+
 .site-header {
   position: sticky;
   z-index: 90;
@@ -11,13 +221,22 @@
   align-items: stretch;
   gap: 1.25rem;
 
-  padding: 1.25rem clamp(1.25rem, 4vw, 4rem);
+  padding: 0.35rem clamp(1.25rem, 4vw, 4rem);
+
   border-bottom: 1px solid rgb(255 255 255 / 25%);
   background: rgb(36 33 25 / 88%);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   box-shadow: 0 8px 24px rgb(31 30 23 / 18%);
   color: var(--white);
+  transition: top 200ms ease, background 200ms ease, border-color 200ms ease,
+    box-shadow 200ms ease, opacity 200ms ease;
+  isolation: isolate;
+}
+
+.site-header > * {
+  position: relative;
+  z-index: 1;
 }
 
 
@@ -45,11 +264,11 @@
 }
 
 .desktop-nav-wrap {
-  display: flex;
   align-items: stretch;
   gap: 0.25rem;
   min-width: 0;
 }
+
 
 .desktop-nav {
   display: flex;
@@ -108,13 +327,8 @@
   display: inline-flex;
 }
 
-.mobile-nav-select {
-  display: none;
-}
-
-
-
 /* Golden underline that slides under the active/hovered nav link and touches
+
    the header's bottom border exactly. It lives outside the scrollable nav so
    it is never clipped. */
 .nav-underline {
@@ -301,6 +515,11 @@
   background: rgb(255 255 255 / 8%);
 }
 
+.user-menu__item--admin {
+  color: var(--marigold);
+  text-decoration: none;
+}
+
 .user-menu__item--danger {
   color: #ffb4a2;
 }
@@ -323,7 +542,47 @@
   text-align: center;
 }
 
+/* Music toggle switch inside the user dropdown. */
+.user-menu__item-label {
+  flex: 1;
+}
+
+.user-menu__toggle {
+  position: relative;
+  display: inline-block;
+  width: 2.1rem;
+  height: 1.15rem;
+  flex: 0 0 auto;
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 12%);
+  transition: background 180ms ease, border-color 180ms ease;
+}
+
+.user-menu__toggle-knob {
+  position: absolute;
+  top: 50%;
+  left: 0.15rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: var(--white);
+  transition: left 180ms ease, background 180ms ease;
+}
+
+.user-menu__toggle.is-on {
+  border-color: var(--marigold);
+  background: var(--marigold);
+}
+
+.user-menu__toggle.is-on .user-menu__toggle-knob {
+  left: calc(100% - 0.95rem);
+  background: var(--ink);
+}
+
 /* Language section inside the user dropdown. */
+
 .user-menu__section {
   padding: 0.75rem 1rem 0.85rem;
   border-bottom: 1px solid rgb(255 255 255 / 10%);
@@ -376,14 +635,22 @@
   padding: 1rem;
 }
 
-.user-menu__password label {
+.user-menu__email {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1rem;
+}
+
+.user-menu__password label,
+.user-menu__email label {
   font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
-.user-menu__password input {
+.user-menu__password input,
+.user-menu__email input {
   width: 100%;
   border: 0;
   border-bottom: 1px solid rgb(255 255 255 / 45%);
@@ -393,9 +660,50 @@
   font: inherit;
 }
 
-.user-menu__password input:focus {
-  outline: 2px solid var(--marigold);
-  outline-offset: 3px;
+.user-menu__password input:focus,
+.user-menu__email input:focus {
+  outline: 2px solid rgb(228 185 104 / 75%);
+  outline-offset: 2px;
+  border-bottom-color: var(--marigold);
+  box-shadow: 0 0 0 3px rgb(228 185 104 / 18%);
+}
+
+.user-menu__notice {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 0.55rem;
+  padding: 0.65rem 0.7rem;
+  background: rgb(255 255 255 / 6%);
+  color: rgb(255 255 255 / 90%);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.user-menu__notice-title {
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.user-menu__current-email {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0.15rem 0 0.2rem;
+}
+
+.user-menu__current-email-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 58%);
+}
+
+.user-menu__current-email-value {
+  color: rgb(255 255 255 / 92%);
+  font-size: 0.74rem;
+  word-break: break-all;
 }
 
 .user-menu__password-actions {
@@ -421,5 +729,147 @@
 
 .user-menu__status--success {
   color: #9fd6a8;
+}
+
+.user-menu__status--info {
+  color: #f6d48a;
+}
+
+.user-menu-modal__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 280;
+  display: grid;
+  place-items: center;
+  padding: 1.1rem;
+  background: rgb(20 18 13 / 62%);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.user-menu-modal__card {
+  position: relative;
+  width: min(34rem, 100%);
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 0.85rem;
+  padding: 1rem;
+  background: linear-gradient(180deg, rgb(25 23 18 / 96%), rgb(19 18 14 / 96%));
+  box-shadow: 0 24px 58px rgb(0 0 0 / 42%);
+  color: var(--white);
+}
+
+.user-menu-modal__close {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 999px;
+  width: 1.9rem;
+  height: 1.9rem;
+  background: rgb(255 255 255 / 5%);
+  color: rgb(255 255 255 / 86%);
+  cursor: pointer;
+}
+
+.user-menu-modal__close:hover {
+  background: rgb(255 255 255 / 10%);
+}
+
+.user-menu-modal__title {
+  margin: 0 2.3rem 0.8rem 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 3vw, 1.35rem);
+  font-weight: 500;
+  color: var(--marigold);
+}
+
+.user-menu-modal__form {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.user-menu-modal__form label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.user-menu-modal__form input {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid rgb(255 255 255 / 45%);
+  padding: 0.5rem 0.2rem;
+  background: transparent;
+  color: var(--white);
+  font: inherit;
+}
+
+.user-menu-modal__form input:focus {
+  outline: 2px solid rgb(228 185 104 / 75%);
+  outline-offset: 2px;
+  border-bottom-color: var(--marigold);
+  box-shadow: 0 0 0 3px rgb(228 185 104 / 18%);
+}
+
+.user-menu-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  margin-top: 0.25rem;
+}
+
+.user-menu-modal__btn {
+  border: 1px solid rgb(255 255 255 / 24%);
+  border-radius: 0.45rem;
+  padding: 0.5rem 0.9rem;
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+}
+
+.user-menu-modal__btn:hover {
+  background: rgb(255 255 255 / 10%);
+}
+
+.user-menu-modal__btn--primary {
+  border-color: var(--marigold);
+  background: var(--marigold);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.user-menu-modal__btn--primary:hover {
+  background: #d99a3a;
+}
+
+/* ── Mobile: fixed header (Android sticky workaround) ──────────────────
+   Android (older Chrome / WebView) has a long-standing bug where
+   `position: sticky` silently fails when an ancestor has `overflow-x`
+   (the `body { overflow-x: clip }` fallback to `hidden`). `position: fixed`
+   is immune to that bug, so on mobile we pin the header with `fixed` instead.
+
+   This rule is placed AFTER the base `.site-header` rule so it wins the
+   cascade. The vertical offset is driven by the existing `body.mobile-nav-only`
+   class (defined above): at the very top the header sits below the countdown
+   (`top: var(--countdown-height)`), and once the user scrolls the countdown
+   hides and the header snaps to `top: 0`.
+
+   Because the header is now out of flow, we push the page content down by the
+   header height so it is never hidden underneath. The countdown stays in flow
+   above it, so only the header height needs compensating. */
+@media (max-width: 899px) {
+  .site-header {
+    position: fixed;
+    top: var(--countdown-height);
+    right: 0;
+    left: 0;
+  }
+
+  main {
+    padding-top: var(--header-height);
+  }
 }
 

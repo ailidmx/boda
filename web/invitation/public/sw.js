@@ -12,7 +12,8 @@
  * Bump CACHE_VERSION whenever you ship a breaking change to the app shell.
  */
 
-const CACHE_VERSION = "boda-v4";
+const CACHE_VERSION = "boda-v5";
+
 
 
 const SHELL_CACHE = `${CACHE_VERSION}-shell`;
@@ -65,7 +66,13 @@ self.addEventListener("fetch", (event) => {
 
   const url = new URL(request.url);
 
+  // Only handle http(s) requests. Browser extensions (chrome-extension://,
+  // moz-extension://, etc.) and other non-http schemes cannot be cached and
+  // would throw "Request scheme ... is unsupported" on cache.put().
+  if (url.protocol !== "http:" && url.protocol !== "https:") return;
+
   // Same-origin navigation → network-first.
+
   if (request.mode === "navigate") {
     event.respondWith(
       fetch(request)

@@ -1,0 +1,275 @@
+[
+  {
+    "id": "CABAÑA 1",
+    "data": {
+      "id": "CABAÑA 1",
+      "name": "CABAÑA MADERA - 2p",
+      "capacity": 2,
+      "capacityRoomCheck": 4,
+      "totalPrice2Nights": 5310,
+      "pricePerPerson2Nights": 2655,
+      "pricePerPersonPerNight": 1328,
+      "occupancy": 2,
+      "occupancyPct": "100%",
+      "isPrivate": true,
+      "isBooked": true,
+      "isBookedXtra": false,
+      "isPaid": false,
+      "isPaidXtra": false,
+      "_source": "cabanas_inventario.csv",
+      "_migratedAt": "2026-08-03T15:31:41.888Z"
+    }
+  },
+  {
+    "id": "CABAÑA 2",
+    "data": {
+      "id": "CABAÑA 2",
+      "name": "CABAÑA MADERA - 2p",
+      "capacity": 2,
+      "capacityRoomCheck": 4,
+      "totalPrice2Nights": 5310,
+      "pricePerPerson2Nights": 2655,
+      "pricePerPersonPerNight": 1328,
+      "occupancy": 2,
+      "occupancyPct": "100%",
+      "isPrivate": true,
+      "isBooked": true,
+      "isBookedXtra": false,
+      "isPaid": false,
+      "isPaidXtra": false,
+      "_source": "cabanas_inventario.csv",
+      "_migratedAt": "2026-08-03T15:31:41.912Z"
+    }
+  },
+  {
+    "id": "CABAÑA 3",
+    "data": {
+      "id": "CABAÑA 3",
+      "name": "CABAÑA MADERA - 2p",
+      "capacity": 2,
+      "capacityRoomCheck": 4,
+      "totalPrice2Nights": 5310,
+      "pricePerPerson2Nights": 2655,
+      "pricePerPersonPerNight": 1328,
+      "occupancy": 4,
+      "occupancyPct": "200%",
+      "isPrivate": true,
+      "isBooked": true,
+      "isBookedXtra": false,
+      "isPaid": false,
+      "isPaidXtra": false,
+      "_source": "cabanas_inventario.csv",
+      "_migratedAt": "2026-08-03T15:31:41.934Z"
+    }
+  },
+  {
+    "id": "CABAÑA 4",
+    "data": {
+      "id": "CABAÑA 4",
+      "name": "CABAÑA MADERA - 2p",
+      "capacity": 2,
+      "capacityRoomCheck": 4,
+      "totalPrice2Nights": 5310,
+      "pricePerPerson2Nights": 2655,
+      "pricePerPersonPerNight": 1328,
+      "occupancy": 2,
+      "occupancyPct": "100%",
+      "isPrivate": true,
+      "isBooked": true,
+      "isBookedXtra": false,
+      "isPaid": false,
+      "isPaidXtra": false,
+      "_source": "cabanas_inventario.csv",
+      "_migratedAt": "2026-08-03T15:31:41.970Z"
+    }
+  },
+  {
+    "id": "CASONA",
+    "data": {
+      "id": "CASONA",
+      "name": "CASONA -  18p",
+      "capacity": 18,
+      "capacityRoomCheck": 18,
+      "totalPrice2Nights": 16980,
+      "pricePerPerson2Nights": 943,
+      "pricePerPersonPerNight": 472,
+      "occupancy": 19,
+      "occupancyPct": "106%",
+      "isPrivate": false,
+      "isBooked": true,
+      "isBookedXtra": true,
+      "isPaid": false,
+      "isPaidXtra": false,
+      "_source": "cabanas_inventario.csv",
+      "_migratedAt": "2026-08-03T15:31:42.094Z"
+    }
+  },
+  {
+    "id": "SUITE DON CARLOS",
+    "data": {
+      "id": "SUITE DON CARLOS",
+      "name": "SUITE DON CARLOS -  8p",
+      "capacity": 8,
+      "capacityRoomCheck": 8,
+      "totalPrice2Nights": 9640,
+      "pricePerPerson2Nights": 1205,
+      "pricePerPersonPerNight": 603,
+      "occupancy": 8,
+      "occupancyPct": "100%",
+      "isPrivate": false,
+      "isBooked": true,
+      "isBookedXtra": false,
+      "isPaid": false,
+      "isPaidXtra": false,
+      "_source": "cabanas_inventario.csv",
+      "_migratedAt": "2026-08-03T15:31:42.069Z"
+    }
+  },
+  {
+    "id": "VILLA AZALEA",
+    "data": {
+      "id": "VILLA AZALEA",
+      "name": "VILLA AZALEA -  12p",
+      "capacity": 12,
+      "capacityRoomCheck": 11,
+      "totalPrice2Nights": 8470,
+      "pricePerPerson2Nights": 706,
+      "pricePerPersonPerNight": 353,
+      "occupancy": 14,
+      "occupancyPct": "117%",
+      "isPrivate": false,
+      "isBooked": true,
+      "isBookedXtra": false,
+      "isPaid": false,
+      "isPaidXtra": false,
+      "_source": "cabanas_inventario.csv",
+      "_migratedAt": "2026-08-03T15:31:41.777Z"
+    }
+  },
+  {
+    "id": "VILLA DALIA",
+    "data": {
+      "id": "VILLA DALIA",
+      "name": "VILLA DALIA -  10p",
+      "capacity": 10,
+      "capacityRoomCheck": 10,
+      "totalPrice2Nights": 11150,
+      "pricePerPerson2Nights": 1115,
+      "pricePerPersonPerNight": 558,
+      "occupancy": 10,
+      "occupancyPct": "100%",
+      "isPrivate": false,
+      "isBooked": true,
+      "isBookedXtra": false,
+      "isPaid": false,
+      "isPaidXtra": false,
+      "_source": "cabanas_inventario.csv",
+      "_migratedAt": "2026-08-03T15:31:41.800Z"
+    }
+  },
+  {
+    "id": "VILLA DON AGUSTIN",
+    "data": {
+      "id": "VILLA DON AGUSTIN",
+      "name": "VILLA DON AGUSTIN -  4p",
+      "capacity": 4,
+      "capacityRoomCheck": 4,
+      "totalPrice2Nights": 5980,
+      "pricePerPerson2Nights": 1495,
+      "pricePerPersonPerNight": 748,
+      "occupancy": 5,
+      "occupancyPct": "125%",
+      "isPrivate": true,
+      "isBooked": true,
+      "isBookedXtra": false,
+      "isPaid": false,
+      "isPaidXtra": false,
+      "_source": "cabanas_inventario.csv",
+      "_migratedAt": "2026-08-03T15:31:42.019Z"
+    }
+  },
+  {
+    "id": "VILLA DON RAFA",
+    "data": {
+      "id": "VILLA DON RAFA",
+      "name": "VILLA DON RAFA -  6p",
+      "capacity": 6,
+      "capacityRoomCheck": 5,
+      "totalPrice2Nights": 7210,
+      "pricePerPerson2Nights": 1202,
+      "pricePerPersonPerNight": 601,
+      "occupancy": 6,
+      "occupancyPct": "100%",
+      "isPrivate": true,
+      "isBooked": true,
+      "isBookedXtra": false,
+      "isPaid": false,
+      "isPaidXtra": false,
+      "_source": "cabanas_inventario.csv",
+      "_migratedAt": "2026-08-03T15:31:42.041Z"
+    }
+  },
+  {
+    "id": "VILLA HORTENCIA",
+    "data": {
+      "id": "VILLA HORTENCIA",
+      "name": "VILLA HORTENCIA -  2p",
+      "capacity": 2,
+      "capacityRoomCheck": 4,
+      "totalPrice2Nights": 5310,
+      "pricePerPerson2Nights": 2655,
+      "pricePerPersonPerNight": 1328,
+      "occupancy": 2,
+      "occupancyPct": "100%",
+      "isPrivate": true,
+      "isBooked": true,
+      "isBookedXtra": false,
+      "isPaid": false,
+      "isPaidXtra": false,
+      "_source": "cabanas_inventario.csv",
+      "_migratedAt": "2026-08-03T15:31:41.867Z"
+    }
+  },
+  {
+    "id": "VILLA LAVANDA",
+    "data": {
+      "id": "VILLA LAVANDA",
+      "name": "VILLA LAVANDA -  4p",
+      "capacity": 4,
+      "capacityRoomCheck": 4,
+      "totalPrice2Nights": 5980,
+      "pricePerPerson2Nights": 1495,
+      "pricePerPersonPerNight": 748,
+      "occupancy": 5,
+      "occupancyPct": "125%",
+      "isPrivate": false,
+      "isBooked": true,
+      "isBookedXtra": false,
+      "isPaid": false,
+      "isPaidXtra": false,
+      "_source": "cabanas_inventario.csv",
+      "_migratedAt": "2026-08-03T15:31:41.845Z"
+    }
+  },
+  {
+    "id": "VILLA MARGARITA",
+    "data": {
+      "id": "VILLA MARGARITA",
+      "name": "VILLA MARGARITA -  10p",
+      "capacity": 10,
+      "capacityRoomCheck": 10,
+      "totalPrice2Nights": 11150,
+      "pricePerPerson2Nights": 1115,
+      "pricePerPersonPerNight": 558,
+      "occupancy": 20,
+      "occupancyPct": "200%",
+      "isPrivate": false,
+      "isBooked": true,
+      "isBookedXtra": false,
+      "isPaid": false,
+      "isPaidXtra": false,
+      "_source": "cabanas_inventario.csv",
+      "_migratedAt": "2026-08-03T15:31:41.822Z"
+    }
+  }
+]

@@ -5,6 +5,12 @@ import { Nav } from "./components/Nav.jsx";
 import { Countdown } from "./components/Countdown.jsx";
 import { Hero } from "./components/Hero.jsx";
 import { LazySection } from "./components/LazySection.jsx";
+import { LanguageModal } from "./components/LanguageModal.jsx";
+import { IdentityModal } from "./components/IdentityModal.jsx";
+import { WinampPlayer } from "./components/WinampPlayer.jsx";
+
+
+
 
 // Below-the-fold sections are code-split and only mounted (and their JS chunk
 // fetched) when they scroll into view. This keeps the initial bundle small and
@@ -13,10 +19,8 @@ import { LazySection } from "./components/LazySection.jsx";
 // The components use named exports, so each lazy() maps the module to its
 // named export via `.then((m) => ({ default: m.X }))` — React.lazy requires a
 // default export.
-const IdentitySection = lazy(() =>
-  import("./components/IdentitySection.jsx").then((m) => ({ default: m.IdentitySection })),
-);
 const Story = lazy(() =>
+
   import("./components/Story.jsx").then((m) => ({ default: m.Story })),
 );
 
@@ -25,6 +29,9 @@ const Venue = lazy(() =>
 );
 const Weekend = lazy(() =>
   import("./components/Weekend.jsx").then((m) => ({ default: m.Weekend })),
+);
+const WeekendProgram = lazy(() =>
+  import("./components/Weekend.jsx").then((m) => ({ default: m.WeekendProgram })),
 );
 const Accommodation = lazy(() =>
   import("./components/Accommodation.jsx").then((m) => ({ default: m.Accommodation })),
@@ -88,17 +95,18 @@ function Invitation() {
 
   return (
     <>
+      <LanguageModal />
+      <IdentityModal />
       <Countdown />
       <Nav />
+      <WinampPlayer />
       <main>
 
+
+
         <Hero />
-        <LazySection id="identity" className="lazy-section">
-          <Suspense fallback={null}>
-            <IdentitySection />
-          </Suspense>
-        </LazySection>
         <LazySection id="story" className="lazy-section">
+
           <Suspense fallback={null}>
             <Story />
           </Suspense>
@@ -119,6 +127,16 @@ function Invitation() {
             <Attire />
           </Suspense>
         </LazySection>
+        <LazySection id="weather" className="lazy-section">
+          <Suspense fallback={null}>
+            <Weather />
+          </Suspense>
+        </LazySection>
+        <LazySection id="weekend-program" className="lazy-section">
+          <Suspense fallback={null}>
+            <WeekendProgram />
+          </Suspense>
+        </LazySection>
         <LazySection id="accommodation" className="lazy-section">
           <Suspense fallback={null}>
             <Accommodation />
@@ -128,12 +146,6 @@ function Invitation() {
         <LazySection id="cabins" className="lazy-section">
           <Suspense fallback={null}>
             <Cabins />
-          </Suspense>
-        </LazySection>
-        <LazySection id="weather" className="lazy-section">
-
-          <Suspense fallback={null}>
-            <Weather />
           </Suspense>
         </LazySection>
         <LazySection id="food" className="lazy-section">

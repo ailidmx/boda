@@ -1,0 +1,92 @@
+[
+  {
+    "id": "38 Tonnes",
+    "data": {
+      "name": "38 Tonnes",
+      "label": "38 Tonnes",
+      "labelEn": "38 Tonnes",
+      "labelFr": "38 Tonnes",
+      "memberCount": 10
+    }
+  },
+  {
+    "id": "Amigos de Aydé",
+    "data": {
+      "name": "Amigos de Aydé",
+      "label": "Amigos de Aydé",
+      "labelEn": "Amigos de Aydé",
+      "labelFr": "Amigos de Aydé",
+      "memberCount": 21
+    }
+  },
+  {
+    "id": "Amigos de David",
+    "data": {
+      "name": "Amigos de David",
+      "label": "Amigos de David",
+      "labelEn": "Amigos de David",
+      "labelFr": "Amigos de David",
+      "memberCount": 24
+    }
+  },
+  {
+    "id": "Familia de Aydé",
+    "data": {
+      "name": "Familia de Aydé",
+      "label": "Familia de Aydé",
+      "labelEn": "Familia de Aydé",
+      "labelFr": "Familia de Aydé",
+      "memberCount": 18
+    }
+  },
+  {
+    "id": "Familia de David",
+    "data": {
+      "name": "Familia de David",
+      "label": "Familia de David",
+      "labelEn": "Familia de David",
+      "labelFr": "Familia de David",
+      "memberCount": 60
+    }
+  },
+  {
+    "id": "Golden",
+    "data": {
+      "name": "Golden",
+      "label": "Golden",
+      "labelEn": "Golden",
+      "labelFr": "Golden",
+      "memberCount": 23
+    }
+  },
+  {
+    "id": "Novios",
+    "data": {
+      "name": "Novios",
+      "label": "Novios",
+      "labelEn": "Novios",
+      "labelFr": "Novios",
+      "memberCount": 2
+    }
+  },
+  {
+    "id": "PetanclubGDL",
+    "data": {
+      "name": "PetanclubGDL",
+      "label": "PetanclubGDL",
+      "labelEn": "PetanclubGDL",
+      "labelFr": "PetanclubGDL",
+      "memberCount": 47
+    }
+  },
+  {
+    "id": "Pintura",
+    "data": {
+      "name": "Pintura",
+      "label": "Pintura",
+      "labelEn": "Pintura",
+      "labelFr": "Pintura",
+      "memberCount": 17
+    }
+  }
+]

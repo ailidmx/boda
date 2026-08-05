@@ -1,0 +1,482 @@
+[
+  {
+    "id": "103",
+    "data": {
+      "id": 103,
+      "guestName": "Adriana Martinez",
+      "group": "Amigos de Ayde",
+      "cabinId": "MARGARITA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque Amigos de Ayde"
+    }
+  },
+  {
+    "id": "104",
+    "data": {
+      "id": 104,
+      "guestName": "Fernanda",
+      "group": "Amigos de Ayde",
+      "cabinId": "MARGARITA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque Amigos de Ayde"
+    }
+  },
+  {
+    "id": "105",
+    "data": {
+      "id": 105,
+      "guestName": "Adriana Agris",
+      "group": "Amigos de Ayde",
+      "cabinId": "MARGARITA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque Amigos de Ayde"
+    }
+  },
+  {
+    "id": "106",
+    "data": {
+      "id": 106,
+      "guestName": "Susana Diaz",
+      "group": "Amigos de Ayde",
+      "cabinId": "MARGARITA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque Amigos de Ayde"
+    }
+  },
+  {
+    "id": "107",
+    "data": {
+      "id": 107,
+      "guestName": "Gabriela",
+      "group": "Amigos de Ayde",
+      "cabinId": "MARGARITA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque Amigos de Ayde"
+    }
+  },
+  {
+    "id": "108",
+    "data": {
+      "id": 108,
+      "guestName": "Tania",
+      "group": "Amigos de Ayde",
+      "cabinId": "MARGARITA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque Amigos de Ayde"
+    }
+  },
+  {
+    "id": "109",
+    "data": {
+      "id": 109,
+      "guestName": "Aili",
+      "group": "Amigos de Ayde",
+      "cabinId": "MARGARITA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque Amigos de Ayde"
+    }
+  },
+  {
+    "id": "110",
+    "data": {
+      "id": 110,
+      "guestName": "Natalia",
+      "group": "Amigos de Ayde",
+      "cabinId": "MARGARITA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque Amigos de Ayde"
+    }
+  },
+  {
+    "id": "111",
+    "data": {
+      "id": 111,
+      "guestName": "Diego Salmeron",
+      "group": "Golden",
+      "cabinId": "CABAÑA_5",
+      "priority": "media",
+      "status": "propuesta_v2",
+      "notes": "Bloque Golden"
+    }
+  },
+  {
+    "id": "113",
+    "data": {
+      "id": 113,
+      "guestName": "Andrea de Salmeron",
+      "group": "Golden",
+      "cabinId": "CABAÑA_5",
+      "priority": "media",
+      "status": "propuesta_v2",
+      "notes": "Bloque Golden"
+    }
+  },
+  {
+    "id": "115",
+    "data": {
+      "id": 115,
+      "guestName": "Samuel Lopez",
+      "group": "Golden",
+      "cabinId": "CABAÑA_5",
+      "priority": "media",
+      "status": "propuesta_v2",
+      "notes": "Bloque Golden"
+    }
+  },
+  {
+    "id": "116",
+    "data": {
+      "id": 116,
+      "guestName": "Rodrigo",
+      "group": "Golden",
+      "cabinId": "CABAÑA_5",
+      "priority": "media",
+      "status": "propuesta_v2",
+      "notes": "Bloque Golden"
+    }
+  },
+  {
+    "id": "117",
+    "data": {
+      "id": 117,
+      "guestName": "Aldo",
+      "group": "Golden",
+      "cabinId": "CABAÑA_5",
+      "priority": "media",
+      "status": "propuesta_v2",
+      "notes": "Bloque Golden"
+    }
+  },
+  {
+    "id": "135",
+    "data": {
+      "id": 135,
+      "guestName": "Cyrielle Rigollet",
+      "group": "Familia de David",
+      "cabinId": "AZALEA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque familiar David"
+    }
+  },
+  {
+    "id": "136",
+    "data": {
+      "id": 136,
+      "guestName": "Julien Rigollet",
+      "group": "Familia de David",
+      "cabinId": "AZALEA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque familiar David"
+    }
+  },
+  {
+    "id": "137",
+    "data": {
+      "id": 137,
+      "guestName": "Fabio Rigollet",
+      "group": "Familia de David",
+      "cabinId": "AZALEA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque familiar David"
+    }
+  },
+  {
+    "id": "138",
+    "data": {
+      "id": 138,
+      "guestName": "Lenzo Rigollet",
+      "group": "Familia de David",
+      "cabinId": "AZALEA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque familiar David"
+    }
+  },
+  {
+    "id": "139",
+    "data": {
+      "id": 139,
+      "guestName": "Timeo Rigollet",
+      "group": "Familia de David",
+      "cabinId": "AZALEA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque familiar David"
+    }
+  },
+  {
+    "id": "140",
+    "data": {
+      "id": 140,
+      "guestName": "Abraham Burciaga",
+      "group": "Pintura",
+      "cabinId": "DALIA",
+      "priority": "media",
+      "status": "propuesta_v2",
+      "notes": "Completa cupo DALIA con bloque Pintura"
+    }
+  },
+  {
+    "id": "141",
+    "data": {
+      "id": 141,
+      "guestName": "Mauricio Vargas",
+      "group": "Pintura",
+      "cabinId": "DALIA",
+      "priority": "media",
+      "status": "propuesta_v2",
+      "notes": "Completa cupo DALIA con bloque Pintura"
+    }
+  },
+  {
+    "id": "142",
+    "data": {
+      "id": 142,
+      "guestName": "Esposa de Mauricio Vargas",
+      "group": "Pintura",
+      "cabinId": "DALIA",
+      "priority": "media",
+      "status": "propuesta_v2",
+      "notes": "Completa cupo DALIA con bloque Pintura"
+    }
+  },
+  {
+    "id": "144",
+    "data": {
+      "id": 144,
+      "guestName": "Victor Segoviano",
+      "group": "Pintura",
+      "cabinId": "CASONA",
+      "priority": "media",
+      "status": "propuesta_v2",
+      "notes": "Ubicacion adicional por disponibilidad funcional"
+    }
+  },
+  {
+    "id": "145",
+    "data": {
+      "id": 145,
+      "guestName": "Esposa de Victor Segoviano",
+      "group": "Pintura",
+      "cabinId": "CASONA",
+      "priority": "media",
+      "status": "propuesta_v2",
+      "notes": "Ubicacion adicional por disponibilidad funcional"
+    }
+  },
+  {
+    "id": "146",
+    "data": {
+      "id": 146,
+      "guestName": "Juan Ignacio Sanchez",
+      "group": "Pintura",
+      "cabinId": "CASONA",
+      "priority": "media",
+      "status": "propuesta_v2",
+      "notes": "Ubicacion adicional por disponibilidad funcional"
+    }
+  },
+  {
+    "id": "147",
+    "data": {
+      "id": 147,
+      "guestName": "Esposa de Juan de Sanchez",
+      "group": "Pintura",
+      "cabinId": "CASONA",
+      "priority": "media",
+      "status": "propuesta_v2",
+      "notes": "Ubicacion adicional por disponibilidad funcional"
+    }
+  },
+  {
+    "id": "151",
+    "data": {
+      "id": 151,
+      "guestName": "Erik Montañez",
+      "group": "Pintura",
+      "cabinId": "DALIA",
+      "priority": "media",
+      "status": "propuesta_v2",
+      "notes": "Completa cupo DALIA con bloque Pintura"
+    }
+  },
+  {
+    "id": "156",
+    "data": {
+      "id": 156,
+      "guestName": "Ismael",
+      "group": "Amigos de Ayde",
+      "cabinId": "MARGARITA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque Amigos de Ayde"
+    }
+  },
+  {
+    "id": "157",
+    "data": {
+      "id": 157,
+      "guestName": "Lupita",
+      "group": "Amigos de Ayde",
+      "cabinId": "MARGARITA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque Amigos de Ayde"
+    }
+  },
+  {
+    "id": "158",
+    "data": {
+      "id": 158,
+      "guestName": "Fabiola Garcia",
+      "group": "Amigos de Ayde",
+      "cabinId": "CASONA",
+      "priority": "media",
+      "status": "propuesta_v2",
+      "notes": "Ubicacion adicional por disponibilidad funcional"
+    }
+  },
+  {
+    "id": "159",
+    "data": {
+      "id": 159,
+      "guestName": "Pablo Garcia",
+      "group": "Amigos de Ayde",
+      "cabinId": "CASONA",
+      "priority": "media",
+      "status": "propuesta_v2",
+      "notes": "Ubicacion adicional por disponibilidad funcional"
+    }
+  },
+  {
+    "id": "19",
+    "data": {
+      "id": 19,
+      "guestName": "Mika Rako",
+      "group": "PetanclubGDL",
+      "cabinId": "DALIA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Asignacion por bloque Petanclub"
+    }
+  },
+  {
+    "id": "20",
+    "data": {
+      "id": 20,
+      "guestName": "Corine Rako",
+      "group": "PetanclubGDL",
+      "cabinId": "DALIA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Asignacion por bloque Petanclub"
+    }
+  },
+  {
+    "id": "201",
+    "data": {
+      "id": 201,
+      "guestName": "Myriam Lefranc",
+      "group": "Familia de David",
+      "cabinId": "AZALEA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque familiar David"
+    }
+  },
+  {
+    "id": "203",
+    "data": {
+      "id": 203,
+      "guestName": "Fabrice Aili",
+      "group": "Familia de David",
+      "cabinId": "AZALEA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque familiar David"
+    }
+  },
+  {
+    "id": "204",
+    "data": {
+      "id": 204,
+      "guestName": "Mireille Rives",
+      "group": "Familia de David",
+      "cabinId": "AZALEA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque familiar David"
+    }
+  },
+  {
+    "id": "21",
+    "data": {
+      "id": 21,
+      "guestName": "Morgane Rako",
+      "group": "PetanclubGDL",
+      "cabinId": "DALIA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Asignacion por bloque Petanclub"
+    }
+  },
+  {
+    "id": "24",
+    "data": {
+      "id": 24,
+      "guestName": "Esposa/esposo Corine Rako",
+      "group": "PetanclubGDL",
+      "cabinId": "DALIA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Asignacion por bloque Petanclub"
+    }
+  },
+  {
+    "id": "67",
+    "data": {
+      "id": 67,
+      "guestName": "Christophe Rigollet",
+      "group": "Familia de David",
+      "cabinId": "AZALEA",
+      "priority": "alta",
+      "status": "propuesta_v2_reubicar",
+      "notes": "Salida de CABAÑA_4 para eliminar sobrecupo (9->8)"
+    }
+  },
+  {
+    "id": "68",
+    "data": {
+      "id": 68,
+      "guestName": "Brigitte Lemery",
+      "group": "Familia de David",
+      "cabinId": "AZALEA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque familiar David"
+    }
+  },
+  {
+    "id": "83",
+    "data": {
+      "id": 83,
+      "guestName": "Jacques Lemery",
+      "group": "Familia de David",
+      "cabinId": "AZALEA",
+      "priority": "alta",
+      "status": "propuesta_v2",
+      "notes": "Bloque familiar David"
+    }
+  }
+]

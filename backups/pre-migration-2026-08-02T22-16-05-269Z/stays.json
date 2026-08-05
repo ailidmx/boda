@@ -1,0 +1,62 @@
+[
+  {
+    "id": "IFThDl9CIEugpNgwp41T",
+    "data": {
+      "travelerId": "V-001",
+      "block": 2,
+      "checkIn": "2027-02-19",
+      "checkOut": "2027-02-21",
+      "city": "Jocotepec",
+      "place": "Roca Azul",
+      "address": "",
+      "status": "confirmed",
+      "contact": "",
+      "notes": "Cabana CABAÑAS_MADERA_33_2_ADULTOS"
+    }
+  },
+  {
+    "id": "R2drGhXaqSTPospaJy8M",
+    "data": {
+      "travelerId": "V-001",
+      "block": 1,
+      "checkIn": "2027-02-14",
+      "checkOut": "2027-02-19",
+      "city": "",
+      "place": "",
+      "address": "",
+      "status": "pending",
+      "contact": "",
+      "notes": "Primera estancia local por definir"
+    }
+  },
+  {
+    "id": "b0QZE5q8VzEBKs30GYDD",
+    "data": {
+      "travelerId": "V-002",
+      "block": 1,
+      "checkIn": "2027-02-10",
+      "checkOut": "2027-03-15",
+      "city": "",
+      "place": "",
+      "address": "",
+      "status": "tentative_pending",
+      "contact": "",
+      "notes": "Fechas y alojamiento completos por confirmar"
+    }
+  },
+  {
+    "id": "lP5i7xV6PtZXGbzJ4VvU",
+    "data": {
+      "travelerId": "V-001",
+      "block": 3,
+      "checkIn": "2027-02-21",
+      "checkOut": "2027-02-28",
+      "city": "",
+      "place": "",
+      "address": "",
+      "status": "pending",
+      "contact": "",
+      "notes": "Estancia posterior a la boda por definir"
+    }
+  }
+]

@@ -1,0 +1,223 @@
+[
+  {
+    "id": "AZALEA",
+    "data": {
+      "code": "AZALEA",
+      "name": "AZALEA - 12p",
+      "capacity": 12,
+      "occupancy": 12,
+      "occupancyPct": 100,
+      "totalPrice2Nights": 8470,
+      "pricePerPerson2Nights": 706,
+      "pricePerPersonPerNight": 353,
+      "tags": [
+        "Petanca"
+      ],
+      "selected": true
+    }
+  },
+  {
+    "id": "CABAÑA_31",
+    "data": {
+      "code": "CABAÑA_31",
+      "name": "CABAÑAS_MADERA_31_2_ADULTOS",
+      "capacity": 2,
+      "occupancy": 2,
+      "occupancyPct": 100,
+      "totalPrice2Nights": 5310,
+      "pricePerPerson2Nights": 2655,
+      "pricePerPersonPerNight": 1328,
+      "tags": [
+        "Spo y Gui"
+      ],
+      "selected": true
+    }
+  },
+  {
+    "id": "CABAÑA_32",
+    "data": {
+      "code": "CABAÑA_32",
+      "name": "CABAÑAS_MADERA_32_2_ADULTOS",
+      "capacity": 2,
+      "occupancy": 2,
+      "occupancyPct": 100,
+      "totalPrice2Nights": 5310,
+      "pricePerPerson2Nights": 2655,
+      "pricePerPersonPerNight": 1328,
+      "tags": [
+        "Francois y Mireille"
+      ],
+      "selected": true
+    }
+  },
+  {
+    "id": "CABAÑA_33",
+    "data": {
+      "code": "CABAÑA_33",
+      "name": "CABAÑAS_MADERA_33_2_ADULTOS",
+      "capacity": 2,
+      "occupancy": 2,
+      "occupancyPct": 100,
+      "totalPrice2Nights": 5310,
+      "pricePerPerson2Nights": 2655,
+      "pricePerPersonPerNight": 1328,
+      "tags": [
+        "Dimitar"
+      ],
+      "selected": true
+    }
+  },
+  {
+    "id": "CABAÑA_34",
+    "data": {
+      "code": "CABAÑA_34",
+      "name": "CABAÑAS_MADERA_34_2_ADULTOS",
+      "capacity": 2,
+      "occupancy": 2,
+      "occupancyPct": 100,
+      "totalPrice2Nights": 5310,
+      "pricePerPerson2Nights": 2655,
+      "pricePerPersonPerNight": 1328,
+      "tags": [
+        "Thierry y Joséphine"
+      ],
+      "selected": true
+    }
+  },
+  {
+    "id": "CABAÑA_4",
+    "data": {
+      "code": "CABAÑA_4",
+      "name": "CABAÑA_4 - 8p",
+      "capacity": 8,
+      "occupancy": 9,
+      "occupancyPct": 113,
+      "totalPrice2Nights": 9640,
+      "pricePerPerson2Nights": 1205,
+      "pricePerPersonPerNight": 603,
+      "tags": [
+        "Kiki JP Christophe Steph Wendy Hugo Lisa Diego Oscar"
+      ],
+      "selected": true
+    }
+  },
+  {
+    "id": "CABAÑA_5",
+    "data": {
+      "code": "CABAÑA_5",
+      "name": "CABAÑA_5 - 6p",
+      "capacity": 6,
+      "occupancy": 6,
+      "occupancyPct": 100,
+      "totalPrice2Nights": 7210,
+      "pricePerPerson2Nights": 1202,
+      "pricePerPersonPerNight": 601,
+      "tags": [
+        "Petanca y Raoul"
+      ],
+      "selected": true
+    }
+  },
+  {
+    "id": "CABAÑA_6",
+    "data": {
+      "code": "CABAÑA_6",
+      "name": "CABAÑA_6 - 4p",
+      "capacity": 4,
+      "occupancy": 4,
+      "occupancyPct": 100,
+      "totalPrice2Nights": 5980,
+      "pricePerPerson2Nights": 1495,
+      "pricePerPersonPerNight": 748,
+      "tags": [
+        "Tristan y Yari"
+      ],
+      "selected": true
+    }
+  },
+  {
+    "id": "CASONA",
+    "data": {
+      "code": "CASONA",
+      "name": "CASONA - 18p",
+      "capacity": 18,
+      "occupancy": 18,
+      "occupancyPct": 100,
+      "totalPrice2Nights": 16980,
+      "pricePerPerson2Nights": 943,
+      "pricePerPersonPerNight": 472,
+      "tags": [
+        "Familia Aydé"
+      ],
+      "selected": true
+    }
+  },
+  {
+    "id": "DALIA",
+    "data": {
+      "code": "DALIA",
+      "name": "DALIA - 10p",
+      "capacity": 10,
+      "occupancy": 7,
+      "occupancyPct": 70,
+      "totalPrice2Nights": 11150,
+      "pricePerPerson2Nights": 1115,
+      "pricePerPersonPerNight": 558,
+      "tags": [
+        "Petanca"
+      ],
+      "selected": true
+    }
+  },
+  {
+    "id": "HORTENCIA",
+    "data": {
+      "code": "HORTENCIA",
+      "name": "HORTENCIA - 2p",
+      "capacity": 2,
+      "occupancy": 2,
+      "occupancyPct": 100,
+      "totalPrice2Nights": 5310,
+      "pricePerPerson2Nights": 2655,
+      "pricePerPersonPerNight": 1328,
+      "tags": [
+        "Novios"
+      ],
+      "selected": true
+    }
+  },
+  {
+    "id": "LAVANDA",
+    "data": {
+      "code": "LAVANDA",
+      "name": "LAVANDA - 4p",
+      "capacity": 4,
+      "occupancy": 0,
+      "occupancyPct": 0,
+      "totalPrice2Nights": 5980,
+      "pricePerPerson2Nights": 1495,
+      "pricePerPersonPerNight": 748,
+      "tags": [
+        "Mika"
+      ],
+      "selected": true
+    }
+  },
+  {
+    "id": "MARGARITA",
+    "data": {
+      "code": "MARGARITA",
+      "name": "MARGARITA - 10p",
+      "capacity": 10,
+      "occupancy": 10,
+      "occupancyPct": 100,
+      "totalPrice2Nights": 11150,
+      "pricePerPerson2Nights": 1115,
+      "pricePerPersonPerNight": 558,
+      "tags": [
+        "Petanca"
+      ],
+      "selected": true
+    }
+  }
+]

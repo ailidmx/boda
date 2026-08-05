@@ -71,15 +71,26 @@ function digitsOnly(value) {
   return (value || "").replace(/\D/g, "");
 }
 
+function normalizeE164ish(value) {
+  const raw = String(value || "").trim();
+  if (!raw) return "";
+  if (raw.startsWith("+")) return raw;
+  const digits = digitsOnly(raw);
+  return digits ? `+${digits}` : "";
+}
+
 /** Find the country whose dial code matches the start of an E.164 value. */
 function countryFromE164(e164) {
-  const digits = digitsOnly(e164);
+  const digits = digitsOnly(normalizeE164ish(e164));
   if (!digits) return COUNTRIES[0];
   // Longest match wins (e.g. +351 Portugal vs +35).
   let best = null;
   for (const c of COUNTRIES) {
     const codeDigits = digitsOnly(c.code);
-    if (digits.startsWith(codeDigits) && (!best || codeDigits.length > digitsOnly(best.code).length)) {
+    if (
+      digits.startsWith(codeDigits) &&
+      (!best || codeDigits.length > digitsOnly(best.code).length)
+    ) {
       best = c;
     }
   }
@@ -120,6 +131,7 @@ export function PhoneInput({
   const [query, setQuery] = useState("");
   const wrapRef = useRef(null);
   const listRef = useRef(null);
+  const normalizedValue = normalizeE164ish(value);
 
   // Keep the country in sync if the value changes externally.
   useEffect(() => {
@@ -140,9 +152,10 @@ export function PhoneInput({
   }, [open]);
 
   const codeDigits = digitsOnly(country.code);
-  const nationalDigits = value.startsWith(country.code)
-    ? digitsOnly(value).slice(codeDigits.length)
-    : "";
+  const currentDigits = digitsOnly(normalizedValue);
+  const nationalDigits = currentDigits.startsWith(codeDigits)
+    ? currentDigits.slice(codeDigits.length)
+    : currentDigits;
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -169,7 +182,9 @@ export function PhoneInput({
     setLocalText(formatted);
   };
 
-  const [localText, setLocalText] = useState(formatNational(country, nationalDigits));
+  const [localText, setLocalText] = useState(
+    formatNational(country, nationalDigits),
+  );
   useEffect(() => {
     setLocalText(formatNational(country, nationalDigits));
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -194,9 +209,16 @@ export function PhoneInput({
           onClick={() => setOpen((v) => !v)}
           disabled={disabled}
         >
-          <span className="phone-input__flag" aria-hidden="true">{country.flag}</span>
+          <span className="phone-input__flag" aria-hidden="true">
+            {country.flag}
+          </span>
           <span className="phone-input__code">{country.code}</span>
-          <span className={`phone-input__caret${open ? " is-open" : ""}`} aria-hidden="true">▾</span>
+          <span
+            className={`phone-input__caret${open ? " is-open" : ""}`}
+            aria-hidden="true"
+          >
+            ▾
+          </span>
         </button>
         <input
           id={id}
@@ -213,7 +235,11 @@ export function PhoneInput({
       </div>
 
       {open && (
-        <div className="phone-input__dropdown" role="listbox" aria-label="Country">
+        <div
+          className="phone-input__dropdown"
+          role="listbox"
+          aria-label="Country"
+        >
           <div className="phone-input__search">
             <input
               type="text"
@@ -233,7 +259,9 @@ export function PhoneInput({
                   className={`phone-input__option${c.iso === country.iso ? " is-active" : ""}`}
                   onClick={() => selectCountry(c)}
                 >
-                  <span className="phone-input__flag" aria-hidden="true">{c.flag}</span>
+                  <span className="phone-input__flag" aria-hidden="true">
+                    {c.flag}
+                  </span>
                   <span className="phone-input__option-name">{c.name}</span>
                   <span className="phone-input__option-code">{c.code}</span>
                 </button>

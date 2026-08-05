@@ -24,11 +24,12 @@ export const CLOUDINARY_UPLOAD_PRESET =
 export const AVATAR_FOLDER = "boda/avatars";
 
 /**
- * Upload an image File to Cloudinary (unsigned) and return the secure
- * delivery URL.
- 
+ * Upload an image File to Cloudinary (unsigned) and return the Cloudinary
+ * public id (e.g. "boda/avatars/abc123"). We store only the public id, never
+ * the delivery URL, so the URL can be rebuilt/optimised at render time.
+ *
  * @param {File} file  the image file to upload
- * @returns {Promise<string>} secure URL of the uploaded image
+ * @returns {Promise<string>} Cloudinary public id of the uploaded image
  */
 export async function uploadAvatar(file) {
   if (!file) throw new Error("No file provided");
@@ -54,11 +55,12 @@ export async function uploadAvatar(file) {
   }
 
   const data = await response.json();
-  if (!data?.secure_url) {
-    throw new Error("Upload failed: no URL returned");
+  if (!data?.public_id) {
+    throw new Error("Upload failed: no public id returned");
   }
-  return data.secure_url;
+  return data.public_id;
 }
+
 
 /**
  * Validate that a chosen file looks like a reasonable close-up photo.

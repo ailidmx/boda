@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { useApp } from "../context/AppContext.jsx";
+import { submitPetanque, submitRsvp } from "../submit-forms.js";
 
 function optionsMarkup(options) {
   return (options || []).map((option) => (
@@ -10,10 +11,49 @@ function optionsMarkup(options) {
 }
 
 export function RSVP() {
-  const { t, profile } = useApp();
+  const { t, profile, language, interfaceText } = useApp();
   const rsvp = t.rsvp || {};
   const petanque = rsvp.petanque || {};
   const showTravelSection = profile?.guest?.comesFromFar === true;
+
+  const formRef = useRef(null);
+  const [status, setStatus] = useState("idle"); // idle | working | success | error
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (status === "working") return;
+    const form = formRef.current;
+    if (!form) return;
+
+    const formData = new FormData(form);
+    const context = {
+      email: profile?.email || "",
+      language,
+    };
+
+    setStatus("working");
+    try {
+      // The RSVP form also collects the petanque section. Both submissions are
+      // independent documents, so we submit them sequentially and only report
+      // success if both succeed.
+      await submitRsvp(formData, context);
+      await submitPetanque(formData, context);
+      setStatus("success");
+      form.reset();
+    } catch (error) {
+      console.warn("[rsvp] submission failed", error.code || error.message);
+      setStatus("error");
+    }
+  };
+
+  const statusText =
+    status === "working"
+      ? interfaceText.submitWorking
+      : status === "success"
+        ? interfaceText.submitSuccess
+        : status === "error"
+          ? interfaceText.submitError
+          : rsvp.previewNote;
 
   return (
     <section className="rsvp-section section">
@@ -22,9 +62,11 @@ export function RSVP() {
         <h2>{rsvp.title}</h2>
         <p>{rsvp.body}</p>
         <form
+          ref={formRef}
           className="rsvp-form"
           data-form-kind="rsvp"
           aria-describedby="rsvp-preview-note"
+          onSubmit={handleSubmit}
         >
           <fieldset>
             <legend>{rsvp.groups.attendance}</legend>
@@ -309,7 +351,7 @@ export function RSVP() {
             {rsvp.button}
           </button>
           <small id="rsvp-preview-note" data-form-status>
-            {rsvp.previewNote}
+            {statusText}
           </small>
         </form>
       </div>

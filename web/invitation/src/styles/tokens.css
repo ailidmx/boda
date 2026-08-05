@@ -1,0 +1,113 @@
+/* ── Design tokens: breakpoints, spacing, fluid type ────────────────────
+ *
+ * This file is the single source of truth for the responsive system.
+ * Every breakpoint, spacing step, and fluid type ramp lives here so the
+ * invitation scales consistently across devices.
+ *
+ * USAGE PATTERN
+ * ─────────────
+ * Component styles should be written MOBILE-FIRST (base styles target the
+ * smallest screen) and then progressively enhanced with `min-width` media
+ * queries. Co-locate each component's media queries inside its own CSS file
+ * (e.g. `styles/hero.css` contains the hero's `@media (min-width: …)` rules).
+ *
+ * The `responsive.css` file is reserved for cross-cutting / shared layout
+ * rules that don't belong to a single component (e.g. the `.section` shell,
+ * `.section-heading`, shared grid primitives).
+ *
+ * BREAKPOINT TOKENS
+ * ─────────────────
+ * These are exposed as CSS custom properties so any component can reference
+ * them, but note that custom properties are NOT usable inside `@media`
+ * queries (CSS spec limitation). The numeric values below are the canonical
+ * source; keep them in sync with the `@media` rules in each file.
+ *
+ *   --bp-sm: 480px   (small phones)
+ *   --bp-md: 640px   (large phones / small tablets)
+ *   --bp-lg: 900px   (tablets / small laptops)
+ *   --bp-xl: 1200px  (laptops / desktops)
+ *   --bp-2xl: 1440px (large desktops)
+ *
+ * FLUID TYPE SCALE
+ * ────────────────
+ * Use `clamp()` with the ramp below for headings and display text so type
+ * scales smoothly between the min and max sizes without hard breakpoints.
+ *
+ *   --text-xs:  clamp(0.72rem, 0.65rem + 0.35vw, 0.85rem)
+ *   --text-sm:  clamp(0.85rem, 0.80rem + 0.25vw, 0.95rem)
+ *   --text-base:clamp(1rem, 0.95rem + 0.25vw, 1.0625rem)
+ *   --text-md:  clamp(1.1rem, 1.0rem + 0.5vw, 1.3rem)
+ *   --text-lg:  clamp(1.3rem, 1.1rem + 1vw, 1.6rem)
+ *   --text-xl:  clamp(1.6rem, 1.2rem + 2vw, 2.2rem)
+ *   --text-2xl: clamp(2rem, 1.4rem + 3vw, 3rem)
+ *   --text-3xl: clamp(2.6rem, 1.8rem + 4vw, 4rem)
+ *   --text-4xl: clamp(3.2rem, 2.2rem + 5vw, 5.5rem)
+ *   --text-5xl: clamp(4rem, 2.6rem + 7vw, 7rem)
+ *   --text-6xl: clamp(5rem, 3rem + 10vw, 9rem)
+ *
+ * SPACING SCALE
+ * ─────────────
+ * Use these for padding/margin/gap so vertical rhythm stays consistent.
+ *
+ *   --space-1: 0.25rem
+ *   --space-2: 0.5rem
+ *   --space-3: 0.75rem
+ *   --space-4: 1rem
+ *   --space-5: 1.5rem
+ *   --space-6: 2rem
+ *   --space-7: 3rem
+ *   --space-8: 4rem
+ *   --space-9: 5rem
+ *   --space-10: 6rem
+ *   --space-11: 8rem
+ *   --space-12: 10rem
+ *
+ * FLUID SPACING
+ * ─────────────
+ * For section padding and large gaps that should scale with the viewport:
+ *
+ *   --space-section-y: clamp(3rem, 6vw, 5rem)
+ *   --space-section-x: clamp(1.25rem, 6vw, 6rem)
+ *   --space-gap:       clamp(1.5rem, 5vw, 5rem)
+ */
+
+:root {
+  /* ── Breakpoints (numeric, for reference / JS) ── */
+  --bp-sm: 480px;
+  --bp-md: 640px;
+  --bp-lg: 900px;
+  --bp-xl: 1200px;
+  --bp-2xl: 1440px;
+
+  /* ── Fluid type scale ── */
+  --text-xs: clamp(0.72rem, 0.65rem + 0.35vw, 0.85rem);
+  --text-sm: clamp(0.85rem, 0.8rem + 0.25vw, 0.95rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.0625rem);
+  --text-md: clamp(1.1rem, 1rem + 0.5vw, 1.3rem);
+  --text-lg: clamp(1.3rem, 1.1rem + 1vw, 1.6rem);
+  --text-xl: clamp(1.6rem, 1.2rem + 2vw, 2.2rem);
+  --text-2xl: clamp(2rem, 1.4rem + 3vw, 3rem);
+  --text-3xl: clamp(2.6rem, 1.8rem + 4vw, 4rem);
+  --text-4xl: clamp(3.2rem, 2.2rem + 5vw, 5.5rem);
+  --text-5xl: clamp(4rem, 2.6rem + 7vw, 7rem);
+  --text-6xl: clamp(5rem, 3rem + 10vw, 9rem);
+
+  /* ── Spacing scale ── */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: 4rem;
+  --space-9: 5rem;
+  --space-10: 6rem;
+  --space-11: 8rem;
+  --space-12: 10rem;
+
+  /* ── Fluid spacing ── */
+  --space-section-y: clamp(3rem, 6vw, 5rem);
+  --space-section-x: clamp(1.25rem, 6vw, 6rem);
+  --space-gap: clamp(1.5rem, 5vw, 5rem);
+}

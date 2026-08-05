@@ -7,28 +7,30 @@
 }
 
 .gallery-heading {
-  display: grid;
-  grid-template-columns: 0.65fr 1.25fr 0.9fr;
-  gap: clamp(1.5rem, 5vw, 5rem);
-  align-items: end;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
   margin-bottom: clamp(3rem, 6vw, 6rem);
 }
 
+.gallery-heading .eyebrow {
+  margin-bottom: 1rem;
+}
+
+.gallery-heading h2 {
+  margin: 0 0 1.5rem;
+}
+
 .gallery-heading p:last-child {
-  max-width: 28rem;
+  max-width: 60rem;
   margin: 0;
   color: rgb(255 253 248 / 72%);
 }
 
 .photo-gallery {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.gallery-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.75rem;
 }
 
@@ -40,6 +42,21 @@
   background: rgb(0 0 0 / 30%);
   aspect-ratio: 1;
 }
+
+/* Medium screens: 3 cards per row */
+@media (max-width: 1024px) {
+  .photo-gallery {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Mobile: 1 card per row */
+@media (max-width: 640px) {
+  .photo-gallery {
+    grid-template-columns: 1fr;
+  }
+}
+
 
 .gallery-item img {
   display: block;

@@ -1,0 +1,45 @@
+/* ── Photos section (contrast-safe) ───────────────────────────────────── */
+
+.photos-section {
+  background: var(--white);
+  color: var(--ink);
+}
+
+.photos-heading h2 {
+  margin: 0;
+  color: var(--ink);
+}
+
+.photos-heading .lead {
+  color: rgb(36 33 25 / 92%);
+}
+
+.photos-before,
+.photos-during {
+  margin-top: 1.4rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgb(36 33 25 / 14%);
+  border-radius: 0.8rem;
+  background: rgb(255 253 248 / 95%);
+}
+
+.photos-before h3,
+.photos-during h3 {
+  margin: 0 0 0.45rem;
+  color: var(--ink);
+}
+
+.photos-before p,
+.photos-during p,
+.photos-note {
+  margin: 0;
+  color: rgb(36 33 25 / 88%);
+}
+
+.photos-upload {
+  margin-top: 1.4rem;
+}
+
+.photos-note {
+  margin-top: 1rem;
+}

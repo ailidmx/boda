@@ -9,10 +9,14 @@
  * app can consume without changes.
  */
 
-import { collection, getDocs } from "firebase/firestore";
+import { collection, getDocs, limit, query } from "firebase/firestore";
+
 import { db } from "./firebase.js";
 import { getGuest } from "./guests.js";
-import { getRoom } from "./rooms.js";
+import { getRoom, getRoomDescription } from "./rooms.js";
+import { collections } from "../../shared/firestore-paths.js";
+
+
 
 // ── Group-level custom content cache ──────────────────────────────────
 
@@ -32,7 +36,11 @@ const groupDataCache = new Map();
  */
 export async function loadGroupCustomContent() {
   try {
-    const snapshot = await getDocs(collection(db, "invitation_groups"));
+    const snapshot = await getDocs(
+      query(collection(db, collections.invitationGroups), limit(500)),
+    );
+
+
     snapshot.forEach((doc) => {
       const data = doc.data();
       // Store full data
@@ -281,8 +289,9 @@ export function invitationProfileText(profile, language = "es") {
     facts.push(`Cuarto: ${profile.room}`);
   }
   if (profile.roomDescription) {
-    facts.push(profile.roomDescription);
+    facts.push(getRoomDescription(profile.roomDescription, language));
   }
+
   return {
     detected: labels.detected,
     eyebrow: labels.eyebrow,
@@ -307,7 +316,7 @@ export function invitationProfileText(profile, language = "es") {
 export function getCustomContent(profile) {
   if (!profile?.guest) return null;
 
-  const groupName = profile.guest.invitacionGroup || profile.guest.group;
+  const groupName = profile.guest.invitationGroup || profile.guest.group;
   const groupContent = groupName ? groupContentCache.get(groupName) : null;
   const guestContent = profile.guest.customContent;
 

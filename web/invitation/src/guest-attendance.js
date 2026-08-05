@@ -11,30 +11,75 @@
  * invitation group (see firebase/firestore.rules).
  */
 
-import { collection, doc, getDocs, setDoc, serverTimestamp } from "firebase/firestore";
+import { collection, doc, getDocs, query, setDoc, serverTimestamp, where } from "firebase/firestore";
+
 import { db } from "./firebase.js";
+import { collections } from "../../shared/firestore-paths.js";
+import { buildAttendancePayload } from "../../shared/payload-builders.js";
+import { validateAttendancePayload } from "../../shared/validation.js";
+import { resolveGuestInvitationGroup } from "./guest-profiles.js";
+
+
 
 /** @type {Map<string, Object>} */
 const attendanceCache = new Map();
 
+function logDb(event, detail) {
+  console.log(`[db][guest-attendance][${event}]`, detail);
+}
+
 /**
- * Load all attendance responses from Firestore into the cache.
- * Call once at startup alongside loadGuestProfiles().
+ * Load the attendance responses for the signed-in guest's OWN invitation group
+ * from Firestore into the cache. Call once at startup alongside
+ * loadGuestProfiles().
+ *
+ * The query is scoped by `invitationGroup` to match the Firestore rules, which
+ * only allow a guest to read responses belonging to their own invitation group.
+ * This prevents a guest from receiving other groups' attendance data.
+ *
+ * @param {string} invitationGroup  the signed-in guest's invitation group
  * @returns {Promise<void>}
  */
-export async function loadAttendanceResponses() {
+export async function loadAttendanceResponses(invitationGroup) {
   try {
-    const snapshot = await getDocs(collection(db, "attendance_responses"));
+    if (!invitationGroup) {
+      console.warn("[attendance] No invitationGroup provided; skipping load");
+      return;
+    }
+    logDb("read:start", {
+      collection: collections.attendanceResponses,
+      op: "getDocs",
+      where: { invitationGroup },
+    });
+    const q = query(
+      collection(db, collections.attendanceResponses),
+      where("invitationGroup", "==", invitationGroup),
+    );
+
+    const snapshot = await getDocs(q);
     snapshot.forEach((docSnap) => {
       attendanceCache.set(docSnap.id, docSnap.data());
     });
+    logDb("read:success", {
+      collection: collections.attendanceResponses,
+      op: "getDocs",
+      where: { invitationGroup },
+      size: snapshot.size,
+    });
     if (!snapshot.empty) {
-      console.log(`[attendance] Loaded ${snapshot.size} attendance responses`);
+      console.log(`[attendance] Loaded ${snapshot.size} attendance responses for group "${invitationGroup}"`);
     }
   } catch (error) {
+    logDb("read:error", {
+      collection: collections.attendanceResponses,
+      op: "getDocs",
+      where: { invitationGroup },
+      error: error.message,
+    });
     console.warn("[attendance] Could not load attendance responses", error.message);
   }
 }
+
 
 /**
  * Get the cached attendance response for a guest id (or null).
@@ -75,20 +120,41 @@ export function resolveGuestAttendance(guest) {
  */
 export async function saveGuestAttendance(guest, attendance, editorGuestId, language = "es") {
   if (!guest?.id) throw new Error("No guest id");
-  const ref = doc(db, "attendance_responses", guest.id);
+  const ref = doc(db, collections.attendanceResponses, guest.id);
   const existing = attendanceCache.get(guest.id) || {};
-  const next = {
-    ...existing,
+  const invitationGroup = resolveGuestInvitationGroup(guest);
+  if (!invitationGroup) {
+    logDb("write:blocked", {
+      collection: collections.attendanceResponses,
+      docId: guest.id,
+      reason: "missing-invitation-group",
+    });
+    throw new Error("Guest invitation group is missing in Firestore.");
+  }
+  const next = buildAttendancePayload({
     guestId: guest.id,
-    friday: attendance.friday !== undefined ? String(attendance.friday || "") : existing.friday || "",
-    saturday: attendance.saturday !== undefined ? String(attendance.saturday || "") : existing.saturday || "",
-    sunday: attendance.sunday !== undefined ? String(attendance.sunday || "") : existing.sunday || "",
-    invitationGroup: guest.invitacionGroup || guest.group || "",
-    updatedBy: editorGuestId || "",
+    attendance,
+    invitationGroup,
+    editorGuestId,
     language,
-    schemaVersion: 1,
-    updatedAt: serverTimestamp(),
-  };
-  await setDoc(ref, next, { merge: true });
-  attendanceCache.set(guest.id, { ...existing, ...next });
+    timestamp: serverTimestamp(),
+  });
+
+  // Runtime validation mirrors the Firestore rules (hasValidAttendanceFields).
+  const result = validateAttendancePayload(next);
+  if (!result.valid) {
+    throw new Error(`Invalid attendance payload: ${result.errors.join("; ")}`);
+  }
+
+  logDb("write:start", { collection: collections.attendanceResponses, docId: guest.id, op: "setDoc", merge: true, payload: next });
+  try {
+    await setDoc(ref, next, { merge: true });
+    attendanceCache.set(guest.id, { ...existing, ...next });
+    logDb("write:success", { collection: collections.attendanceResponses, docId: guest.id, op: "setDoc", merge: true, payload: next });
+  } catch (error) {
+    logDb("write:error", { collection: collections.attendanceResponses, docId: guest.id, op: "setDoc", merge: true, payload: next, error: error.message });
+    throw error;
+  }
+
 }
+

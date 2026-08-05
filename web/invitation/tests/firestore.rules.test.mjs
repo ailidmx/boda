@@ -85,6 +85,19 @@ before(async () => {
       ),
     },
   });
+
+  // The current rules resolve an invited guest by checking that a document
+  // exists at `guests/{auth.uid}` (auth UIDs are set to the guest ID from the
+  // Google Sheet). Seed the invited guest so `isInvitedGuest()` succeeds.
+  // `withSecurityRulesDisabled()` bypasses rules (equivalent to the Admin SDK).
+  await environment.withSecurityRulesDisabled(async (admin) => {
+    await setDoc(doc(admin.firestore(), "guests", guestUid), {
+      guestId: guestUid,
+      invitationGroup: "Familia de David",
+      updatedBy: "seed",
+      updatedAt: serverTimestamp(),
+    });
+  });
 });
 
 after(async () => {
@@ -130,66 +143,155 @@ test("an unauthenticated visitor cannot submit", async () => {
   await assertFails(setDoc(doc(db, "rsvp_submissions", "anonymous"), rsvp));
 });
 
-test("the guest and unrelated accounts cannot read submissions", async () => {
-  const guestDb = environment.authenticatedContext(guestUid).firestore();
-  const otherDb = environment
-    .authenticatedContext("other", {
+// ── Submission reads: admin-only ────────────────────────────────────────
+// The current rules restrict reads of submission collections to `isAdmin()`
+// (guests/{auth.uid}.isAdmin == true). Regular invited guests can WRITE
+// submissions but cannot READ them back. This prevents a guest from seeing
+// other guests' personal data (names, emails, phones, travel itineraries).
+
+const adminUid = "admin-uid-1";
+
+async function seedAdmin() {
+  await environment.withSecurityRulesDisabled(async (admin) => {
+    await setDoc(doc(admin.firestore(), "guests", adminUid), {
+      guestId: adminUid,
+      invitationGroup: "Novios",
+      isAdmin: true,
+      updatedBy: "seed",
+      updatedAt: serverTimestamp(),
+    });
+  });
+}
+
+test("an invited guest cannot read submissions (admin-only)", async () => {
+  const db = environment.authenticatedContext(guestUid).firestore();
+  await assertFails(getDoc(doc(db, "rsvp_submissions", "valid")));
+  await assertFails(getDoc(doc(db, "experience_suggestions", "valid")));
+  await assertFails(getDoc(doc(db, "coast_interest", "valid")));
+  await assertFails(getDoc(doc(db, "petanque_participation", "valid")));
+});
+
+test("an admin can read all submission collections", async () => {
+  await seedAdmin();
+  const db = environment.authenticatedContext(adminUid).firestore();
+  await assertSucceeds(getDoc(doc(db, "rsvp_submissions", "valid")));
+  await assertSucceeds(getDoc(doc(db, "experience_suggestions", "valid")));
+  await assertSucceeds(getDoc(doc(db, "coast_interest", "valid")));
+  await assertSucceeds(getDoc(doc(db, "petanque_participation", "valid")));
+});
+
+test("a non-admin authenticated user cannot read submissions", async () => {
+  const db = environment
+    .authenticatedContext("non-admin", {
       email: "someone@example.com",
       email_verified: true,
-    })
-    .firestore();
-
-  await assertFails(getDoc(doc(guestDb, "rsvp_submissions", "valid")));
-  await assertFails(getDoc(doc(otherDb, "rsvp_submissions", "valid")));
-});
-
-test("David and Aydé can read submissions with verified emails", async () => {
-  for (const email of ["david.aili.mx@gmail.com", "aydemiss@gmail.com"]) {
-    const db = environment
-      .authenticatedContext(email, { email, email_verified: true })
-      .firestore();
-    await assertSucceeds(getDoc(doc(db, "rsvp_submissions", "valid")));
-    await assertSucceeds(
-      getDoc(doc(db, "experience_suggestions", "valid")),
-    );
-    await assertSucceeds(getDoc(doc(db, "coast_interest", "valid")));
-  }
-});
-
-test("an allowlisted but unverified email cannot read submissions", async () => {
-  const db = environment
-    .authenticatedContext("unverified-david", {
-      email: "david.aili.mx@gmail.com",
-      email_verified: false,
     })
     .firestore();
   await assertFails(getDoc(doc(db, "rsvp_submissions", "valid")));
 });
 
+test("an unauthenticated visitor cannot read submissions", async () => {
+  const db = environment.unauthenticatedContext().firestore();
+  await assertFails(getDoc(doc(db, "rsvp_submissions", "valid")));
+});
+
+
 // ── Guests collection: group members may edit each other's contact ──────
 // The `guests` collection is the source of truth for guest records. Any
-// authenticated guest may update the phone/email of a member of their own
-// invitation group (mapped via guest_auth/{uid}.invitationGroup), but nothing
-// else, and never members of another group.
+// authenticated guest may update the phone of a member of their own
+// invitation group (resolved from `guests/{auth.uid}.invitationGroup`), but
+// nothing else, and never members of another group. Email is NOT stored here
+// — it is the Firebase Auth login credential and is changed via `updateEmail`.
+
 
 const editorUid = "editor-uid-1";
 const editorGroup = "Familia de David";
 
 async function seedGuestAuth() {
-  const admin = environment.adminContext().firestore();
-  await setDoc(doc(admin, "guest_auth", editorUid), {
-    guestId: "david_aili",
-    invitationGroup: editorGroup,
+  // `withSecurityRulesDisabled()` bypasses rules (equivalent to the Admin SDK).
+  await environment.withSecurityRulesDisabled(async (admin) => {
+    // The current rules resolve the editor's group from their own guest
+    // document at `guests/{auth.uid}` (auth UIDs are set to the guest ID).
+    await setDoc(doc(admin.firestore(), "guests", editorUid), {
+      guestId: editorUid,
+      invitationGroup: editorGroup,
+      updatedBy: "seed",
+      updatedAt: serverTimestamp(),
+    });
   });
 }
 
 test("a group member can update the phone of another member in their group", async () => {
   await seedGuestAuth();
+  // The target guest document already exists (synced from the Google Sheet).
+  // Seed it via the admin context so the update below is a real UPDATE, not a
+  // CREATE (the rules' `hasValidGuestContactFields()` dereferences
+  // `resource.data`, which is null on create).
+  await environment.withSecurityRulesDisabled(async (admin) => {
+    await setDoc(doc(admin.firestore(), "guests", "catherine"), {
+      guestId: "catherine",
+      identity: {
+        firstName: "Catherine",
+        lastName: "Martin",
+        phone: "+33 6 00 00 00 00",
+      },
+      invitationGroup: editorGroup,
+      updatedBy: "seed",
+      updatedAt: serverTimestamp(),
+    });
+  });
+
   const db = environment.authenticatedContext(editorUid).firestore();
   await assertSucceeds(
     setDoc(doc(db, "guests", "catherine"), {
       guestId: "catherine",
-      phone: "+33 6 12 34 56 78",
+      identity: { phone: "+33 6 12 34 56 78" },
+      invitationGroup: editorGroup,
+      updatedBy: "david_aili",
+      updatedAt: serverTimestamp(),
+    }),
+  );
+});
+
+test("a group member can update a guest identity without sending invitationGroup", async () => {
+  await seedGuestAuth();
+  await environment.withSecurityRulesDisabled(async (admin) => {
+    await setDoc(doc(admin.firestore(), "guests", "catherine"), {
+      guestId: "catherine",
+      identity: {
+        firstName: "Catherine",
+        lastName: "Martin",
+        phone: "+33 6 00 00 00 00",
+      },
+      invitationGroup: editorGroup,
+      updatedBy: "seed",
+      updatedAt: serverTimestamp(),
+    });
+  });
+
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "guests", "catherine"), {
+      guestId: "catherine",
+      identity: {
+        firstName: "Catherine",
+        middleName: "",
+        lastName: "Martin",
+        maternalLastName: "",
+      },
+      updatedBy: "david_aili",
+      updatedAt: serverTimestamp(),
+    }),
+  );
+});
+
+test("a group member cannot store an email on the guests collection (email lives in Firebase Auth)", async () => {
+  await seedGuestAuth();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertFails(
+    setDoc(doc(db, "guests", "catherine"), {
+      guestId: "catherine",
+      identity: { phone: "+33 6 12 34 56 78" },
       email: "catherine@example.com",
       invitationGroup: editorGroup,
       updatedBy: "david_aili",
@@ -198,13 +300,34 @@ test("a group member can update the phone of another member in their group", asy
   );
 });
 
-test("a group member cannot edit non-contact fields of another member", async () => {
+
+// The rules allow group members to edit contact fields AND name corrections
+// (firstName/lastName). Sheet-synced fields (cabin, room, table, rsvp,
+// isAdmin, etc.) are read-only from the client. This test verifies that a
+// group member cannot modify a sheet-synced administrative field.
+test("a group member cannot edit sheet-synced administrative fields", async () => {
   await seedGuestAuth();
+  // Seed the target guest so the write below is an UPDATE (the rules'
+  // `hasValidGuestContactFields()` dereferences `resource.data`).
+  await environment.withSecurityRulesDisabled(async (admin) => {
+    await setDoc(doc(admin.firestore(), "guests", "catherine"), {
+      guestId: "catherine",
+      identity: {
+        firstName: "Catherine",
+        lastName: "Martin",
+        phone: "+33 6 00 00 00 00",
+      },
+      invitationGroup: editorGroup,
+      updatedBy: "seed",
+      updatedAt: serverTimestamp(),
+    });
+  });
+
   const db = environment.authenticatedContext(editorUid).firestore();
   await assertFails(
     setDoc(doc(db, "guests", "catherine"), {
       guestId: "catherine",
-      firstName: "Hacked",
+      isAdmin: true,
       invitationGroup: editorGroup,
       updatedBy: "david_aili",
       updatedAt: serverTimestamp(),
@@ -218,7 +341,7 @@ test("a group member cannot edit a member of a different group", async () => {
   await assertFails(
     setDoc(doc(db, "guests", "sebastien"), {
       guestId: "sebastien",
-      phone: "+33 6 00 00 00 00",
+      identity: { phone: "+33 6 00 00 00 00" },
       invitationGroup: "PetanclubGDL",
       updatedBy: "david_aili",
       updatedAt: serverTimestamp(),
@@ -231,7 +354,7 @@ test("an unauthenticated visitor cannot edit a guest record", async () => {
   await assertFails(
     setDoc(doc(db, "guests", "catherine"), {
       guestId: "catherine",
-      phone: "+33 6 00 00 00 00",
+      identity: { phone: "+33 6 00 00 00 00" },
       invitationGroup: editorGroup,
       updatedBy: "david_aili",
       updatedAt: serverTimestamp(),
@@ -239,3 +362,340 @@ test("an unauthenticated visitor cannot edit a guest record", async () => {
   );
 });
 
+// ── Admin write scope: invitationGroup and _deleted ─────────────────────
+// Regular guests may NOT modify `invitationGroup` (reassign a guest to a
+// different group) or `_deleted` (soft-delete a guest). These are
+// administrative operations. Admins MAY modify both.
+
+test("a group member cannot change invitationGroup (admin-only)", async () => {
+  await seedGuestAuth();
+  // Seed the target guest so the write below is an UPDATE.
+  await environment.withSecurityRulesDisabled(async (admin) => {
+    await setDoc(doc(admin.firestore(), "guests", "catherine"), {
+      guestId: "catherine",
+      identity: {
+        firstName: "Catherine",
+        lastName: "Martin",
+        phone: "+33 6 00 00 00 00",
+      },
+      invitationGroup: editorGroup,
+      updatedBy: "seed",
+      updatedAt: serverTimestamp(),
+    });
+  });
+
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertFails(
+    setDoc(doc(db, "guests", "catherine"), {
+      guestId: "catherine",
+      identity: { phone: "+33 6 12 34 56 78" },
+      invitationGroup: "PetanclubGDL", // attempt to move to another group
+      updatedBy: "david_aili",
+      updatedAt: serverTimestamp(),
+    }),
+  );
+});
+
+test("a group member cannot soft-delete a guest (admin-only)", async () => {
+  await seedGuestAuth();
+  // Seed the target guest so the write below is an UPDATE.
+  await environment.withSecurityRulesDisabled(async (admin) => {
+    await setDoc(doc(admin.firestore(), "guests", "catherine"), {
+      guestId: "catherine",
+      identity: {
+        firstName: "Catherine",
+        lastName: "Martin",
+        phone: "+33 6 00 00 00 00",
+      },
+      invitationGroup: editorGroup,
+      updatedBy: "seed",
+      updatedAt: serverTimestamp(),
+    });
+  });
+
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertFails(
+    setDoc(doc(db, "guests", "catherine"), {
+      guestId: "catherine",
+      identity: { phone: "+33 6 12 34 56 78" },
+      invitationGroup: editorGroup,
+      _deleted: true, // attempt to soft-delete
+      updatedBy: "david_aili",
+      updatedAt: serverTimestamp(),
+    }),
+  );
+});
+
+test("an admin can change invitationGroup", async () => {
+  await seedAdmin();
+  // Seed the target guest so the write below is an UPDATE.
+  await environment.withSecurityRulesDisabled(async (admin) => {
+    await setDoc(doc(admin.firestore(), "guests", "catherine"), {
+      guestId: "catherine",
+      identity: {
+        firstName: "Catherine",
+        lastName: "Martin",
+        phone: "+33 6 00 00 00 00",
+      },
+      invitationGroup: editorGroup,
+      updatedBy: "seed",
+      updatedAt: serverTimestamp(),
+    });
+  });
+
+  const db = environment.authenticatedContext(adminUid).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "guests", "catherine"), {
+      guestId: "catherine",
+      identity: { phone: "+33 6 12 34 56 78" },
+      invitationGroup: "PetanclubGDL", // admin may reassign
+      updatedBy: "admin-uid-1",
+      updatedAt: serverTimestamp(),
+    }),
+  );
+});
+
+test("an admin can soft-delete a guest", async () => {
+  await seedAdmin();
+  // Seed the target guest so the write below is an UPDATE.
+  await environment.withSecurityRulesDisabled(async (admin) => {
+    await setDoc(doc(admin.firestore(), "guests", "catherine"), {
+      guestId: "catherine",
+      identity: {
+        firstName: "Catherine",
+        lastName: "Martin",
+        phone: "+33 6 00 00 00 00",
+      },
+      invitationGroup: editorGroup,
+      updatedBy: "seed",
+      updatedAt: serverTimestamp(),
+    });
+  });
+
+  const db = environment.authenticatedContext(adminUid).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "guests", "catherine"), {
+      guestId: "catherine",
+      identity: { phone: "+33 6 12 34 56 78" },
+      invitationGroup: editorGroup,
+      _deleted: true, // admin may soft-delete
+      updatedBy: "admin-uid-1",
+      updatedAt: serverTimestamp(),
+    }),
+  );
+});
+
+
+// ── Attendance responses: group-scoped reads ────────────────────────────
+// The rules allow a guest to read attendance responses only for their own
+// invitation group. Admins can read all. Guests can create/update responses
+// for members of their own group.
+
+const attendanceGroup = "Familia de David";
+const otherGroup = "PetanclubGDL";
+
+async function seedAttendanceData() {
+  await environment.withSecurityRulesDisabled(async (admin) => {
+    // Seed the editor's own guest doc (already done in seedGuestAuth).
+    // Seed attendance responses for the editor's group and another group.
+    await setDoc(doc(admin.firestore(), "attendance_responses", "catherine"), {
+      guestId: "catherine",
+      friday: "yes",
+      saturday: "yes",
+      sunday: "maybe",
+      invitationGroup: attendanceGroup,
+      updatedBy: "seed",
+      language: "es",
+      schemaVersion: 1,
+      updatedAt: serverTimestamp(),
+    });
+    await setDoc(doc(admin.firestore(), "attendance_responses", "sebastien"), {
+      guestId: "sebastien",
+      friday: "no",
+      saturday: "yes",
+      sunday: "yes",
+      invitationGroup: otherGroup,
+      updatedBy: "seed",
+      language: "es",
+      schemaVersion: 1,
+      updatedAt: serverTimestamp(),
+    });
+  });
+}
+
+test("a guest can read attendance responses for their own group", async () => {
+  await seedGuestAuth();
+  await seedAttendanceData();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertSucceeds(getDoc(doc(db, "attendance_responses", "catherine")));
+});
+
+test("a guest cannot read attendance responses for another group", async () => {
+  await seedGuestAuth();
+  await seedAttendanceData();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertFails(getDoc(doc(db, "attendance_responses", "sebastien")));
+});
+
+test("an admin can read attendance responses for any group", async () => {
+  await seedAdmin();
+  await seedAttendanceData();
+  const db = environment.authenticatedContext(adminUid).firestore();
+  await assertSucceeds(getDoc(doc(db, "attendance_responses", "catherine")));
+  await assertSucceeds(getDoc(doc(db, "attendance_responses", "sebastien")));
+});
+
+test("a guest can create an attendance response for their own group", async () => {
+  await seedGuestAuth();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "attendance_responses", "catherine"), {
+      guestId: "catherine",
+      friday: "yes",
+      saturday: "yes",
+      sunday: "maybe",
+      invitationGroup: attendanceGroup,
+      updatedBy: editorUid,
+      language: "es",
+      schemaVersion: 1,
+      updatedAt: serverTimestamp(),
+    }),
+  );
+});
+
+test("a guest cannot create an attendance response for another group", async () => {
+  await seedGuestAuth();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertFails(
+    setDoc(doc(db, "attendance_responses", "sebastien"), {
+      guestId: "sebastien",
+      friday: "no",
+      saturday: "yes",
+      sunday: "yes",
+      invitationGroup: otherGroup,
+      updatedBy: editorUid,
+      language: "es",
+      schemaVersion: 1,
+      updatedAt: serverTimestamp(),
+    }),
+  );
+});
+
+// ── Admin access to guests collection ──────────────────────────────────
+// Admins (guests/{auth.uid}.isAdmin == true) can read and write any guest
+// document. Regular guests can only read/write their own group.
+
+test("an admin can read any guest document", async () => {
+  await seedAdmin();
+  await environment.withSecurityRulesDisabled(async (admin) => {
+    await setDoc(doc(admin.firestore(), "guests", "sebastien"), {
+      guestId: "sebastien",
+      invitationGroup: otherGroup,
+      updatedBy: "seed",
+      updatedAt: serverTimestamp(),
+    });
+  });
+  const db = environment.authenticatedContext(adminUid).firestore();
+  await assertSucceeds(getDoc(doc(db, "guests", "sebastien")));
+});
+
+test("a guest cannot read a guest from another group", async () => {
+  await seedGuestAuth();
+  await environment.withSecurityRulesDisabled(async (admin) => {
+    await setDoc(doc(admin.firestore(), "guests", "sebastien"), {
+      guestId: "sebastien",
+      invitationGroup: otherGroup,
+      updatedBy: "seed",
+      updatedAt: serverTimestamp(),
+    });
+  });
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertFails(getDoc(doc(db, "guests", "sebastien")));
+});
+
+// ── Invitation groups: group-scoped reads ─────────────────────────────
+// Group content (customContent, tag styling) is personalized per group.
+// A guest may only read their OWN group's document (document ID = group
+// name). Admins may read all groups. Unauthenticated users may read none.
+
+const groupName = "Familia de David";
+const otherGroupName = "PetanclubGDL";
+
+async function seedInvitationGroups() {
+  await environment.withSecurityRulesDisabled(async (admin) => {
+    await setDoc(doc(admin.firestore(), "invitation_groups", groupName), {
+      customContent: {
+        greeting: "¡Hola familia!",
+        message: "Bienvenidos a nuestra boda.",
+        section: "",
+        hideSections: [],
+      },
+      tag: { color: "#55452d", textColor: "#ffffff", label: "Familia de David" },
+    });
+    await setDoc(doc(admin.firestore(), "invitation_groups", otherGroupName), {
+      customContent: {
+        greeting: "Hola Petanclub",
+        message: "Nos vemos en GDL.",
+        section: "",
+        hideSections: [],
+      },
+      tag: { color: "#123456", textColor: "#ffffff", label: "PetanclubGDL" },
+    });
+  });
+}
+
+test("a guest can read their own invitation group's document", async () => {
+  await seedGuestAuth();
+  await seedInvitationGroups();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertSucceeds(getDoc(doc(db, "invitation_groups", groupName)));
+});
+
+test("a guest cannot read another invitation group's document", async () => {
+  await seedGuestAuth();
+  await seedInvitationGroups();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertFails(getDoc(doc(db, "invitation_groups", otherGroupName)));
+});
+
+test("an admin can read any invitation group's document", async () => {
+  await seedAdmin();
+  await seedInvitationGroups();
+  const db = environment.authenticatedContext(adminUid).firestore();
+  await assertSucceeds(getDoc(doc(db, "invitation_groups", groupName)));
+  await assertSucceeds(getDoc(doc(db, "invitation_groups", otherGroupName)));
+});
+
+test("an unauthenticated visitor cannot read invitation groups", async () => {
+  await seedInvitationGroups();
+  const db = environment.unauthenticatedContext().firestore();
+  await assertFails(getDoc(doc(db, "invitation_groups", groupName)));
+});
+
+test("a guest cannot write to invitation groups", async () => {
+  await seedGuestAuth();
+  await seedInvitationGroups();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertFails(
+    setDoc(doc(db, "invitation_groups", groupName), {
+      customContent: { greeting: "Hacked", message: "", section: "", hideSections: [] },
+    }),
+  );
+});
+
+test("an admin can write to invitation groups", async () => {
+  await seedAdmin();
+  await seedInvitationGroups();
+  const db = environment.authenticatedContext(adminUid).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "invitation_groups", groupName), {
+      customContent: {
+        greeting: "¡Hola familia!",
+        message: "Bienvenidos a nuestra boda.",
+        section: "",
+        hideSections: [],
+      },
+      tag: { color: "#55452d", textColor: "#ffffff", label: "Familia de David" },
+    }),
+  );
+});

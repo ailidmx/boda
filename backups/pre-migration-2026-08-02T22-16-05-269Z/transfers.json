@@ -1,0 +1,42 @@
+[
+  {
+    "id": "TR-001",
+    "data": {
+      "transferId": "TR-001",
+      "travelerId": "V-001",
+      "type": "recogida_llegada",
+      "date": "2027-02-14",
+      "airport": "GDL",
+      "flightRef": "AM39",
+      "flightTime": "19:20",
+      "airportTargetTime": "",
+      "pickupSuggestedTime": "20:15",
+      "origin": "Aeropuerto GDL",
+      "destination": "Primera estancia pendiente",
+      "responsible": "",
+      "vehicle": "",
+      "status": "planning",
+      "notes": "Hora sugerida tras migracion y equipaje; ajustar cuando llegue el billete"
+    }
+  },
+  {
+    "id": "TR-002",
+    "data": {
+      "transferId": "TR-002",
+      "travelerId": "V-001",
+      "type": "regreso_aeropuerto",
+      "date": "2027-02-28",
+      "airport": "GDL",
+      "flightRef": "AM36",
+      "flightTime": "11:15",
+      "airportTargetTime": "08:15",
+      "pickupSuggestedTime": "",
+      "origin": "Estancia pendiente",
+      "destination": "Aeropuerto GDL",
+      "responsible": "",
+      "vehicle": "",
+      "status": "blocked",
+      "notes": "Definir alojamiento del 21 al 28 y calcular salida con trafico real"
+    }
+  }
+]

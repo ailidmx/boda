@@ -8,7 +8,10 @@ import {
   INVITATION_CODES,
   parseInvitationProfile,
 } from "../src/invitation-profile.js";
-import { GUEST_IDS } from "../src/guests.js";
+import GUESTS from "../src/guests.js";
+
+const GUEST_IDS = GUESTS.map((g) => g.id);
+
 
 // ── Legacy profile codes ──────────────────────────────────────────────
 

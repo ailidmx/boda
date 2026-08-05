@@ -1,32 +1,193 @@
 /**
- * Generate src/guests.js from invitados/lista_invitados.csv (source of truth).
- *
- * The CSV must contain these columns (in order):
- *   No,check,Nombre,Email,Se envió invitación ,Confirmado,Hospadeje,Grupo,
- *   Adulto/Niño,Hombre/Mujer,Confirmado el ,Mesa,privado?,pagado?,Cabaña,
- *   Cuarto,Invitacion,_invitacion_group,precio,precio_pp_2noches,
- *   viajaEnAvion,lang,username,firebase_email,password
+ * Generate web/shared/guests.js from the live Google Sheet Invitados tab
+ * (source of truth). Both apps (invitation + dashboard) re-export from this
+ * shared module.
  *
  * Usage:
  *   node scripts/generate-guests.mjs
  */
 
-import { readFileSync, writeFileSync } from "fs";
+import { writeFileSync, readFileSync, readdirSync, existsSync } from "fs";
 import { fileURLToPath } from "url";
+import { pathToFileURL } from "url";
 import { dirname, join } from "path";
+import crypto from "crypto";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const CSV_PATH = join(__dirname, "../../../invitados/lista_invitados.csv");
-const OUT_PATH = join(__dirname, "../src/guests.js");
+// Single shared output — both apps re-export from web/shared/guests.js.
+const OUT_PATH = join(__dirname, "../../shared/guests.js");
+const SHEETS_ENV_PATH = join(__dirname, "../../../integraciones/google_sheets/.env");
+const BACKUPS_DIR = join(__dirname, "../../../backups");
+const serviceAccount = JSON.parse(readFileSync(join(__dirname, "../../../integraciones/google_sheets/service_account.json"), "utf-8"));
+
+
 
 const AUTH_DOMAIN = "boda-david-y-ayde.web.app";
+
+function parseEnvFile(filePath) {
+  const env = {};
+  const raw = readFileSync(filePath, "utf-8");
+  for (const line of raw.split(/\r?\n/)) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const idx = trimmed.indexOf("=");
+    if (idx === -1) continue;
+    const key = trimmed.slice(0, idx).trim();
+    let value = trimmed.slice(idx + 1).trim();
+    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    env[key] = value;
+  }
+  return env;
+}
+
+function base64Url(input) {
+  return Buffer.from(input)
+    .toString("base64")
+    .replace(/=/g, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
+}
+
+function signJwtAssertion({ clientEmail, privateKey, scope, tokenUri }) {
+  const now = Math.floor(Date.now() / 1000);
+  const header = { alg: "RS256", typ: "JWT" };
+  const claim = {
+    iss: clientEmail,
+    scope,
+    aud: tokenUri,
+    exp: now + 3600,
+    iat: now,
+  };
+  const encodedHeader = base64Url(JSON.stringify(header));
+  const encodedClaim = base64Url(JSON.stringify(claim));
+  const unsigned = `${encodedHeader}.${encodedClaim}`;
+  const signature = crypto.createSign("RSA-SHA256").update(unsigned).sign(privateKey, "base64")
+    .replace(/=/g, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
+  return `${unsigned}.${signature}`;
+}
+
+async function getSheetsAccessToken() {
+  const tokenUri = serviceAccount.token_uri;
+  const assertion = signJwtAssertion({
+    clientEmail: serviceAccount.client_email,
+    privateKey: serviceAccount.private_key,
+    scope: "https://www.googleapis.com/auth/spreadsheets.readonly",
+    tokenUri,
+  });
+  const response = await fetch(tokenUri, {
+    method: "POST",
+    headers: { "content-type": "application/x-www-form-urlencoded" },
+    body: new URLSearchParams({
+      grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer",
+      assertion,
+    }),
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to obtain Google access token: ${response.status} ${await response.text()}`);
+  }
+  const data = await response.json();
+  return data.access_token;
+}
+
+function sanitizeHeaders(rawHeaders) {
+  const seen = new Map();
+  return rawHeaders.map((header, index) => {
+    const base = String(header || "").trim() || `col_${index + 1}`;
+    const count = (seen.get(base) || 0) + 1;
+    seen.set(base, count);
+    return count === 1 ? base : `${base}_${count}`;
+  });
+}
+
+function valuesToObjects(values) {
+  if (!values.length) return [];
+  const headers = sanitizeHeaders(values[0]);
+  return values.slice(1).map((row) => {
+    const padded = row.concat(Array(Math.max(0, headers.length - row.length)).fill(""));
+    const obj = {};
+    headers.forEach((header, index) => {
+      obj[header] = padded[index] !== undefined ? String(padded[index]).trim() : "";
+    });
+    return obj;
+  });
+}
+
+async function readInvitadosSheet() {
+  const env = parseEnvFile(SHEETS_ENV_PATH);
+  const spreadsheetId = (process.env.GOOGLE_SHEETS_ID || env.GOOGLE_SHEETS_ID || "").trim();
+  const sheetName = (process.env.WS_INVITADOS || env.WS_INVITADOS || "Invitados").trim();
+  if (!spreadsheetId) {
+    throw new Error(`Missing GOOGLE_SHEETS_ID in ${SHEETS_ENV_PATH}`);
+  }
+  const token = await getSheetsAccessToken();
+  const range = encodeURIComponent(sheetName);
+  const response = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${range}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) {
+    throw new Error(`Failed to read Google Sheet: ${response.status} ${await response.text()}`);
+  }
+  const data = await response.json();
+  return valuesToObjects(data.values || []);
+}
+
+function loadLegacyUsernames() {
+  if (!existsSync(BACKUPS_DIR)) return new Map();
+  const backupDirs = readdirSync(BACKUPS_DIR, { withFileTypes: true })
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort()
+    .reverse();
+
+  for (const dirName of backupDirs) {
+    const guestsPath = join(BACKUPS_DIR, dirName, "guests.json");
+    if (!existsSync(guestsPath)) continue;
+    try {
+      const records = JSON.parse(readFileSync(guestsPath, "utf-8"));
+      const usernames = new Map();
+      for (const record of records) {
+        const id = cleanStr(record?.id || record?.data?.id);
+        const username = cleanStr(record?.data?.username || record?.username);
+        if (id && username) usernames.set(id, username);
+      }
+      if (usernames.size > 0) return usernames;
+    } catch {
+      // Skip malformed backup files and keep searching older snapshots.
+    }
+  }
+
+  return new Map();
+}
+
+function cleanStr(v) {
+  if (v === undefined || v === null) return "";
+  return String(v).trim();
+}
+
+function pick(row, ...keys) {
+  for (const key of keys) {
+    const value = cleanStr(row[key]);
+    if (value) return value;
+  }
+  return "";
+}
+
+function toBool(v) {
+  if (v === undefined || v === null || v === "") return false;
+  const s = String(v).trim().toUpperCase();
+  return s === "TRUE" || s === "1" || s === "YES" || s === "SI";
+}
 
 /** Map a CSV cabin name to a unit key + label + occupancy + payment. */
 function cabinInfo(cabana, privado, pagado) {
   if (!cabana) return { hasCabin: false };
   const c = String(cabana).trim().toUpperCase();
-  const priv = String(privado).trim().toUpperCase() === "TRUE";
-  const pag = String(pagado).trim().toUpperCase() === "TRUE";
+  const priv = toBool(privado);
+  const pag = toBool(pagado);
   let unit = null;
   let label = c;
   if (c.includes("HORTENCIA")) { unit = "hortencia"; label = "Hortencia"; }
@@ -53,132 +214,84 @@ function cabinInfo(cabana, privado, pagado) {
   };
 }
 
-function slugify(str) {
-  return String(str || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "_")
-    .replace(/^_+|_+$/g, "");
-}
+const previousGuestsModule = await import(`${pathToFileURL(OUT_PATH).href}?ts=${Date.now()}`);
+const previousGuests = Array.isArray(previousGuestsModule.default) ? previousGuestsModule.default : [];
+const previousGuestsById = new Map(previousGuests.map((guest) => [guest.id, guest]));
+const legacyUsernamesById = loadLegacyUsernames();
 
-/**
- * Split one CSV line into cells, honouring double-quoted fields that may
- * contain commas and escaped quotes ("").
- */
-function parseLine(line) {
-  const cells = [];
-  let current = "";
-  let inQuotes = false;
-  for (let i = 0; i < line.length; i++) {
-    const ch = line[i];
-    if (inQuotes) {
-      if (ch === '"') {
-        if (line[i + 1] === '"') {
-          current += '"';
-          i += 1;
-        } else {
-          inQuotes = false;
-        }
-      } else {
-        current += ch;
-      }
-    } else if (ch === '"') {
-      inQuotes = true;
-    } else if (ch === ",") {
-      cells.push(current);
-      current = "";
-    } else {
-      current += ch;
-    }
-  }
-  cells.push(current);
-  return cells;
-}
+const sheetRows = await readInvitadosSheet();
 
-/**
- * The CSV is inconsistent: the two price columns (`precio`,
- * `precio_pp_2noches`) are sometimes absent and, when present, contain
- * unquoted thousands separators (e.g. `$5,310`). A naive split(",") therefore
- * shifts every column after them by a variable amount.
- *
- * To stay robust we never rely on the middle columns. The columns we need are
- * either before the prices (fixed positions 0..17) or after them (always the
- * last five cells: viajaEnAvion, lang, username, firebase_email, password).
- * The price columns in between are ignored.
- */
-const FRONT_COLUMNS = [
-  "No", "check", "Nombre", "Email", "Se envió invitación ", "Confirmado",
-  "Hospadeje", "Grupo", "Adulto/Niño", "Hombre/Mujer", "Confirmado el ",
-  "Mesa", "privado?", "pagado?", "Cabaña", "Cuarto", "Invitacion",
-  "_invitacion_group",
-];
-const BACK_COLUMNS = [
-  "viajaEnAvion", "lang", "username", "firebase_email", "password",
-];
-
-function parseCsv(text) {
-  const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
-  const rows = [];
-  for (let i = 1; i < lines.length; i++) {
-    const cells = parseLine(lines[i]);
-    const row = {};
-    FRONT_COLUMNS.forEach((h, idx) => { row[h] = (cells[idx] || "").trim(); });
-    BACK_COLUMNS.forEach((h, idx) => {
-      row[h] = (cells[cells.length - BACK_COLUMNS.length + idx] || "").trim();
-    });
-    rows.push(row);
-  }
-  return rows;
-}
-
-
-
-const csv = readFileSync(CSV_PATH, "utf-8");
-const rows = parseCsv(csv);
+// UID is the canonical guest document identifier. firebase.auth (the live
+// sheet currently uses the compatible firebase_auth spelling) only controls
+// whether that guest has a Firebase Auth account.
+const rows = sheetRows.filter((r) => pick(r, "UID") !== "");
+console.log(`Sheet rows with UID: ${rows.length}`);
 
 const guests = rows.map((r) => {
-  const nombre = r["Nombre"] || "";
-  const apellido = r["Apellido"] || "";
-  const firstName = nombre.trim();
-  const lastName = apellido.trim();
-  const username = (r["username"] || "").trim();
-  const firebaseEmail = (r["firebase_email"] || "").trim() ||
-    (username ? `${username}@${AUTH_DOMAIN}` : "");
-  const lang = (r["lang"] || "es").toLowerCase();
-  const group = (r["Grupo"] || "").trim();
-  const invitacionGroup = (r["Invitacion"] || "").trim();
+  const id = pick(r, "UID");
+  const nombre = pick(r, "Nombre", "identity.firstName");
+  const nombre2 = pick(r, "Nombre 2", "identity.middleName");
+  const apellido = pick(r, "Apellido", "identity.lastName");
+  const apellido2 = pick(r, "Apellido 2", "identity.maternalLastName");
+  const firstName = [nombre, nombre2].filter(Boolean).join(" ");
+  const lastName = [apellido, apellido2].filter(Boolean).join(" ");
+  const previousGuest = previousGuestsById.get(id);
+  const defaultEmail = pick(r, "_default_email");
+  const derivedUsername = defaultEmail && defaultEmail.endsWith(`@${AUTH_DOMAIN}`)
+    ? defaultEmail.slice(0, defaultEmail.indexOf("@"))
+    : "";
+  const firebaseAuth = toBool(pick(r, "firebase.auth", "firebase_auth"));
+  const username = firebaseAuth
+    ? previousGuest?.username || legacyUsernamesById.get(id) || pick(r, "username") || derivedUsername
+    : "";
+  const firebaseEmail = firebaseAuth
+    ? pick(r, "firebase.Identifier", "firebase_email", "_email") || (username ? `${username}@${AUTH_DOMAIN}` : "")
+    : "";
+  const lang = (pick(r, "lang", "identity.lang") || "es").toLowerCase();
+  const group = pick(r, "tag_group", "tagGroup", "invitacion_group", "invitacionGroup");
+  const invitationGroup = pick(r, "invitacion_group", "invitacionGroup");
   const isNovio = group === "Novios";
-  const cabin = cabinInfo(r["Cabaña"], r["privado?"], r["pagado?"]);
-  const room = (r["Cuarto"] || "").trim() || undefined;
+  const cabin = cabinInfo(pick(r, "Cabaña", "hosting.cabin"), pick(r, "privateCabin?", "_privateCabin?"), pick(r, "isCabinPaid", "hosting.isCabinPaid"));
+  const room = pick(r, "Cuarto", "hosting.room") || undefined;
+  const cloudinaryId = pick(r, "cloudinary_id", "cloudinaryId");
+  const idCheckUser = toBool(pick(r, "id_check_user", "idCheckUser"));
+  // Phone comes straight from the sheet's `Celular` column (source of truth).
+  const phone = pick(r, "Celular", "identity.phone");
 
   const g = {
-    id: slugify(`${firstName} ${lastName}`) || slugify(username) || `guest_${r["No"]}`,
+    id,
+    firebaseAuth,
     username,
     firebaseEmail,
     lang,
+    nombre,
+    nombre2,
+    apellido,
+    apellido2,
     firstName,
     lastName,
     group,
-    ...(invitacionGroup ? { invitacionGroup } : {}),
+    ...(invitationGroup ? { invitationGroup } : {}),
     ...cabin,
     ...(room ? { room } : {}),
   };
+  if (phone) g.phone = phone;
+  if (cloudinaryId) g.cloudinaryId = cloudinaryId;
+  if (idCheckUser) g.idCheckUser = true;
   if (isNovio) g.isNovio = true;
   return g;
 });
 
+
 const lines = [];
 lines.push(`/**`);
 lines.push(` * Guest registry — GENERATED by scripts/generate-guests.mjs`);
-lines.push(` * from invitados/lista_invitados.csv (source of truth).`);
-lines.push(` * Do not edit by hand; re-run the generator after changing the CSV.`);
+lines.push(` * from the live Google Sheet Invitados tab (source of truth).`);
+lines.push(` * Do not edit by hand; re-run the generator after changing the sheet.`);
 lines.push(` */`);
 lines.push(``);
-lines.push(`import { collection, getDocs } from "firebase/firestore";`);
-lines.push(`import { db } from "./firebase.js";`);
-lines.push(``);
 lines.push(`/** Domain used to build the Firebase auth email from a username. */`);
+
 lines.push(`export const AUTH_EMAIL_DOMAIN = "${AUTH_DOMAIN}";`);
 lines.push(``);
 lines.push(`/** Shared password for every guest account. */`);
@@ -188,13 +301,18 @@ lines.push(`/** @type {GuestProfile[]} */`);
 lines.push(`const GUESTS = [`);
 for (const g of guests) {
   const parts = [`id: ${JSON.stringify(g.id)}`];
+  if (g.firebaseAuth) parts.push(`firebaseAuth: true`);
   if (g.username) parts.push(`username: ${JSON.stringify(g.username)}`);
   if (g.firebaseEmail) parts.push(`firebaseEmail: ${JSON.stringify(g.firebaseEmail)}`);
   if (g.lang) parts.push(`lang: ${JSON.stringify(g.lang)}`);
+  parts.push(`nombre: ${JSON.stringify(g.nombre)}`);
+  parts.push(`nombre2: ${JSON.stringify(g.nombre2)}`);
+  parts.push(`apellido: ${JSON.stringify(g.apellido)}`);
+  parts.push(`apellido2: ${JSON.stringify(g.apellido2)}`);
   parts.push(`firstName: ${JSON.stringify(g.firstName)}`);
   parts.push(`lastName: ${JSON.stringify(g.lastName)}`);
   parts.push(`group: ${JSON.stringify(g.group)}`);
-  if (g.invitacionGroup) parts.push(`invitacionGroup: ${JSON.stringify(g.invitacionGroup)}`);
+  if (g.invitationGroup) parts.push(`invitationGroup: ${JSON.stringify(g.invitationGroup)}`);
   if (g.hasCabin) {
     parts.push(`hasCabin: true`);
     parts.push(`unit: ${JSON.stringify(g.unit)}`);
@@ -205,9 +323,13 @@ for (const g of guests) {
     parts.push(`hasCabin: false`);
   }
   if (g.room) parts.push(`room: ${JSON.stringify(g.room)}`);
+  if (g.phone) parts.push(`phone: ${JSON.stringify(g.phone)}`);
+  if (g.cloudinaryId) parts.push(`cloudinaryId: ${JSON.stringify(g.cloudinaryId)}`);
+  if (g.idCheckUser) parts.push(`idCheckUser: true`);
   if (g.isNovio) parts.push(`isNovio: true`);
   lines.push(`  { ${parts.join(", ")} },`);
 }
+
 lines.push(`];`);
 lines.push(``);
 lines.push(`/**`);
@@ -235,7 +357,6 @@ lines.push(`}`);
 lines.push(``);
 lines.push(`/**`);
 lines.push(` * Look up a guest by id.`);
-
 lines.push(` * @param {string} id`);
 lines.push(` * @returns {GuestProfile|undefined}`);
 lines.push(` */`);
@@ -258,29 +379,6 @@ lines.push(` * @returns {GuestProfile[]}`);
 lines.push(` */`);
 lines.push(`export function getGuestsByUnit(unit) {`);
 lines.push(`  return GUESTS.filter((g) => g.hasCabin && g.unit === unit);`);
-lines.push(`}`);
-lines.push(``);
-lines.push(`/**`);
-lines.push(` * Load deleted guest ids from Firestore and mark them on the registry.`);
-lines.push(` * @returns {Promise<string[]>}`);
-lines.push(` */`);
-lines.push(`export async function loadDeletedGuestIds() {`);
-lines.push(`  try {`);
-lines.push(`    const snap = await getDocs(collection(db, "guests"));`);
-lines.push(`    const deleted = [];`);
-lines.push(`    snap.forEach((doc) => {`);
-lines.push(`      const data = doc.data();`);
-lines.push(`      if (data && data._deleted) deleted.push(doc.id);`);
-lines.push(`    });`);
-lines.push(`    deleted.forEach((id) => {`);
-lines.push(`      const g = GUESTS.find((x) => x.id === id);`);
-lines.push(`      if (g) g._deleted = true;`);
-lines.push(`    });`);
-lines.push(`    return deleted;`);
-lines.push(`  } catch (error) {`);
-lines.push(`    console.warn("loadDeletedGuestIds failed", error);`);
-lines.push(`    return [];`);
-lines.push(`  }`);
 lines.push(`}`);
 lines.push(``);
 lines.push(`export default GUESTS;`);
