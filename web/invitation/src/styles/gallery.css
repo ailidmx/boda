@@ -14,6 +14,12 @@
   margin-bottom: clamp(3rem, 6vw, 6rem);
 }
 
+/* The gallery sits on a dark background, so the shared section-heading
+   separator uses a light border instead of the default dark one. */
+.gallery-heading.section-heading {
+  border-bottom-color: rgb(255 253 248 / 22%);
+}
+
 .gallery-heading .eyebrow {
   margin-bottom: 1rem;
 }

@@ -111,12 +111,31 @@ Doc ID = código estable de la cabaña (e.g. `"VILLA AZALEA"`, `"CABAÑA 1"`).
 | `isBookedXtra` | `boolean` | Si está reservada como extra |
 | `isPaid` | `boolean` | Si está pagada |
 | `isPaidXtra` | `boolean` | Si está pagada como extra |
+| `showcase` | `map` | Descripciones localizadas del showcase `{ es, fr, en }` |
+| `showcase.{lang}.key` | `string` | Clave del showcase (e.g. `"azalea"`, `"wooden"`) |
+| `showcase.{lang}.title` | `string` | Título de la cabaña |
+| `showcase.{lang}.intro` | `string` | Introducción / descripción breve |
+| `showcase.{lang}.capacity` | `string` | Capacidad (texto localizado) |
+| `showcase.{lang}.roomsLabel` | `string` | Etiqueta de habitaciones |
+| `showcase.{lang}.bedsLabel` | `string` | Etiqueta de camas |
+| `showcase.{lang}.rooms` | `array` | Lista de habitaciones (texto localizado) |
+| `showcase.{lang}.amenities` | `string` | Amenidades / espacios observados |
+| `showcase.{lang}.galleryLabel` | `string` | Etiqueta de la galería |
+| `showcase.{lang}.photoAlts` | `array` | Textos alternativos de las fotos |
+| `showcase.{lang}.videoLabel` | `string` | Etiqueta del video (opcional) |
+| `showcase.{lang}.note` | `string` | Nota / tarifa interna |
+| `cloudinaryIds` | `string` | IDs de Cloudinary separados por coma (e.g. `"cabin-azalea-01,cabin-azalea-02"`) |
 | `_source` | `string` | Fuente de datos (e.g. `"cabanas_inventario.csv"`) |
 | `_migratedAt` | `string` | Fecha de migración (ISO) |
+| `_showcaseMigratedAt` | `string` | Fecha de migración del showcase (ISO) |
 
 **Ocupación:** `occupancy` y `occupancyPct` no se almacenan. Ambos valores se calculan a partir de las asignaciones de habitación de la colección `guests` y de la capacidad de `rooms`.
 
-**Uso:** La colección `cabins` proporciona el nombre público de la cabaña y sus datos de reserva. La colección `rooms` sigue siendo la fuente de verdad para el detalle de las habitaciones.
+**Uso:** La colección `cabins` proporciona el nombre público de la cabaña, sus datos de reserva y el showcase público (descripciones localizadas + fotos de Cloudinary). La colección `rooms` sigue siendo la fuente de verdad para el detalle de las habitaciones.
+
+**Showcase:** El campo `showcase` alimenta la sección "Cabañas" de la invitación. Se carga con `loadCabinsShowcase()` en `web/invitation/src/cabins.js`. Los IDs de Cloudinary se almacenan como string separado por comas en `cloudinaryIds` y se convierten a URLs de entrega con `cloudinaryImage()`.
+
+**Reglas:** Solo la pareja puede escribir; todos pueden leer. El schema se valida con `hasValidCabinFields()` en `firebase/firestore.rules`.
 
 ---
 

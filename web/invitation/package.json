@@ -8,7 +8,8 @@
     "dev:network": "vite --host",
     "manifest": "node scripts/generate-media-manifest.mjs",
 
-    "build": "npm run manifest && vite build",
+    "build": "npm run manifest && vite build && node scripts/postbuild.mjs",
+
     "preview": "vite preview",
     "links": "node scripts/generate-invitation-links.mjs",
     "favicons": "node scripts/generate-favicons.mjs",

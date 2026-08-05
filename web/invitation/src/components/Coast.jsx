@@ -48,9 +48,11 @@ export function Coast() {
   return (
     <section className="coast-section section" id="after">
       <div className="coast-copy reveal">
-        <p className="eyebrow">{coast.eyebrow}</p>
-        <h2>{coast.title}</h2>
-        <p className="lead">{coast.body}</p>
+        <div className="section-heading">
+          <p className="eyebrow">{coast.eyebrow}</p>
+          <h2>{coast.title}</h2>
+          <p className="lead">{coast.body}</p>
+        </div>
         <div className="coast-ideas">
           {coast.plans.map((plan, index) => (
             <article key={index}>

@@ -11,6 +11,18 @@
   text-align: center;
 }
 
+/* The guest cloud keeps its centered header but adopts the shared
+   section-heading separator (dark border on the light cream background). */
+.guest-cloud-heading {
+  align-items: center;
+  text-align: center;
+}
+
+.guest-cloud-heading .eyebrow {
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .guest-cloud-title {
   max-width: none;
   margin: 0 0 0.75rem;

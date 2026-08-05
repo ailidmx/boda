@@ -9,7 +9,7 @@ export function Gallery() {
 
   return (
     <section className="gallery-section section">
-      <div className="gallery-heading reveal">
+      <div className="gallery-heading section-heading reveal">
         <p className="eyebrow">{gallery.eyebrow}</p>
         <h2>{gallery.title}</h2>
         <p className="lead">{gallery.body}</p>

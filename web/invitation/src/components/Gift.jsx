@@ -9,9 +9,11 @@ export function Gift() {
   return (
     <section className="gift-section section">
       <div className="gift-copy reveal">
-        <p className="eyebrow">{gift.eyebrow}</p>
-        <h2>{gift.title}</h2>
-        <p className="lead">{gift.body}</p>
+        <div className="section-heading">
+          <p className="eyebrow">{gift.eyebrow}</p>
+          <h2>{gift.title}</h2>
+          <p className="lead">{gift.body}</p>
+        </div>
         <p className="note">{gift.note}</p>
         {gift.accounts && (
           <div className="gift-accounts">
