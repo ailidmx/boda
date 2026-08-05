@@ -1,35 +1,43 @@
 /* ── Weather section ──────────────────────────────────────────────────── */
 
 .weather-section {
-  overflow: hidden;
+  overflow-x: clip;
+  padding-top: clamp(2rem, 4vw, 3rem);
+  padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
   background:
     linear-gradient(180deg, #d9cfae 0%, #f4eee4 58%, #293b35 58%);
 }
 
 .weather-heading {
-  display: grid;
-  grid-template-columns: 0.8fr 1fr 0.45fr;
-  gap: clamp(2rem, 6vw, 6rem);
-  align-items: center;
-  margin-bottom: clamp(3rem, 6vw, 6rem);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  margin-bottom: clamp(1.5rem, 3vw, 3rem);
+}
+
+.weather-heading .eyebrow {
+  margin-bottom: 1rem;
 }
 
 .weather-heading h2 {
-  margin: 0.8rem 0 0;
+  margin: 0 0 1.5rem;
 }
 
 .weather-heading .lead {
   margin: 0;
+  max-width: 60rem;
 }
 
 .weather-sun {
   display: grid;
-  width: min(11rem, 24vw);
+  width: min(7rem, 16vw);
   border: 1px solid rgb(36 33 25 / 28%);
   border-radius: 50%;
   place-self: center;
   aspect-ratio: 1;
   place-items: center;
+  margin-top: 1.25rem;
 }
 
 .weather-sun span {
@@ -48,10 +56,10 @@
 
 .weather-fact {
   display: grid;
-  min-height: 13rem;
+  min-height: 9rem;
   align-content: start;
   border-right: 1px solid rgb(36 33 25 / 18%);
-  padding: clamp(1.5rem, 3vw, 2.5rem);
+  padding: clamp(1rem, 2vw, 1.75rem);
 }
 
 .weather-fact:last-child {
@@ -79,8 +87,8 @@
 .weather-day {
   display: grid;
   grid-template-columns: 1.35fr 0.65fr;
-  gap: clamp(2rem, 7vw, 7rem);
-  padding-top: clamp(4rem, 7vw, 7rem);
+  gap: clamp(1.5rem, 4vw, 4rem);
+  padding-top: clamp(1.5rem, 3vw, 3rem);
   color: var(--white);
 }
 
@@ -95,7 +103,7 @@
   grid-template-columns: minmax(7rem, 0.4fr) 1fr;
   gap: 1.5rem;
   border-top: 1px solid rgb(255 255 255 / 24%);
-  padding: 1.4rem 0;
+  padding: 0.9rem 0;
 }
 
 .weather-moments time {
@@ -110,7 +118,7 @@
 .weather-advice h3 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.45rem, 2.7vw, 2.2rem);
+  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
   font-weight: 400;
 }
 
@@ -121,23 +129,29 @@
 
 .weather-advice {
   border: 1px solid rgb(255 255 255 / 28%);
-  padding: clamp(1.75rem, 4vw, 3rem);
+  padding: clamp(1.25rem, 2.5vw, 2rem);
 }
 
 .weather-advice ul {
-  margin: 1.5rem 0 0;
+  margin: 1rem 0 0;
   padding-left: 1.2rem;
 }
 
 .weather-advice li {
-  margin-bottom: 1rem;
+  margin-bottom: 0.6rem;
 }
 
 .weather-disclaimer {
   max-width: 52rem;
-  margin: 3rem 0 0 auto;
+  margin: 1.5rem 0 0 auto;
   color: rgb(255 253 248 / 65%);
   font-size: 0.85rem;
   font-style: italic;
   text-align: right;
+}
+
+/* Section nav pinned to the bottom of the weather section */
+.weather-section .section-nav {
+  margin-top: auto;
+  padding-top: 1rem;
 }

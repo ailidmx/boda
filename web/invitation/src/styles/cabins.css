@@ -1,5 +1,43 @@
 /* ── Cabins showcase ──────────────────────────────────────────────────── */
 
+/* ── Responsive: mobile-first ──────────────────────────────────────────
+   The cabin profile is a 2-column grid on desktop (heading | details) that
+   stacks on mobile. The gallery is a horizontal scroll-snap strip that
+   widens its cards on smaller screens. */
+
+/* Tablet: stack the profile, widen gallery cards. */
+@media (max-width: 900px) {
+  .cabin-profile {
+    grid-template-columns: 1fr;
+  }
+
+  .cabin-profile-details {
+    max-width: 42rem;
+  }
+
+  .cabin-gallery {
+    grid-auto-columns: minmax(17rem, 48vw);
+  }
+}
+
+/* Small phones: shrink the cabin title and gallery photos. */
+@media (max-width: 600px) {
+  .cabin-profile-heading h2 {
+    font-size: clamp(4rem, 24vw, 7rem);
+  }
+
+  .cabin-gallery {
+    grid-auto-columns: min(80vw, 22rem);
+  }
+
+  .cabin-gallery-photo,
+  .cabin-gallery-photo:first-child {
+    grid-column: auto;
+    height: min(112vw, 34rem);
+  }
+}
+
+
 .cabins-showcase {
   overflow: hidden;
   background: #c9c0ad;

@@ -7,8 +7,16 @@
 }
 
 .attire-eyebrow {
-  text-align: center;
   margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  color: rgb(255 253 248 / 88%);
+  text-align: center;
+}
+
+/* Desktop: bigger eyebrow text, consistent with other section eyebrows. */
+@media (min-width: 900px) {
+  .attire-eyebrow {
+    font-size: clamp(2.4rem, 4vw, 3.2rem);
+  }
 }
 
 .attire-grid {
@@ -21,10 +29,12 @@
 .oaxaca-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 0.75rem;
-  padding: 1rem;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  max-width: 22rem;
+  margin-inline: auto;
   background: rgb(255 255 255 / 10%);
-  border: 1rem solid rgb(255 255 255 / 10%);
+  border: 0.5rem solid rgb(255 255 255 / 10%);
 }
 
 .oaxaca-tile {
@@ -46,9 +56,60 @@
   margin-bottom: 2rem;
 }
 
+/* Citation-style lead: large quote mark + left border, echoing the venue's
+   facilities-lead and the accommodation citation. */
+.attire-citation {
+  position: relative;
+  max-width: 34rem;
+  margin: 0 0 1.25rem;
+  padding-left: 1.25rem;
+  border-left: 2px solid var(--marigold, #d9b36a);
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.attire-citation::before {
+  content: "“";
+  position: absolute;
+  top: -0.5em;
+  left: -0.1rem;
+  color: var(--marigold, #d9b36a);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.6em;
+  line-height: 1;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.attire-dress-code {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgb(255 255 255 / 35%);
+}
+
+.attire-dress-code__title {
+  margin: 0 0 0.5rem;
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.attire-dress-code__body {
+  margin: 0 0 0.5rem;
+  font-size: 1.5rem;
+  line-height: 1.45;
+}
+
+.attire-dress-code__body:last-child {
+  margin-bottom: 0;
+}
+
 .attire-copy .note {
-  margin-top: 2rem;
-  padding-top: 1.5rem;
+  margin-top: 1.25rem;
+  padding-top: 1rem;
   border-top: 1px solid rgb(255 255 255 / 35%);
   font-size: 0.8rem;
 }
@@ -81,7 +142,53 @@
 }
 
 @media (max-width: 720px) {
+  .attire-eyebrow {
+    margin-bottom: 1rem;
+  }
+
   .attire-grid {
     grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+
+  .attire-copy h2 {
+    margin-bottom: 1rem;
+    font-size: clamp(1.35rem, 5.2vw, 1.65rem);
+  }
+
+  .attire-citation {
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+    font-size: clamp(1.15rem, 4.5vw, 1.4rem);
+    line-height: 1.35;
+  }
+
+  .attire-dress-code {
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+  }
+
+  .attire-dress-code__title {
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+  }
+
+  .attire-dress-code__body {
+    font-size: 1.15rem;
+    line-height: 1.45;
+  }
+
+  .attire-copy .note {
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    font-size: 0.72rem;
+    line-height: 1.45;
+  }
+
+  .oaxaca-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.35rem;
+    padding: 0.4rem;
+    border-width: 0.4rem;
   }
 }

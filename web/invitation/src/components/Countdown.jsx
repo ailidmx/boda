@@ -22,7 +22,7 @@ function getCountdown() {
 
 const UNITS = ["years", "months", "days", "hours", "minutes"];
 
-export function Countdown() {
+export function Countdown({ contained = false }) {
   const { t } = useApp();
   const [time, setTime] = useState(getCountdown);
 
@@ -34,12 +34,16 @@ export function Countdown() {
   const prefix = time.isPast ? t.countdown.arrived : t.countdown.prefix;
 
   return (
-    <div className="countdown-bar" aria-live="polite">
+    <div
+      className={`countdown-bar${contained ? " countdown-bar--contained" : ""}`}
+      aria-live="polite"
+    >
       <span className="countdown-label">
         <InitialsSwap variant="identity-swap--countdown" />
         <span className="countdown-prefix">{prefix}</span>
       </span>
       <div className="countdown-values">
+
 
         {UNITS.map((unit) => (
           <span className="countdown-unit" key={unit}>

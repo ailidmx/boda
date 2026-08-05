@@ -1,0 +1,30 @@
+[
+  {
+    "id": "ayde_juarez",
+    "data": {
+      "invitationGroup": "David y Aydé",
+      "updatedBy": "ayde_juarez",
+      "guestId": "ayde_juarez",
+      "photoUrl": "https://res.cloudinary.com/k2ajcgxv/image/upload/v1785542790/boda/avatars/tnonlwvp7qkwmyn0ixyf.jpg",
+      "firstName": "Aydé",
+      "lastName": "Juárez Guadalupe",
+      "updatedAt": {
+        "_seconds": 1785681391,
+        "_nanoseconds": 583000000
+      }
+    }
+  },
+  {
+    "id": "david_aili",
+    "data": {
+      "invitationGroup": "David y Aydé",
+      "photoUrl": "https://res.cloudinary.com/k2ajcgxv/image/upload/v1785637390/boda/avatars/gkfpcy35wymxpfj3oyii.jpg",
+      "updatedBy": "david_aili",
+      "guestId": "david_aili",
+      "updatedAt": {
+        "_seconds": 1785637391,
+        "_nanoseconds": 317000000
+      }
+    }
+  }
+]

@@ -5,6 +5,37 @@ import { ROCA_AZUL_GALLERY, wixUrl, wixOriginal } from "../rocaAzulGallery.js";
 import { useApp } from "../context/AppContext.jsx";
 import { LightboxCarousel } from "./LightboxCarousel.jsx";
 
+const YOUTUBE_IFRAME_API = "https://www.youtube.com/iframe_api";
+let youtubeApiPromise;
+
+function loadYouTubeIframeApi() {
+  if (window.YT?.Player) return Promise.resolve(window.YT);
+
+  if (!youtubeApiPromise) {
+    youtubeApiPromise = new Promise((resolve, reject) => {
+      const previousReadyHandler = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => {
+        try {
+          previousReadyHandler?.();
+        } finally {
+          resolve(window.YT);
+        }
+      };
+
+      let script = document.querySelector(`script[src="${YOUTUBE_IFRAME_API}"]`);
+      if (!script) {
+        script = document.createElement("script");
+        script.src = YOUTUBE_IFRAME_API;
+        script.async = true;
+        document.head.appendChild(script);
+      }
+      script.addEventListener("error", () => reject(new Error("YouTube API failed to load")), { once: true });
+    });
+  }
+
+  return youtubeApiPromise;
+}
+
 // Large, decorative icons for each facility card (Albercas, Deporte,
 // Jardines, Cabañas). Kept inline so they inherit currentColor and stay
 // crisp at any size.
@@ -34,6 +65,17 @@ const FACILITY_ICONS = [
     <path d="M26 53V38h12v15" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
   </svg>,
 ];
+
+function PrivacyLockIcon() {
+  return (
+    <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+      <rect x="14" y="26" width="36" height="26" rx="3" fill="none" stroke="currentColor" strokeWidth="3" />
+      <path d="M22 26v-6a10 10 0 0 1 20 0v6" fill="none" stroke="currentColor" strokeWidth="3" />
+      <circle cx="32" cy="38" r="3" fill="currentColor" />
+      <path d="M32 41v5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+    </svg>
+  );
+}
 
 // A photo card whose facility content (title + list) appears as an elegant
 // overlay on hover (desktop) or on tap (mobile). The photo and its group are
@@ -72,14 +114,52 @@ function FacilityCard({ group, image, icon, index, onOpen }) {
 // The presentation video card. It shows a square-cropped YouTube thumbnail
 // (no black letterbox bars) and swaps to the real player on click, so the
 // vignette keeps the square form of the surrounding cards.
-function VideoCard({ title }) {
+function VideoCard({ title, onPlaybackChange }) {
   const [playing, setPlaying] = useState(false);
+  const iframeRef = useRef(null);
+  const origin = encodeURIComponent(window.location.origin);
+
+  useEffect(() => {
+    if (!playing || !iframeRef.current) return undefined;
+
+    let disposed = false;
+    let player;
+
+    loadYouTubeIframeApi()
+      .then((YT) => {
+        if (disposed || !iframeRef.current) return;
+        player = new YT.Player(iframeRef.current, {
+          events: {
+            onStateChange: ({ data }) => {
+              if (data === YT.PlayerState.PLAYING) {
+                onPlaybackChange(true);
+              } else if (
+                data === YT.PlayerState.PAUSED
+                || data === YT.PlayerState.ENDED
+                || data === YT.PlayerState.CUED
+              ) {
+                onPlaybackChange(false);
+              }
+            },
+            onError: () => onPlaybackChange(false),
+          },
+        });
+      })
+      .catch(() => onPlaybackChange(false));
+
+    return () => {
+      disposed = true;
+      player?.destroy?.();
+    };
+  }, [playing, onPlaybackChange]);
+
   return (
     <article className="facility-card facility-card--video reveal">
       {playing ? (
         <div className="video-frame">
           <iframe
-            src="https://www.youtube.com/embed/oGOgfQGz9tw?rel=0&autoplay=1"
+            ref={iframeRef}
+            src={`https://www.youtube.com/embed/oGOgfQGz9tw?rel=0&autoplay=1&enablejsapi=1&origin=${origin}`}
             title={title}
             loading="lazy"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -91,7 +171,10 @@ function VideoCard({ title }) {
         <button
           type="button"
           className="video-poster"
-          onClick={() => setPlaying(true)}
+          onClick={() => {
+            onPlaybackChange(true);
+            setPlaying(true);
+          }}
           aria-label={title}
         >
           <img
@@ -179,34 +262,52 @@ function RocaGallery({ images, alts, label, onOpen }) {
 
 
 
-// The six cards (4 facility cards + photo carousel + video) are shown as a
-// slideset of two slides, each holding three cards in a single row. Only one
-// slide is visible at a time, with prev/next + dot navigation below. The
-// slideset autoplays slowly (6s per slide) and offers a play/pause toggle.
-function FacilitySlideset({ slides }) {
+// Desktop groups the six cards into two pages of three. Mobile groups them
+// into three pages of two to reduce the carousel's vertical footprint.
+function FacilitySlideset({ items, playbackPaused = false }) {
   const [active, setActive] = useState(0);
   const [playing, setPlaying] = useState(true);
-  const count = slides.length;
+  const [mobile, setMobile] = useState(() => window.matchMedia("(max-width: 899px)").matches);
+  const pageSize = mobile ? 2 : 3;
+  const pages = [];
+  for (let i = 0; i < items.length; i += pageSize) {
+    pages.push(items.slice(i, i + pageSize));
+  }
+  const count = pages.length;
 
-  // Slow autoplay: advance one slide every 6 seconds while playing.
   useEffect(() => {
-    if (!playing) return undefined;
+    const media = window.matchMedia("(max-width: 899px)");
+    const update = () => setMobile(media.matches);
+    update();
+    media.addEventListener?.("change", update);
+    return () => media.removeEventListener?.("change", update);
+  }, []);
+
+  // Changing breakpoint changes the number of pages. Return to the first page
+  // so no stale desktop index can point beyond the mobile/desktop page set.
+  useEffect(() => {
+    setActive(0);
+  }, [mobile]);
+
+  // Slow autoplay: give guests time to read each pair of facility cards.
+  useEffect(() => {
+    if (!playing || playbackPaused) return undefined;
     const id = setInterval(() => {
       setActive((a) => (a + 1) % count);
-    }, 6000);
+    }, 10000);
     return () => clearInterval(id);
-  }, [playing, count]);
+  }, [playing, playbackPaused, count]);
 
   return (
     <div className="facility-slideset">
       <div className="facility-slideset__track">
-        {slides.map((slide, i) => (
+        {pages.map((page, i) => (
           <div
             key={i}
             className={`facility-slide${i === active ? " is-active" : ""}`}
             aria-hidden={i !== active}
           >
-            {slide}
+            {page}
           </div>
         ))}
       </div>
@@ -220,7 +321,7 @@ function FacilitySlideset({ slides }) {
           ←
         </button>
         <div className="facility-slideset__dots">
-          {slides.map((_, i) => (
+          {pages.map((_, i) => (
             <button
               key={i}
               type="button"
@@ -262,6 +363,69 @@ export function Venue() {
 
   // Full-screen lightbox state. `lightbox` holds { images, startIndex } or null.
   const [lightbox, setLightbox] = useState(null);
+  const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [venueActive, setVenueActive] = useState(false);
+  const [venueVideoPlaying, setVenueVideoPlaying] = useState(false);
+  const sectionRef = useRef(null);
+  const privacyFabRef = useRef(null);
+  const privacyPanelRef = useRef(null);
+  const privacyCloseRef = useRef(null);
+
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || typeof IntersectionObserver === "undefined") return undefined;
+
+    const mobile = window.matchMedia("(max-width: 899px)");
+    let latestEntry = null;
+    const syncVisibility = () => {
+      setVenueActive(Boolean(mobile.matches && latestEntry?.isIntersecting));
+      if (!mobile.matches) setPrivacyOpen(false);
+    };
+    const observer = new IntersectionObserver(([entry]) => {
+      latestEntry = entry;
+      syncVisibility();
+    }, { rootMargin: "-45% 0px -45% 0px", threshold: 0 });
+
+    observer.observe(section);
+    mobile.addEventListener?.("change", syncVisibility);
+    return () => {
+      observer.disconnect();
+      mobile.removeEventListener?.("change", syncVisibility);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!privacyOpen) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    const trigger = privacyFabRef.current;
+    document.body.style.overflow = "hidden";
+    privacyCloseRef.current?.focus();
+
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setPrivacyOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const focusable = [...(privacyPanelRef.current?.querySelectorAll("button:not([disabled])") || [])];
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+      trigger?.focus();
+    };
+  }, [privacyOpen]);
 
   // Build the venue gallery slide set (full-res URLs for the lightbox).
   const venueSlides = ROCA_AZUL_GALLERY.map((id, index) => ({
@@ -277,8 +441,33 @@ export function Venue() {
     alt: image.alt,
   }));
 
+  const facilityItems = [
+    ...facilities.groups.map((group, index) => (
+      <FacilityCard
+        key={`facility-${index}`}
+        group={group}
+        image={facilities.gallery[index]}
+        icon={FACILITY_ICONS[index % FACILITY_ICONS.length]}
+        index={index}
+        onOpen={(i) => setLightbox({ images: facilitySlides, startIndex: i })}
+      />
+    )),
+    <RocaGallery
+      key="roca-gallery"
+      images={ROCA_AZUL_GALLERY}
+      alts={facilities.rocaGalleryAlts}
+      label={facilities.rocaGalleryLabel}
+      onOpen={(i) => setLightbox({ images: venueSlides, startIndex: i })}
+    />,
+    <VideoCard
+      key="venue-video"
+      title={facilities.videoTitle}
+      onPlaybackChange={setVenueVideoPlaying}
+    />,
+  ];
+
   return (
-    <section className="facilities-section section">
+    <section className="facilities-section section" ref={sectionRef}>
       {/* ── Single slide · heading + photo-cards + gallery ───────────── */}
       <div className="venue-slide venue-slide--one">
         <div className="experience-heading reveal">
@@ -302,53 +491,7 @@ export function Venue() {
         </div>
 
 
-        {/* The six cards (4 facility cards + photo carousel + video) are shown
-            as a slideset of two slides, each holding three cards in a single
-            row. Only one slide is visible at a time, with prev/next + dot
-            navigation below. */}
-        <FacilitySlideset
-          slides={[
-            // Slide 1: the first three facility cards (Albercas, Deporte,
-            // Jardines) in one row.
-            facilities.groups.slice(0, 3).map((group, index) => (
-              <FacilityCard
-                key={index}
-                group={group}
-                image={facilities.gallery[index]}
-                icon={FACILITY_ICONS[index % FACILITY_ICONS.length]}
-                index={index}
-                onOpen={(i) => setLightbox({ images: facilitySlides, startIndex: i })}
-              />
-            )),
-            // Slide 2: the last facility card (Cabañas) + the photo carousel
-            // + the video, in one row.
-            <>
-              {facilities.groups.slice(3).map((group, index) => {
-                const i = index + 3;
-                return (
-                  <FacilityCard
-                    key={i}
-                    group={group}
-                    image={facilities.gallery[i]}
-                    icon={FACILITY_ICONS[i % FACILITY_ICONS.length]}
-                    index={i}
-                    onOpen={(idx) => setLightbox({ images: facilitySlides, startIndex: idx })}
-                  />
-                );
-              })}
-              {/* Photo slideset card (cabañas photos), one photo visible at a time */}
-              <RocaGallery
-                images={ROCA_AZUL_GALLERY}
-                alts={facilities.rocaGalleryAlts}
-                label={facilities.rocaGalleryLabel}
-                onOpen={(i) => setLightbox({ images: venueSlides, startIndex: i })}
-              />
-              {/* The presentation video, back in a card within the grid. It
-                  shows a square thumbnail and swaps to the player on click. */}
-              <VideoCard title={facilities.videoTitle} />
-            </>,
-          ]}
-        />
+        <FacilitySlideset items={facilityItems} playbackPaused={venueVideoPlaying} />
 
 
 
@@ -366,24 +509,50 @@ export function Venue() {
           {facilities.gallerySource} ↗
         </a>
 
-        <div className="venue-privacy reveal">
-          <span className="venue-privacy__icon" aria-hidden="true">
-            <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-              <rect x="14" y="26" width="36" height="26" rx="3" fill="none" stroke="currentColor" strokeWidth="3" />
-              <path d="M22 26v-6a10 10 0 0 1 20 0v6" fill="none" stroke="currentColor" strokeWidth="3" />
-              <circle cx="32" cy="38" r="3" fill="currentColor" />
-              <path d="M32 41v5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-            </svg>
-          </span>
-          <div>
-            <h3>{facilities.privacyTitle}</h3>
-            {/* Render each sentence of the privacy note on its own line. */}
-            {facilities.privacyBody.split(". ").map((sentence, i, arr) => (
-              <p key={i}>{i < arr.length - 1 ? `${sentence}.` : sentence}</p>
-            ))}
+        <div
+          className={`venue-privacy-shell${privacyOpen ? " is-mobile-open" : ""}`}
+          role={privacyOpen ? "dialog" : undefined}
+          aria-modal={privacyOpen ? "true" : undefined}
+          aria-label={privacyOpen ? facilities.privacyTitle : undefined}
+          onMouseDown={(event) => {
+            if (privacyOpen && event.target === event.currentTarget) setPrivacyOpen(false);
+          }}
+        >
+          <div className="venue-privacy reveal" ref={privacyPanelRef}>
+            <button
+              ref={privacyCloseRef}
+              className="venue-privacy__close"
+              type="button"
+              aria-label="Close"
+              onClick={() => setPrivacyOpen(false)}
+            >
+              ×
+            </button>
+            <div className="venue-privacy__header">
+              <span className="venue-privacy__icon" aria-hidden="true">
+                <PrivacyLockIcon />
+              </span>
+              <h3>{facilities.privacyTitle}</h3>
+            </div>
+            <div className="venue-privacy__body">
+              {/* Render each sentence of the privacy note on its own line. */}
+              {facilities.privacyBody.split(". ").map((sentence, i, arr) => (
+                <p key={i}>{i < arr.length - 1 ? `${sentence}.` : sentence}</p>
+              ))}
+            </div>
           </div>
-
         </div>
+
+        <button
+          ref={privacyFabRef}
+          className={`venue-privacy-fab${venueActive && !privacyOpen ? " is-visible" : ""}`}
+          type="button"
+          aria-label={facilities.privacyTitle}
+          aria-haspopup="dialog"
+          onClick={() => setPrivacyOpen(true)}
+        >
+          <PrivacyLockIcon />
+        </button>
         <p className="facilities-note">{facilities.note}</p>
 
         <nav className="venue-nav venue-nav--dark" aria-label="Venue navigation">

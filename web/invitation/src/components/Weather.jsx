@@ -51,6 +51,13 @@ export function Weather() {
       </div>
 
       <p className="weather-disclaimer">{weather.disclaimer}</p>
+
+      <nav className="section-nav section-nav--light" aria-label="Continue">
+        <a className="section-nav-link" href="#weekend-program">
+          <span>{weather.navNext}</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </nav>
     </section>
   );
 }

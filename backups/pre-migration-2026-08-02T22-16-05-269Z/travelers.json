@@ -1,0 +1,38 @@
+[
+  {
+    "id": "V-001",
+    "data": {
+      "travelerId": "V-001",
+      "travelGroupId": "G-001",
+      "guestId": 211,
+      "name": "Dimitar",
+      "originCity": "Malaga",
+      "originCountry": "Espana",
+      "tripStart": "2027-02-14",
+      "tripEnd": "2027-02-28",
+      "arrivalAirport": "GDL",
+      "flightStatus": "booked_pending_ticket_details",
+      "stayStatus": "partial",
+      "transferStatus": "planning",
+      "notes": "Primer invitado con vuelo reservado; ruta declarada AGP-MAD-GDL"
+    }
+  },
+  {
+    "id": "V-002",
+    "data": {
+      "travelerId": "V-002",
+      "travelGroupId": "G-002",
+      "guestId": 89,
+      "name": "Mama Tina",
+      "originCity": "",
+      "originCountry": "",
+      "tripStart": "2027-02-10",
+      "tripEnd": "2027-03-15",
+      "arrivalAirport": "",
+      "flightStatus": "tentative_dates",
+      "stayStatus": "no_lodging_details",
+      "transferStatus": "not_started",
+      "notes": "Asistencia confirmada; fechas de viaje no confirmadas"
+    }
+  }
+]

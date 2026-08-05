@@ -7,6 +7,21 @@
   text-align: center;
 }
 
+.site-footer-whatsapp {
+  width: min(100%, 42rem);
+  margin: 0 auto 2rem;
+  text-align: left;
+}
+
+.site-footer-whatsapp .identity-whatsapp-link {
+  color: var(--ink);
+}
+
+.site-footer-whatsapp .identity-whatsapp-text small,
+.site-footer-whatsapp .identity-whatsapp-arrow {
+  color: rgb(36 33 25 / 78%);
+}
+
 .footer-monogram {
   margin-bottom: 1.5rem;
   color: #e4b968;

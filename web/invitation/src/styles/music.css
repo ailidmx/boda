@@ -1,5 +1,52 @@
 /* ── Music / playlist section ─────────────────────────────────────────── */
 
+/* ── Responsive: mobile-first ──────────────────────────────────────────
+   The music lineup is 4 columns on desktop, collapsing to 2 on tablet and 1
+   on mobile. The playlist section (heading | grid) stacks on tablet, and the
+   playlist grid collapses to 1 column on mobile. */
+
+/* Tablet: lineup → 2 cols, playlist + open-stage stack. */
+@media (max-width: 900px) {
+  .music-lineup {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .music-act {
+    border-right: 1px solid rgb(255 255 255 / 22%);
+    border-bottom: 1px solid rgb(255 255 255 / 22%);
+  }
+
+  .playlist-section,
+  .open-stage {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Small phones: lineup → 1 col, playlist grid → 1 col. */
+@media (max-width: 600px) {
+  .music-lineup {
+    grid-template-columns: 1fr;
+  }
+
+  .music-act {
+    min-height: auto;
+  }
+
+  .playlist-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .playlist-card {
+    min-height: auto;
+  }
+
+  .suggestion-form,
+  .coast-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 .music-section {
   background: var(--ink);
   color: var(--white);
@@ -199,4 +246,20 @@
 .coast-form > small {
   color: rgb(36 33 25 / 65%);
   text-align: center;
+}
+
+/* Keep the mobile overrides after the desktop declarations so intrinsic
+   card widths cannot widen the page. */
+@media (max-width: 899px) {
+  .playlist-section,
+  .playlist-grid,
+  .open-stage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .playlist-section > *,
+  .playlist-grid > *,
+  .open-stage > * {
+    min-width: 0;
+  }
 }

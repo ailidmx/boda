@@ -2,6 +2,9 @@
 
 :root {
   --ink: #241921;
+  --ink-700: #4c464f;
+  --ink-600: #625b66;
+  --ink-500: #7a7280;
   --cream: #f4eee4;
   --sand: #d9cfae;
   --terracotta: #a94d31;
@@ -23,7 +26,7 @@
 
 
 
-  --countdown-height: 4.5rem;
+  --countdown-height: 3.2rem;
   --header-height: 5rem;
 }
 
@@ -45,6 +48,7 @@ html {
 
 body {
   margin: 0;
+  overflow-x: clip;
   background: var(--cream);
   color: var(--ink);
   font-family: var(--font-body);
@@ -160,17 +164,17 @@ p {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(1rem, 3vw, 2.5rem);
+  gap: clamp(0.65rem, 3vw, 2rem);
   height: var(--countdown-height);
-  padding-inline: 1.25rem;
+  padding-inline: 1rem;
   background: var(--ink);
   color: var(--white);
 }
 
 .countdown-prefix {
-  font-size: 0.68rem;
+  font-size: clamp(0.4rem, 0.85vw, 0.58rem);
   font-weight: 600;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.34em;
   text-transform: uppercase;
   color: #e4b968;
   white-space: nowrap;
@@ -179,31 +183,38 @@ p {
 .countdown-values {
   display: flex;
   align-items: center;
-  gap: clamp(0.75rem, 2vw, 1.5rem);
-  width: min(100%, 34rem);
+  gap: clamp(0.6rem, 2.5vw, 1.5rem);
+  width: min(100%, 32rem);
 }
 
 .countdown-unit {
-  display: grid;
-  grid-template-columns: auto auto;
-  gap: 0.4rem;
-  align-items: baseline;
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  white-space: nowrap;
 }
 
 .countdown-unit strong {
+  min-width: 1.3em;
   font-family: var(--font-countdown);
-  font-size: clamp(1.6rem, 3vw, 2.2rem);
-  font-weight: 500;
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1;
+  text-align: center;
 }
 
-
 .countdown-unit small {
-  font-size: 0.62rem;
-  letter-spacing: 0.12em;
+  color: rgb(255 253 248 / 72%);
+  font-size: clamp(0.6rem, 1.4vw, 1rem);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  line-height: 1;
   text-transform: uppercase;
-  color: rgb(255 255 255 / 65%);
 }
 
 /* ── Site shell ── */
@@ -245,37 +256,48 @@ p {
 
 
 .section-heading {
-  display: grid;
-  grid-template-columns: 0.55fr 1fr 1fr;
-  gap: clamp(1.5rem, 5vw, 5rem);
-  align-items: start;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
   padding-bottom: clamp(2rem, 4vw, 4rem);
   border-bottom: 1px solid rgb(36 33 25 / 20%);
 }
 
 .section-heading .eyebrow {
-  align-self: start;
+  margin-bottom: 1rem;
 }
 
 .section-heading h2 {
-  margin: 0;
+  margin: 0 0 1.5rem;
   font-size: clamp(2.6rem, 6vw, 6.5rem);
 }
 
 
 .section-heading p:last-child {
   margin: 0;
+  max-width: 60rem;
   color: rgb(36 33 25 / 85%);
 }
 
 
 .eyebrow {
+  position: relative;
   margin: 0 0 1rem;
   color: var(--terracotta);
   font-size: 2rem;
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+}
+
+.eyebrow::before {
+  content: "";
+  display: block;
+  width: 3.5rem;
+  height: 0.22rem;
+  margin-bottom: 1.25rem;
+  background: var(--terracotta);
 }
 
 
@@ -368,8 +390,10 @@ p {
 .form-field input:focus,
 .form-field select:focus,
 .form-field textarea:focus {
-  outline: 2px solid var(--terracotta);
-  outline-offset: 3px;
+  outline: 2px solid rgb(228 185 104 / 70%);
+  outline-offset: 2px;
+  border-bottom-color: var(--marigold);
+  box-shadow: 0 0 0 3px rgb(228 185 104 / 20%);
 }
 
 /* ── Video frame ── */

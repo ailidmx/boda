@@ -1,5 +1,21 @@
 /* ── RSVP section ─────────────────────────────────────────────────────── */
 
+/* ── Responsive: mobile-first ──────────────────────────────────────────
+   The RSVP form grid is 2 columns on desktop, collapsing to 1 column on
+   mobile. The frame padding tightens on small screens. */
+
+@media (max-width: 600px) {
+  .rsvp-frame {
+    padding: clamp(2rem, 6vw, 3rem);
+    outline-offset: -0.4rem;
+  }
+
+  .rsvp-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
 .rsvp-section {
   display: grid;
   place-items: center;

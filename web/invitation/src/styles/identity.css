@@ -455,7 +455,7 @@
   border: 1px solid rgb(36 33 25 / 35%);
   border-radius: 0.5rem;
   background: var(--white);
-  overflow: hidden;
+  overflow: visible;
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
@@ -552,8 +552,10 @@
 }
 
 .phone-input__search input:focus {
-  outline: 2px solid var(--terracotta);
+  outline: 2px solid rgb(228 185 104 / 75%);
   outline-offset: 1px;
+  border-color: var(--marigold);
+  box-shadow: 0 0 0 2px rgb(228 185 104 / 20%);
 }
 
 .phone-input__list {

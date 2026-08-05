@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { EVENT } from "../content.js";
 import { MEDIA } from "../media.js";
 import { useApp } from "../context/AppContext.jsx";
@@ -6,11 +6,7 @@ import { useApp } from "../context/AppContext.jsx";
 export function Weekend() {
   const { t } = useApp();
   const weekend = t.weekend || {};
-
-  // The detailed programme is one slide per day (Friday, Saturday, Sunday).
-  const programs = [weekend.friday, weekend.saturday, weekend.sunday].filter(
-    Boolean,
-  );
+  const nav = t.nav || {};
 
   return (
     <section className="weekend-section section">
@@ -37,18 +33,23 @@ export function Weekend() {
         <ScheduleCarousel items={weekend.items} />
 
         <nav className="weekend-nav weekend-nav--light" aria-label="Weekend navigation">
-          <a className="weekend-nav-link" href="#weekend-program">
-            <span>{weekend.navProgram}</span>
+          <a className="weekend-nav-link" href="#attire">
+            <span>{nav.attire}</span>
             <span aria-hidden="true">↓</span>
           </a>
         </nav>
       </div>
-
-      {/* ── Slides 2–4 · detailed programme, one slide per day ───────── */}
-      <DayProgramSlideset programs={programs} />
     </section>
   );
 
+}
+
+export function WeekendProgram() {
+  const { t } = useApp();
+  const weekend = t.weekend || {};
+  const programs = [weekend.friday, weekend.saturday, weekend.sunday].filter(Boolean);
+
+  return <DayProgramSlideset programs={programs} />;
 }
 
 // The detailed programme is a full-height slide with its own menu entry
@@ -58,23 +59,51 @@ export function Weekend() {
 function DayProgramSlideset({ programs }) {
   const { t } = useApp();
   const weekend = t.weekend || {};
+  const nav = t.nav || {};
   const [active, setActive] = useState(0);
+  const programTrackRef = useRef(null);
   const count = programs.length;
   const current = programs[active] || {};
 
+  useEffect(() => {
+    programTrackRef.current
+      ?.querySelector(".day-program-slide.is-active")
+      ?.scrollTo({ top: 0, behavior: "auto" });
+  }, [active]);
+
   return (
-    <section className="weekend-program section" id="weekend-program">
+    <section className="weekend-program section">
       <div className="weekend-program__header">
         <div className="section-heading reveal">
           <p className="eyebrow">{current.eyebrow}</p>
-          <h2>{current.title}</h2>
+          <div className="weekend-program__title-row">
+            <button
+              type="button"
+              className={`day-program-slideset__arrow${active === 0 ? " is-hidden" : ""}`}
+              onClick={() => setActive((a) => (a - 1 + count) % count)}
+              aria-label="Día anterior"
+              tabIndex={active === 0 ? -1 : 0}
+            >
+              ←
+            </button>
+            <h2>{current.title}</h2>
+            <button
+              type="button"
+              className={`day-program-slideset__arrow${active === count - 1 ? " is-hidden" : ""}`}
+              onClick={() => setActive((a) => (a + 1) % count)}
+              aria-label="Día siguiente"
+              tabIndex={active === count - 1 ? -1 : 0}
+            >
+              →
+            </button>
+          </div>
           {current.warning && <p className="programme-citation">{current.warning}</p>}
         </div>
       </div>
 
 
       <div className="day-program-slideset">
-        <div className="day-program-slideset__track">
+        <div className="day-program-slideset__track" ref={programTrackRef}>
           {programs.map((program, index) => (
             <div
               key={index}
@@ -86,14 +115,6 @@ function DayProgramSlideset({ programs }) {
           ))}
         </div>
         <div className="day-program-slideset__nav">
-          <button
-            type="button"
-            className="day-program-slideset__arrow"
-            onClick={() => setActive((a) => (a - 1 + count) % count)}
-            aria-label="Día anterior"
-          >
-            ←
-          </button>
           <div className="day-program-slideset__dots">
             {programs.map((_, i) => (
               <button
@@ -106,20 +127,13 @@ function DayProgramSlideset({ programs }) {
               />
             ))}
           </div>
-          <button
-            type="button"
-            className="day-program-slideset__arrow"
-            onClick={() => setActive((a) => (a + 1) % count)}
-            aria-label="Día siguiente"
-          >
-            →
-          </button>
         </div>
+
       </div>
 
       <nav className="weekend-nav weekend-nav--light" aria-label="Programme navigation">
-        <a className="weekend-nav-link" href="#attire">
-          <span>{weekend.navProgram}</span>
+        <a className="weekend-nav-link" href="#accommodation">
+          <span>{nav.accommodation}</span>
           <span aria-hidden="true">↓</span>
         </a>
       </nav>
@@ -135,19 +149,47 @@ function DayProgramSlideset({ programs }) {
 function ScheduleCarousel({ items }) {
   const [playing, setPlaying] = useState(true);
   const [active, setActive] = useState(0);
+  const touchStartRef = useRef(null);
   const count = items.length;
+
+  const handleTouchStart = (event) => {
+    const touch = event.touches[0];
+    touchStartRef.current = { x: touch.clientX, y: touch.clientY };
+  };
+
+  const handleTouchEnd = (event) => {
+    const start = touchStartRef.current;
+    const touch = event.changedTouches[0];
+    touchStartRef.current = null;
+    if (!start || !touch) return;
+
+    const deltaX = touch.clientX - start.x;
+    const deltaY = touch.clientY - start.y;
+    if (Math.abs(deltaX) < 40 || Math.abs(deltaX) <= Math.abs(deltaY)) return;
+
+    setActive((current) => (
+      deltaX < 0
+        ? (current + 1) % count
+        : (current - 1 + count) % count
+    ));
+  };
 
   useEffect(() => {
     if (!playing) return undefined;
     const id = setInterval(() => {
       setActive((a) => (a + 1) % count);
-    }, 3500);
+    }, 6000);
     return () => clearInterval(id);
   }, [playing, count]);
 
   return (
     <div className="schedule-carousel" id="weekend-schedule">
-      <div className="schedule-grid">
+      <div
+        className="schedule-grid"
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchCancel={() => { touchStartRef.current = null; }}
+      >
         {items.map((item, index) => (
           <ScheduleItem
             key={index}
@@ -203,4 +245,3 @@ function DayProgram({ program }) {
     </div>
   );
 }
-

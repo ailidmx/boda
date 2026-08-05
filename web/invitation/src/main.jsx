@@ -1,18 +1,22 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
+import "./styles/tokens.css";
 import "./styles/base.css";
+
 import "./styles/countdown.css";
 import "./styles/nav.css";
 import "./styles/hero.css";
-import "./styles/identity.css";
+
 import "./styles/invitation-profile.css";
 import "./styles/story.css";
 import "./styles/funfact.css";
 import "./styles/gallery.css";
+import "./styles/photos.css";
 import "./styles/weekend.css";
 import "./styles/weather.css";
 import "./styles/food.css";
 import "./styles/music.css";
+import "./styles/cardcarousel.css";
 import "./styles/venue.css";
 import "./styles/lightbox.css";
 import "./styles/accommodation.css";
@@ -27,9 +31,18 @@ import "./styles/footer.css";
 import "./styles/thanks.css";
 import "./styles/guestcloud.css";
 import "./styles/authgate.css";
+import "./styles/langmodal.css";
+import "./styles/identity.css";
+import "./styles/identitymodal.css";
+import "./styles/winamp.css";
+
+
+
 
 import "./styles/responsive.css";
+
 import { App } from "./App.jsx";
+import { handleAuthCallback } from "./spotify-player.js";
 
 // Register the service worker for offline support + PWA installability.
 // Only in production: in dev the Vite server handles HMR and we don't want a
@@ -48,4 +61,12 @@ const container = document.querySelector("#app");
 // Vite proxy in dev, and Firebase Hosting rewrites in production). This
 // invitation build only renders the React invitation.
 const root = createRoot(container);
-root.render(<App />);
+
+// If this window is the Spotify OAuth popup returning with a `?code=`, handle
+// the callback (exchange code → post token to opener → close) WITHOUT rendering
+// the full invitation UI. This keeps the popup invisible and instant.
+handleAuthCallback().then((handled) => {
+  if (!handled) {
+    root.render(<App />);
+  }
+});

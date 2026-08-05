@@ -59,10 +59,10 @@
 }
 
 .weekend-banner .section-heading {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 1.25rem;
-  align-items: start;
   padding: clamp(1.5rem, 3vw, 2.5rem);
   border-bottom: 0;
   border-radius: 1.25rem;
@@ -102,7 +102,9 @@
 /* The day date is the prominent header of each card. */
 .schedule-day {
   margin: 0 0 1.5rem;
-  color: var(--terracotta);
+  padding-left: 0.65rem;
+  border-left: 2px solid var(--schedule-accent, var(--terracotta));
+  color: var(--schedule-accent, var(--terracotta));
   font-size: clamp(0.85rem, 1.4vw, 1.05rem);
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -139,13 +141,80 @@
 }
 
 .schedule-item {
+  --schedule-accent: var(--marigold);
+  --schedule-accent-rgb: 198 139 43;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
   min-height: 22rem;
   padding: 3rem clamp(1rem, 3vw, 3rem);
-  border: 1px solid rgb(36 33 25 / 14%);
+  border: 1px solid rgb(var(--schedule-accent-rgb) / 28%);
   border-radius: 1.25rem;
+  background:
+    radial-gradient(100% 130% at 100% 0%, rgb(var(--schedule-accent-rgb) / 16%), transparent 58%),
+    linear-gradient(145deg, rgb(255 253 248 / 98%), rgb(244 238 228 / 72%));
+  box-shadow: 0 1rem 2.5rem rgb(36 33 25 / 9%);
   opacity: 1;
   transform: none;
   pointer-events: auto;
+}
+
+.schedule-item:nth-child(2) {
+  --schedule-accent: var(--terracotta);
+  --schedule-accent-rgb: 169 77 49;
+}
+
+.schedule-item:nth-child(3) {
+  --schedule-accent: var(--sage);
+  --schedule-accent-rgb: 122 139 122;
+}
+
+.schedule-item::before {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--schedule-accent), transparent 85%);
+  content: "";
+}
+
+.schedule-item::after {
+  position: absolute;
+  z-index: 0;
+  top: 0.25rem;
+  right: 1rem;
+  color: rgb(var(--schedule-accent-rgb) / 9%);
+  font-family: var(--font-display);
+  font-size: 5rem;
+  line-height: 1;
+  content: "01";
+  pointer-events: none;
+}
+
+.schedule-item:nth-child(2)::after {
+  content: "02";
+}
+
+.schedule-item:nth-child(3)::after {
+  content: "03";
+}
+
+.schedule-item > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (min-width: 900px) {
+  .schedule-item {
+    transition: box-shadow 250ms ease, transform 250ms ease;
+  }
+
+  .schedule-item:hover {
+    box-shadow: 0 1.35rem 3rem rgb(36 33 25 / 14%);
+    transform: translateY(-0.2rem);
+  }
 }
 
 /* The play/pause + counter controls only make sense in the mobile carousel
@@ -192,20 +261,45 @@
 .weekend-program {
   display: flex;
   flex-direction: column;
+  height: calc(100svh - var(--countdown-height) - var(--header-height));
   min-height: calc(100svh - var(--countdown-height) - var(--header-height));
-  justify-content: center;
+  justify-content: flex-start;
+  overflow: hidden;
   padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 6vw, 6rem);
   background: var(--white);
 }
 
 .weekend-program__header {
+  flex: 0 0 clamp(11rem, 23svh, 15rem);
+  min-height: 0;
   width: 100%;
   margin-bottom: clamp(2rem, 4vw, 4rem);
+  overflow-y: auto;
 }
 
 .weekend-program__header .section-heading {
   border-bottom: 0;
   padding-bottom: 0;
+}
+
+.weekend-program__title-row {
+  display: grid;
+  grid-template-columns: 2.4rem minmax(0, 1fr) 2.4rem;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.weekend-program__title-row h2 {
+  width: 100%;
+  max-width: none;
+  text-align: center;
+}
+
+.weekend-program__title-row .day-program-slideset__arrow {
+  width: 2.4rem;
+  height: 2.4rem;
+  font-size: 1.2rem;
 }
 
 /* The day's warning text is styled as an elegant citation (quote): italic
@@ -240,12 +334,16 @@
 
 /* Only the content part gets the coloured background. */
 .weekend-program .day-program-slideset {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
   width: 100%;
   padding: clamp(2.5rem, 6vw, 6rem) clamp(1.25rem, 4vw, 4rem);
   background:
     radial-gradient(120% 140% at 100% 0%, rgb(228 185 104 / 16%), transparent 55%),
     var(--sand);
-  border-radius: 1.5rem;
+  border-radius: 0;
 }
 
 .weekend-program .weekend-nav {
@@ -260,11 +358,18 @@
    day is visible; inactive days are stacked and hidden with a gentle fade. */
 .day-program-slideset__track {
   position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .day-program-slide {
   position: absolute;
   inset: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding-right: 0.35rem;
   opacity: 0;
   visibility: hidden;
   transform: translateX(1.5rem);
@@ -273,15 +378,17 @@
 }
 
 .day-program-slide.is-active {
-  position: relative;
+  position: absolute;
   opacity: 1;
   visibility: visible;
   transform: translateX(0);
   pointer-events: auto;
 }
 
-/* Prev/next + dot navigation, centered just below the day card. */
+/* Pagination dots remain centered below the day card. The previous/next
+   arrows live beside the changing title above. */
 .day-program-slideset__nav {
+  flex: 0 0 auto;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -308,6 +415,15 @@
   background: rgb(255 255 255 / 85%);
   transform: scale(1.05);
 }
+
+/* Hidden arrow (left on the first slide, right on the last). Uses
+   `visibility: hidden` instead of `display: none` so the arrow keeps its
+   placeholder space and the nav never shifts as you move between days. */
+.day-program-slideset__arrow.is-hidden {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 
 .day-program-slideset__dots {
   display: flex;
@@ -444,4 +560,181 @@
 .weekend-nav--light .weekend-nav-link:hover,
 .weekend-nav--light .weekend-nav-link:focus-visible {
   color: var(--terracotta);
+}
+
+/* On mobile, overlap the three schedule cards so only the active card is
+   visible. These rules live after the desktop card styles so the carousel
+   state wins in the cascade. */
+@media (max-width: 899px) {
+  .section.weekend-section {
+    padding-block: 0;
+  }
+
+  .section.weekend-program {
+    height: calc(100svh - var(--header-height));
+    min-height: calc(100svh - var(--header-height));
+    justify-content: flex-start;
+    overflow: hidden;
+    padding: 1.25rem clamp(1.25rem, 4vw, 4rem);
+  }
+
+  .weekend-program__header {
+    flex: 0 0 clamp(9.75rem, 23svh, 12rem);
+    min-height: 0;
+    margin-bottom: 1rem;
+    overflow-y: auto;
+  }
+
+  .weekend-program .section-heading h2 {
+    margin: 0;
+    font-size: clamp(2.6rem, 6vw, 4.5rem);
+  }
+
+  .weekend-program .section-heading p:last-child {
+    position: relative;
+    top: 1.5rem;
+  }
+
+  .weekend-program .programme-citation {
+    margin-top: 1rem;
+    padding-top: 0.85rem;
+    font-size: clamp(1rem, 4vw, 1.2rem);
+    line-height: 1.4;
+  }
+
+  .weekend-program .programme-citation::before {
+    top: 0;
+    font-size: 2.8em;
+  }
+
+  .weekend-program .day-program-slideset {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    min-height: 0;
+    padding: 1rem clamp(1rem, 4vw, 1.5rem);
+  }
+
+  .weekend-program .day-program-slideset__track {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .weekend-program .day-program-slide {
+    scrollbar-color: rgb(36 33 25 / 28%) transparent;
+    scrollbar-width: thin;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .weekend-program .day-program-slide::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  .weekend-program .day-program-slide::-webkit-scrollbar-thumb {
+    background: rgb(36 33 25 / 28%);
+  }
+
+  .weekend-program .day-program-slideset__nav,
+  .weekend-program .weekend-nav {
+    flex: 0 0 auto;
+  }
+
+  .weekend-program .day-program-slideset__nav {
+    margin-top: 0.75rem;
+  }
+
+  .weekend-program .weekend-nav {
+    margin-top: 0.75rem;
+    padding-top: 0.65rem;
+  }
+
+  .weekend-slide {
+    min-height: calc(100svh - var(--header-height));
+  }
+
+  .weekend-banner {
+    margin: 0 calc(clamp(1.25rem, 6vw, 6rem) * -1) 0.75rem;
+  }
+
+  .weekend-banner-content {
+    padding: clamp(1rem, 6vw, 6rem) clamp(1.25rem, 4vw, 4rem);
+  }
+
+  .weekend-banner .section-heading {
+    gap: 0.65rem;
+    padding: 1rem;
+  }
+
+  .weekend-banner .section-heading p:last-child {
+    font-size: clamp(1rem, 4vw, 1.15rem);
+    line-height: 1.35;
+  }
+
+  .weekend-dates {
+    margin-top: 0.75rem;
+  }
+
+  .schedule-carousel {
+    gap: 1rem;
+    margin-top: 0;
+  }
+
+  .schedule-grid {
+    grid-template-columns: 1fr;
+    gap: 0;
+    overflow: hidden;
+    touch-action: pan-y;
+  }
+
+  .schedule-item {
+    grid-area: 1 / 1;
+    min-height: 13.5rem;
+    padding: 1.25rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateX(0.75rem);
+    pointer-events: none;
+    transition: opacity 350ms ease, transform 350ms ease, visibility 350ms;
+  }
+
+  .schedule-item::after {
+    top: 0.4rem;
+    right: 0.75rem;
+    font-size: 3.75rem;
+  }
+
+  .schedule-item.is-active {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    pointer-events: auto;
+  }
+
+  .schedule-day {
+    margin-bottom: 0.75rem;
+  }
+
+  .schedule-item h3 {
+    margin-bottom: 0.75rem;
+    font-size: clamp(1.5rem, 6vw, 1.85rem);
+  }
+
+  .schedule-item p:last-child {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .schedule-carousel-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.85rem;
+  }
+
+  .weekend-slide .weekend-nav {
+    margin-top: auto;
+    margin-bottom: auto;
+    padding-top: 0.65rem;
+  }
 }

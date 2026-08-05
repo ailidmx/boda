@@ -1,6 +1,7 @@
 import React from "react";
 import { MEDIA } from "../media.js";
 import { useApp } from "../context/AppContext.jsx";
+import { SwipeCardCarousel } from "./SwipeCardCarousel.jsx";
 
 export function Food() {
   const { t } = useApp();
@@ -19,22 +20,28 @@ export function Food() {
         <h3>{food.flavoursTitle}</h3>
       </div>
 
-      <div className="flavours-grid">
+      <SwipeCardCarousel className="flavours-grid" label={food.flavoursTitle}>
         {food.flavours.map((flavour, index) => (
           <article className="flavour-card reveal" key={index}>
-            <img
-              src={MEDIA.food[flavour.key]}
-              alt={flavour.title}
-              loading="lazy"
-              decoding="async"
-            />
+            {MEDIA.food[flavour.key] ? (
+              <img
+                src={MEDIA.food[flavour.key]}
+                alt={flavour.title}
+                loading="lazy"
+                decoding="async"
+              />
+            ) : (
+              <div className="flavour-card__illustration" aria-hidden="true">
+                <span>Pizza</span>
+              </div>
+            )}
             <div>
               <h3>{flavour.title}</h3>
               <p>{flavour.body}</p>
             </div>
           </article>
         ))}
-      </div>
+      </SwipeCardCarousel>
 
       <details className="photo-credits reveal">
         <summary>{food.photoCredits}</summary>

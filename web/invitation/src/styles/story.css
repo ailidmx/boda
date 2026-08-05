@@ -32,6 +32,17 @@
   opacity: 0.9;
 }
 
+@media (max-width: 899px) {
+  .story-mark {
+    color: var(--terracotta);
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 2vw, 2rem);
+    letter-spacing: -0.13em;
+    line-height: 0.8;
+    opacity: 0.9;
+  }
+}
+
 .identity-swap--story .identity-swap-state {
   gap: 0.02em;
 }
@@ -138,4 +149,135 @@
 .story-footer .fun-fact-list {
   margin-top: 0;
   max-width: 100%;
+}
+
+.story-facts-close,
+.story-facts-fab {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  /* The explorer is removed from the mobile section flow so the Story slide
+     stays compact. It becomes a modal only after the avatar FAB is pressed. */
+  .story-footer {
+    display: none;
+  }
+
+  .story-footer.is-mobile-open {
+    position: fixed;
+    z-index: 240;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding:
+      max(1rem, env(safe-area-inset-top))
+      1rem
+      max(1rem, env(safe-area-inset-bottom));
+    border: 0;
+    background: rgb(18 27 24 / 72%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .story-facts-panel {
+    position: relative;
+    width: min(100%, 34rem);
+    max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow-y: auto;
+    border: 1px solid rgb(198 139 43 / 48%);
+    border-radius: 1.25rem;
+    background: var(--cream);
+    box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 38%);
+    overscroll-behavior: contain;
+  }
+
+  .story-facts-panel .fun-fact-list {
+    border: 0;
+    background: transparent;
+  }
+
+  .story-facts-panel .fun-fact-list-heading {
+    justify-content: flex-start;
+    padding-right: 2.75rem;
+  }
+
+  .story-facts-panel .fun-fact-header-avatar {
+    display: inline-flex;
+    width: 3.25rem;
+    height: 3.25rem;
+    flex: 0 0 3.25rem;
+    overflow: hidden;
+    border: 2px solid var(--marigold);
+    border-radius: 50%;
+    box-shadow: 0 0.25rem 0.75rem rgb(36 33 25 / 20%);
+  }
+
+  .story-facts-panel .fun-fact-header-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .story-facts-panel .fun-fact-row {
+    grid-template-columns: 1fr;
+  }
+
+  .story-facts-panel .fun-fact-avatar {
+    display: none;
+  }
+
+  .story-facts-close {
+    position: absolute;
+    z-index: 2;
+    top: 0.65rem;
+    right: 0.75rem;
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    place-items: center;
+    padding: 0;
+    border: 1px solid rgb(36 33 25 / 20%);
+    border-radius: 50%;
+    background: rgb(255 253 248 / 88%);
+    color: var(--ink);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  /* Oscar + Diego use the same circular, marigold-bordered avatar treatment
+     as the explorer itself. The FAB appears only while Story is in view. */
+  .story-facts-fab {
+    position: fixed;
+    z-index: 130;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    display: block;
+    width: 4.25rem;
+    height: 4.25rem;
+    padding: 0;
+    overflow: hidden;
+    border: 3px solid var(--marigold);
+    border-radius: 50%;
+    background: var(--cream);
+    box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(1rem) scale(0.9);
+    transition: opacity 180ms ease, transform 180ms ease;
+  }
+
+  .story-facts-fab.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
+
+  .story-facts-fab img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 }

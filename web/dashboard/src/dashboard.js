@@ -1,21 +1,27 @@
-import { collection, getDocs, doc, setDoc, deleteDoc, onSnapshot } from "firebase/firestore";
+import { collection, getDocs, doc, setDoc, deleteDoc, onSnapshot, limit, query } from "firebase/firestore";
+
 
 import { db } from "./firebase.js";
 import { getActiveGuests, getGuestsByUnit, getGuest, getGuestByEmail } from "./guests.js";
+import { loadRooms } from "./rooms.js";
 import { buildInvitationUrl } from "./invitation-profile.js";
+import { collections } from "../../shared/firestore-paths.js";
+import {
+  buildDashboardGuestEditPayload,
+  buildDashboardGuestInlinePayload,
+} from "../../shared/payload-builders.js";
+
 import { auth } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 
 
-const DASHBOARD_CODE = "vivelafrance";
-
-
 const COLLECTIONS = {
-  rsvps: "rsvp_submissions",
-  suggestions: "experience_suggestions",
-  coast: "coast_interest",
-  petanque: "petanque_participation",
+  rsvps: collections.rsvpSubmissions,
+  suggestions: collections.experienceSuggestions,
+  coast: collections.coastInterest,
+  petanque: collections.petanqueParticipation,
 };
+
 
 const state = {
   rsvps: [],
@@ -189,6 +195,28 @@ function showMessage(message, stateName = "") {
   status.dataset.state = stateName;
 }
 
+function guestIdentity(guest) {
+  return guest?.identity || {};
+}
+
+function guestHosting(guest) {
+  return guest?.hosting || {};
+}
+
+function guestFullName(guest) {
+  const identity = guestIdentity(guest);
+  return [
+    identity.firstName || guest.firstName,
+    identity.middleName || guest.middleName,
+    identity.lastName || guest.lastName,
+    identity.maternalLastName || guest.maternalLastName,
+  ].filter(Boolean).join(" ");
+}
+
+function guestRoom(guest) {
+  return guestHosting(guest).room || guest.room || "";
+}
+
 // ── Access control ─────────────────────────────────────────────────────
 // There is no dedicated admin login. The dashboard reuses the same Firebase
 // Auth session as the invitation and only grants access to guests who belong
@@ -201,12 +229,21 @@ function isNovioGuest(guest) {
   return Boolean(guest && (guest.group === NOVIOS_GROUP || guest.isNovio));
 }
 
+function invitationHref() {
+  // In dev, the dashboard runs on port 5174 while the invitation runs on
+  // port 5173. Link back to the invitation's origin so the user can sign in.
+  return window.location.port === "5174"
+    ? "http://localhost:5173/"
+    : "/";
+}
+
 function renderAccessDenied(app) {
   document.title = "Acceso restringido · David & Aydé";
+  const backHref = invitationHref();
   app.innerHTML = `
     <main class="dashboard-login">
       <section class="dashboard-login-card">
-        <a class="dashboard-back" href="/">← Volver a la invitación</a>
+        <a class="dashboard-back" href="${backHref}">← Volver a la invitación</a>
         <div class="dashboard-login-icon" aria-hidden="true">◆</div>
         <p class="dashboard-eyebrow">Zona privada</p>
         <h1>Panel de los novios</h1>
@@ -214,11 +251,12 @@ function renderAccessDenied(app) {
           Este panel está reservado a David y Aydé. Si crees que deberías tener
           acceso, escríbenos directamente.
         </p>
-        <a class="dashboard-button" href="/">Volver a la invitación</a>
+        <a class="dashboard-button" href="${backHref}">Volver a la invitación</a>
       </section>
     </main>
   `;
 }
+
 
 // ── Guest Manager ──────────────────────────────────────────────────────
 
@@ -253,17 +291,27 @@ function getFilteredGuests() {
     filtered = filtered.filter(
       (g) =>
         g.id.toLowerCase().includes(q) ||
-        g.firstName.toLowerCase().includes(q) ||
-        g.lastName.toLowerCase().includes(q) ||
+        String(guestIdentity(g).firstName || g.firstName || "").toLowerCase().includes(q) ||
+        String(guestIdentity(g).middleName || g.middleName || "").toLowerCase().includes(q) ||
+        String(guestIdentity(g).lastName || g.lastName || "").toLowerCase().includes(q) ||
+        String(guestIdentity(g).maternalLastName || g.maternalLastName || "").toLowerCase().includes(q) ||
         g.group.toLowerCase().includes(q),
     );
   }
+
   return filtered;
 }
 
 function getInviteUrl(guestId) {
-  return buildInvitationUrl(window.location.origin, guestId);
+  // In dev, the dashboard runs on port 5174 while the invitation runs on
+  // port 5173. Build invitation links against the invitation's origin.
+  const origin =
+    window.location.port === "5174"
+      ? "http://localhost:5173"
+      : window.location.origin;
+  return buildInvitationUrl(origin, guestId);
 }
+
 
 function getRsvpForGuest(guestId) {
   return state.rsvps.find((r) => r.invitationCode === guestId);
@@ -293,94 +341,71 @@ function openGuestEditor(guest) {
 
         <div class="dashboard-modal-field">
           <label for="edit-firstName">Nombre</label>
-          <input id="edit-firstName" name="firstName" value="${guest.firstName}" required />
+          <input id="edit-firstName" name="firstName" value="${guest.identity?.firstName || guest.firstName || ""}" required />
+        </div>
+
+        <div class="dashboard-modal-field">
+          <label for="edit-middleName">Nombre 2</label>
+          <input id="edit-middleName" name="middleName" value="${guest.identity?.middleName || guest.middleName || guest.nombre2 || ""}" />
         </div>
 
         <div class="dashboard-modal-field">
           <label for="edit-lastName">Apellido</label>
-          <input id="edit-lastName" name="lastName" value="${guest.lastName || ""}" />
+          <input id="edit-lastName" name="lastName" value="${guest.identity?.lastName || guest.lastName || ""}" />
         </div>
 
         <div class="dashboard-modal-field">
-          <label for="edit-group">Grupo</label>
-          <select id="edit-group" name="group">
-            ${getUniqueGuestGroups()
-              .map(
-                (g) =>
-                  `<option value="${g}" ${guest.group === g ? "selected" : ""}>${g}</option>`,
-              )
-              .join("")}
-            <option value="__create_group__" style="color:#a0352c;font-weight:600;">＋ Crear nuevo grupo…</option>
+          <label for="edit-maternalLastName">Apellido 2</label>
+          <input id="edit-maternalLastName" name="maternalLastName" value="${guest.identity?.maternalLastName || guest.maternalLastName || guest.apellido2 || ""}" />
+        </div>
+
+        <div class="dashboard-modal-field">
+          <label for="edit-gender">Género</label>
+          <input id="edit-gender" name="gender" value="${guest.identity?.gender || guest.gender || ""}" placeholder="Ej: H, M" />
+        </div>
+
+        <div class="dashboard-modal-field">
+          <label for="edit-identityCloudinaryId">Foto de perfil (identity.cloudinaryId)</label>
+          <input id="edit-identityCloudinaryId" name="identityCloudinaryId" value="${guest.identity?.cloudinaryId || guest.cloudinaryId || ""}"
+            placeholder="Ej: v1785544747/IMG_3496_qzt2un.heic" />
+        </div>
+
+
+        <div class="dashboard-modal-field">
+          <label for="edit-invitationGroup">Grupo de invitación</label>
+          <input id="edit-invitationGroup" name="invitationGroup" value="${guest.invitationGroup || ""}"
+            placeholder="Ej: Familia Rako, Sebastian, Mónica, Iyali y Amélie…" />
+          <small style="color:#8a7a5f;display:block;margin-top:0.25rem;">
+            Grupo visible en la invitación. El grupo interno (${guest.group || "—"}) se edita en la hoja de cálculo.
+          </small>
+        </div>
+
+        <div class="dashboard-modal-field">
+          <label for="edit-phone">Teléfono</label>
+          <input id="edit-phone" name="phone" value="${guest.identity?.phone || guest.phone || ""}" placeholder="Ej: +52 1 55 1234 5678" />
+        </div>
+
+        <div class="dashboard-modal-field">
+          <label for="edit-idCheckUser">Verificación de identidad</label>
+          <select id="edit-idCheckUser" name="idCheckUser">
+            <option value="true" ${guest.idCheckUser ? "selected" : ""}>Sí</option>
+            <option value="false" ${!guest.idCheckUser ? "selected" : ""}>No</option>
           </select>
         </div>
 
         <div class="dashboard-modal-field">
-          <label for="edit-hasCabin">¿Tiene cabaña?</label>
-          <select id="edit-hasCabin" name="hasCabin">
-            <option value="true" ${guest.hasCabin ? "selected" : ""}>Sí</option>
-            <option value="false" ${!guest.hasCabin ? "selected" : ""}>No</option>
-          </select>
-        </div>
-
-        <div class="dashboard-modal-field" id="edit-cabin-fields" style="${guest.hasCabin ? "" : "display:none"}">
-          <label for="edit-unit">Cabaña</label>
-          <select id="edit-unit" name="unit">
-            <option value="">—</option>
-            ${getUniqueCabins()
-              .map(
-                (c) =>
-                  `<option value="${c}" ${guest.unit === c ? "selected" : ""}>${c}</option>`,
-              )
-              .join("")}
-          </select>
-        </div>
-
-        <div class="dashboard-modal-field" id="edit-occupancy-field" style="${guest.hasCabin ? "" : "display:none"}">
-          <label for="edit-occupancy">Ocupación</label>
-          <select id="edit-occupancy" name="occupancy">
-            <option value="privada" ${guest.occupancy === "privada" ? "selected" : ""}>Privada</option>
-            <option value="compartida" ${guest.occupancy === "compartida" ? "selected" : ""}>Compartida</option>
-          </select>
-        </div>
-
-        <div class="dashboard-modal-field" id="edit-payment-field" style="${guest.hasCabin ? "" : "display:none"}">
-          <label for="edit-payment">Pago</label>
-          <select id="edit-payment" name="payment">
-            <option value="pagada" ${guest.payment === "pagada" ? "selected" : ""}>Pagada</option>
-            <option value="porpagar" ${guest.payment === "porpagar" ? "selected" : ""}>Por pagar</option>
-          </select>
+          <label for="edit-cloudinaryId">Foto de perfil (Cloudinary ID)</label>
+          <input id="edit-cloudinaryId" name="cloudinaryId" value="${guest.cloudinaryId || ""}"
+            placeholder="Ej: v1785544747/IMG_3496_qzt2un.heic" />
         </div>
 
         <div class="dashboard-modal-field">
-          <label for="edit-cabinLabel">Nombre visible de cabaña</label>
-          <input id="edit-cabinLabel" name="cabinLabel" value="${guest.cabinLabel || ""}" placeholder="Ej: Cabaña 4" />
-        </div>
-
-        <div class="dashboard-modal-field" id="edit-room-field" style="${guest.hasCabin ? "" : "display:none"}">
-          <label for="edit-room">Cuarto / Habitación</label>
-          <input id="edit-room" name="room" value="${guest.room || ""}" placeholder="Ej: VILLA AZALEA-1, SUITE DON CARLOS-2" />
-          <small style="color:#8a7a5f;display:block;margin-top:0.25rem;">Nivel de detalle dentro de la cabaña (cuarto asignado).</small>
-        </div>
-
-        <hr class="dashboard-modal-divider" />
-
-        <div class="dashboard-modal-field">
-          <label for="edit-customGreeting">Saludo personalizado (HTML)</label>
-          <input id="edit-customGreeting" name="customGreeting" value="${guest.customContent?.greeting || ""}" placeholder="Ej: ¡Bienvenidos, familia!" />
-        </div>
-
-        <div class="dashboard-modal-field">
-          <label for="edit-customMessage">Mensaje personalizado (HTML)</label>
-          <textarea id="edit-customMessage" name="customMessage" rows="3" placeholder="Ej: Les tenemos una sorpresa preparada…">${guest.customContent?.message || ""}</textarea>
-        </div>
-
-        <div class="dashboard-modal-field">
-          <label for="edit-customSection">Sección extra (HTML)</label>
-          <textarea id="edit-customSection" name="customSection" rows="4" placeholder="Ej: <div><h3>Nota especial</h3><p>...</p></div>">${guest.customContent?.section || ""}</textarea>
+          <label for="edit-messageAuthor">Autor del mensaje</label>
+          <input id="edit-messageAuthor" name="messageAuthor" value="${guest.messageAuthor || ""}"
+            placeholder="Ej: David y Aydé" />
         </div>
 
         <div class="dashboard-modal-actions">
-
           <button class="dashboard-button" type="submit">Guardar cambios</button>
           <button class="dashboard-button dashboard-button-secondary" type="button" data-modal-close>Cancelar</button>
         </div>
@@ -391,20 +416,6 @@ function openGuestEditor(guest) {
 
   document.body.appendChild(overlay);
 
-  // Toggle cabin fields when hasCabin changes
-  const hasCabinSelect = overlay.querySelector("[name=hasCabin]");
-  const cabinFields = overlay.querySelector("#edit-cabin-fields");
-  const occupancyField = overlay.querySelector("#edit-occupancy-field");
-  const paymentField = overlay.querySelector("#edit-payment-field");
-  const roomField = overlay.querySelector("#edit-room-field");
-  hasCabinSelect.addEventListener("change", () => {
-    const show = hasCabinSelect.value === "true";
-    cabinFields.style.display = show ? "" : "none";
-    occupancyField.style.display = show ? "" : "none";
-    paymentField.style.display = show ? "" : "none";
-    if (roomField) roomField.style.display = show ? "" : "none";
-  });
-
   // Close handlers
   overlay.querySelectorAll("[data-modal-close]").forEach((btn) => {
     btn.addEventListener("click", () => overlay.remove());
@@ -413,23 +424,7 @@ function openGuestEditor(guest) {
     if (e.target === overlay) overlay.remove();
   });
 
-  // Handle group select change for "create new group"
-  const groupSelect = overlay.querySelector("[name=group]");
-  groupSelect.addEventListener("change", async () => {
-    if (groupSelect.value === "__create_group__") {
-      openCreateGroupModal((newGroupName) => {
-        // Add the new option and select it
-        const opt = document.createElement("option");
-        opt.value = newGroupName;
-        opt.textContent = newGroupName;
-        opt.selected = true;
-        groupSelect.insertBefore(opt, groupSelect.querySelector('[value="__create_group__"]'));
-        groupSelect.value = newGroupName;
-      });
-    }
-  });
-
-  // Submit handler
+  // Submit handler — only writes AGREED SCHEMA fields to `guests`
   const form = overlay.querySelector("[data-guest-form]");
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -438,36 +433,48 @@ function openGuestEditor(guest) {
     status.textContent = "Guardando…";
     status.dataset.state = "working";
 
-    const hasCabin = data.get("hasCabin") === "true";
-    const customGreeting = data.get("customGreeting") || "";
-    const customMessage = data.get("customMessage") || "";
-    const customSection = data.get("customSection") || "";
-
-    const updated = {
-      id: data.get("id"),
+    const guestId = data.get("id");
+    const updated = buildDashboardGuestEditPayload({
+      guestId,
       firstName: data.get("firstName"),
+      middleName: data.get("middleName") || "",
       lastName: data.get("lastName") || "",
-      group: data.get("group"),
-      hasCabin,
-      unit: hasCabin ? data.get("unit") || "" : "",
-      occupancy: hasCabin ? data.get("occupancy") || "" : "",
-      payment: hasCabin ? data.get("payment") || "" : "",
-      cabinLabel: hasCabin ? data.get("cabinLabel") || "" : "",
-      room: hasCabin ? data.get("room") || "" : "",
-    };
-
-    // Only include customContent if at least one field is non-empty
-    if (customGreeting || customMessage || customSection) {
-      updated.customContent = {};
-      if (customGreeting) updated.customContent.greeting = customGreeting;
-      if (customMessage) updated.customContent.message = customMessage;
-      if (customSection) updated.customContent.section = customSection;
-    }
+      maternalLastName: data.get("maternalLastName") || "",
+      gender: data.get("gender") || "",
+      invitationGroup: data.get("invitationGroup") || "",
+      phone: data.get("phone") || "",
+      idCheckUser: data.get("idCheckUser") === "true",
+      cloudinaryId: data.get("identityCloudinaryId") || data.get("cloudinaryId") || "",
+      messageAuthor: data.get("messageAuthor") || "",
+      timestamp: new Date(),
+    });
 
     try {
-      await setDoc(doc(db, "guests", updated.id), updated);
+      await setDoc(doc(db, collections.guests, guestId), updated, { merge: true });
 
-      status.textContent = "✅ Guardado. Recarga la página para ver los cambios.";
+
+      // Update in-memory guest
+      const g = getGuest(guestId);
+      if (g) {
+        g.identity = {
+          ...(g.identity || {}),
+          ...(updated.identity || {}),
+        };
+        g.firstName = updated.identity?.firstName || g.firstName;
+        g.middleName = updated.identity?.middleName || g.middleName;
+        g.lastName = updated.identity?.lastName || g.lastName;
+        g.maternalLastName = updated.identity?.maternalLastName || g.maternalLastName;
+        g.gender = updated.identity?.gender || g.gender;
+        g.identity.cloudinaryId = updated.identity?.cloudinaryId || g.identity.cloudinaryId;
+        g.invitationGroup = updated.invitationGroup;
+        g.phone = updated.identity?.phone || g.phone;
+        g.idCheckUser = updated.idCheckUser;
+        g.cloudinaryId = updated.identity?.cloudinaryId || updated.cloudinaryId;
+        g.messageAuthor = updated.messageAuthor;
+      }
+
+
+      status.textContent = "✅ Guardado.";
       status.dataset.state = "success";
       setTimeout(() => overlay.remove(), 1500);
     } catch (err) {
@@ -478,20 +485,56 @@ function openGuestEditor(guest) {
   });
 }
 
+
 // ── Inline save helper ─────────────────────────────────────────────────
 
+// AGREED SCHEMA: Only these fields may be written to the `guests` collection
+// from the client. Everything else (group, hasCabin, unit, occupancy, payment,
+// cabinLabel, room, customContent) is static data from the sheet and must be
+// edited there, not in Firestore.
+const GUEST_WRITABLE_FIELDS = new Set([
+  "firstName", "middleName", "lastName", "maternalLastName", "phone", "idCheckUser", "cloudinaryId",
+  "messageAuthor", "invitationGroup", "_deleted",
+]);
+
+
 async function saveGuestInline(guestId, field, value) {
+  // Reject writes to fields outside the agreed schema
+  if (!GUEST_WRITABLE_FIELDS.has(field)) {
+    console.warn(`[schema] Field "${field}" is not in the agreed guests schema. Skipping write.`);
+    return false;
+  }
   try {
-    await setDoc(doc(db, "guests", guestId), { [field]: value }, { merge: true });
-    // Also update the in-memory guest
     const guest = getGuest(guestId);
-    if (guest) guest[field] = value;
+    const invitationGroup = guest?.invitationGroup || "";
+    const payload = buildDashboardGuestInlinePayload(
+      guestId,
+      field,
+      value,
+      invitationGroup,
+      new Date(),
+    );
+    if (!payload) return false;
+    await setDoc(
+      doc(db, collections.guests, guestId),
+      payload,
+      { merge: true },
+    );
+
+    // Also update the in-memory guest
+    if (guest) {
+      if (["firstName", "middleName", "lastName", "maternalLastName", "phone"].includes(field)) {
+        guest.identity = { ...(guest.identity || {}), [field]: value };
+      }
+      guest[field] = value;
+    }
     return true;
   } catch (err) {
     console.error("Failed to save guest inline", err);
     return false;
   }
 }
+
 
 // ── Delete confirm modal ───────────────────────────────────────────────
 
@@ -506,9 +549,10 @@ function openDeleteConfirm(guest) {
       </div>
       <div class="dashboard-modal-form">
         <p style="line-height:1.6;color:#55452d;">
-          ¿Estás segura de eliminar a <strong>${guest.firstName} ${guest.lastName}</strong>
+          ¿Estás segura de eliminar a <strong>${guestFullName(guest)}</strong>
           (ID: <code>${guest.id}</code>)?
         </p>
+
         <p style="font-size:0.85rem;color:#a0352c;">
           Esta acción marcará al invitado como eliminado en Firestore. Los datos estáticos se restaurarán al recargar.
         </p>
@@ -539,7 +583,8 @@ function openDeleteConfirm(guest) {
     status.textContent = "Eliminando…";
     status.dataset.state = "working";
     try {
-      await setDoc(doc(db, "guests", guest.id), { _deleted: true }, { merge: true });
+      await setDoc(doc(db, collections.guests, guest.id), { _deleted: true }, { merge: true });
+
       status.textContent = "✅ Marcado como eliminado. Recarga para ver los cambios.";
       status.dataset.state = "success";
       setTimeout(() => overlay.remove(), 1500);
@@ -598,7 +643,8 @@ function openCreateGroupModal(callback) {
     status.dataset.state = "working";
 
     try {
-      await setDoc(doc(db, "invitation_groups", name), {
+      await setDoc(doc(db, collections.invitationGroups, name), {
+
         tag: { color: "#55452d", textColor: "#ffffff", label: name },
         customContent: { greeting: "", message: "", section: "", hideSections: [] },
       });
@@ -720,10 +766,11 @@ function renderGroupsPanel() {
         const isTagField = field.startsWith("tag.");
         const docField = isTagField ? field : `customContent.${field}`;
         await setDoc(
-          doc(db, "invitation_groups", groupId),
+          doc(db, collections.invitationGroups, groupId),
           { [docField]: value },
           { merge: true },
         );
+
         if (status) {
           status.textContent = "✅ Guardado";
           setTimeout(() => { if (status) status.textContent = ""; }, 2000);
@@ -746,7 +793,8 @@ function renderGroupsPanel() {
     btn.addEventListener("click", () => {
       const groupId = btn.dataset.deleteGroup;
       if (confirm(`¿Eliminar el grupo "${groupId}"? Esto no afecta a los invitados asignados a este grupo.`)) {
-        deleteDoc(doc(db, "invitation_groups", groupId)).catch((err) => {
+        deleteDoc(doc(db, collections.invitationGroups, groupId)).catch((err) => {
+
           console.error("Failed to delete group", err);
           alert("Error al eliminar el grupo.");
         });
@@ -766,7 +814,7 @@ function renderGuestManager() {
   // Group by the selected dimension (group / cabin / room)
   const groupKeyOf = (g) => {
     if (state.groupBy === "cabin") return g.hasCabin && g.unit ? g.cabinLabel || g.unit : "Sin cabaña";
-    if (state.groupBy === "room") return g.room || "Sin cuarto";
+    if (state.groupBy === "room") return guestRoom(g) || "Sin cuarto";
     return g.group || "Sin grupo";
   };
 
@@ -860,9 +908,10 @@ function renderGuestManager() {
             <tr class="dashboard-guest-row" data-group="${groupName}">
               <td><code>${guest.id}</code></td>
               <td>
-                <input class="dashboard-inline-input" type="text" value="${guest.firstName} ${guest.lastName}"
+                <input class="dashboard-inline-input" type="text" value="${guestFullName(guest)}"
                   data-inline-field="name" data-guest-id="${guest.id}" title="Editar nombre" />
               </td>
+
               <td>
                 <select class="dashboard-inline-select" data-inline-field="group" data-guest-id="${guest.id}">
                   ${getUniqueGuestGroups()
@@ -888,7 +937,7 @@ function renderGuestManager() {
                 </select>
               </td>
               <td>
-                <input class="dashboard-inline-input" type="text" value="${guest.room || ""}"
+                <input class="dashboard-inline-input" type="text" value="${guestRoom(guest)}"
                   data-inline-field="room" data-guest-id="${guest.id}" placeholder="—" title="Editar cuarto" />
               </td>
               <td data-guest-status="${guest.id}"></td>
@@ -957,16 +1006,25 @@ function renderGuestManager() {
   });
 
   // ── Inline edit: name ──
+  // The full name is split into 4 fields: firstName, middleName, lastName,
+  // maternalLastName. We split on spaces, assigning the first token to
+  // firstName, the last token to maternalLastName, and the middle tokens to
+  // middleName/lastName as best we can.
   container.querySelectorAll("[data-inline-field='name']").forEach((input) => {
     input.addEventListener("change", async () => {
       const guestId = input.dataset.guestId;
-      const fullName = input.value.trim();
-      const spaceIdx = fullName.indexOf(" ");
-      const firstName = spaceIdx === -1 ? fullName : fullName.slice(0, spaceIdx);
-      const lastName = spaceIdx === -1 ? "" : fullName.slice(spaceIdx + 1).trim();
+      const parts = input.value.trim().split(/\s+/).filter(Boolean);
+      if (parts.length === 0) return;
+      const firstName = parts[0];
+      const maternalLastName = parts.length > 1 ? parts[parts.length - 1] : "";
+      const middle = parts.slice(1, parts.length - 1);
+      const middleName = middle[0] || "";
+      const lastName = middle[1] || "";
       const ok1 = await saveGuestInline(guestId, "firstName", firstName);
-      const ok2 = await saveGuestInline(guestId, "lastName", lastName);
-      if (ok1 && ok2) {
+      const ok2 = await saveGuestInline(guestId, "middleName", middleName);
+      const ok3 = await saveGuestInline(guestId, "lastName", lastName);
+      const ok4 = await saveGuestInline(guestId, "maternalLastName", maternalLastName);
+      if (ok1 && ok2 && ok3 && ok4) {
         input.style.borderColor = "#4caf50";
         setTimeout(() => (input.style.borderColor = ""), 1000);
       } else {
@@ -975,16 +1033,20 @@ function renderGuestManager() {
     });
   });
 
-  // ── Inline edit: group ──
+
+  // ── Inline edit: group (invitationGroup) ──
+  // NOTE: The internal `group` field is static data from the sheet and cannot
+  // be edited from the dashboard. This select edits `invitationGroup` (the
+  // display group shown on the invitation), which IS in the agreed schema.
   container.querySelectorAll("[data-inline-field='group']").forEach((select) => {
     select.addEventListener("change", async () => {
       const value = select.value;
       // If user selected the "create new group" option
       if (value === "__create_group__") {
         openCreateGroupModal((newGroupName) => {
-          // After group is created, assign this guest to the new group
+          // After group is created, assign this guest to the new invitation group
           const guestId = select.dataset.guestId;
-          saveGuestInline(guestId, "group", newGroupName).then((ok) => {
+          saveGuestInline(guestId, "invitationGroup", newGroupName).then((ok) => {
             if (ok) {
               select.value = newGroupName;
               select.style.borderColor = "#4caf50";
@@ -995,7 +1057,7 @@ function renderGuestManager() {
         return;
       }
       const guestId = select.dataset.guestId;
-      const ok = await saveGuestInline(guestId, "group", select.value);
+      const ok = await saveGuestInline(guestId, "invitationGroup", select.value);
       if (ok) {
         select.style.borderColor = "#4caf50";
         setTimeout(() => (select.style.borderColor = ""), 1000);
@@ -1005,51 +1067,34 @@ function renderGuestManager() {
     });
   });
 
-  // ── Inline edit: unit (cabin) ──
+  // ── Inline edit: unit (cabin) — READ-ONLY ──
+  // Cabin assignment is static data from the sheet. It cannot be edited from
+  // the dashboard to keep the schema clean. Use the Google Sheet instead.
   container.querySelectorAll("[data-inline-field='unit']").forEach((select) => {
-    select.addEventListener("change", async () => {
-      const guestId = select.dataset.guestId;
-      const hasCabin = select.value !== "";
-      const updates = { hasCabin, unit: select.value || "" };
-      if (!hasCabin) {
-        updates.occupancy = "";
-        updates.payment = "";
-        updates.cabinLabel = "";
-      }
-      try {
-        await setDoc(doc(db, "guests", guestId), updates, { merge: true });
-        const guest = getGuest(guestId);
-        if (guest) {
-          guest.hasCabin = hasCabin;
-          guest.unit = select.value || "";
-          if (!hasCabin) {
-            guest.occupancy = "";
-            guest.payment = "";
-            guest.cabinLabel = "";
-          }
-        }
-        select.style.borderColor = "#4caf50";
-        setTimeout(() => (select.style.borderColor = ""), 1000);
-      } catch (err) {
-        console.error("Failed to save cabin", err);
-        select.style.borderColor = "#a0352c";
-      }
+    select.addEventListener("change", () => {
+      // Revert the change — cabin is static data from the sheet
+      const guest = getGuest(select.dataset.guestId);
+      if (guest) select.value = guest.unit || "";
+      select.style.borderColor = "#a0352c";
+      setTimeout(() => (select.style.borderColor = ""), 1500);
+      alert("La asignación de cabaña se edita en la hoja de cálculo, no aquí.");
     });
   });
 
-  // ── Inline edit: room (cuarto) ──
+  // ── Inline edit: room (cuarto) — READ-ONLY ──
+  // Room assignment is static data from the sheet. It cannot be edited from
+  // the dashboard to keep the schema clean. Use the Google Sheet instead.
   container.querySelectorAll("[data-inline-field='room']").forEach((input) => {
-    input.addEventListener("change", async () => {
-      const guestId = input.dataset.guestId;
-      const ok = await saveGuestInline(guestId, "room", input.value.trim());
-      if (ok) {
-        input.style.borderColor = "#4caf50";
-        setTimeout(() => (input.style.borderColor = ""), 1000);
-      } else {
-        input.style.borderColor = "#a0352c";
-      }
+    input.addEventListener("change", () => {
+      // Revert the change — room is static data from the sheet
+      const guest = getGuest(input.dataset.guestId);
+      if (guest) input.value = guest.room || "";
+      input.style.borderColor = "#a0352c";
+      setTimeout(() => (input.style.borderColor = ""), 1500);
+      alert("El cuarto se edita en la hoja de cálculo, no aquí.");
     });
   });
+
 
   // ── Edit guest (modal) ──
   container.querySelectorAll("[data-edit-guest]").forEach((btn) => {
@@ -1119,10 +1164,11 @@ function renderCabinAssignments() {
                   .map(
                     (g) => `
                   <li>
-                    <span>${g.firstName} ${g.lastName}</span>
+                    <span>${[g.firstName, g.middleName, g.lastName, g.maternalLastName].filter(Boolean).join(" ")}</span>
                     <code class="dashboard-cabin-code">${g.id}</code>
                     <button class="dashboard-link-btn" data-copy-guest="${g.id}" title="Copiar enlace">🔗</button>
                   </li>
+
                 `,
                   )
                   .join("")}
@@ -1176,9 +1222,10 @@ function renderTableAssignments() {
               .map(
                 (g) => `
               <li>
-                <span>${g.firstName} ${g.lastName}</span>
+                <span>${[g.firstName, g.middleName, g.lastName, g.maternalLastName].filter(Boolean).join(" ")}</span>
                 <span class="dashboard-table-status">${getRsvpForGuest(g.id)?.attendance === "yes" ? "✅" : getRsvpForGuest(g.id)?.attendance === "no" ? "❌" : "⏳"}</span>
               </li>
+
             `,
               )
               .join("")}
@@ -1368,11 +1415,18 @@ function updateDashboardData() {
   renderTableAssignments();
 }
 
+// Bounded query limit for dashboard collections. Prevents unbounded reads
+// that would grow with the number of submissions. For a wedding (~100-200
+// guests) 1000 is generous; it also protects against runaway growth.
+const DASHBOARD_QUERY_LIMIT = 1000;
+
 async function loadDashboardData() {
   showMessage("Actualizando respuestas…", "working");
   const entries = await Promise.all(
     Object.entries(COLLECTIONS).map(async ([key, collectionName]) => {
-      const snapshot = await getDocs(collection(db, collectionName));
+      const snapshot = await getDocs(
+        query(collection(db, collectionName), limit(DASHBOARD_QUERY_LIMIT)),
+      );
       const records = snapshot.docs.map((item) => ({
         id: item.id,
         ...item.data(),
@@ -1391,6 +1445,7 @@ async function loadDashboardData() {
   updateDashboardData();
   showMessage(`Actualizado a las ${new Date().toLocaleTimeString("es-MX")}`);
 }
+
 
 function showLoadError(error) {
   console.error("Dashboard data load failed", error);
@@ -1459,10 +1514,11 @@ function renderDashboard(app) {
           <h1>Panel de los novios</h1>
         </div>
         <div class="dashboard-header-actions">
-          <a class="dashboard-link" href="/">Ver invitación</a>
+          <a class="dashboard-link" href="${invitationHref()}">Ver invitación</a>
           <button class="dashboard-button dashboard-button-secondary" type="button" data-refresh>Actualizar</button>
           <button class="dashboard-button dashboard-button-secondary" type="button" data-sign-out>Salir</button>
         </div>
+
       </header>
 
       <p class="dashboard-status" data-dashboard-status></p>
@@ -1598,7 +1654,11 @@ function renderDashboard(app) {
 
 
   // ── Real-time listener for invitation_groups ──
-  const groupsUnsub = onSnapshot(collection(db, "invitation_groups"), (snapshot) => {
+  const groupsUnsub = onSnapshot(
+    query(collection(db, collections.invitationGroups), limit(DASHBOARD_QUERY_LIMIT)),
+    (snapshot) => {
+
+
     state.invitationGroups = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
     // Re-render guest manager and groups panel if they exist
     renderGuestManager();
@@ -1610,7 +1670,14 @@ function renderDashboard(app) {
   renderCabinAssignments();
   renderGroupsPanel();
 
+  // ── Load rooms from Firestore (source of truth) ──
+  loadRooms().then(() => {
+    // Re-render cabin assignments now that room data is available
+    renderCabinAssignments();
+  });
+
   // ── Handle browser back/forward ──
+
   window.addEventListener("popstate", (event) => {
     const tab = getTabFromPath();
     state.activeTab = tab;
@@ -1628,8 +1695,9 @@ function renderDashboard(app) {
       console.warn("Sign out error", err);
     }
     // Return to the invitation, which will show its own access gate.
-    window.location.href = "/";
+    window.location.href = invitationHref();
   });
+
 
   document.querySelectorAll("[data-export]").forEach((button) => {
     button.addEventListener("click", () => downloadCsv(button.dataset.export));
@@ -1649,7 +1717,13 @@ export function startDashboard(app) {
   onAuthStateChanged(auth, (user) => {
     if (!user) {
       // No active session: send them to the invitation to sign in first.
-      window.location.href = "/";
+      // In dev, the dashboard runs on port 5174 while the invitation runs on
+      // port 5173. Redirect to the invitation's origin so the user can sign in.
+      const invitationOrigin =
+        window.location.port === "5174"
+          ? "http://localhost:5173"
+          : window.location.origin;
+      window.location.href = `${invitationOrigin}/`;
       return;
     }
     const guest = getGuestByEmail(user.email);
@@ -1660,4 +1734,5 @@ export function startDashboard(app) {
     }
   });
 }
+
 

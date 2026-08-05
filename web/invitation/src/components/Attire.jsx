@@ -5,6 +5,7 @@ import { useApp } from "../context/AppContext.jsx";
 export function Attire() {
   const { t } = useApp();
   const attire = t.attire || {};
+  const weekend = t.weekend || {};
 
   return (
     <section className="attire-section section">
@@ -25,37 +26,27 @@ export function Attire() {
         </div>
         <div className="attire-copy reveal">
           <h2>{attire.title}</h2>
-          <p className="lead">{attire.body}</p>
+          <p className="attire-citation">{attire.body}</p>
           {attire.dressCode && (
-            <div
-              style={{
-                marginTop: "2rem",
-                paddingTop: "1.5rem",
-                borderTop: "1px solid rgba(255,255,255,0.35)",
-              }}
-            >
-              <p
-                style={{
-                  fontWeight: 600,
-                  fontSize: "0.9rem",
-                  letterSpacing: "0.08em",
-                  textTransform: "uppercase",
-                  margin: "0 0 0.75rem",
-                }}
-              >
+            <div className="attire-dress-code">
+              <p className="attire-dress-code__title">
                 {attire.dressCode.title}
               </p>
-              <p style={{ fontSize: "0.95rem", lineHeight: 1.6, margin: 0 }}>
-                {attire.dressCode.body}
-              </p>
+              {(attire.dressCode.paragraphs || [attire.dressCode.body]).map(
+                (paragraph, i) => (
+                  <p className="attire-dress-code__body" key={i}>
+                    {paragraph}
+                  </p>
+                )
+              )}
             </div>
           )}
           <p className="note">{attire.guestNote}</p>
         </div>
       </div>
       <nav className="attire-nav" aria-label="Attire navigation">
-        <a className="attire-nav-link" href="#accommodation">
-          <span>{attire.navNext}</span>
+        <a className="attire-nav-link" href="#weekend-program">
+          <span>{weekend.navProgram}</span>
           <span aria-hidden="true">↓</span>
         </a>
       </nav>

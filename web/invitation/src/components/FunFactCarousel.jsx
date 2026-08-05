@@ -22,24 +22,18 @@ function normalizeFact(fact) {
 }
 
 
-export function FunFactCarousel({ facts, id, label = "" }) {
+export function FunFactCarousel({ facts, id, label = "", headerAvatar = null }) {
   const [pageIndex, setPageIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const timerRef = useRef(null);
 
-  if (!facts || !facts.length) return null;
-
-  const normalized = facts.map(normalizeFact);
+  // Compute pageCount before any hooks so the effect below can reference it.
+  const normalized = (facts || []).map(normalizeFact);
   const pages = [];
   for (let i = 0; i < normalized.length; i += FUN_FACT_PAGE_SIZE) {
     pages.push(normalized.slice(i, i + FUN_FACT_PAGE_SIZE));
   }
   const pageCount = pages.length;
-  const activePage = pages[pageIndex % pages.length];
-
-  const goTo = (index) => {
-    setPageIndex((index + pageCount) % pageCount);
-  };
 
   // Autoplay: advance every AUTOPLAY_INTERVAL ms unless paused. The timer is
   // reset whenever the user navigates manually (pageIndex changes) so it never
@@ -51,6 +45,16 @@ export function FunFactCarousel({ facts, id, label = "" }) {
     }, AUTOPLAY_INTERVAL);
     return () => window.clearTimeout(timerRef.current);
   }, [pageIndex, paused, pageCount]);
+
+  if (!facts || !facts.length) return null;
+
+  const activePage = pages[pageIndex % pages.length];
+
+
+  const goTo = (index) => {
+    setPageIndex((index + pageCount) % pageCount);
+  };
+
 
   return (
     <div
@@ -64,56 +68,14 @@ export function FunFactCarousel({ facts, id, label = "" }) {
     >
       {label && (
         <div className="fun-fact-list-heading">
+          {headerAvatar && (
+            <span className="fun-fact-header-avatar" aria-hidden="true">
+              <img src={headerAvatar} alt="" />
+            </span>
+          )}
           <span className="fun-fact-label" aria-hidden="true">
             {label}
           </span>
-          {pageCount > 1 && (
-            <div className="fun-fact-controls">
-              <button
-                className="fun-fact-arrow fun-fact-arrow--prev"
-                type="button"
-                data-fun-fact-prev={id}
-                aria-label="Previous"
-                onClick={() => goTo(pageIndex - 1)}
-              >
-                ‹
-              </button>
-              <div className="fun-fact-dots" data-fun-fact-dots={id}>
-                {pages.map((_, index) => (
-                  <button
-                    key={index}
-                    className="fun-fact-dot"
-                    type="button"
-                    data-fun-fact-dot={id}
-                    data-index={index}
-                    aria-label={`Page ${index + 1}`}
-                    aria-current={index === pageIndex}
-                    onClick={() => goTo(index)}
-                  />
-                ))}
-              </div>
-              <button
-                className="fun-fact-arrow fun-fact-arrow--next"
-                type="button"
-                data-fun-fact-next={id}
-                aria-label="Next"
-                onClick={() => goTo(pageIndex + 1)}
-              >
-                ›
-              </button>
-              <button
-                className="fun-fact-pause"
-                type="button"
-                data-fun-fact-pause={id}
-                aria-pressed={paused}
-                aria-label={paused ? "Play" : "Pause"}
-                onClick={() => setPaused((prev) => !prev)}
-              >
-                {paused ? "▶" : "❚❚"}
-              </button>
-            </div>
-          )}
-
         </div>
       )}
       {label && <hr className="fun-fact-divider" aria-hidden="true" />}
@@ -152,7 +114,54 @@ export function FunFactCarousel({ facts, id, label = "" }) {
           </ol>
         </div>
       </div>
+      {pageCount > 1 && (
+        <footer className="fun-fact-footer" aria-label="Carousel navigation">
+          <div className="fun-fact-controls">
+            <button
+              className="fun-fact-arrow fun-fact-arrow--prev"
+              type="button"
+              data-fun-fact-prev={id}
+              aria-label="Previous"
+              onClick={() => goTo(pageIndex - 1)}
+            >
+              ‹
+            </button>
+            <div className="fun-fact-dots" data-fun-fact-dots={id}>
+              {pages.map((_, index) => (
+                <button
+                  key={index}
+                  className="fun-fact-dot"
+                  type="button"
+                  data-fun-fact-dot={id}
+                  data-index={index}
+                  aria-label={`Page ${index + 1}`}
+                  aria-current={index === pageIndex}
+                  onClick={() => goTo(index)}
+                />
+              ))}
+            </div>
+            <button
+              className="fun-fact-arrow fun-fact-arrow--next"
+              type="button"
+              data-fun-fact-next={id}
+              aria-label="Next"
+              onClick={() => goTo(pageIndex + 1)}
+            >
+              ›
+            </button>
+            <button
+              className="fun-fact-pause"
+              type="button"
+              data-fun-fact-pause={id}
+              aria-pressed={paused}
+              aria-label={paused ? "Play" : "Pause"}
+              onClick={() => setPaused((prev) => !prev)}
+            >
+              {paused ? "▶" : "❚❚"}
+            </button>
+          </div>
+        </footer>
+      )}
     </div>
   );
 }
-

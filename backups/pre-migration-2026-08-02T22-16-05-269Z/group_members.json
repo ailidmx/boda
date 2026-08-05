@@ -1,0 +1,35 @@
+[
+  {
+    "id": "EH5zZvthuTlw2jLPTR0p",
+    "data": {
+      "groupId": "G-002",
+      "guestId": 89,
+      "travelerId": "V-002",
+      "name": "Mama Tina",
+      "role": "principal",
+      "travelStatus": "tentative"
+    }
+  },
+  {
+    "id": "yumaQcUQYuv1oHIqrWDQ",
+    "data": {
+      "groupId": "G-001",
+      "guestId": 211,
+      "travelerId": "V-001",
+      "name": "Dimitar",
+      "role": "principal",
+      "travelStatus": "booked"
+    }
+  },
+  {
+    "id": "zMhg7gdkhc9a1orqj0PI",
+    "data": {
+      "groupId": "G-001",
+      "guestId": 212,
+      "travelerId": null,
+      "name": "Dimitar +1",
+      "role": "acompanante",
+      "travelStatus": "unknown"
+    }
+  }
+]

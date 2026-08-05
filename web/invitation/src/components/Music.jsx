@@ -1,6 +1,7 @@
 import React from "react";
 import { EVENT } from "../content.js";
 import { useApp } from "../context/AppContext.jsx";
+import { SwipeCardCarousel } from "./SwipeCardCarousel.jsx";
 
 export function Music() {
   const { t } = useApp();
@@ -19,7 +20,7 @@ export function Music() {
         <p className="lead">{music.body}</p>
       </div>
 
-      <div className="music-lineup">
+      <SwipeCardCarousel className="music-lineup" label={music.title}>
         {music.acts.map((act, index) => (
           <article className="music-act reveal" key={index}>
             <span>0{index + 1}</span>
@@ -28,7 +29,7 @@ export function Music() {
             <small>{act.note}</small>
           </article>
         ))}
-      </div>
+      </SwipeCardCarousel>
 
       <div className="playlist-section reveal">
         <div className="playlist-heading">
@@ -36,7 +37,7 @@ export function Music() {
           <h3>{music.playlists.title}</h3>
           <p>{music.playlists.body}</p>
         </div>
-        <div className="playlist-grid">
+        <SwipeCardCarousel className="playlist-grid" label={music.playlists.title}>
           {playlists.map(([playlist, url], index) => (
             <article className="playlist-card" key={playlist}>
               <span className="playlist-number">0{index + 1}</span>
@@ -57,7 +58,7 @@ export function Music() {
               </a>
             </article>
           ))}
-        </div>
+        </SwipeCardCarousel>
       </div>
     </section>
   );
