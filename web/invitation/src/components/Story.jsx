@@ -5,6 +5,7 @@ import { useApp } from "../context/AppContext.jsx";
 import { InitialsSwap } from "./ui.jsx";
 import { FunFactCarousel } from "./FunFactCarousel.jsx";
 import { LightboxCarousel } from "./LightboxCarousel.jsx";
+import { MAP_IMAGES } from "../mapImages.js";
 
 
 
@@ -104,17 +105,34 @@ export function Story() {
     };
   }, [factsOpen]);
 
-  // Build the slide set for the shared lightbox carousel.
-  const chapalaSlides = CHAPALA_HIGHLIGHTS.map((photo, index) => ({
-    src: photo.src,
-    full: photo.full,
-    alt: story.photoAlts[index],
-  }));
+  // Build the slide set for the shared lightbox carousel. The venue map is
+  // prepended so clicking the map opens the viewer on it (index 0), while the
+  // Chapala photos follow (index 1+).
+  const mapSlide = {
+    src: MAP_IMAGES.venue[0].src,
+    full: MAP_IMAGES.venue[0].full,
+    alt: story.mapLabel,
+  };
+  const chapalaSlides = [
+    mapSlide,
+    ...CHAPALA_HIGHLIGHTS.map((photo, index) => ({
+      src: photo.src,
+      full: photo.full,
+      alt: story.photoAlts[index],
+    })),
+  ];
 
   return (
     <section className="story-section section" ref={sectionRef}>
       <div className="story-mark">
         <InitialsSwap variant="identity-swap--story" delay="-3.4s" />
+        <button
+          type="button"
+          className="story-map"
+          aria-label={`${story.mapLabel} — ver en grande`}
+          onClick={() => setLightbox({ startIndex: 0 })}
+          style={{ backgroundImage: `url(${MAP_IMAGES.venue[0].src})` }}
+        />
       </div>
       <div className="story-copy reveal">
         <p className="eyebrow">{story.eyebrow}</p>
@@ -128,7 +146,7 @@ export function Story() {
               key={index}
               type="button"
               className="chapala-photo"
-              onClick={() => setLightbox({ startIndex: index })}
+              onClick={() => setLightbox({ startIndex: index + 1 })}
               aria-label={`${story.photoAlts[index]} — ver en grande`}
             >
               <img
@@ -178,6 +196,19 @@ export function Story() {
         onClick={() => setFactsOpen(true)}
       >
         <img src={KIDS_AVATAR} alt="" />
+      </button>
+
+      {/* Mobile-only map FAB: opens the venue map in the lightbox. Styled like
+          an old-time map (parchment + compass) to match the map artwork. */}
+      <button
+        className={`story-map-fab${storyActive ? " is-visible" : ""}`}
+        type="button"
+        aria-label={`${story.mapLabel} — ver en grande`}
+        onClick={() => setLightbox({ startIndex: 0 })}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z" />
+        </svg>
       </button>
 
       <nav className="section-nav" aria-label="Continue">

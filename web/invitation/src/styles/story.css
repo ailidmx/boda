@@ -24,12 +24,39 @@
 
 
 .story-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
   color: var(--terracotta);
   font-family: var(--font-display);
   font-size: clamp(8rem, 23vw, 22rem);
   letter-spacing: -0.13em;
   line-height: 0.8;
   opacity: 0.9;
+}
+
+/* The map to the venue sits in the left column, below the animated initials.
+   It is a clickable button that opens the full-screen viewer. It fills as
+   much of the left column as possible so it reads almost like a background
+   image, while staying compact enough for the whole Story slide to fit. */
+.story-map {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  padding: 0;
+  border: 0;
+  border-radius: 0.75rem;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  box-shadow: 0 0.75rem 2rem rgb(36 33 25 / 14%);
+  cursor: zoom-in;
+  transition: transform 400ms ease, box-shadow 400ms ease;
+}
+
+.story-map:hover {
+  transform: scale(1.02);
+  box-shadow: 0 1rem 2.5rem rgb(36 33 25 / 22%);
 }
 
 @media (max-width: 899px) {
@@ -40,6 +67,12 @@
     letter-spacing: -0.13em;
     line-height: 0.8;
     opacity: 0.9;
+  }
+
+  /* On mobile the map is hidden below the initials; it is instead opened via
+     the old-map FAB on the left edge of the screen. */
+  .story-map {
+    display: none;
   }
 }
 
@@ -119,7 +152,6 @@
   cursor: pointer;
   scroll-snap-align: start;
 }
-
 
 .chapala-photo img {
   width: 100%;
@@ -279,5 +311,45 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+  }
+
+  /* Mobile-only map FAB on the left edge. Styled like an old-time map:
+     parchment wash, a compass-rose icon and a double sepia ring, so it reads
+     as a little "map" button that opens the venue map in the lightbox. */
+  .story-map-fab {
+    position: fixed;
+    z-index: 130;
+    left: max(1rem, env(safe-area-inset-left));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    display: grid;
+    width: 4.25rem;
+    height: 4.25rem;
+    place-items: center;
+    padding: 0;
+    border: 2px solid rgb(120 84 40 / 55%);
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 25%, rgb(255 244 214 / 95%), rgb(214 178 116 / 92%) 70%);
+    box-shadow:
+      inset 0 0 0 3px rgb(255 250 235 / 55%),
+      inset 0 0 0 4px rgb(120 84 40 / 35%),
+      0 0.65rem 1.5rem rgb(36 33 25 / 32%);
+    color: rgb(90 60 25 / 90%);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(1rem) scale(0.9);
+    transition: opacity 180ms ease, transform 180ms ease;
+  }
+
+  .story-map-fab.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
+
+  .story-map-fab svg {
+    width: 2.3rem;
+    height: 2.3rem;
+    fill: currentColor;
   }
 }

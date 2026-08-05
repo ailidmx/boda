@@ -178,6 +178,7 @@
   }
 
   body.mobile-nav-only .countdown-bar {
+
     transform: translateY(-100%);
     opacity: 0;
     pointer-events: none;
@@ -843,3 +844,32 @@
 .user-menu-modal__btn--primary:hover {
   background: #d99a3a;
 }
+
+/* ── Mobile: fixed header (Android sticky workaround) ──────────────────
+   Android (older Chrome / WebView) has a long-standing bug where
+   `position: sticky` silently fails when an ancestor has `overflow-x`
+   (the `body { overflow-x: clip }` fallback to `hidden`). `position: fixed`
+   is immune to that bug, so on mobile we pin the header with `fixed` instead.
+
+   This rule is placed AFTER the base `.site-header` rule so it wins the
+   cascade. The vertical offset is driven by the existing `body.mobile-nav-only`
+   class (defined above): at the very top the header sits below the countdown
+   (`top: var(--countdown-height)`), and once the user scrolls the countdown
+   hides and the header snaps to `top: 0`.
+
+   Because the header is now out of flow, we push the page content down by the
+   header height so it is never hidden underneath. The countdown stays in flow
+   above it, so only the header height needs compensating. */
+@media (max-width: 899px) {
+  .site-header {
+    position: fixed;
+    top: var(--countdown-height);
+    right: 0;
+    left: 0;
+  }
+
+  main {
+    padding-top: var(--header-height);
+  }
+}
+

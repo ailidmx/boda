@@ -269,7 +269,7 @@
    a single row. Only one slide is visible at a time, with prev/next + dot
    navigation below. */
 .facility-slideset {
-  margin-top: clamp(0.75rem, 1.5vw, 1.25rem);
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
 }
 
 .facility-slideset__track {
@@ -991,6 +991,7 @@
   .facilities-section .experience-heading-row--main {
     gap: 1rem;
     margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
   }
 
   .facilities-section .experience-heading-row--main h2 {

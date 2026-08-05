@@ -218,6 +218,7 @@ export const content = {
         "Roca Azul está a orillas del lago, con vistas al atardecer.",
       ],
       anecdotesLabel: "El lago de Chapala en 12 anécdotas",
+      mapLabel: "Cómo llegar a Roca Azul",
       navNext: "Descubrir el lugar",
 
     },
@@ -283,6 +284,8 @@ export const content = {
       saturday: {
         eyebrow: "Sábado 20 · programa",
         title: "La tarde, paso a paso",
+        citation:
+          "Del primer brindis al último baile: una tarde que camina hacia el faro y termina en fiesta.",
         warning:
           "Quienes vengan desde Guadalajara: salgan con bastante anticipación. Los accesos hacia Jocotepec pueden congestionarse fácilmente y necesitamos que todos estén en Roca Azul a las 13:00.",
 
@@ -300,6 +303,8 @@ export const content = {
       friday: {
         eyebrow: "Viernes 19 · programa",
         title: "Llegada y bienvenida",
+        citation:
+          "Del primer encuentro a la primera pizza: el fin de semana empieza sin prisas.",
         warning:
           "Un primer encuentro relajado para instalarnos, convivir y empezar el fin de semana sin prisas.",
         items: [
@@ -311,12 +316,15 @@ export const content = {
       sunday: {
         eyebrow: "Domingo 21 · programa",
         title: "Desayuno y despedida",
+        citation:
+          "Una última mañana juntos, entre desayunos y abrazos de despedida.",
         warning: "Una última mañana juntos antes de los regresos.",
         items: [
           { time: "Mañana", title: "Desayuno", body: "Desayuno incluido para quienes se hospedan en las cabañas." },
           { time: "Mediodía", title: "Despedida", body: "Últimos momentos juntos y regresos." },
         ],
       },
+
     },
     weather: {
       eyebrow: "El clima esperado",
@@ -340,8 +348,6 @@ export const content = {
         "Protector solar y lentes de sol para las primeras horas.",
         "Calzado cómodo para jardines y espacios exteriores.",
       ],
-      disclaimer:
-        "Esto es una referencia climática, no un pronóstico. Publicaremos aquí la previsión real aproximadamente diez días antes de la boda.",
       navNext: "Ver el programa",
     },
     food: {
@@ -885,6 +891,21 @@ export const content = {
           "David llevará una guayabera de lino blanco con bordados dorados, y ambos vestiremos piezas bordadas por artesanas de una comunidad de Oaxaca, como un homenaje a la riqueza de nuestras tradiciones.",
           "La única regla es que se sientan ustedes mismos: elegantes, cómodos y listos para celebrar, bailar y llenar este día de color, amor y buena energía.",
         ],
+        pictograms: {
+          ariaLabel: "Pictogramas del código de vestimenta",
+          noWhite: "Sin blanco",
+          noBlack: "Sin negro",
+          noGrey: "Sin gris",
+          colorGreen: "Viste de verde",
+          colorTeal: "Viste de turquesa",
+          colorMarigold: "Viste de amarillo",
+          dressNoWhite: "Sin vestido blanco",
+          dressNoBlack: "Sin vestido negro",
+          dressNoGrey: "Sin vestido gris",
+          dressColor: "Vestido de color",
+          funky: "Funky",
+          mexican: "Patrones mexicanos",
+        },
       },
       guestNote:
         "¡Gracias por ser parte de nuestra historia! ✨🌼",
@@ -1311,6 +1332,7 @@ export const content = {
         "Roca Azul se trouve au bord du lac, face au coucher de soleil.",
       ],
       anecdotesLabel: "Le lac de Chapala en 12 anecdotes",
+      mapLabel: "Comment rejoindre Roca Azul",
       navNext: "Découvrir le lieu",
 
     },
@@ -1375,6 +1397,8 @@ export const content = {
       saturday: {
         eyebrow: "Samedi 20 · programme",
         title: "L’après-midi, pas à pas",
+        citation:
+          "Du premier toast au dernier pas de danse : un après-midi qui marche vers le phare et finit en fête.",
         warning:
           "Pour celles et ceux qui viennent de Guadalajara : partez très en avance. Les accès vers Jocotepec peuvent facilement être embouteillés et nous avons besoin que tout le monde soit à Roca Azul à 13 h.",
 
@@ -1392,6 +1416,9 @@ export const content = {
       friday: {
         eyebrow: "Vendredi 19 · programme",
         title: "Arrivée et bienvenue",
+        citation:
+          "De première boule à la dernière pizza : le week-end commence sans se presser.",
+
         warning:
           "Un premier moment détendu pour s’installer, se retrouver et commencer le week-end sans se presser.",
         items: [
@@ -1403,12 +1430,15 @@ export const content = {
       sunday: {
         eyebrow: "Dimanche 21 · programme",
         title: "Petit-déjeuner et au revoir",
+        citation:
+          "Une dernière matinée ensemble, entre petits-déjeuners et au revoir.",
         warning: "Une dernière matinée ensemble avant les départs.",
         items: [
           { time: "Matin", title: "Petit-déjeuner", body: "Petit-déjeuner inclus pour les personnes logées dans les gîtes." },
           { time: "Midi", title: "Au revoir", body: "Derniers moments ensemble et départs." },
         ],
       },
+
     },
     weather: {
       eyebrow: "La météo habituelle",
@@ -1432,8 +1462,6 @@ export const content = {
         "De la crème solaire et des lunettes pour les premières heures.",
         "Des chaussures confortables pour les jardins et les espaces extérieurs.",
       ],
-      disclaimer:
-        "Il s’agit d’une tendance climatique, pas d’une prévision. La météo réelle sera publiée ici environ dix jours avant le mariage.",
       navNext: "Voir le programme",
     },
     food: {
@@ -1968,7 +1996,7 @@ export const content = {
       body:
         "Nous sommes immensément heureux de partager ce jour avec vous, et nous souhaitons que, tout comme chaque personne a laissé une empreinte spéciale dans notre vie, chacun apporte aussi un peu de son essence à cette célébration.",
       dressCode: {
-        title: "Habillez-vous de couleur",
+        title: "Habillez-vous de couleur !",
         paragraphs: [
           "Nous croyons que les couleurs transmettent de l’énergie, de la joie et de la personnalité.",
           "C’est pourquoi nous aimerions que vous nous accompagniez dans des tons pleins de vie, en évitant de préférence le noir, le gris et le blanc.",
@@ -1976,6 +2004,21 @@ export const content = {
           "David portera une guayabera en lin blanc avec des broderies dorées, et nous porterons tous les deux des pièces brodées par des artisanes d’une communauté d’Oaxaca, en hommage à la richesse de nos traditions.",
           "La seule règle est que vous soyez vous-mêmes : élégants, à l’aise et prêts à célébrer, danser et remplir ce jour de couleur, d’amour et de bonne énergie.",
         ],
+        pictograms: {
+          ariaLabel: "Pictogrammes du code vestimentaire",
+          noWhite: "Pas de blanc",
+          noBlack: "Pas de noir",
+          noGrey: "Pas de gris",
+          colorGreen: "Portez du vert",
+          colorTeal: "Portez du turquoise",
+          colorMarigold: "Portez du jaune",
+          dressNoWhite: "Pas de robe blanche",
+          dressNoBlack: "Pas de robe noire",
+          dressNoGrey: "Pas de robe grise",
+          dressColor: "Robe colorée",
+          funky: "Funky",
+          mexican: "Motifs mexicains",
+        },
       },
       guestNote:
         "Merci de faire partie de notre histoire ! ✨🌼",
@@ -2399,6 +2442,7 @@ export const content = {
         "Roca Azul sits on the lake shore, facing the sunset.",
       ],
       anecdotesLabel: "Lake Chapala in 12 anecdotes",
+      mapLabel: "Getting to Roca Azul",
       navNext: "Discover the venue",
 
     },
@@ -2463,6 +2507,8 @@ export const content = {
       saturday: {
         eyebrow: "Saturday 20 · programme",
         title: "The afternoon, step by step",
+        citation:
+          "From the first toast to the last dance: an afternoon that walks toward the lighthouse and ends in celebration.",
         warning:
           "If you are travelling from Guadalajara, please leave plenty of time. The roads into Jocotepec can become congested very easily, and everyone needs to be at Roca Azul by 1 pm.",
 
@@ -2480,6 +2526,8 @@ export const content = {
       friday: {
         eyebrow: "Friday 19 · programme",
         title: "Arrival and welcome",
+        citation:
+          "From the first hello to the first pizza: the weekend begins without rushing.",
         warning:
           "A relaxed first gathering to settle in, connect, and ease into the weekend.",
         items: [
@@ -2491,12 +2539,15 @@ export const content = {
       sunday: {
         eyebrow: "Sunday 21 · programme",
         title: "Breakfast and farewell",
+        citation:
+          "One last morning together, between breakfasts and goodbyes.",
         warning: "One final morning together before the journeys home.",
         items: [
           { time: "Morning", title: "Breakfast", body: "Breakfast included for guests staying in the guest houses." },
           { time: "Midday", title: "Farewell", body: "Final moments together and departures." },
         ],
       },
+
     },
     weather: {
       eyebrow: "Typical weather",
@@ -2520,8 +2571,6 @@ export const content = {
         "Sunscreen and sunglasses for the first part of the day.",
         "Comfortable shoes for gardens and outdoor areas.",
       ],
-      disclaimer:
-        "This is a climate guide, not a forecast. We will publish the actual weather outlook here around ten days before the wedding.",
       navNext: "See the programme",
     },
     food: {
@@ -3064,6 +3113,21 @@ export const content = {
           "David will wear a white linen guayabera with golden embroidery, and we will both wear pieces embroidered by artisans from a community in Oaxaca, as a tribute to the richness of our traditions.",
           "The only rule is that you be yourselves: elegant, comfortable, and ready to celebrate, dance, and fill this day with colour, love, and good energy.",
         ],
+        pictograms: {
+          ariaLabel: "Dress code pictograms",
+          noWhite: "No white",
+          noBlack: "No black",
+          noGrey: "No grey",
+          colorGreen: "Wear green",
+          colorTeal: "Wear teal",
+          colorMarigold: "Wear marigold",
+          dressNoWhite: "No white dress",
+          dressNoBlack: "No black dress",
+          dressNoGrey: "No grey dress",
+          dressColor: "Colourful dress",
+          funky: "Funky",
+          mexican: "Mexican patterns",
+        },
       },
       guestNote:
         "Thank you for being part of our story! ✨🌼",

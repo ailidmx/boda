@@ -553,7 +553,6 @@ export function Venue() {
         >
           <PrivacyLockIcon />
         </button>
-        <p className="facilities-note">{facilities.note}</p>
 
         <nav className="venue-nav venue-nav--dark" aria-label="Venue navigation">
           <a className="venue-nav-link" href="#weekend">

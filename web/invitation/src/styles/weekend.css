@@ -159,15 +159,16 @@
   pointer-events: auto;
 }
 
-.schedule-item:nth-child(2) {
+.schedule-slide:nth-child(2) .schedule-item {
   --schedule-accent: var(--terracotta);
   --schedule-accent-rgb: 169 77 49;
 }
 
-.schedule-item:nth-child(3) {
+.schedule-slide:nth-child(3) .schedule-item {
   --schedule-accent: var(--sage);
   --schedule-accent-rgb: 122 139 122;
 }
+
 
 .schedule-item::before {
   position: absolute;
@@ -193,13 +194,14 @@
   pointer-events: none;
 }
 
-.schedule-item:nth-child(2)::after {
+.schedule-slide:nth-child(2) .schedule-item::after {
   content: "02";
 }
 
-.schedule-item:nth-child(3)::after {
+.schedule-slide:nth-child(3) .schedule-item::after {
   content: "03";
 }
+
 
 .schedule-item > * {
   position: relative;
@@ -222,6 +224,13 @@
 .schedule-carousel-controls {
   display: none;
 }
+
+/* The slideset navigation (arrows + dots) is mobile-only; hidden on desktop
+   where the three cards sit side-by-side. */
+.schedule-carousel__nav {
+  display: none;
+}
+
 
 .schedule-carousel-toggle {
   display: inline-flex;
@@ -270,10 +279,10 @@
 }
 
 .weekend-program__header {
-  flex: 0 0 clamp(11rem, 23svh, 15rem);
+  flex: 0 0 clamp(13rem, 26svh, 17rem);
   min-height: 0;
   width: 100%;
-  margin-bottom: clamp(2rem, 4vw, 4rem);
+  margin-bottom: clamp(1.5rem, 3vw, 3rem);
   overflow-y: auto;
 }
 
@@ -282,21 +291,26 @@
   padding-bottom: 0;
 }
 
-.weekend-program__title-row {
+/* The eyebrow is centred for this section, with the previous/next arrows
+   flanking it on either side. The arrows share the eyebrow's size and colour
+   so the whole row reads as one navigation unit. */
+.weekend-program__eyebrow-row {
   display: grid;
   grid-template-columns: 2.4rem minmax(0, 1fr) 2.4rem;
   align-items: center;
   gap: 0.75rem;
   width: 100%;
+  margin-bottom: 0.5rem;
 }
 
-.weekend-program__title-row h2 {
+.weekend-program__eyebrow-row .eyebrow {
   width: 100%;
   max-width: none;
+  margin: 0;
   text-align: center;
 }
 
-.weekend-program__title-row .day-program-slideset__arrow {
+.weekend-program__eyebrow-row .day-program-slideset__arrow {
   width: 2.4rem;
   height: 2.4rem;
   font-size: 1.2rem;
@@ -352,7 +366,51 @@
   border-top: 1px solid rgb(36 33 25 / 18%);
 }
 
+/* In-page warning / info panel shown at the bottom of the programme section
+   on desktop. It carries the long travel disclaimer (e.g. the Guadalajara
+   note) that would otherwise clutter the header citation. On mobile it is
+   hidden and replaced by a FAB + modal. */
+.weekend-program__warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex: 0 0 auto;
+  width: 100%;
+  margin-top: 1.25rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgb(198 139 43 / 32%);
+  border-left: 3px solid var(--marigold);
+  border-radius: 0.9rem;
+  background: rgb(228 185 104 / 12%);
+  color: rgb(36 33 25 / 82%);
+}
 
+.weekend-program__warning-icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  margin-top: 0.1rem;
+  color: var(--marigold);
+}
+
+.weekend-program__warning-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.weekend-program__warning p {
+  margin: 0;
+  font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+  line-height: 1.5;
+}
+
+/* Warning FAB + modal are mobile-only; hidden on desktop. */
+.weekend-warning-fab,
+.weekend-warning-shell {
+  display: none;
+}
 
 /* The detailed programme is a slideset of one card per day. Only the active
    day is visible; inactive days are stacked and hidden with a gentle fade. */
@@ -465,7 +523,7 @@
   grid-template-columns: minmax(6.5rem, 0.4fr) 1fr;
   gap: 1.5rem;
   border-top: 1px solid rgb(36 33 25 / 20%);
-  padding: 1.35rem 0;
+  padding: 0.9rem 0;
 }
 
 .day-program-timeline time {
@@ -479,13 +537,15 @@
 .day-program-timeline h4 {
   margin: 0;
   font-family: var(--font-display);
-  font-size: clamp(1.3rem, 2.5vw, 1.9rem);
+  font-size: clamp(1.15rem, 2vw, 1.55rem);
   font-weight: 400;
 }
 
 .day-program-timeline p {
-  margin: 0.35rem 0 0;
+  margin: 0.25rem 0 0;
   color: rgb(36 33 25 / 70%);
+  font-size: clamp(0.95rem, 1.3vw, 1.05rem);
+  line-height: 1.45;
 }
 
 /* The three dates (Fri · Sat · Sun) sit in a row below the banner text,
@@ -562,9 +622,9 @@
   color: var(--terracotta);
 }
 
-/* On mobile, overlap the three schedule cards so only the active card is
-   visible. These rules live after the desktop card styles so the carousel
-   state wins in the cascade. */
+/* On mobile, the three schedule cards become a swipeable horizontal strip.
+   These rules live after the desktop card styles so the mobile layout wins
+   in the cascade. */
 @media (max-width: 899px) {
   .section.weekend-section {
     padding-block: 0;
@@ -579,15 +639,27 @@
   }
 
   .weekend-program__header {
-    flex: 0 0 clamp(9.75rem, 23svh, 12rem);
+    flex: 0 0 clamp(11rem, 26svh, 13.5rem);
     min-height: 0;
     margin-bottom: 1rem;
     overflow-y: auto;
   }
 
+  .weekend-program__eyebrow-row {
+    grid-template-columns: 2rem minmax(0, 1fr) 2rem;
+    gap: 0.5rem;
+    margin-bottom: 0.35rem;
+  }
+
+  .weekend-program__eyebrow-row .day-program-slideset__arrow {
+    width: 2rem;
+    height: 2rem;
+    font-size: 1rem;
+  }
+
   .weekend-program .section-heading h2 {
     margin: 0;
-    font-size: clamp(2.6rem, 6vw, 4.5rem);
+    font-size: clamp(1.6rem, 6vw, 4.5rem);
   }
 
   .weekend-program .section-heading p:last-child {
@@ -680,35 +752,118 @@
     margin-top: 0;
   }
 
+  /* On mobile the three day cards become a 1-slide slideset: only the active
+     card is visible at a time, with arrows + dots to navigate and touch swipe
+     support. */
   .schedule-grid {
-    grid-template-columns: 1fr;
-    gap: 0;
-    overflow: hidden;
-    touch-action: pan-y;
+    display: block;
+  }
+
+  .schedule-slide {
+    display: none;
+  }
+
+  .schedule-slide.is-active {
+    display: block;
+    animation: schedule-slide-in 0.3s ease;
+  }
+
+  @keyframes schedule-slide-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .schedule-item {
-    grid-area: 1 / 1;
     min-height: 13.5rem;
     padding: 1.25rem;
-    opacity: 0;
-    visibility: hidden;
-    transform: translateX(0.75rem);
-    pointer-events: none;
-    transition: opacity 350ms ease, transform 350ms ease, visibility 350ms;
   }
+
+  /* Slideset navigation (arrows + dots), mobile only. */
+  .schedule-carousel__nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.25rem;
+    margin-top: 1rem;
+  }
+
+  .schedule-carousel__arrow {
+    display: grid;
+    width: 2.5rem;
+    height: 2.5rem;
+    place-items: center;
+    border: 1px solid rgb(36 33 25 / 30%);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .schedule-carousel__arrow:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+
+  .schedule-carousel__arrow:not(:disabled):hover {
+    background: rgb(36 33 25 / 8%);
+    border-color: rgb(36 33 25 / 55%);
+  }
+
+  .schedule-carousel__arrow:focus-visible {
+    outline: 2px solid var(--marigold);
+    outline-offset: 2px;
+  }
+
+  .schedule-carousel__dots {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .schedule-carousel__dot {
+    display: grid;
+    width: 1.5rem;
+    height: 1.5rem;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .schedule-carousel__dot span {
+    display: block;
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: rgb(36 33 25 / 25%);
+    transition: background 0.2s ease, transform 0.2s ease;
+  }
+
+  .schedule-carousel__dot.is-active span {
+    background: var(--terracotta);
+    transform: scale(1.25);
+  }
+
+  .schedule-carousel__dot:focus-visible {
+    outline: 2px solid var(--marigold);
+    outline-offset: 2px;
+  }
+
 
   .schedule-item::after {
     top: 0.4rem;
     right: 0.75rem;
     font-size: 3.75rem;
-  }
-
-  .schedule-item.is-active {
-    opacity: 1;
-    visibility: visible;
-    transform: none;
-    pointer-events: auto;
   }
 
   .schedule-day {
@@ -725,16 +880,121 @@
     line-height: 1.4;
   }
 
-  .schedule-carousel-controls {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.85rem;
-  }
-
   .weekend-slide .weekend-nav {
     margin-top: auto;
     margin-bottom: auto;
     padding-top: 0.65rem;
+  }
+
+  /* On mobile the in-page warning panel is hidden and replaced by a FAB that
+     opens a modal with the disclaimer. */
+  .weekend-program__warning {
+    display: none;
+  }
+
+  .weekend-warning-fab {
+    position: fixed;
+    z-index: 60;
+    right: 1.1rem;
+    bottom: 1.1rem;
+    display: grid;
+    place-items: center;
+    width: 3.4rem;
+    height: 3.4rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: var(--terracotta);
+    color: var(--white);
+    box-shadow: 0 0.6rem 1.6rem rgb(36 33 25 / 32%);
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.9);
+    pointer-events: none;
+    transition: opacity 300ms ease, transform 300ms ease;
+  }
+
+  .weekend-warning-fab.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  .weekend-warning-fab:focus-visible {
+    outline: 2px solid var(--marigold);
+    outline-offset: 2px;
+  }
+
+  .weekend-warning-fab svg {
+    width: 1.7rem;
+    height: 1.7rem;
+  }
+
+  .weekend-warning-shell {
+    position: fixed;
+    z-index: 70;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 1.25rem;
+    background: rgb(36 33 25 / 55%);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 300ms ease, visibility 300ms;
+  }
+
+  .weekend-warning-shell.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .weekend-warning-panel {
+    position: relative;
+    width: min(100%, 26rem);
+    max-height: 80svh;
+    overflow-y: auto;
+    padding: 2rem 1.5rem 1.5rem;
+    border-radius: 1.25rem;
+    background: var(--white);
+    box-shadow: 0 1.5rem 3.5rem rgb(36 33 25 / 35%);
+  }
+
+  .weekend-warning__close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: grid;
+    place-items: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border: 1px solid rgb(36 33 25 / 22%);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink);
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .weekend-warning__eyebrow {
+    display: block;
+    margin-bottom: 0.65rem;
+  }
+
+  .weekend-warning__title {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 400;
+    color: var(--ink);
+  }
+
+
+  .weekend-warning__body {
+    margin: 0;
+    color: rgb(36 33 25 / 78%);
+    font-size: 1rem;
+    line-height: 1.5;
   }
 }

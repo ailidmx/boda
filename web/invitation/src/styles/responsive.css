@@ -94,6 +94,15 @@
   }
 }
 
+/* The four weather facts always sit in a 2×2 grid on mobile (they are a
+   compact stat block, not a long list), widening to 4 across on desktop via
+   weather.css. This overrides the shared 1-column mobile default above. */
+@media (max-width: 899px) {
+  .weather-facts {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
 /* ── Shared form grids ──────────────────────────────────────────────────
    RSVP, suggestion, and coast forms all use a 2-column grid on desktop that
    collapses to 1 column on mobile. */
