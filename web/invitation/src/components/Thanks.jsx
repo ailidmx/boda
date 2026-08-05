@@ -78,12 +78,14 @@ export function Thanks() {
   return (
     <section className="thanks-section section" id="thanks">
       <div className="thanks-frame">
-        <p className="eyebrow">{thanks.eyebrow}</p>
+        <div className="section-heading thanks-heading">
+          <p className="eyebrow">{thanks.eyebrow}</p>
 
-        <blockquote className="thanks-quote">
-          <h2>{thanks.title}</h2>
-          <p className="thanks-subtitle">{thanks.subtitle}</p>
-        </blockquote>
+          <blockquote className="thanks-quote">
+            <h2>{thanks.title}</h2>
+            <p className="thanks-subtitle">{thanks.subtitle}</p>
+          </blockquote>
+        </div>
 
         <ul className="thanks-credits">
           {credits.map((credit, index) => (

@@ -105,12 +105,19 @@
   color: rgb(36 33 25 / 62%);
 }
 
+/* Slide 2 (the moments) sits on a white panel so it reads as a distinct
+   card against the section's warm gradient. */
+.weather-slideset__slide--moments {
+  background: var(--white);
+  padding: clamp(1.5rem, 3vw, 3rem);
+}
+
 .weather-day {
   display: grid;
   grid-template-columns: 1.35fr 0.65fr;
   gap: clamp(1.5rem, 4vw, 4rem);
   padding-top: clamp(1.5rem, 3vw, 3rem);
-  color: var(--white);
+  color: var(--ink);
 }
 
 .weather-moments {
@@ -123,12 +130,12 @@
   display: grid;
   grid-template-columns: minmax(7rem, 0.4fr) 1fr;
   gap: 1.5rem;
-  border-top: 1px solid rgb(255 255 255 / 24%);
+  border-top: 1px solid rgb(36 33 25 / 18%);
   padding: 0.9rem 0;
 }
 
 .weather-moments time {
-  color: #e4b968;
+  color: var(--terracotta);
   font-size: 0.7rem;
   font-weight: 700;
   letter-spacing: 0.09em;
@@ -145,11 +152,11 @@
 
 .weather-moments p {
   margin: 0.4rem 0 0;
-  color: rgb(255 253 248 / 70%);
+  color: rgb(36 33 25 / 70%);
 }
 
 .weather-advice {
-  border: 1px solid rgb(255 255 255 / 28%);
+  border: 1px solid rgb(36 33 25 / 18%);
   padding: clamp(1.25rem, 2.5vw, 2rem);
 }
 
@@ -199,6 +206,20 @@
    a FAB-activated modal. They stack vertically instead of sharing a cramped
    two-column row. */
 @media (max-width: 899px) {
+  /* Center the sun within the heading on mobile. */
+  .weather-heading {
+    align-items: center;
+    text-align: center;
+  }
+
+  .weather-heading .eyebrow {
+    align-self: center;
+  }
+
+  .weather-sun {
+    margin-inline: auto;
+  }
+
   .weather-day {
     grid-template-columns: 1fr;
     gap: 1.5rem;
@@ -354,10 +375,10 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 0.35rem;
-    border: 1px solid rgb(255 255 255 / 24%);
+    border: 1px solid rgb(36 33 25 / 16%);
     border-radius: 0.75rem;
     padding: 0.9rem;
-    background: rgb(255 255 255 / 6%);
+    background: rgb(36 33 25 / 4%);
   }
 
   .weather-moments time {
@@ -379,18 +400,18 @@
   .weather-advice-fab {
     position: fixed;
     z-index: 90;
-    right: 1.25rem;
-    bottom: 1.5rem;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
     display: grid;
-    width: 3.5rem;
-    height: 3.5rem;
+    width: 4.25rem;
+    height: 4.25rem;
     place-items: center;
-    border: 0;
+    border: 3px solid var(--marigold);
     border-radius: 50%;
     background: var(--terracotta);
     color: var(--white);
     font-size: 1.4rem;
-    box-shadow: 0 0.6rem 1.6rem rgb(0 0 0 / 30%);
+    box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
     cursor: pointer;
     opacity: 0;
     transform: translateY(1rem) scale(0.9);

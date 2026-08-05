@@ -13,6 +13,12 @@
   margin-bottom: 2rem;
 }
 
+/* The gift section sits on a dark background, so the shared section-heading
+   separator uses a light border instead of the default dark one. */
+.gift-copy .section-heading {
+  border-bottom-color: rgb(255 255 255 / 25%);
+}
+
 .gift-copy .note {
   margin-top: 2rem;
   padding-top: 1.5rem;

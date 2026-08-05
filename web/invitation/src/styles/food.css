@@ -38,7 +38,10 @@
 /* Small phones: flavours → 1 col, food days → 1 col. */
 @media (max-width: 600px) {
   .flavours-heading {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
   }
 
   .flavours-heading .eyebrow {
@@ -119,6 +122,15 @@
   overflow: hidden;
   background: #f6f0e5;
   border: 1px solid rgb(36 33 25 / 14%);
+  border-radius: 0.75rem;
+  box-shadow: 0 0.5rem 1.5rem rgb(36 33 25 / 6%);
+  transition: transform 300ms ease, box-shadow 300ms ease, border-color 300ms ease;
+}
+
+.flavour-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 1.25rem 2.5rem rgb(36 33 25 / 12%);
+  border-color: rgb(36 33 25 / 24%);
 }
 
 .flavour-card img,

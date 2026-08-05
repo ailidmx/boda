@@ -9,10 +9,13 @@
  *    repeated visits are fast and work offline.
  *  - Cross-origin (fonts, images): network-first, cache successful responses.
  *
- * Bump CACHE_VERSION whenever you ship a breaking change to the app shell.
+ * CACHE_VERSION is auto-bumped on every build by scripts/postbuild.mjs (it
+ * injects the build number), so the service worker cache is invalidated on
+ * each deploy and guests are never served a stale app shell.
  */
 
-const CACHE_VERSION = "boda-v5";
+const CACHE_VERSION = "boda-v6";
+
 
 
 

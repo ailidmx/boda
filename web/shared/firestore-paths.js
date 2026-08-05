@@ -21,6 +21,8 @@ export const collections = {
   invitationGroups: "invitation_groups",
   /** Room inventory (public content). */
   rooms: "rooms",
+  /** Cabin inventory + showcase (public content). */
+  cabins: "cabins",
   /** RSVP form submissions. */
   rsvpSubmissions: "rsvp_submissions",
   /** Petanque participation form submissions. */

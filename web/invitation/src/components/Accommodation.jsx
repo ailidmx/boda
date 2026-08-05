@@ -137,6 +137,9 @@ export function Accommodation() {
     activeMember && (activeMember.hasCabin === false || !assignedCabin),
   );
   const option = accommodation.guestOption || {};
+  const cabinsShowcase = accommodation.cabinsShowcase || {};
+  const privateVideoEyebrow = cabinsShowcase.privateVideoEyebrow;
+  const privateVideoTitle = cabinsShowcase.privateVideoTitle;
   const cabinArrangement = cabin?.isPrivate === true
     ? option.occupancy?.privada
     : cabin?.isPrivate === false
@@ -224,6 +227,24 @@ export function Accommodation() {
           ))}
           <p className="accommodation-facts-note">{accommodation.specialNote}</p>
         </div>
+
+        {privateVideoTitle && (
+          <div className="cabins-private-video reveal">
+            <p className="eyebrow">{privateVideoEyebrow}</p>
+            <h3>{privateVideoTitle}</h3>
+            <div className="video-frame">
+              <iframe
+                src="https://www.youtube.com/embed/zf0zhZihub4"
+                title={privateVideoTitle}
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        )}
+
         <div
           className={`accommodation-note-shell${noteOpen ? " is-mobile-open" : ""}`}
           role={noteOpen ? "dialog" : undefined}

@@ -8,6 +8,8 @@ import { LazySection } from "./components/LazySection.jsx";
 import { LanguageModal } from "./components/LanguageModal.jsx";
 import { IdentityModal } from "./components/IdentityModal.jsx";
 import { WinampPlayer } from "./components/WinampPlayer.jsx";
+import { useVersionCheck } from "./hooks/useVersionCheck.js";
+
 
 
 
@@ -85,7 +87,13 @@ const Footer = lazy(() =>
 function Invitation() {
   const { authState } = useApp();
 
+  // Force guests onto the latest deployed version: periodically compare the
+  // running build number against the deployed version.json and hard-reload if
+  // a newer release has shipped. Runs for all auth states.
+  useVersionCheck();
+
   if (authState === "loading") {
+
     return <div className="app-loading" aria-label="Loading" />;
   }
 

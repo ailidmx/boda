@@ -43,14 +43,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
           cache-dependency-path: web/invitation/package-lock.json
+
 
       - name: Install dependencies
         working-directory: web/invitation
@@ -80,10 +81,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -109,6 +110,7 @@ jobs:
 
       - name: Deploy development
         uses: FirebaseExtended/action-hosting-deploy@v0
+
         with:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BODA_500805 }}
           projectId: boda-500805
@@ -125,10 +127,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: npm
@@ -154,6 +156,7 @@ jobs:
 
       - name: Deploy production
         uses: FirebaseExtended/action-hosting-deploy@v0
+
         with:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BODA_500805 }}
           projectId: boda-500805

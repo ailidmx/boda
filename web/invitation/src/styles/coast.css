@@ -13,6 +13,12 @@
   margin-bottom: 2rem;
 }
 
+/* The coast section sits on a dark background, so the shared section-heading
+   separator uses a light border instead of the default dark one. */
+.coast-copy .section-heading {
+  border-bottom-color: rgb(255 255 255 / 25%);
+}
+
 .coast-ideas {
   margin-top: 3rem;
   border-top: 1px solid rgb(255 255 255 / 25%);

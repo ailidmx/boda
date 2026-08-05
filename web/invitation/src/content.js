@@ -833,46 +833,6 @@ export const content = {
         "Coordinaremos las recogidas cuando tengamos sus números de vuelo.",
         "Cada viajero tendrá un itinerario de llegada, estancia y regreso.",
       ],
-      routes: {
-        eyebrow: "Mapa de trayectos",
-        title: "Llegar a Roca Azul y seguir hacia la costa",
-        note:
-          "Las duraciones indicadas son orientativas y pueden variar enormemente. Sean previsores y, mejor aún, estén en el lugar con anticipación reservando un alojamiento si pueden.",
-        venue: "Roca Azul · Jocotepec",
-        toVenueLabel: "Hacia Roca Azul",
-        toBeachLabel: "Hacia la playa",
-        originsLabel: "Hacia la boda",
-        destinationsLabel: "Después de la boda",
-        mapLabel: "Mapa de Roca Azul y sus alrededores",
-        directionsLabel: "Cómo llegar (rutas en Google Maps)",
-        origins: [
-          { place: "Centro de Guadalajara", duration: "≈ 1 h 30", detail: "Ruta libre" },
-
-          { place: "Nuestra casa · Tesistán", duration: "≈ 1 h 45", detail: "Ruta libre" },
-          { place: "Aeropuerto GDL", duration: "≈ 1 h", detail: "Ruta libre" },
-        ],
-        destinations: [
-          {
-            place: "Barra de Navidad",
-            duration: "≈ 5 h",
-            detail: "Libre · Cocula → Autlán → Barra",
-          },
-          {
-            place: "Barra de Navidad",
-            duration: "≈ 4 h 45",
-            detail: "Vía Manzanillo · casetas ≈ $500 MXN",
-          },
-        {
-          place: "Manzanillo",
-          duration: "≈ 4 h 30",
-          detail: "Casetas ≈ $500 MXN",
-        },
-      ],
-      maps: {
-        venueLabel: "Cómo llegar al lugar",
-        beachLabel: "Cómo llegar a la playa",
-      },
-    },
       cta: "Compartir mis datos de viaje",
 
       ctaNote: "El formulario privado ya está disponible más abajo.",
@@ -1946,46 +1906,6 @@ export const content = {
         "Nous coordonnerons les accueils dès réception de vos numéros de vol.",
         "Chaque voyageur aura un itinéraire d’arrivée, de séjour et de retour.",
       ],
-      routes: {
-        eyebrow: "Schéma des trajets",
-        title: "Rejoindre Roca Azul, puis continuer vers la côte",
-        note:
-          "Les durées indiquées sont indicatives et peuvent varier énormément. Soyez prévoyants et, encore mieux, soyez sur place en avance en réservant un logement si vous pouvez.",
-        venue: "Roca Azul · Jocotepec",
-        toVenueLabel: "Vers Roca Azul",
-        toBeachLabel: "Vers la plage",
-        originsLabel: "Vers le mariage",
-        destinationsLabel: "Après le mariage",
-        mapLabel: "Carte de Roca Azul et de ses environs",
-        directionsLabel: "Itinéraires (routes sur Google Maps)",
-        origins: [
-          { place: "Centre de Guadalajara", duration: "≈ 1 h 30", detail: "Route gratuite" },
-
-          { place: "Notre maison · Tesistán", duration: "≈ 1 h 45", detail: "Route gratuite" },
-          { place: "Aéroport GDL", duration: "≈ 1 h", detail: "Route gratuite" },
-        ],
-        destinations: [
-          {
-            place: "Barra de Navidad",
-            duration: "≈ 5 h",
-            detail: "Sans péage · Cocula → Autlán → Barra",
-          },
-          {
-            place: "Barra de Navidad",
-            duration: "≈ 4 h 45",
-            detail: "Via Manzanillo · péages ≈ 500 MXN",
-          },
-          {
-            place: "Manzanillo",
-            duration: "≈ 4 h 30",
-            detail: "Péages ≈ 500 MXN",
-          },
-        ],
-        maps: {
-          venueLabel: "Comment rejoindre le lieu",
-          beachLabel: "Comment rejoindre la plage",
-        },
-      },
       cta: "Partager mes informations de voyage",
 
       ctaNote: "Le formulaire privé est maintenant disponible plus bas.",
@@ -3055,46 +2975,6 @@ export const content = {
         "We will coordinate airport pickups once we have your flight numbers.",
         "Every traveller will have an arrival, stay, and return itinerary.",
       ],
-      routes: {
-        eyebrow: "Journey map",
-        title: "Getting to Roca Azul, then travelling on to the coast",
-        note:
-          "The times shown are indicative and can vary enormously. Please plan ahead and, even better, arrive early by booking accommodation if you can.",
-        venue: "Roca Azul · Jocotepec",
-        toVenueLabel: "GO TO ROCA AZUL",
-        toBeachLabel: "GO TO THE PLAYA",
-        originsLabel: "To the wedding",
-        destinationsLabel: "After the wedding",
-        mapLabel: "Map of Roca Azul and its surroundings",
-        directionsLabel: "Getting there (routes on Google Maps)",
-        origins: [
-          { place: "Central Guadalajara", duration: "≈ 1 hr 30", detail: "Toll-free route" },
-
-          { place: "Our home · Tesistán", duration: "≈ 1 hr 45", detail: "Toll-free route" },
-          { place: "GDL Airport", duration: "≈ 1 hr", detail: "Toll-free route" },
-        ],
-        destinations: [
-          {
-            place: "Barra de Navidad",
-            duration: "≈ 5 hr",
-            detail: "Toll-free · Cocula → Autlán → Barra",
-          },
-          {
-            place: "Barra de Navidad",
-            duration: "≈ 4 hr 45",
-            detail: "Via Manzanillo · tolls ≈ MXN 500",
-          },
-          {
-            place: "Manzanillo",
-            duration: "≈ 4 hr 30",
-            detail: "Tolls ≈ MXN 500",
-          },
-        ],
-        maps: {
-          venueLabel: "Getting to the venue",
-          beachLabel: "Getting to the beach",
-        },
-      },
       cta: "Share my travel details",
 
       ctaNote: "The private form is now available below.",

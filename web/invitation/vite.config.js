@@ -1,11 +1,24 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
+// Build number injected at build time so the footer can display the exact
+// deployed version. It is a short UTC timestamp (YYYYMMDD-HHMM) that changes
+// on every build, making it trivial to confirm which release a guest is seeing
+// (and to spot a stale cached version).
+const BUILD_NUMBER = new Date()
+  .toISOString()
+  .replace(/[-:]/g, "")
+  .replace("T", "-")
+  .slice(0, 13);
+
 export default defineConfig({
   base: "./",
   plugins: [
     react(),
   ],
+  define: {
+    __BUILD_NUMBER__: JSON.stringify(BUILD_NUMBER),
+  },
 
   build: {
     // The dashboard build outputs into dist/dashboard/. We must NOT empty the
