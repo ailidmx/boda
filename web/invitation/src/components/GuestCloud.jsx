@@ -160,11 +160,13 @@ export function GuestCloud() {
   return (
     <section className="guest-cloud-section section" id="guests">
       <div className="guest-cloud-frame">
-        <p className="eyebrow">{cloud.eyebrow}</p>
-        <h2 className="guest-cloud-title">{cloud.title}</h2>
-        {cloud.subtitle && (
-          <p className="guest-cloud-subtitle">{cloud.subtitle}</p>
-        )}
+        <div className="section-heading guest-cloud-heading">
+          <p className="eyebrow">{cloud.eyebrow}</p>
+          <h2 className="guest-cloud-title">{cloud.title}</h2>
+          {cloud.subtitle && (
+            <p className="guest-cloud-subtitle">{cloud.subtitle}</p>
+          )}
+        </div>
 
         <div className="guest-cloud-mode" role="group" aria-label={cloud.modeGroupLabel || "Guest name mode"}>
           <button

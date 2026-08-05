@@ -553,6 +553,61 @@ service cloud.firestore {
 
 
 
+    // ── Cabins ──────────────────────────────────────────────────────────────
+    // Cabin inventory + showcase (id, name, capacity, pricing, booking flags,
+    // localized showcase descriptions, Cloudinary photo IDs). Readable by
+    // everyone (public content); writable only by the couple. The schema is
+    // enforced with hasOnly() so no extra fields can be added from the client.
+    function hasValidCabinFields() {
+      return request.resource.data.keys().hasAll([
+          "id", "name", "capacity", "totalPrice2Nights",
+          "pricePerPerson2Nights", "isPrivate"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "id", "name", "capacity", "totalPrice2Nights",
+          "pricePerPerson2Nights", "isPrivate",
+          "isBooked", "isBookedXtra", "isPaid", "isPaidXtra",
+          "capacityRoomCheck", "showcase", "cloudinaryIds",
+          "_source", "_migratedAt", "_showcaseMigratedAt"
+        ])
+        && isShortText(request.resource.data.id, 100)
+        && request.resource.data.id.size() > 0
+        && isShortText(request.resource.data.name, 150)
+        && request.resource.data.capacity is int
+        && request.resource.data.capacity > 0
+        && request.resource.data.totalPrice2Nights is int
+        && request.resource.data.totalPrice2Nights >= 0
+        && request.resource.data.pricePerPerson2Nights is int
+        && request.resource.data.pricePerPerson2Nights >= 0
+        && request.resource.data.isPrivate is bool
+        && (!request.resource.data.keys().hasAny(["isBooked"])
+          || request.resource.data.isBooked is bool)
+        && (!request.resource.data.keys().hasAny(["isBookedXtra"])
+          || request.resource.data.isBookedXtra is bool)
+        && (!request.resource.data.keys().hasAny(["isPaid"])
+          || request.resource.data.isPaid is bool)
+        && (!request.resource.data.keys().hasAny(["isPaidXtra"])
+          || request.resource.data.isPaidXtra is bool)
+        && (!request.resource.data.keys().hasAny(["capacityRoomCheck"])
+          || request.resource.data.capacityRoomCheck is int)
+        && (!request.resource.data.keys().hasAny(["cloudinaryIds"])
+          || isShortText(request.resource.data.cloudinaryIds, 2000))
+        && (!request.resource.data.keys().hasAny(["showcase"])
+          || (request.resource.data.showcase is map
+            && request.resource.data.showcase.keys().hasOnly(["es", "fr", "en"])
+            && request.resource.data.showcase.es is map
+            && request.resource.data.showcase.fr is map
+            && request.resource.data.showcase.en is map));
+    }
+
+    match /cabins/{cabinId} {
+      allow read: if true;
+      allow create, update: if isAdmin() && hasValidCabinFields();
+      allow delete: if isAdmin();
+    }
+
+
+
 
     // ── Thanks / greetings ──────────────────────────────────────────────────
     // Sourced from the Google Sheet THANKS table (guest -> text in fr/es/en).

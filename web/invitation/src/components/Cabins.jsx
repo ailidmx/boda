@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { MEDIA } from "../media.js";
+import { cloudinaryImage } from "../cloudinary.js";
 import { useApp } from "../context/AppContext.jsx";
+import { loadCabinsShowcase } from "../cabins.js";
 
 /**
  * Cabins showcase.
@@ -9,17 +11,40 @@ import { useApp } from "../context/AppContext.jsx";
  * private tour video. Any other guest with lodging in one of the showcased
  * cabins sees only their own cabin (plus the shared tour video). Guests
  * without a cabin in the catalogue see nothing here.
+ *
+ * The showcase descriptions and photo IDs are loaded from the Firestore
+ * `cabins` collection (source of truth). Until the DB is populated, the
+ * component falls back to the static trilingual content in content.js and the
+ * build-time media manifest.
  */
 export function Cabins() {
   const { t, profile } = useApp();
-  const showcase = t.accommodation?.cabinsShowcase;
+  const staticShowcase = t.accommodation?.cabinsShowcase;
+  const [dbShowcase, setDbShowcase] = useState(null);
+
+  // Load the DB-sourced showcase once. When the DB has showcase data it
+  // overrides the static content; otherwise we keep the static fallback.
+  useEffect(() => {
+    let cancelled = false;
+    loadCabinsShowcase(t.lang || "es").then((units) => {
+      if (cancelled) return;
+      if (units && units.length > 0) setDbShowcase(units);
+    });
+    return () => { cancelled = true; };
+  }, [t.lang]);
+
+  const showcase = dbShowcase || staticShowcase;
   if (!showcase) return null;
 
   const guest = profile?.guest;
   const isNovio = Boolean(guest?.isNovio);
 
   // Full catalogue: the main unit (azalea) plus the additional units.
-  const allCabins = [showcase, ...(showcase.additionalUnits || [])];
+  // DB-sourced showcase is a flat array; static content nests the main unit
+  // with `additionalUnits`. Normalize both into a flat list.
+  const allCabins = Array.isArray(showcase)
+    ? showcase
+    : [showcase, ...(showcase.additionalUnits || [])];
 
   // For non-novios, resolve the single cabin assigned to this guest.
   let cabinsToShow = allCabins;
@@ -30,31 +55,25 @@ export function Cabins() {
     cabinsToShow = [own];
   }
 
+  // The section eyebrow lives in the static content (it is section-level,
+  // not per-cabin), so always read it from there.
+  const eyebrow = staticShowcase?.eyebrow;
+
   return (
     <section className="cabins-showcase section" id="cabins">
       {cabinsToShow.map((cabin) => (
-        <CabinUnit key={cabin.key} cabin={cabin} eyebrow={showcase.eyebrow} />
+        <CabinUnit key={cabin.key} cabin={cabin} eyebrow={eyebrow} />
       ))}
-      <div className="cabins-private-video reveal">
-        <p className="eyebrow">{showcase.privateVideoEyebrow}</p>
-        <h3>{showcase.privateVideoTitle}</h3>
-        <div className="video-frame">
-          <iframe
-            src="https://www.youtube.com/embed/zf0zhZihub4"
-            title={showcase.privateVideoTitle}
-            loading="lazy"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-            referrerPolicy="strict-origin-when-cross-origin"
-            allowFullScreen
-          />
-        </div>
-      </div>
     </section>
   );
 }
 
 function CabinUnit({ cabin, eyebrow }) {
-  const photos = MEDIA.cabins[cabin.key] || [];
+  // Photos come from the DB (Cloudinary IDs) when available; otherwise fall
+  // back to the build-time media manifest.
+  const photos = cabin.cloudinaryIds?.length
+    ? cabin.cloudinaryIds.map((id) => cloudinaryImage(`boda/${id}`, { width: 1200 }))
+    : MEDIA.cabins[cabin.key] || [];
   const video = MEDIA.cabinVideos[cabin.key];
 
   return (

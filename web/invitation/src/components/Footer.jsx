@@ -37,6 +37,9 @@ export function Footer() {
           {EVENT.dateShort} · {EVENT.venue}
         </p>
         <p className="footer-privacy">{footer.privacy}</p>
+        <p className="footer-build" aria-hidden="true">
+          v{__BUILD_NUMBER__}
+        </p>
       </div>
     </footer>
   );

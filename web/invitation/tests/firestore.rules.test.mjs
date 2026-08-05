@@ -5,7 +5,8 @@ import {
   assertSucceeds,
   initializeTestEnvironment,
 } from "@firebase/rules-unit-testing";
-import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { doc, getDoc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
+
 
 const projectId = "boda-rules-test";
 const guestUid = "yfu7MMCmFaPCK7UW4czr5c3x7Aa2";
@@ -270,9 +271,11 @@ test("a group member can update a guest identity without sending invitationGroup
   });
 
   const db = environment.authenticatedContext(editorUid).firestore();
+  // Use `updateDoc` (partial update) so `invitationGroup` is preserved and NOT
+  // included in `affectedKeys()`. With `setDoc` (full replace), omitting
+  // `invitationGroup` would remove it, which the rules forbid for non-admins.
   await assertSucceeds(
-    setDoc(doc(db, "guests", "catherine"), {
-      guestId: "catherine",
+    updateDoc(doc(db, "guests", "catherine"), {
       identity: {
         firstName: "Catherine",
         middleName: "",
@@ -286,6 +289,7 @@ test("a group member can update a guest identity without sending invitationGroup
 });
 
 test("a group member cannot store an email on the guests collection (email lives in Firebase Auth)", async () => {
+
   await seedGuestAuth();
   const db = environment.authenticatedContext(editorUid).firestore();
   await assertFails(

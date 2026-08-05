@@ -8,7 +8,8 @@
     "dev:network": "vite --host",
     "manifest": "node scripts/generate-media-manifest.mjs",
 
-    "build": "npm run manifest && vite build",
+    "build": "npm run manifest && vite build && node scripts/postbuild.mjs",
+
     "preview": "vite preview",
     "links": "node scripts/generate-invitation-links.mjs",
     "favicons": "node scripts/generate-favicons.mjs",
@@ -23,9 +24,11 @@
     "@vitejs/plugin-react": "^5.2.0",
     "favicons": "^7.3.1",
     "firebase-admin": "^14.2.0",
+    "firebase-tools": "^14.0.0",
     "sharp": "^0.35.3",
     "vite": "^7.3.6"
   },
+
   "dependencies": {
     "@cloudinary/react": "^1.14.4",
     "@cloudinary/url-gen": "^1.22.0",

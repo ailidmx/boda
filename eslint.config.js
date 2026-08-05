@@ -45,6 +45,8 @@ export default [
       globals: {
         ...globals.browser,
         ...globals.node,
+        // Vite-injected build-time constant (see vite.config.js define)
+        __BUILD_NUMBER__: "readonly",
       },
       parserOptions: {
         ecmaFeatures: {
