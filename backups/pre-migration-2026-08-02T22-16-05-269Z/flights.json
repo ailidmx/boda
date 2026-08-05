@@ -1,0 +1,90 @@
+[
+  {
+    "id": "0gzwD3afsQhwtkR5OeYX",
+    "data": {
+      "travelerId": "V-001",
+      "segment": 3,
+      "direction": "vuelta",
+      "status": "probable_pending_ticket",
+      "date": "2027-02-28",
+      "origin": "GDL",
+      "destination": "MAD",
+      "airline": "Aeromexico",
+      "flightNumber": "AM36",
+      "departureLocal": "11:15",
+      "arrivalDate": "2027-03-01",
+      "arrivalLocal": "05:00",
+      "terminalDeparture": "T1",
+      "terminalArrival": "T1",
+      "sourceUrl": "https://www.flight.info/AM36",
+      "verifiedDate": "2026-07-28",
+      "notes": "Horario publicado para domingos hasta 2027-02-28; no sustituye el billete"
+    }
+  },
+  {
+    "id": "WcEjChTjL9zOV5HjUtmh",
+    "data": {
+      "travelerId": "V-001",
+      "segment": 2,
+      "direction": "ida",
+      "status": "probable_pending_ticket",
+      "date": "2027-02-14",
+      "origin": "MAD",
+      "destination": "GDL",
+      "airline": "Aeromexico",
+      "flightNumber": "AM39",
+      "departureLocal": "13:30",
+      "arrivalDate": "2027-02-14",
+      "arrivalLocal": "19:20",
+      "terminalDeparture": "T1",
+      "terminalArrival": "T1",
+      "sourceUrl": "https://www.flight.info/AM39",
+      "verifiedDate": "2026-07-28",
+      "notes": "Horario publicado para domingos de febrero de 2027; no sustituye el billete"
+    }
+  },
+  {
+    "id": "lYkANQ44no4LdKHB3ATy",
+    "data": {
+      "travelerId": "V-001",
+      "segment": 4,
+      "direction": "vuelta",
+      "status": "pending_ticket",
+      "date": "2027-03-01",
+      "origin": "MAD",
+      "destination": "AGP",
+      "airline": "",
+      "flightNumber": "",
+      "departureLocal": "",
+      "arrivalDate": "2027-03-01",
+      "arrivalLocal": "",
+      "terminalDeparture": "",
+      "terminalArrival": "",
+      "sourceUrl": "",
+      "verifiedDate": "",
+      "notes": "Fecha inferida por llegada transatlantica; confirmar tramo y horario en billete"
+    }
+  },
+  {
+    "id": "xU14T4CbCQViI4DMOjGU",
+    "data": {
+      "travelerId": "V-001",
+      "segment": 1,
+      "direction": "ida",
+      "status": "pending_ticket",
+      "date": "2027-02-14",
+      "origin": "AGP",
+      "destination": "MAD",
+      "airline": "",
+      "flightNumber": "",
+      "departureLocal": "",
+      "arrivalDate": "2027-02-14",
+      "arrivalLocal": "",
+      "terminalDeparture": "",
+      "terminalArrival": "",
+      "sourceUrl": "",
+      "verifiedDate": "",
+      "notes": "Confirmar en billete de Dimitar"
+    }
+  }
+]

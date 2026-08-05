@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+
 import { useApp } from "../context/AppContext.jsx";
 import { LANGUAGE_FLAGS, LANGUAGE_FLAGS_ONLY } from "./ui.jsx";
 
@@ -8,12 +9,13 @@ import { resolveGuestName, resolveGuestPhoto } from "../guest-profiles.js";
 
 const NAV_LINKS = [
   ["home", "#top"],
-  ["you", "#identity"],
   ["story", "#story"],
+
   ["venue", "#venue"],
   ["weekend", "#weekend"],
-  ["programme", "#weekend-program"],
   ["attire", "#attire"],
+  ["weather", "#weather"],
+  ["programme", "#weekend-program"],
   ["accommodation", "#accommodation"],
   ["travel", "#travel"],
   ["gift", "#gift"],
@@ -28,16 +30,36 @@ const NAV_LINKS = [
 
 
 function UserMenu() {
-  const { t, profile, signOut, changePassword, language, setLanguage } = useApp();
+  const {
+    t,
+    profile,
+    signOut,
+    changePassword,
+    changeEmail,
+    reauthenticate,
+    language,
+    setLanguage,
+    openIdentityPrompt,
+    musicEnabled,
+    setMusicEnabled,
+  } = useApp();
   const nav = t.nav || {};
+  const identity = t.identity || {};
+
+
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState("menu"); // "menu" | "password"
+  const [accountModal, setAccountModal] = useState(null); // null | "email" | "password"
   const [password, setPassword] = useState("");
-  const [status, setStatus] = useState(null); // { type, text }
+  const [draftEmail, setDraftEmail] = useState("");
+  const [reauthPassword, setReauthPassword] = useState("");
+  const [needsReauth, setNeedsReauth] = useState(false);
+  const [menuStatus, setMenuStatus] = useState(null); // { type, text }
+  const [modalStatus, setModalStatus] = useState(null); // { type, text }
   const [busy, setBusy] = useState(false);
   const menuRef = useRef(null);
 
   const guest = profile?.guest;
+  const isAdmin = guest?.isAdmin === true;
   const photo = guest ? resolveGuestPhoto(guest) : null;
   const { firstName } = guest ? resolveGuestName(guest) : { firstName: "" };
   const initials = (firstName || "?")
@@ -47,19 +69,60 @@ function UserMenu() {
     .join("")
     .toUpperCase();
 
+  const currentEmail = String(profile?.email || "").trim();
+
 
   useEffect(() => {
     if (!open) return;
     const onDocClick = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setOpen(false);
-        setMode("menu");
-        setStatus(null);
+        setMenuStatus(null);
       }
     };
     document.addEventListener("mousedown", onDocClick);
     return () => document.removeEventListener("mousedown", onDocClick);
   }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    setDraftEmail(currentEmail);
+  }, [open, currentEmail]);
+
+  useEffect(() => {
+    if (!accountModal) return;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onEscape = (event) => {
+      if (event.key === "Escape") {
+        setAccountModal(null);
+      }
+    };
+    window.addEventListener("keydown", onEscape);
+
+    return () => {
+      document.body.style.overflow = previous;
+      window.removeEventListener("keydown", onEscape);
+    };
+  }, [accountModal]);
+
+  const openAccountModal = (type) => {
+    setOpen(false);
+    setAccountModal(type);
+    setBusy(false);
+    setModalStatus(null);
+    setPassword("");
+    setDraftEmail(currentEmail);
+    setReauthPassword("");
+    setNeedsReauth(false);
+  };
+
+  const closeAccountModal = () => {
+    setAccountModal(null);
+    setBusy(false);
+    setModalStatus(null);
+  };
 
   const handleLogout = async () => {
     await signOut();
@@ -68,18 +131,64 @@ function UserMenu() {
   const handlePasswordSubmit = async (event) => {
     event.preventDefault();
     if (password.length < 6) {
-      setStatus({ type: "error", text: nav.passwordError });
+      setModalStatus({ type: "error", text: nav.passwordError });
       return;
     }
     setBusy(true);
-    setStatus(null);
+    setModalStatus(null);
     try {
       await changePassword(password);
-      setStatus({ type: "success", text: nav.passwordSuccess });
+      setMenuStatus({ type: "success", text: nav.passwordSuccess });
       setPassword("");
-      setMode("menu");
+      closeAccountModal();
     } catch (error) {
-      setStatus({ type: "error", text: nav.passwordError });
+      setModalStatus({ type: "error", text: nav.passwordError });
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const applyEmailChange = async () => {
+    const result = await changeEmail(draftEmail.trim());
+    if (result?.status === "verification-sent") {
+      setMenuStatus({ type: "success", text: nav.emailVerificationSent || identity.emailVerificationSent });
+    } else if (result?.status === "unchanged") {
+      setMenuStatus({ type: "success", text: nav.emailUnchanged || nav.emailSuccess });
+    } else {
+      setMenuStatus({ type: "success", text: nav.emailSuccess });
+    }
+    closeAccountModal();
+  };
+
+  const handleEmailSubmit = async (event) => {
+    event.preventDefault();
+    const value = draftEmail.trim();
+    if (!value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      setModalStatus({ type: "error", text: nav.emailInvalid || identity.emailInvalid });
+      return;
+    }
+
+    if (needsReauth && !reauthPassword.trim()) {
+      setModalStatus({ type: "error", text: nav.emailReauthPasswordRequired || nav.passwordError });
+      return;
+    }
+
+    setBusy(true);
+    setModalStatus(null);
+    try {
+      if (needsReauth) {
+        await reauthenticate(reauthPassword.trim());
+        setNeedsReauth(false);
+        setReauthPassword("");
+      }
+      await applyEmailChange();
+    } catch (error) {
+      if (error?.code === "auth/requires-recent-login") {
+        setNeedsReauth(true);
+        setModalStatus({ type: "info", text: nav.emailReauthRequired });
+      } else {
+        setModalStatus({ type: "error", text: nav.emailError || identity.emailUpdateError || nav.passwordError });
+      }
     } finally {
       setBusy(false);
     }
@@ -111,82 +220,271 @@ function UserMenu() {
 
       {open && (
         <div className="user-menu__dropdown">
-          {mode === "menu" ? (
-            <>
-              <div className="user-menu__section" role="group" aria-label="Language">
-                <span className="user-menu__section-label">Language</span>
-                <div className="user-menu__langs">
-                  {SUPPORTED_LANGUAGES.map((lang) => (
-                    <button
-                      key={lang}
-                      className={`user-menu__lang-option${lang === language ? " is-active" : ""}`}
-                      type="button"
-                      aria-pressed={lang === language}
-                      onClick={() => setLanguage(lang)}
-                    >
-                      {LANGUAGE_FLAGS[lang]}
-                    </button>
-                  ))}
-                </div>
+          <>
+            <div className="user-menu__section" role="group" aria-label="Language">
+              <span className="user-menu__section-label">Language</span>
+              <div className="user-menu__langs">
+                {SUPPORTED_LANGUAGES.map((lang) => (
+                  <button
+                    key={lang}
+                    className={`user-menu__lang-option${lang === language ? " is-active" : ""}`}
+                    type="button"
+                    aria-pressed={lang === language}
+                    onClick={() => setLanguage(lang)}
+                  >
+                    {LANGUAGE_FLAGS[lang]}
+                  </button>
+                ))}
               </div>
-              <button
-                className="user-menu__item"
-                type="button"
-                onClick={() => {
-                  setMode("password");
-                  setStatus(null);
-                }}
+            </div>
+            <button
+              className="user-menu__item"
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                openIdentityPrompt();
+              }}
+            >
+              <span className="user-menu__item-icon">🪪</span>
+              {identity.eyebrow}
+            </button>
+            {isAdmin && (
+              <a
+                className="user-menu__item user-menu__item--admin"
+                href="/dashboard"
+                onClick={() => setOpen(false)}
               >
-                <span className="user-menu__item-icon">🔑</span>
-                {nav.changePassword}
-              </button>
-              <button
-                className="user-menu__item user-menu__item--danger"
-                type="button"
-                onClick={handleLogout}
-              >
-                <span className="user-menu__item-icon">↪</span>
-                {nav.logout}
-              </button>
-            </>
-          ) : (
+                <span className="user-menu__item-icon">📊</span>
+                {nav.dashboard}
+              </a>
+            )}
+            <button
+              className="user-menu__item"
+              type="button"
+              onClick={() => openAccountModal("email")}
+            >
+              <span className="user-menu__item-icon">✉</span>
+              {nav.changeEmail}
+            </button>
 
-            <form className="user-menu__password" onSubmit={handlePasswordSubmit}>
-              <label htmlFor="user-menu-password">{nav.newPasswordLabel}</label>
-              <input
-                id="user-menu-password"
-                type="password"
-                value={password}
-                placeholder={nav.newPasswordPlaceholder}
-                onChange={(e) => setPassword(e.target.value)}
-                autoFocus
-              />
-              {status && (
-                <p className={`user-menu__status user-menu__status--${status.type}`}>
-                  {status.text}
+            <button
+              className="user-menu__item"
+              type="button"
+              onClick={() => openAccountModal("password")}
+            >
+              <span className="user-menu__item-icon">🔑</span>
+              {nav.changePassword}
+            </button>
+
+            <button
+              className="user-menu__item"
+              type="button"
+              role="switch"
+              aria-checked={musicEnabled}
+              onClick={() => setMusicEnabled(!musicEnabled)}
+            >
+              <span className="user-menu__item-icon">🎵</span>
+              <span className="user-menu__item-label">{nav.music}</span>
+              <span className={`user-menu__toggle${musicEnabled ? " is-on" : ""}`} aria-hidden="true">
+                <span className="user-menu__toggle-knob" />
+              </span>
+            </button>
+
+            <button
+              className="user-menu__item user-menu__item--danger"
+              type="button"
+              onClick={handleLogout}
+            >
+              <span className="user-menu__item-icon">↪</span>
+              {nav.logout}
+            </button>
+
+            {menuStatus && (
+              <p className={`user-menu__status user-menu__status--${menuStatus.type}`}>
+                {menuStatus.text}
+              </p>
+            )}
+          </>
+        </div>
+      )}
+
+      {accountModal && (
+        <div
+          className="user-menu-modal__overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="account-modal-title"
+          onClick={closeAccountModal}
+        >
+          <div
+            className="user-menu-modal__card"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              className="user-menu-modal__close"
+              type="button"
+              aria-label={nav.cancel}
+              onClick={closeAccountModal}
+            >
+              ✕
+            </button>
+
+            <h3 id="account-modal-title" className="user-menu-modal__title">
+              {accountModal === "email" ? nav.changeEmail : nav.changePassword}
+            </h3>
+
+            {accountModal === "email" ? (
+              <form className="user-menu-modal__form" onSubmit={handleEmailSubmit}>
+                <p className="user-menu__notice">
+                  <strong className="user-menu__notice-title">{nav.emailWarningTitle}</strong>
+                  <span>{nav.emailWarningBody}</span>
                 </p>
-              )}
-              <div className="user-menu__password-actions">
-                <button
-                  className="user-menu__item"
-                  type="button"
-                  onClick={() => {
-                    setMode("menu");
-                    setStatus(null);
-                  }}
-                >
-                  {nav.cancel}
-                </button>
-                <button
-                  className="user-menu__item user-menu__item--primary"
-                  type="submit"
-                  disabled={busy}
-                >
-                  {busy ? nav.working : nav.save}
-                </button>
-              </div>
-            </form>
-          )}
+
+                <div className="user-menu__current-email">
+                  <span className="user-menu__current-email-label">{nav.currentEmailLabel}</span>
+                  <span className="user-menu__current-email-value">{currentEmail || "-"}</span>
+                </div>
+
+                <label htmlFor="account-modal-email">{nav.newEmailLabel}</label>
+                <input
+                  id="account-modal-email"
+                  type="email"
+                  value={draftEmail}
+                  placeholder={nav.newEmailPlaceholder}
+                  onChange={(e) => setDraftEmail(e.target.value)}
+                  autoComplete="email"
+                  autoFocus
+                />
+
+                {needsReauth && (
+                  <>
+                    <label htmlFor="account-modal-reauth">{nav.emailReauthLabel}</label>
+                    <input
+                      id="account-modal-reauth"
+                      type="password"
+                      value={reauthPassword}
+                      placeholder={nav.emailReauthPlaceholder}
+                      onChange={(e) => setReauthPassword(e.target.value)}
+                      autoComplete="current-password"
+                    />
+                  </>
+                )}
+
+                {modalStatus && (
+                  <p className={`user-menu__status user-menu__status--${modalStatus.type}`}>
+                    {modalStatus.text}
+                  </p>
+                )}
+
+                <div className="user-menu-modal__actions">
+                  <button
+                    className="user-menu-modal__btn"
+                    type="button"
+                    onClick={closeAccountModal}
+                  >
+                    {nav.cancel}
+                  </button>
+                  <button
+                    className="user-menu-modal__btn user-menu-modal__btn--primary"
+                    type="submit"
+                    disabled={busy}
+                  >
+                    {busy ? nav.working : nav.save}
+                  </button>
+                </div>
+              </form>
+            ) : (
+              <form className="user-menu-modal__form" onSubmit={handlePasswordSubmit}>
+                <label htmlFor="account-modal-password">{nav.newPasswordLabel}</label>
+                <input
+                  id="account-modal-password"
+                  type="password"
+                  value={password}
+                  placeholder={nav.newPasswordPlaceholder}
+                  onChange={(e) => setPassword(e.target.value)}
+                  autoFocus
+                />
+
+                {modalStatus && (
+                  <p className={`user-menu__status user-menu__status--${modalStatus.type}`}>
+                    {modalStatus.text}
+                  </p>
+                )}
+
+                <div className="user-menu-modal__actions">
+                  <button
+                    className="user-menu-modal__btn"
+                    type="button"
+                    onClick={closeAccountModal}
+                  >
+                    {nav.cancel}
+                  </button>
+                  <button
+                    className="user-menu-modal__btn user-menu-modal__btn--primary"
+                    type="submit"
+                    disabled={busy}
+                  >
+                    {busy ? nav.working : nav.save}
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Mobile navigation: a custom dropdown that mirrors the desktop nav's golden
+// underline treatment. It is borderless and translucent so it feels like a
+// floating, integrated menu rather than a boxed control.
+function MobileNav({ activeKey }) {
+  const { t } = useApp();
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const onDocClick = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [open]);
+
+  const activeLabel = t.nav[activeKey] || t.nav.home;
+
+  return (
+    <div className="mobile-nav" ref={menuRef}>
+      <button
+        className="mobile-nav__trigger"
+        type="button"
+        aria-haspopup="true"
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <span className="mobile-nav__label">{activeLabel}</span>
+        <span className={`mobile-nav__arrow${open ? " is-open" : ""}`} aria-hidden="true">
+          ▾
+        </span>
+      </button>
+
+      {open && (
+        <div className="mobile-nav__dropdown">
+          {NAV_LINKS.map(([key, href]) => (
+            <a
+              key={key}
+              href={href}
+              className={`mobile-nav__link${key === activeKey ? " is-active" : ""}`}
+              aria-current={key === activeKey ? "true" : undefined}
+              onClick={() => setOpen(false)}
+            >
+              {t.nav[key]}
+            </a>
+          ))}
         </div>
       )}
     </div>
@@ -194,14 +492,89 @@ function UserMenu() {
 }
 
 export function Nav() {
-  const { t, profile } = useApp();
-  const isNovio = profile?.guest?.isNovio;
+  const { t } = useApp();
+
   const navRef = useRef(null);
   const underlineRef = useRef(null);
   const [canLeft, setCanLeft] = useState(false);
   const [canRight, setCanRight] = useState(false);
   const [activeKey, setActiveKey] = useState("home");
   const [hoverKey, setHoverKey] = useState(null);
+
+  // Keep CSS shell vars in sync with the real rendered sticky bar heights.
+  // This avoids layout gaps when mobile bar heights differ from static rem
+  // tokens due to responsive padding, font metrics, or browser UI changes.
+  useEffect(() => {
+    const root = document.documentElement;
+
+    const updateHeights = () => {
+      const countdown = document.querySelector(".countdown-bar");
+      const header = document.querySelector(".site-header");
+      if (!header) return;
+
+      const countdownHeight = countdown
+        ? countdown.getBoundingClientRect().height
+        : 0;
+      const headerHeight = header.getBoundingClientRect().height;
+
+      root.style.setProperty("--countdown-height", `${countdownHeight}px`);
+      root.style.setProperty("--header-height", `${headerHeight}px`);
+    };
+
+    updateHeights();
+
+    let observer;
+    if (typeof ResizeObserver !== "undefined") {
+      observer = new ResizeObserver(updateHeights);
+      const countdown = document.querySelector(".countdown-bar");
+      const header = document.querySelector(".site-header");
+      if (countdown) observer.observe(countdown);
+      if (header) observer.observe(header);
+    }
+
+    window.addEventListener("resize", updateHeights);
+    window.addEventListener("orientationchange", updateHeights);
+
+    return () => {
+      observer?.disconnect();
+      window.removeEventListener("resize", updateHeights);
+      window.removeEventListener("orientationchange", updateHeights);
+    };
+  }, []);
+
+  // Mobile-only behavior: once the user leaves the very top, keep the
+  // countdown hidden and show only the sticky nav. Countdown reappears only
+  // when returning to the absolute top.
+  useEffect(() => {
+    const root = document.body;
+    const media = window.matchMedia("(max-width: 899px)");
+
+    const clearState = () => {
+      root.classList.remove("mobile-nav-only");
+    };
+
+    const update = () => {
+      if (!media.matches) {
+        clearState();
+        return;
+      }
+
+      const y = window.scrollY;
+      const nearTop = y <= 1;
+      const navOnly = !nearTop;
+      root.classList.toggle("mobile-nav-only", navOnly);
+    };
+
+    update();
+    window.addEventListener("scroll", update, { passive: true });
+    window.addEventListener("resize", update);
+
+    return () => {
+      clearState();
+      window.removeEventListener("scroll", update);
+      window.removeEventListener("resize", update);
+    };
+  }, []);
 
 
   const updateArrows = () => {
@@ -234,7 +607,7 @@ export function Nav() {
   // Position the golden underline under a given nav link (active by default,
   // or the hovered link). Measured via getBoundingClientRect so it stays
   // correct even while the nav is scrolled.
-  const positionUnderline = (key = activeKey) => {
+  const positionUnderline = useCallback((key = activeKey) => {
     const underline = underlineRef.current;
     const header = document.querySelector(".site-header");
     const href = hrefFor(key);
@@ -244,7 +617,8 @@ export function Nav() {
     const linkRect = link.getBoundingClientRect();
     underline.style.left = `${linkRect.left - headerRect.left}px`;
     underline.style.width = `${linkRect.width}px`;
-  };
+  }, [activeKey]);
+
 
 
 
@@ -253,10 +627,10 @@ export function Nav() {
   useEffect(() => {
     const ids = NAV_LINKS.map(([key, href]) => ({ key, id: href.slice(1) }));
     const headerOffset = () => {
-      const countdown = document.querySelector(".countdown");
+      const countdown = document.querySelector(".countdown-bar");
       const header = document.querySelector(".site-header");
-      const cd = countdown ? countdown.offsetHeight : 0;
-      const hd = header ? header.offsetHeight : 0;
+      const cd = countdown ? countdown.getBoundingClientRect().height : 0;
+      const hd = header ? header.getBoundingClientRect().height : 0;
       return cd + hd;
     };
 
@@ -309,24 +683,20 @@ export function Nav() {
       nav.removeEventListener("scroll", onNavScroll);
       window.removeEventListener("resize", onNavScroll);
     };
-  }, [activeKey, hoverKey]);
+  }, [activeKey, hoverKey, positionUnderline]);
+
 
 
   const scrollBy = (dir) => {
     navRef.current?.scrollBy({ left: dir * 240, behavior: "smooth" });
   };
 
-
-
-  const handleMobileNav = (event) => {
-    const href = event.target.value;
-    if (href) window.location.hash = href;
-  };
-
   return (
+
     <header className="site-header">
       <span className="nav-underline" ref={underlineRef} aria-hidden="true" />
       <div className="desktop-nav-wrap">
+
 
 
         <button
@@ -356,11 +726,6 @@ export function Nav() {
               {t.nav[key]}
             </a>
           ))}
-          {isNovio && (
-            <a className="nav-dashboard-link" href="/dashboard">
-              📊 {t.nav.dashboard}
-            </a>
-          )}
         </nav>
 
 
@@ -374,31 +739,15 @@ export function Nav() {
         </button>
       </div>
 
+      <MobileNav activeKey={activeKey} />
+
       <div className="site-header__actions">
         <UserMenu />
         <a className="header-rsvp" href="#rsvp">
           {t.nav.rsvp}
         </a>
       </div>
-
-
-
-      <select
-        className="mobile-nav-select"
-        aria-label="Navigation"
-        defaultValue=""
-        onChange={handleMobileNav}
-      >
-        <option value="" disabled>
-          {t.nav.you}
-        </option>
-        {NAV_LINKS.map(([key, href]) => (
-          <option key={key} value={href}>
-            {t.nav[key]}
-          </option>
-        ))}
-        {isNovio && <option value="/dashboard">📊 {t.nav.dashboard}</option>}
-      </select>
     </header>
+
   );
 }

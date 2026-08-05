@@ -3,6 +3,7 @@ import { EVENT } from "../content.js";
 import { MEDIA } from "../media.js";
 import { getGroupTag } from "../invitation-profile.js";
 import { useApp } from "../context/AppContext.jsx";
+import { resolveGuestName } from "../guest-profiles.js";
 import { CoupleNames, HeroDate } from "./ui.jsx";
 
 function heroImages() {
@@ -47,15 +48,36 @@ export function Hero() {
   }, [paused, images.length]);
 
   const groupTag = guest
-    ? getGroupTag(guest.invitacionGroup || guest.group).label
+    ? getGroupTag(guest.invitationGroup || guest.group).label
     : "";
+  const fullName = guest ? resolveGuestName(guest).fullName : "";
+  const customMessage = String(
+    profile?.custom?.message
+      || profile?.guest?.customContent?.message
+      || profile?.guest?.message
+      || "",
+  ).trim();
+  const customMessageAuthor = String(
+    profile?.custom?.messageAuth
+      || profile?.custom?.messageAuthor
+      || profile?.guest?.customContent?.messageAuth
+      || profile?.guest?.customContent?.messageAuthor
+      || profile?.guest?.messageAuth
+      || profile?.guest?.messageAuthor
+      || "",
+  ).trim();
+  const hasCustomHeroMessage = Boolean(customMessage);
 
   return (
     <section className="hero" id="top">
       <div className={`hero-art${images.length ? " has-photo" : ""}`}>
         {images.length ? (
           <>
-            <div className="hero-slides" role="img" aria-label={t.hero.imageAlt}>
+            <div
+              className="hero-slides"
+              role="img"
+              aria-label={t.hero.imageAlt}
+            >
               {images.map((image, index) => {
                 const src = typeof image === "string" ? image : image.src;
                 const position =
@@ -117,7 +139,7 @@ export function Hero() {
       <div className="hero-content">
         {guest && (
           <p className="hero-guest-name">
-            {guest.firstName} {guest.lastName}
+                {fullName}
           </p>
         )}
         <p className="hero-eyebrow">{t.hero.eyebrow}</p>
@@ -133,16 +155,25 @@ export function Hero() {
           {EVENT.place}
         </p>
         {guest && <p className="hero-group-name">{groupTag}</p>}
-        <p className="hero-invitation">{t.hero.invitation}</p>
+        {hasCustomHeroMessage ? (
+          <p className="hero-invitation hero-invitation--custom">
+            <span className="hero-invitation__message">{customMessage}</span>
+            {customMessageAuthor && (
+              <span className="hero-invitation__author">{customMessageAuthor}</span>
+            )}
+          </p>
+        ) : (
+          <p className="hero-invitation">{t.hero.invitation}</p>
+        )}
         <span className="hero-date-label">{EVENT.dateShort}</span>
-
       </div>
 
-      <a className="scroll-cue" href="#identity">
-
-        <span>{t.hero.scroll}</span>
-        <span aria-hidden="true">↓</span>
-      </a>
+      <nav className="section-nav section-nav--light hero-section-nav" aria-label="Continue">
+        <a className="section-nav-link" href="#story">
+          <span>{t.hero.navStory}</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </nav>
     </section>
   );
 }

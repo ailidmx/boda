@@ -23,6 +23,7 @@ import { readFileSync, existsSync } from "fs";
 import { homedir } from "os";
 import { fileURLToPath } from "url";
 import { dirname, join } from "path";
+import { createRequire } from "module";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -56,34 +57,57 @@ if (!serviceAccount) {
   process.exit(1);
 }
 
-const { initializeApp, cert } = await import("firebase-admin/app");
-const { getAuth } = await import("firebase-admin/auth");
+// Resolve firebase-admin from the invitation app's node_modules to avoid
+// the CJS/ESM interop issue with jwks-rsa/jose in firebase-admin v14.
+const invitationDir = join(__dirname, "..");
+const reqFromInvitation = createRequire(join(invitationDir, "package.json"));
+const adminPath = reqFromInvitation.resolve("firebase-admin");
+const authPath = reqFromInvitation.resolve("firebase-admin/auth");
 
-const app = initializeApp({
-  credential: cert(serviceAccount),
-  projectId: "boda-500805",
-});
+const admin = await import(adminPath);
+const { getAuth } = await import(authPath);
 
-const auth = getAuth(app);
+if (admin.getApps().length === 0) {
+  admin.initializeApp({
+    credential: admin.cert(serviceAccount),
+    projectId: serviceAccount.project_id || "boda-500805",
+  });
+}
+
+const auth = getAuth();
+
 
 
 // ── CSV parsing ────────────────────────────────────────────────────────
 //
 // The CSV has numeric columns with unquoted thousands separators (e.g.
-// `$5,310`), so a naive split(",") misaligns every column after them. The
-// last three columns are always `username,firebase_email,password` and never
-// contain commas, so we extract them from the tail of each line. The guest
-// name is the third column (also comma-free).
+// `$5,310`), so a naive split(",") misaligns every column after them. We
+// use the header row to find the exact column indices for `username`,
+// `firebase_email`, and `password`.
 
 function parseAccounts(text) {
   const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
+  if (lines.length < 2) return [];
+
+  // Parse header to find column indices
+  const headers = lines[0].split(",").map((h) => h.trim());
+  const usernameIdx = headers.indexOf("username");
+  const emailIdx = headers.indexOf("firebase_email");
+  const passwordIdx = headers.indexOf("password");
+  const nameIdx = headers.indexOf("Nombre");
+
+  if (usernameIdx === -1 || emailIdx === -1) {
+    console.error("CSV missing required columns: username, firebase_email");
+    return [];
+  }
+
   const accounts = [];
   for (let i = 1; i < lines.length; i++) {
     const cells = lines[i].split(",");
-    const username = (cells[cells.length - 3] || "").trim();
-    const email = (cells[cells.length - 2] || "").trim();
-    const password = (cells[cells.length - 1] || "").trim();
-    const name = (cells[2] || "").trim();
+    const username = (cells[usernameIdx] || "").trim();
+    const email = (cells[emailIdx] || "").trim();
+    const password = (cells[passwordIdx] || "").trim();
+    const name = nameIdx >= 0 ? (cells[nameIdx] || "").trim() : "";
     if (!username || !email) continue;
     accounts.push({
       username,
@@ -94,6 +118,7 @@ function parseAccounts(text) {
   }
   return accounts;
 }
+
 
 const csv = readFileSync(CSV_PATH, "utf-8");
 const accounts = parseAccounts(csv);

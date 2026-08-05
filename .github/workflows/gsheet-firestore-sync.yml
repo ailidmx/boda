@@ -1,0 +1,109 @@
+name: GSheet -> Firestore/Auth Sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Run mode
+        required: true
+        type: choice
+        default: dry-run
+        options:
+          - dry-run
+          - execute
+      fail_on_drift:
+        description: Fail on drift (dry-run only)
+        required: false
+        type: boolean
+        default: true
+      mark_stale:
+        description: Mark stale Firestore docs as deleted
+        required: false
+        type: boolean
+        default: false
+      sheet_id:
+        description: Google Sheet ID override (optional)
+        required: true
+        type: string
+      sheet_name:
+        description: Google Sheet tab name override (optional)
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: gsheet-firestore-sync-${{ github.ref_name }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Write service account for Firebase + Sheets
+        run: |
+          mkdir -p integraciones/google_sheets
+          printf '%s' '${{ secrets.FIREBASE_SERVICE_ACCOUNT_BODA_500805 }}' > integraciones/google_sheets/service_account.json
+
+      - name: Build sync command
+        id: cmd
+        env:
+          MODE: ${{ inputs.mode }}
+          FAIL_ON_DRIFT: ${{ inputs.fail_on_drift }}
+          MARK_STALE: ${{ inputs.mark_stale }}
+          SHEET_ID_INPUT: ${{ inputs.sheet_id }}
+          SHEET_NAME_INPUT: ${{ inputs.sheet_name }}
+        run: |
+          set -euo pipefail
+
+          cmd="node scripts/gsheet-firestore-sync.mjs"
+          cmd+=" --report-json=reports/gsheet-firestore-sync-report.json"
+          cmd+=" --report-md=reports/gsheet-firestore-sync-report.md"
+
+          if [ "${MODE}" = "execute" ]; then
+            cmd+=" --execute"
+          else
+            cmd+=" --ci"
+            if [ "${FAIL_ON_DRIFT}" = "true" ]; then
+              cmd+=" --fail-on-drift"
+            fi
+          fi
+
+          if [ "${MARK_STALE}" = "true" ]; then
+            cmd+=" --mark-stale"
+          fi
+
+          cmd+=" --sheet-id=${SHEET_ID_INPUT}"
+
+          if [ -n "${SHEET_NAME_INPUT}" ]; then
+            cmd+=" --sheet-name=${SHEET_NAME_INPUT}"
+          fi
+
+          echo "command=${cmd}" >> "$GITHUB_OUTPUT"
+          echo "Prepared command: ${cmd}"
+
+      - name: Run sync
+        run: ${{ steps.cmd.outputs.command }}
+
+      - name: Upload sync reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gsheet-firestore-sync-report-${{ github.run_id }}
+          path: |
+            reports/gsheet-firestore-sync-report.json
+            reports/gsheet-firestore-sync-report.md
+          if-no-files-found: warn

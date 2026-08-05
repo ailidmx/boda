@@ -1,0 +1,164 @@
+/* ── Language-preference modal ───────────────────────────────────────────
+ * Shown right after sign-in when the guest's preferred language differs
+ * from the browser language they saw on the login page. The invitation has
+ * already switched to the preferred language in the background; this modal
+ * lets the guest confirm it or switch back to their browser language.
+ */
+
+.lang-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: rgb(41 59 53 / 72%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: lang-modal-fade 0.25s ease-out;
+}
+
+.lang-modal-card {
+  /* Same width as the login card so the "David y Aydé" crossing animation
+     travels the exact same distance and feels identical to the login. */
+  position: relative;
+  width: min(100%, 34rem);
+  border: 1px solid rgb(255 253 248 / 35%);
+  padding: clamp(1.75rem, 6vw, 2.75rem);
+  background: var(--cream);
+  box-shadow: 0 2rem 6rem rgb(0 0 0 / 35%);
+  color: var(--ink);
+  text-align: center;
+  animation: lang-modal-pop 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Close (✕) button — attached to the header, not the body. Its centre sits
+   exactly on the top-right border of the card (half the button pokes out),
+   matching the login/identity modal treatment. */
+.lang-modal-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+  z-index: 2;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgb(36 33 25 / 18%);
+  border-radius: 50%;
+  background: var(--cream);
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.lang-modal-close:hover {
+  background: var(--marigold);
+  border-color: var(--marigold);
+  color: var(--white);
+}
+
+.lang-modal-close:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 2px;
+}
+
+
+/* Inner scroll container — keeps the card's overflow visible so the close
+   (✕) button can bleed out above the card without being clipped. */
+.lang-modal-scroll {
+  max-height: min(92vh, 52rem);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.lang-modal-title {
+  margin: 0.75rem 0 0.9rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 5vw, 2rem);
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.lang-modal-body {
+  margin: 0;
+  color: var(--ink);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+.lang-modal-actions {
+  display: grid;
+  gap: 0.6rem;
+  margin-top: 1.75rem;
+}
+
+.lang-modal-btn {
+  width: 100%;
+  border: 1px solid transparent;
+  padding: 0.8rem 1.25rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s, background 0.2s, color 0.2s;
+}
+
+.lang-modal-btn:hover {
+  opacity: 0.9;
+}
+
+.lang-modal-btn:active {
+  transform: translateY(1px);
+}
+
+.lang-modal-btn:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 3px;
+}
+
+.lang-modal-btn--primary {
+  background: var(--marigold);
+  color: var(--white);
+}
+
+.lang-modal-btn--ghost {
+  border-color: rgb(36 25 33 / 35%);
+  background: transparent;
+  color: var(--ink);
+}
+
+.lang-modal-btn--ghost:hover {
+  background: rgb(36 25 33 / 6%);
+}
+
+@keyframes lang-modal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes lang-modal-pop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lang-modal-overlay,
+  .lang-modal-card {
+    animation: none;
+  }
+}

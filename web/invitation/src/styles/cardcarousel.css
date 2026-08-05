@@ -1,0 +1,103 @@
+/* Reusable card carousel: transparent on desktop so existing grids keep their
+   layout, native horizontal scroll-snap on mobile. */
+.swipe-card-carousel,
+.swipe-card-carousel__viewport {
+  width: 100%;
+  min-width: 0;
+}
+
+.swipe-card-carousel__dots {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .swipe-card-carousel__viewport {
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .swipe-card-carousel__viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .swipe-card-carousel__track {
+    display: flex;
+    align-items: stretch;
+    gap: 0.75rem;
+    width: max-content;
+    min-width: 100%;
+    padding: 0.2rem 0.75rem 0.8rem;
+  }
+
+  .swipe-card-carousel__track > * {
+    flex: 0 0 min(78vw, 19rem);
+    width: min(78vw, 19rem);
+    min-width: 0;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+
+  .swipe-card-carousel__track .flavour-card,
+  .swipe-card-carousel__track .flavour-card:nth-child(4),
+  .swipe-card-carousel__track .flavour-card:nth-child(5),
+  .swipe-card-carousel__track .flavour-card:last-child {
+    grid-column: auto;
+  }
+
+  .swipe-card-carousel__track .flavour-card img,
+  .swipe-card-carousel__track .flavour-card:nth-child(4) img,
+  .swipe-card-carousel__track .flavour-card:nth-child(5) img,
+  .swipe-card-carousel__track .flavour-card__illustration {
+    height: min(58vw, 14rem);
+  }
+
+  .playlist-section {
+    padding: 1rem;
+  }
+
+  .swipe-card-carousel__track .music-act {
+    min-height: 18rem;
+    border: 1px solid rgb(255 255 255 / 22%);
+  }
+
+  .swipe-card-carousel__track .playlist-card {
+    min-height: 20rem;
+  }
+
+  .swipe-card-carousel__dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    margin-top: 0.35rem;
+  }
+
+  .swipe-card-carousel__dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: currentColor;
+    color: rgb(36 33 25 / 25%);
+    cursor: pointer;
+    transition: color 180ms ease, transform 180ms ease;
+  }
+
+  .music-section .swipe-card-carousel__dot {
+    color: rgb(255 255 255 / 30%);
+  }
+
+  .swipe-card-carousel__dot.is-active {
+    color: var(--terracotta);
+    transform: scale(1.25);
+  }
+
+  .music-section .swipe-card-carousel__dot.is-active {
+    color: var(--marigold);
+  }
+}

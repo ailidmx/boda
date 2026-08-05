@@ -1,7 +1,7 @@
 # Firestore Schema — Boda
 
 > Definición de colecciones, tipos de campos y relaciones entre entidades.
-> Versión: 2026-07-29
+> Versión: 2026-08-03
 
 ---
 
@@ -9,251 +9,118 @@
 
 - **Doc ID**: se especifica por colección.
 - **Tipos**: `string`, `number`, `boolean`, `Timestamp`, `Reference`, `Array`, `Map`.
-- **Referencias**: se indican como `Reference<collection>`.
 - **Campos opcionales**: marcados con `?`.
 - **Moneda**: todos los precios en MXN (pesos mexicanos). Conversión a EUR se hace en capa de presentación.
+- **Idioma de campos**: TODOS los nombres de campo en Firestore son en inglés (camelCase). NO se usan nombres en español (ej. `invitacionGroup`, `celular`, `capacidad`, `ocupacion`). Usar `invitationGroup`, `phone`, `capacity`, `occupancy`.
+- **Schema estricto**: las reglas de Firestore (`firebase/firestore.rules`) usan `hasOnly(...)` para rechazar cualquier campo no acordado. El frontend NO puede crear campos nuevos; debe ceñirse a este schema.
+- **Migración**: para renombrar campos legacy (`invitacionGroup` → `invitationGroup`, `celular` → `phone`, `capacidad` → `capacity`, etc.) ejecutar `web/invitation/scripts/rename-fields.mjs` (hace backup y merge, no pierde datos).
 
 ---
 
-## 1. `guests/{row}`
+## 1. `guests/{id}`
 
-Doc ID = número de fila del CSV (1-based).
+Doc ID = ID único del invitado (e.g. `"david_aïli"`, `"mónica_quezada_rangel"`).
 
 | Campo | Tipo | Descripción |
 |---|---|---|
-| `row` | `number` | Número de fila en CSV (1-based) |
-| `firstName` | `string` | Nombre |
-| `lastName` | `string` | Apellido |
-| `email` | `string` | Correo electrónico |
-| `phone` | `string` | Teléfono / WhatsApp (editable por el grupo vía CRUD) |
-| `groupId` | `string` | Referencia a `guest_groups/{name}` |
-| `cabinId` | `string` o `null` | Referencia a `cabins/{code}`. `null` si no tiene cabaña |
-| `isChild` | `boolean` | `true` si es Niño, `false` si Adulto |
-| `gender` | `string` | `"H"` o `"M"` |
-| `invitationSent` | `boolean` | Si se envió invitación |
-| `confirmed` | `boolean` | Si confirmó asistencia |
-| `confirmedDate` | `string` o `null` | Fecha de confirmación (formato ISO) |
+| `id` | `string` | ID único del invitado (doc ID) |
+| `identity` | `map` | Datos de identidad del invitado |
+| `identity.firstName` | `string` | Nombre |
+| `identity.middleName` | `string` | Nombre 2 (opcional) |
+| `identity.lastName` | `string` | Apellido |
+| `identity.maternalLastName` | `string` | Apellido materno / Apellido 2 (canónico, opcional) |
+| `identity.gender` | `string` | Género / tratamiento del invitado (opcional) |
+| `identity.cloudinaryId` | `string` | ID de foto en Cloudinary (opcional) |
+| `identity.lang` | `string` | Idioma preferido: `"es"`, `"fr"`, `"en"` |
+| `identity.age` | `string` | Edad (opcional) |
+| `identity.phone` | `string` | Teléfono / WhatsApp |
+| `idCheckUser` | `boolean` | Si el usuario verificó su identidad |
+| `gender` | `string` | Copia de compatibilidad; usar `identity.gender` como campo canónico |
+| `cloudinaryId` | `string` | Copia de compatibilidad; usar `identity.cloudinaryId` como campo canónico |
+| `message` | `string` | Mensaje personalizado (opcional) |
+| `messageAuthor` | `string` | Autor del mensaje (opcional) |
+| `invitationGroup` | `string` | Grupo de invitación (e.g. `"David y Aydé"`, `"Familia Rako"`) |
+| `tagGroup` | `string` | Grupo de etiqueta (e.g. `"PetanclubGDL"`, `"Novios"`) |
+| `hosting` | `map` | Datos de hospedaje del invitado |
+| `hosting.cabin` | `string` | Nombre de la cabaña asignada (opcional) |
+| `hosting.room` | `string` | ID de la habitación asignada (opcional) |
+| `hosting.xtraCabin` | `string` | Cabaña extra (opcional) |
+| `hosting.xtraRoom` | `string` | Habitación extra (opcional) |
+| `hosting.isCabinPaidByNovios` | `boolean` | Cabaña pagada por los novios |
+| `hosting.isCabinPaid` | `boolean` | Cabaña pagada |
+| `hosting.isXtraCabinPaidByNovios` | `boolean` | Cabaña extra pagada por los novios |
+| `hosting.isXtraCabinPaid` | `boolean` | Cabaña extra pagada |
+| `table` | `string` | Mesa asignada (opcional) |
+| `sent` | `boolean` | Si se envió la invitación |
+| `rsvp` | `map` | Objeto anidado con confirmaciones RSVP |
+| `rsvp.friday` | `boolean` | Confirmó asistencia viernes |
+| `rsvp.saturday` | `boolean` | Confirmó asistencia sábado |
+| `rsvp.sunday` | `boolean` | Confirmó asistencia domingo |
+| `rsvp.confirmCabin` | `boolean` | Confirmó cabaña |
+| `rsvp.cabinWaitingList` | `boolean` | En lista de espera de cabaña |
+| `rsvp.xtra` | `boolean` | Confirmó cabaña extra |
+| `rsvp.playa` | `boolean` | Confirmó playa |
+| `rsvp.petanca` | `boolean` | Confirmó petanca |
+| `rsvp.needBalls` | `boolean` | Necesita bolas de petanca |
+| `modifiedAt` | `string` | Fecha de última modificación |
+| `travelsByPlane` | `boolean` | Viaja en avión |
 
-> **Contacto editable:** Los miembros de un grupo de invitación pueden actualizar
-> `phone` y `email` de cualquier miembro de su propio grupo (regla
-> `hasValidGuestContactFields` en `firebase/firestore.rules`). El CRUD de la
-> invitación escribe estos campos en `guests/{guestId}`.
+| `isAdmin` | `boolean` | Es administrador |
+| `_source` | `string` | Fuente de datos (e.g. `"google_sheet"`) |
+| `_migratedAt` | `string` | Fecha de migración (ISO) |
 
-
-**Relaciones:**
-- `groupId` → `guest_groups/{name}`
-- `cabinId` → `cabins/{code}`
+**Reglas:** Los invitados pueden actualizar sus propios campos RSVP y contacto. La pareja puede actualizar todo. El schema se valida con `hasValidGuestFields()` en `firebase/firestore.rules`.
 
 ---
 
-## 2. `guest_groups/{name}`
+## 2. `rooms/{roomId}`
 
-Doc ID = nombre del grupo (e.g. `"PetanclubGDL"`, `"Novios"`, `"Familia de David"`).
+Doc ID = ID único de la habitación (e.g. `"VILLA MARGARITA-1"`, `"CASONA-3"`).
 
 | Campo | Tipo | Descripción |
 |---|---|---|
-| `name` | `string` | Nombre interno del grupo (doc ID) |
-| `label` | `string` | Etiqueta visible (idioma neutro) |
-| `labelEn` | `string` | Etiqueta en inglés |
-| `labelFr` | `string` | Etiqueta en francés |
-| `memberCount` | `number` | Número de miembros (calculado) |
+| `id` | `string` | ID único de la habitación (doc ID) |
+| `cabin` | `string` | Nombre de la cabaña (e.g. `"VILLA MARGARITA"`) |
+| `description` | `map` | Descripciones localizadas `{ es, fr, en }` |
+| `capacity` | `number` | Capacidad máxima de personas |
+| `isShared` | `boolean` | Si la habitación es compartida entre grupos |
+| `_source` | `string` | Fuente de datos (e.g. `"cuartos.csv"`) |
+| `_migratedAt` | `string` | Fecha de migración (ISO) |
 
-**Grupos conocidos:**
-- `Novios`
-- `PetanclubGDL`
-- `Amigos de David`
-- `Amigos de Aydé`
-- `Familia de David`
-- `Familia de Aydé`
-- `Golden`
-- `Pintura`
-- `38 Tonnes`
+**Uso:** La colección `rooms` es la fuente de verdad para el inventario de habitaciones. Se carga al inicio con `loadRooms()` tanto en la invitación como en el dashboard. La ocupación se calcula en tiempo de ejecución contando los invitados asignados a cada habitación (campo `room` en `guests`).
+
+**Reglas:** Solo la pareja puede escribir; todos pueden leer. El schema se valida con `hasValidRoomFields()` en `firebase/firestore.rules`.
 
 ---
 
-## 3. `cabins/{code}`
+## 3. `cabins/{id}`
 
-Doc ID = código de cabaña (e.g. `"AZALEA"`, `"DALIA"`, `"CABAÑA_31"`).
+Doc ID = código estable de la cabaña (e.g. `"VILLA AZALEA"`, `"CABAÑA 1"`).
 
 | Campo | Tipo | Descripción |
 |---|---|---|
-| `code` | `string` | Código único de cabaña (doc ID) |
-| `name` | `string` | Nombre completo (e.g. `"AZALEA - 12p"`) |
+| `id` | `string` | ID único de la cabaña (doc ID) |
+| `name` | `string` | Nombre público con capacidad (e.g. `"CABAÑA MADERA - 2p"`) |
 | `capacity` | `number` | Capacidad nominal |
-| `occupancy` | `number` | Ocupación actual (personas asignadas) |
-| `occupancyPct` | `number` | Porcentaje de ocupación (0–100) |
+| `capacityRoomCheck` | `number` | Capacidad de verificación por habitación |
 | `totalPrice2Nights` | `number` | Precio total por 2 noches (MXN) |
 | `pricePerPerson2Nights` | `number` | Precio por persona 2 noches (MXN) |
 | `pricePerPersonPerNight` | `number` | Precio por persona por noche (MXN) |
-| `tags` | `array<string>` | Etiquetas (e.g. `["Petanca", "Novios"]`) |
-| `selected` | `boolean` | Si está seleccionada en el plan |
+| `isPrivate` | `boolean` | Si es privada |
+| `isBooked` | `boolean` | Si está reservada |
+| `isBookedXtra` | `boolean` | Si está reservada como extra |
+| `isPaid` | `boolean` | Si está pagada |
+| `isPaidXtra` | `boolean` | Si está pagada como extra |
+| `_source` | `string` | Fuente de datos (e.g. `"cabanas_inventario.csv"`) |
+| `_migratedAt` | `string` | Fecha de migración (ISO) |
 
-**Códigos conocidos:**
-- `AZALEA`, `DALIA`, `MARGARITA`, `LAVANDA`, `HORTENCIA`
-- `CABAÑA_31`, `CABAÑA_32`, `CABAÑA_33`, `CABAÑA_34`
-- `CABAÑA_6`, `CABAÑA_5`, `CABAÑA_4`
-- `CASONA`
+**Ocupación:** `occupancy` y `occupancyPct` no se almacenan. Ambos valores se calculan a partir de las asignaciones de habitación de la colección `guests` y de la capacidad de `rooms`.
 
----
-
-## 4. `assignments/{id}`
-
-Doc ID = número de fila del CSV de asignación (propuesta_v2).
-
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `id` | `number` | ID de la asignación |
-| `guestName` | `string` | Nombre completo del invitado |
-| `group` | `string` | Grupo del invitado |
-| `cabinId` | `string` | Referencia a `cabins/{code}` |
-| `priority` | `string` | Prioridad: `"alta"`, `"media"`, `"baja"` |
-| `status` | `string` | Estado: `"propuesta_v2"`, `"propuesta_v2_reubicar"` |
-| `notes` | `string` | Notas operativas |
+**Uso:** La colección `cabins` proporciona el nombre público de la cabaña y sus datos de reserva. La colección `rooms` sigue siendo la fuente de verdad para el detalle de las habitaciones.
 
 ---
 
-## 5. `travel_groups/{groupId}`
-
-Doc ID = ID del grupo de viaje (e.g. `"G-001"`, `"G-002"`).
-
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `groupId` | `string` | ID del grupo (doc ID) |
-| `name` | `string` | Nombre del grupo (e.g. `"Dimitar + acompañante"`) |
-| `arrivalDate` | `string` | Fecha de llegada (ISO) |
-| `departureDate` | `string` | Fecha de salida (ISO) |
-| `dateStatus` | `string` | Estado de fechas: `"partial"`, `"tentative"`, `"confirmed"` |
-| `attendanceStatus` | `string` | Estado de asistencia: `"confirmed"` |
-| `origin` | `string` | Ciudad/país de origen |
-| `airport` | `string` | Aeropuerto de llegada (e.g. `"GDL"`) |
-| `totalPeople` | `number` | Total de personas en el grupo |
-| `coordinator` | `string` | Nombre del coordinador |
-| `notes` | `string` | Notas |
-
----
-
-## 6. `group_members/{autoId}`
-
-Doc ID = ID auto-generado por Firestore.
-
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `groupId` | `string` | Referencia a `travel_groups/{groupId}` |
-| `guestId` | `number` | Referencia a `guests/{row}` |
-| `travelerId` | `string` o `null` | Referencia a `travelers/{travelerId}` |
-| `name` | `string` | Nombre del miembro |
-| `role` | `string` | Rol: `"principal"`, `"acompanante"` |
-| `travelStatus` | `string` | Estado: `"booked"`, `"unknown"`, `"tentative"` |
-
----
-
-## 7. `travelers/{travelerId}`
-
-Doc ID = ID del viajero (e.g. `"V-001"`, `"V-002"`).
-
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `travelerId` | `string` | ID del viajero (doc ID) |
-| `travelGroupId` | `string` | Referencia a `travel_groups/{groupId}` |
-| `guestId` | `number` | Referencia a `guests/{row}` |
-| `name` | `string` | Nombre del viajero |
-| `originCity` | `string` | Ciudad de origen |
-| `originCountry` | `string` | País de origen |
-| `tripStart` | `string` | Fecha inicio del viaje (ISO) |
-| `tripEnd` | `string` | Fecha fin del viaje (ISO) |
-| `arrivalAirport` | `string` | Aeropuerto de llegada |
-| `flightStatus` | `string` | Estado de vuelos |
-| `stayStatus` | `string` | Estado de estancias |
-| `transferStatus` | `string` | Estado de traslados |
-| `notes` | `string` | Notas |
-
----
-
-## 8. `flights/{autoId}`
-
-Doc ID = ID auto-generado por Firestore.
-
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `travelerId` | `string` | Referencia a `travelers/{travelerId}` |
-| `segment` | `number` | Número de segmento (1, 2, 3…) |
-| `direction` | `string` | Dirección: `"ida"`, `"vuelta"` |
-| `status` | `string` | Estado del vuelo |
-| `date` | `string` | Fecha del vuelo (ISO) |
-| `origin` | `string` | Código aeropuerto origen (e.g. `"AGP"`) |
-| `destination` | `string` | Código aeropuerto destino (e.g. `"MAD"`) |
-| `airline` | `string` | Aerolínea |
-| `flightNumber` | `string` | Número de vuelo |
-| `departureLocal` | `string` | Hora de salida local (HH:mm) |
-| `arrivalDate` | `string` | Fecha de llegada (ISO) |
-| `arrivalLocal` | `string` | Hora de llegada local (HH:mm) |
-| `terminalDeparture` | `string` | Terminal de salida |
-| `terminalArrival` | `string` | Terminal de llegada |
-| `sourceUrl` | `string` | URL de fuente del horario |
-| `verifiedDate` | `string` | Fecha de verificación (ISO) |
-| `notes` | `string` | Notas |
-
----
-
-## 9. `stays/{autoId}`
-
-Doc ID = ID auto-generado por Firestore.
-
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `travelerId` | `string` | Referencia a `travelers/{travelerId}` |
-| `block` | `number` | Bloque de estancia (1, 2, 3…) |
-| `checkIn` | `string` | Fecha de check-in (ISO) |
-| `checkOut` | `string` | Fecha de check-out (ISO) |
-| `city` | `string` | Ciudad |
-| `place` | `string` | Lugar / nombre del alojamiento |
-| `address` | `string` | Dirección |
-| `status` | `string` | Estado: `"pending"`, `"confirmed"`, `"tentative_pending"` |
-| `contact` | `string` | Contacto |
-| `notes` | `string` | Notas |
-
----
-
-## 10. `transfers/{transferId}`
-
-Doc ID = ID del traslado (e.g. `"TR-001"`, `"TR-002"`).
-
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `transferId` | `string` | ID del traslado (doc ID) |
-| `travelerId` | `string` | Referencia a `travelers/{travelerId}` |
-| `type` | `string` | Tipo: `"recogida_llegada"`, `"regreso_aeropuerto"` |
-| `date` | `string` | Fecha (ISO) |
-| `airport` | `string` | Aeropuerto |
-| `flightRef` | `string` | Referencia del vuelo |
-| `flightTime` | `string` | Hora del vuelo |
-| `airportTargetTime` | `string` | Hora objetivo en aeropuerto |
-| `pickupSuggestedTime` | `string` | Hora sugerida de recogida |
-| `origin` | `string` | Origen |
-| `destination` | `string` | Destino |
-| `responsible` | `string` | Responsable |
-| `vehicle` | `string` | Vehículo |
-| `status` | `string` | Estado: `"planning"`, `"blocked"`, `"confirmed"` |
-| `notes` | `string` | Notas |
-
----
-
-## 11. `invitation_groups/{groupId}`
-
-Doc ID = nombre del grupo (e.g. `"Familia de David"`, `"PetanclubGDL"`).
-
-| Campo | Tipo | Descripción |
-|---|---|---|
-| `customContent.greeting` | `string` | Saludo personalizado (HTML) que aparece arriba del perfil |
-| `customContent.message` | `string` | Mensaje personalizado (HTML) dentro de la tarjeta de perfil |
-| `customContent.section` | `string` | Sección extra (HTML) que se renderiza después del perfil |
-| `customContent.hideSections` | `array<string>` | IDs de secciones a ocultar (ej: `["schedule", "gift"]`) |
-
-**Uso:** El contenido se carga al inicio con `loadGroupCustomContent()` y se mergea con el contenido por invitado (el contenido del invitado sobrescribe al del grupo).
-
----
-
-## 12. `budget/{autoId}`
+## 4. `budget/{autoId}`
 
 Doc ID = ID auto-generado por Firestore.
 
@@ -274,22 +141,177 @@ Doc ID = ID auto-generado por Firestore.
 
 ---
 
+## 5. `thanks/{autoId}`
+
+Doc ID = ID auto-generado por Firestore.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `guest` | `string` | ID del invitado |
+| `es` | `string` | Mensaje de agradecimiento en español |
+| `fr` | `string` | Mensaje de agradecimiento en francés |
+| `en` | `string` | Mensaje de agradecimiento en inglés |
+| `_source` | `string` | Fuente de datos |
+| `_migratedAt` | `string` | Fecha de migración (ISO) |
+
+---
+
+## 6. `attendance_responses/{guestId}`
+
+Doc ID = ID del invitado (mismo que `guests/{id}`).
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `guestId` | `string` | ID del invitado |
+| `friday` | `string` | Asistencia viernes: `"yes"`, `"no"`, `"maybe"`, `""` |
+| `saturday` | `string` | Asistencia sábado: `"yes"`, `"no"`, `"maybe"`, `""` |
+| `sunday` | `string` | Asistencia domingo: `"yes"`, `"no"`, `"maybe"`, `""` |
+| `invitationGroup` | `string` | Grupo de invitación |
+| `updatedBy` | `string` | ID del invitado que editó |
+| `language` | `string` | Idioma: `"es"`, `"fr"`, `"en"` |
+| `schemaVersion` | `number` | Versión del schema (`1`) |
+| `updatedAt` | `Timestamp` | Fecha de última actualización |
+
+**Reglas:** Cualquier invitado autenticado puede crear/actualizar la respuesta de asistencia de sí mismo o de miembros de su grupo de invitación. El schema se valida con `hasValidAttendanceFields()` en `firebase/firestore.rules`.
+
+---
+
+## 7. `rsvp_submissions/{submissionId}`
+
+Doc ID = ID auto-generado por Firestore.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `firstName` | `string` | Nombre |
+| `lastName` | `string` | Apellido |
+| `email` | `string` | Correo electrónico |
+| `whatsapp` | `string` | WhatsApp |
+| `attendance` | `string` | Asistencia |
+| `groupMode` | `string` | Modo de grupo |
+| `groupName` | `string` | Nombre del grupo |
+| `partySize` | `string` | Tamaño del grupo |
+| `adults` | `string` | Adultos |
+| `children` | `string` | Niños |
+| `guests` | `string` | Invitados |
+| `accommodation` | `string` | Alojamiento |
+| `travelStatus` | `string` | Estado de viaje |
+| `arrivalFrom` | `string` | Origen de llegada |
+| `arrivalTo` | `string` | Destino de llegada |
+| `arrivalDate` | `string` | Fecha de llegada |
+| `arrivalTime` | `string` | Hora de llegada |
+| `arrivalAirline` | `string` | Aerolínea de llegada |
+| `arrivalFlight` | `string` | Vuelo de llegada |
+| `departureFrom` | `string` | Origen de salida |
+| `departureTo` | `string` | Destino de salida |
+| `departureDate` | `string` | Fecha de salida |
+| `departureTime` | `string` | Hora de salida |
+| `departureAirline` | `string` | Aerolínea de salida |
+| `departureFlight` | `string` | Vuelo de salida |
+| `route` | `string` | Ruta |
+| `notes` | `string` | Notas |
+| `invitationCode` | `string` | Código de invitación |
+| `language` | `string` | Idioma: `"es"`, `"fr"`, `"en"` |
+| `schemaVersion` | `number` | Versión del schema (`3`) |
+| `createdAt` | `Timestamp` | Fecha de creación |
+
+**Reglas:** Solo invitados autenticados pueden crear. El schema se valida con `hasValidRsvpFields()` en `firebase/firestore.rules`.
+
+---
+
+## 8. `experience_suggestions/{submissionId}`
+
+Doc ID = ID auto-generado por Firestore.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `name` | `string` | Nombre |
+| `dessert` | `string` | Postre |
+| `foodSuggestion` | `string` | Sugerencia de comida |
+| `songTitle` | `string` | Título de canción |
+| `songArtist` | `string` | Artista |
+| `singInterest` | `string` | Interés en cantar |
+| `extra` | `string` | Extra |
+| `invitationCode` | `string` | Código de invitación |
+| `language` | `string` | Idioma: `"es"`, `"fr"`, `"en"` |
+| `schemaVersion` | `number` | Versión del schema (`1`) |
+| `createdAt` | `Timestamp` | Fecha de creación |
+
+**Reglas:** Solo invitados autenticados pueden crear. El schema se valida con `hasOnly` en `firebase/firestore.rules`.
+
+---
+
+## 9. `coast_interest/{submissionId}`
+
+Doc ID = ID auto-generado por Firestore.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `name` | `string` | Nombre |
+| `interest` | `string` | Interés |
+| `partySize` | `string` | Tamaño del grupo |
+| `nights` | `string` | Noches |
+| `destination` | `string` | Destino |
+| `style` | `string` | Estilo |
+| `note` | `string` | Nota |
+| `invitationCode` | `string` | Código de invitación |
+| `language` | `string` | Idioma: `"es"`, `"fr"`, `"en"` |
+| `schemaVersion` | `number` | Versión del schema (`1`) |
+| `createdAt` | `Timestamp` | Fecha de creación |
+
+**Reglas:** Solo invitados autenticados pueden crear. El schema se valida con `hasOnly` en `firebase/firestore.rules`.
+
+---
+
+## 10. `petanque_participation/{submissionId}`
+
+Doc ID = ID auto-generado por Firestore.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| `petanqueParticipation` | `string` | Participación en petanca |
+| `petanquePartySize` | `string` | Tamaño del grupo de petanca |
+| `petanqueNames` | `string` | Nombres de participantes |
+| `petanqueOwnBoules` | `string` | Trae sus propias bolas |
+| `invitationCode` | `string` | Código de invitación |
+| `language` | `string` | Idioma: `"es"`, `"fr"`, `"en"` |
+| `schemaVersion` | `number` | Versión del schema (`1`) |
+| `createdAt` | `Timestamp` | Fecha de creación |
+
+**Reglas:** Solo invitados autenticados pueden crear. El schema se valida con `hasOnly` en `firebase/firestore.rules`.
+
+
+---
+
+## Colecciones eliminadas
+
+Las siguientes colecciones fueron eliminadas en la migración de 2026-08-02 y ya no existen:
+
+- `guest_auth`
+- `guest_profiles`
+- `guest_groups`
+
+- `assignments`
+- `flights`
+- `stays`
+- `transfers`
+- `travel_groups`
+- `travelers`
+- `group_members`
+
+---
+
 ## Diagrama de relaciones
 
 ```
-guests ──groupId──→ guest_groups
+guests ──invitationGroup──→ (agrupación lógica, no colección)
   │
-  └──cabinId──→ cabins
+  ├──room──→ rooms
   │
-  └──guestId──→ group_members ──groupId──→ travel_groups
-                  │
-                  └──travelerId──→ travelers ──travelGroupId──→ travel_groups
-                                     │
-                                     ├──→ flights
-                                     ├──→ stays
-                                     └──→ transfers
+  ├──cabin──→ cabins (legacy)
+  │
+  └──table──→ (mesa, no colección)
 
-assignments ──cabinId──→ cabins
+rooms ──cabin──→ cabins (legacy)
 ```
 
 ---
@@ -297,6 +319,6 @@ assignments ──cabinId──→ cabins
 ## Notas
 
 - **Currency**: Todos los precios están en MXN. La conversión a EUR se hará en la capa de presentación (frontend) con un módulo de conversión.
-- **Cabin codes**: Son los códigos cortos (e.g. `"AZALEA"`, `"CABAÑA_31"`) — NO el nombre completo del CSV (e.g. `"AZALEA - 12p"`).
-- **Invitation codes**: Se derivan en tiempo de lectura desde `guests.cabinId` + datos del guest. No se almacenan directamente.
-- **Occupancy**: Se calcula como número de guests con ese `cabinId`, no se almacena manualmente.
+- **Occupancy**: Se calcula como número de guests con ese `room` o `cabin`, no se almacena manualmente.
+- **Schema estricto**: Las reglas de Firestore usan `hasOnly(...)` para rechazar campos no acordados. El frontend NO puede crear campos nuevos.
+- **Migración**: Para renombrar campos legacy ejecutar `web/invitation/scripts/rename-fields.mjs`.

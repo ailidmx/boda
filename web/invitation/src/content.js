@@ -49,6 +49,7 @@ export const content = {
       accommodation: "Alojamiento",
       travel: "Vengo de lejos",
       attire: "Vestuario",
+      weather: "Clima",
       gift: "Regalos",
       photos: "Fotos",
       thanks: "Gracias",
@@ -58,8 +59,29 @@ export const content = {
 
 
       dashboard: "admin",
+      changeEmail: "Cambiar correo",
       changePassword: "Cambiar contraseña",
+      music: "Música",
       logout: "Cerrar sesión",
+
+      emailWarningTitle: "Atención al cambiar tu correo",
+      emailWarningBody:
+        "Tu acceso a la invitación quedará ligado al nuevo correo. Te enviaremos una verificación y debes confirmarla para completar el cambio.",
+      currentEmailLabel: "Correo actual",
+      newEmailLabel: "Nuevo correo",
+      newEmailPlaceholder: "nuevo@correo.com",
+      emailInvalid: "Escribe un correo válido.",
+      emailSuccess: "Correo actualizado.",
+      emailUnchanged: "Ese correo ya está activo en tu cuenta.",
+      emailError: "No pudimos cambiar el correo. Inténtalo de nuevo.",
+      emailVerificationSent:
+        "Te enviamos un correo de verificación al nuevo email. Confírmalo para completar el cambio.",
+      emailReauthRequired:
+        "Por seguridad, confirma tu contraseña para cambiar el correo.",
+      emailReauthLabel: "Contraseña actual",
+      emailReauthPlaceholder: "Escribe tu contraseña",
+      emailReauthPasswordRequired: "Escribe tu contraseña actual.",
+
       newPasswordLabel: "Nueva contraseña",
       newPasswordPlaceholder: "Mínimo 6 caracteres",
       passwordError: "La contraseña debe tener al menos 6 caracteres.",
@@ -87,6 +109,7 @@ export const content = {
       invitation: "Queremos celebrar este momento con ustedes",
 
       scroll: "Empecemos",
+      navStory: "Descubrir nuestra invitación",
 
       imageNote: "Aquí irá nuestra fotografía",
       imageAlt: "David y Aydé juntos",
@@ -97,6 +120,8 @@ export const content = {
     identity: {
       eyebrow: "Verificación de identidad",
       title: "¿Está bien escrito tu nombre?",
+      titleGroup: "¿Los datos de {count} invitados de este grupo son correctos?",
+      titleSingle: "¿Tus datos personales son correctos?",
 
       body:
         "Queremos que cada invitado se sienta reconocido. Si tu nombre o el de alguien de tu grupo está mal escrito, corrígelo aquí y lo usaremos en la invitación y en la mesa.",
@@ -106,9 +131,21 @@ export const content = {
       you: "Tú",
       firstName: "Nombre",
       lastName: "Apellido",
+      firstNameLabel: "Nombre",
+      middleNameLabel: "Segundo nombre",
+      lastNameLabel: "Apellido",
+      maternalLastNameLabel: "Segundo apellido",
+      nombreLabel: "Nombre",
+      nombre2Label: "Segundo nombre",
+      apellidoLabel: "Apellido",
+      apellido2Label: "Segundo apellido",
+
       fullName: "Nombre completo",
       editName: "Corregir nombre",
+
       correctNumber: "Corregir número",
+      edit: "Editar",
+
 
       addPhoto: "Subir foto",
 
@@ -135,15 +172,21 @@ export const content = {
       phoneLabel: "Número de celular",
 
       phonePlaceholder: "Ej. 33 1234 5678",
+      phoneMissing: "Número de celular faltante",
       emailLabel: "Correo electrónico",
       emailPlaceholder: "tucorreo@ejemplo.com",
       phoneRequired: "Escribe tu número de celular.",
       emailRequired: "Escribe tu correo electrónico.",
       emailInvalid: "Escribe un correo electrónico válido.",
+      emailVerificationSent: "Te enviamos un correo de verificación al nuevo email. Confírmalo para completar el cambio.",
+      emailUpdateError: "No pudimos actualizar el correo. Verifica que sea válido y, si aparece un correo de verificación, confírmalo primero.",
       back: "Atrás",
       next: "Continuar",
       finish: "Terminar",
+      confirm: "Confirmar",
+      ok: "Sí, es correcto",
       contactSaved: "¡Listo! Gracias por confirmar tus datos.",
+
       whatsappLabel: "Agrégame al grupo de WhatsApp",
       whatsappHint:
         "Únete al grupo para recibir avisos, coordinación de traslados y novedades del fin de semana.",
@@ -175,6 +218,7 @@ export const content = {
         "Roca Azul está a orillas del lago, con vistas al atardecer.",
       ],
       anecdotesLabel: "El lago de Chapala en 12 anécdotas",
+      mapLabel: "Cómo llegar a Roca Azul",
       navNext: "Descubrir el lugar",
 
     },
@@ -240,6 +284,8 @@ export const content = {
       saturday: {
         eyebrow: "Sábado 20 · programa",
         title: "La tarde, paso a paso",
+        citation:
+          "Del primer brindis al último baile: una tarde que camina hacia el faro y termina en fiesta.",
         warning:
           "Quienes vengan desde Guadalajara: salgan con bastante anticipación. Los accesos hacia Jocotepec pueden congestionarse fácilmente y necesitamos que todos estén en Roca Azul a las 13:00.",
 
@@ -257,6 +303,8 @@ export const content = {
       friday: {
         eyebrow: "Viernes 19 · programa",
         title: "Llegada y bienvenida",
+        citation:
+          "Del primer encuentro a la primera pizza: el fin de semana empieza sin prisas.",
         warning:
           "Un primer encuentro relajado para instalarnos, convivir y empezar el fin de semana sin prisas.",
         items: [
@@ -268,12 +316,15 @@ export const content = {
       sunday: {
         eyebrow: "Domingo 21 · programa",
         title: "Desayuno y despedida",
+        citation:
+          "Una última mañana juntos, entre desayunos y abrazos de despedida.",
         warning: "Una última mañana juntos antes de los regresos.",
         items: [
           { time: "Mañana", title: "Desayuno", body: "Desayuno incluido para quienes se hospedan en las cabañas." },
           { time: "Mediodía", title: "Despedida", body: "Últimos momentos juntos y regresos." },
         ],
       },
+
     },
     weather: {
       eyebrow: "El clima esperado",
@@ -297,8 +348,7 @@ export const content = {
         "Protector solar y lentes de sol para las primeras horas.",
         "Calzado cómodo para jardines y espacios exteriores.",
       ],
-      disclaimer:
-        "Esto es una referencia climática, no un pronóstico. Publicaremos aquí la previsión real aproximadamente diez días antes de la boda.",
+      navNext: "Ver el programa",
     },
     food: {
       eyebrow: "A la mesa",
@@ -332,6 +382,11 @@ export const content = {
           key: "guacamole",
           title: "Guacamole y opciones vegetarianas",
           body: "Habrá guacamole, tortillas, salsas y otros acompañamientos sin carne. Podrán indicar sus restricciones en el RSVP.",
+        },
+        {
+          key: "pizza",
+          title: "Pizza",
+          body: "Pizzas para compartir el viernes por la noche: una bienvenida sencilla e informal después de las llegadas y la petanca.",
         },
       ],
       days: [
@@ -563,11 +618,76 @@ export const content = {
         "Contamos con alojamiento en el lugar para aproximadamente 80 personas. Como necesitamos distribuir las cabañas y las habitaciones con cuidado, les pedimos que nos indiquen cuanto antes si desean aprovechar esta opción.",
       facts: [
         { value: "≈ 80–90", label: "lugares disponibles" },
-        { value: "$1,200 MXN", label: "por persona · 2 noches" },
+        {
+          value: "≈ $1,200 MXN",
+          euroValue: "≈ €60",
+          label: "por persona · 2 noches",
+        },
         { value: "2", label: "desayunos incluidos" },
       ],
       specialNote:
         "El alojamiento se reserva únicamente como paquete completo de dos noches, del viernes 19 al domingo 21: no es posible reservar una sola noche. El precio estimado es de $1,200 MXN por persona por las dos noches e incluye los dos desayunos del fin de semana.",
+      noteTitle: "A tener en cuenta",
+      noCabinRecommendation:
+        "Les recomendamos buscar un hotel o un Airbnb en los alrededores.",
+      guestOption: {
+        eyebrow: "Tu alojamiento",
+        membersLabel: "Miembros del grupo",
+        linkLabel: "Consultar la opción prevista para ti",
+        backLabel: "Volver al alojamiento",
+        onSiteTitle: "Una plaza está prevista en Roca Azul",
+        onSiteBody:
+          "Esta es la opción registrada para tu perfil. Te confirmaremos directamente cualquier ajuste.",
+        independentTitle: "Alojamiento por tu cuenta",
+        independentBody:
+          "Les recomendamos buscar un hotel o un Airbnb en los alrededores.",
+        cabinLabel: "Cabaña",
+        roomLabel: "Habitación",
+        cabinCapacityLabel: "Capacidad de la casa",
+        roomCapacityLabel: "Capacidad del cuarto",
+        cabinPriceLabel: "Precio de la cabaña · 2 días",
+        personPriceLabel: "Precio por persona · 2 noches",
+        coveredPriceLabel: "Pagado por los novios",
+        peopleLabel: "personas",
+        cabinOccupancyLabel: "Modalidad de la cabaña",
+        roomOccupancyLabel: "Modalidad de la habitación",
+        occupancy: { privada: "Privada", compartida: "Compartida" },
+        wholeCabinTitle: "Ocupación completa de la cabaña",
+        wholeCabinBody: "Todas las habitaciones y las personas asignadas a cada una.",
+        emptyRoom: "Sin personas asignadas",
+        youLabel: "Tú",
+        airbnbTitle: "Airbnbs cerca de Roca Azul",
+        airbnbBody:
+          "Estas opciones aparecieron en la zona para las noches del 19 al 21 de febrero de 2027. Confirma la disponibilidad y el precio directamente en Airbnb.",
+        airbnbAreaPrice: "Precio de entrada observado en la zona",
+        fromPrice: "Desde · tarifa orientativa",
+        perNight: "por noche",
+        beforeTaxes: "sin impuestos",
+        airbnbGuests: "huéspedes",
+        airbnbBedrooms: "habitaciones",
+        airbnbBeds: "camas",
+        airbnbRating: "Calificación",
+        airbnbView: "Ver alojamiento",
+        airbnbSearchAll: "Ver toda la búsqueda en Airbnb",
+        hotelTitle: "Hoteles cerca de Roca Azul",
+        hotelBody:
+          "Tarifas de referencia observadas actualmente. Consulta con cada hotel la disponibilidad, los impuestos y el precio final para las noches del 19 al 21 de febrero de 2027.",
+        hotelLocation: "Zona",
+        hotelView: "Ver hotel",
+        hotelTypes: {
+          spaHotel: "Hotel spa",
+          boutiqueSpa: "Resort boutique y spa",
+          thermalHotel: "Hotel y aguas termales",
+        },
+        paymentLabel: "Pago",
+        payment: {
+          covered: "Cubierto por los novios",
+          paid: "Pago registrado",
+          pending: "Por confirmar",
+        },
+        extraCabinLabel: "Alojamiento adicional",
+        button: "Actualizar mi RSVP",
+      },
 
 
       contactPrompt: "Más info",
@@ -761,14 +881,34 @@ export const content = {
       eyebrow: "Vestuario",
       title: "Estética mexicana y código de vestimenta",
       body:
-        "Hemos elegido una estética mexicana para nuestra boda como un homenaje a la cultura, la comida, la música y el lugar que nos reúne. Queremos que todo se sienta festivo, colorido y profundamente mexicano.",
+        "Nos hace muchísima ilusión compartir este día con ustedes, y queremos que, así como cada persona ha dejado una huella especial en nuestra vida, también cada uno aporte un poco de su esencia a esta celebración.",
       dressCode: {
-        title: "No hay código de vestimenta",
-        body:
-          "Queremos que se sientan ustedes mismos, sin disfraces. Si quieren ser elegantes, sean elegantes; si quieren ir relajados, vayan relajados. Lo importante es que se sientan cómodos. Tengan en cuenta que necesitarán un conjunto completo de ropa: habrá natación, baño de vapor, deportes, la ceremonia, el baile y, si la noche se alarga junto a la fogata, un suéter ligero.",
+        title: "Vístete de color",
+        paragraphs: [
+          "Creemos que los colores transmiten energía, alegría y personalidad.",
+          "Por eso, nos encantaría que nos acompañaran vistiendo tonos llenos de vida, procurando evitar el negro, el gris y el blanco.",
+          "Nuestra boda tendrá una inspiración mexicana, con una decoración en tonos blancos y detalles artesanales.",
+          "David llevará una guayabera de lino blanco con bordados dorados, y ambos vestiremos piezas bordadas por artesanas de una comunidad de Oaxaca, como un homenaje a la riqueza de nuestras tradiciones.",
+          "La única regla es que se sientan ustedes mismos: elegantes, cómodos y listos para celebrar, bailar y llenar este día de color, amor y buena energía.",
+        ],
+        pictograms: {
+          ariaLabel: "Pictogramas del código de vestimenta",
+          noWhite: "Sin blanco",
+          noBlack: "Sin negro",
+          noGrey: "Sin gris",
+          colorGreen: "Viste de verde",
+          colorTeal: "Viste de turquesa",
+          colorMarigold: "Viste de amarillo",
+          dressNoWhite: "Sin vestido blanco",
+          dressNoBlack: "Sin vestido negro",
+          dressNoGrey: "Sin vestido gris",
+          dressColor: "Vestido de color",
+          funky: "Funky",
+          mexican: "Patrones mexicanos",
+        },
       },
       guestNote:
-        "Lo más importante es que se sientan cómodos y celebren con nosotros. Si tienen dudas, escríbanos.",
+        "¡Gracias por ser parte de nuestra historia! ✨🌼",
       navNext: "Alojamiento",
 
     },
@@ -809,9 +949,9 @@ export const content = {
         "Sin nuestros padrinos y ayudantes nada de esto sería posible. Queremos dar su lugar a todos los que ayudaron a que esto sea posible con toda nuestra gratitud a ...",
 
       credits: [
-        { name: "Manuel Amuezca", role: "Wedding planner" },
-        { name: "Manuel Amuezca", role: "Pizzas del viernes" },
-        { name: "Manuel Amuzeca", role: "Pizzas del viernes" },
+        { name: "Manuel Amezcua", role: "Wedding planner" },
+        { name: "Manuel Amezcua", role: "Pizzas del viernes" },
+        { name: "Manuel Amezcua", role: "Pizzas del viernes" },
         { name: "Ismael", role: "Pizzas" },
         { name: "Isabel Guadalupe", role: "Vestuario de los novios" },
       ],
@@ -904,8 +1044,8 @@ export const content = {
       petanque: {
         eyebrow: "Torneo de petanca",
         intro: "El viernes por la tarde organizaremos un torneo de petanca. ¿Se apuntan?",
-        organizerLabel: "Organiza: David",
-        organizerWhatsapp: "https://wa.me/523332017504",
+        organizerLabel: "Organiza: Pierre",
+        organizerWhatsapp: "https://wa.me/523310212012",
         fields: {
           participation: "¿Participan en el torneo?",
           partySize: "¿Cuántas personas?",
@@ -1020,7 +1160,8 @@ export const content = {
       venue: "Le lieu",
       accommodation: "Hébergement",
       travel: "Je viens de loin",
-      attire: "Tenues",
+      attire: "Code vestimentaire",
+      weather: "Météo",
       gift: "Cadeaux",
       photos: "Photos",
       thanks: "Merci",
@@ -1030,8 +1171,29 @@ export const content = {
 
 
       dashboard: "admin",
+      changeEmail: "Changer l’adresse e-mail",
       changePassword: "Changer le mot de passe",
+      music: "Musique",
       logout: "Se déconnecter",
+
+      emailWarningTitle: "Attention avant de changer l’adresse e-mail",
+      emailWarningBody:
+        "Votre accès à l’invitation passera par cette nouvelle adresse. Un e-mail de vérification sera envoyé et devra être confirmé.",
+      currentEmailLabel: "Adresse actuelle",
+      newEmailLabel: "Nouvelle adresse",
+      newEmailPlaceholder: "nouveau@email.com",
+      emailInvalid: "Saisissez une adresse e-mail valide.",
+      emailSuccess: "Adresse e-mail mise à jour.",
+      emailUnchanged: "Cette adresse est déjà active sur votre compte.",
+      emailError: "Impossible de changer l’adresse e-mail. Réessayez.",
+      emailVerificationSent:
+        "Un e-mail de vérification a été envoyé à la nouvelle adresse. Confirmez-le pour finaliser le changement.",
+      emailReauthRequired:
+        "Pour des raisons de sécurité, confirmez votre mot de passe pour changer l’adresse e-mail.",
+      emailReauthLabel: "Mot de passe actuel",
+      emailReauthPlaceholder: "Saisissez votre mot de passe",
+      emailReauthPasswordRequired: "Saisissez votre mot de passe actuel.",
+
       newPasswordLabel: "Nouveau mot de passe",
       newPasswordPlaceholder: "6 caractères minimum",
       passwordError: "Le mot de passe doit contenir au moins 6 caractères.",
@@ -1059,6 +1221,7 @@ export const content = {
       invitation: "Nous voulons vivre ce moment avec vous",
 
       scroll: "Commençons",
+      navStory: "Découvrir notre invitation",
 
       imageNote: "Notre photographie viendra ici",
       imageAlt: "David et Aydé ensemble",
@@ -1069,6 +1232,8 @@ export const content = {
     identity: {
       eyebrow: "Vérification d'identité",
       title: "Votre nom est-il bien écrit ?",
+      titleGroup: "Les infos des {count} invités sont-elles correctes ?",
+      titleSingle: "Vos infos personelles sont elles correctes ?",
 
       body:
         "Nous voulons que chaque invité se sente reconnu. Si votre nom ou celui d’un membre de votre groupe est mal orthographié, corrigez-le ici et nous l’utiliserons dans l’invitation et à table.",
@@ -1078,9 +1243,21 @@ export const content = {
       you: "Vous",
       firstName: "Prénom",
       lastName: "Nom",
+      firstNameLabel: "Prénom",
+      middleNameLabel: "Deuxième prénom",
+      lastNameLabel: "Nom",
+      maternalLastNameLabel: "Deuxième nom",
+      nombreLabel: "Prénom",
+      nombre2Label: "Deuxième prénom",
+      apellidoLabel: "Nom",
+      apellido2Label: "Deuxième nom",
+
       fullName: "Nom complet",
       editName: "Corriger le nom",
+
       correctNumber: "Corriger le numéro",
+      edit: "Modifier",
+
 
       addPhoto: "Déposer une photo",
 
@@ -1090,6 +1267,7 @@ export const content = {
       saving: "Enregistrement…",
       cancel: "Annuler",
       saved: "C’est fait ! Nous l’avons mis à jour.",
+      savedWithName: "C'est fait, {name} est à jour.",
       saveError: "Impossible d’enregistrer. Vérifiez votre connexion et réessayez.",
       nameRequired: "Écrivez au moins votre prénom.",
       photoSaved: "Photo enregistrée ! Merci.",
@@ -1107,15 +1285,21 @@ export const content = {
       phoneLabel: "Numéro de portable",
 
       phonePlaceholder: "Ex. 33 12 34 56 78",
+      phoneMissing: "Numéro de portable manquant",
       emailLabel: "Adresse e-mail",
       emailPlaceholder: "votrecourriel@exemple.com",
       phoneRequired: "Écrivez votre numéro de portable.",
       emailRequired: "Écrivez votre adresse e-mail.",
       emailInvalid: "Écrivez une adresse e-mail valide.",
+      emailVerificationSent: "Un e-mail de vérification a été envoyé à la nouvelle adresse. Confirmez-le pour finaliser le changement.",
+      emailUpdateError: "Impossible de mettre à jour l’adresse e-mail. Vérifiez qu’elle est valide et, si un e-mail de vérification est envoyé, confirmez-le d’abord.",
       back: "Retour",
       next: "Continuer",
       finish: "Terminer",
+      confirm: "Confirmer",
+      ok: "Confirm",
       contactSaved: "C’est fait ! Merci d’avoir confirmé vos coordonnées.",
+
       whatsappLabel: "Ajoutez-moi au groupe WhatsApp",
       whatsappHint:
         "Rejoignez le groupe pour recevoir les avis, la coordination des transferts et les nouveautés du week-end.",
@@ -1148,6 +1332,7 @@ export const content = {
         "Roca Azul se trouve au bord du lac, face au coucher de soleil.",
       ],
       anecdotesLabel: "Le lac de Chapala en 12 anecdotes",
+      mapLabel: "Comment rejoindre Roca Azul",
       navNext: "Découvrir le lieu",
 
     },
@@ -1212,6 +1397,8 @@ export const content = {
       saturday: {
         eyebrow: "Samedi 20 · programme",
         title: "L’après-midi, pas à pas",
+        citation:
+          "Du premier toast au dernier pas de danse : un après-midi qui marche vers le phare et finit en fête.",
         warning:
           "Pour celles et ceux qui viennent de Guadalajara : partez très en avance. Les accès vers Jocotepec peuvent facilement être embouteillés et nous avons besoin que tout le monde soit à Roca Azul à 13 h.",
 
@@ -1229,10 +1416,13 @@ export const content = {
       friday: {
         eyebrow: "Vendredi 19 · programme",
         title: "Arrivée et bienvenue",
+        citation:
+          "De première boule à la dernière pizza : le week-end commence sans se presser.",
+
         warning:
           "Un premier moment détendu pour s’installer, se retrouver et commencer le week-end sans se presser.",
         items: [
-          { time: "Dès midi", title: "Arrivées et check-in", body: "Accueil et temps pour s’installer dans les cabanes." },
+          { time: "Dès midi", title: "Arrivées et check-in", body: "Accueil et temps pour s’installer dans les gîtes." },
           { time: "Après-midi", title: "Pétanque et jeux", body: "Des jeux en plein air pour briser la glace." },
           { time: "Soir", title: "Pizzas de bienvenue", body: "Un dîner informel pour se retrouver sans se presser." },
         ],
@@ -1240,12 +1430,15 @@ export const content = {
       sunday: {
         eyebrow: "Dimanche 21 · programme",
         title: "Petit-déjeuner et au revoir",
+        citation:
+          "Une dernière matinée ensemble, entre petits-déjeuners et au revoir.",
         warning: "Une dernière matinée ensemble avant les départs.",
         items: [
-          { time: "Matin", title: "Petit-déjeuner", body: "Petit-déjeuner inclus pour les personnes logées dans les cabanes." },
+          { time: "Matin", title: "Petit-déjeuner", body: "Petit-déjeuner inclus pour les personnes logées dans les gîtes." },
           { time: "Midi", title: "Au revoir", body: "Derniers moments ensemble et départs." },
         ],
       },
+
     },
     weather: {
       eyebrow: "La météo habituelle",
@@ -1269,8 +1462,7 @@ export const content = {
         "De la crème solaire et des lunettes pour les premières heures.",
         "Des chaussures confortables pour les jardins et les espaces extérieurs.",
       ],
-      disclaimer:
-        "Il s’agit d’une tendance climatique, pas d’une prévision. La météo réelle sera publiée ici environ dix jours avant le mariage.",
+      navNext: "Voir le programme",
     },
     food: {
       eyebrow: "À table",
@@ -1305,6 +1497,11 @@ export const content = {
           title: "Guacamole et options végétariennes",
           body: "Il y aura du guacamole, des tortillas, des sauces et d’autres accompagnements sans viande. Vous pourrez préciser vos restrictions dans le RSVP.",
         },
+        {
+          key: "pizza",
+          title: "Pizza",
+          body: "Des pizzas à partager le vendredi soir : un accueil simple et informel après les arrivées et la pétanque.",
+        },
       ],
       days: [
         {
@@ -1319,7 +1516,7 @@ export const content = {
           day: "Samedi",
           title: "Des carnitas à la taquiza",
           items: [
-            "Petit-déjeuner inclus pour les personnes logées dans les cabanes.",
+            "Petit-déjeuner inclus pour les personnes logées dans les gîtes.",
             "Carnitas pour le déjeuner.",
             "Tejuino, avec option tejuino loco à la tequila ou au mezcal.",
             "Taquiza dans la soirée.",
@@ -1330,7 +1527,7 @@ export const content = {
           day: "Dimanche",
           title: "Un dernier petit-déjeuner ensemble",
           items: [
-            "Petit-déjeuner inclus pour les personnes logées dans les cabanes.",
+            "Petit-déjeuner inclus pour les personnes logées dans les gîtes.",
             "Une matinée tranquille avant les départs ou la suite vers la côte.",
           ],
         },
@@ -1456,18 +1653,18 @@ export const content = {
       eyebrow: "Le lieu",
       title: "Tout le club à votre disposition",
       body:
-        "Entre cérémonie et célébration, tout le club est à nous : piscines, jardins, terrains et cabanes pour se retrouver, explorer ou simplement se reposer.",
+        "Entre cérémonie et célébration, tout le club est à nous : piscines, jardins, terrains et gîtes pour se retrouver, explorer ou simplement se reposer.",
 
       videoTitle: "Vidéo de présentation de Roca Azul",
       privacyTitle: "Intimité",
       privacyBody:
-        "Toutes les cabanes seront louées par les invités du mariage, environ 80 à 90 personnes. En outre, d’autres invités du mariage seront logés non loin, peut-être à proximité, ou viendront seulement pour la journée : environ 60 personnes selon les estimations actuelles. Le club ne sera toutefois pas entièrement privé ce week-end : certains espaces accueillent encore des tentes ou des caravanes. Nous partagerons les lieux et respecterons le calme. La musique pourra jouer jusqu’à 2 h du matin, puis nous continuerons dans les cabanes.",
+        "Tous les gîtes seront louées par les invités du mariage, environ 80 à 90 personnes. En outre, d’autres invités du mariage seront logés non loin, peut-être à proximité, ou viendront seulement pour la journée : environ 60 personnes selon les estimations actuelles. Le club ne sera toutefois pas entièrement privé ce week-end : certains espaces accueillent encore des tentes ou des caravanes. Nous partagerons les lieux et respecterons le calme. La musique pourra jouer jusqu’à 2 h du matin, puis nous continuerons dans les gîtes.",
 
       gallery: [
         { key: "pool", title: "Piscines", alt: "Piscine et jardins du Club Roca Azul" },
         { key: "courts", title: "Sport", alt: "Terrains de sport de Roca Azul" },
         { key: "gardens", title: "Jardins", alt: "Espaces verts du Club Roca Azul" },
-        { key: "cabins", title: "Cabanes", alt: "Cabanes et chambres de Roca Azul" },
+        { key: "cabins", title: "Gîtes", alt: "Gîtes et chambres de Roca Azul" },
 
       ],
       gallerySource: "Photos du lieu : Club Roca Azul",
@@ -1476,7 +1673,7 @@ export const content = {
         "Vue du Club Roca Azul",
         "Jardins du Club Roca Azul",
         "Piscine du Club Roca Azul",
-        "Cabanes du Club Roca Azul",
+        "Gîtes du Club Roca Azul",
         "Lac de Chapala depuis Roca Azul",
         "Coucher de soleil à Roca Azul",
       ],
@@ -1521,7 +1718,7 @@ export const content = {
       note:
         "Liste fondée sur les services publiés par Roca Azul. Certains espaces, horaires, activités ou suppléments devront être confirmés à l’approche de la date.",
       navNext: "Découvrir le lieu",
-      navContinue: "Continuer",
+      navContinue: "Réserver la date",
       navIdentity: "Votre nom est-il bien écrit ?",
     },
     accommodation: {
@@ -1529,28 +1726,93 @@ export const content = {
       eyebrow: "Hébergement",
       title: "Dormir sur place, nous organiser à temps",
       citation:
-        "Nous serons à Roca Azul dès le jeudi. Les invités pourront arriver à partir du vendredi vers midi, et la célébration principale sera un mariage d’après-midi le samedi.",
+        "La fête commence dès le vendredi ou le samedi dans l’après-midi. Il est conseillé de réserver un logement sur place.",
       body:
-        "Nous disposons d’environ 80 places sur le lieu. Comme les cabanes et les chambres doivent être réparties avec soin, merci de nous indiquer dès que possible si cette option vous intéresse.",
+        "Nous disposons d’environ 80 places sur le lieu. Malheureusement, nous ne pouvons pas proposer cette option à tout le monde. Comme les gîtes et les chambres doivent être répartis avec soin, merci de nous indiquer dès que possible l’option d’hébergement que vous aurez choisie.",
       facts: [
         { value: "≈ 80–90", label: "places disponibles" },
-        { value: "1 200 MXN", label: "par personne · 2 nuits" },
+        {
+          value: "≈ 1 200 MXN",
+          euroValue: "≈ 60 €",
+          label: "par personne · 2 nuits",
+        },
         { value: "2", label: "petits-déjeuners inclus" },
       ],
       specialNote:
         "L’hébergement se réserve uniquement sous la forme d’un forfait complet de deux nuits, du vendredi 19 au dimanche 21 : une seule nuit n’est pas possible. Le tarif estimatif est de 1 200 MXN par personne pour les deux nuits et comprend les deux petits-déjeuners du week-end.",
+      noteTitle: "À savoir",
+      noCabinRecommendation:
+        "Nous vous recommandons de chercher un hôtel ou un Airbnb dans les environs.",
+      guestOption: {
+        eyebrow: "Votre hébergement",
+        membersLabel: "Membres du groupe",
+        linkLabel: "Voir l’option prévue pour vous",
+        backLabel: "Retour à l’hébergement",
+        onSiteTitle: "Une place est prévue à Roca Azul",
+        onSiteBody:
+          "Voici l’option enregistrée pour votre profil. Nous vous confirmerons directement tout ajustement.",
+        independentTitle: "Hébergement de votre côté",
+        independentBody:
+          "Nous vous recommandons de chercher un hôtel ou un Airbnb dans les environs.",
+        cabinLabel: "Gîte",
+        roomLabel: "Chambre",
+        cabinCapacityLabel: "Capacité du gîte",
+        roomCapacityLabel: "Capacité de la chambre",
+        cabinPriceLabel: "Prix du gîte · 2 nuits",
+        personPriceLabel: "Prix par personne · 2 nuits",
+        coveredPriceLabel: "Pris en charge par les mariés",
+        peopleLabel: "personnes",
+        cabinOccupancyLabel: "Modalité du gîte",
+        roomOccupancyLabel: "Modalité de la chambre",
+        occupancy: { privada: "Privée", compartida: "Partagée" },
+        wholeCabinTitle: "Occupation complète du gîte",
+        wholeCabinBody: "Toutes les chambres et les personnes affectées à chacune d’elles.",
+        emptyRoom: "Aucune personne affectée",
+        youLabel: "Vous",
+        airbnbTitle: "Airbnbs près de Roca Azul",
+        airbnbBody:
+          "Ces options sont apparues dans la zone pour les nuits du 19 au 21 février 2027. Vérifiez la disponibilité et le tarif directement sur Airbnb.",
+        airbnbAreaPrice: "Prix d’entrée observé dans la zone",
+        fromPrice: "À partir de · tarif indicatif",
+        perNight: "par nuit",
+        beforeTaxes: "hors taxes",
+        airbnbGuests: "voyageurs",
+        airbnbBedrooms: "chambres",
+        airbnbBeds: "lits",
+        airbnbRating: "Note",
+        airbnbView: "Voir le logement",
+        airbnbSearchAll: "Voir toute la recherche sur Airbnb",
+        hotelTitle: "Hôtels près de Roca Azul",
+        hotelBody:
+          "Tarifs indicatifs observés actuellement. Vérifiez auprès de chaque hôtel les disponibilités, les taxes et le prix final pour les nuits du 19 au 21 février 2027.",
+        hotelLocation: "Secteur",
+        hotelView: "Voir l’hôtel",
+        hotelTypes: {
+          spaHotel: "Hôtel spa",
+          boutiqueSpa: "Boutique resort et spa",
+          thermalHotel: "Hôtel et eaux thermales",
+        },
+        paymentLabel: "Paiement",
+        payment: {
+          covered: "Pris en charge par les mariés",
+          paid: "Paiement enregistré",
+          pending: "À confirmer",
+        },
+        extraCabinLabel: "Hébergement supplémentaire",
+        button: "Mettre à jour mon RSVP",
+      },
 
 
       contactPrompt: "Plus d'infos",
 
       cabinsShowcase: {
-        eyebrow: "Découvrez les cabanes",
+        eyebrow: "Découvrez les gîtes",
         privateVideoEyebrow: "Vidéo privée",
-        privateVideoTitle: "Une visite des cabanes",
+        privateVideoTitle: "Une visite des gîtes",
         key: "azalea",
         title: "Azalea",
         intro:
-          "La première cabane de notre catalogue : spacieuse, avec de belles pièces communes et une capacité annoncée de 12 personnes.",
+          "La première gîte de notre catalogue : spacieuse, avec de belles pièces communes et une capacité annoncée de 12 personnes.",
         capacity: "12 personnes",
         roomsLabel: "3 chambres",
         bedsLabel: "7 lits décrits",
@@ -1563,15 +1825,15 @@ export const content = {
           "Les photos montrent un salon, une salle à manger, une cuisine, un comptoir et une salle de bain avec douche.",
         galleryLabel: "Galerie d’Azalea",
         photoAlts: [
-          "Salle à manger et espace commun de la cabane Azalea",
-          "Salon et salle à manger de la cabane Azalea",
-          "Salon de la cabane Azalea",
+          "Salle à manger et espace commun du gîte Azalea",
+          "Salon et salle à manger du gîte Azalea",
+          "Salon du gîte Azalea",
           "Chambre avec deux lits doubles dans Azalea",
           "Deuxième chambre avec deux lits doubles dans Azalea",
           "Chambre avec trois lits simples dans Azalea",
-          "Salle de bain avec douche de la cabane Azalea",
-          "Cuisine équipée de la cabane Azalea",
-          "Comptoir et cuisine de la cabane Azalea",
+          "Salle de bain avec douche du gîte Azalea",
+          "Cuisine équipée du gîte Azalea",
+          "Comptoir et cuisine du gîte Azalea",
         ],
         note:
           "Nous confirmerons directement la répartition finale des invités.",
@@ -1580,7 +1842,7 @@ export const content = {
             key: "dalia",
             title: "Dalia",
             intro:
-              "Une cabane lumineuse près de la piscine, avec trois chambres et dix couchages parfaitement identifiés.",
+              "Une gîte lumineuse près de la piscine, avec trois chambres et dix couchages parfaitement identifiés.",
             capacity: "10 personnes",
             roomsLabel: "3 chambres",
             bedsLabel: "7 lits · 10 couchages",
@@ -1593,8 +1855,8 @@ export const content = {
               "Les photos montrent un salon, une salle à manger, une salle de bain avec douche et une vue vers la piscine.",
             galleryLabel: "Galerie de Dalia",
             photoAlts: [
-              "Salle à manger de la cabane Dalia près de la piscine",
-              "Salon de la cabane Dalia",
+              "Salle à manger du gîte Dalia près de la piscine",
+              "Salon du gîte Dalia",
               "Chambre avec deux lits doubles dans Dalia",
               "Chambre avec quatre lits simples superposés dans Dalia",
               "Chambre avec un lit double dans Dalia",
@@ -1608,7 +1870,7 @@ export const content = {
             key: "margarita",
             title: "Margarita",
             intro:
-              "Une cabane joyeuse aux tons jaunes, avec trois chambres, des espaces communs lumineux et un jardin avec foyer extérieur.",
+              "Une gîte joyeuse aux tons jaunes, avec trois chambres, des espaces communs lumineux et un jardin avec foyer extérieur.",
             capacity: "10 personnes",
             roomsLabel: "3 chambres",
             bedsLabel: "7 lits · 10 couchages",
@@ -1621,24 +1883,24 @@ export const content = {
               "Les photos montrent un salon-salle à manger, une cuisine avec comptoir, une salle de bain avec douche, un jardin et un foyer extérieur.",
             galleryLabel: "Galerie de Margarita",
             photoAlts: [
-              "Espace commun intérieur de la cabane Margarita",
+              "Espace commun intérieur du gîte Margarita",
               "Chambre avec quatre lits simples superposés dans Margarita",
               "Salle de bain avec douche de Margarita",
               "Chambre avec deux lits doubles dans Margarita",
-              "Cuisine avec comptoir de la cabane Margarita",
-              "Salle à manger de la cabane Margarita",
+              "Cuisine avec comptoir du gîte Margarita",
+              "Salle à manger du gîte Margarita",
               "Chambre avec un lit double dans Margarita",
-              "Jardin et foyer extérieur de la cabane Margarita",
+              "Jardin et foyer extérieur du gîte Margarita",
             ],
             note:
               "Le coût interne enregistré est de 11 150 MXN pour les deux nuits ; l’attribution et le montant final par personne seront confirmés directement.",
           },
           {
             key: "wooden",
-            title: "Cabanes en bois 31–34",
+            title: "Gîtes en bois 31–34",
             intro:
-              "Quatre cabanes indépendantes sous les arbres, idéales pour les couples ou petites familles qui souhaitent un espace plus intime.",
-            capacity: "4 cabanes",
+              "Quatre gîtes indépendantes sous les arbres, idéales pour les couples ou petites familles qui souhaitent un espace plus intime.",
+            capacity: "4 gîtes",
             roomsLabel: "2 adultes par unité",
             bedsLabel: "Jusqu’à 2 mineurs",
             rooms: [
@@ -1648,12 +1910,12 @@ export const content = {
             ],
             amenities:
               "Les photos et la vidéo montrent une terrasse, un réfrigérateur, un lavabo, une télévision et un intérieur entièrement habillé de bois.",
-            galleryLabel: "Galerie des cabanes en bois 31 à 34",
+            galleryLabel: "Galerie des gîtes en bois 31 à 34",
             photoAlts: [
-              "Extérieur d’une cabane en bois sous les arbres",
-              "Entrée de la cabane en bois numéro 34",
-              "Lit king size dans une cabane en bois",
-              "Canapé-lit et équipements intérieurs d’une cabane en bois",
+              "Extérieur d’un gîte en bois sous les arbres",
+              "Entrée du gîte en bois numéro 34",
+              "Lit king size dans un gîte en bois",
+              "Canapé-lit et équipements intérieurs d’un gîte en bois",
             ],
             videoLabel: "Visite vidéo · 16 s",
             note:
@@ -1665,10 +1927,10 @@ export const content = {
         eyebrow: "Comment ça marche ?",
         title: "Dites-nous ce que vous préférez",
         body:
-          "Votre réponse nous permettra de répartir les cabanes de façon juste et organisée.",
+          "Votre réponse nous permettra de répartir les gîtes de façon juste et organisée.",
         steps: [
           "Indiquez votre préférence d’hébergement dans le RSVP.",
-          "Nous organiserons les cabanes selon les groupes, les dates et les disponibilités.",
+          "Nous organiserons les gîtes selon les groupes, les dates et les disponibilités.",
           "Nous confirmerons directement l’attribution, le tarif final et le paiement.",
         ],
         button: "Répondre au RSVP",
@@ -1729,17 +1991,37 @@ export const content = {
       ctaNote: "Le formulaire privé est maintenant disponible plus bas.",
     },
     attire: {
-      eyebrow: "Tenues",
-      title: "Esthétique mexicaine et code vestimentaire",
+      eyebrow: "Code vestimentaire",
+      title: "Esthétique mexicaine",
       body:
-        "Nous avons choisi une esthétique mexicaine pour notre mariage en hommage à la culture, la cuisine, la musique et le lieu qui nous réunit. Nous voulons que tout soit festif, coloré et profondément mexicain.",
+        "Nous sommes immensément heureux de partager ce jour avec vous, et nous souhaitons que, tout comme chaque personne a laissé une empreinte spéciale dans notre vie, chacun apporte aussi un peu de son essence à cette célébration.",
       dressCode: {
-        title: "Pas de code vestimentaire",
-        body:
-          "Nous voulons que vous soyez vous-mêmes, sans déguisement. Si vous voulez être élégants, soyez élégants ; si vous préférez être décontractés, soyez décontractés. L’important est que vous vous sentiez à l’aise. Prévoyez une tenue complète : il y aura de la natation, un bain de vapeur, du sport, la cérémonie, la danse et, si la soirée se prolonge autour du feu, un pull léger.",
+        title: "Habillez-vous de couleur !",
+        paragraphs: [
+          "Nous croyons que les couleurs transmettent de l’énergie, de la joie et de la personnalité.",
+          "C’est pourquoi nous aimerions que vous nous accompagniez dans des tons pleins de vie, en évitant de préférence le noir, le gris et le blanc.",
+          "Notre mariage aura une inspiration mexicaine, avec une décoration en tons blancs et des détails artisanaux.",
+          "David portera une guayabera en lin blanc avec des broderies dorées, et nous porterons tous les deux des pièces brodées par des artisanes d’une communauté d’Oaxaca, en hommage à la richesse de nos traditions.",
+          "La seule règle est que vous soyez vous-mêmes : élégants, à l’aise et prêts à célébrer, danser et remplir ce jour de couleur, d’amour et de bonne énergie.",
+        ],
+        pictograms: {
+          ariaLabel: "Pictogrammes du code vestimentaire",
+          noWhite: "Pas de blanc",
+          noBlack: "Pas de noir",
+          noGrey: "Pas de gris",
+          colorGreen: "Portez du vert",
+          colorTeal: "Portez du turquoise",
+          colorMarigold: "Portez du jaune",
+          dressNoWhite: "Pas de robe blanche",
+          dressNoBlack: "Pas de robe noire",
+          dressNoGrey: "Pas de robe grise",
+          dressColor: "Robe colorée",
+          funky: "Funky",
+          mexican: "Motifs mexicains",
+        },
       },
       guestNote:
-        "Le plus important est que vous soyez à l'aise et que vous célébriez avec nous. Si vous avez des questions, écrivez-nous.",
+        "Merci de faire partie de notre histoire ! ✨🌼",
       navNext: "Hébergement",
 
     },
@@ -1780,9 +2062,9 @@ export const content = {
       subtitle:
         "Sans nos padrinos et nos aides, rien de tout cela ne serait possible. Nous tenons à remercier avec toute notre gratitude…",
       credits: [
-        { name: "Manuel Amuezca", role: "Wedding planner" },
-        { name: "Manuel Amuezca", role: "Pizzas du vendredi" },
-        { name: "Manuel Amuzeca", role: "Pizzas du vendredi" },
+        { name: "Manuel Amezcua", role: "Wedding planner" },
+        { name: "Manuel Amezcua", role: "Pizzas du vendredi" },
+        { name: "Manuel Amezcua", role: "Pizzas du vendredi" },
         { name: "Ismael", role: "Pizzas" },
         { name: "Isabel Guadalupe", role: "Tenues des mariés" },
       ],
@@ -1791,8 +2073,8 @@ export const content = {
         "Vous apparaissez ici sans le savoir : une mission vous a été confiée. Dommage, mais il est impossible de l’effacer : l’admin IT de la page est en vacances, on ne peut pas le supprimer, donc il faut s’y tenir.",
         "Vous avez apporté votre aide et vous n’apparaissez pas. Dommage. L’IT est peut-être en vacances, mais envoyez vos réclamations aux mariés ou au wedding planner.",
       ],
-      cta: "Parler aux mariés",
-      ctaPlanner: "Parler au wedding planner",
+      cta: "Contacter les mariés",
+      ctaPlanner: "Wedding planner",
       guestCloud: {
         eyebrow: "Nos invités",
         title: "Tous ceux qui nous accompagnent",
@@ -1811,7 +2093,7 @@ export const content = {
         {
           title: "Plan 1 · Rester à Roca Azul",
           body:
-            "Louer une cabane deux nuits de plus, du dimanche au mardi, pour continuer à se retrouver sur place. Si cela vous intéresse, indiquez-le dans le RSVP et nous organiserons la cabane pour votre groupe.",
+            "Louer un gîte deux nuits de plus, du dimanche au mardi, pour continuer à se retrouver sur place. Si cela vous intéresse, indiquez-le dans le RSVP et nous organiserons le gîte pour votre groupe.",
         },
         {
           title: "Plan 2 · La plage",
@@ -1875,8 +2157,8 @@ export const content = {
       petanque: {
         eyebrow: "Tournoi de pétanque",
         intro: "Le vendredi après-midi, nous organiserons un tournoi de pétanque. Vous participez ?",
-        organizerLabel: "Organise : David",
-        organizerWhatsapp: "https://wa.me/523332017504",
+        organizerLabel: "Organise : Pierre",
+        organizerWhatsapp: "https://wa.me/523310212012",
         fields: {
           participation: "Participez-vous au tournoi ?",
           partySize: "Combien de personnes ?",
@@ -1992,6 +2274,7 @@ export const content = {
       accommodation: "Accommodation",
       travel: "Coming from afar",
       attire: "Attire",
+      weather: "Weather",
       gift: "Gifts",
       photos: "Photos",
       thanks: "Thanks",
@@ -2001,8 +2284,29 @@ export const content = {
 
 
       dashboard: "admin",
+      changeEmail: "Change email",
       changePassword: "Change password",
+      music: "Music",
       logout: "Log out",
+
+      emailWarningTitle: "Before you change your email",
+      emailWarningBody:
+        "Your invitation access will move to the new email. We will send a verification email and you must confirm it to finish.",
+      currentEmailLabel: "Current email",
+      newEmailLabel: "New email",
+      newEmailPlaceholder: "new@email.com",
+      emailInvalid: "Enter a valid email address.",
+      emailSuccess: "Email updated.",
+      emailUnchanged: "This email is already active on your account.",
+      emailError: "We could not change the email. Please try again.",
+      emailVerificationSent:
+        "We sent a verification email to the new address. Confirm it to complete the change.",
+      emailReauthRequired:
+        "For security, confirm your password before changing the email.",
+      emailReauthLabel: "Current password",
+      emailReauthPlaceholder: "Enter your password",
+      emailReauthPasswordRequired: "Enter your current password.",
+
       newPasswordLabel: "New password",
       newPasswordPlaceholder: "At least 6 characters",
       passwordError: "The password must be at least 6 characters.",
@@ -2030,6 +2334,7 @@ export const content = {
       invitation: "We want to celebrate this moment with you",
 
       scroll: "Let's begin",
+      navStory: "Discover our invitation",
 
       imageNote: "Our photograph will go here",
       imageAlt: "David and Aydé together",
@@ -2040,6 +2345,8 @@ export const content = {
     identity: {
       eyebrow: "Identity check",
       title: "Is your name spelled correctly?",
+      titleGroup: "Are the details of the {count} guests in this group correct?",
+      titleSingle: "Are your personal details correct?",
 
       body:
         "We want every guest to feel recognised. If your name or someone in your group is misspelled, correct it here and we will use it in the invitation and at the table.",
@@ -2049,11 +2356,23 @@ export const content = {
       you: "You",
       firstName: "First name",
       lastName: "Last name",
+      firstNameLabel: "First name",
+      middleNameLabel: "Middle name",
+      lastNameLabel: "Last name",
+      maternalLastNameLabel: "Second last name",
+      nombreLabel: "First name",
+      nombre2Label: "Middle name",
+      apellidoLabel: "Last name",
+      apellido2Label: "Second last name",
+
       fullName: "Full name",
       editName: "Correct name",
+
       correctNumber: "Correct number",
+      edit: "Edit",
 
       addPhoto: "Upload photo",
+
 
       changePhoto: "Change photo",
       uploading: "Uploading…",
@@ -2078,15 +2397,21 @@ export const content = {
       phoneLabel: "Mobile number",
 
       phonePlaceholder: "E.g. 33 1234 5678",
+      phoneMissing: "Mobile number missing",
       emailLabel: "Email address",
       emailPlaceholder: "you@example.com",
       phoneRequired: "Please enter your mobile number.",
       emailRequired: "Please enter your email address.",
       emailInvalid: "Please enter a valid email address.",
+      emailVerificationSent: "We sent a verification email to the new address. Confirm it to complete the change.",
+      emailUpdateError: "We could not update the email. Check that it is valid and, if a verification email is sent, confirm it first.",
       back: "Back",
       next: "Continue",
       finish: "Finish",
+      confirm: "Confirm",
+      ok: "Yes, it's correct",
       contactSaved: "Done! Thank you for confirming your details.",
+
       whatsappLabel: "Add me to the WhatsApp group",
       whatsappHint:
         "Join the group to receive announcements, transfer coordination, and weekend updates.",
@@ -2117,6 +2442,7 @@ export const content = {
         "Roca Azul sits on the lake shore, facing the sunset.",
       ],
       anecdotesLabel: "Lake Chapala in 12 anecdotes",
+      mapLabel: "Getting to Roca Azul",
       navNext: "Discover the venue",
 
     },
@@ -2181,6 +2507,8 @@ export const content = {
       saturday: {
         eyebrow: "Saturday 20 · programme",
         title: "The afternoon, step by step",
+        citation:
+          "From the first toast to the last dance: an afternoon that walks toward the lighthouse and ends in celebration.",
         warning:
           "If you are travelling from Guadalajara, please leave plenty of time. The roads into Jocotepec can become congested very easily, and everyone needs to be at Roca Azul by 1 pm.",
 
@@ -2198,10 +2526,12 @@ export const content = {
       friday: {
         eyebrow: "Friday 19 · programme",
         title: "Arrival and welcome",
+        citation:
+          "From the first hello to the first pizza: the weekend begins without rushing.",
         warning:
           "A relaxed first gathering to settle in, connect, and ease into the weekend.",
         items: [
-          { time: "From midday", title: "Arrivals and check-in", body: "Welcome and time to settle into the cabins." },
+          { time: "From midday", title: "Arrivals and check-in", body: "Welcome and time to settle into the guest houses." },
           { time: "Afternoon", title: "Pétanque and games", body: "Outdoor games to break the ice." },
           { time: "Evening", title: "Welcome pizzas", body: "An informal dinner to reconnect without rushing." },
         ],
@@ -2209,12 +2539,15 @@ export const content = {
       sunday: {
         eyebrow: "Sunday 21 · programme",
         title: "Breakfast and farewell",
+        citation:
+          "One last morning together, between breakfasts and goodbyes.",
         warning: "One final morning together before the journeys home.",
         items: [
-          { time: "Morning", title: "Breakfast", body: "Breakfast included for guests staying in the cabins." },
+          { time: "Morning", title: "Breakfast", body: "Breakfast included for guests staying in the guest houses." },
           { time: "Midday", title: "Farewell", body: "Final moments together and departures." },
         ],
       },
+
     },
     weather: {
       eyebrow: "Typical weather",
@@ -2238,8 +2571,7 @@ export const content = {
         "Sunscreen and sunglasses for the first part of the day.",
         "Comfortable shoes for gardens and outdoor areas.",
       ],
-      disclaimer:
-        "This is a climate guide, not a forecast. We will publish the actual weather outlook here around ten days before the wedding.",
+      navNext: "See the programme",
     },
     food: {
       eyebrow: "At the table",
@@ -2274,6 +2606,11 @@ export const content = {
           title: "Guacamole and vegetarian options",
           body: "There will be guacamole, tortillas, salsas, and other meat-free sides. You can share dietary restrictions in the RSVP.",
         },
+        {
+          key: "pizza",
+          title: "Pizza",
+          body: "Pizzas to share on Friday evening: a simple, informal welcome after arrivals and pétanque.",
+        },
       ],
       days: [
         {
@@ -2288,7 +2625,7 @@ export const content = {
           day: "Saturday",
           title: "From carnitas to taquiza",
           items: [
-            "Breakfast included for guests staying in the cabins.",
+            "Breakfast included for guests staying in the guest houses.",
             "Carnitas for lunch.",
             "Tejuino, with a tejuino loco option using tequila or mezcal.",
             "A taquiza in the evening.",
@@ -2299,7 +2636,7 @@ export const content = {
           day: "Sunday",
           title: "One last breakfast together",
           items: [
-            "Breakfast included for guests staying in the cabins.",
+            "Breakfast included for guests staying in the guest houses.",
             "A peaceful morning before farewells or continuing to the coast.",
           ],
         },
@@ -2425,18 +2762,18 @@ export const content = {
       eyebrow: "The venue",
       title: "The whole club to enjoy",
       body:
-        "Between ceremony and celebration, the whole club is ours: pools, gardens, courts and cabins to gather, explore, or simply unwind.",
+        "Between ceremony and celebration, the whole club is ours: pools, gardens, courts and guest houses to gather, explore, or simply unwind.",
 
       videoTitle: "Roca Azul presentation video",
       privacyTitle: "Privacy",
       privacyBody:
-        "All the cabins will be rented by guests of the wedding, around 80 to 90 people. In addition, other wedding guests will be staying nearby, perhaps not far away, or will come only for the day: around 60 people according to current estimates. Even so, the club will not be entirely private that weekend: some areas still host tents or trailers. We will share the space and respect the quiet. Music can play until 2 am, after which we will continue in the cabins.",
+        "All the guest houses will be rented by guests of the wedding, around 80 to 90 people. In addition, other wedding guests will be staying nearby, perhaps not far away, or will come only for the day: around 60 people according to current estimates. Even so, the club will not be entirely private that weekend: some areas still host tents or trailers. We will share the space and respect the quiet. Music can play until 2 am, after which we will continue in the guest houses.",
 
       gallery: [
         { key: "pool", title: "Pools", alt: "Pool and gardens at Club Roca Azul" },
         { key: "courts", title: "Sport", alt: "Sports courts at Roca Azul" },
         { key: "gardens", title: "Gardens", alt: "Green spaces at Club Roca Azul" },
-        { key: "cabins", title: "Cabins", alt: "Cabins and guest rooms at Roca Azul" },
+        { key: "cabins", title: "Guest houses", alt: "Guest houses and guest rooms at Roca Azul" },
       ],
 
       gallerySource: "Venue photographs: Club Roca Azul",
@@ -2445,7 +2782,7 @@ export const content = {
         "View of Club Roca Azul",
         "Gardens at Club Roca Azul",
         "Pool at Club Roca Azul",
-        "Cabins at Club Roca Azul",
+        "Guest houses at Club Roca Azul",
         "Lake Chapala from Roca Azul",
         "Sunset at Roca Azul",
       ],
@@ -2500,26 +2837,91 @@ export const content = {
       citation:
         "We will be at Roca Azul from Thursday. Guests may arrive from around midday on Friday, and Saturday’s main celebration will be an afternoon wedding.",
       body:
-        "We have accommodation at the venue for approximately 80 people. As the cabins and rooms need to be allocated carefully, please let us know as soon as possible if you would like to use this option.",
+        "We have accommodation at the venue for approximately 80 people. As the guest houses and rooms need to be allocated carefully, please let us know as soon as possible if you would like to use this option.",
       facts: [
         { value: "≈ 80–90", label: "places available" },
-        { value: "MXN 1,200", label: "per person · 2 nights" },
+        {
+          value: "≈ MXN 1,200",
+          euroValue: "≈ €60",
+          label: "per person · 2 nights",
+        },
         { value: "2", label: "breakfasts included" },
       ],
       specialNote:
         "Accommodation is available only as a complete two-night package, from Friday 19 to Sunday 21; one-night bookings are not possible. The estimated price is MXN 1,200 per person for both nights and includes both weekend breakfasts.",
+      noteTitle: "Good to know",
+      noCabinRecommendation:
+        "We recommend looking for a hotel or an Airbnb nearby.",
+      guestOption: {
+        eyebrow: "Your accommodation",
+        membersLabel: "Group members",
+        linkLabel: "See the option selected for you",
+        backLabel: "Back to accommodation",
+        onSiteTitle: "A place is planned for you at Roca Azul",
+        onSiteBody:
+          "This is the option currently recorded for your profile. We will confirm any adjustment directly.",
+        independentTitle: "Independent accommodation",
+        independentBody:
+          "We recommend looking for a hotel or an Airbnb nearby.",
+        cabinLabel: "Guest house",
+        roomLabel: "Room",
+        cabinCapacityLabel: "Guest house capacity",
+        roomCapacityLabel: "Room capacity",
+        cabinPriceLabel: "Guest house price · 2 nights",
+        personPriceLabel: "Price per person · 2 nights",
+        coveredPriceLabel: "Covered by the couple",
+        peopleLabel: "people",
+        cabinOccupancyLabel: "Guest house arrangement",
+        roomOccupancyLabel: "Room arrangement",
+        occupancy: { privada: "Private", compartida: "Shared" },
+        wholeCabinTitle: "Full guest house occupancy",
+        wholeCabinBody: "Every room and the people assigned to it.",
+        emptyRoom: "No one assigned",
+        youLabel: "You",
+        airbnbTitle: "Airbnbs near Roca Azul",
+        airbnbBody:
+          "These options appeared in the area for February 19–21, 2027. Confirm availability and pricing directly on Airbnb.",
+        airbnbAreaPrice: "Starting price currently seen in the area",
+        fromPrice: "From · indicative rate",
+        perNight: "per night",
+        beforeTaxes: "before taxes",
+        airbnbGuests: "guests",
+        airbnbBedrooms: "bedrooms",
+        airbnbBeds: "beds",
+        airbnbRating: "Rating",
+        airbnbView: "View listing",
+        airbnbSearchAll: "View the full Airbnb search",
+        hotelTitle: "Hotels near Roca Azul",
+        hotelBody:
+          "Indicative rates currently observed. Check availability, taxes, and the final price with each hotel for February 19–21, 2027.",
+        hotelLocation: "Area",
+        hotelView: "View hotel",
+        hotelTypes: {
+          spaHotel: "Spa hotel",
+          boutiqueSpa: "Boutique resort and spa",
+          thermalHotel: "Hotel and thermal pools",
+        },
+        paymentLabel: "Payment",
+        payment: {
+          covered: "Covered by the couple",
+          paid: "Payment recorded",
+          pending: "To be confirmed",
+        },
+        extraCabinLabel: "Additional accommodation",
+        button: "Update my RSVP",
+      },
 
 
       contactPrompt: "More info",
 
       cabinsShowcase: {
-        eyebrow: "Explore the cabins",
+        eyebrow: "Explore the guest houses",
         privateVideoEyebrow: "Private video",
-        privateVideoTitle: "A tour of the cabins",
+        privateVideoTitle: "A tour of the guest houses",
         key: "azalea",
         title: "Azalea",
         intro:
-          "The first cabin in our catalogue: spacious, with generous shared areas and an advertised capacity of 12 guests.",
+          "The first guest house in our catalogue: spacious, with generous shared areas and an advertised capacity of 12 guests.",
         capacity: "12 guests",
         roomsLabel: "3 bedrooms",
         bedsLabel: "7 listed beds",
@@ -2532,15 +2934,15 @@ export const content = {
           "The photographs show a living room, dining room, kitchen, breakfast bar, and bathroom with shower.",
         galleryLabel: "Azalea gallery",
         photoAlts: [
-          "Dining room and shared area in the Azalea cabin",
-          "Living and dining room in the Azalea cabin",
-          "Living room in the Azalea cabin",
+          "Dining room and shared area in the Azalea guest house",
+          "Living and dining room in the Azalea guest house",
+          "Living room in the Azalea guest house",
           "Bedroom with two double beds in Azalea",
           "Second bedroom with two double beds in Azalea",
           "Bedroom with three single beds in Azalea",
-          "Bathroom with shower in the Azalea cabin",
-          "Equipped kitchen in the Azalea cabin",
-          "Breakfast bar and kitchen in the Azalea cabin",
+          "Bathroom with shower in the Azalea guest house",
+          "Equipped kitchen in the Azalea guest house",
+          "Breakfast bar and kitchen in the Azalea guest house",
         ],
         note:
           "We will confirm the final guest allocation directly.",
@@ -2549,7 +2951,7 @@ export const content = {
             key: "dalia",
             title: "Dalia",
             intro:
-              "A bright cabin beside the pool, with three bedrooms and ten clearly identified sleeping places.",
+              "A bright guest house beside the pool, with three bedrooms and ten clearly identified sleeping places.",
             capacity: "10 guests",
             roomsLabel: "3 bedrooms",
             bedsLabel: "7 beds · sleeps 10",
@@ -2562,8 +2964,8 @@ export const content = {
               "The photographs show a living room, dining room, bathroom with shower, and a view towards the pool.",
             galleryLabel: "Dalia gallery",
             photoAlts: [
-              "Dining room in the Dalia cabin beside the pool",
-              "Living room in the Dalia cabin",
+              "Dining room in the Dalia guest house beside the pool",
+              "Living room in the Dalia guest house",
               "Bedroom with two double beds in Dalia",
               "Bedroom with four single bunk beds in Dalia",
               "Bedroom with one double bed in Dalia",
@@ -2577,7 +2979,7 @@ export const content = {
             key: "margarita",
             title: "Margarita",
             intro:
-              "A cheerful yellow-toned cabin with three bedrooms, bright shared spaces, and a garden with an outdoor fire pit.",
+              "A cheerful yellow-toned guest house with three bedrooms, bright shared spaces, and a garden with an outdoor fire pit.",
             capacity: "10 guests",
             roomsLabel: "3 bedrooms",
             bedsLabel: "7 beds · sleeps 10",
@@ -2590,24 +2992,24 @@ export const content = {
               "The photographs show a living-dining room, kitchen with breakfast bar, bathroom with shower, garden, and outdoor fire pit.",
             galleryLabel: "Margarita gallery",
             photoAlts: [
-              "Indoor shared area in the Margarita cabin",
+              "Indoor shared area in the Margarita guest house",
               "Bedroom with four single bunk beds in Margarita",
               "Bathroom with shower in Margarita",
               "Bedroom with two double beds in Margarita",
               "Kitchen with breakfast bar in Margarita",
-              "Dining room in the Margarita cabin",
+              "Dining room in the Margarita guest house",
               "Bedroom with one double bed in Margarita",
-              "Garden and outdoor fire pit at the Margarita cabin",
+              "Garden and outdoor fire pit at the Margarita guest house",
             ],
             note:
               "The recorded internal cost is MXN 11,150 for both nights; allocation and the final per-person amount will be confirmed directly.",
           },
           {
             key: "wooden",
-            title: "Wooden cabins 31–34",
+            title: "Wooden guest houses 31–34",
             intro:
-              "Four independent cabins beneath the trees, ideal for couples or small families looking for a more private space.",
-            capacity: "4 cabins",
+              "Four independent guest houses beneath the trees, ideal for couples or small families looking for a more private space.",
+            capacity: "4 guest houses",
             roomsLabel: "2 adults per unit",
             bedsLabel: "Up to 2 minors",
             rooms: [
@@ -2617,12 +3019,12 @@ export const content = {
             ],
             amenities:
               "The photographs and video show a terrace, refrigerator, washbasin, television, and a fully wood-lined interior.",
-            galleryLabel: "Wooden cabins 31 to 34 gallery",
+            galleryLabel: "Wooden guest houses 31 to 34 gallery",
             photoAlts: [
-              "Exterior of a wooden cabin beneath the trees",
-              "Entrance to wooden cabin number 34",
-              "King-size bed inside a wooden cabin",
-              "Sofa bed and interior amenities in a wooden cabin",
+              "Exterior of a wooden guest house beneath the trees",
+              "Entrance to wooden guest house number 34",
+              "King-size bed inside a wooden guest house",
+              "Sofa bed and interior amenities in a wooden guest house",
             ],
             videoLabel: "Video tour · 16 sec",
             note:
@@ -2634,10 +3036,10 @@ export const content = {
         eyebrow: "How does it work?",
         title: "Tell us what you prefer",
         body:
-          "Your response will help us allocate the cabins fairly and thoughtfully.",
+          "Your response will help us allocate the guest houses fairly and thoughtfully.",
         steps: [
           "Select your accommodation preference in the RSVP.",
-          "We will arrange cabins according to groups, dates, and availability.",
+          "We will arrange guest houses according to groups, dates, and availability.",
           "We will confirm the allocation, final price, and payment details directly.",
         ],
         button: "Answer the RSVP",
@@ -2701,14 +3103,34 @@ export const content = {
       eyebrow: "Attire",
       title: "Mexican aesthetic and dress code",
       body:
-        "We have chosen a Mexican aesthetic for our wedding as a tribute to the culture, the food, the music, and the place that brings us together. We want everything to feel festive, colorful, and deeply Mexican.",
+        "We are overjoyed to share this day with you, and just as every person has left a special mark on our lives, we would love each of you to bring a little of your own essence to this celebration.",
       dressCode: {
-        title: "No dress code",
-        body:
-          "We want you to be yourselves, not dressed up. If you want to be elegant, be elegant; if you prefer to be relaxed, be relaxed. What matters is that you feel comfortable. Do bring a full set of clothes: there will be swimming, a steam bath, sports, the ceremony, dancing, and, if the night runs long around the fire, a light sweater.",
+        title: "Dress in colour",
+        paragraphs: [
+          "We believe colours convey energy, joy, and personality.",
+          "That is why we would love you to join us wearing vibrant tones, ideally avoiding black, grey, and white.",
+          "Our wedding will have a Mexican inspiration, with white-toned décor and artisanal details.",
+          "David will wear a white linen guayabera with golden embroidery, and we will both wear pieces embroidered by artisans from a community in Oaxaca, as a tribute to the richness of our traditions.",
+          "The only rule is that you be yourselves: elegant, comfortable, and ready to celebrate, dance, and fill this day with colour, love, and good energy.",
+        ],
+        pictograms: {
+          ariaLabel: "Dress code pictograms",
+          noWhite: "No white",
+          noBlack: "No black",
+          noGrey: "No grey",
+          colorGreen: "Wear green",
+          colorTeal: "Wear teal",
+          colorMarigold: "Wear marigold",
+          dressNoWhite: "No white dress",
+          dressNoBlack: "No black dress",
+          dressNoGrey: "No grey dress",
+          dressColor: "Colourful dress",
+          funky: "Funky",
+          mexican: "Mexican patterns",
+        },
       },
       guestNote:
-        "The most important thing is that you feel comfortable and celebrate with us. If you have any questions, write to us.",
+        "Thank you for being part of our story! ✨🌼",
       navNext: "Accommodation",
 
     },
@@ -2748,9 +3170,9 @@ export const content = {
       subtitle:
         "Without our padrinos and helpers, none of this would be possible. We want to thank, with all our gratitude…",
       credits: [
-        { name: "Manuel Amuezca", role: "Wedding planner" },
-        { name: "Manuel Amuezca", role: "Friday pizzas" },
-        { name: "Manuel Amuzeca", role: "Friday pizzas" },
+        { name: "Manuel Amezcua", role: "Wedding planner" },
+        { name: "Manuel Amezcua", role: "Friday pizzas" },
+        { name: "Manuel Amezcua", role: "Friday pizzas" },
         { name: "Ismael", role: "Pizzas" },
         { name: "Isabel Guadalupe", role: "The couple’s outfits" },
       ],
@@ -2779,7 +3201,7 @@ export const content = {
         {
           title: "Plan 1 · Stay at Roca Azul",
           body:
-            "Rent a cabin for two more nights, from Sunday to Tuesday, to keep spending time together at the venue. If you are interested, let us know in the RSVP and we will arrange a cabin for your group.",
+            "Rent a guest house for two more nights, from Sunday to Tuesday, to keep spending time together at the venue. If you are interested, let us know in the RSVP and we will arrange a guest house for your group.",
         },
         {
           title: "Plan 2 · The beach",
@@ -2843,8 +3265,8 @@ export const content = {
       petanque: {
         eyebrow: "Pétanque tournament",
         intro: "On Friday afternoon we will organise a pétanque tournament. Would you like to join?",
-        organizerLabel: "Organised by: David",
-        organizerWhatsapp: "https://wa.me/523332017504",
+        organizerLabel: "Organised by: Pierre",
+        organizerWhatsapp: "https://wa.me/523310212012",
         fields: {
           participation: "Will you participate in the tournament?",
           partySize: "How many people?",

@@ -1,5 +1,63 @@
 /* ── Venue / facilities section ───────────────────────────────────────── */
 
+/* ── Responsive: mobile-first ──────────────────────────────────────────
+   The venue section is a 2-column grid on desktop (visual | copy) that
+   stacks on mobile. The venue gallery (4 columns) collapses to 2 columns on
+   tablet and 1 on mobile. The facility slideset stacks its three cards
+   vertically on mobile. */
+
+/* Tablet: stack the venue section, gallery → 2 cols. */
+@media (max-width: 900px) {
+  .venue-gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .venue-visual {
+    min-height: 32rem;
+  }
+}
+
+/* Small phones: gallery → 1 col, facility cards stack vertically. */
+@media (max-width: 600px) {
+  .venue-gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .venue-gallery-card {
+    min-height: min(85vw, 28rem);
+  }
+
+  .venue-visual-copy {
+    align-items: start;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .venue-visual-copy small {
+    text-align: left;
+  }
+
+  /* Facility photo-cards: each slideset slide stacks its three cards
+     vertically on mobile (one card per row) so they stay large and readable.
+     The slideset prev/next + dot navigation switches between the two slides. */
+  .facility-slide {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .facility-card {
+    aspect-ratio: 1 / 1;
+  }
+
+  /* On touch, hover doesn't exist, so keep the list visible by default. */
+  .facility-card ul {
+    max-height: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+
 .venue-section {
   display: grid;
   grid-template-columns: 1.15fr 0.85fr;
@@ -113,6 +171,7 @@
 }
 
 .facilities-section {
+  overflow-x: clip;
   background: #d9d5c5;
 }
 
@@ -210,7 +269,7 @@
    a single row. Only one slide is visible at a time, with prev/next + dot
    navigation below. */
 .facility-slideset {
-  margin-top: clamp(0.75rem, 1.5vw, 1.25rem);
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
 }
 
 .facility-slideset__track {
@@ -588,6 +647,14 @@
   height: 2.6rem;
 }
 
+.venue-privacy__header {
+  display: contents;
+}
+
+.venue-privacy__body {
+  grid-column: 2;
+}
+
 .venue-privacy h3 {
   margin: 0 0 1rem;
   font-family: var(--font-display);
@@ -600,6 +667,11 @@
   margin: 0;
   font-size: clamp(0.95rem, 1.4vw, 1.05rem);
   line-height: 1.85;
+}
+
+.venue-privacy__close,
+.venue-privacy-fab {
+  display: none;
 }
 
 
@@ -886,4 +958,239 @@
   color: var(--terracotta);
 }
 
+@media (max-width: 899px) {
+  /* Match the mobile Story heading rhythm:
+     1. eyebrow, 2. venue link, 3. title, 4. citation. */
+  .facilities-section .experience-heading {
+    gap: 0;
+  }
 
+  .facilities-section .experience-heading-row {
+    width: 100%;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.6rem;
+  }
+
+  .facilities-section .experience-heading-row:not(.experience-heading-row--main) {
+    align-items: baseline;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .facilities-section .venue-location-link {
+    max-width: 68%;
+    padding-bottom: 0.15rem;
+    font-size: clamp(0.68rem, 2.7vw, 0.82rem);
+    line-height: 1.25;
+    text-align: right;
+  }
+
+  .facilities-section .experience-heading-row--main {
+    gap: 1rem;
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .facilities-section .experience-heading-row--main h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 6vw, 5.5rem);
+  }
+
+  .facilities-section .facilities-lead {
+    font-size: clamp(1rem, 2.6vw, 2rem);
+  }
+
+  .facility-slide {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    height: clamp(13rem, 36svh, 20rem);
+  }
+
+  .facility-slideset__nav {
+    gap: 0.85rem;
+    margin-top: 0.85rem;
+  }
+
+  .facility-slideset__arrow,
+  .facility-slideset__toggle {
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    font-size: 0.75rem;
+    font-weight: 400;
+  }
+
+  .facility-slideset__arrow:hover,
+  .facility-slideset__toggle:hover {
+    background: transparent;
+  }
+
+  .facility-slideset__dots {
+    gap: 0.4rem;
+  }
+
+  .facility-slideset__dot {
+    width: 0.45rem;
+    height: 0.45rem;
+  }
+
+  .facility-card__overlay {
+    gap: 0.35rem;
+    padding: 0.7rem;
+  }
+
+  .facility-card__icon {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.55rem;
+  }
+
+  .facility-card__icon svg {
+    width: 1.2rem;
+    height: 1.2rem;
+  }
+
+  .facility-card h3 {
+    font-size: clamp(1.05rem, 4.5vw, 1.4rem);
+  }
+
+  .facility-card ul {
+    gap: 0.2rem;
+  }
+
+  .facility-card li {
+    padding-left: 0.7rem;
+    font-size: clamp(0.65rem, 2.5vw, 0.78rem);
+    line-height: 1.25;
+  }
+
+  .facility-card li::before {
+    width: 0.25rem;
+    height: 0.25rem;
+  }
+
+  .video-play {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.1rem;
+  }
+
+  /* Keep the long privacy disclosure out of the mobile Venue layout. */
+  .venue-privacy-shell {
+    display: none;
+  }
+
+  .venue-privacy-shell.is-mobile-open {
+    position: fixed;
+    z-index: 240;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding:
+      max(1rem, env(safe-area-inset-top))
+      1rem
+      max(1rem, env(safe-area-inset-bottom));
+    background: rgb(18 27 24 / 72%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .venue-privacy-shell.is-mobile-open .venue-privacy {
+    display: block;
+    width: min(100%, 34rem);
+    max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    margin: 0;
+    padding: 1.25rem;
+    overflow-y: auto;
+    border-color: rgb(198 139 43 / 48%);
+    background:
+      radial-gradient(120% 140% at 0% 0%, rgb(228 185 104 / 22%), transparent 55%),
+      var(--cream);
+    box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 38%);
+    overscroll-behavior: contain;
+  }
+
+  .venue-privacy__header {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding-right: 2.5rem;
+  }
+
+  .venue-privacy__header .venue-privacy__icon {
+    width: 3.25rem;
+    height: 3.25rem;
+    flex-basis: 3.25rem;
+    border-radius: 50%;
+  }
+
+  .venue-privacy__header .venue-privacy__icon svg {
+    width: 1.9rem;
+    height: 1.9rem;
+  }
+
+  .venue-privacy__header h3 {
+    margin: 0;
+  }
+
+  .venue-privacy__body {
+    margin-top: 1rem;
+  }
+
+  .venue-privacy__close {
+    position: absolute;
+    z-index: 2;
+    top: 0.65rem;
+    right: 0.75rem;
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    place-items: center;
+    padding: 0;
+    border: 1px solid rgb(36 33 25 / 20%);
+    border-radius: 50%;
+    background: rgb(255 253 248 / 88%);
+    color: var(--ink);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .venue-privacy-fab {
+    position: fixed;
+    z-index: 130;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    width: 4.25rem;
+    height: 4.25rem;
+    display: grid;
+    place-items: center;
+    padding: 0;
+    border: 3px solid var(--marigold);
+    border-radius: 50%;
+    background: var(--terracotta);
+    box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
+    color: var(--white);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(1rem) scale(0.9);
+    transition: opacity 180ms ease, transform 180ms ease;
+  }
+
+  .venue-privacy-fab.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
+
+  .venue-privacy-fab svg {
+    width: 2.4rem;
+    height: 2.4rem;
+  }
+}

@@ -1,0 +1,2450 @@
+{
+  "mode": "execute",
+  "ciMode": true,
+  "failOnDrift": true,
+  "generatedAt": "2026-08-05T00:04:38.662Z",
+  "source": "gsheet",
+  "sourceRef": "spreadsheetId=1tvUs2WPksMWVbV10hdVoZ2NLNwTx6Q2R8Bs0sEbkqMg;sheet=Invitados",
+  "authHealth": {
+    "authUsersTotal": 223,
+    "guestsTotal": 269,
+    "authUsersMappedToGuest": 223,
+    "authUsersWithoutGuestCount": 0,
+    "authUsersWithoutSheetCount": 0,
+    "authDisabledBySheetCount": 0,
+    "authDeleteCandidatesCount": 0,
+    "sheetAuthExpectedCount": 223,
+    "sheetAuthDisabledCount": 36,
+    "guestsWithoutAuthCount": 0,
+    "sheetGuestsWithoutAuthCount": 0,
+    "authEmailUpdateCandidatesCount": 0,
+    "authEmailUpdateBlockedInvalidCount": 0,
+    "authEmailUpdateBlockedInUseCount": 0,
+    "authCreateCandidatesCount": 0,
+    "authCreateBlockedMissingEmailCount": 0,
+    "authCreateBlockedInvalidEmailCount": 0,
+    "authCreateBlockedEmailInUseCount": 0,
+    "mappingCoveragePct": 100,
+    "authWithoutGuest": [],
+    "authWithoutSheet": [],
+    "authDisabledBySheet": [],
+    "authDeleteCandidates": [],
+    "guestsWithoutAuth": [],
+    "sheetGuestsWithoutAuth": [],
+    "authEmailUpdateCandidates": [],
+    "authEmailUpdateBlockedInvalid": [],
+    "authEmailUpdateBlockedInUse": [],
+    "authCreateCandidates": [],
+    "authCreateBlockedMissingEmail": [],
+    "authCreateBlockedInvalidEmail": [],
+    "authCreateBlockedEmailInUse": []
+  },
+  "invalidRows": [],
+  "added": [],
+  "changed": [],
+  "unchanged": [],
+  "stale": [
+    {
+      "id": "gael",
+      "doc": {
+        "invitationGroup": "Famille Hevia Besson",
+        "tagGroup": "Amigos de David",
+        "modifiedAt": "",
+        "hosting": {
+          "xtraRoom": "",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "isXtraCabinPaid": false,
+          "isXtraCabinPaidByNovios": false,
+          "xtraCabin": "",
+          "cabin": "",
+          "room": ""
+        },
+        "idCheckUser": false,
+        "isAdmin": false,
+        "message": "",
+        "sent": false,
+        "travelsByPlane": false,
+        "rsvp": {
+          "playa": false,
+          "sunday": false,
+          "saturday": false,
+          "xtra": false,
+          "confirmCabin": false,
+          "needBalls": false,
+          "friday": false,
+          "petanca": false,
+          "cabinWaitingList": false
+        },
+        "maternalLastName": "Besson",
+        "messageAuthor": "",
+        "id": "gael",
+        "table": "Mesa #9",
+        "identity": {
+          "maternalLastName": "Besson",
+          "lastName": "Hevia",
+          "gender": "H",
+          "phone": "",
+          "middleName": "",
+          "cloudinaryId": "gale_e4vlri",
+          "lang": "fr",
+          "age": "Niño",
+          "firstName": "Gaël"
+        }
+      }
+    },
+    {
+      "id": "hijo_de_fanny",
+      "doc": {
+        "id": "hijo_de_fanny",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "Fanny y su hijo",
+        "tagGroup": "Amigos de David",
+        "table": "Niños #2",
+        "sent": false,
+        "rsvp": {
+          "friday": false,
+          "saturday": false,
+          "sunday": false,
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "xtra": false,
+          "playa": false,
+          "petanca": false,
+          "needBalls": false
+        },
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:38.590Z",
+        "hosting": {
+          "cabin": "",
+          "room": "",
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "maternalLastName": "",
+        "identity": {
+          "age": "Niño",
+          "lang": "es",
+          "cloudinaryId": "",
+          "gender": "H",
+          "maternalLastName": "",
+          "firstName": "Ian",
+          "lastName": "Farias",
+          "phone": "523310228084",
+          "middleName": ""
+        }
+      }
+    },
+    {
+      "id": "jesus_de_guadalupe",
+      "doc": {
+        "id": "jesus_de_guadalupe",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "Elvira y Eduardo",
+        "tagGroup": "Familia de Aydé",
+        "table": "Niños #1",
+        "sent": false,
+        "rsvp": {
+          "friday": true,
+          "saturday": true,
+          "sunday": true,
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "xtra": false,
+          "playa": false,
+          "petanca": false,
+          "needBalls": false
+        },
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:36.598Z",
+        "hosting": {
+          "cabin": "CASONA",
+          "room": "CASONA-3",
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": true,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "maternalLastName": "Guadalupe",
+        "identity": {
+          "age": "Niño",
+          "firstName": "Jesus",
+          "lang": "es",
+          "phone": "",
+          "gender": "H",
+          "middleName": "",
+          "maternalLastName": "Guadalupe",
+          "lastName": "",
+          "cloudinaryId": "jesus_e9c7ak"
+        }
+      }
+    },
+    {
+      "id": "leonard_de_carne",
+      "doc": {
+        "id": "leonard_de_carne",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "Tristan y Yari",
+        "tagGroup": "Amigos de David",
+        "table": "Niños #2",
+        "sent": false,
+        "rsvp": {
+          "friday": true,
+          "saturday": true,
+          "sunday": true,
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "xtra": false,
+          "playa": false,
+          "petanca": false,
+          "needBalls": false
+        },
+        "modifiedAt": "",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:38.887Z",
+        "hosting": {
+          "cabin": "",
+          "room": "",
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "maternalLastName": "",
+        "identity": {
+          "age": "Niño",
+          "lastName": "De Carne",
+          "lang": "fr",
+          "phone": "",
+          "gender": "H",
+          "maternalLastName": "",
+          "middleName": "",
+          "cloudinaryId": "leonard_fln167",
+          "firstName": "Léonard"
+        }
+      }
+    },
+    {
+      "id": "luca",
+      "doc": {
+        "invitationGroup": "Famille Hevia Besson",
+        "tagGroup": "Amigos de David",
+        "modifiedAt": "",
+        "hosting": {
+          "xtraRoom": "",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "isXtraCabinPaid": false,
+          "isXtraCabinPaidByNovios": false,
+          "xtraCabin": "",
+          "cabin": "",
+          "room": ""
+        },
+        "idCheckUser": false,
+        "isAdmin": false,
+        "message": "",
+        "sent": false,
+        "travelsByPlane": false,
+        "rsvp": {
+          "playa": false,
+          "sunday": false,
+          "saturday": false,
+          "xtra": false,
+          "confirmCabin": false,
+          "needBalls": false,
+          "friday": false,
+          "petanca": false,
+          "cabinWaitingList": false
+        },
+        "maternalLastName": "Besson",
+        "identity": {
+          "maternalLastName": "Besson",
+          "firstName": "Luca",
+          "lastName": "Hevia",
+          "gender": "H",
+          "phone": "",
+          "middleName": "",
+          "cloudinaryId": "luca_xyyh8h",
+          "lang": "fr",
+          "age": "Niño"
+        },
+        "messageAuthor": "",
+        "id": "luca",
+        "table": "Mesa #9"
+      }
+    },
+    {
+      "id": "mama_tina_guadalupe",
+      "doc": {
+        "id": "mama_tina_guadalupe",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "Elvira y Eduardo",
+        "tagGroup": "Familia de Aydé",
+        "table": "Novios",
+        "sent": false,
+        "rsvp": {
+          "friday": true,
+          "saturday": true,
+          "sunday": true,
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "xtra": false,
+          "playa": false,
+          "petanca": false,
+          "needBalls": false
+        },
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:36.655Z",
+        "modifiedAt": "dom 25 ene 26",
+        "hosting": {
+          "cabin": "CASONA",
+          "room": "CASONA-3",
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": true,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "maternalLastName": "",
+        "identity": {
+          "age": "Adulto",
+          "firstName": "Mama",
+          "lang": "es",
+          "phone": "",
+          "gender": "M",
+          "maternalLastName": "",
+          "lastName": "",
+          "middleName": "Tina",
+          "cloudinaryId": "mamtina_csr8vm"
+        }
+      }
+    },
+    {
+      "id": "papa_kao_guadalupe",
+      "doc": {
+        "id": "papa_kao_guadalupe",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "Elvira y Eduardo",
+        "tagGroup": "Familia de Aydé",
+        "table": "Novios",
+        "sent": false,
+        "rsvp": {
+          "friday": true,
+          "saturday": true,
+          "sunday": true,
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "xtra": false,
+          "playa": false,
+          "petanca": false,
+          "needBalls": false
+        },
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:36.693Z",
+        "modifiedAt": "dom 25 ene 26",
+        "hosting": {
+          "cabin": "CASONA",
+          "room": "CASONA-3",
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": true,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "maternalLastName": "",
+        "identity": {
+          "age": "Adulto",
+          "firstName": "Papa",
+          "lang": "es",
+          "phone": "",
+          "gender": "H",
+          "maternalLastName": "",
+          "lastName": "",
+          "middleName": "Kao",
+          "cloudinaryId": "papakao_xawxqx"
+        }
+      }
+    },
+    {
+      "id": "pareja_de_fred_bonpard",
+      "doc": {
+        "id": "pareja_de_fred_bonpard",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "Famille Bonpard",
+        "tagGroup": "Familia de David",
+        "table": "Mesa #4",
+        "sent": false,
+        "rsvp": {
+          "friday": false,
+          "saturday": false,
+          "sunday": false,
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "xtra": false,
+          "playa": false,
+          "petanca": false,
+          "needBalls": false
+        },
+        "modifiedAt": "",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:40.296Z",
+        "hosting": {
+          "cabin": "",
+          "room": "",
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "maternalLastName": "Fred Bonpard",
+        "identity": {
+          "age": "Adulto",
+          "firstName": "Pareja",
+          "lang": "fr",
+          "cloudinaryId": "",
+          "gender": "M",
+          "lastName": "De",
+          "middleName": "",
+          "maternalLastName": "Fred Bonpard",
+          "phone": "33658313401"
+        }
+      }
+    },
+    {
+      "id": "sofía_de_guadalupe",
+      "doc": {
+        "id": "sofía_de_guadalupe",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "Elvira y Eduardo",
+        "tagGroup": "Familia de Aydé",
+        "table": "Niños #1",
+        "sent": false,
+        "rsvp": {
+          "friday": true,
+          "saturday": true,
+          "sunday": true,
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "xtra": false,
+          "playa": false,
+          "petanca": false,
+          "needBalls": false
+        },
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:36.575Z",
+        "hosting": {
+          "cabin": "CASONA",
+          "room": "CASONA-3",
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": true,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "maternalLastName": "Guadalupe",
+        "identity": {
+          "age": "Niño",
+          "lang": "es",
+          "phone": "",
+          "gender": "M",
+          "middleName": "",
+          "maternalLastName": "Guadalupe",
+          "lastName": "",
+          "cloudinaryId": "sofia_mzwh7m",
+          "firstName": "Sofía"
+        }
+      }
+    },
+    {
+      "id": "valentina_de_juárez",
+      "doc": {
+        "id": "valentina_de_juárez",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "Noel y Carmen",
+        "tagGroup": "Familia de Aydé",
+        "table": "Niños #1",
+        "sent": false,
+        "rsvp": {
+          "friday": true,
+          "saturday": true,
+          "sunday": true,
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "xtra": false,
+          "playa": false,
+          "petanca": false,
+          "needBalls": false
+        },
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:36.880Z",
+        "hosting": {
+          "cabin": "CASONA",
+          "room": "CASONA-1",
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": true,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "maternalLastName": "",
+        "identity": {
+          "age": "Niño",
+          "firstName": "Valentina",
+          "lang": "es",
+          "phone": "",
+          "cloudinaryId": "",
+          "gender": "M",
+          "middleName": "",
+          "maternalLastName": "",
+          "lastName": "Júarez"
+        }
+      }
+    }
+  ],
+  "sheetAuth": [
+    {
+      "id": "david_aïli",
+      "uid": "david_aïli",
+      "enabled": true,
+      "identifier": "david.aili.mx@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "aydé_juárez_guadalupe",
+      "uid": "aydé_juárez_guadalupe",
+      "enabled": true,
+      "identifier": "aydemiss@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "sebastian_cecillon_arevalo",
+      "uid": "sebastian_cecillon_arevalo",
+      "enabled": true,
+      "identifier": "sebastian.cecillon@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "mónica_quezada_rangel",
+      "uid": "mónica_quezada_rangel",
+      "enabled": true,
+      "identifier": "quezmon.88@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "iyali_soleil_cecillon_quezada",
+      "uid": "iyali_soleil_cecillon_quezada",
+      "enabled": false,
+      "identifier": "iyali_soleil_cecillon_quezada@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "ameli_cecillon_quezada",
+      "uid": "ameli_cecillon_quezada",
+      "enabled": false,
+      "identifier": "ameli_cecillon_quezada@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "pierre_wanecque",
+      "uid": "pierre_wanecque",
+      "enabled": true,
+      "identifier": "pierre.wanecque@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "mónica_leticia_garcía_santos",
+      "uid": "mónica_leticia_garcía_santos",
+      "enabled": true,
+      "identifier": "gmonicaleticia@hotmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "emmanuel_jourdain",
+      "uid": "emmanuel_jourdain",
+      "enabled": true,
+      "identifier": "emmanuel.jourdain@hotmail.fr",
+      "passwordPresent": true
+    },
+    {
+      "id": "carolina_saldana_suarez",
+      "uid": "carolina_saldana_suarez",
+      "enabled": false,
+      "identifier": "carolina_saldana_suarez@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "julien_bac",
+      "uid": "julien_bac",
+      "enabled": true,
+      "identifier": "julien.bac@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "javier_etcheverria",
+      "uid": "javier_etcheverria",
+      "enabled": true,
+      "identifier": "chubisdub9@hotmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "fabian_castellanos",
+      "uid": "fabian_castellanos",
+      "enabled": true,
+      "identifier": "delfabo@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "diego_hernandez",
+      "uid": "diego_hernandez",
+      "enabled": true,
+      "identifier": "diego_hernandez@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "esposa_de_diego_matraz",
+      "uid": "esposa_de_diego_matraz",
+      "enabled": false,
+      "identifier": "esposa_de_diego_matraz@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "mika_rako",
+      "uid": "mika_rako",
+      "enabled": true,
+      "identifier": "mika_rako@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "corine_rako",
+      "uid": "corine_rako",
+      "enabled": true,
+      "identifier": "corinerako@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "livier_rako",
+      "uid": "livier_rako",
+      "enabled": true,
+      "identifier": "livier_rako@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "cathy_rako",
+      "uid": "cathy_rako",
+      "enabled": true,
+      "identifier": "cathy_rako@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "morgane_rako",
+      "uid": "morgane_rako",
+      "enabled": true,
+      "identifier": "morgane_rakotonoera@yahoo.fr",
+      "passwordPresent": true
+    },
+    {
+      "id": "pareja_de_morgane_rako",
+      "uid": "pareja_de_morgane_rako",
+      "enabled": false,
+      "identifier": "pareja_de_morgane_rako@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "aldo_díaz_de_sandi",
+      "uid": "aldo_díaz_de_sandi",
+      "enabled": true,
+      "identifier": "aldo_díaz_de_sandi@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "iopoch_díaz_de_sandi",
+      "uid": "iopoch_díaz_de_sandi",
+      "enabled": true,
+      "identifier": "iopoch_díaz_de_sandi@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "esposa_de_aldo_díaz_de_sandi",
+      "uid": "esposa_de_aldo_díaz_de_sandi",
+      "enabled": false,
+      "identifier": "esposa_de_aldo_díaz_de_sandi@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "hija_de_aldo_díaz_de_sandi",
+      "uid": "hija_de_aldo_díaz_de_sandi",
+      "enabled": false,
+      "identifier": "hija_de_aldo_díaz_de_sandi@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "manu_vázquez",
+      "uid": "manu_vázquez",
+      "enabled": true,
+      "identifier": "manuelblack73@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "novia_de_manu_vázquez",
+      "uid": "novia_de_manu_vázquez",
+      "enabled": false,
+      "identifier": "novia_de_manu_vázquez@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "rodrigo_arana",
+      "uid": "rodrigo_arana",
+      "enabled": true,
+      "identifier": "arq.aranabarba@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "mariana",
+      "uid": "mariana",
+      "enabled": true,
+      "identifier": "marianhernandezr@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "tania_gallardo",
+      "uid": "tania_gallardo",
+      "enabled": true,
+      "identifier": "tania.gallardo.ram@hotmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "ana_farías",
+      "uid": "ana_farías",
+      "enabled": true,
+      "identifier": "anafariascordova@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "marcia",
+      "uid": "marcia",
+      "enabled": true,
+      "identifier": "ht.marcia@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "clément_diguet",
+      "uid": "clément_diguet",
+      "enabled": true,
+      "identifier": "clemdiguet79@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "esposa_clément",
+      "uid": "esposa_clément",
+      "enabled": true,
+      "identifier": "esposa_clément@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "charles_pinet",
+      "uid": "charles_pinet",
+      "enabled": true,
+      "identifier": "c.pinet@wanadoo.fr",
+      "passwordPresent": true
+    },
+    {
+      "id": "dylan_maringolo",
+      "uid": "dylan_maringolo",
+      "enabled": true,
+      "identifier": "dylan_maringolo@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "jeff",
+      "uid": "jeff",
+      "enabled": true,
+      "identifier": "jeff@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "esposa_de_jeff",
+      "uid": "esposa_de_jeff",
+      "enabled": false,
+      "identifier": "esposa_de_jeff@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "denis",
+      "uid": "denis",
+      "enabled": true,
+      "identifier": "denis@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "esposa_de_denis",
+      "uid": "esposa_de_denis",
+      "enabled": false,
+      "identifier": "esposa_de_denis@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "diego_möller",
+      "uid": "diego_möller",
+      "enabled": true,
+      "identifier": "diegoalvarezmoller@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "violeta",
+      "uid": "violeta",
+      "enabled": true,
+      "identifier": "letavio086@hotmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "cesar",
+      "uid": "cesar",
+      "enabled": true,
+      "identifier": "oensalada@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "pablo_galaud",
+      "uid": "pablo_galaud",
+      "enabled": true,
+      "identifier": "pablo_galaud@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "brianda",
+      "uid": "brianda",
+      "enabled": true,
+      "identifier": "brianda@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "max",
+      "uid": "max",
+      "enabled": true,
+      "identifier": "max@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "jean-daniel",
+      "uid": "jean-daniel",
+      "enabled": true,
+      "identifier": "jean-daniel@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "benjamin_saksik",
+      "uid": "benjamin_saksik",
+      "enabled": true,
+      "identifier": "benjamin_saksik@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "raoul_le_bas",
+      "uid": "raoul_le_bas",
+      "enabled": true,
+      "identifier": "raoul_le_bas@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "cynthia_cobarrubias",
+      "uid": "cynthia_cobarrubias",
+      "enabled": true,
+      "identifier": "cynthia_cobarrubias@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "anne-sophie_charon",
+      "uid": "anne-sophie_charon",
+      "enabled": true,
+      "identifier": "anne-sophie_charon@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "rodrigo",
+      "uid": "rodrigo",
+      "enabled": true,
+      "identifier": "rodrigo.fernandez87@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "aswhin",
+      "uid": "aswhin",
+      "enabled": true,
+      "identifier": "aswhin@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "selene",
+      "uid": "selene",
+      "enabled": true,
+      "identifier": "selene@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "thierry_aïli",
+      "uid": "thierry_aïli",
+      "enabled": true,
+      "identifier": "docdadi@free.fr",
+      "passwordPresent": true
+    },
+    {
+      "id": "joséphine_rosa",
+      "uid": "joséphine_rosa",
+      "enabled": true,
+      "identifier": "jr_unique@hotmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "catherine_lemery",
+      "uid": "catherine_lemery",
+      "enabled": true,
+      "identifier": "kikihuit@free.fr",
+      "passwordPresent": true
+    },
+    {
+      "id": "jean-pierre_rigollet",
+      "uid": "jean-pierre_rigollet",
+      "enabled": true,
+      "identifier": "jp.rigollet@orange.fr",
+      "passwordPresent": true
+    },
+    {
+      "id": "stéphane_aïli",
+      "uid": "stéphane_aïli",
+      "enabled": true,
+      "identifier": "aili.stephane@free.fr",
+      "passwordPresent": true
+    },
+    {
+      "id": "wendy_aïli",
+      "uid": "wendy_aïli",
+      "enabled": true,
+      "identifier": "aili.wendy@free.fr",
+      "passwordPresent": true
+    },
+    {
+      "id": "hugo_aïli",
+      "uid": "hugo_aïli",
+      "enabled": true,
+      "identifier": "hugosaure@free.fr",
+      "passwordPresent": true
+    },
+    {
+      "id": "lisa_aïli",
+      "uid": "lisa_aïli",
+      "enabled": true,
+      "identifier": "knackigirl@free.fr",
+      "passwordPresent": true
+    },
+    {
+      "id": "diego_aïli_vázquez",
+      "uid": "diego_aïli_vázquez",
+      "enabled": true,
+      "identifier": "diego_aïli_vázquez@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "oscar_aïli_vázquez",
+      "uid": "oscar_aïli_vázquez",
+      "enabled": true,
+      "identifier": "oscar_aïli_vázquez@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "christophe_rigollet",
+      "uid": "christophe_rigollet",
+      "enabled": true,
+      "identifier": "christophe_rigollet@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "jacques_lemery",
+      "uid": "jacques_lemery",
+      "enabled": true,
+      "identifier": "jacques.lemery@free.fr",
+      "passwordPresent": true
+    },
+    {
+      "id": "krystel_vazquez",
+      "uid": "krystel_vazquez",
+      "enabled": true,
+      "identifier": "krystel_vazquez@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "elvira_guadalupe",
+      "uid": "elvira_guadalupe",
+      "enabled": true,
+      "identifier": "elvira_guadalupe@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "eduardo_de_guadalupe",
+      "uid": "eduardo_de_guadalupe",
+      "enabled": true,
+      "identifier": "eduardo_de_guadalupe@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "sofía_guadalupe",
+      "uid": "sofía_guadalupe",
+      "enabled": false,
+      "identifier": "sofía_guadalupe@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "jesus_guadalupe",
+      "uid": "jesus_guadalupe",
+      "enabled": false,
+      "identifier": "jesus_guadalupe@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "elizabeth_guadalupe",
+      "uid": "elizabeth_guadalupe",
+      "enabled": true,
+      "identifier": "elizabeth_guadalupe@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "mama_tina",
+      "uid": "mama_tina",
+      "enabled": false,
+      "identifier": "mama_tina@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "papa_kao",
+      "uid": "papa_kao",
+      "enabled": false,
+      "identifier": "papa_kao@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "isabel_guadalupe",
+      "uid": "isabel_guadalupe",
+      "enabled": true,
+      "identifier": "isabel_guadalupe@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "diana_ramírez",
+      "uid": "diana_ramírez",
+      "enabled": true,
+      "identifier": "diana_ramírez@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "noel_omar_guadalupe",
+      "uid": "noel_omar_guadalupe",
+      "enabled": true,
+      "identifier": "noel_omar_guadalupe@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "carmen_de_juárez",
+      "uid": "carmen_de_juárez",
+      "enabled": true,
+      "identifier": "carmen_de_juárez@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "yadira_de_juárez",
+      "uid": "yadira_de_juárez",
+      "enabled": true,
+      "identifier": "yadira_de_juárez@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "valentina_júarez",
+      "uid": "valentina_júarez",
+      "enabled": false,
+      "identifier": "valentina_júarez@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "jaime_juárez",
+      "uid": "jaime_juárez",
+      "enabled": true,
+      "identifier": "jaime_juárez@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "irma_juárez",
+      "uid": "irma_juárez",
+      "enabled": true,
+      "identifier": "irma_juárez@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "erik",
+      "uid": "erik",
+      "enabled": true,
+      "identifier": "erik@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "esposa_de_erik",
+      "uid": "esposa_de_erik",
+      "enabled": true,
+      "identifier": "esposa_de_erik@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "olaf",
+      "uid": "olaf",
+      "enabled": true,
+      "identifier": "olaf@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "tía_mili",
+      "uid": "tía_mili",
+      "enabled": true,
+      "identifier": "tía_mili@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "adriana_martínez",
+      "uid": "adriana_martínez",
+      "enabled": true,
+      "identifier": "adriana_martínez@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "fernanda",
+      "uid": "fernanda",
+      "enabled": true,
+      "identifier": "fernanda@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "adriana_agris",
+      "uid": "adriana_agris",
+      "enabled": true,
+      "identifier": "adriana_agris@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "susana_díaz",
+      "uid": "susana_díaz",
+      "enabled": true,
+      "identifier": "susana_díaz@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "gabriela",
+      "uid": "gabriela",
+      "enabled": true,
+      "identifier": "gabriela@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "tania",
+      "uid": "tania",
+      "enabled": true,
+      "identifier": "tania@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "ernesto_ruelas",
+      "uid": "ernesto_ruelas",
+      "enabled": true,
+      "identifier": "ernesto_ruelas@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "aili",
+      "uid": "aili",
+      "enabled": true,
+      "identifier": "aili@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "juan",
+      "uid": "juan",
+      "enabled": true,
+      "identifier": "juan@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "natalia",
+      "uid": "natalia",
+      "enabled": true,
+      "identifier": "natalia@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "diego_salmerón",
+      "uid": "diego_salmerón",
+      "enabled": true,
+      "identifier": "diego_salmerón@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "ana_peregrino",
+      "uid": "ana_peregrino",
+      "enabled": true,
+      "identifier": "ana_peregrino@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "samuel_lópez",
+      "uid": "samuel_lópez",
+      "enabled": true,
+      "identifier": "samuel_lópez@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "rodrigo_fernández_castillo",
+      "uid": "rodrigo_fernández_castillo",
+      "enabled": true,
+      "identifier": "rodrigo_fernández_castillo@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "aldo",
+      "uid": "aldo",
+      "enabled": true,
+      "identifier": "aldo@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "karime",
+      "uid": "karime",
+      "enabled": true,
+      "identifier": "karime@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "renata",
+      "uid": "renata",
+      "enabled": true,
+      "identifier": "renata@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "cristian",
+      "uid": "cristian",
+      "enabled": true,
+      "identifier": "cristian@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "alejandro",
+      "uid": "alejandro",
+      "enabled": true,
+      "identifier": "alejandro@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "manu",
+      "uid": "manu",
+      "enabled": true,
+      "identifier": "manu@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "fanny_golden",
+      "uid": "fanny_golden",
+      "enabled": true,
+      "identifier": "fanny_golden@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "novio_de_fanny",
+      "uid": "novio_de_fanny",
+      "enabled": true,
+      "identifier": "novio_de_fanny@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "genesio",
+      "uid": "genesio",
+      "enabled": true,
+      "identifier": "genesio@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "federica",
+      "uid": "federica",
+      "enabled": true,
+      "identifier": "federica@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "lorenzo",
+      "uid": "lorenzo",
+      "enabled": true,
+      "identifier": "lorenzo@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "montserrat",
+      "uid": "montserrat",
+      "enabled": true,
+      "identifier": "montserrat@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "cyrielle_rigollet",
+      "uid": "cyrielle_rigollet",
+      "enabled": true,
+      "identifier": "cyrielle_rigollet@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "julien_rigollet",
+      "uid": "julien_rigollet",
+      "enabled": true,
+      "identifier": "julien_rigollet@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "fabio_rigollet",
+      "uid": "fabio_rigollet",
+      "enabled": true,
+      "identifier": "fabio_rigollet@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "lenzo_rigollet",
+      "uid": "lenzo_rigollet",
+      "enabled": true,
+      "identifier": "lenzo_rigollet@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "timeo_rigollet",
+      "uid": "timeo_rigollet",
+      "enabled": true,
+      "identifier": "timeo_rigollet@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "abraham_burciaga",
+      "uid": "abraham_burciaga",
+      "enabled": true,
+      "identifier": "abraham_burciaga@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "mauricio_vargas",
+      "uid": "mauricio_vargas",
+      "enabled": true,
+      "identifier": "mauricio_vargas@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "esposa_de_mauricio_vargas",
+      "uid": "esposa_de_mauricio_vargas",
+      "enabled": false,
+      "identifier": "esposa_de_mauricio_vargas@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "victor_segoviano",
+      "uid": "victor_segoviano",
+      "enabled": true,
+      "identifier": "victor_segoviano@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "esposa_de_victor_segoviano",
+      "uid": "esposa_de_victor_segoviano",
+      "enabled": false,
+      "identifier": "esposa_de_victor_segoviano@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "juan_ignacio_sánchez",
+      "uid": "juan_ignacio_sánchez",
+      "enabled": true,
+      "identifier": "juan_ignacio_sánchez@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "esposa_de_juan_ignacio",
+      "uid": "esposa_de_juan_ignacio",
+      "enabled": false,
+      "identifier": "esposa_de_juan_ignacio@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "tracy",
+      "uid": "tracy",
+      "enabled": true,
+      "identifier": "tracy@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "esposo_de_tracy",
+      "uid": "esposo_de_tracy",
+      "enabled": false,
+      "identifier": "esposo_de_tracy@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "julio",
+      "uid": "julio",
+      "enabled": true,
+      "identifier": "julio@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "erik_montañez",
+      "uid": "erik_montañez",
+      "enabled": true,
+      "identifier": "erik_montañez@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "treviño",
+      "uid": "treviño",
+      "enabled": true,
+      "identifier": "treviño@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "jimena",
+      "uid": "jimena",
+      "enabled": true,
+      "identifier": "jimena@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "endy_angiano",
+      "uid": "endy_angiano",
+      "enabled": true,
+      "identifier": "endy_angiano@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "manuel_amezcua",
+      "uid": "manuel_amezcua",
+      "enabled": true,
+      "identifier": "manuel_amezcua@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "ismael",
+      "uid": "ismael",
+      "enabled": true,
+      "identifier": "ismael@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "lupita",
+      "uid": "lupita",
+      "enabled": true,
+      "identifier": "lupita@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "fabiola_garcía",
+      "uid": "fabiola_garcía",
+      "enabled": true,
+      "identifier": "fabiola_garcía@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "pablo_garcía",
+      "uid": "pablo_garcía",
+      "enabled": true,
+      "identifier": "pablo_garcía@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "fanny",
+      "uid": "fanny",
+      "enabled": true,
+      "identifier": "stefhany.farias@dt.cfe.mx",
+      "passwordPresent": true
+    },
+    {
+      "id": "ian_farias",
+      "uid": "ian_farias",
+      "enabled": false,
+      "identifier": "ian_farias@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "rené_linares",
+      "uid": "rené_linares",
+      "enabled": true,
+      "identifier": "rené_linares@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "esposa_de_rené",
+      "uid": "esposa_de_rené",
+      "enabled": true,
+      "identifier": "esposa_de_rené@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "carlos_la_pelona",
+      "uid": "carlos_la_pelona",
+      "enabled": true,
+      "identifier": "carlos_la_pelona@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "alberto_trejo",
+      "uid": "alberto_trejo",
+      "enabled": true,
+      "identifier": "alberto_trejo@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "spomenka_petrovic",
+      "uid": "spomenka_petrovic",
+      "enabled": true,
+      "identifier": "spomenka_petrovic@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "guilhem_petrovic",
+      "uid": "guilhem_petrovic",
+      "enabled": true,
+      "identifier": "guilhem_petrovic@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "pierre_berthelon",
+      "uid": "pierre_berthelon",
+      "enabled": true,
+      "identifier": "pierre_berthelon@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "titis_berthelon",
+      "uid": "titis_berthelon",
+      "enabled": true,
+      "identifier": "titis_berthelon@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "tristan_de_carne",
+      "uid": "tristan_de_carne",
+      "enabled": true,
+      "identifier": "tristan_de_carne@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "yari_de_carne",
+      "uid": "yari_de_carne",
+      "enabled": true,
+      "identifier": "yari_de_carne@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "léonard_de_carne",
+      "uid": "léonard_de_carne",
+      "enabled": false,
+      "identifier": "léonard_de_carne@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "louis_de_carne",
+      "uid": "louis_de_carne",
+      "enabled": false,
+      "identifier": "louis_de_carne@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "frederic_bousquet",
+      "uid": "frederic_bousquet",
+      "enabled": true,
+      "identifier": "frederic_bousquet@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "laurent_monte",
+      "uid": "laurent_monte",
+      "enabled": true,
+      "identifier": "laurent_monte@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "isabelle_panzica",
+      "uid": "isabelle_panzica",
+      "enabled": true,
+      "identifier": "isabelle_panzica@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "chansamone_thao_nantha_kouman",
+      "uid": "chansamone_thao_nantha_kouman",
+      "enabled": true,
+      "identifier": "chansamone_thao_nantha_kouman@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "boris_bousquet",
+      "uid": "boris_bousquet",
+      "enabled": true,
+      "identifier": "boris_bousquet@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "esposa_de_chang",
+      "uid": "esposa_de_chang",
+      "enabled": true,
+      "identifier": "esposa_de_chang@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "alexis_boilley",
+      "uid": "alexis_boilley",
+      "enabled": true,
+      "identifier": "alexis_boilley@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "florent_lagaye",
+      "uid": "florent_lagaye",
+      "enabled": true,
+      "identifier": "florent_lagaye@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "karine_lagaye",
+      "uid": "karine_lagaye",
+      "enabled": true,
+      "identifier": "karine_lagaye@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "cyril_bertholin",
+      "uid": "cyril_bertholin",
+      "enabled": true,
+      "identifier": "cyril_bertholin@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "vincent",
+      "uid": "vincent",
+      "enabled": true,
+      "identifier": "vincent@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "celia",
+      "uid": "celia",
+      "enabled": true,
+      "identifier": "celia@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "marion_livoti",
+      "uid": "marion_livoti",
+      "enabled": true,
+      "identifier": "marion_livoti@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "benoit_guinet",
+      "uid": "benoit_guinet",
+      "enabled": true,
+      "identifier": "benoit_guinet@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "antoine",
+      "uid": "antoine",
+      "enabled": true,
+      "identifier": "antoine@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "françois_lemery",
+      "uid": "françois_lemery",
+      "enabled": true,
+      "identifier": "françois_lemery@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "mireille_lemery",
+      "uid": "mireille_lemery",
+      "enabled": true,
+      "identifier": "mireille_lemery@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "diego_henao",
+      "uid": "diego_henao",
+      "enabled": true,
+      "identifier": "diego_henao@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "ana_garcía",
+      "uid": "ana_garcía",
+      "enabled": true,
+      "identifier": "ana_garcía@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "dimitar",
+      "uid": "dimitar",
+      "enabled": true,
+      "identifier": "dimitar.s.m@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "acompagnante_de_dimitar",
+      "uid": "acompagnante_de_dimitar",
+      "enabled": false,
+      "identifier": "acompagnante_de_dimitar@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "jenny_di_fonzo",
+      "uid": "jenny_di_fonzo",
+      "enabled": true,
+      "identifier": "jenny_di_fonzo@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "acompagnante_de_jenny",
+      "uid": "acompagnante_de_jenny",
+      "enabled": false,
+      "identifier": "acompagnante_de_jenny@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "sophie_petot-rosa",
+      "uid": "sophie_petot-rosa",
+      "enabled": true,
+      "identifier": "s.petot.rosa@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "thomas_lesbros",
+      "uid": "thomas_lesbros",
+      "enabled": true,
+      "identifier": "thomas.lesbros@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "céleste_lesbros",
+      "uid": "céleste_lesbros",
+      "enabled": false,
+      "identifier": "céleste_lesbros@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "myriam_lefranc",
+      "uid": "myriam_lefranc",
+      "enabled": true,
+      "identifier": "myriamlefranc@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "pierre_soubeyrat",
+      "uid": "pierre_soubeyrat",
+      "enabled": true,
+      "identifier": "pierre.soubeyrat@wanadoo.fr",
+      "passwordPresent": true
+    },
+    {
+      "id": "fabrice_aïli",
+      "uid": "fabrice_aïli",
+      "enabled": true,
+      "identifier": "fabrice.aili@aol.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "mireille_rives",
+      "uid": "mireille_rives",
+      "enabled": true,
+      "identifier": "mireille.rives@icloud.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "sandra_aïli",
+      "uid": "sandra_aïli",
+      "enabled": true,
+      "identifier": "sandra.aili@icloud.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "johanna_aïli",
+      "uid": "johanna_aïli",
+      "enabled": true,
+      "identifier": "johanna.aili@icloud.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "simon_aïli",
+      "uid": "simon_aïli",
+      "enabled": true,
+      "identifier": "noul.simon@outlook.fr",
+      "passwordPresent": true
+    },
+    {
+      "id": "chantal_anselmo",
+      "uid": "chantal_anselmo",
+      "enabled": true,
+      "identifier": "chan.anselmo@outlook.fr",
+      "passwordPresent": true
+    },
+    {
+      "id": "patrick_anselmo",
+      "uid": "patrick_anselmo",
+      "enabled": true,
+      "identifier": "patrick.anselmo@orange.fr",
+      "passwordPresent": true
+    },
+    {
+      "id": "patricia_habell-aïli",
+      "uid": "patricia_habell-aïli",
+      "enabled": true,
+      "identifier": "habellaili@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "martin_habell",
+      "uid": "martin_habell",
+      "enabled": true,
+      "identifier": "habellmartin@aol.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "sian_habell-aïli",
+      "uid": "sian_habell-aïli",
+      "enabled": true,
+      "identifier": "sianaili@hotmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "robin_green",
+      "uid": "robin_green",
+      "enabled": true,
+      "identifier": "robinjames.green@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "eliso_aïli_green",
+      "uid": "eliso_aïli_green",
+      "enabled": false,
+      "identifier": "eliso_aïli_green@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "wolf_aïli_green",
+      "uid": "wolf_aïli_green",
+      "enabled": false,
+      "identifier": "wolf_aïli_green@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "maël_habell_aïli",
+      "uid": "maël_habell_aïli",
+      "enabled": true,
+      "identifier": "mael.habell@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "emma_habell_aïli",
+      "uid": "emma_habell_aïli",
+      "enabled": true,
+      "identifier": "emmajwwhitaker@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "fréderic_bonpard",
+      "uid": "fréderic_bonpard",
+      "enabled": true,
+      "identifier": "fréderic_bonpard@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "robin_bonpard",
+      "uid": "robin_bonpard",
+      "enabled": false,
+      "identifier": "robin_bonpard@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "maël_bonpard",
+      "uid": "maël_bonpard",
+      "enabled": false,
+      "identifier": "maël_bonpard@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "ajla_asceric",
+      "uid": "ajla_asceric",
+      "enabled": false,
+      "identifier": "ajla_asceric@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "arel_asceric",
+      "uid": "arel_asceric",
+      "enabled": false,
+      "identifier": "arel_asceric@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "virginie_bonpard",
+      "uid": "virginie_bonpard",
+      "enabled": true,
+      "identifier": "virginie_bonpard@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "brigitte_bonpard",
+      "uid": "brigitte_bonpard",
+      "enabled": true,
+      "identifier": "brigitte_bonpard@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "edwige",
+      "uid": "edwige",
+      "enabled": true,
+      "identifier": "hedwige.bonnin@hotmail.fr",
+      "passwordPresent": true
+    },
+    {
+      "id": "géraldine_toussaint",
+      "uid": "géraldine_toussaint",
+      "enabled": true,
+      "identifier": "géraldine_toussaint@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "pareja_de_géraldine",
+      "uid": "pareja_de_géraldine",
+      "enabled": false,
+      "identifier": "pareja_de_géraldine@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "gaëtane_lefranc",
+      "uid": "gaëtane_lefranc",
+      "enabled": true,
+      "identifier": "gaëtane_lefranc@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "stéphane_bon",
+      "uid": "stéphane_bon",
+      "enabled": true,
+      "identifier": "stéphane_bon@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "ange_bon",
+      "uid": "ange_bon",
+      "enabled": true,
+      "identifier": "ange_bon@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "josé_alberto_ricardo_valdés_villareal_miranda",
+      "uid": "josé_alberto_ricardo_valdés_villareal_miranda",
+      "enabled": true,
+      "identifier": "josé_alberto_ricardo_valdés_villareal_miranda@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "lucas",
+      "uid": "lucas",
+      "enabled": true,
+      "identifier": "lucas@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "laurence",
+      "uid": "laurence",
+      "enabled": true,
+      "identifier": "laurence@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "sébastien_mut",
+      "uid": "sébastien_mut",
+      "enabled": true,
+      "identifier": "sébastien_mut@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "carmene_mut_coudene",
+      "uid": "carmene_mut_coudene",
+      "enabled": true,
+      "identifier": "carmene_mut_coudene@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "arsene_mut_coudene",
+      "uid": "arsene_mut_coudene",
+      "enabled": true,
+      "identifier": "arsene_mut_coudene@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "gregory_nussbaumer",
+      "uid": "gregory_nussbaumer",
+      "enabled": true,
+      "identifier": "gregory_nussbaumer@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "paul-henry_picard",
+      "uid": "paul-henry_picard",
+      "enabled": true,
+      "identifier": "paul-henry_picard@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "victor_sirisakd",
+      "uid": "victor_sirisakd",
+      "enabled": true,
+      "identifier": "victor_sirisakd@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "michel_passelande",
+      "uid": "michel_passelande",
+      "enabled": true,
+      "identifier": "michel.passelande2@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "nicole_passelande",
+      "uid": "nicole_passelande",
+      "enabled": true,
+      "identifier": "nicolepasselandelemery@gmail.com",
+      "passwordPresent": true
+    },
+    {
+      "id": "sébastien_passelande",
+      "uid": "sébastien_passelande",
+      "enabled": true,
+      "identifier": "sébastien_passelande@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "gilles",
+      "uid": "gilles",
+      "enabled": true,
+      "identifier": "gilles@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "habiba",
+      "uid": "habiba",
+      "enabled": true,
+      "identifier": "habiba@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "yvon_leborgne",
+      "uid": "yvon_leborgne",
+      "enabled": true,
+      "identifier": "yvon_leborgne@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "antoine_faure",
+      "uid": "antoine_faure",
+      "enabled": true,
+      "identifier": "antoine_faure@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "aurélien_neyrand",
+      "uid": "aurélien_neyrand",
+      "enabled": true,
+      "identifier": "aurélien_neyrand@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "claudia",
+      "uid": "claudia",
+      "enabled": true,
+      "identifier": "claudia@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "damien_gilles",
+      "uid": "damien_gilles",
+      "enabled": true,
+      "identifier": "damien_gilles@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "desislava",
+      "uid": "desislava",
+      "enabled": true,
+      "identifier": "desislava@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "michaël_delarche",
+      "uid": "michaël_delarche",
+      "enabled": true,
+      "identifier": "michaël_delarche@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "robin_haider",
+      "uid": "robin_haider",
+      "enabled": true,
+      "identifier": "robin_haider@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "esteban",
+      "uid": "esteban",
+      "enabled": true,
+      "identifier": "esteban@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "sandra_gdl",
+      "uid": "sandra_gdl",
+      "enabled": true,
+      "identifier": "sandra_gdl@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "ilija_stankovic",
+      "uid": "ilija_stankovic",
+      "enabled": true,
+      "identifier": "ilija_stankovic@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "jeanne_sergent",
+      "uid": "jeanne_sergent",
+      "enabled": true,
+      "identifier": "jeanne_sergent@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "guillaume",
+      "uid": "guillaume",
+      "enabled": true,
+      "identifier": "guillaume@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "muriel",
+      "uid": "muriel",
+      "enabled": true,
+      "identifier": "muriel@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "julien_bryard",
+      "uid": "julien_bryard",
+      "enabled": true,
+      "identifier": "julien_bryard@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "lilou",
+      "uid": "lilou",
+      "enabled": true,
+      "identifier": "lilou@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "romane",
+      "uid": "romane",
+      "enabled": true,
+      "identifier": "romane@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "mireille_guillermet",
+      "uid": "mireille_guillermet",
+      "enabled": true,
+      "identifier": "mireille_guillermet@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "moussa_boutemine",
+      "uid": "moussa_boutemine",
+      "enabled": true,
+      "identifier": "moussa_boutemine@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "sofiane_benalia",
+      "uid": "sofiane_benalia",
+      "enabled": true,
+      "identifier": "sofiane_benalia@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "tanguy",
+      "uid": "tanguy",
+      "enabled": true,
+      "identifier": "tanguy@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "berni_cardoso",
+      "uid": "berni_cardoso",
+      "enabled": false,
+      "identifier": "berni_cardoso@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "jorge_jr._cardoso",
+      "uid": "jorge_jr._cardoso",
+      "enabled": true,
+      "identifier": "jorge_jr._cardoso@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "juri_cardoso",
+      "uid": "juri_cardoso",
+      "enabled": true,
+      "identifier": "juri_cardoso@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "jorge_cardoso",
+      "uid": "jorge_cardoso",
+      "enabled": true,
+      "identifier": "jorge_cardoso@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "guillemette_renard",
+      "uid": "guillemette_renard",
+      "enabled": true,
+      "identifier": "guillemette_renard@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "marido_de_guillemette_renard",
+      "uid": "marido_de_guillemette_renard",
+      "enabled": false,
+      "identifier": "marido_de_guillemette_renard@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "elodie",
+      "uid": "elodie",
+      "enabled": true,
+      "identifier": "elodie@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "cedric",
+      "uid": "cedric",
+      "enabled": true,
+      "identifier": "cedric@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "michel_lemery",
+      "uid": "michel_lemery",
+      "enabled": true,
+      "identifier": "m-p.lemery@wanadoo.fr",
+      "passwordPresent": true
+    },
+    {
+      "id": "pierrette",
+      "uid": "pierrette",
+      "enabled": true,
+      "identifier": "pierrette@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "benjamin_besson",
+      "uid": "benjamin_besson",
+      "enabled": true,
+      "identifier": "benjamin_besson@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "america",
+      "uid": "america",
+      "enabled": true,
+      "identifier": "america@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "gaël_hevia_besson",
+      "uid": "gaël_hevia_besson",
+      "enabled": false,
+      "identifier": "gaël_hevia_besson@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "luca_hevia_besson",
+      "uid": "luca_hevia_besson",
+      "enabled": false,
+      "identifier": "luca_hevia_besson@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "luz",
+      "uid": "luz",
+      "enabled": true,
+      "identifier": "luz@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "stefan",
+      "uid": "stefan",
+      "enabled": true,
+      "identifier": "stefan@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "guy",
+      "uid": "guy",
+      "enabled": true,
+      "identifier": "guy@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "evelyne",
+      "uid": "evelyne",
+      "enabled": true,
+      "identifier": "evelyne@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    }
+  ],
+  "alerts": [],
+  "comparisonAudit": [
+    {
+      "id": "gael",
+      "status": "candidate-delete",
+      "comparedFields": 37,
+      "diffCount": 37
+    },
+    {
+      "id": "hijo_de_fanny",
+      "status": "candidate-delete",
+      "comparedFields": 37,
+      "diffCount": 37
+    },
+    {
+      "id": "jesus_de_guadalupe",
+      "status": "candidate-delete",
+      "comparedFields": 37,
+      "diffCount": 37
+    },
+    {
+      "id": "leonard_de_carne",
+      "status": "candidate-delete",
+      "comparedFields": 37,
+      "diffCount": 37
+    },
+    {
+      "id": "luca",
+      "status": "candidate-delete",
+      "comparedFields": 37,
+      "diffCount": 37
+    },
+    {
+      "id": "mama_tina_guadalupe",
+      "status": "candidate-delete",
+      "comparedFields": 37,
+      "diffCount": 37
+    },
+    {
+      "id": "papa_kao_guadalupe",
+      "status": "candidate-delete",
+      "comparedFields": 37,
+      "diffCount": 37
+    },
+    {
+      "id": "pareja_de_fred_bonpard",
+      "status": "candidate-delete",
+      "comparedFields": 37,
+      "diffCount": 37
+    },
+    {
+      "id": "sofía_de_guadalupe",
+      "status": "candidate-delete",
+      "comparedFields": 37,
+      "diffCount": 37
+    },
+    {
+      "id": "valentina_de_juárez",
+      "status": "candidate-delete",
+      "comparedFields": 37,
+      "diffCount": 37
+    }
+  ],
+  "writes": 10,
+  "authPlan": {
+    "emailUpdates": 0,
+    "authCreates": 0,
+    "authDeletes": 0,
+    "blockedCreatesMissingEmail": 0,
+    "blockedEmailUpdatesInvalid": 0,
+    "blockedEmailUpdatesInUse": 0,
+    "blockedCreatesInvalidEmail": 0,
+    "blockedCreatesEmailInUse": 0
+  },
+  "authResults": {
+    "authDeletesApplied": 0,
+    "emailUpdatesApplied": 0,
+    "authCreatesApplied": 0,
+    "failures": []
+  },
+  "unchangedOmitted": 259
+}

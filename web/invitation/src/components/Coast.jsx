@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import { useApp } from "../context/AppContext.jsx";
+import { submitCoast } from "../submit-forms.js";
 
 function optionsMarkup(options) {
   return (options || []).map((option) => (
@@ -10,9 +11,39 @@ function optionsMarkup(options) {
 }
 
 export function Coast() {
-  const { t } = useApp();
+  const { t, language, interfaceText } = useApp();
   const coast = t.coast || {};
   const form = coast.form || {};
+
+  const formRef = useRef(null);
+  const [status, setStatus] = useState("idle"); // idle | working | success | error
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    if (status === "working") return;
+    const formEl = formRef.current;
+    if (!formEl) return;
+
+    const formData = new FormData(formEl);
+    setStatus("working");
+    try {
+      await submitCoast(formData, { language });
+      setStatus("success");
+      formEl.reset();
+    } catch (error) {
+      console.warn("[coast] submission failed", error.code || error.message);
+      setStatus("error");
+    }
+  };
+
+  const statusText =
+    status === "working"
+      ? interfaceText.submitWorking
+      : status === "success"
+        ? interfaceText.submitSuccess
+        : status === "error"
+          ? interfaceText.submitError
+          : form.previewNote;
 
   return (
     <section className="coast-section section" id="after">
@@ -35,9 +66,11 @@ export function Coast() {
         <h3>{form.title}</h3>
         <p>{form.body}</p>
         <form
+          ref={formRef}
           className="coast-form"
           data-form-kind="coast"
           aria-describedby="coast-preview-note"
+          onSubmit={handleSubmit}
         >
           <div className="form-field">
             <label htmlFor="coast-name">{form.fields.name}</label>
@@ -92,7 +125,7 @@ export function Coast() {
             {form.button}
           </button>
           <small id="coast-preview-note" data-form-status>
-            {form.previewNote}
+            {statusText}
           </small>
         </form>
       </div>

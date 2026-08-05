@@ -42,8 +42,9 @@ const GUESTS = eval(`(${guestsMatch[1]})`);
 
 const groups = new Set();
 GUESTS.forEach((g) => {
-  if (g.group) groups.add(g.group);
+  if (g.invitationGroup) groups.add(g.invitationGroup);
 });
+
 
 const sortedGroups = [...groups].sort();
 console.log(`Found ${sortedGroups.length} unique groups from ${GUESTS.length} guests:`);

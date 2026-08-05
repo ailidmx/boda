@@ -5,21 +5,26 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:network": "vite --host",
     "manifest": "node scripts/generate-media-manifest.mjs",
+
     "build": "npm run manifest && vite build",
     "preview": "vite preview",
     "links": "node scripts/generate-invitation-links.mjs",
     "favicons": "node scripts/generate-favicons.mjs",
     "test:profiles": "node --test tests/invitation-profile.test.mjs",
-    "test:rules": "node --test tests/firestore.rules.test.mjs"
+    "test:rules": "node --test tests/firestore.rules.test.mjs",
+    "test:validation": "node --test tests/validation.test.mjs"
+
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.1",
-    "@vitejs/plugin-react": "^4.7.0",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
+    "@vitejs/plugin-react": "^5.2.0",
     "favicons": "^7.3.1",
     "firebase-admin": "^14.2.0",
     "sharp": "^0.35.3",
-    "vite": "^6.4.3"
+    "vite": "^7.3.6"
   },
   "dependencies": {
     "@cloudinary/react": "^1.14.4",
@@ -29,5 +34,11 @@
     "firebase": "^12.17.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8"
+  },
+  "allowScripts": {
+    "@firebase/util@1.15.2": true,
+    "esbuild@0.28.1": true,
+    "fsevents@2.3.3": true,
+    "protobufjs@7.6.5": true
   }
 }

@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { CHAPALA_HIGHLIGHTS } from "../rocaAzulGallery.js";
 import { chapalaAnecdotes } from "../chapalaAnecdotes.js";
 import { useApp } from "../context/AppContext.jsx";
 import { InitialsSwap } from "./ui.jsx";
 import { FunFactCarousel } from "./FunFactCarousel.jsx";
 import { LightboxCarousel } from "./LightboxCarousel.jsx";
+import { MAP_IMAGES } from "../mapImages.js";
 
 
 
@@ -35,18 +36,103 @@ export function Story() {
 
   // Full-screen lightbox state for the Chapala photo set.
   const [lightbox, setLightbox] = useState(null);
+  const [factsOpen, setFactsOpen] = useState(false);
+  const [storyActive, setStoryActive] = useState(false);
+  const sectionRef = useRef(null);
+  const factsFabRef = useRef(null);
+  const factsPanelRef = useRef(null);
+  const factsCloseRef = useRef(null);
 
-  // Build the slide set for the shared lightbox carousel.
-  const chapalaSlides = CHAPALA_HIGHLIGHTS.map((photo, index) => ({
-    src: photo.src,
-    full: photo.full,
-    alt: story.photoAlts[index],
-  }));
+  // Show the mobile FAB only while the Story section occupies a meaningful
+  // part of the viewport. CSS keeps it hidden at desktop widths.
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section || typeof IntersectionObserver === "undefined") return undefined;
+
+    const mobile = window.matchMedia("(max-width: 899px)");
+    let latestEntry = null;
+    const syncVisibility = () => {
+      const visible = mobile.matches && latestEntry?.isIntersecting;
+      setStoryActive(Boolean(visible));
+      if (!mobile.matches) setFactsOpen(false);
+    };
+    const observer = new IntersectionObserver(([entry]) => {
+      latestEntry = entry;
+      syncVisibility();
+    }, { rootMargin: "-45% 0px -45% 0px", threshold: 0 });
+
+    observer.observe(section);
+    mobile.addEventListener?.("change", syncVisibility);
+    return () => {
+      observer.disconnect();
+      mobile.removeEventListener?.("change", syncVisibility);
+    };
+  }, []);
+
+  // Treat the mobile explorer as a real modal: lock background scrolling,
+  // support Escape, focus the close button, then return focus to the FAB.
+  useEffect(() => {
+    if (!factsOpen) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    const trigger = factsFabRef.current;
+    document.body.style.overflow = "hidden";
+    factsCloseRef.current?.focus();
+
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setFactsOpen(false);
+        return;
+      }
+      if (event.key !== "Tab") return;
+
+      const focusable = [...(factsPanelRef.current?.querySelectorAll("button:not([disabled])") || [])];
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+      trigger?.focus();
+    };
+  }, [factsOpen]);
+
+  // Build the slide set for the shared lightbox carousel. The venue map is
+  // prepended so clicking the map opens the viewer on it (index 0), while the
+  // Chapala photos follow (index 1+).
+  const mapSlide = {
+    src: MAP_IMAGES.venue[0].src,
+    full: MAP_IMAGES.venue[0].full,
+    alt: story.mapLabel,
+  };
+  const chapalaSlides = [
+    mapSlide,
+    ...CHAPALA_HIGHLIGHTS.map((photo, index) => ({
+      src: photo.src,
+      full: photo.full,
+      alt: story.photoAlts[index],
+    })),
+  ];
 
   return (
-    <section className="story-section section">
+    <section className="story-section section" ref={sectionRef}>
       <div className="story-mark">
         <InitialsSwap variant="identity-swap--story" delay="-3.4s" />
+        <button
+          type="button"
+          className="story-map"
+          aria-label={`${story.mapLabel} — ver en grande`}
+          onClick={() => setLightbox({ startIndex: 0 })}
+          style={{ backgroundImage: `url(${MAP_IMAGES.venue[0].src})` }}
+        />
       </div>
       <div className="story-copy reveal">
         <p className="eyebrow">{story.eyebrow}</p>
@@ -60,7 +146,7 @@ export function Story() {
               key={index}
               type="button"
               className="chapala-photo"
-              onClick={() => setLightbox({ startIndex: index })}
+              onClick={() => setLightbox({ startIndex: index + 1 })}
               aria-label={`${story.photoAlts[index]} — ver en grande`}
             >
               <img
@@ -73,13 +159,57 @@ export function Story() {
           ))}
         </div>
       </div>
-      <div className="story-footer">
-        <FunFactCarousel
-          facts={anecdotes}
-          id="story-anecdotes"
-          label={story.anecdotesLabel}
-        />
+      <div
+        className={`story-footer${factsOpen ? " is-mobile-open" : ""}`}
+        role={factsOpen ? "dialog" : undefined}
+        aria-modal={factsOpen ? "true" : undefined}
+        aria-label={factsOpen ? story.anecdotesLabel : undefined}
+        onMouseDown={(event) => {
+          if (factsOpen && event.target === event.currentTarget) setFactsOpen(false);
+        }}
+      >
+        <div className="story-facts-panel" ref={factsPanelRef}>
+          <button
+            ref={factsCloseRef}
+            className="story-facts-close"
+            type="button"
+            aria-label="Close"
+            onClick={() => setFactsOpen(false)}
+          >
+            ×
+          </button>
+          <FunFactCarousel
+            facts={anecdotes}
+            id="story-anecdotes"
+            label={story.anecdotesLabel}
+            headerAvatar={KIDS_AVATAR}
+          />
+        </div>
       </div>
+
+      <button
+        ref={factsFabRef}
+        className={`story-facts-fab${storyActive && !factsOpen ? " is-visible" : ""}`}
+        type="button"
+        aria-label={story.anecdotesLabel}
+        aria-haspopup="dialog"
+        onClick={() => setFactsOpen(true)}
+      >
+        <img src={KIDS_AVATAR} alt="" />
+      </button>
+
+      {/* Mobile-only map FAB: opens the venue map in the lightbox. Styled like
+          an old-time map (parchment + compass) to match the map artwork. */}
+      <button
+        className={`story-map-fab${storyActive ? " is-visible" : ""}`}
+        type="button"
+        aria-label={`${story.mapLabel} — ver en grande`}
+        onClick={() => setLightbox({ startIndex: 0 })}
+      >
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 2a7 7 0 0 0-7 7c0 5.25 7 13 7 13s7-7.75 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6.5a2.5 2.5 0 0 1 0 5Z" />
+        </svg>
+      </button>
 
       <nav className="section-nav" aria-label="Continue">
         <a className="section-nav-link" href="#venue">
@@ -99,5 +229,3 @@ export function Story() {
     </section>
   );
 }
-
-

@@ -9,10 +9,13 @@
  * app can consume without changes.
  */
 
-import { collection, getDocs } from "firebase/firestore";
+import { doc, getDoc } from "firebase/firestore";
 import { db } from "./firebase.js";
 import { getGuest } from "./guests.js";
-import { getRoom } from "./rooms.js";
+import { getRoom, getRoomDescription } from "./rooms.js";
+import { collections } from "../../shared/firestore-paths.js";
+
+
 
 // ── Group-level custom content cache ──────────────────────────────────
 
@@ -25,27 +28,47 @@ const groupContentCache = new Map();
  */
 const groupDataCache = new Map();
 
+function logDb(event, detail) {
+  console.log(`[db][invitation-profile][${event}]`, detail);
+}
+
 /**
- * Load custom content for all invitation groups from Firestore.
- * Call once at startup alongside loadGuestOverrides().
+ * Load custom content for the signed-in guest's OWN invitation group from
+ * Firestore. The Firestore rules scope reads to the guest's own group, so
+ * this must be called with the guest's invitationGroup (resolved from their
+ * own guest document after authentication).
+ *
+ * @param {string} invitationGroup - the signed-in guest's invitation group
  * @returns {Promise<void>}
  */
-export async function loadGroupCustomContent() {
+export async function loadGroupCustomContent(invitationGroup) {
   try {
-    const snapshot = await getDocs(collection(db, "invitation_groups"));
-    snapshot.forEach((doc) => {
-      const data = doc.data();
+    if (!invitationGroup) {
+      console.warn("[invitation] No invitationGroup provided; skipping group content load");
+      return;
+    }
+    // Read only the guest's own group document (document ID = group name).
+    // This matches the Firestore rule: a guest may only read their own group.
+    const ref = doc(db, collections.invitationGroups, invitationGroup);
+
+    logDb("read:start", { collection: collections.invitationGroups, docId: invitationGroup, op: "getDoc" });
+    const snapshot = await getDoc(ref);
+    if (snapshot.exists()) {
+      const data = snapshot.data();
       // Store full data
-      groupDataCache.set(doc.id, data);
+      groupDataCache.set(snapshot.id, data);
       // Store customContent separately for backward compat
       if (data.customContent) {
-        groupContentCache.set(doc.id, data.customContent);
+        groupContentCache.set(snapshot.id, data.customContent);
       }
-    });
-    if (!snapshot.empty) {
-      console.log(`[invitation] Loaded ${snapshot.size} group custom contents`);
+      logDb("read:success", { collection: collections.invitationGroups, docId: snapshot.id, op: "getDoc", data });
+      console.log(`[invitation] Loaded group custom content for "${snapshot.id}"`);
+    } else {
+      logDb("read:empty", { collection: collections.invitationGroups, docId: invitationGroup, op: "getDoc" });
+      console.log(`[invitation] No group content found for "${invitationGroup}"`);
     }
   } catch (error) {
+    logDb("read:error", { collection: collections.invitationGroups, docId: invitationGroup, op: "getDoc", error: error.message });
     console.warn("[invitation] Could not load group custom content", error.message);
   }
 }
@@ -217,14 +240,16 @@ export function parseInvitationProfile(code) {
   // 1. Try per-guest lookup first
   const guest = getGuest(code);
   if (guest) {
-    const room = guest.room ? getRoom(guest.room) : null;
+    const hosting = guest.hosting || {};
+    const roomId = hosting.room || guest.room;
+    const room = roomId ? getRoom(roomId) : null;
     return {
       code,
       hasCabin: guest.hasCabin,
       unit: guest.unit,
       occupancy: guest.occupancy,
       payment: guest.payment,
-      room: guest.room,
+      room: roomId,
       roomDescription: room?.description || null,
       guest, // full profile for personalised content
     };
@@ -281,8 +306,9 @@ export function invitationProfileText(profile, language = "es") {
     facts.push(`Cuarto: ${profile.room}`);
   }
   if (profile.roomDescription) {
-    facts.push(profile.roomDescription);
+    facts.push(getRoomDescription(profile.roomDescription, language));
   }
+
   return {
     detected: labels.detected,
     eyebrow: labels.eyebrow,
@@ -307,7 +333,7 @@ export function invitationProfileText(profile, language = "es") {
 export function getCustomContent(profile) {
   if (!profile?.guest) return null;
 
-  const groupName = profile.guest.invitacionGroup || profile.guest.group;
+  const groupName = profile.guest.invitationGroup || profile.guest.group;
   const groupContent = groupName ? groupContentCache.get(groupName) : null;
   const guestContent = profile.guest.customContent;
 
