@@ -82,9 +82,20 @@ jobs:
         working-directory: web/dashboard
         run: npm ci
 
+      - name: Write Cloudinary .env from secrets
+        working-directory: web/invitation
+        run: |
+          cat > .env <<'EOF'
+          CLOUDINARY_URL=cloudinary://${{ secrets.CLOUDINARY_API_KEY }}:${{ secrets.CLOUDINARY_API_SECRET }}@${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
+          EOF
+
       - name: Build invitation
         working-directory: web/invitation
         run: npm run build
+
 
       - name: Build dashboard
         working-directory: web/dashboard
