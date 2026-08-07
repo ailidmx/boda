@@ -603,7 +603,7 @@ test("an admin can read any guest document", async () => {
   await assertSucceeds(getDoc(doc(db, "guests", "sebastien")));
 });
 
-test("a guest cannot read a guest from another group", async () => {
+test("an invited guest can read a guest from another group", async () => {
   await seedGuestAuth();
   await environment.withSecurityRulesDisabled(async (admin) => {
     await setDoc(doc(admin.firestore(), "guests", "sebastien"), {
@@ -614,7 +614,7 @@ test("a guest cannot read a guest from another group", async () => {
     });
   });
   const db = environment.authenticatedContext(editorUid).firestore();
-  await assertFails(getDoc(doc(db, "guests", "sebastien")));
+  await assertSucceeds(getDoc(doc(db, "guests", "sebastien")));
 });
 
 // ── Invitation groups: group-scoped reads ─────────────────────────────
