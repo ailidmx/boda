@@ -1,0 +1,135 @@
+/* ── Pétanque section ────────────────────────────────────────────────────
+ * A tribute to the traditional French ball game. Sits between the detailed
+ * programme (white) and the accommodation section (light), so it uses a warm
+ * cream background with a soft radial glow to feel distinct yet cohesive.
+ */
+
+.petanque-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 6vw, 6rem);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgb(228 185 104 / 14%), transparent 55%),
+    var(--cream);
+}
+
+.petanque-copy {
+  width: 100%;
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+.petanque-copy .section-heading {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+.petanque-lead {
+  max-width: 46rem;
+}
+
+.petanque-body {
+  max-width: 46rem;
+  margin: 1.5rem 0 0;
+  font-size: var(--text-base);
+  line-height: 1.75;
+  color: var(--ink);
+}
+
+/* The homage line is styled as a handwritten note, echoing the story section. */
+.petanque-homage {
+  max-width: 46rem;
+  margin: 1.5rem 0 0;
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  line-height: 1.6;
+  color: var(--deep-green);
+}
+
+/* Photo strip, mirroring the Chapala gallery: a horizontal scroll on mobile
+   that becomes a tidy grid on desktop. */
+.petanque-photos {
+  display: grid;
+  grid-auto-columns: minmax(15rem, 22vw);
+  grid-auto-flow: column;
+  gap: 0.8rem;
+  margin-top: 2rem;
+  overflow-x: auto;
+  padding-bottom: 1.25rem;
+
+  scroll-snap-type: x mandatory;
+  scrollbar-color: var(--terracotta) rgb(36 33 25 / 12%);
+  scrollbar-width: thin;
+}
+
+.petanque-photo {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0.5rem;
+  background: none;
+  cursor: pointer;
+  scroll-snap-align: start;
+}
+
+.petanque-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 700ms ease;
+}
+
+.petanque-photo:hover img {
+  transform: scale(1.04);
+}
+
+/* Desktop-only bottom nav: leads to the accommodation section. Hidden on
+   mobile, matching the pattern used across the other sections. */
+.petanque-nav {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .petanque-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem 2.5rem;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgb(36 33 25 / 18%);
+  }
+
+  .petanque-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--ink);
+    font-size: 0.62rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color 250ms ease;
+  }
+
+  .petanque-nav-link:hover,
+  .petanque-nav-link:focus-visible {
+    color: var(--terracotta);
+    text-decoration: underline;
+  }
+}
+
+@media (max-width: 899px) {
+  .petanque-section {
+    padding: 1.25rem clamp(1.25rem, 4vw, 4rem);
+  }
+
+  .petanque-copy .section-heading h2 {
+    margin: 0;
+    font-size: clamp(1.6rem, 6vw, 4.5rem);
+  }
+}

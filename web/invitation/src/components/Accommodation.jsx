@@ -1,14 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { EVENT } from "../content.js";
+
 import { useApp } from "../context/AppContext.jsx";
 import { getActiveGuests } from "../guests.js";
 import {
   getGroupMembers,
   resolveGuestName,
   resolveGuestPhoto,
+  resolveLiveGuest,
 } from "../guest-profiles.js";
 import { getCabin } from "../cabins.js";
 import { getRoom, getRoomDescription, getRoomsByCabin } from "../rooms.js";
+import { cloudinaryImage } from "../cloudinary.js";
+
+
 
 const AIRBNB_SEARCH_URL = "https://www.airbnb.mx/s/roca-azul/homes?date_picker_type=calendar&checkin=2027-02-19&checkout=2027-02-21&refinement_paths%5B%5D=%2Fhomes&search_type=search_query";
 const AIRBNB_SUGGESTIONS = [
@@ -88,17 +94,69 @@ function formatPrice(amount, language) {
   return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(amount);
 }
 
-function AccommodationPrice({ amount, language, covered = false, coveredLabel }) {
+/* Two-line price block: line 1 shows MXN, line 2 shows EUR. When the stay is
+   covered by the couple, each line shows the original price struck through
+   next to the discounted price to pay (red); otherwise it shows the plain
+   price. */
+function PriceLines({ original, toPay, language, showSale }) {
   return (
-    <dd className={`accommodation-price${covered ? " is-covered" : ""}`}>
+    <>
+      <span className="accommodation-plan-line">
+        {showSale && (
+          <span className="accommodation-plan-original">
+            {formatPrice(original, language)} MXN
+          </span>
+        )}
+        <strong>{formatPrice(toPay, language)} MXN</strong>
+      </span>
+      <span className="accommodation-plan-line">
+        {showSale && (
+          <span className="accommodation-plan-original">
+            ≈ {formatPrice(original / MXN_PER_EUR, language)} €
+          </span>
+        )}
+        <small>≈ {formatPrice(toPay / MXN_PER_EUR, language)} €</small>
+      </span>
+    </>
+  );
+}
+
+function AccommodationPrice({ original, toPay, language, covered = false, coveredLabel, showSale }) {
+  const isSale = showSale ?? (covered && toPay < original);
+  return (
+    <dd className={`accommodation-price${isSale ? " is-sale" : ""}`}>
       <span className="accommodation-price-values">
-        <strong>{formatPrice(amount, language)} MXN</strong>
-        <small>≈ {formatPrice(amount / MXN_PER_EUR, language)} €</small>
+        <PriceLines
+          original={original}
+          toPay={toPay}
+          language={language}
+          showSale={isSale}
+        />
       </span>
       {covered && <em>{coveredLabel}</em>}
     </dd>
   );
 }
+
+
+/* Price block used inside the plan card rows. When the stay is covered by the
+   couple it shows the original price struck through next to the discounted
+   price to pay (red); otherwise it shows the plain price. */
+function PlanPrice({ original, toPay, language, covered = false }) {
+  const showSale = covered && toPay < original;
+  return (
+    <div className={`accommodation-plan-price${showSale ? " is-sale" : ""}`}>
+      <PriceLines
+        original={original}
+        toPay={toPay}
+        language={language}
+        showSale={showSale}
+      />
+    </div>
+  );
+}
+
+
 
 export function Accommodation() {
   const { t, profile, language } = useApp();
@@ -110,18 +168,38 @@ export function Accommodation() {
   const activeMember = activeMemberId
     ? groupMembers.find((m) => m.id === activeMemberId) || guest
     : guest;
-  const hosting = activeMember?.hosting || {};
+  // Merge the active member's live Firestore record so the per-person cabin,
+  // room, and payment flags are consistent with the group totals below (which
+  // also use resolveLiveGuest). This keeps the per-person row stable when
+  // switching between members of the same group.
+  const liveActive = resolveLiveGuest(activeMember) || activeMember;
+  const hosting = liveActive?.hosting || {};
   const assignedCabin =
-    hosting.cabin || activeMember?.cabin || activeMember?.cabinLabel || activeMember?.unit || activeMember?.room;
-  const assignedRoom = hosting.room || activeMember?.room;
-  const extraCabin = hosting.xtraCabin || activeMember?.xtraCabin;
-  const extraRoom = hosting.xtraRoom || activeMember?.xtraRoom;
+    hosting.cabin || liveActive?.cabin || liveActive?.cabinLabel || liveActive?.unit || liveActive?.room;
+  const assignedRoom = hosting.room || liveActive?.room;
+  const extraCabin = hosting.xtraCabin || liveActive?.xtraCabin;
+  const extraRoom = hosting.xtraRoom || liveActive?.xtraRoom;
   const room = assignedRoom ? getRoom(assignedRoom) : null;
   const roomDescription = getRoomDescription(room, language);
   const cabinId = room?.cabin || assignedCabin;
   const cabin = getCabin(cabinId);
   const cabinName = cabin?.name?.replace(/\s+/g, " ") || cabinId;
+
+  // Photos come from the DB (Cloudinary IDs). cloudinaryIds may be an array
+  // (new format) or a comma-separated string (legacy format).
+  const rawCloudinaryIds = cabin?.cloudinaryIds;
+  const cloudinaryIdList = Array.isArray(rawCloudinaryIds)
+    ? rawCloudinaryIds
+    : typeof rawCloudinaryIds === "string"
+      ? rawCloudinaryIds.split(",").map((id) => id.trim()).filter(Boolean)
+      : [];
+  const cabinPhotos = cloudinaryIdList.map((id) =>
+    cloudinaryImage(`boda/${id}`, { width: 1200 }),
+  );
+
+
   const cabinRooms = getRoomsByCabin(cabin?.id || room?.cabin || cabinId);
+
   const roomOccupants = cabinRooms.map((cabinRoom) => ({
     room: cabinRoom,
     occupants: activeGuests
@@ -133,7 +211,89 @@ export function Accommodation() {
       }))
       .filter((candidate) => candidate.name),
   }));
+
+  // ── Group accommodation helpers ────────────────────────────────────────
+  // Resolve a member's cabin object from their own data, merging the live
+  // Firestore record (which carries the effective cabin, room, and payment
+  // flags) with the static registry. This is fully independent of which
+  // member is currently selected in the tabs, so the group total never
+  // changes when switching members.
+  const resolveMemberCabin = (member) => {
+    const source = resolveLiveGuest(member);
+    const mHosting = source?.hosting || {};
+    const mAssignedCabin =
+      mHosting.cabin ||
+      source?.cabin ||
+      source?.cabinLabel ||
+      source?.unit ||
+      source?.room;
+    const mAssignedRoom = mHosting.room || source?.room;
+    const mRoom = mAssignedRoom ? getRoom(mAssignedRoom) : null;
+    const mCabinId = mRoom?.cabin || mAssignedCabin;
+    return mCabinId ? getCabin(mCabinId) : null;
+  };
+
+  // Whether a member's stay is covered by the couple.
+  const resolveMemberCovered = (member) => {
+    const source = resolveLiveGuest(member);
+    return source?.hosting?.isCabinPaidByNovios ?? source?.isCabinPaidByNovios;
+  };
+
+  // ── Dynamic per-person pricing ─────────────────────────────────────────
+  // The per-person price is no longer stored: it is derived from the cabin's
+  // total price for two nights divided by the number of occupants. When the
+  // cabin is under capacity, the price is split among the actual occupants
+  // (e.g. 10 people in a 12-person cabin each pay total/10). When the cabin is
+  // at or over capacity, the price is split by the max capacity (e.g. 12 or 20
+  // people in a 12-person cabin each pay total/12).
+  const cabinPerPersonPrice = (cabinObj, occupantCount) => {
+    if (!cabinObj?.totalPrice2Nights) return 0;
+    const capacity = cabinObj.capacity || 1;
+    const divisor = Math.min(occupantCount, capacity);
+    return divisor > 0 ? cabinObj.totalPrice2Nights / divisor : 0;
+  };
+
+  // Number of active guests assigned to a given cabin (across all rooms).
+  const cabinOccupantCount = (cabinId) =>
+    activeGuests.filter((candidate) => {
+      const candidateRoom = getAssignedRoom(candidate);
+      const candidateCabinId = candidateRoom
+        ? getRoom(candidateRoom)?.cabin
+        : resolveLiveGuest(candidate)?.hosting?.cabin
+          || resolveLiveGuest(candidate)?.cabin
+          || resolveLiveGuest(candidate)?.cabinLabel
+          || resolveLiveGuest(candidate)?.unit
+          || resolveLiveGuest(candidate)?.room;
+      return candidateCabinId === cabinId;
+    }).length;
+
+  // ── Cabin total price across all occupants ─────────────────────────────
+  // A cabin can be shared by guests from different invitation groups (e.g. a
+  // couple-covered member and a paying member in the same cabin). The cabin
+  // total price must therefore reflect who actually shares the cabin and who
+  // is covered by the couple — not just the active member — so a shared cabin
+  // where some occupants pay shows the amount those occupants still owe.
+  const cabinOccupants = roomOccupants.flatMap(({ occupants }) => occupants);
+  const cabinOccupantCovered = (occupantId) => {
+    const occupant = activeGuests.find((g) => g.id === occupantId);
+    const source = resolveLiveGuest(occupant);
+    return source?.hosting?.isCabinPaidByNovios ?? source?.isCabinPaidByNovios;
+  };
+  // Dynamic per-person price for the active member's cabin.
+  const activeCabinPerPerson = cabinPerPersonPrice(cabin, cabinOccupants.length);
+  // Sum of per-person prices for the cabin occupants who are NOT covered.
+  const cabinPriceToPay = cabinOccupants.reduce((sum, occupant) => {
+    if (cabinOccupantCovered(occupant.id)) return sum;
+    return sum + activeCabinPerPerson;
+  }, 0);
+  // True when at least one cabin occupant is covered by the couple.
+  const anyCabinCovered = cabinOccupants.some((o) => cabinOccupantCovered(o.id));
+
+
+
+
   const hasNoCabin = Boolean(
+
     activeMember && (activeMember.hasCabin === false || !assignedCabin),
   );
   const option = accommodation.guestOption || {};
@@ -156,11 +316,39 @@ export function Accommodation() {
     : isPaid || activeMember?.payment === "pagada"
       ? option.payment?.paid
       : option.payment?.pending;
+
+  // ── Group accommodation totals ─────────────────────────────────────────
+  // Theoretical total: sum of every member's dynamic per-person price. This is
+  // the first calculation and never changes when switching members.
+  const groupTotal = groupMembers.reduce((sum, member) => {
+    const memberCabin = resolveMemberCabin(member);
+    const memberCount = memberCabin ? cabinOccupantCount(memberCabin.id) : 0;
+    return sum + cabinPerPersonPrice(memberCabin, memberCount);
+  }, 0);
+
+  // Amount already covered by the couple across the group's members.
+  const coveredTotal = groupMembers.reduce((sum, member) => {
+    const memberCabin = resolveMemberCabin(member);
+    const memberCovered = resolveMemberCovered(member);
+    const memberCount = memberCabin ? cabinOccupantCount(memberCabin.id) : 0;
+    return sum + (memberCovered ? cabinPerPersonPrice(memberCabin, memberCount) : 0);
+  }, 0);
+
+
+  // Second calculation: what the group still pays after the couple's share.
+  const priceToPay = Math.max(0, groupTotal - coveredTotal);
+
+  // True when at least one group member has a stay covered by the couple.
+  const anyCovered = groupMembers.some(resolveMemberCovered);
+
   const [noteOpen, setNoteOpen] = useState(false);
+  const [occupancyOpen, setOccupancyOpen] = useState(false);
   const [sectionActive, setSectionActive] = useState(false);
   const sectionRef = useRef(null);
   const noteFabRef = useRef(null);
   const noteCloseRef = useRef(null);
+  const occupancyCloseRef = useRef(null);
+
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -203,6 +391,23 @@ export function Accommodation() {
     };
   }, [noteOpen]);
 
+  useEffect(() => {
+    if (!occupancyOpen) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    occupancyCloseRef.current?.focus();
+
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") setOccupancyOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKeyDown);
+    };
+  }, [occupancyOpen]);
+
+
   return (
     <section className="accommodation-section section" ref={sectionRef}>
       <div className="accommodation-copy reveal" id="accommodation-overview">
@@ -212,6 +417,22 @@ export function Accommodation() {
           <p className="accommodation-citation">{accommodation.citation}</p>
         )}
         <p className="lead">{accommodation.body}</p>
+
+        {privateVideoTitle && (
+          <div className="cabins-private-video reveal">
+            <h3>{privateVideoTitle}</h3>
+            <div className="video-frame">
+              <iframe
+                src="https://www.youtube.com/embed/zf0zhZihub4"
+                title={privateVideoTitle}
+                loading="lazy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerPolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+              />
+            </div>
+          </div>
+        )}
 
         <div className="accommodation-facts">
           {accommodation.facts.map((fact, index) => (
@@ -227,23 +448,6 @@ export function Accommodation() {
           ))}
           <p className="accommodation-facts-note">{accommodation.specialNote}</p>
         </div>
-
-        {privateVideoTitle && (
-          <div className="cabins-private-video reveal">
-            <p className="eyebrow">{privateVideoEyebrow}</p>
-            <h3>{privateVideoTitle}</h3>
-            <div className="video-frame">
-              <iframe
-                src="https://www.youtube.com/embed/zf0zhZihub4"
-                title={privateVideoTitle}
-                loading="lazy"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen
-              />
-            </div>
-          </div>
-        )}
 
         <div
           className={`accommodation-note-shell${noteOpen ? " is-mobile-open" : ""}`}
@@ -307,10 +511,96 @@ export function Accommodation() {
 
       <div className="accommodation-form-wrap" id="accommodation-option">
         <p className="eyebrow">{option.eyebrow}</p>
+        <h3>{hasNoCabin ? option.independentTitle : option.onSiteTitle}</h3>
+        {hasNoCabin ? (
+          <p className="accommodation-personal-note">
+            {option.independentBody}
+          </p>
+        ) : (
+          <>
+            <p className="accommodation-citation">{option.onSiteBody}</p>
+            {paidByCouple && (
+              <p className="accommodation-covered-note">
+                <strong>{option.onSiteCoveredBody}</strong>
+              </p>
+            )}
+            {cabinName && (
+              <p className="accommodation-cabin-badge">{cabinName}</p>
+            )}
+          </>
+        )}
+
+
+
+        {!hasNoCabin && cabinPhotos.length > 0 && (
+          <div className="accommodation-photo-carousel" aria-label={cabinName}>
+            {cabinPhotos.map((photo, index) => (
+              <figure className="accommodation-photo" key={index}>
+                <img
+                  src={photo}
+                  alt=""
+                  loading="lazy"
+                  decoding="async"
+                />
+                <figcaption>
+                  <span>{cabinName}</span>
+                  <small>
+                    {String(index + 1).padStart(2, "0")} /{" "}
+                    {String(cabinPhotos.length).padStart(2, "0")}
+                  </small>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        )}
+
+        {!hasNoCabin && cabin && (
+          <div className="accommodation-plan-card">
+            <h4>{option.planCardTitle}</h4>
+
+            {activeCabinPerPerson > 0 && (
+              <div className="accommodation-plan-row">
+                <span className="accommodation-plan-label">
+                  {option.planCardPerPerson}
+                </span>
+                <PlanPrice
+                  original={activeCabinPerPerson}
+                  toPay={paidByCouple ? 0 : activeCabinPerPerson}
+                  language={language}
+                  covered={paidByCouple}
+                />
+                {paidByCouple && <em>{option.planCardSaleLabel}</em>}
+              </div>
+            )}
+
+
+            {groupMembers.length > 1 && (
+              <div className="accommodation-plan-row">
+                <span className="accommodation-plan-label">
+                  {option.planCardGroupTotal}
+                </span>
+                <PlanPrice
+                  original={groupTotal}
+                  toPay={priceToPay}
+                  language={language}
+                  covered={anyCovered}
+                />
+                {anyCovered && <em>{option.planCardSaleLabel}</em>}
+              </div>
+            )}
+
+            <p className="accommodation-plan-disclaimer">
+              {option.planCardEurDisclaimer} · {option.planCardEstimate}
+            </p>
+
+          </div>
+        )}
+
         {groupMembers.length > 1 && (
           <div className="accommodation-member-tabs" role="tablist" aria-label={option.membersLabel || "Group members"}>
             {groupMembers.map((member) => {
               const { firstName } = resolveGuestName(member);
+              const memberPhoto = resolveGuestPhoto(member);
               const isActive = member.id === (activeMember?.id || guest?.id);
               return (
                 <button
@@ -321,6 +611,11 @@ export function Accommodation() {
                   className={`accommodation-member-tab${isActive ? " is-active" : ""}`}
                   onClick={() => setActiveMemberId(member.id)}
                 >
+                  <span className="accommodation-member-tab-avatar" aria-hidden="true">
+                    {memberPhoto
+                      ? <img src={memberPhoto} alt="" loading="lazy" />
+                      : getInitials(resolveGuestName(member).fullName)}
+                  </span>
                   <span className="accommodation-member-tab-name">{firstName}</span>
                   {member.id === guest?.id && <small>{option.youLabel}</small>}
                 </button>
@@ -328,17 +623,12 @@ export function Accommodation() {
             })}
           </div>
         )}
-        <h3>{hasNoCabin ? option.independentTitle : option.onSiteTitle}</h3>
-        {hasNoCabin ? (
-          <p className="accommodation-personal-note">
-            {accommodation.noCabinRecommendation}
-          </p>
-        ) : (
-          <p>{option.onSiteBody}</p>
-        )}
 
         {!hasNoCabin && (
           <dl className="accommodation-option-details">
+
+
+
             <div>
               <dt>{option.cabinLabel}</dt>
               <dd>{cabinName}</dd>
@@ -365,23 +655,32 @@ export function Accommodation() {
               <div>
                 <dt>{option.cabinPriceLabel}</dt>
                 <AccommodationPrice
-                  amount={cabin.totalPrice2Nights}
+                  original={cabin.totalPrice2Nights}
+                  toPay={cabinPriceToPay}
                   language={language}
+                  covered={cabinPriceToPay === 0}
+                  showSale={anyCabinCovered && cabinPriceToPay < cabin.totalPrice2Nights}
                   coveredLabel={option.coveredPriceLabel}
                 />
               </div>
             )}
-            {cabin?.pricePerPerson2Nights && (
+
+
+
+            {activeCabinPerPerson > 0 && (
               <div>
                 <dt>{option.personPriceLabel}</dt>
                 <AccommodationPrice
-                  amount={cabin.pricePerPerson2Nights}
+                  original={activeCabinPerPerson}
+                  toPay={paidByCouple ? 0 : activeCabinPerPerson}
                   language={language}
                   covered={paidByCouple}
                   coveredLabel={option.coveredPriceLabel}
                 />
               </div>
             )}
+
+
             {cabinArrangement && (
               <div>
                 <dt>{option.cabinOccupancyLabel}</dt>
@@ -415,45 +714,75 @@ export function Accommodation() {
         )}
 
         {!hasNoCabin && roomOccupants.length > 0 && (
-          <section className="accommodation-cabin-occupancy">
-            <h4>{option.wholeCabinTitle}</h4>
-            <p>{option.wholeCabinBody}</p>
-            <div className="accommodation-room-list">
-              {roomOccupants.map(({ room: cabinRoom, occupants }) => (
-                <article
-                  className={cabinRoom.id === assignedRoom ? "is-current" : undefined}
-                  key={cabinRoom.id}
-                >
-                  <header>
-                    <strong>{getRoomDescription(cabinRoom, language)}</strong>
-                    <span>
-                      {cabinRoom.capacity} {option.peopleLabel} ·{
-                        " "
-                      }{option.occupancy?.[cabinRoom.isShared ? "compartida" : "privada"]}
-                    </span>
-                  </header>
-                  <div className="accommodation-room-occupants">
-                    {occupants.length > 0 ? occupants.map((occupant) => (
-                      <div className="accommodation-room-person" key={occupant.id}>
-                        <span className="accommodation-room-avatar" aria-hidden="true">
-                          {occupant.photo
-                            ? <img src={occupant.photo} alt="" loading="lazy" />
-                            : getInitials(occupant.name)}
-                        </span>
-                        <span>
-                          {occupant.name}
-                          {occupant.id === activeMember?.id && <small>{option.youLabel}</small>}
-                        </span>
-                      </div>
-                    )) : (
-                      <span className="accommodation-room-empty">{option.emptyRoom}</span>
-                    )}
+          <>
+            {createPortal(
+
+              <div
+                className={`accommodation-occupancy-shell${occupancyOpen ? " is-open" : ""}`}
+                role={occupancyOpen ? "dialog" : undefined}
+                aria-modal={occupancyOpen ? "true" : undefined}
+                aria-labelledby={occupancyOpen ? "accommodation-occupancy-title" : undefined}
+                onMouseDown={(event) => {
+                  if (occupancyOpen && event.target === event.currentTarget) setOccupancyOpen(false);
+                }}
+              >
+                <div className="accommodation-occupancy-panel">
+                  <button
+                    ref={occupancyCloseRef}
+                    className="accommodation-occupancy-close"
+                    type="button"
+                    aria-label="Close"
+                    onClick={() => setOccupancyOpen(false)}
+                  >
+                    ×
+                  </button>
+                  <p className="eyebrow accommodation-occupancy-eyebrow">
+                    {option.wholeCabinTitle}
+                  </p>
+                  <h3 id="accommodation-occupancy-title">{cabinName}</h3>
+                  <p className="accommodation-occupancy-body">{option.wholeCabinBody}</p>
+                  <div className="accommodation-room-list">
+                    {roomOccupants.map(({ room: cabinRoom, occupants }) => (
+                      <article
+                        className={cabinRoom.id === assignedRoom ? "is-current" : undefined}
+                        key={cabinRoom.id}
+                      >
+                        <header>
+                          <strong>{getRoomDescription(cabinRoom, language)}</strong>
+                          <span>
+                            {cabinRoom.capacity} {option.peopleLabel} ·{
+                              " "
+                            }{option.occupancy?.[cabinRoom.isShared ? "compartida" : "privada"]}
+                          </span>
+                        </header>
+                        <div className="accommodation-room-occupants">
+                          {occupants.length > 0 ? occupants.map((occupant) => (
+                            <div className="accommodation-room-person" key={occupant.id}>
+                              <span className="accommodation-room-avatar" aria-hidden="true">
+                                {occupant.photo
+                                  ? <img src={occupant.photo} alt="" loading="lazy" />
+                                  : getInitials(occupant.name)}
+                              </span>
+                              <span>
+                                {occupant.name}
+                                {occupant.id === activeMember?.id && <small>{option.youLabel}</small>}
+                              </span>
+                            </div>
+                          )) : (
+                            <span className="accommodation-room-empty">{option.emptyRoom}</span>
+                          )}
+                        </div>
+                      </article>
+                    ))}
                   </div>
-                </article>
-              ))}
-            </div>
-          </section>
+                </div>
+              </div>,
+              document.body,
+            )}
+          </>
         )}
+
+
 
         {hasNoCabin && (
           <section className="accommodation-airbnb">
@@ -530,16 +859,38 @@ export function Accommodation() {
           </section>
         )}
 
-        <a className="button button-dark" href="#rsvp">
-          {option.button}
-        </a>
+        <div className="accommodation-actions">
+          {!hasNoCabin && roomOccupants.length > 0 && (
+            <button
+              type="button"
+              className="accommodation-occupancy-trigger"
+              aria-haspopup="dialog"
+              onClick={() => setOccupancyOpen(true)}
+            >
+              {option.wholeCabinTitle}
+            </button>
+          )}
+          <a className="button button-dark" href="#rsvp">
+            {option.button}
+          </a>
+        </div>
         <nav className="accommodation-subnav accommodation-subnav--back" aria-label={option.backLabel}>
+
           <a href="#accommodation-overview">
             <span aria-hidden="true">↑</span>
             <span>{option.backLabel}</span>
           </a>
         </nav>
       </div>
+
+      {/* Desktop-only bottom nav linking to the next section (Food / "A TABLE"). */}
+      <nav className="section-nav accommodation-section-nav" aria-label="Continue">
+        <a className="section-nav-link" href="#food">
+          <span>{accommodation.navNext}</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </nav>
     </section>
   );
 }
+

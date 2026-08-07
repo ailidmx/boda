@@ -13,6 +13,7 @@ import "./styles/funfact.css";
 import "./styles/gallery.css";
 import "./styles/photos.css";
 import "./styles/weekend.css";
+import "./styles/petanque.css";
 import "./styles/weather.css";
 import "./styles/food.css";
 import "./styles/music.css";
@@ -20,8 +21,8 @@ import "./styles/cardcarousel.css";
 import "./styles/venue.css";
 import "./styles/lightbox.css";
 import "./styles/accommodation.css";
-import "./styles/cabins.css";
 import "./styles/travel.css";
+
 import "./styles/mapcarousel.css";
 import "./styles/attire.css";
 import "./styles/gift.css";

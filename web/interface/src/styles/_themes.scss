@@ -1,0 +1,20 @@
+// ── Theme variants: portal / planning / guests ──────────────────────────
+@use "tokens" as *;
+
+.theme-portal {
+  --brand: #{$theme-portal-brand};
+  --brand-dark: #{$theme-portal-brand-dark};
+  --teal: #{$theme-portal-teal};
+}
+
+.theme-planning {
+  --brand: #{$theme-planning-brand};
+  --brand-dark: #{$theme-planning-brand-dark};
+  --teal: #{$theme-planning-teal};
+}
+
+.theme-guests {
+  --brand: #{$theme-guests-brand};
+  --brand-dark: #{$theme-guests-brand-dark};
+  --teal: #{$theme-guests-teal};
+}

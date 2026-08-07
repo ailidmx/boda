@@ -93,3 +93,42 @@
 .gift-contacts a:hover {
   text-decoration: underline;
 }
+
+
+/* ── Gift → Thanks transition nav ────────────────────────────────────────
+   CADEAUX and MERCI are adjacent sections sharing the same dark style, so
+   instead of the plain section-nav we use an ornamental flourish divider to
+   keep the hand-finished, art-worked feel. Desktop-only. */
+.gift-section-nav {
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  border-top-color: rgb(255 255 255 / 22%);
+}
+
+.gift-section-nav-ornament {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9rem;
+  color: var(--marigold);
+  font-size: 0.85rem;
+  line-height: 1;
+}
+
+.gift-section-nav-ornament::before,
+.gift-section-nav-ornament::after {
+  content: "";
+  width: clamp(2rem, 6vw, 4rem);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 45%));
+}
+
+.gift-section-nav-ornament::after {
+  background: linear-gradient(270deg, transparent, rgb(255 255 255 / 45%));
+}
+
+@media (max-width: 899px) {
+  .gift-section-nav {
+    display: none;
+  }
+}

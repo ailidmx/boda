@@ -342,11 +342,12 @@ function MemberCard({
             e.stopPropagation();
             startEdit();
           }}
-          aria-label={copy.edit}
+          aria-label={identityVerified ? copy.edit : copy.verify}
           aria-pressed={false}
         >
-          {copy.edit || "Edit"}
+          {identityVerified ? copy.edit || "Edit" : copy.verify || "Verify"}
         </button>
+
       )}
 
       <div className="identity-member-flip">

@@ -48,6 +48,18 @@ export function Gift() {
           ))}
         </div>
       </div>
+
+      {/* Desktop-only bottom nav linking to the next section (Thanks / "MERCI").
+          CADEAUX and MERCI share the same dark style, so this transition uses an
+          ornamental flourish divider instead of the plain section-nav to keep the
+          hand-finished, art-worked feel. Hidden on mobile. */}
+      <nav className="section-nav section-nav--light gift-section-nav" aria-label="Continue">
+        <span className="gift-section-nav-ornament" aria-hidden="true">✦</span>
+        <a className="section-nav-link" href="#thanks">
+          <span>{gift.navNext}</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </nav>
     </section>
   );
 }

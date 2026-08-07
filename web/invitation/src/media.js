@@ -1,5 +1,6 @@
-import { cloudinaryImage, cloudinaryVideo } from "./cloudinary.js";
-import { CABIN_PHOTOS, CABIN_VIDEOS } from "./generated-media.js";
+import { cloudinaryImage } from "./cloudinary.js";
+
+
 
 /*
  * Public invitation media registry.
@@ -9,11 +10,11 @@ import { CABIN_PHOTOS, CABIN_VIDEOS } from "./generated-media.js";
  * ROCA_AZUL, COMIDA, CABANAS, VESTUARIO, ...). This module maps each public
  * id to the section that uses it and builds optimized delivery URLs.
  *
- * Cabin photos and videos are generated at build time from Cloudinary tags
- * (scripts/generate-media-manifest.mjs) so adding a photo is as simple as
- * tagging it in Cloudinary and re-running the generator.
+ * Cabin photos are stored in the Firestore `cabins` collection via the
+ * `cloudinaryIds` field and read directly by the Accommodation section.
  *
  * The local WebP/MP4 derivatives in src/assets/approved/ are no longer
+
  * bundled; they remain only as the source for the Cloudinary upload script
  * (scripts/upload-to-cloudinary.mjs).
  */
@@ -79,13 +80,43 @@ export const MEDIA = {
     pool: img("venue-pool", { width: 1200, height: 1200, crop: "fill" }),
   },
 
+  // Food cards are 4:3 (aspect-ratio 4/3 in CSS), so every image is delivered
+  // with a fixed 4:3 crop (c_fill) to keep all cards visually identical.
   food: {
-    carnitas: img("food-carnitas", { width: 900 }),
-    guacamole: img("food-guacamole", { width: 900 }),
-    nopales: img("food-nopales", { width: 900 }),
-    taquiza: img("food-taquiza", { width: 900 }),
-    tejuino: img("food-tejuino", { width: 900 }),
+    // The updated food photos live at the Cloudinary account root (not under
+    // `boda/`), so they are built directly with cloudinaryImage instead of the
+    // `img` helper — same as the pizza card.
+    carnitas: cloudinaryImage("carnitas_rtct2y", { width: 600, height: 450, crop: "fill" }),
+    aguas: cloudinaryImage("aguas_kpoxib", { width: 600, height: 450, crop: "fill" }),
+
+    esquites: cloudinaryImage("esquites_rzhsv6", { width: 600, height: 450, crop: "fill" }),
+    guacamole: cloudinaryImage("guacamole_inzf4m", { width: 600, height: 450, crop: "fill" }),
+    nopales: cloudinaryImage("nopales_kyhrzh", { width: 600, height: 450, crop: "fill" }),
+    pizza: cloudinaryImage("pizza_cxhngb", { width: 600, height: 450, crop: "fill" }),
+    taquiza: cloudinaryImage("taquiza_zkqygq", { width: 600, height: 450, crop: "fill" }),
+    tejuino: cloudinaryImage("tejuino_davqad", { width: 600, height: 450, crop: "fill" }),
+    tequila: cloudinaryImage("tequila_k7ewqm", { width: 600, height: 450, crop: "fill" }),
   },
+
+
+
+
+
+  // Live music acts — each card gets a photo of the act/band. These assets
+  // live at the Cloudinary account root (not under the `boda/` folder), so
+  // they are built directly with cloudinaryImage instead of the `img` helper.
+  music: {
+    marimba: cloudinaryImage("marimba_jclxjy", { width: 900 }),
+    mariachi: cloudinaryImage("mariachis_f0foi2", { width: 900 }),
+    norteno: cloudinaryImage("norteños_izxes3", { width: 900 }),
+    frenchBand: cloudinaryImage("38t_photo_yhx9m3", { width: 900 }),
+    // 38 tonnes logo, overlaid in the top-right corner of the card.
+    frenchBandLogo: cloudinaryImage("logo38t_aptkvz", { width: 200 }),
+  },
+
+
+
+
   oaxaca: [
     img("oaxaca-01", { width: 800 }),
     img("oaxaca-02", { width: 800 }),
@@ -94,21 +125,7 @@ export const MEDIA = {
   ],
   // Party photo used as the background banner of the weekend section.
   weekendBanner: img("party-01", { width: 1600 }),
-
-
-  // Cabin photos and videos are generated at build time from Cloudinary tags
-  // (scripts/generate-media-manifest.mjs → src/generated-media.js).
-  cabins: Object.fromEntries(
-    Object.entries(CABIN_PHOTOS).map(([key, ids]) => [
-      key,
-      ids.map((id) => img(id, { width: 1200 })),
-    ]),
-  ),
-  cabinVideos: Object.fromEntries(
-    Object.entries(CABIN_VIDEOS).map(([key, id]) => [
-      key,
-      cloudinaryVideo(`boda/${id}`, { width: 1200 }),
-    ]),
-  ),
 };
+
+
 

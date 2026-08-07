@@ -41,21 +41,8 @@
     scroll-snap-stop: always;
   }
 
-  .swipe-card-carousel__track .flavour-card,
-  .swipe-card-carousel__track .flavour-card:nth-child(4),
-  .swipe-card-carousel__track .flavour-card:nth-child(5),
-  .swipe-card-carousel__track .flavour-card:last-child {
-    grid-column: auto;
-  }
-
-  .swipe-card-carousel__track .flavour-card img,
-  .swipe-card-carousel__track .flavour-card:nth-child(4) img,
-  .swipe-card-carousel__track .flavour-card:nth-child(5) img,
-  .swipe-card-carousel__track .flavour-card__illustration {
-    height: min(58vw, 14rem);
-  }
-
   .playlist-section {
+
     padding: 1rem;
   }
 

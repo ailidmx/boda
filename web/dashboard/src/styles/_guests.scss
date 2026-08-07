@@ -1,0 +1,224 @@
+// ── Guest manager: filters, table, badges, inline edit ──────────────────
+@use "tokens" as *;
+
+// ── Filters ──
+.dashboard-guest-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.dashboard-filter-group {
+  display: grid;
+  gap: 0.3rem;
+
+  label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $ink-muted;
+  }
+
+  select,
+  input {
+    padding: 0.5rem 0.75rem;
+    border: 1px solid $border-strong;
+    border-radius: 0.5rem;
+    background: $card-bg;
+    font: inherit;
+    min-width: 10rem;
+  }
+}
+
+.dashboard-filter-count {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-left: auto;
+  font-size: 0.85rem;
+  color: $ink-muted;
+
+  strong {
+    color: $ink;
+  }
+}
+
+// ── Table ──
+.dashboard-guest-table-wrap {
+  overflow-x: auto;
+}
+
+.dashboard-guest-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+
+  th {
+    padding: 0.6rem 0.75rem;
+    border-bottom: 2px solid $border-strong;
+    color: $ink-muted;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 0.55rem 0.75rem;
+    border-bottom: 1px solid $border-light;
+    vertical-align: middle;
+  }
+
+  tr:hover td {
+    background: rgba(85, 69, 45, 0.03);
+  }
+
+  code {
+    padding: 0.15rem 0.35rem;
+    border-radius: 0.25rem;
+    background: rgba(85, 69, 45, 0.08);
+    font-size: 0.78rem;
+  }
+}
+
+.dashboard-link-btn {
+  border: 0;
+  padding: 0.25rem 0.4rem;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  border-radius: 0.3rem;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(85, 69, 45, 0.1);
+  }
+}
+
+// ── Badges ──
+.dashboard-badge {
+  display: inline-block;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.dashboard-badge-pending {
+  background: $status-pending-bg;
+  color: $status-pending-text;
+}
+
+.dashboard-badge-yes {
+  background: $status-yes-bg;
+  color: $status-yes-text;
+}
+
+.dashboard-badge-no {
+  background: $status-no-bg;
+  color: $status-no-text;
+}
+
+.dashboard-badge-maybe {
+  background: $status-maybe-bg;
+  color: $status-maybe-text;
+}
+
+// ── Grouped guest table ──
+.dashboard-group-header td {
+  padding: 0;
+  border-bottom: 2px solid $border-strong;
+}
+
+.dashboard-group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 0;
+  background: rgba(85, 69, 45, 0.06);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+  text-align: left;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(85, 69, 45, 0.1);
+  }
+
+  strong {
+    font-weight: 600;
+    color: $ink;
+  }
+}
+
+.dashboard-group-arrow {
+  font-size: 0.65rem;
+  color: $ink-muted;
+  transition: transform 0.15s;
+}
+
+.dashboard-group-count {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: $ink-muted;
+}
+
+// ── Inline edit inputs ──
+.dashboard-inline-input {
+  width: 100%;
+  min-width: 8rem;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid transparent;
+  border-radius: 0.35rem;
+  background: transparent;
+  font: inherit;
+  font-size: 0.85rem;
+  color: $ink;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: $border-strong;
+    background: rgba(255, 253, 249, 0.6);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $accent;
+    background: $white;
+    box-shadow: 0 0 0 2px rgba(138, 106, 54, 0.12);
+  }
+}
+
+.dashboard-inline-select {
+  max-width: 12rem;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid transparent;
+  border-radius: 0.35rem;
+  background: transparent;
+  font: inherit;
+  font-size: 0.82rem;
+  color: $ink;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: $border-strong;
+    background: rgba(255, 253, 249, 0.6);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $accent;
+    background: $white;
+    box-shadow: 0 0 0 2px rgba(138, 106, 54, 0.12);
+  }
+}

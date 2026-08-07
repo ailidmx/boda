@@ -1,7 +1,9 @@
 import React from "react";
 import { EVENT } from "../content.js";
+import { MEDIA } from "../media.js";
 import { useApp } from "../context/AppContext.jsx";
 import { SwipeCardCarousel } from "./SwipeCardCarousel.jsx";
+
 
 export function Music() {
   const { t } = useApp();
@@ -13,7 +15,8 @@ export function Music() {
   ];
 
   return (
-    <section className="music-section section">
+    <section className="music-section section" id="music">
+
       <div className="experience-heading reveal">
         <p className="eyebrow">{music.eyebrow}</p>
         <h2>{music.title}</h2>
@@ -21,15 +24,55 @@ export function Music() {
       </div>
 
       <SwipeCardCarousel className="music-lineup" label={music.title}>
-        {music.acts.map((act, index) => (
-          <article className="music-act reveal" key={index}>
-            <span>0{index + 1}</span>
-            <p>{act.moment}</p>
-            <h3>{act.name}</h3>
-            <small>{act.note}</small>
-          </article>
-        ))}
+        {music.acts.map((act, index) => {
+          const photo = act.image ? MEDIA.music[act.image] : null;
+          return (
+            <article className="music-act reveal" key={index}>
+              {photo && (
+                <div className="music-act__photo">
+                  <img src={photo} alt={act.name} loading="lazy" />
+                  {act.logo && (
+                    <img
+                      className="music-act__logo"
+                      src={MEDIA.music[act.logo]}
+                      alt={`${act.name} logo`}
+                      loading="lazy"
+                    />
+                  )}
+                </div>
+              )}
+
+              <span className="music-act__number">0{index + 1}</span>
+              <p className="music-act__moment">{act.moment}</p>
+              <h3>{act.name}</h3>
+              <small>{act.note}</small>
+              {act.link && (
+                <div className="music-act__links">
+                  <a
+                    className="text-link"
+                    href={act.link}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {music.listenLabel || "Listen"} ↗
+                  </a>
+                  {act.website && (
+                    <a
+                      className="text-link"
+                      href={act.website}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      {music.websiteLabel || "Website"} ↗
+                    </a>
+                  )}
+                </div>
+              )}
+            </article>
+          );
+        })}
       </SwipeCardCarousel>
+
 
       <div className="playlist-section reveal">
         <div className="playlist-heading">

@@ -46,7 +46,7 @@
   }
 
   .facility-card {
-    aspect-ratio: 1 / 1;
+    aspect-ratio: 4 / 3;
   }
 
   /* On touch, hover doesn't exist, so keep the list visible by default. */
@@ -454,12 +454,12 @@
 .facility-card__overlay {
   position: absolute;
   z-index: 1;
-  inset: auto 0 0;
+  inset: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   gap: 0.75rem;
-  padding: clamp(1.1rem, 2vw, 1.6rem);
+  padding: clamp(1.5rem, 2.5vw, 2.25rem);
   color: var(--white);
   /* Let clicks pass through to the full-bleed photo button so tapping anywhere
      on the card opens the lightbox carousel. */
@@ -1004,9 +1004,15 @@
   }
 
   .facility-slide {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
     gap: 0.75rem;
-    height: clamp(13rem, 36svh, 20rem);
+    height: auto;
+  }
+
+  /* One card per slide on mobile, sized 4:3. */
+  .facility-slide .facility-card {
+    height: auto;
+    aspect-ratio: 4 / 3;
   }
 
   .facility-slideset__nav {
@@ -1040,33 +1046,33 @@
   }
 
   .facility-card__overlay {
-    gap: 0.35rem;
-    padding: 0.7rem;
+    gap: 0.5rem;
+    padding: 1.25rem;
   }
 
   .facility-card__icon {
-    width: 2rem;
-    height: 2rem;
-    border-radius: 0.55rem;
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 0.65rem;
   }
 
   .facility-card__icon svg {
-    width: 1.2rem;
-    height: 1.2rem;
+    width: 1.5rem;
+    height: 1.5rem;
   }
 
   .facility-card h3 {
-    font-size: clamp(1.05rem, 4.5vw, 1.4rem);
+    font-size: clamp(1.4rem, 5.5vw, 1.9rem);
   }
 
   .facility-card ul {
-    gap: 0.2rem;
+    gap: 0.3rem;
   }
 
   .facility-card li {
-    padding-left: 0.7rem;
-    font-size: clamp(0.65rem, 2.5vw, 0.78rem);
-    line-height: 1.25;
+    padding-left: 0.85rem;
+    font-size: clamp(0.85rem, 3vw, 1.05rem);
+    line-height: 1.35;
   }
 
   .facility-card li::before {
@@ -1085,34 +1091,31 @@
     display: none;
   }
 
+  /* INTIMITE modal — styled like the other section FAB modals (weather
+     advice / attire pictogram): a white rounded panel with a display-font
+     title and a bordered close button over a dimmed overlay. */
   .venue-privacy-shell.is-mobile-open {
     position: fixed;
     z-index: 240;
     inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding:
-      max(1rem, env(safe-area-inset-top))
-      1rem
-      max(1rem, env(safe-area-inset-bottom));
-    background: rgb(18 27 24 / 72%);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    display: grid;
+    place-items: center;
+    padding: 1.25rem;
+    background: rgb(36 33 25 / 55%);
   }
 
   .venue-privacy-shell.is-mobile-open .venue-privacy {
+    position: relative;
     display: block;
-    width: min(100%, 34rem);
-    max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    width: min(100%, 26rem);
+    max-height: 80svh;
     margin: 0;
-    padding: 1.25rem;
+    padding: 2rem 1.5rem 1.5rem;
     overflow-y: auto;
-    border-color: rgb(198 139 43 / 48%);
-    background:
-      radial-gradient(120% 140% at 0% 0%, rgb(228 185 104 / 22%), transparent 55%),
-      var(--cream);
-    box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 38%);
+    border: 0;
+    border-radius: 1.25rem;
+    background: var(--white);
+    box-shadow: 0 1.5rem 3.5rem rgb(36 33 25 / 35%);
     overscroll-behavior: contain;
   }
 
@@ -1137,27 +1140,37 @@
 
   .venue-privacy__header h3 {
     margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 400;
+    color: var(--ink);
   }
 
   .venue-privacy__body {
     margin-top: 1rem;
   }
 
+  .venue-privacy__body p {
+    color: rgb(36 33 25 / 78%);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
   .venue-privacy__close {
     position: absolute;
     z-index: 2;
-    top: 0.65rem;
+    top: 0.75rem;
     right: 0.75rem;
     display: grid;
     width: 2.25rem;
     height: 2.25rem;
     place-items: center;
     padding: 0;
-    border: 1px solid rgb(36 33 25 / 20%);
+    border: 1px solid rgb(36 33 25 / 22%);
     border-radius: 50%;
-    background: rgb(255 253 248 / 88%);
+    background: transparent;
     color: var(--ink);
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     line-height: 1;
     cursor: pointer;
   }

@@ -1,0 +1,203 @@
+// ── Components: buttons, cards, grids, tags, metrics ────────────────────
+@use "tokens" as *;
+
+// ── Buttons ──
+.btn {
+  text-decoration: none;
+  border: 1px solid $line;
+  border-radius: 999px;
+  padding: 10px 16px;
+  font-weight: 700;
+  background: #fff;
+
+  &.primary {
+    color: #fff;
+    border-color: #934124;
+    background: linear-gradient(120deg, var(--brand-dark), var(--brand));
+  }
+}
+
+// ── Grids ──
+.grid {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 14px;
+
+  &.two {
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  }
+
+  &.four {
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  }
+}
+
+// ── Cards ──
+.card,
+.metric-card {
+  border: 1px solid rgba(126, 47, 23, 0.2);
+  border-radius: 16px;
+  background: $paper;
+  padding: 16px;
+  box-shadow: $shadow-card;
+}
+
+.card {
+  h3,
+  .metric-card h3 {
+    margin-top: 0;
+  }
+
+  p,
+  li {
+    color: $ink-soft;
+  }
+}
+
+// ── DNA block ──
+.dna-block {
+  background:
+    radial-gradient(circle at 95% 10%, rgba(31, 111, 103, 0.12), transparent 36%),
+    radial-gradient(circle at 8% 88%, rgba(122, 39, 70, 0.12), transparent 42%),
+    $paper;
+}
+
+.dna-grid {
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+.dna-card {
+  border: 1px solid rgba(126, 47, 23, 0.14);
+  border-radius: 14px;
+  padding: 14px;
+  background: rgba(255, 253, 249, 0.9);
+
+  h4 {
+    margin: 8px 0;
+    font-size: 18px;
+  }
+}
+
+.dna-chip {
+  display: inline-block;
+  font-weight: 700;
+  font-size: 12px;
+  letter-spacing: 0.8px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  color: #fff;
+  background: linear-gradient(120deg, $wine, var(--brand-dark));
+}
+
+// ── Hover transitions ──
+.card,
+.metric-card,
+.btn,
+.lang-btn,
+.nav-links a {
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
+}
+
+.card:hover,
+.metric-card:hover {
+  transform: translateY(-2px);
+  box-shadow: $shadow-hover;
+}
+
+.btn:hover,
+.lang-btn:hover,
+.nav-links a:hover {
+  transform: translateY(-1px);
+}
+
+// ── Tags ──
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  border: 1px solid rgba(31, 111, 103, 0.25);
+  border-radius: 999px;
+  background: rgba(31, 111, 103, 0.07);
+  color: #174a45;
+  font-weight: 700;
+  padding: 6px 10px;
+  font-size: 13px;
+}
+
+// ── Program card ──
+.program-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 249, 242, 0.96)),
+    $paper;
+}
+
+// ── Cabins card ──
+.cabins-card {
+  background:
+    radial-gradient(circle at 12% 8%, rgba(177, 98, 47, 0.08), transparent 32%),
+    radial-gradient(circle at 90% 92%, rgba(46, 125, 99, 0.08), transparent 34%),
+    $paper;
+}
+
+.cabins-grid {
+  margin-top: 12px;
+}
+
+.cabin-card {
+  border: 1px solid rgba(122, 39, 70, 0.18);
+  border-radius: 14px;
+  padding: 14px;
+  background: rgba(255, 255, 255, 0.94);
+
+  h4 {
+    margin: 0 0 6px;
+    font-size: 18px;
+  }
+
+  ul {
+    margin: 8px 0;
+    padding-left: 18px;
+  }
+
+  li {
+    margin-bottom: 6px;
+  }
+}
+
+// ── Timeline list ──
+.timeline-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+  display: grid;
+  gap: 10px;
+
+  li {
+    border-left: 3px solid rgba(122, 39, 70, 0.35);
+    padding: 6px 0 6px 12px;
+    color: $ink-soft;
+    font-weight: 600;
+  }
+}
+
+// ── Metric cards ──
+.metric-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  strong {
+    font-size: 30px;
+    color: var(--brand-dark);
+  }
+}
+
+// ── Note ──
+.note {
+  font-size: 14px;
+  color: $ink-soft;
+}

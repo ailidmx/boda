@@ -28,6 +28,18 @@ export function useVersionCheck(intervalMs = 60_000) {
 
     let timer = null;
 
+    // Guard against an infinite reload loop. If a mismatch somehow persists
+    // (e.g. a stale version.json), we must not reload forever. We remember the
+    // last build we reloaded to in sessionStorage and only reload once per
+    // distinct build, so a persistent mismatch can never loop.
+    const reloadKey = "boda-version-reloaded";
+    const lastReloaded = (() => {
+      try {
+        return sessionStorage.getItem(reloadKey);
+      } catch {
+        return null;
+      }
+    })();
 
     const check = async () => {
       try {
@@ -41,10 +53,16 @@ export function useVersionCheck(intervalMs = 60_000) {
         const latest = data && data.build;
         if (!latest) return;
 
-        if (latest !== currentBuild) {
+        if (latest !== currentBuild && latest !== lastReloaded) {
           console.info(
             `[version] New build detected (${currentBuild} → ${latest}). Reloading…`,
           );
+          // Remember we are reloading to this build so we never loop on it.
+          try {
+            sessionStorage.setItem(reloadKey, latest);
+          } catch {
+            /* ignore */
+          }
           // Hard reload, bypassing the service worker cache entirely.
           window.location.reload();
         }
@@ -53,6 +71,7 @@ export function useVersionCheck(intervalMs = 60_000) {
         console.warn("[version] check failed:", err);
       }
     };
+
 
     // Check immediately on mount, then on an interval.
     check();

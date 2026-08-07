@@ -31,9 +31,13 @@
     font-size: 1rem;
   }
 
-  .story-lead {
-    font-size: clamp(1rem, 2.6vw, 2rem);
+  /* Match the base rule's specificity (#story .story-lead) so the mobile
+     override wins over the higher-specificity base declaration. */
+  #story .story-lead {
+    font-size: clamp(0.9rem, 2.2vw, 1.3rem);
   }
+
+
 
   h2 {
     font-size: clamp(1.5rem, 6vw, 5.5rem);
@@ -47,7 +51,15 @@
     min-height: auto;
     padding-block: var(--space-7);
   }
+
+  /* The accommodation (HEBERGEMENT) section keeps its compact mobile
+     padding-block instead of inheriting the shared `.section` value, so the
+     two stacked panels (overview + form) stay snug on small phones. */
+  .accommodation-section {
+    padding-block: var(--space-3);
+  }
 }
+
 
 /* ── Shared section heading ─────────────────────────────────────────────
    `.section-heading` is a stacked layout (eyebrow | title | copy) on all
@@ -63,22 +75,16 @@
 
 /* Mobile-first: 1 column. */
 .gallery-row,
-.food-grid,
 .music-lineup,
-.venue-gallery,
-.flavours-grid,
-.weather-facts {
+.venue-gallery {
   grid-template-columns: 1fr;
 }
 
 /* Small phones → 2 columns for compact grids. */
 @media (min-width: 480px) {
   .gallery-row,
-  .food-grid,
   .music-lineup,
-  .venue-gallery,
-  .flavours-grid,
-  .weather-facts {
+  .venue-gallery {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -86,22 +92,14 @@
 /* Tablet+ → 3 columns for wider grids. */
 @media (min-width: 900px) {
   .gallery-row,
-  .food-grid,
   .music-lineup,
-  .venue-gallery,
-  .flavours-grid {
+  .venue-gallery {
     grid-template-columns: repeat(3, 1fr);
   }
 }
 
-/* The four weather facts always sit in a 2×2 grid on mobile (they are a
-   compact stat block, not a long list), widening to 4 across on desktop via
-   weather.css. This overrides the shared 1-column mobile default above. */
-@media (max-width: 899px) {
-  .weather-facts {
-    grid-template-columns: repeat(2, 1fr);
-  }
-}
+
+
 
 /* ── Shared form grids ──────────────────────────────────────────────────
    RSVP, suggestion, and coast forms all use a 2-column grid on desktop that
@@ -216,9 +214,24 @@
   }
 }
 
+/* ── Extra-large screens: contain the whole page ────────────────────────
+   On very wide displays (≥1440px) the invitation stretches edge-to-edge.
+   Constrain the main content column (all sections + footer) into a centered
+   max-width container so the layout doesn't get uncomfortably wide. */
+@media (min-width: 1440px) {
+  main,
+  #footer {
+    max-width: 120rem;
+    margin-inline: auto;
+  }
+}
+
+
+
 /* ── Reduced motion ─────────────────────────────────────────────────────
    Respect users who prefer reduced motion: disable animations/transitions
    and show the primary identity state statically. */
+
 
 @media (prefers-reduced-motion: reduce) {
   *,

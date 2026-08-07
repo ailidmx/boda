@@ -1,13 +1,13 @@
 {
-  "mode": "execute",
+  "mode": "dry-run",
   "ciMode": true,
   "failOnDrift": true,
-  "generatedAt": "2026-08-05T00:04:38.662Z",
+  "generatedAt": "2026-08-05T23:29:26.594Z",
   "source": "gsheet",
   "sourceRef": "spreadsheetId=1tvUs2WPksMWVbV10hdVoZ2NLNwTx6Q2R8Bs0sEbkqMg;sheet=Invitados",
   "authHealth": {
     "authUsersTotal": 223,
-    "guestsTotal": 269,
+    "guestsTotal": 259,
     "authUsersMappedToGuest": 223,
     "authUsersWithoutGuestCount": 0,
     "authUsersWithoutSheetCount": 0,
@@ -18,7 +18,7 @@
     "guestsWithoutAuthCount": 0,
     "sheetGuestsWithoutAuthCount": 0,
     "authEmailUpdateCandidatesCount": 0,
-    "authEmailUpdateBlockedInvalidCount": 0,
+    "authEmailUpdateBlockedInvalidCount": 1,
     "authEmailUpdateBlockedInUseCount": 0,
     "authCreateCandidatesCount": 0,
     "authCreateBlockedMissingEmailCount": 0,
@@ -32,7 +32,15 @@
     "guestsWithoutAuth": [],
     "sheetGuestsWithoutAuth": [],
     "authEmailUpdateCandidates": [],
-    "authEmailUpdateBlockedInvalid": [],
+    "authEmailUpdateBlockedInvalid": [
+      {
+        "uid": "cyrielle_rigollet",
+        "invitationGroup": "Famille Rigollet",
+        "sheetEmail": "t juletcy69@gmail.com",
+        "authEmail": "cyrielle_rigollet@boda-david-y-ayde.web.app",
+        "authDisabled": false
+      }
+    ],
     "authEmailUpdateBlockedInUse": [],
     "authCreateCandidates": [],
     "authCreateBlockedMissingEmail": [],
@@ -41,68 +49,74 @@
   },
   "invalidRows": [],
   "added": [],
-  "changed": [],
-  "unchanged": [],
-  "stale": [
+  "changed": [
     {
-      "id": "gael",
-      "doc": {
-        "invitationGroup": "Famille Hevia Besson",
-        "tagGroup": "Amigos de David",
-        "modifiedAt": "",
+      "id": "pierre_wanecque",
+      "mismatches": [
+        {
+          "path": "identity.middleName",
+          "sheetValue": "Thomas Nicolas",
+          "firestoreValue": ""
+        },
+        {
+          "path": "identity.maternalLastName",
+          "sheetValue": "D'Ascencao",
+          "firestoreValue": ""
+        }
+      ],
+      "payload": {
+        "id": "pierre_wanecque",
+        "identity": {
+          "firstName": "Pierre",
+          "middleName": "Thomas Nicolas",
+          "lastName": "Wanecque",
+          "maternalLastName": "D'Ascencao",
+          "lang": "fr",
+          "age": "Adulto",
+          "gender": "H",
+          "phone": "523310212012",
+          "cloudinaryId": "pierre_avy8gg"
+        },
         "hosting": {
-          "xtraRoom": "",
+          "cabin": "VILLA AZALEA",
+          "room": "VILLA AZALEA-1",
           "isCabinPaidByNovios": false,
           "isCabinPaid": false,
-          "isXtraCabinPaid": false,
-          "isXtraCabinPaidByNovios": false,
           "xtraCabin": "",
-          "cabin": "",
-          "room": ""
+          "xtraRoom": "",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
         },
-        "idCheckUser": false,
-        "isAdmin": false,
-        "message": "",
-        "sent": false,
-        "travelsByPlane": false,
         "rsvp": {
-          "playa": false,
-          "sunday": false,
-          "saturday": false,
-          "xtra": false,
-          "confirmCabin": false,
-          "needBalls": false,
           "friday": false,
+          "saturday": false,
+          "sunday": false,
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "xtra": false,
+          "playa": false,
           "petanca": false,
-          "cabinWaitingList": false
+          "needBalls": false
         },
-        "maternalLastName": "Besson",
-        "messageAuthor": "",
-        "id": "gael",
-        "table": "Mesa #9",
-        "identity": {
-          "maternalLastName": "Besson",
-          "lastName": "Hevia",
-          "gender": "H",
-          "phone": "",
-          "middleName": "",
-          "cloudinaryId": "gale_e4vlri",
-          "lang": "fr",
-          "age": "Niño",
-          "firstName": "Gaël"
-        }
-      }
-    },
-    {
-      "id": "hijo_de_fanny",
-      "doc": {
-        "id": "hijo_de_fanny",
+        "sent": false,
+        "tagGroup": "PetanclubGDL",
+        "invitationGroup": "Familia Wanecque García",
         "idCheckUser": false,
         "message": "",
         "messageAuthor": "",
-        "invitationGroup": "Fanny y su hijo",
-        "tagGroup": "Amigos de David",
-        "table": "Niños #2",
+        "table": "Petanclub #1",
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "maternalLastName": "D'Ascencao"
+      },
+      "existing": {
+        "id": "pierre_wanecque",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "tagGroup": "PetanclubGDL",
+        "table": "Petanclub #1",
         "sent": false,
         "rsvp": {
           "friday": false,
@@ -119,10 +133,10 @@
         "travelsByPlane": false,
         "isAdmin": false,
         "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:38.590Z",
+        "_migratedAt": "2026-08-03T15:31:34.602Z",
         "hosting": {
-          "cabin": "",
-          "room": "",
+          "cabin": "VILLA AZALEA",
+          "room": "VILLA AZALEA-1",
           "xtraCabin": "",
           "xtraRoom": "",
           "isCabinPaid": false,
@@ -130,126 +144,78 @@
           "isXtraCabinPaidByNovios": false,
           "isXtraCabinPaid": false
         },
+        "invitationGroup": "Familia Wanecque García",
         "maternalLastName": "",
         "identity": {
-          "age": "Niño",
-          "lang": "es",
-          "cloudinaryId": "",
+          "age": "Adulto",
+          "firstName": "Pierre",
+          "lastName": "Wanecque",
+          "lang": "fr",
+          "cloudinaryId": "pierre_avy8gg",
           "gender": "H",
           "maternalLastName": "",
-          "firstName": "Ian",
-          "lastName": "Farias",
-          "phone": "523310228084",
+          "phone": "523310212012",
           "middleName": ""
         }
       }
     },
     {
-      "id": "jesus_de_guadalupe",
-      "doc": {
-        "id": "jesus_de_guadalupe",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "invitationGroup": "Elvira y Eduardo",
-        "tagGroup": "Familia de Aydé",
-        "table": "Niños #1",
-        "sent": false,
-        "rsvp": {
-          "friday": true,
-          "saturday": true,
-          "sunday": true,
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "xtra": false,
-          "playa": false,
-          "petanca": false,
-          "needBalls": false
-        },
-        "modifiedAt": "",
-        "travelsByPlane": false,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:36.598Z",
-        "hosting": {
-          "cabin": "CASONA",
-          "room": "CASONA-3",
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": true,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "maternalLastName": "Guadalupe",
-        "identity": {
-          "age": "Niño",
-          "firstName": "Jesus",
-          "lang": "es",
-          "phone": "",
-          "gender": "H",
-          "middleName": "",
-          "maternalLastName": "Guadalupe",
-          "lastName": "",
-          "cloudinaryId": "jesus_e9c7ak"
+      "id": "marido_de_guillemette_renard",
+      "mismatches": [
+        {
+          "path": "identity.phone",
+          "sheetValue": "33633011221",
+          "firestoreValue": "33629248588"
         }
-      }
-    },
-    {
-      "id": "leonard_de_carne",
-      "doc": {
-        "id": "leonard_de_carne",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "invitationGroup": "Tristan y Yari",
-        "tagGroup": "Amigos de David",
-        "table": "Niños #2",
-        "sent": false,
-        "rsvp": {
-          "friday": true,
-          "saturday": true,
-          "sunday": true,
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "xtra": false,
-          "playa": false,
-          "petanca": false,
-          "needBalls": false
+      ],
+      "payload": {
+        "id": "marido_de_guillemette_renard",
+        "identity": {
+          "firstName": "Matthieu",
+          "middleName": "",
+          "lastName": "Goury",
+          "maternalLastName": "",
+          "lang": "fr",
+          "age": "Adulto",
+          "gender": "H",
+          "phone": "33633011221",
+          "cloudinaryId": ""
         },
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:38.887Z",
         "hosting": {
           "cabin": "",
           "room": "",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
           "xtraCabin": "",
           "xtraRoom": "",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": false,
           "isXtraCabinPaidByNovios": false,
           "isXtraCabinPaid": false
         },
-        "maternalLastName": "",
-        "identity": {
-          "age": "Niño",
-          "lastName": "De Carne",
-          "lang": "fr",
-          "phone": "",
-          "gender": "H",
-          "maternalLastName": "",
-          "middleName": "",
-          "cloudinaryId": "leonard_fln167",
-          "firstName": "Léonard"
-        }
-      }
-    },
-    {
-      "id": "luca",
-      "doc": {
-        "invitationGroup": "Famille Hevia Besson",
+        "rsvp": {
+          "friday": false,
+          "saturday": false,
+          "sunday": false,
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "xtra": false,
+          "playa": false,
+          "petanca": false,
+          "needBalls": false
+        },
+        "sent": false,
+        "tagGroup": "Amigos de David",
+        "invitationGroup": "Guillemette et ...",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "Mesa #8",
+        "modifiedAt": "",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "maternalLastName": ""
+      },
+      "existing": {
+        "invitationGroup": "Guillemette et ...",
         "tagGroup": "Amigos de David",
         "modifiedAt": "",
         "hosting": {
@@ -266,7 +232,7 @@
         "isAdmin": false,
         "message": "",
         "sent": false,
-        "travelsByPlane": false,
+        "travelsByPlane": true,
         "rsvp": {
           "playa": false,
           "sunday": false,
@@ -278,279 +244,31 @@
           "petanca": false,
           "cabinWaitingList": false
         },
-        "maternalLastName": "Besson",
+        "maternalLastName": "",
+        "messageAuthor": "",
+        "id": "marido_de_guillemette_renard",
+        "table": "Mesa #8",
+        "updatedBy": "sync_script",
         "identity": {
-          "maternalLastName": "Besson",
-          "firstName": "Luca",
-          "lastName": "Hevia",
+          "maternalLastName": "",
           "gender": "H",
-          "phone": "",
-          "middleName": "",
-          "cloudinaryId": "luca_xyyh8h",
-          "lang": "fr",
-          "age": "Niño"
-        },
-        "messageAuthor": "",
-        "id": "luca",
-        "table": "Mesa #9"
-      }
-    },
-    {
-      "id": "mama_tina_guadalupe",
-      "doc": {
-        "id": "mama_tina_guadalupe",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "invitationGroup": "Elvira y Eduardo",
-        "tagGroup": "Familia de Aydé",
-        "table": "Novios",
-        "sent": false,
-        "rsvp": {
-          "friday": true,
-          "saturday": true,
-          "sunday": true,
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "xtra": false,
-          "playa": false,
-          "petanca": false,
-          "needBalls": false
-        },
-        "travelsByPlane": false,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:36.655Z",
-        "modifiedAt": "dom 25 ene 26",
-        "hosting": {
-          "cabin": "CASONA",
-          "room": "CASONA-3",
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": true,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "maternalLastName": "",
-        "identity": {
-          "age": "Adulto",
-          "firstName": "Mama",
-          "lang": "es",
-          "phone": "",
-          "gender": "M",
-          "maternalLastName": "",
-          "lastName": "",
-          "middleName": "Tina",
-          "cloudinaryId": "mamtina_csr8vm"
-        }
-      }
-    },
-    {
-      "id": "papa_kao_guadalupe",
-      "doc": {
-        "id": "papa_kao_guadalupe",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "invitationGroup": "Elvira y Eduardo",
-        "tagGroup": "Familia de Aydé",
-        "table": "Novios",
-        "sent": false,
-        "rsvp": {
-          "friday": true,
-          "saturday": true,
-          "sunday": true,
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "xtra": false,
-          "playa": false,
-          "petanca": false,
-          "needBalls": false
-        },
-        "travelsByPlane": false,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:36.693Z",
-        "modifiedAt": "dom 25 ene 26",
-        "hosting": {
-          "cabin": "CASONA",
-          "room": "CASONA-3",
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": true,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "maternalLastName": "",
-        "identity": {
-          "age": "Adulto",
-          "firstName": "Papa",
-          "lang": "es",
-          "phone": "",
-          "gender": "H",
-          "maternalLastName": "",
-          "lastName": "",
-          "middleName": "Kao",
-          "cloudinaryId": "papakao_xawxqx"
-        }
-      }
-    },
-    {
-      "id": "pareja_de_fred_bonpard",
-      "doc": {
-        "id": "pareja_de_fred_bonpard",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "invitationGroup": "Famille Bonpard",
-        "tagGroup": "Familia de David",
-        "table": "Mesa #4",
-        "sent": false,
-        "rsvp": {
-          "friday": false,
-          "saturday": false,
-          "sunday": false,
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "xtra": false,
-          "playa": false,
-          "petanca": false,
-          "needBalls": false
-        },
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:40.296Z",
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": false,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "maternalLastName": "Fred Bonpard",
-        "identity": {
-          "age": "Adulto",
-          "firstName": "Pareja",
-          "lang": "fr",
+          "phone": "33629248588",
           "cloudinaryId": "",
-          "gender": "M",
-          "lastName": "De",
-          "middleName": "",
-          "maternalLastName": "Fred Bonpard",
-          "phone": "33658313401"
-        }
-      }
-    },
-    {
-      "id": "sofía_de_guadalupe",
-      "doc": {
-        "id": "sofía_de_guadalupe",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "invitationGroup": "Elvira y Eduardo",
-        "tagGroup": "Familia de Aydé",
-        "table": "Niños #1",
-        "sent": false,
-        "rsvp": {
-          "friday": true,
-          "saturday": true,
-          "sunday": true,
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "xtra": false,
-          "playa": false,
-          "petanca": false,
-          "needBalls": false
+          "lang": "fr",
+          "age": "Adulto",
+          "firstName": "Matthieu",
+          "lastName": "Goury",
+          "middleName": ""
         },
-        "modifiedAt": "",
-        "travelsByPlane": false,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:36.575Z",
-        "hosting": {
-          "cabin": "CASONA",
-          "room": "CASONA-3",
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": true,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "maternalLastName": "Guadalupe",
-        "identity": {
-          "age": "Niño",
-          "lang": "es",
-          "phone": "",
-          "gender": "M",
-          "middleName": "",
-          "maternalLastName": "Guadalupe",
-          "lastName": "",
-          "cloudinaryId": "sofia_mzwh7m",
-          "firstName": "Sofía"
-        }
-      }
-    },
-    {
-      "id": "valentina_de_juárez",
-      "doc": {
-        "id": "valentina_de_juárez",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "invitationGroup": "Noel y Carmen",
-        "tagGroup": "Familia de Aydé",
-        "table": "Niños #1",
-        "sent": false,
-        "rsvp": {
-          "friday": true,
-          "saturday": true,
-          "sunday": true,
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "xtra": false,
-          "playa": false,
-          "petanca": false,
-          "needBalls": false
-        },
-        "modifiedAt": "",
-        "travelsByPlane": false,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:36.880Z",
-        "hosting": {
-          "cabin": "CASONA",
-          "room": "CASONA-1",
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": true,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "maternalLastName": "",
-        "identity": {
-          "age": "Niño",
-          "firstName": "Valentina",
-          "lang": "es",
-          "phone": "",
-          "cloudinaryId": "",
-          "gender": "M",
-          "middleName": "",
-          "maternalLastName": "",
-          "lastName": "Júarez"
+        "updatedAt": {
+          "_seconds": 1785972056,
+          "_nanoseconds": 575000000
         }
       }
     }
   ],
+  "unchanged": [],
+  "stale": [],
   "sheetAuth": [
     {
       "id": "david_aïli",
@@ -1004,7 +722,7 @@
       "id": "christophe_rigollet",
       "uid": "christophe_rigollet",
       "enabled": true,
-      "identifier": "christophe_rigollet@boda-david-y-ayde.web.app",
+      "identifier": "rigollet.chris@laposte.net",
       "passwordPresent": true
     },
     {
@@ -1018,7 +736,7 @@
       "id": "krystel_vazquez",
       "uid": "krystel_vazquez",
       "enabled": true,
-      "identifier": "krystel_vazquez@boda-david-y-ayde.web.app",
+      "identifier": "krystelvazquez@gmail.com",
       "passwordPresent": true
     },
     {
@@ -1340,7 +1058,7 @@
       "id": "cyrielle_rigollet",
       "uid": "cyrielle_rigollet",
       "enabled": true,
-      "identifier": "cyrielle_rigollet@boda-david-y-ayde.web.app",
+      "identifier": "t juletcy69@gmail.com",
       "passwordPresent": true
     },
     {
@@ -2271,7 +1989,7 @@
       "id": "guillemette_renard",
       "uid": "guillemette_renard",
       "enabled": true,
-      "identifier": "guillemette_renard@boda-david-y-ayde.web.app",
+      "identifier": "domainedechevillard@gmail.com",
       "passwordPresent": true
     },
     {
@@ -2285,7 +2003,7 @@
       "id": "elodie",
       "uid": "elodie",
       "enabled": true,
-      "identifier": "elodie@boda-david-y-ayde.web.app",
+      "identifier": "elody.bacquet@gmail.com",
       "passwordPresent": true
     },
     {
@@ -2369,73 +2087,25 @@
   "alerts": [],
   "comparisonAudit": [
     {
-      "id": "gael",
-      "status": "candidate-delete",
+      "id": "pierre_wanecque",
+      "status": "changed",
       "comparedFields": 37,
-      "diffCount": 37
+      "diffCount": 2
     },
     {
-      "id": "hijo_de_fanny",
-      "status": "candidate-delete",
+      "id": "marido_de_guillemette_renard",
+      "status": "changed",
       "comparedFields": 37,
-      "diffCount": 37
-    },
-    {
-      "id": "jesus_de_guadalupe",
-      "status": "candidate-delete",
-      "comparedFields": 37,
-      "diffCount": 37
-    },
-    {
-      "id": "leonard_de_carne",
-      "status": "candidate-delete",
-      "comparedFields": 37,
-      "diffCount": 37
-    },
-    {
-      "id": "luca",
-      "status": "candidate-delete",
-      "comparedFields": 37,
-      "diffCount": 37
-    },
-    {
-      "id": "mama_tina_guadalupe",
-      "status": "candidate-delete",
-      "comparedFields": 37,
-      "diffCount": 37
-    },
-    {
-      "id": "papa_kao_guadalupe",
-      "status": "candidate-delete",
-      "comparedFields": 37,
-      "diffCount": 37
-    },
-    {
-      "id": "pareja_de_fred_bonpard",
-      "status": "candidate-delete",
-      "comparedFields": 37,
-      "diffCount": 37
-    },
-    {
-      "id": "sofía_de_guadalupe",
-      "status": "candidate-delete",
-      "comparedFields": 37,
-      "diffCount": 37
-    },
-    {
-      "id": "valentina_de_juárez",
-      "status": "candidate-delete",
-      "comparedFields": 37,
-      "diffCount": 37
+      "diffCount": 1
     }
   ],
-  "writes": 10,
+  "writes": 0,
   "authPlan": {
     "emailUpdates": 0,
     "authCreates": 0,
     "authDeletes": 0,
     "blockedCreatesMissingEmail": 0,
-    "blockedEmailUpdatesInvalid": 0,
+    "blockedEmailUpdatesInvalid": 1,
     "blockedEmailUpdatesInUse": 0,
     "blockedCreatesInvalidEmail": 0,
     "blockedCreatesEmailInUse": 0
@@ -2446,5 +2116,5 @@
     "authCreatesApplied": 0,
     "failures": []
   },
-  "unchangedOmitted": 259
+  "unchangedOmitted": 257
 }
