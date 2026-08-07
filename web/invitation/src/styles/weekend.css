@@ -99,7 +99,11 @@
   letter-spacing: 0.12em;
 }
 
-/* The day date is the prominent header of each card. */
+/* ── Schedule cards (shared) ────────────────────────────────────────────
+   The card visual styling (border, gradient background, accent colors,
+   day header, typography) applies on every screen. Only the layout differs:
+   desktop shows three cards side-by-side, mobile collapses them into a
+   one-card carousel. */
 .schedule-day {
   margin: 0 0 1.5rem;
   padding-left: 0.65rem;
@@ -125,9 +129,6 @@
   line-height: 1.55;
 }
 
-/* The three day cards sit side-by-side in a single row on desktop. On mobile
-   they collapse into an autoplaying carousel (one card at a time) — see the
-   responsive rules. */
 .schedule-carousel {
   display: grid;
   gap: 1.5rem;
@@ -157,6 +158,7 @@
   opacity: 1;
   transform: none;
   pointer-events: auto;
+  transition: box-shadow 250ms ease, transform 250ms ease;
 }
 
 .schedule-slide:nth-child(2) .schedule-item {
@@ -168,7 +170,6 @@
   --schedule-accent: var(--sage);
   --schedule-accent-rgb: 122 139 122;
 }
-
 
 .schedule-item::before {
   position: absolute;
@@ -202,36 +203,13 @@
   content: "03";
 }
 
-
 .schedule-item > * {
   position: relative;
   z-index: 1;
 }
 
-@media (min-width: 900px) {
-  .schedule-item {
-    transition: box-shadow 250ms ease, transform 250ms ease;
-  }
-
-  .schedule-item:hover {
-    box-shadow: 0 1.35rem 3rem rgb(36 33 25 / 14%);
-    transform: translateY(-0.2rem);
-  }
-}
-
 /* The play/pause + counter controls only make sense in the mobile carousel
    mode, so they are hidden on desktop. */
-.schedule-carousel-controls {
-  display: none;
-}
-
-/* The slideset navigation (arrows + dots) is mobile-only; hidden on desktop
-   where the three cards sit side-by-side. */
-.schedule-carousel__nav {
-  display: none;
-}
-
-
 .schedule-carousel-toggle {
   display: inline-flex;
   align-items: center;
@@ -261,30 +239,61 @@
   letter-spacing: 0.14em;
 }
 
-/* Detailed programme: a full-height slide with its own menu entry
-   ("programme"). It is a flex column so the header sits at the top, the
-   day-program slideset is centered, and the footer nav is pinned to the
-   bottom. The header keeps a plain background while only the content
-   (day-program-slideset) gets the warm tinted background, so the two parts
-   are visually distinct. */
+/* ── DESKTOP schedule (≥900px) ─────────────────────────────────────────
+   The three day cards sit side-by-side in a single 3-column row. Only the
+   desktop-specific layout lives here; the shared card styling above applies
+   on every screen. */
+@media (min-width: 900px) {
+  /* Each grid cell is a flex column so the card inside stretches to fill the
+     full row height, keeping all three cards the same height regardless of
+     their content length. */
+  .schedule-slide {
+    display: flex;
+  }
+
+  .schedule-slide .schedule-item {
+    flex: 1;
+    width: 100%;
+  }
+
+  .schedule-item:hover {
+    box-shadow: 0 1.35rem 3rem rgb(36 33 25 / 14%);
+    transform: translateY(-0.2rem);
+  }
+
+  /* The play/pause + counter controls only make sense in the mobile carousel
+     mode, so they are hidden on desktop. */
+  .schedule-carousel-controls {
+    display: none;
+  }
+
+  /* The slideset navigation (arrows + dots) is mobile-only; hidden on desktop
+     where the three cards sit side-by-side. */
+  .schedule-carousel__nav {
+    display: none;
+  }
+}
+
+
+/* Detailed programme: a flex column that fits its content (no fixed height,
+   no internal scrolling). The header sits at the top, the day-program
+   slideset below it, and the footer nav at the bottom. The header keeps a
+   plain background while only the content (day-program-slideset) gets the
+   warm tinted background, so the two parts are visually distinct. */
 .weekend-program {
   display: flex;
   flex-direction: column;
-  height: calc(100svh - var(--countdown-height) - var(--header-height));
-  min-height: calc(100svh - var(--countdown-height) - var(--header-height));
   justify-content: flex-start;
-  overflow: hidden;
   padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 6vw, 6rem);
   background: var(--white);
 }
 
 .weekend-program__header {
-  flex: 0 0 clamp(13rem, 26svh, 17rem);
-  min-height: 0;
+  flex: 0 0 auto;
   width: 100%;
   margin-bottom: clamp(1.5rem, 3vw, 3rem);
-  overflow-y: auto;
 }
+
 
 .weekend-program__header .section-heading {
   border-bottom: 0;
@@ -313,8 +322,9 @@
 .weekend-program__eyebrow-row .day-program-slideset__arrow {
   width: 2.4rem;
   height: 2.4rem;
-  font-size: 1.2rem;
+  font-size: 4rem;
 }
+
 
 /* The day's warning text is styled as an elegant citation (quote): italic
    display type, a marigold quote mark and a left rule, echoing the venue
@@ -329,9 +339,10 @@
   font-size: clamp(1.15rem, 2vw, 1.6rem);
   font-style: italic;
   font-weight: 400;
-  line-height: 1.55;
+  line-height: 1.75;
   color: var(--ink);
 }
+
 
 .programme-citation::before {
   content: "“";
@@ -366,68 +377,27 @@
   border-top: 1px solid rgb(36 33 25 / 18%);
 }
 
-/* In-page warning / info panel shown at the bottom of the programme section
-   on desktop. It carries the long travel disclaimer (e.g. the Guadalajara
-   note) that would otherwise clutter the header citation. On mobile it is
-   hidden and replaced by a FAB + modal. */
-.weekend-program__warning {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  flex: 0 0 auto;
-  width: 100%;
-  margin-top: 1.25rem;
-  padding: 1rem 1.25rem;
-  border: 1px solid rgb(198 139 43 / 32%);
-  border-left: 3px solid var(--marigold);
-  border-radius: 0.9rem;
-  background: rgb(228 185 104 / 12%);
-  color: rgb(36 33 25 / 82%);
-}
-
-.weekend-program__warning-icon {
-  flex: 0 0 auto;
-  display: grid;
-  place-items: center;
-  width: 1.6rem;
-  height: 1.6rem;
-  margin-top: 0.1rem;
-  color: var(--marigold);
-}
-
-.weekend-program__warning-icon svg {
-  width: 100%;
-  height: 100%;
-}
-
-.weekend-program__warning p {
-  margin: 0;
-  font-size: clamp(0.95rem, 1.3vw, 1.05rem);
-  line-height: 1.5;
-}
-
 /* Warning FAB + modal are mobile-only; hidden on desktop. */
 .weekend-warning-fab,
 .weekend-warning-shell {
   display: none;
 }
 
+
 /* The detailed programme is a slideset of one card per day. Only the active
-   day is visible; inactive days are stacked and hidden with a gentle fade. */
+   day is visible; inactive days are stacked and hidden with a gentle fade.
+   All three day cards share the same grid cell, so the track grows to the
+   height of the tallest card and every card is the same height (no layout
+   jump when switching days, no internal scrolling). */
 .day-program-slideset__track {
-  position: relative;
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
+  display: grid;
+  grid-template-areas: "stack";
 }
 
 .day-program-slide {
-  position: absolute;
-  inset: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  overscroll-behavior: contain;
-  padding-right: 0.35rem;
+  grid-area: stack;
+  position: relative;
+  overflow: visible;
   opacity: 0;
   visibility: hidden;
   transform: translateX(1.5rem);
@@ -436,12 +406,13 @@
 }
 
 .day-program-slide.is-active {
-  position: absolute;
+  position: relative;
   opacity: 1;
   visibility: visible;
   transform: translateX(0);
   pointer-events: auto;
 }
+
 
 /* Pagination dots remain centered below the day card. The previous/next
    arrows live beside the changing title above. */
@@ -459,18 +430,17 @@
   place-items: center;
   width: 2.4rem;
   height: 2.4rem;
-  border: 1px solid rgb(36 33 25 / 30%);
-  border-radius: 50%;
-  background: rgb(255 255 255 / 55%);
-  color: var(--ink);
+  border: 0;
+  background: transparent;
+  color: var(--terracotta);
   font-size: 1rem;
   line-height: 1;
   cursor: pointer;
-  transition: background 200ms ease, transform 200ms ease;
+  transition: color 200ms ease, transform 200ms ease;
 }
 
 .day-program-slideset__arrow:hover {
-  background: rgb(255 255 255 / 85%);
+  color: var(--marigold);
   transform: scale(1.05);
 }
 
@@ -631,19 +601,15 @@
   }
 
   .section.weekend-program {
-    height: calc(100svh - var(--header-height));
-    min-height: calc(100svh - var(--header-height));
     justify-content: flex-start;
-    overflow: hidden;
     padding: 1.25rem clamp(1.25rem, 4vw, 4rem);
   }
 
   .weekend-program__header {
-    flex: 0 0 clamp(11rem, 26svh, 13.5rem);
-    min-height: 0;
+    flex: 0 0 auto;
     margin-bottom: 1rem;
-    overflow-y: auto;
   }
+
 
   .weekend-program__eyebrow-row {
     grid-template-columns: 2rem minmax(0, 1fr) 2rem;
@@ -654,8 +620,9 @@
   .weekend-program__eyebrow-row .day-program-slideset__arrow {
     width: 2rem;
     height: 2rem;
-    font-size: 1rem;
+    font-size: 2rem;
   }
+
 
   .weekend-program .section-heading h2 {
     margin: 0;
@@ -687,30 +654,10 @@
     padding: 1rem clamp(1rem, 4vw, 1.5rem);
   }
 
-  .weekend-program .day-program-slideset__track {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow: hidden;
-  }
-
-  .weekend-program .day-program-slide {
-    scrollbar-color: rgb(36 33 25 / 28%) transparent;
-    scrollbar-width: thin;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .weekend-program .day-program-slide::-webkit-scrollbar {
-    width: 3px;
-  }
-
-  .weekend-program .day-program-slide::-webkit-scrollbar-thumb {
-    background: rgb(36 33 25 / 28%);
-  }
-
-  .weekend-program .day-program-slideset__nav,
   .weekend-program .weekend-nav {
     flex: 0 0 auto;
   }
+
 
   .weekend-program .day-program-slideset__nav {
     margin-top: 0.75rem;
@@ -886,13 +833,8 @@
     padding-top: 0.65rem;
   }
 
-  /* On mobile the in-page warning panel is hidden and replaced by a FAB that
-     opens a modal with the disclaimer. */
-  .weekend-program__warning {
-    display: none;
-  }
-
   .weekend-warning-fab {
+
     position: fixed;
     z-index: 60;
     right: max(1rem, env(safe-area-inset-right));

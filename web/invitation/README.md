@@ -9,8 +9,9 @@ One-page public wedding invitation inspired by the visual simplicity of the Squa
 - Firebase Web SDK for Authentication and Firestore.
 - Authored ES, FR and EN content in `src/locales/`.
 - CSS is split per component under `src/styles/` (base, hero, story, venue,
-  accommodation, cabins, travel, rsvp, footer, responsive, …) and imported in
+  accommodation, travel, rsvp, footer, responsive, …) and imported in
   order from `src/main.jsx`.
+
 
 ## Local use
 
@@ -64,15 +65,11 @@ The sticky countdown targets `2027-02-20T00:00:00-06:00`, local time in Jalisco.
 - `scripts/upload-to-cloudinary.mjs` uploads the approved derivatives plus the
   remote venue/Chapala images. It reads credentials from `web/invitation/.env`
   (see `.env.example`); the real `.env` is git-ignored.
-- `scripts/generate-media-manifest.mjs` is a **build-time step** that queries
-  Cloudinary by per-cabin tag and reads the cabin database
-  (`invitados/cabanas/*.json`) to write `src/generated-media.js`. It runs
-  automatically before every `npm run build` (or manually via `npm run
-  manifest`). To add a cabin photo, tag it in Cloudinary and re-run the build.
-- `src/generated-media.js` is a generated file (do not edit by hand) exposing
-  `CABIN_PHOTOS`, `CABIN_VIDEOS`, and `CABIN_DB` (cabin metadata straight from
-  the database).
+- Cabin photos are stored in the Firestore `cabins` collection via the
+  `cloudinaryIds` field (comma-separated Cloudinary public IDs). The
+  Accommodation section reads them directly from the cabin record.
 - The hero rotates through four photographs every 6.5 seconds and includes
+
   manual selection and pause controls.
 
 

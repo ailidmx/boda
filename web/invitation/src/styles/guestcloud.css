@@ -1,14 +1,30 @@
+/* The guest cloud is embedded inside the MERCI (thanks) section but keeps its
+   own full-width cream background, breaking out of the section's padding so
+   the warm radial gradients span edge to edge. */
 .guest-cloud-section {
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 6vw, 6rem);
   background:
     radial-gradient(circle at 12% 18%, rgb(198 139 43 / 14%), transparent 26rem),
     radial-gradient(circle at 88% 82%, rgb(169 77 49 / 14%), transparent 28rem),
     var(--cream);
 }
 
+
 .guest-cloud-frame {
   width: min(100%, 64rem);
   margin: 0 auto;
   text-align: center;
+}
+
+/* On desktop, let the cloud grow horizontally to fill the viewport (minus a
+   comfortable margin) so the tags can spread out across the full width. */
+@media (min-width: 1100px) {
+  .guest-cloud-frame {
+    width: calc(100vw - 8rem);
+    max-width: 96rem;
+  }
 }
 
 /* The guest cloud keeps its centered header but adopts the shared
@@ -214,3 +230,20 @@
   }
 }
 
+
+/* Desktop-only bottom nav linking to the next section (Gift / "CADEAUX").
+   The guest cloud is a full-width cream band, so the nav sits centered at the
+   bottom of the band. Hidden on mobile, where the stacked sections already
+   flow naturally. */
+@media (min-width: 900px) {
+  .guest-cloud-section-nav {
+    width: min(100%, 64rem);
+    margin: 2.5rem auto 0;
+  }
+}
+
+@media (max-width: 899px) {
+  .guest-cloud-section-nav {
+    display: none;
+  }
+}

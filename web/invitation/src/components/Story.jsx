@@ -123,7 +123,7 @@ export function Story() {
   ];
 
   return (
-    <section className="story-section section" ref={sectionRef}>
+    <section className="story-section section" id="story" ref={sectionRef}>
       <div className="story-mark">
         <InitialsSwap variant="identity-swap--story" delay="-3.4s" />
         <button

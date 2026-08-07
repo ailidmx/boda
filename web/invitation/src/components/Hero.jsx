@@ -51,6 +51,10 @@ export function Hero() {
     ? getGroupTag(guest.invitationGroup || guest.group).label
     : "";
   const fullName = guest ? resolveGuestName(guest).fullName : "";
+  // Gender-aware invitation line: "M" = Mujer (feminine), "H" = Hombre
+  // (masculine). Falls back to the default eyebrow when gender is unknown.
+  const gender = String(guest?.gender || "").trim().toUpperCase();
+  const eyebrow = gender === "M" ? t.hero.eyebrowF : t.hero.eyebrowM;
   const customMessage = String(
     profile?.custom?.message
       || profile?.guest?.customContent?.message
@@ -137,15 +141,21 @@ export function Hero() {
       </div>
 
       <div className="hero-content">
+        {guest && <p className="hero-group-name">{groupTag}</p>}
+
         {guest && (
           <p className="hero-guest-name">
                 {fullName}
           </p>
         )}
-        <p className="hero-eyebrow">{t.hero.eyebrow}</p>
+
+        <p className="hero-eyebrow">{eyebrow}</p>
+
         <h1>
           <CoupleNames variant="identity-swap--hero" delay="-1.2s" />
         </h1>
+
+
         <p className="hero-date">
           <HeroDate />
         </p>
@@ -154,8 +164,8 @@ export function Hero() {
           <br />
           {EVENT.place}
         </p>
-        {guest && <p className="hero-group-name">{groupTag}</p>}
         {hasCustomHeroMessage ? (
+
           <p className="hero-invitation hero-invitation--custom">
             <span className="hero-invitation__message">{customMessage}</span>
             {customMessageAuthor && (
@@ -163,10 +173,16 @@ export function Hero() {
             )}
           </p>
         ) : (
-          <p className="hero-invitation">{t.hero.invitation}</p>
+          <p className="hero-invitation hero-invitation__message">
+            {t.hero.invitation}
+          </p>
         )}
-        <span className="hero-date-label">{EVENT.dateShort}</span>
+
+
+        <p className="hero-date-label">{EVENT.dateShort}</p>
       </div>
+
+
 
       <nav className="section-nav section-nav--light hero-section-nav" aria-label="Continue">
         <a className="section-nav-link" href="#story">

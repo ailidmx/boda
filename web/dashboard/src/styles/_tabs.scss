@@ -1,0 +1,65 @@
+// ── Tab navigation ──────────────────────────────────────────────────────
+@use "tokens" as *;
+
+.dashboard-tabs {
+  display: flex;
+  gap: 0.35rem;
+  margin: 1.5rem 0 0;
+  padding: 0.35rem;
+  border-radius: 1rem;
+  background: rgba(85, 69, 45, 0.08);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.dashboard-tab {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  border: 0;
+  border-radius: 0.75rem;
+  background: transparent;
+  color: $ink-muted;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: rgba(85, 69, 45, 0.08);
+    color: $dark;
+  }
+}
+
+.dashboard-tab-active {
+  background: $white;
+  color: $ink;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+
+  &:hover {
+    background: $white;
+    color: $ink;
+  }
+}
+
+.dashboard-tab-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.dashboard-tab-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
+// ── Panels ──
+.dashboard-panel {
+  display: none;
+}
+
+.dashboard-panel-active {
+  display: block;
+}

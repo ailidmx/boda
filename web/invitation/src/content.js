@@ -45,9 +45,13 @@ export const content = {
 
       weekend: "Guarden la fecha",
       programme: "Programa",
+      petanque: "Pétanque",
       venue: "El lugar",
+      food: "A la mesa",
       accommodation: "Alojamiento",
+
       travel: "Vengo de lejos",
+      coast: "¿Y después?",
       attire: "Vestuario",
       weather: "Clima",
       gift: "Regalos",
@@ -58,7 +62,7 @@ export const content = {
 
 
 
-      dashboard: "admin",
+      dashboard: "Admin",
       changeEmail: "Cambiar correo",
       changePassword: "Cambiar contraseña",
       music: "Música",
@@ -74,8 +78,13 @@ export const content = {
       emailSuccess: "Correo actualizado.",
       emailUnchanged: "Ese correo ya está activo en tu cuenta.",
       emailError: "No pudimos cambiar el correo. Inténtalo de nuevo.",
+      emailErrorTitle: "No se pudo cambiar el correo",
+      emailDomainError:
+        "No pudimos enviar el correo de verificación desde este dominio. Prueba desde la invitación publicada o escríbenos para ayudarte.",
+
       emailVerificationSent:
         "Te enviamos un correo de verificación al nuevo email. Confírmalo para completar el cambio.",
+
       emailReauthRequired:
         "Por seguridad, confirma tu contraseña para cambiar el correo.",
       emailReauthLabel: "Contraseña actual",
@@ -84,10 +93,21 @@ export const content = {
 
       newPasswordLabel: "Nueva contraseña",
       newPasswordPlaceholder: "Mínimo 6 caracteres",
+      currentPasswordLabel: "Contraseña actual",
+      currentPasswordPlaceholder: "Escribe tu contraseña actual",
+      confirmPasswordLabel: "Confirmar nueva contraseña",
+      confirmPasswordPlaceholder: "Repite la nueva contraseña",
       passwordError: "La contraseña debe tener al menos 6 caracteres.",
+      passwordMismatch: "Las contraseñas no coinciden.",
+      passwordWrongCurrent: "La contraseña actual no es correcta.",
+      passwordReauthRequired:
+        "Por seguridad, confirma tu contraseña actual para cambiarla.",
       passwordSuccess: "¡Contraseña actualizada!",
+      successTitle: "¡Listo!",
+      ok: "Aceptar",
       cancel: "Cancelar",
       save: "Guardar",
+
       working: "Guardando…",
     },
 
@@ -105,8 +125,11 @@ export const content = {
 
 
     hero: {
-      eyebrow: "nos casamos",
+      eyebrow: "Estás invitado a nuestra boda",
+      eyebrowM: "Estás invitado a nuestra boda",
+      eyebrowF: "Estás invitada a nuestra boda",
       invitation: "Queremos celebrar este momento con ustedes",
+
 
       scroll: "Empecemos",
       navStory: "Descubrir nuestra invitación",
@@ -145,6 +168,8 @@ export const content = {
 
       correctNumber: "Corregir número",
       edit: "Editar",
+      verify: "Verificar",
+
 
 
       addPhoto: "Subir foto",
@@ -284,6 +309,8 @@ export const content = {
       saturday: {
         eyebrow: "Sábado 20 · programa",
         title: "La tarde, paso a paso",
+        warningTitle: "¡Atención al tráfico!",
+
         citation:
           "Del primer brindis al último baile: una tarde que camina hacia el faro y termina en fiesta.",
         warning:
@@ -326,6 +353,24 @@ export const content = {
       },
 
     },
+    petanqueTribute: {
+      eyebrow: 'Pétanque',
+      title: 'Un homenaje a la petanca',
+      intro:
+        'La petanca es un juego de bolas tradicional francés que se juega al aire libre, lanzando bolas metálicas lo más cerca posible de un pequeño objetivo de madera llamado «cochonnet». Nació en el sur de Francia y hoy se juega en todo el mundo.',
+      body:
+        'Para nosotros, la petanca es mucho más que un juego: es el hilo que nos ha unido a una comunidad increíble de amigos y compañeros de club, aquí en México y en todo el mundo. Gracias a la petanca hemos construido lazos de amistad que nos acompañan a donde vayamos.',
+      homage:
+        'Como homenaje a este hermoso juego, queremos que nuestros invitados tengan la oportunidad de conocer y jugar con nuestros compañeros de petanca. Una tarde de bolas, risas y buena compañía.',
+      photosLabel: 'Nuestros compañeros de petanca',
+      photoAlts: [
+        'Partida de petanca entre amigos',
+        'Bolas de petanca sobre la tierra',
+        'Nuestro club de petanca',
+        'Un cochonnet y las bolas',
+      ],
+      navNext: 'Alojamiento',
+    },
     weather: {
       eyebrow: "El clima esperado",
       title: "Sol de tarde, noche fresca",
@@ -338,6 +383,7 @@ export const content = {
         { value: "≈ 18:55", label: "puesta de sol", note: "Muy cerca de la ceremonia en el faro" },
       ],
       moments: [
+        { time: "8:00–12:00", title: "Mañana fresca y despejada", body: "Cielo limpio y temperatura fresca; ideal para un café al aire libre." },
         { time: "13:00–17:30", title: "Tarde luminosa", body: "Sol y temperatura agradable a cálida; convienen protector solar, lentes y agua." },
         { time: "18:00", title: "Ceremonia y atardecer", body: "La luz comenzará a bajar durante la ceremonia en el faro." },
         { time: "Desde 19:00", title: "La noche refresca", body: "La temperatura puede bajar rápido junto al lago." },
@@ -351,44 +397,73 @@ export const content = {
       navNext: "Ver el programa",
     },
     food: {
-      eyebrow: "A la mesa",
+      eyebrow: "Sabores de Jalisco y México",
       title: "Un fin de semana para probar, brindar y compartir",
       body:
-        "Queremos que cada comida sea sencilla, generosa y muy mexicana. Este es el menú que estamos imaginando; todavía puede crecer con sus ideas.",
+        "Queremos que cada comida sea sencilla, generosa y muy mexicana. Aquí un adelanto de los platillos que podrán degustar.",
+
       flavoursEyebrow: "Sabores de Jalisco y México",
+
       flavoursTitle: "¿Qué vamos a probar?",
+      flavourType: { food: "Comida", drink: "Bebida" },
       flavours: [
+
         {
           key: "carnitas",
+          type: "food",
           title: "Carnitas",
           body: "Cerdo cocido lentamente hasta quedar tierno y dorado, servido con tortillas, cebolla, cilantro, salsas y limón.",
         },
         {
-          key: "taquiza",
-          title: "Taquiza",
-          body: "Una mesa con varios guisos mexicanos, tortillas calientes y acompañamientos para que cada quien arme sus propios tacos.",
-        },
-        {
           key: "tejuino",
+          type: "drink",
           title: "Tejuino",
           body: "Bebida tapatía de maíz fermentado, dulce y ácida, servida muy fría con limón y sal. También habrá tejuino loco con tequila o mezcal.",
         },
         {
+          key: "taquiza",
+          type: "food",
+          title: "Taquiza",
+          body: "Una mesa con varios guisos mexicanos, tortillas calientes y acompañamientos para que cada quien arme sus propios tacos.",
+        },
+        {
+          key: "aguas",
+          type: "drink",
+          title: "Aguas de sabores",
+          body: "Agua fresca de frutas naturales servida con hielo: una selección refrescante y deliciosa de sabores para acompañar la comida.",
+        },
+        {
           key: "nopales",
+          type: "food",
           title: "Ensalada de nopales",
           body: "Nopal tierno con tomate, cebolla, hierbas y queso: una opción fresca, mexicana y vegetariana.",
         },
         {
+          key: "esquites",
+          type: "food",
+          title: "Esquites",
+          body: "Elotes hervidos y preparados al estilo esquites, servidos en vasos con mayonesa, queso, chile y limón.",
+        },
+        {
           key: "guacamole",
+          type: "food",
           title: "Guacamole y opciones vegetarianas",
           body: "Habrá guacamole, tortillas, salsas y otros acompañamientos sin carne. Podrán indicar sus restricciones en el RSVP.",
         },
         {
           key: "pizza",
+          type: "food",
           title: "Pizza",
           body: "Pizzas para compartir el viernes por la noche: una bienvenida sencilla e informal después de las llegadas y la petanca.",
         },
+        {
+          key: "tequila",
+          type: "drink",
+          title: "Tequila",
+          body: "Una selección de tequila y mezcal para brindar y acompañar la sobremesa, con sal, limón y naranja.",
+        },
       ],
+
       days: [
         {
           day: "Viernes por la noche",
@@ -420,9 +495,9 @@ export const content = {
       ],
       note:
         "Los detalles siguen en preparación. También estamos considerando agua, bebidas sin alcohol, café, opciones para niñas y niños y necesidades alimentarias especiales.",
-      photoCredits: "Créditos de las fotografías",
       drinks: {
         eyebrow: "Para brindar",
+
         title: "La política de municiones",
         body:
           "Tendremos una cantidad razonable de alcohol por invitado, principalmente cerveza y tequila, además de refrescos y opciones sin alcohol.",
@@ -435,29 +510,41 @@ export const content = {
       title: "Escuchar, bailar y también cantar",
       body:
         "La música acompañará cada cambio de energía del sábado, desde el final de la ceremonia hasta la pista de baile.",
+      listenLabel: "Escuchar",
+      websiteLabel: "Sitio web",
+
       acts: [
         {
           moment: "Después del aperitivo",
           name: "Marimba",
           note: "Para acompañar el primer brindis antes de las carnitas.",
+          image: "marimba",
         },
 
         {
           moment: "Después de la ceremonia en el faro",
           name: "Mariachi",
           note: "Una entrada festiva para abrir la cena.",
+          image: "mariachi",
         },
         {
           moment: "Después de la cena",
           name: "Norteño",
           note: "Para abrir la fiesta, cantar y empezar a bailar.",
+          image: "norteno",
         },
         {
           moment: "Si se animan",
-          name: "Una banda francesa",
+          name: "38 tonnes",
           note: "Un pequeño puente musical entre nuestras dos culturas.",
+          image: "frenchBand",
+          logo: "frenchBandLogo",
+          link: "https://youtu.be/5ZK7WTeiGwE?si=lOhp2RsyNKOC9M_k",
+          website: "https://www.38tonnes.fr/",
         },
+
       ],
+
       stage: {
         eyebrow: "Escena abierta",
         title: "¿Hay una canción que quieran cantar?",
@@ -612,10 +699,12 @@ export const content = {
 
       eyebrow: "Alojamiento",
       title: "Dormir cerca, organizarnos a tiempo",
+      navNext: "A la mesa",
+
       citation:
         "Nosotros estaremos en Roca Azul desde el jueves. Los invitados pueden llegar desde el viernes alrededor del mediodía y la celebración principal será una boda de tarde el sábado.",
       body:
-        "Contamos con alojamiento en el lugar para aproximadamente 80 personas. Como necesitamos distribuir las cabañas y las habitaciones con cuidado, les pedimos que nos indiquen cuanto antes si desean aprovechar esta opción.",
+        "Contamos con alojamiento en el lugar para aproximadamente 80 personas, por lo que no podemos ofrecer un lugar a todos los invitados, y tampoco podemos costear el alojamiento de todos. Como necesitamos distribuir las cabañas y las habitaciones con cuidado, les pedimos que nos indiquen cuanto antes si desean aprovechar esta opción.",
       facts: [
         { value: "≈ 80–90", label: "lugares disponibles" },
         {
@@ -635,12 +724,17 @@ export const content = {
         membersLabel: "Miembros del grupo",
         linkLabel: "Consultar la opción prevista para ti",
         backLabel: "Volver al alojamiento",
-        onSiteTitle: "Una plaza está prevista en Roca Azul",
+        onSiteTitle: "¡Un alojamiento está previsto para ti!",
         onSiteBody:
-          "Esta es la opción registrada para tu perfil. Te confirmaremos directamente cualquier ajuste.",
-        independentTitle: "Alojamiento por tu cuenta",
+          "Esta es la opción a la que hemos pensado para ti, esperamos que te guste. Si esta opción no te conviene, no hay problema, simplemente háznoslo saber para que podamos reasignarlo a otras personas.",
+        onSiteCoveredBody:
+          "Estamos felices de invitarte a este alojamiento de forma gratuita.",
+        independentTitle:
+          "Todos los alojamientos en el lugar ya están reservados. Sin embargo, si alguien se desiste, es posible que se libere un lugar. Mientras tanto, aquí hay algunas sugerencias:",
+
         independentBody:
-          "Les recomendamos buscar un hotel o un Airbnb en los alrededores.",
+          "Les recomendamos buscar un hotel o un Airbnb en los alrededores. Aquí hay algunas sugerencias:",
+
         cabinLabel: "Cabaña",
         roomLabel: "Habitación",
         cabinCapacityLabel: "Capacidad de la casa",
@@ -687,129 +781,29 @@ export const content = {
         },
         extraCabinLabel: "Alojamiento adicional",
         button: "Actualizar mi RSVP",
+        planCardTitle: "Tu plan",
+        planCardPerPerson: "Precio por persona · 2 noches",
+        planCardGroupTotal: "Total del grupo",
+        planCardCovered: "Cubierto por los novios",
+        planCardPartiallyCovered: "Parcialmente cubierto",
+        planCardNotCovered: "Por pagar",
+        planCardSale: "Precio promocional",
+        planCardSaleLabel: "Cubierto por los novios",
+        planCardEurDisclaimer: "Tipo de cambio estimado: 1 € = 20 MXN",
+
+        planCardEstimate: "Estimación",
       },
+
 
 
       contactPrompt: "Más info",
 
       cabinsShowcase: {
-        eyebrow: "Conozcan las cabañas",
         privateVideoEyebrow: "Video privado",
         privateVideoTitle: "Un recorrido por las cabañas",
-        key: "azalea",
-        title: "Azalea",
-        intro:
-          "La primera cabaña de nuestro catálogo: amplia, con espacios comunes para convivir y capacidad anunciada para 12 personas.",
-        capacity: "12 personas",
-        roomsLabel: "3 habitaciones",
-        bedsLabel: "7 camas descritas",
-        rooms: [
-          "Habitación 1 · 2 camas matrimoniales",
-          "Habitación 2 · 2 camas matrimoniales",
-          "Habitación 3 · 3 camas individuales",
-        ],
-        amenities:
-          "Las fotografías muestran sala, comedor, cocina, barra y baño con ducha.",
-        galleryLabel: "Galería de Azalea",
-        photoAlts: [
-          "Comedor y espacio común de la cabaña Azalea",
-          "Sala y comedor de la cabaña Azalea",
-          "Sala de la cabaña Azalea",
-          "Habitación con dos camas matrimoniales en Azalea",
-          "Segunda habitación con dos camas matrimoniales en Azalea",
-          "Habitación con tres camas individuales en Azalea",
-          "Baño con ducha de la cabaña Azalea",
-          "Cocina equipada de la cabaña Azalea",
-          "Barra y cocina de la cabaña Azalea",
-        ],
-        note:
-          "La distribución final de huéspedes será confirmada directamente por nosotros.",
-        additionalUnits: [
-          {
-            key: "dalia",
-            title: "Dalia",
-            intro:
-              "Una cabaña luminosa junto a la alberca, con tres habitaciones y diez couchages perfectamente identificados.",
-            capacity: "10 personas",
-            roomsLabel: "3 habitaciones",
-            bedsLabel: "7 camas · 10 lugares",
-            rooms: [
-              "Habitación 1 · 2 camas matrimoniales",
-              "Habitación 2 · 4 camas individuales en 2 literas",
-              "Habitación 3 · 1 cama matrimonial",
-            ],
-            amenities:
-              "Las fotografías muestran sala, comedor, baño con ducha y vista hacia la alberca.",
-            galleryLabel: "Galería de Dalia",
-            photoAlts: [
-              "Comedor de la cabaña Dalia junto a la alberca",
-              "Sala de la cabaña Dalia",
-              "Habitación con dos camas matrimoniales en Dalia",
-              "Habitación con cuatro camas individuales en literas en Dalia",
-              "Habitación con una cama matrimonial en Dalia",
-              "Baño con ducha de la cabaña Dalia",
-              "Segunda vista del baño con ducha de la cabaña Dalia",
-            ],
-            note:
-              "El costo interno registrado es de $11,150 MXN por las dos noches; la asignación y el importe final por persona serán confirmados directamente.",
-          },
-          {
-            key: "margarita",
-            title: "Margarita",
-            intro:
-              "Una cabaña alegre en tonos amarillos, con tres habitaciones, espacios comunes luminosos y jardín con fogatero.",
-            capacity: "10 personas",
-            roomsLabel: "3 habitaciones",
-            bedsLabel: "7 camas · 10 lugares",
-            rooms: [
-              "Habitación 1 · 2 camas matrimoniales",
-              "Habitación 2 · 4 camas individuales en 2 literas",
-              "Habitación 3 · 1 cama matrimonial",
-            ],
-            amenities:
-              "Las fotografías muestran sala-comedor, cocina con barra, baño con ducha, jardín y fogatero exterior.",
-            galleryLabel: "Galería de Margarita",
-            photoAlts: [
-              "Área común interior de la cabaña Margarita",
-              "Habitación con cuatro camas individuales en literas en Margarita",
-              "Baño con ducha de la cabaña Margarita",
-              "Habitación con dos camas matrimoniales en Margarita",
-              "Cocina con barra de la cabaña Margarita",
-              "Comedor de la cabaña Margarita",
-              "Habitación con una cama matrimonial en Margarita",
-              "Jardín y fogatero exterior de la cabaña Margarita",
-            ],
-            note:
-              "El costo interno registrado es de $11,150 MXN por las dos noches; la asignación y el importe final por persona serán confirmados directamente.",
-          },
-          {
-            key: "wooden",
-            title: "Cabañas de madera 31–34",
-            intro:
-              "Cuatro cabañas independientes entre los árboles, ideales para parejas o familias pequeñas que quieren un espacio más íntimo.",
-            capacity: "4 cabañas",
-            roomsLabel: "2 adultos por unidad",
-            bedsLabel: "Hasta 2 menores",
-            rooms: [
-              "Unidades disponibles · 31, 32, 33 y 34",
-              "Cada unidad · 1 cama king size",
-              "Cada unidad · 1 sofá cama matrimonial",
-            ],
-            amenities:
-              "Las fotografías y el video muestran terraza, refrigerador, lavabo, televisión y un interior completamente revestido de madera.",
-            galleryLabel: "Galería de las cabañas de madera 31 a 34",
-            photoAlts: [
-              "Exterior de una cabaña de madera entre los árboles",
-              "Entrada de la cabaña de madera número 34",
-              "Cama king size dentro de una cabaña de madera",
-              "Sofá cama y equipamiento interior de una cabaña de madera",
-            ],
-            videoLabel: "Recorrido en video · 16 s",
-            note:
-              "Tarifa interna por unidad y por las dos noches: $5,310 MXN para 2 adultos, o $5,790 MXN para 2 adultos y 2 menores. Confirmaremos directamente la asignación y el importe final.",
-          },
-        ],
       },
+
+
       plan: {
         eyebrow: "¿Cómo funciona?",
         title: "Díganos qué prefieren",
@@ -901,6 +895,7 @@ export const content = {
         },
       },
       cta: "Hablar con los novios",
+      navNext: "Gracias",
     },
     thanks: {
       eyebrow: "Agradecimientos",
@@ -927,6 +922,7 @@ export const content = {
         title: "Todos los que nos acompañan",
         subtitle:
           "Cada nombre es una historia compartida. Gracias por ser parte de este día.",
+        navNext: "Regalos",
       },
     },
     coast: {
@@ -1117,9 +1113,13 @@ export const content = {
 
       weekend: "Réservez la date",
       programme: "Programme",
+      petanque: "Pétanque",
       venue: "Le lieu",
+      food: "À table",
       accommodation: "Hébergement",
+
       travel: "Je viens de loin",
+      coast: "Et après ?",
       attire: "Code vestimentaire",
       weather: "Météo",
       gift: "Cadeaux",
@@ -1130,7 +1130,7 @@ export const content = {
 
 
 
-      dashboard: "admin",
+      dashboard: "Admin",
       changeEmail: "Changer l’adresse e-mail",
       changePassword: "Changer le mot de passe",
       music: "Musique",
@@ -1146,8 +1146,13 @@ export const content = {
       emailSuccess: "Adresse e-mail mise à jour.",
       emailUnchanged: "Cette adresse est déjà active sur votre compte.",
       emailError: "Impossible de changer l’adresse e-mail. Réessayez.",
+      emailErrorTitle: "Impossible de changer l’adresse e-mail",
+      emailDomainError:
+        "Impossible d’envoyer l’e-mail de vérification depuis ce domaine. Essayez depuis l’invitation publiée ou écrivez-nous pour obtenir de l’aide.",
+
       emailVerificationSent:
         "Un e-mail de vérification a été envoyé à la nouvelle adresse. Confirmez-le pour finaliser le changement.",
+
       emailReauthRequired:
         "Pour des raisons de sécurité, confirmez votre mot de passe pour changer l’adresse e-mail.",
       emailReauthLabel: "Mot de passe actuel",
@@ -1156,10 +1161,21 @@ export const content = {
 
       newPasswordLabel: "Nouveau mot de passe",
       newPasswordPlaceholder: "6 caractères minimum",
+      currentPasswordLabel: "Mot de passe actuel",
+      currentPasswordPlaceholder: "Saisissez votre mot de passe actuel",
+      confirmPasswordLabel: "Confirmer le nouveau mot de passe",
+      confirmPasswordPlaceholder: "Répétez le nouveau mot de passe",
       passwordError: "Le mot de passe doit contenir au moins 6 caractères.",
+      passwordMismatch: "Les mots de passe ne correspondent pas.",
+      passwordWrongCurrent: "Le mot de passe actuel est incorrect.",
+      passwordReauthRequired:
+        "Pour des raisons de sécurité, confirmez votre mot de passe actuel pour le changer.",
       passwordSuccess: "Mot de passe mis à jour !",
+      successTitle: "C’est fait !",
+      ok: "OK",
       cancel: "Annuler",
       save: "Enregistrer",
+
       working: "Enregistrement…",
     },
 
@@ -1177,8 +1193,11 @@ export const content = {
 
 
     hero: {
-      eyebrow: "nous nous marions",
+      eyebrow: "Tu es invité à notre mariage",
+      eyebrowM: "Tu es invité à notre mariage",
+      eyebrowF: "Tu es invitée à notre mariage",
       invitation: "Nous voulons vivre ce moment avec vous",
+
 
       scroll: "Commençons",
       navStory: "Découvrir notre invitation",
@@ -1217,6 +1236,8 @@ export const content = {
 
       correctNumber: "Corriger le numéro",
       edit: "Modifier",
+      verify: "Vérifier",
+
 
 
       addPhoto: "Déposer une photo",
@@ -1357,6 +1378,8 @@ export const content = {
       saturday: {
         eyebrow: "Samedi 20 · programme",
         title: "L’après-midi, pas à pas",
+        warningTitle: "Attention aux bouchons !",
+
         citation:
           "Du premier toast au dernier pas de danse : un après-midi qui marche vers le phare et finit en fête.",
         warning:
@@ -1400,6 +1423,24 @@ export const content = {
       },
 
     },
+    petanqueTribute: {
+      eyebrow: 'Pétanque',
+      title: 'Un hommage à la pétanque',
+      intro:
+        "La pétanque est un jeu de boules traditionnel français qui se joue en plein air, en lançant des boules métalliques le plus près possible d'un petit objectif en bois appelé « cochonnet ». Elle est née dans le sud de la France et se joue aujourd'hui dans le monde entier.",
+      body:
+        "Pour nous, la pétanque est bien plus qu'un jeu : c'est le fil qui nous a reliés à une communauté incroyable d'amis et de camarades de club, ici au Mexique et partout dans le monde. Grâce à la pétanque, nous avons tissé des liens d'amitié qui nous accompagnent partout.",
+      homage:
+        "En hommage à ce magnifique jeu, nous voulons que nos invités aient l'occasion de rencontrer et de jouer avec nos camarades de pétanque. Un après-midi de boules, de rires et de bonne compagnie.",
+      photosLabel: 'Nos camarades de pétanque',
+      photoAlts: [
+        'Partie de pétanque entre amis',
+        'Boules de pétanque sur la terre',
+        'Notre club de pétanque',
+        'Un cochonnet et les boules',
+      ],
+      navNext: 'Hébergement',
+    },
     weather: {
       eyebrow: "La météo habituelle",
       title: "Soleil l’après-midi, fraîcheur le soir",
@@ -1408,13 +1449,20 @@ export const content = {
       facts: [
         { value: "≈ 27 °C", label: "maximale habituelle", note: "Pendant l’après-midi" },
         { value: "≈ 8–10 °C", label: "minimale habituelle", note: "En fin de nuit" },
-        { value: "3–5 %", label: "risque climatique de pluie", note: "Pour une journée typique de février" },
+        { value: "3–5 %", label: "risque de pluie", note: "Pour une journée typique de février" },
+
         { value: "≈ 18 h 55", label: "coucher du soleil", note: "Presque au même moment que la cérémonie au phare" },
       ],
       moments: [
-        { time: "13 h–17 h 30", title: "Après-midi lumineuse", body: "Soleil et douceur à chaleur ; crème solaire, lunettes et eau seront utiles." },
-        { time: "18 h", title: "Cérémonie et coucher du soleil", body: "La lumière commencera à baisser pendant la cérémonie au phare." },
-        { time: "Dès 19 h", title: "La soirée se rafraîchit", body: "La température peut baisser rapidement au bord du lac." },
+        { time: "8 h–12 h", title: "Matinée fraîche", body: "Ciel dégagé et fraîcheur matinale." },
+
+
+        { time: "13 h–17 h 30", title: "Après-midi lumineuse", body: "Soleil et douceur à chaleur." },
+
+        { time: "18 h", title: "Cérémonie", body: "La lumière commencera à baisser pendant la cérémonie au phare." },
+
+        { time: "Dès 19 h", title: "Soirée fraiche", body: "La température peut baisser rapidement au bord du lac." },
+
       ],
       adviceTitle: "À prévoir",
       advice: [
@@ -1425,44 +1473,75 @@ export const content = {
       navNext: "Voir le programme",
     },
     food: {
-      eyebrow: "À table",
+      eyebrow: "Saveurs de Jalisco et du Mexique",
       title: "Un week-end pour goûter, trinquer et partager",
+
       body:
-        "Nous voulons que chaque repas soit simple, généreux et profondément mexicain. Voici le menu que nous imaginons ; il peut encore évoluer grâce à vos idées.",
-      flavoursEyebrow: "Saveurs du Jalisco et du Mexique",
+        "Nous voulons que chaque repas soit simple, généreux et profondément mexicain. Voici un aperçu des plats que vous pourrez déguster.",
+
+      flavoursEyebrow: "Saveurs de Jalisco et du Mexique",
+
+
       flavoursTitle: "Qu’allons-nous goûter ?",
+      flavourType: { food: "Plat", drink: "Boisson" },
       flavours: [
+
         {
           key: "carnitas",
+          type: "food",
           title: "Carnitas",
           body: "Du porc longuement confit jusqu’à devenir tendre et doré, servi avec tortillas, oignon, coriandre, sauces et citron vert.",
         },
         {
-          key: "taquiza",
-          title: "Taquiza",
-          body: "Une table de plusieurs plats mijotés mexicains, tortillas chaudes et garnitures pour que chacun compose ses propres tacos.",
-        },
-        {
           key: "tejuino",
+          type: "drink",
           title: "Tejuino",
           body: "Une boisson typique de Guadalajara à base de maïs fermenté, douce et acidulée, servie très fraîche avec citron vert et sel. Version « loco » à la tequila ou au mezcal en option.",
         },
         {
+          key: "taquiza",
+          type: "food",
+          title: "Taquiza",
+          body: "Une table de plusieurs plats mijotés mexicains, tortillas chaudes et garnitures pour que chacun compose ses propres tacos.",
+        },
+        {
+          key: "aguas",
+          type: "drink",
+          title: "Aguas de sabores",
+          body: "De l’eau fraîche aux fruits naturels servie avec des glaçons : une sélection rafraîchissante et délicieuse de saveurs pour accompagner le repas.",
+        },
+        {
           key: "nopales",
+          type: "food",
           title: "Salade de nopales",
           body: "Du cactus nopal tendre avec tomate, oignon, herbes et fromage : une option fraîche, mexicaine et végétarienne.",
         },
         {
+          key: "esquites",
+          type: "food",
+          title: "Esquites",
+          body: "Des épis de maïs bouillis et préparés façon esquites, servis en verres avec mayonnaise, fromage, piment et citron vert.",
+        },
+        {
           key: "guacamole",
+          type: "food",
           title: "Guacamole et options végétariennes",
           body: "Il y aura du guacamole, des tortillas, des sauces et d’autres accompagnements sans viande. Vous pourrez préciser vos restrictions dans le RSVP.",
         },
         {
           key: "pizza",
+          type: "food",
           title: "Pizza",
           body: "Des pizzas à partager le vendredi soir : un accueil simple et informel après les arrivées et la pétanque.",
         },
+        {
+          key: "tequila",
+          type: "drink",
+          title: "Tequila",
+          body: "Une sélection de tequila et de mezcal pour trinquer et accompagner la fin du repas, avec sel, citron vert et orange.",
+        },
       ],
+
       days: [
         {
           day: "Vendredi soir",
@@ -1494,44 +1573,57 @@ export const content = {
       ],
       note:
         "Les détails sont encore en préparation. Nous pensons aussi à l’eau, aux boissons sans alcool, au café, aux options pour les enfants et aux besoins alimentaires particuliers.",
-      photoCredits: "Crédits photographiques",
       drinks: {
         eyebrow: "Pour trinquer",
-        title: "La politique des munitions",
+
+        title: "Alcool",
         body:
           "Nous prévoirons une quantité raisonnable d’alcool par invité, principalement de la bière et de la tequila, ainsi que des sodas et des boissons sans alcool.",
         note:
           "Si vous voulez être certains que la soirée soit particulièrement bien arrosée, vous pouvez apporter vos propres munitions, à partager et à savourer avec modération.",
       },
+
     },
     music: {
       eyebrow: "Musique live",
       title: "Écouter, danser et aussi chanter",
       body:
         "La musique accompagnera chaque changement d’énergie du samedi, de la fin de la cérémonie jusqu’à la piste de danse.",
+      listenLabel: "Écouter",
+      websiteLabel: "Site web",
       acts: [
+
         {
           moment: "Après l’apéro",
           name: "Marimba",
           note: "Pour accompagner le premier verre avant les carnitas.",
+          image: "marimba",
         },
 
         {
           moment: "Après la cérémonie au phare",
           name: "Mariachi",
           note: "Une entrée festive pour ouvrir le dîner.",
+          image: "mariachi",
         },
         {
           moment: "Après le dîner",
           name: "Norteño",
           note: "Pour ouvrir la fête, chanter et commencer à danser.",
+          image: "norteno",
         },
         {
           moment: "S’ils se lancent",
-          name: "Un groupe français",
+          name: "38 tonnes",
           note: "Un petit pont musical entre nos deux cultures.",
+          image: "frenchBand",
+          logo: "frenchBandLogo",
+          link: "https://youtu.be/5ZK7WTeiGwE?si=lOhp2RsyNKOC9M_k",
+          website: "https://www.38tonnes.fr/",
         },
+
       ],
+
       stage: {
         eyebrow: "Scène ouverte",
         title: "Une chanson que vous aimeriez chanter ?",
@@ -1685,10 +1777,12 @@ export const content = {
 
       eyebrow: "Hébergement",
       title: "Dormir sur place, nous organiser à temps",
+      navNext: "À table",
+
       citation:
         "La fête commence dès le vendredi ou le samedi dans l’après-midi. Il est conseillé de réserver un logement sur place.",
       body:
-        "Nous disposons d’environ 80 places sur le lieu. Malheureusement, nous ne pouvons pas proposer cette option à tout le monde. Comme les gîtes et les chambres doivent être répartis avec soin, merci de nous indiquer dès que possible l’option d’hébergement que vous aurez choisie.",
+        "Nous disposons d’environ 80 places sur le lieu, ce qui ne nous permet pas d’héberger tous nos invités, et nous ne pouvons pas non plus prendre en charge le logement de chacun. Comme les gîtes et les chambres doivent être répartis avec soin, merci de nous indiquer dès que possible l’option d’hébergement que vous aurez choisie.",
       facts: [
         { value: "≈ 80–90", label: "places disponibles" },
         {
@@ -1708,12 +1802,17 @@ export const content = {
         membersLabel: "Membres du groupe",
         linkLabel: "Voir l’option prévue pour vous",
         backLabel: "Retour à l’hébergement",
-        onSiteTitle: "Une place est prévue à Roca Azul",
+        onSiteTitle: "Un logement est prévu pour toi !",
         onSiteBody:
-          "Voici l’option enregistrée pour votre profil. Nous vous confirmerons directement tout ajustement.",
-        independentTitle: "Hébergement de votre côté",
+          "Voici l’option à laquelle nous avons pensé pour toi, nous espérons qu’elle te plaira. Si cette option ne te convient pas, aucun souci, simplement fais-le nous savoir pour que l’on puisse le réassigner à d’autres personnes.",
+        onSiteCoveredBody:
+          "Nous sommes heureux de t’inviter dans ce logement gratuitement.",
+        independentTitle:
+          "Tous les hébergements sur place sont déjà réservés. Cependant, si quelqu’un se désiste il se peut qu’une place se libère. En attendant voici quelques suggestions :",
+
         independentBody:
-          "Nous vous recommandons de chercher un hôtel ou un Airbnb dans les environs.",
+          "Nous vous recommandons de chercher un hôtel ou un Airbnb dans les environs. Voici quelques suggestions :",
+
         cabinLabel: "Gîte",
         roomLabel: "Chambre",
         cabinCapacityLabel: "Capacité du gîte",
@@ -1760,129 +1859,29 @@ export const content = {
         },
         extraCabinLabel: "Hébergement supplémentaire",
         button: "Mettre à jour mon RSVP",
+        planCardTitle: "Votre plan",
+        planCardPerPerson: "Prix par personne · 2 nuits",
+        planCardGroupTotal: "Total du groupe",
+        planCardCovered: "Pris en charge par les mariés",
+        planCardPartiallyCovered: "Partiellement pris en charge",
+        planCardNotCovered: "À payer",
+        planCardSale: "Prix promotionnel",
+        planCardSaleLabel: "Pris en charge par les mariés",
+        planCardEurDisclaimer: "Taux de change estimé : 1 € = 20 MXN",
+
+        planCardEstimate: "Estimation",
       },
+
 
 
       contactPrompt: "Plus d'infos",
 
       cabinsShowcase: {
-        eyebrow: "Découvrez les gîtes",
         privateVideoEyebrow: "Vidéo privée",
         privateVideoTitle: "Une visite des gîtes",
-        key: "azalea",
-        title: "Azalea",
-        intro:
-          "La première gîte de notre catalogue : spacieuse, avec de belles pièces communes et une capacité annoncée de 12 personnes.",
-        capacity: "12 personnes",
-        roomsLabel: "3 chambres",
-        bedsLabel: "7 lits décrits",
-        rooms: [
-          "Chambre 1 · 2 lits doubles",
-          "Chambre 2 · 2 lits doubles",
-          "Chambre 3 · 3 lits simples",
-        ],
-        amenities:
-          "Les photos montrent un salon, une salle à manger, une cuisine, un comptoir et une salle de bain avec douche.",
-        galleryLabel: "Galerie d’Azalea",
-        photoAlts: [
-          "Salle à manger et espace commun du gîte Azalea",
-          "Salon et salle à manger du gîte Azalea",
-          "Salon du gîte Azalea",
-          "Chambre avec deux lits doubles dans Azalea",
-          "Deuxième chambre avec deux lits doubles dans Azalea",
-          "Chambre avec trois lits simples dans Azalea",
-          "Salle de bain avec douche du gîte Azalea",
-          "Cuisine équipée du gîte Azalea",
-          "Comptoir et cuisine du gîte Azalea",
-        ],
-        note:
-          "Nous confirmerons directement la répartition finale des invités.",
-        additionalUnits: [
-          {
-            key: "dalia",
-            title: "Dalia",
-            intro:
-              "Une gîte lumineuse près de la piscine, avec trois chambres et dix couchages parfaitement identifiés.",
-            capacity: "10 personnes",
-            roomsLabel: "3 chambres",
-            bedsLabel: "7 lits · 10 couchages",
-            rooms: [
-              "Chambre 1 · 2 lits doubles",
-              "Chambre 2 · 4 lits simples dans 2 lits superposés",
-              "Chambre 3 · 1 lit double",
-            ],
-            amenities:
-              "Les photos montrent un salon, une salle à manger, une salle de bain avec douche et une vue vers la piscine.",
-            galleryLabel: "Galerie de Dalia",
-            photoAlts: [
-              "Salle à manger du gîte Dalia près de la piscine",
-              "Salon du gîte Dalia",
-              "Chambre avec deux lits doubles dans Dalia",
-              "Chambre avec quatre lits simples superposés dans Dalia",
-              "Chambre avec un lit double dans Dalia",
-              "Salle de bain avec douche de Dalia",
-              "Deuxième vue de la salle de bain avec douche de Dalia",
-            ],
-            note:
-              "Le coût interne enregistré est de 11 150 MXN pour les deux nuits ; l’attribution et le montant final par personne seront confirmés directement.",
-          },
-          {
-            key: "margarita",
-            title: "Margarita",
-            intro:
-              "Une gîte joyeuse aux tons jaunes, avec trois chambres, des espaces communs lumineux et un jardin avec foyer extérieur.",
-            capacity: "10 personnes",
-            roomsLabel: "3 chambres",
-            bedsLabel: "7 lits · 10 couchages",
-            rooms: [
-              "Chambre 1 · 2 lits doubles",
-              "Chambre 2 · 4 lits simples dans 2 lits superposés",
-              "Chambre 3 · 1 lit double",
-            ],
-            amenities:
-              "Les photos montrent un salon-salle à manger, une cuisine avec comptoir, une salle de bain avec douche, un jardin et un foyer extérieur.",
-            galleryLabel: "Galerie de Margarita",
-            photoAlts: [
-              "Espace commun intérieur du gîte Margarita",
-              "Chambre avec quatre lits simples superposés dans Margarita",
-              "Salle de bain avec douche de Margarita",
-              "Chambre avec deux lits doubles dans Margarita",
-              "Cuisine avec comptoir du gîte Margarita",
-              "Salle à manger du gîte Margarita",
-              "Chambre avec un lit double dans Margarita",
-              "Jardin et foyer extérieur du gîte Margarita",
-            ],
-            note:
-              "Le coût interne enregistré est de 11 150 MXN pour les deux nuits ; l’attribution et le montant final par personne seront confirmés directement.",
-          },
-          {
-            key: "wooden",
-            title: "Gîtes en bois 31–34",
-            intro:
-              "Quatre gîtes indépendantes sous les arbres, idéales pour les couples ou petites familles qui souhaitent un espace plus intime.",
-            capacity: "4 gîtes",
-            roomsLabel: "2 adultes par unité",
-            bedsLabel: "Jusqu’à 2 mineurs",
-            rooms: [
-              "Unités disponibles · 31, 32, 33 et 34",
-              "Dans chaque unité · 1 lit king size",
-              "Dans chaque unité · 1 canapé-lit double",
-            ],
-            amenities:
-              "Les photos et la vidéo montrent une terrasse, un réfrigérateur, un lavabo, une télévision et un intérieur entièrement habillé de bois.",
-            galleryLabel: "Galerie des gîtes en bois 31 à 34",
-            photoAlts: [
-              "Extérieur d’un gîte en bois sous les arbres",
-              "Entrée du gîte en bois numéro 34",
-              "Lit king size dans un gîte en bois",
-              "Canapé-lit et équipements intérieurs d’un gîte en bois",
-            ],
-            videoLabel: "Visite vidéo · 16 s",
-            note:
-              "Tarif interne par unité pour les deux nuits : 5 310 MXN pour 2 adultes, ou 5 790 MXN pour 2 adultes et 2 mineurs. Nous confirmerons directement l’attribution et le montant final.",
-          },
-        ],
       },
+
+
       plan: {
         eyebrow: "Comment ça marche ?",
         title: "Dites-nous ce que vous préférez",
@@ -1975,6 +1974,7 @@ export const content = {
         },
       },
       cta: "Parler aux mariés",
+      navNext: "Merci",
     },
     thanks: {
       eyebrow: "Remerciements",
@@ -2000,6 +2000,7 @@ export const content = {
         title: "Tous ceux qui nous accompagnent",
         subtitle:
           "Chaque nom est une histoire partagée. Merci de faire partie de ce jour.",
+        navNext: "Cadeaux",
       },
     },
     coast: {
@@ -2190,9 +2191,13 @@ export const content = {
 
       weekend: "Save the date",
       programme: "Programme",
+      petanque: "Pétanque",
       venue: "The venue",
+      food: "At the table",
       accommodation: "Accommodation",
+
       travel: "Coming from afar",
+      coast: "And afterwards?",
       attire: "Attire",
       weather: "Weather",
       gift: "Gifts",
@@ -2203,7 +2208,7 @@ export const content = {
 
 
 
-      dashboard: "admin",
+      dashboard: "Admin",
       changeEmail: "Change email",
       changePassword: "Change password",
       music: "Music",
@@ -2219,8 +2224,13 @@ export const content = {
       emailSuccess: "Email updated.",
       emailUnchanged: "This email is already active on your account.",
       emailError: "We could not change the email. Please try again.",
+      emailErrorTitle: "Could not change the email",
+      emailDomainError:
+        "We could not send the verification email from this domain. Try from the published invitation or message us for help.",
+
       emailVerificationSent:
         "We sent a verification email to the new address. Confirm it to complete the change.",
+
       emailReauthRequired:
         "For security, confirm your password before changing the email.",
       emailReauthLabel: "Current password",
@@ -2229,10 +2239,21 @@ export const content = {
 
       newPasswordLabel: "New password",
       newPasswordPlaceholder: "At least 6 characters",
+      currentPasswordLabel: "Current password",
+      currentPasswordPlaceholder: "Enter your current password",
+      confirmPasswordLabel: "Confirm new password",
+      confirmPasswordPlaceholder: "Repeat the new password",
       passwordError: "The password must be at least 6 characters.",
+      passwordMismatch: "The passwords do not match.",
+      passwordWrongCurrent: "The current password is incorrect.",
+      passwordReauthRequired:
+        "For security, confirm your current password to change it.",
       passwordSuccess: "Password updated!",
+      successTitle: "Done!",
+      ok: "OK",
       cancel: "Cancel",
       save: "Save",
+
       working: "Saving…",
     },
 
@@ -2250,8 +2271,9 @@ export const content = {
 
 
     hero: {
-      eyebrow: "we are getting married",
+      eyebrow: "You are invited to our wedding",
       invitation: "We want to celebrate this moment with you",
+
 
       scroll: "Let's begin",
       navStory: "Discover our invitation",
@@ -2290,8 +2312,10 @@ export const content = {
 
       correctNumber: "Correct number",
       edit: "Edit",
+      verify: "Verify",
 
       addPhoto: "Upload photo",
+
 
 
       changePhoto: "Change photo",
@@ -2427,7 +2451,9 @@ export const content = {
       saturday: {
         eyebrow: "Saturday 20 · programme",
         title: "The afternoon, step by step",
+        warningTitle: "Traffic alert!",
         citation:
+
           "From the first toast to the last dance: an afternoon that walks toward the lighthouse and ends in celebration.",
         warning:
           "If you are travelling from Guadalajara, please leave plenty of time. The roads into Jocotepec can become congested very easily, and everyone needs to be at Roca Azul by 1 pm.",
@@ -2469,6 +2495,24 @@ export const content = {
       },
 
     },
+    petanqueTribute: {
+      eyebrow: 'Pétanque',
+      title: 'A tribute to pétanque',
+      intro:
+        'Pétanque is a traditional French ball game played outdoors, tossing metal balls as close as possible to a small wooden target called the « cochonnet ». It was born in the south of France and is now played all over the world.',
+      body:
+        'For us, pétanque is much more than a game: it is the thread that has connected us to an incredible community of friends and clubmates, here in Mexico and around the world. Thanks to pétanque we have built friendships that travel with us wherever we go.',
+      homage:
+        'As a tribute to this beautiful game, we want our guests to have the chance to meet and play with our pétanque mates. An afternoon of boules, laughter and good company.',
+      photosLabel: 'Our pétanque mates',
+      photoAlts: [
+        'A pétanque game among friends',
+        'Pétanque balls on the ground',
+        'Our pétanque club',
+        'A cochonnet and the balls',
+      ],
+      navNext: 'Accommodation',
+    },
     weather: {
       eyebrow: "Typical weather",
       title: "Afternoon sunshine, a cool evening",
@@ -2481,6 +2525,7 @@ export const content = {
         { value: "≈ 6:55 pm", label: "sunset", note: "Very close to the lighthouse ceremony" },
       ],
       moments: [
+        { time: "8–12 am", title: "A crisp, clear morning", body: "Clear skies and a cool start; perfect for coffee outdoors." },
         { time: "1–5:30 pm", title: "A bright afternoon", body: "Sunny and pleasantly warm; sunscreen, sunglasses, and water will help." },
         { time: "6 pm", title: "Ceremony and sunset", body: "The light will begin to fade during the lighthouse ceremony." },
         { time: "From 7 pm", title: "A cooler evening", body: "Temperatures can fall quickly beside the lake." },
@@ -2494,44 +2539,73 @@ export const content = {
       navNext: "See the programme",
     },
     food: {
-      eyebrow: "At the table",
+      eyebrow: "Flavours of Jalisco and Mexico",
       title: "A weekend to taste, toast, and share",
       body:
-        "We want every meal to feel simple, generous, and unmistakably Mexican. This is the menu we are imagining, and it can still grow with your ideas.",
+        "We want every meal to feel simple, generous, and unmistakably Mexican. Here's a preview of the dishes you'll be able to taste.",
+
       flavoursEyebrow: "Flavours of Jalisco and Mexico",
+
       flavoursTitle: "What will we be tasting?",
+      flavourType: { food: "Food", drink: "Drink" },
       flavours: [
+
         {
           key: "carnitas",
+          type: "food",
           title: "Carnitas",
           body: "Pork cooked slowly until tender and golden, served with tortillas, onion, coriander, salsa, and lime.",
         },
         {
-          key: "taquiza",
-          title: "Taquiza",
-          body: "A spread of Mexican stews, warm tortillas, and toppings so everyone can assemble their own tacos.",
-        },
-        {
           key: "tejuino",
+          type: "drink",
           title: "Tejuino",
           body: "A sweet-and-tangy Guadalajara drink made from fermented corn, served ice-cold with lime and salt. A tequila or mezcal “tejuino loco” will also be available.",
         },
         {
+          key: "taquiza",
+          type: "food",
+          title: "Taquiza",
+          body: "A spread of Mexican stews, warm tortillas, and toppings so everyone can assemble their own tacos.",
+        },
+        {
+          key: "aguas",
+          type: "drink",
+          title: "Aguas de sabores",
+          body: "Fresh fruit water served over ice: a delicious, refreshing set of natural fruit flavours to accompany the meal.",
+        },
+        {
           key: "nopales",
+          type: "food",
           title: "Nopal cactus salad",
           body: "Tender nopal cactus with tomato, onion, herbs, and cheese: a fresh, Mexican, vegetarian option.",
         },
         {
+          key: "esquites",
+          type: "food",
+          title: "Esquites",
+          body: "Boiled corn prepared esquites-style, served in cups with mayonnaise, cheese, chilli, and lime.",
+        },
+        {
           key: "guacamole",
+          type: "food",
           title: "Guacamole and vegetarian options",
           body: "There will be guacamole, tortillas, salsas, and other meat-free sides. You can share dietary restrictions in the RSVP.",
         },
         {
           key: "pizza",
+          type: "food",
           title: "Pizza",
           body: "Pizzas to share on Friday evening: a simple, informal welcome after arrivals and pétanque.",
         },
+        {
+          key: "tequila",
+          type: "drink",
+          title: "Tequila",
+          body: "A selection of tequila and mezcal to toast and accompany the end of the meal, with salt, lime, and orange.",
+        },
       ],
+
       days: [
         {
           day: "Friday evening",
@@ -2563,9 +2637,9 @@ export const content = {
       ],
       note:
         "Details are still being prepared. We are also considering water, alcohol-free drinks, coffee, children’s options, and special dietary needs.",
-      photoCredits: "Photo credits",
       drinks: {
         eyebrow: "For the toast",
+
         title: "Our drinks policy",
         body:
           "We will provide a reasonable amount of alcohol per guest, mainly beer and tequila, together with soft drinks and alcohol-free options.",
@@ -2578,29 +2652,41 @@ export const content = {
       title: "Listen, dance, and sing too",
       body:
         "Music will accompany every shift in energy on Saturday, from the end of the ceremony to the dance floor.",
+      listenLabel: "Listen",
+      websiteLabel: "Website",
       acts: [
+
         {
           moment: "After the aperitif",
           name: "Marimba",
           note: "For the first toast before the carnitas.",
+          image: "marimba",
         },
 
         {
           moment: "After the lighthouse ceremony",
           name: "Mariachi",
           note: "A festive opening to dinner.",
+          image: "mariachi",
         },
         {
           moment: "After dinner",
           name: "Norteño",
           note: "To open the party, sing, and start dancing.",
+          image: "norteno",
         },
         {
           moment: "If they are up for it",
-          name: "A French band",
+          name: "38 tonnes",
           note: "A small musical bridge between our two cultures.",
+          image: "frenchBand",
+          logo: "frenchBandLogo",
+          link: "https://youtu.be/5ZK7WTeiGwE?si=lOhp2RsyNKOC9M_k",
+          website: "https://www.38tonnes.fr/",
         },
+
       ],
+
       stage: {
         eyebrow: "Open stage",
         title: "Is there a song you would like to sing?",
@@ -2754,10 +2840,12 @@ export const content = {
 
       eyebrow: "Accommodation",
       title: "Stay close, help us plan ahead",
+      navNext: "At the table",
       citation:
+
         "We will be at Roca Azul from Thursday. Guests may arrive from around midday on Friday, and Saturday’s main celebration will be an afternoon wedding.",
       body:
-        "We have accommodation at the venue for approximately 80 people. As the guest houses and rooms need to be allocated carefully, please let us know as soon as possible if you would like to use this option.",
+        "We have accommodation at the venue for approximately 80 people, so we can't offer a place to every guest, and we can't afford to cover everyone's lodging. As the guest houses and rooms need to be allocated carefully, please let us know as soon as possible if you would like to use this option.",
       facts: [
         { value: "≈ 80–90", label: "places available" },
         {
@@ -2777,12 +2865,17 @@ export const content = {
         membersLabel: "Group members",
         linkLabel: "See the option selected for you",
         backLabel: "Back to accommodation",
-        onSiteTitle: "A place is planned for you at Roca Azul",
+        onSiteTitle: "Accommodation is planned for you!",
         onSiteBody:
-          "This is the option currently recorded for your profile. We will confirm any adjustment directly.",
-        independentTitle: "Independent accommodation",
+          "This is the option we thought of for you, we hope you like it. If this option doesn't suit you, no worries, just let us know so we can reassign it to other people.",
+        onSiteCoveredBody:
+          "We are happy to invite you to this accommodation for free.",
+        independentTitle:
+          "All on-site accommodation is already booked. However, if someone cancels, a spot may become available. In the meantime, here are some suggestions:",
+
         independentBody:
-          "We recommend looking for a hotel or an Airbnb nearby.",
+          "We recommend looking for a hotel or an Airbnb nearby. Here are some suggestions:",
+
         cabinLabel: "Guest house",
         roomLabel: "Room",
         cabinCapacityLabel: "Guest house capacity",
@@ -2829,129 +2922,29 @@ export const content = {
         },
         extraCabinLabel: "Additional accommodation",
         button: "Update my RSVP",
+        planCardTitle: "Your plan",
+        planCardPerPerson: "Price per person · 2 nights",
+        planCardGroupTotal: "Group total",
+        planCardCovered: "Covered by the couple",
+        planCardPartiallyCovered: "Partially covered",
+        planCardNotCovered: "To pay",
+        planCardSale: "Promotional price",
+        planCardSaleLabel: "Covered by the couple",
+        planCardEurDisclaimer: "Estimated exchange rate: 1 € = 20 MXN",
+
+        planCardEstimate: "Estimate",
       },
+
 
 
       contactPrompt: "More info",
 
       cabinsShowcase: {
-        eyebrow: "Explore the guest houses",
         privateVideoEyebrow: "Private video",
         privateVideoTitle: "A tour of the guest houses",
-        key: "azalea",
-        title: "Azalea",
-        intro:
-          "The first guest house in our catalogue: spacious, with generous shared areas and an advertised capacity of 12 guests.",
-        capacity: "12 guests",
-        roomsLabel: "3 bedrooms",
-        bedsLabel: "7 listed beds",
-        rooms: [
-          "Bedroom 1 · 2 double beds",
-          "Bedroom 2 · 2 double beds",
-          "Bedroom 3 · 3 single beds",
-        ],
-        amenities:
-          "The photographs show a living room, dining room, kitchen, breakfast bar, and bathroom with shower.",
-        galleryLabel: "Azalea gallery",
-        photoAlts: [
-          "Dining room and shared area in the Azalea guest house",
-          "Living and dining room in the Azalea guest house",
-          "Living room in the Azalea guest house",
-          "Bedroom with two double beds in Azalea",
-          "Second bedroom with two double beds in Azalea",
-          "Bedroom with three single beds in Azalea",
-          "Bathroom with shower in the Azalea guest house",
-          "Equipped kitchen in the Azalea guest house",
-          "Breakfast bar and kitchen in the Azalea guest house",
-        ],
-        note:
-          "We will confirm the final guest allocation directly.",
-        additionalUnits: [
-          {
-            key: "dalia",
-            title: "Dalia",
-            intro:
-              "A bright guest house beside the pool, with three bedrooms and ten clearly identified sleeping places.",
-            capacity: "10 guests",
-            roomsLabel: "3 bedrooms",
-            bedsLabel: "7 beds · sleeps 10",
-            rooms: [
-              "Bedroom 1 · 2 double beds",
-              "Bedroom 2 · 4 single beds in 2 bunk beds",
-              "Bedroom 3 · 1 double bed",
-            ],
-            amenities:
-              "The photographs show a living room, dining room, bathroom with shower, and a view towards the pool.",
-            galleryLabel: "Dalia gallery",
-            photoAlts: [
-              "Dining room in the Dalia guest house beside the pool",
-              "Living room in the Dalia guest house",
-              "Bedroom with two double beds in Dalia",
-              "Bedroom with four single bunk beds in Dalia",
-              "Bedroom with one double bed in Dalia",
-              "Bathroom with shower in Dalia",
-              "Second view of the bathroom with shower in Dalia",
-            ],
-            note:
-              "The recorded internal cost is MXN 11,150 for both nights; allocation and the final per-person amount will be confirmed directly.",
-          },
-          {
-            key: "margarita",
-            title: "Margarita",
-            intro:
-              "A cheerful yellow-toned guest house with three bedrooms, bright shared spaces, and a garden with an outdoor fire pit.",
-            capacity: "10 guests",
-            roomsLabel: "3 bedrooms",
-            bedsLabel: "7 beds · sleeps 10",
-            rooms: [
-              "Bedroom 1 · 2 double beds",
-              "Bedroom 2 · 4 single beds in 2 bunk beds",
-              "Bedroom 3 · 1 double bed",
-            ],
-            amenities:
-              "The photographs show a living-dining room, kitchen with breakfast bar, bathroom with shower, garden, and outdoor fire pit.",
-            galleryLabel: "Margarita gallery",
-            photoAlts: [
-              "Indoor shared area in the Margarita guest house",
-              "Bedroom with four single bunk beds in Margarita",
-              "Bathroom with shower in Margarita",
-              "Bedroom with two double beds in Margarita",
-              "Kitchen with breakfast bar in Margarita",
-              "Dining room in the Margarita guest house",
-              "Bedroom with one double bed in Margarita",
-              "Garden and outdoor fire pit at the Margarita guest house",
-            ],
-            note:
-              "The recorded internal cost is MXN 11,150 for both nights; allocation and the final per-person amount will be confirmed directly.",
-          },
-          {
-            key: "wooden",
-            title: "Wooden guest houses 31–34",
-            intro:
-              "Four independent guest houses beneath the trees, ideal for couples or small families looking for a more private space.",
-            capacity: "4 guest houses",
-            roomsLabel: "2 adults per unit",
-            bedsLabel: "Up to 2 minors",
-            rooms: [
-              "Available units · 31, 32, 33, and 34",
-              "Each unit · 1 king-size bed",
-              "Each unit · 1 double sofa bed",
-            ],
-            amenities:
-              "The photographs and video show a terrace, refrigerator, washbasin, television, and a fully wood-lined interior.",
-            galleryLabel: "Wooden guest houses 31 to 34 gallery",
-            photoAlts: [
-              "Exterior of a wooden guest house beneath the trees",
-              "Entrance to wooden guest house number 34",
-              "King-size bed inside a wooden guest house",
-              "Sofa bed and interior amenities in a wooden guest house",
-            ],
-            videoLabel: "Video tour · 16 sec",
-            note:
-              "Internal rate per unit for both nights: MXN 5,310 for 2 adults, or MXN 5,790 for 2 adults and 2 minors. Allocation and the final amount will be confirmed directly.",
-          },
-        ],
       },
+
+
       plan: {
         eyebrow: "How does it work?",
         title: "Tell us what you prefer",
@@ -3043,6 +3036,7 @@ export const content = {
         },
       },
       cta: "Talk to the couple",
+      navNext: "Thanks",
     },
     thanks: {
       eyebrow: "Acknowledgements",
@@ -3068,6 +3062,7 @@ export const content = {
         title: "Everyone joining us",
         subtitle:
           "Every name is a shared story. Thank you for being part of this day.",
+        navNext: "Gifts",
       },
     },
     coast: {

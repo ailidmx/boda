@@ -36,8 +36,15 @@
 
 .photo-gallery {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-auto-columns: calc((100% - 3 * 0.75rem) / 4);
+  grid-auto-flow: column;
   gap: 0.75rem;
+  overflow-x: auto;
+  padding-bottom: 1.25rem;
+
+  scroll-snap-type: x mandatory;
+  scrollbar-color: var(--terracotta) rgb(255 253 248 / 22%);
+  scrollbar-width: thin;
 }
 
 .gallery-item {
@@ -47,21 +54,23 @@
   border-radius: 0.35rem;
   background: rgb(0 0 0 / 30%);
   aspect-ratio: 1;
+  scroll-snap-align: start;
 }
 
 /* Medium screens: 3 cards per row */
 @media (max-width: 1024px) {
   .photo-gallery {
-    grid-template-columns: repeat(3, 1fr);
+    grid-auto-columns: calc((100% - 2 * 0.75rem) / 3);
   }
 }
 
 /* Mobile: 1 card per row */
 @media (max-width: 640px) {
   .photo-gallery {
-    grid-template-columns: 1fr;
+    grid-auto-columns: 100%;
   }
 }
+
 
 
 .gallery-item img {

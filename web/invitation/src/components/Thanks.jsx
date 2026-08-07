@@ -4,6 +4,7 @@ import { useApp } from "../context/AppContext.jsx";
 import { getActiveGuests } from "../guests.js";
 import { resolveGuestName, resolveGuestPhoto } from "../guest-profiles.js";
 
+
 // Wedding planner contact used in the humorous "credits" mentions.
 const PLANNER = {
   label: "Manuel",
@@ -137,6 +138,8 @@ export function Thanks() {
           </a>
         </div>
       </div>
+
     </section>
   );
 }
+

@@ -1,0 +1,21 @@
+// ── Responsive: tablet and below ────────────────────────────────────────
+@use "tokens" as *;
+
+@media (max-width: $bp-tablet) {
+  .topbar {
+    grid-template-columns: 1fr;
+  }
+
+  .lang-row {
+    justify-content: flex-start;
+  }
+
+  .hero::after {
+    font-size: clamp(46px, 18vw, 74px);
+  }
+
+  .page::before {
+    width: 140px;
+    height: 140px;
+  }
+}

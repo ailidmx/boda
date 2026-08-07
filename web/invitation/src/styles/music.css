@@ -5,46 +5,16 @@
    on mobile. The playlist section (heading | grid) stacks on tablet, and the
    playlist grid collapses to 1 column on mobile. */
 
-/* Tablet: lineup → 2 cols, playlist + open-stage stack. */
-@media (max-width: 900px) {
-  .music-lineup {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  .music-act {
-    border-right: 1px solid rgb(255 255 255 / 22%);
-    border-bottom: 1px solid rgb(255 255 255 / 22%);
-  }
-
+/* The music lineup is a single row of 4 cards on desktop. On mobile
+   (≤899px) the SwipeCardCarousel takes over and shows one card per slide,
+   so no intermediate grid is needed here. */
+@media (max-width: 899px) {
   .playlist-section,
   .open-stage {
     grid-template-columns: 1fr;
   }
 }
 
-/* Small phones: lineup → 1 col, playlist grid → 1 col. */
-@media (max-width: 600px) {
-  .music-lineup {
-    grid-template-columns: 1fr;
-  }
-
-  .music-act {
-    min-height: auto;
-  }
-
-  .playlist-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .playlist-card {
-    min-height: auto;
-  }
-
-  .suggestion-form,
-  .coast-form {
-    grid-template-columns: 1fr;
-  }
-}
 
 
 .music-section {
@@ -69,12 +39,40 @@
   border-right: 1px solid rgb(255 255 255 / 22%);
 }
 
-.music-act > span {
+.music-act__photo {
+  position: relative;
+  margin: -2rem -2rem 2rem;
+  overflow: hidden;
+}
+
+
+.music-act__photo img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.music-act__logo {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  object-fit: contain;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 92%);
+  box-shadow: 0 2px 10px rgb(0 0 0 / 35%);
+  padding: 0.25rem;
+}
+
+
+.music-act__number {
   color: #e4b968;
   font-size: 0.65rem;
 }
 
-.music-act > p {
+.music-act__moment {
   min-height: 3.5rem;
   margin-top: 4rem;
   color: rgb(255 255 255 / 62%);
@@ -86,6 +84,18 @@
 .music-act small {
   color: rgb(255 255 255 / 70%);
 }
+
+.music-act__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.music-act__links .text-link {
+  color: #e4b968;
+}
+
 
 .playlist-section {
   display: grid;

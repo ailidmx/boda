@@ -262,13 +262,13 @@ function RocaGallery({ images, alts, label, onOpen }) {
 
 
 
-// Desktop groups the six cards into two pages of three. Mobile groups them
-// into three pages of two to reduce the carousel's vertical footprint.
+// Desktop groups the six cards into two pages of three. Mobile shows one card
+// per slide (4:3) so each facility reads clearly on a small screen.
 function FacilitySlideset({ items, playbackPaused = false }) {
   const [active, setActive] = useState(0);
   const [playing, setPlaying] = useState(true);
   const [mobile, setMobile] = useState(() => window.matchMedia("(max-width: 899px)").matches);
-  const pageSize = mobile ? 2 : 3;
+  const pageSize = mobile ? 1 : 3;
   const pages = [];
   for (let i = 0; i < items.length; i += pageSize) {
     pages.push(items.slice(i, i + pageSize));

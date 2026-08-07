@@ -16,8 +16,9 @@
 .story-section .section-nav {
   grid-column: 1 / -1;
   align-self: end;
-  margin-top: clamp(0.5rem, 1.2vw, 1rem);
+  margin-top: auto;
 }
+
 
 
 
@@ -96,10 +97,10 @@
 
 
 /* Lead de la story stylisé comme une citation littéraire. */
-.story-lead {
+#story .story-lead {
   position: relative;
   max-width: 34rem;
-  margin: 0 0 1.25rem;
+  margin: 1.5rem 0 1.5rem;
   padding-left: 1.5rem;
 
   border-left: 2px solid var(--marigold);
@@ -139,6 +140,9 @@
   scrollbar-width: thin;
 }
 
+
+
+
 .chapala-photo {
   position: relative;
   display: block;
@@ -152,6 +156,8 @@
   cursor: pointer;
   scroll-snap-align: start;
 }
+
+
 
 .chapala-photo img {
   width: 100%;
@@ -184,15 +190,23 @@
 }
 
 .story-facts-close,
-.story-facts-fab {
+.story-facts-fab,
+.story-map-fab {
   display: none;
 }
 
+
 @media (max-width: 899px) {
+  /* Reduce chapala photo height on mobile so the section fits within 100vh. */
+  .chapala-photo {
+    aspect-ratio: 4 / 3;
+  }
+
   /* The explorer is removed from the mobile section flow so the Story slide
      stays compact. It becomes a modal only after the avatar FAB is pressed. */
   .story-footer {
     display: none;
+
   }
 
   .story-footer.is-mobile-open {
