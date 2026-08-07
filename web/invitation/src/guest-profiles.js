@@ -147,11 +147,11 @@ export function resolveGuestInvitationGroup(guest) {
  * update made by another guest (or by the sync pipeline) is reflected
  * automatically — no manual re-fetch needed.
  *
- * SECURITY: The read is scoped to the signed-in guest's OWN invitation group
- * (matching the Firestore rules' `guests` read rule). A guest must never
- * receive other groups' phone, cabin, room, table, payment, or admin data.
- * The couple (David & Aydé) pass their own group and read only their group's
- * records here; the dashboard reads the full collection separately.
+ * SECURITY: The Firestore rules now allow any invited guest to read any guest
+ * document so the accommodation section can resolve the cabin, room, and
+ * payment/coverage flags of every occupant sharing a cabin (a cabin can be
+ * shared by guests from different invitation groups). We therefore load the
+ * whole collection here. Writes remain strictly group-scoped.
  *
  * Call once at startup alongside loadGroupCustomContent(). Returns an
  * unsubscribe function for cleanup.
@@ -167,12 +167,9 @@ export function loadGuestProfiles(invitationGroup) {
   logDb("read:start", {
     collection: collections.guests,
     op: "onSnapshot",
-    where: { invitationGroup: group },
+    scope: "all-guests",
   });
-  const q = query(
-    collection(db, collections.guests),
-    where("invitationGroup", "==", group),
-  );
+  const q = query(collection(db, collections.guests));
 
   return onSnapshot(
     q,
@@ -189,22 +186,23 @@ export function loadGuestProfiles(invitationGroup) {
       logDb("read:success", {
         collection: collections.guests,
         op: "onSnapshot",
-        where: { invitationGroup: group },
+        scope: "all-guests",
         size: snapshot.size,
       });
-      console.log(`[guest-profiles] Live sync — ${snapshot.size} guest records (group: ${group})`);
+      console.log(`[guest-profiles] Live sync — ${snapshot.size} guest records (all guests)`);
     },
     (error) => {
       logDb("read:error", {
         collection: collections.guests,
         op: "onSnapshot",
-        where: { invitationGroup: group },
+        scope: "all-guests",
         error: error.message,
       });
       console.warn("[guest-profiles] Live sync failed", error.message);
     },
   );
 }
+
 
 
 
@@ -593,4 +591,23 @@ export function getGroupMembers(guest, allGuests) {
   const self = members.find((g) => g.id === guest.id);
   const others = members.filter((g) => g.id !== guest.id);
   return [self || guest, ...others];
+}
+
+/**
+ * Merge a static guest record with its live Firestore record (if loaded).
+ * Live fields (hosting, identity, contact, rsvp, etc.) override the static
+ * data, so callers can read the effective cabin, room, and payment flags.
+ * @param {Object} guest  static guest from guests.js
+ * @returns {Object}
+ */
+export function resolveLiveGuest(guest) {
+  if (!guest) return null;
+  const record = guestsCache.get(guest.id);
+  if (!record) return guest;
+  return {
+    ...guest,
+    ...Object.fromEntries(
+      Object.entries(record).filter(([, v]) => v !== undefined),
+    ),
+  };
 }

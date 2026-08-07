@@ -679,6 +679,16 @@
   color: rgb(255 255 255 / 90%);
   font-size: 0.72rem;
   line-height: 1.35;
+  /* Keep the notice inside its container: grid items default to
+     min-width:auto, which lets long text (e.g. the French warning) blow
+     past the card edge. min-width:0 lets the text wrap instead. */
+  min-width: 0;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.user-menu__notice > * {
+  min-width: 0;
 }
 
 .user-menu__notice-title {
@@ -686,6 +696,7 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
+
 
 .user-menu__current-email {
   display: grid;
@@ -735,6 +746,17 @@
   color: #f6d48a;
 }
 
+/* Success message shown in its own modal (after changing email/password).
+   Larger, centered text so it reads as a confirmation rather than a cramped
+   inline note inside the dropdown. */
+.user-menu__status--modal {
+  margin: 0.25rem 0 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+
 .user-menu-modal__overlay {
   position: fixed;
   inset: 0;
@@ -756,7 +778,13 @@
   background: linear-gradient(180deg, rgb(25 23 18 / 96%), rgb(19 18 14 / 96%));
   box-shadow: 0 24px 58px rgb(0 0 0 / 42%);
   color: var(--white);
+  /* The modal lives inside .site-header__actions, which sets
+     white-space: nowrap. That nowrap is inherited by the modal and prevents
+     the notice text from wrapping, so it bleeds out of the card. Reset it
+     here so all modal text wraps normally. */
+  white-space: normal;
 }
+
 
 .user-menu-modal__close {
   position: absolute;

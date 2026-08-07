@@ -96,17 +96,15 @@ export function Weather() {
             className={`weather-slideset__slide weather-slideset__slide--moments${mobileSlide === 1 ? " is-active" : ""}`}
           >
             <div className="weather-day reveal">
-              <ol className="weather-moments">
+              <div className="weather-moments">
                 {weather.moments.map((moment, index) => (
-                  <li key={index}>
-                    <time>{moment.time}</time>
-                    <div>
-                      <h3>{moment.title}</h3>
-                      <p>{moment.body}</p>
-                    </div>
-                  </li>
+                  <article className="weather-moment reveal" key={index}>
+                    <strong>{moment.time}</strong>
+                    <span>{moment.title}</span>
+                    <small>{moment.body}</small>
+                  </article>
                 ))}
-              </ol>
+              </div>
               <aside className="weather-advice">
                 <h3>{weather.adviceTitle}</h3>
                 <ul>

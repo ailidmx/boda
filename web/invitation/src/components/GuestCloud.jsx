@@ -158,8 +158,9 @@ export function GuestCloud() {
   const hasCarousel = avatars.length > 0;
 
   return (
-    <section className="guest-cloud-section section" id="guests">
+    <div className="guest-cloud-section">
       <div className="guest-cloud-frame">
+
         <div className="section-heading guest-cloud-heading">
           <p className="eyebrow">{cloud.eyebrow}</p>
           <h2 className="guest-cloud-title">{cloud.title}</h2>
@@ -250,6 +251,7 @@ export function GuestCloud() {
           </div>
         </div>
       )}
-    </section>
+    </div>
   );
 }
+

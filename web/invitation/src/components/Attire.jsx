@@ -167,8 +167,8 @@ export function Attire() {
       )}
 
       <nav className="attire-nav" aria-label="Attire navigation">
-        <a className="attire-nav-link" href="#weekend-program">
-          <span>{weekend.navProgram}</span>
+        <a className="attire-nav-link" href="#weather">
+          <span>{t.nav.weather}</span>
           <span aria-hidden="true">↓</span>
         </a>
       </nav>

@@ -1,0 +1,27 @@
+// ── Base: reset, global layout ──────────────────────────────────────────
+@use "tokens" as *;
+
+:root {
+  color: $ink;
+  background: $bg;
+  font-family: $font-body;
+  font-synthesis: none;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  background:
+    radial-gradient(circle at top left, rgba(163, 125, 64, 0.16), transparent 28rem),
+    $bg;
+}
+
+button,
+a {
+  font: inherit;
+}
+
+.dashboard,
+.dashboard-login {
+  min-height: 100vh;
+}

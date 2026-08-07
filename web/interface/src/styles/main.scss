@@ -1,0 +1,11 @@
+// ── Interface main stylesheet ───────────────────────────────────────────
+// Entry point: imports all partials in dependency order.
+// Import this file from your JS entry point (e.g. main.jsx).
+
+@use "tokens";
+@use "base";
+@use "themes";
+@use "layout";
+@use "components";
+@use "animations";
+@use "responsive";

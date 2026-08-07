@@ -1,4 +1,4 @@
-import "./dashboard.css";
+import "./styles/main.scss";
 import { startDashboard } from "./dashboard.js";
 
 const container = document.querySelector("#app");

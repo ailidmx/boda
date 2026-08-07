@@ -1,0 +1,102 @@
+// ── Modal overlay & dialog ──────────────────────────────────────────────
+@use "tokens" as *;
+
+.dashboard-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(30, 24, 16, 0.55);
+  backdrop-filter: blur(3px);
+}
+
+.dashboard-modal {
+  width: min(100%, 40rem);
+  max-height: 90vh;
+  overflow-y: auto;
+  border: 1px solid $border-strong;
+  border-radius: 1.25rem;
+  background: $cream-light;
+  box-shadow: $shadow-modal;
+}
+
+.dashboard-modal-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid $border-light;
+
+  h3 {
+    margin: 0;
+    font-family: $font-display;
+    font-size: 1.5rem;
+    font-weight: 400;
+  }
+}
+
+.dashboard-modal-close {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.4rem;
+  line-height: 1;
+  color: $ink-muted;
+  transition: color 0.15s;
+
+  &:hover {
+    color: $ink;
+  }
+}
+
+.dashboard-modal-body {
+  padding: 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.dashboard-modal-field {
+  display: grid;
+  gap: 0.3rem;
+
+  label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $dark;
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 0.6rem 0.75rem;
+    border: 1px solid $border-strong;
+    border-radius: 0.5rem;
+    background: $white;
+    font: inherit;
+    font-size: 0.9rem;
+    transition: border-color 0.15s, box-shadow 0.15s;
+
+    &:focus {
+      outline: none;
+      border-color: $accent;
+      box-shadow: 0 0 0 2px rgba(138, 106, 54, 0.12);
+    }
+  }
+}
+
+.dashboard-modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 0.5rem;
+}
+
+.dashboard-modal-error {
+  color: #a0352c;
+  font-size: 0.85rem;
+}

@@ -442,15 +442,16 @@ service cloud.firestore {
 
     match /guests/{guestId} {
 
-      // READ SCOPE: Administrators may read any guest. A regular authenticated
-      // guest may only read members of their OWN invitation group (resolved
-      // from `guests/{auth.uid}.invitationGroup`). This prevents a guest from
-      // seeing other groups' phone, cabin, room, table, payment, and admin
-      // data. The rule is query-compatible: a list query MUST filter by
-      // `where('invitationGroup', '==', <myGroup>)` for it to succeed.
+      // READ SCOPE: Administrators may read any guest. Any invited guest may
+      // also read any guest document so the accommodation section can resolve
+      // the cabin, room, and payment/coverage flags of every occupant sharing
+      // a cabin (a cabin can be shared by guests from different invitation
+      // groups). This intentionally relaxes the previous group-only read so
+      // the "Prix du gîte" reflects the whole cabin, not just the signed-in
+      // group's share. Writes remain strictly group-scoped.
       allow read: if isAdmin()
-        || (request.auth != null
-            && resource.data.invitationGroup == editorInvitationGroup());
+        || isInvitedGuest();
+
       // AGREED SCHEMA ENFORCEMENT: ALL writes must pass the schema validation.
       // Administrators use hasValidAdminGuestFields() (may additionally modify
       // `invitationGroup` and `_deleted`); regular guests use
@@ -567,9 +568,10 @@ service cloud.firestore {
           "id", "name", "capacity", "totalPrice2Nights",
           "pricePerPerson2Nights", "isPrivate",
           "isBooked", "isBookedXtra", "isPaid", "isPaidXtra",
-          "capacityRoomCheck", "showcase", "cloudinaryIds",
+          "capacityRoomCheck", "cloudinaryIds", "key", "updatedAt",
           "_source", "_migratedAt", "_showcaseMigratedAt"
         ])
+
         && isShortText(request.resource.data.id, 100)
         && request.resource.data.id.size() > 0
         && isShortText(request.resource.data.name, 150)
@@ -591,13 +593,11 @@ service cloud.firestore {
         && (!request.resource.data.keys().hasAny(["capacityRoomCheck"])
           || request.resource.data.capacityRoomCheck is int)
         && (!request.resource.data.keys().hasAny(["cloudinaryIds"])
-          || isShortText(request.resource.data.cloudinaryIds, 2000))
-        && (!request.resource.data.keys().hasAny(["showcase"])
-          || (request.resource.data.showcase is map
-            && request.resource.data.showcase.keys().hasOnly(["es", "fr", "en"])
-            && request.resource.data.showcase.es is map
-            && request.resource.data.showcase.fr is map
-            && request.resource.data.showcase.en is map));
+          || (request.resource.data.cloudinaryIds is list
+            && request.resource.data.cloudinaryIds.size() <= 50
+            && request.resource.data.cloudinaryIds.all(id, id is string && id.size() <= 200)));
+
+
     }
 
     match /cabins/{cabinId} {

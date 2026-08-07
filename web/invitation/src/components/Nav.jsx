@@ -13,16 +13,24 @@ const NAV_LINKS = [
 
   ["venue", "#venue"],
   ["weekend", "#weekend"],
+
   ["attire", "#attire"],
+
   ["weather", "#weather"],
   ["programme", "#weekend-program"],
+  ["petanque", "#petanque"],
   ["accommodation", "#accommodation"],
+  ["food", "#food"],
+  ["music", "#music"],
+  ["coast", "#coast"],
   ["travel", "#travel"],
-  ["gift", "#gift"],
   ["photos", "#photos"],
-  ["thanks", "#thanks"],
   ["guests", "#guests"],
+  ["gift", "#gift"],
+  ["thanks", "#thanks"],
 ];
+
+
 
 
 
@@ -50,11 +58,16 @@ function UserMenu() {
   const [open, setOpen] = useState(false);
   const [accountModal, setAccountModal] = useState(null); // null | "email" | "password"
   const [password, setPassword] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [draftEmail, setDraftEmail] = useState("");
   const [reauthPassword, setReauthPassword] = useState("");
   const [needsReauth, setNeedsReauth] = useState(false);
-  const [menuStatus, setMenuStatus] = useState(null); // { type, text }
+  const [successModal, setSuccessModal] = useState(null); // string message
+  const [errorModal, setErrorModal] = useState(null); // string message
   const [modalStatus, setModalStatus] = useState(null); // { type, text }
+
+
   const [busy, setBusy] = useState(false);
   const menuRef = useRef(null);
 
@@ -77,9 +90,9 @@ function UserMenu() {
     const onDocClick = (event) => {
       if (menuRef.current && !menuRef.current.contains(event.target)) {
         setOpen(false);
-        setMenuStatus(null);
       }
     };
+
     document.addEventListener("mousedown", onDocClick);
     return () => document.removeEventListener("mousedown", onDocClick);
   }, [open]);
@@ -113,6 +126,8 @@ function UserMenu() {
     setBusy(false);
     setModalStatus(null);
     setPassword("");
+    setCurrentPassword("");
+    setConfirmPassword("");
     setDraftEmail(currentEmail);
     setReauthPassword("");
     setNeedsReauth(false);
@@ -130,19 +145,34 @@ function UserMenu() {
 
   const handlePasswordSubmit = async (event) => {
     event.preventDefault();
+    if (!currentPassword.trim()) {
+      setModalStatus({ type: "error", text: nav.passwordReauthRequired });
+      return;
+    }
     if (password.length < 6) {
       setModalStatus({ type: "error", text: nav.passwordError });
+      return;
+    }
+    if (password !== confirmPassword) {
+      setModalStatus({ type: "error", text: nav.passwordMismatch });
       return;
     }
     setBusy(true);
     setModalStatus(null);
     try {
-      await changePassword(password);
-      setMenuStatus({ type: "success", text: nav.passwordSuccess });
+      await changePassword(currentPassword, password);
+      setSuccessModal(nav.passwordSuccess);
       setPassword("");
+      setCurrentPassword("");
+      setConfirmPassword("");
       closeAccountModal();
     } catch (error) {
-      setModalStatus({ type: "error", text: nav.passwordError });
+
+      if (error?.code === "auth/wrong-password" || error?.code === "auth/invalid-credential") {
+        setModalStatus({ type: "error", text: nav.passwordWrongCurrent });
+      } else {
+        setModalStatus({ type: "error", text: nav.passwordError });
+      }
     } finally {
       setBusy(false);
     }
@@ -151,14 +181,15 @@ function UserMenu() {
   const applyEmailChange = async () => {
     const result = await changeEmail(draftEmail.trim());
     if (result?.status === "verification-sent") {
-      setMenuStatus({ type: "success", text: nav.emailVerificationSent || identity.emailVerificationSent });
+      setSuccessModal(nav.emailVerificationSent || identity.emailVerificationSent);
     } else if (result?.status === "unchanged") {
-      setMenuStatus({ type: "success", text: nav.emailUnchanged || nav.emailSuccess });
+      setSuccessModal(nav.emailUnchanged || nav.emailSuccess);
     } else {
-      setMenuStatus({ type: "success", text: nav.emailSuccess });
+      setSuccessModal(nav.emailSuccess);
     }
     closeAccountModal();
   };
+
 
   const handleEmailSubmit = async (event) => {
     event.preventDefault();
@@ -168,7 +199,10 @@ function UserMenu() {
       return;
     }
 
-    if (needsReauth && !reauthPassword.trim()) {
+    // The current password is always required: we re-authenticate FIRST so the
+    // session is recent, and only then attempt the email change. This avoids
+    // the auth/requires-recent-login error entirely.
+    if (!reauthPassword.trim()) {
       setModalStatus({ type: "error", text: nav.emailReauthPasswordRequired || nav.passwordError });
       return;
     }
@@ -176,23 +210,41 @@ function UserMenu() {
     setBusy(true);
     setModalStatus(null);
     try {
-      if (needsReauth) {
-        await reauthenticate(reauthPassword.trim());
-        setNeedsReauth(false);
-        setReauthPassword("");
-      }
+      // Re-authenticate with the current password, then change the email.
+      await reauthenticate(reauthPassword.trim());
       await applyEmailChange();
     } catch (error) {
-      if (error?.code === "auth/requires-recent-login") {
-        setNeedsReauth(true);
-        setModalStatus({ type: "info", text: nav.emailReauthRequired });
+      const code = error?.code || "";
+      if (code === "auth/wrong-password" || code === "auth/invalid-credential") {
+        setModalStatus({ type: "error", text: nav.passwordWrongCurrent });
+      } else if (code === "auth/requires-recent-login") {
+        // Should not happen after a successful re-auth, but handle it safely:
+        // close the account modal and show a clear error.
+        closeAccountModal();
+        setErrorModal(nav.emailReauthRequired);
+      } else if (
+        code === "auth/unauthorized-domain" ||
+        code === "auth/operation-not-allowed" ||
+        code === "auth/invalid-action-code"
+      ) {
+        // The verification email could not be sent because the current origin
+        // is not in the Firebase "Authorized domains" list (common on
+        // localhost). Surface a clear message instead of a generic failure.
+        setModalStatus({
+          type: "error",
+          text: nav.emailDomainError || nav.emailError || identity.emailUpdateError,
+        });
       } else {
-        setModalStatus({ type: "error", text: nav.emailError || identity.emailUpdateError || nav.passwordError });
+        setModalStatus({
+          type: "error",
+          text: nav.emailError || identity.emailUpdateError || nav.passwordError,
+        });
       }
     } finally {
       setBusy(false);
     }
   };
+
 
   return (
     <div className="user-menu" ref={menuRef}>
@@ -221,6 +273,16 @@ function UserMenu() {
       {open && (
         <div className="user-menu__dropdown">
           <>
+            {isAdmin && (
+              <a
+                className="user-menu__item user-menu__item--admin"
+                href="/dashboard"
+                onClick={() => setOpen(false)}
+              >
+                <span className="user-menu__item-icon">📊</span>
+                {nav.dashboard}
+              </a>
+            )}
             <div className="user-menu__section" role="group" aria-label="Language">
               <span className="user-menu__section-label">Language</span>
               <div className="user-menu__langs">
@@ -248,16 +310,6 @@ function UserMenu() {
               <span className="user-menu__item-icon">🪪</span>
               {identity.eyebrow}
             </button>
-            {isAdmin && (
-              <a
-                className="user-menu__item user-menu__item--admin"
-                href="/dashboard"
-                onClick={() => setOpen(false)}
-              >
-                <span className="user-menu__item-icon">📊</span>
-                {nav.dashboard}
-              </a>
-            )}
             <button
               className="user-menu__item"
               type="button"
@@ -298,15 +350,10 @@ function UserMenu() {
               <span className="user-menu__item-icon">↪</span>
               {nav.logout}
             </button>
-
-            {menuStatus && (
-              <p className={`user-menu__status user-menu__status--${menuStatus.type}`}>
-                {menuStatus.text}
-              </p>
-            )}
           </>
         </div>
       )}
+
 
       {accountModal && (
         <div
@@ -356,19 +403,16 @@ function UserMenu() {
                   autoFocus
                 />
 
-                {needsReauth && (
-                  <>
-                    <label htmlFor="account-modal-reauth">{nav.emailReauthLabel}</label>
-                    <input
-                      id="account-modal-reauth"
-                      type="password"
-                      value={reauthPassword}
-                      placeholder={nav.emailReauthPlaceholder}
-                      onChange={(e) => setReauthPassword(e.target.value)}
-                      autoComplete="current-password"
-                    />
-                  </>
-                )}
+                <label htmlFor="account-modal-reauth">{nav.emailReauthLabel}</label>
+                <input
+                  id="account-modal-reauth"
+                  type="password"
+                  value={reauthPassword}
+                  placeholder={nav.emailReauthPlaceholder}
+                  onChange={(e) => setReauthPassword(e.target.value)}
+                  autoComplete="current-password"
+                />
+
 
                 {modalStatus && (
                   <p className={`user-menu__status user-menu__status--${modalStatus.type}`}>
@@ -395,6 +439,17 @@ function UserMenu() {
               </form>
             ) : (
               <form className="user-menu-modal__form" onSubmit={handlePasswordSubmit}>
+                <label htmlFor="account-modal-current-password">{nav.currentPasswordLabel}</label>
+                <input
+                  id="account-modal-current-password"
+                  type="password"
+                  value={currentPassword}
+                  placeholder={nav.currentPasswordPlaceholder}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  autoComplete="current-password"
+                  autoFocus
+                />
+
                 <label htmlFor="account-modal-password">{nav.newPasswordLabel}</label>
                 <input
                   id="account-modal-password"
@@ -402,7 +457,17 @@ function UserMenu() {
                   value={password}
                   placeholder={nav.newPasswordPlaceholder}
                   onChange={(e) => setPassword(e.target.value)}
-                  autoFocus
+                  autoComplete="new-password"
+                />
+
+                <label htmlFor="account-modal-confirm-password">{nav.confirmPasswordLabel}</label>
+                <input
+                  id="account-modal-confirm-password"
+                  type="password"
+                  value={confirmPassword}
+                  placeholder={nav.confirmPasswordPlaceholder}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  autoComplete="new-password"
                 />
 
                 {modalStatus && (
@@ -432,11 +497,97 @@ function UserMenu() {
           </div>
         </div>
       )}
+
+      {successModal && (
+        <div
+          className="user-menu-modal__overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="success-modal-title"
+          onClick={() => setSuccessModal(null)}
+        >
+          <div
+            className="user-menu-modal__card"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              className="user-menu-modal__close"
+              type="button"
+              aria-label={nav.cancel}
+              onClick={() => setSuccessModal(null)}
+            >
+              ✕
+            </button>
+
+            <h3 id="success-modal-title" className="user-menu-modal__title">
+              {nav.successTitle || "✓"}
+            </h3>
+
+            <p className="user-menu__status user-menu__status--success user-menu__status--modal">
+              {successModal}
+            </p>
+
+            <div className="user-menu-modal__actions">
+              <button
+                className="user-menu-modal__btn user-menu-modal__btn--primary"
+                type="button"
+                onClick={() => setSuccessModal(null)}
+              >
+                {nav.ok || nav.close || "OK"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {errorModal && (
+        <div
+          className="user-menu-modal__overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="error-modal-title"
+          onClick={() => setErrorModal(null)}
+        >
+          <div
+            className="user-menu-modal__card"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              className="user-menu-modal__close"
+              type="button"
+              aria-label={nav.cancel}
+              onClick={() => setErrorModal(null)}
+            >
+              ✕
+            </button>
+
+            <h3 id="error-modal-title" className="user-menu-modal__title">
+              {nav.emailErrorTitle || "⚠️"}
+            </h3>
+
+            <p className="user-menu__status user-menu__status--error user-menu__status--modal">
+              {errorModal}
+            </p>
+
+            <div className="user-menu-modal__actions">
+              <button
+                className="user-menu-modal__btn user-menu-modal__btn--primary"
+                type="button"
+                onClick={() => setErrorModal(null)}
+              >
+                {nav.ok || nav.close || "OK"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
+
 // Mobile navigation: a custom dropdown that mirrors the desktop nav's golden
+
 // underline treatment. It is borderless and translucent so it feels like a
 // floating, integrated menu rather than a boxed control.
 function MobileNav({ activeKey }) {

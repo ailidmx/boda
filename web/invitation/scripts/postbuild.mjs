@@ -1,16 +1,14 @@
 /**
  * Post-build step for the invitation.
  *
- * Runs after `vite build` and:
- *   1. Writes `dist/version.json` with the exact build number so the running
- *      app can compare itself against the latest deployed version and force a
- *      reload when a new release ships (cache-busting for stale tabs).
- *   2. Injects the build number into `dist/sw.js`'s CACHE_VERSION so the
- *      service worker cache is invalidated on every deploy (prevents the SW
- *      from serving a stale app shell).
+ * NOTE: This script is now largely redundant. The build number is computed ONCE
+ * in vite.config.js and a Vite plugin (`writeVersionArtifacts`) writes
+ * `dist/version.json` and injects the SW cache version using that SAME value.
  *
- * The build number format matches vite.config.js: a short UTC timestamp
- * (YYYYMMDD-HHMM) that changes on every build.
+ * This script is kept only as a manual fallback. To avoid reintroducing the
+ * infinite-reload bug (where a separately-recomputed timestamp differed from
+ * the bundle's by a minute), it READS the build number from the already-written
+ * `dist/version.json` instead of recomputing it.
  */
 import { readFileSync, writeFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -19,15 +17,23 @@ import { dirname, join } from "node:path";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dist = join(__dirname, "..", "dist");
 
-// Same format as vite.config.js so the footer and version.json agree.
-const BUILD_NUMBER = new Date()
-  .toISOString()
-  .replace(/[-:]/g, "")
-  .replace("T", "-")
-  .slice(0, 13);
-
-// 1. Write version.json
+// Read the build number from version.json (written by the Vite plugin) so it
+// always matches the bundle's __BUILD_NUMBER__. Never recompute it here.
 const versionPath = join(dist, "version.json");
+let BUILD_NUMBER = null;
+if (existsSync(versionPath)) {
+  try {
+    BUILD_NUMBER = JSON.parse(readFileSync(versionPath, "utf8")).build;
+  } catch {
+    BUILD_NUMBER = null;
+  }
+}
+if (!BUILD_NUMBER) {
+  console.error("❌ version.json not found or invalid — run `vite build` first.");
+  process.exit(1);
+}
+
+// 1. (Re)write version.json with the same build number (idempotent).
 writeFileSync(versionPath, JSON.stringify({ build: BUILD_NUMBER }, null, 2) + "\n");
 console.log(`📄 Wrote ${versionPath} → build ${BUILD_NUMBER}`);
 
@@ -48,3 +54,4 @@ if (existsSync(swPath)) {
 }
 
 console.log("✅ Post-build complete.");
+

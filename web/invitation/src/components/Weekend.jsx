@@ -190,19 +190,8 @@ function DayProgramSlideset({ programs }) {
 
       </div>
 
-      {/* In-page warning / info panel (desktop). The long travel disclaimer
-          (e.g. the Guadalajara note) lives here instead of cluttering the
-          header citation. */}
-      {current.warning && (
-        <div className="weekend-program__warning">
-          <span className="weekend-program__warning-icon" aria-hidden="true">
-            <WarningIcon />
-          </span>
-          <p>{current.warning}</p>
-        </div>
-      )}
-
       <nav className="weekend-nav weekend-nav--light" aria-label="Programme navigation">
+
         <a className="weekend-nav-link" href="#accommodation">
           <span>{nav.accommodation}</span>
           <span aria-hidden="true">↓</span>
