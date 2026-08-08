@@ -1,23 +1,194 @@
 /* ── Coast / beach section ────────────────────────────────────────────── */
 
 .coast-section {
+  position: relative;
   display: grid;
   grid-template-columns: 1fr 0.9fr;
   gap: clamp(3rem, 8vw, 8rem);
   align-items: start;
-  background: #264b52;
+  min-width: 0;
+  overflow: hidden;
+  /* Beach story — a clear sky at the top that melts into the sea, then the
+     sandy shore at the bottom. The decorative scene elements (sun, birds,
+     boats, sparkles, beach) layer on top of this gradient. */
+  background:
+    linear-gradient(180deg,
+      #7ec8e3 0%,
+      #a8dcef 34%,
+      #cfeef7 46%,
+      #2f7f9e 47%,
+      #1f5f7d 62%,
+      #174a63 78%,
+      #e8d9a8 79%,
+      #f3e6bd 100%);
   color: var(--white);
 }
+
+/* ── Beach story backdrop ────────────────────────────────────────────────
+   A decorative, layered scene that reads top-to-bottom: sky with a sun in
+   the top-right corner → horizon with birds & boats → sparkling sea → sandy
+   beach. It sits absolutely behind the section content. */
+.coast-scene {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Sun — a soft glowing disc in the top-right corner of the sky. */
+.coast-scene__sun {
+  position: absolute;
+  top: 6%;
+  right: 8%;
+  width: clamp(4rem, 9vw, 8rem);
+  height: clamp(4rem, 9vw, 8rem);
+  border-radius: 50%;
+  background: radial-gradient(circle at 38% 35%, #fff7d6 0%, #ffe9a3 45%, rgb(255 214 120 / 0%) 72%);
+  box-shadow: 0 0 3rem 1.5rem rgb(255 233 163 / 45%);
+  animation: coast-sun-glow 6s ease-in-out infinite alternate;
+}
+
+@keyframes coast-sun-glow {
+  from { box-shadow: 0 0 2.5rem 1rem rgb(255 233 163 / 40%); }
+  to   { box-shadow: 0 0 4rem 2rem rgb(255 233 163 / 55%); }
+}
+
+/* Birds — small symbolic "M" strokes drifting across the sky. */
+.coast-scene__birds {
+  position: absolute;
+  top: 16%;
+  left: 6%;
+  width: 34%;
+  height: auto;
+  color: rgb(255 255 255 / 85%);
+  animation: coast-birds-drift 26s ease-in-out infinite alternate;
+}
+
+@keyframes coast-birds-drift {
+  from { transform: translateX(0); }
+  to   { transform: translateX(2.5rem); }
+}
+
+/* Boats — symbolic hulls with a sail, sitting on the horizon line. */
+.coast-scene__boats {
+  position: absolute;
+  top: 44%;
+  left: 4%;
+  width: 42%;
+  height: auto;
+  color: rgb(20 40 44 / 85%);
+}
+
+.coast-scene__boat--2 {
+  transform: translate(30%, 12%) scale(0.8);
+  opacity: 0.85;
+}
+
+/* Sparkles — tiny twinkling lights scattered across the sea. */
+.coast-scene__sparkle {
+  position: absolute;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: #fffbe8;
+  box-shadow: 0 0 0.6rem 0.15rem rgb(255 251 232 / 80%);
+  animation: coast-sparkle 3.2s ease-in-out infinite;
+}
+
+.coast-scene__sparkle--1 { top: 52%; left: 12%; animation-delay: 0s; }
+.coast-scene__sparkle--2 { top: 58%; left: 30%; animation-delay: 0.6s; }
+.coast-scene__sparkle--3 { top: 55%; left: 48%; animation-delay: 1.1s; }
+.coast-scene__sparkle--4 { top: 62%; left: 66%; animation-delay: 0.3s; }
+.coast-scene__sparkle--5 { top: 54%; left: 82%; animation-delay: 1.6s; }
+.coast-scene__sparkle--6 { top: 68%; left: 20%; animation-delay: 2s; }
+.coast-scene__sparkle--7 { top: 66%; left: 55%; animation-delay: 0.9s; }
+.coast-scene__sparkle--8 { top: 60%; left: 90%; animation-delay: 1.3s; }
+
+@keyframes coast-sparkle {
+  0%, 100% { opacity: 0.15; transform: scale(0.6); }
+  50%      { opacity: 1;    transform: scale(1.25); }
+}
+
+/* Beach — a soft sandy shore with a gentle wave line at the top. */
+.coast-scene__beach {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 21%;
+  background:
+    radial-gradient(120% 90% at 50% 0%, rgb(255 255 255 / 35%), transparent 55%),
+    linear-gradient(180deg, #e8d9a8 0%, #f3e6bd 100%);
+}
+
+/* Keep the section content above the decorative scene. */
+.coast-section > *:not(.coast-scene) {
+  position: relative;
+  z-index: 1;
+}
+
+
 
 .coast-copy h2 {
   margin-bottom: 2rem;
 }
+
+/* Allow the left column to shrink so the horizontal photo strip never bleeds
+   out of its grid track on desktop. */
+.coast-copy {
+  min-width: 0;
+  /* A soft translucent dark panel keeps the white text legible over the
+     bright sky and sandy beach of the backdrop scene. */
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  border-radius: 1.25rem;
+  background: rgb(15 40 50 / 42%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
 
 /* The coast section sits on a dark background, so the shared section-heading
    separator uses a light border instead of the default dark one. */
 .coast-copy .section-heading {
   border-bottom-color: rgb(255 255 255 / 25%);
 }
+
+/* The coast intro line is styled as a literary citation: a marigold left
+   rule, display serif, italic, with a large opening quote mark. */
+.coast-copy .section-heading .lead {
+  position: relative;
+  max-width: 40rem;
+  margin: 1.5rem 0 0;
+  padding-left: 1.5rem;
+  border-left: 2px solid var(--marigold);
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2.2vw, 1.7rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--white);
+}
+
+.coast-copy .section-heading .lead::before {
+  content: "“";
+  position: absolute;
+  top: -0.35em;
+  left: -0.15rem;
+  font-family: var(--font-display);
+  font-size: 3.5em;
+  line-height: 1;
+  color: var(--marigold);
+  opacity: 0.35;
+}
+
+@media (max-width: 899px) {
+  .coast-copy .section-heading .lead {
+    font-size: clamp(1rem, 4.5vw, 1.2rem);
+    padding-left: 1.1rem;
+  }
+}
+
 
 .coast-ideas {
   margin-top: 3rem;
@@ -49,26 +220,280 @@
   font-size: 0.8rem;
 }
 
-.coast-form-wrap {
-  padding: clamp(2rem, 4vw, 4rem);
-  background: var(--sand);
-  color: var(--ink);
+/* Barra de Navidad photo strip, mirroring the Chapala slideset: a horizontal
+   scroll-snap strip that is swipable on mobile and shows as a tidy row on
+   desktop. The wrapper keeps the strip inside its grid column (no bleeding)
+   and hosts the thin, borderless prev/next controls. */
+.barra-carousel {
+  min-width: 0;
+  margin-top: 1.5rem;
 }
 
-.coast-form-wrap > p:not(.eyebrow) {
-  margin-bottom: 2rem;
+.barra-photos {
+  display: grid;
+  grid-auto-columns: minmax(15rem, 20rem);
+  grid-auto-flow: column;
+  gap: 0.8rem;
+  overflow-x: auto;
+  padding-bottom: 1.25rem;
+
+  scroll-snap-type: x mandatory;
+  scrollbar-color: #e4b968 rgb(255 255 255 / 18%);
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
 }
 
-.coast-form-wrap h3 {
-  margin: 0 0 1.5rem;
+.barra-photo {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  margin: 0;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  scroll-snap-align: start;
+}
+
+.barra-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 700ms ease;
+}
+
+.barra-photo:hover img {
+  transform: scale(1.04);
+}
+
+/* Thin, borderless prev/next controls, matching the shared mobile carousel
+   pattern (no rounded borders, transparent background). */
+.barra-carousel__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.barra-carousel__arrow {
+  display: inline-grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  color: #e4b968;
+  font-size: 1.25rem;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 200ms ease;
+}
+
+.barra-carousel__arrow:hover,
+.barra-carousel__arrow:focus-visible {
+  color: var(--white);
+  background: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+.barra-carousel__arrow:focus-visible {
+  outline: 2px solid var(--marigold);
+  outline-offset: 2px;
+}
+
+@media (max-width: 899px) {
+  .barra-photo {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+
+/* ── Mini RSVP (replaces the old "Sondage sans engagement" form) ───────────
+   A compact card in the right column asking each guest how likely they are
+   to join each "Et après ?" plan. It reuses the shared RSVP components
+   ("¡Te animas!" look) with the scale variant — one row per guest with a
+   0–5 selector. Sits on a translucent dark panel over the beach backdrop. */
+.coast-rsvp-mini {
+  display: grid;
+  gap: 1.5rem;
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: 1.25rem;
+  background: rgb(15 40 50 / 42%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  color: var(--white);
+  text-align: left;
+}
+
+.coast-rsvp-mini-head .eyebrow {
+  color: var(--marigold);
+}
+
+.coast-rsvp-mini-head h3 {
+  margin: 0 0 0.5rem;
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+}
+
+.coast-rsvp-mini-intro {
+  margin: 0;
+  max-width: 46rem;
+  color: rgb(255 253 248 / 78%);
+}
+
+/* The shared RsvpQuestion blocks (scale variant) and RsvpRecap summary
+   render inside the mini card. Their own styles live in rsvp.css; here we
+   only stack them and align the save button. */
+.coast-rsvp-questions {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.coast-rsvp-save {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.coast-rsvp-save .button {
+  justify-self: start;
+  margin: 0;
+}
+
+.coast-rsvp-save small {
+  color: #e4b968;
+  font-size: 0.9rem;
+}
+
+
+
+/* ── Coast accommodation suggestions ────────────────────────────────────────
+   The coast section is a two-column grid; the suggestions block spans both
+   columns and reuses the Accommodation "no cabin" card pattern. */
+.coast-suggestions {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin-top: clamp(3rem, 6vw, 5rem);
+  padding: clamp(2rem, 4vw, 3rem);
+  border-radius: 1.25rem;
+  background: rgb(15 40 50 / 42%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+
+/* The suggestions block reuses the Accommodation card pattern, whose
+   horizontal carousels (Airbnb + hotels) must stay inside their grid track.
+   `min-width: 0` lets the grid column shrink so the scroll-snap strips never
+   bleed past the section edge. */
+.coast-suggestions .accommodation-airbnb {
+  min-width: 0;
+}
+
+.coast-suggestions .accommodation-airbnb-list {
+  min-width: 0;
+}
+
+
+.coast-suggestions .section-heading {
+  border-bottom-color: rgb(255 255 255 / 25%);
+}
+
+.coast-suggestions .section-heading h3 {
+  margin: 0 0 1rem;
   font-family: var(--font-display);
   font-size: clamp(1.8rem, 3vw, 2.8rem);
   font-weight: 400;
   line-height: 1.05;
 }
 
-.coast-form {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
+.coast-suggestions .section-heading .lead {
+  color: rgb(255 255 255 / 82%);
 }
+
+/* The suggestions intro is a citation (blockquote): a large display quote
+   with a golden left rule and quotation marks, echoing the travel citation. */
+.coast-suggestions-citation {
+  position: relative;
+  margin: 0;
+  max-width: 46rem;
+  padding: 0.25rem 0 0.25rem 1.75rem;
+  border-left: 3px solid var(--marigold);
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2.2vw, 1.6rem);
+  line-height: 1.5;
+  color: #f3e6c8;
+}
+
+.coast-suggestions-citation::before {
+  content: "“";
+  position: absolute;
+  top: -0.55em;
+  left: 0.35rem;
+  font-family: var(--font-display);
+  font-size: 2.6em;
+  line-height: 1;
+  color: var(--marigold);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* The accommodation cards are designed for a light background; on the dark
+   coast section we give them a slightly translucent dark surface so the
+   gradient image and text stay legible. */
+
+.coast-suggestions .accommodation-stay-card {
+  background: rgb(20 40 44 / 55%);
+  border-color: rgb(255 255 255 / 18%);
+}
+
+.coast-suggestions .accommodation-stay-card:hover {
+  border-color: var(--marigold);
+}
+
+.coast-suggestions .accommodation-airbnb > h4 {
+  color: #e4b968;
+}
+
+.coast-suggestions .accommodation-airbnb > p {
+  color: rgb(255 255 255 / 72%);
+}
+
+.coast-suggestions .accommodation-market-price {
+  color: rgb(255 255 255 / 82%);
+}
+
+.coast-suggestions .accommodation-airbnb-search {
+  color: #e4b968;
+  border-color: rgb(255 255 255 / 25%);
+}
+
+@media (max-width: 899px) {
+  /* Contain the whole section so the horizontal carousels (Barra photo
+     strip + Airbnb/hotel suggestion strips) never bleed past the viewport.
+     `overflow: hidden` clips any overflow and `min-width: 0` lets the grid
+     track shrink, mirroring the accommodation section's mobile handling. */
+  .coast-section {
+    gap: 0;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .coast-copy,
+  .coast-rsvp-mini {
+    min-width: 0;
+    overflow: hidden;
+  }
+
+
+  .coast-suggestions {
+    grid-column: 1 / -1;
+  }
+}
+

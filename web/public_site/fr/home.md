@@ -8,5 +8,6 @@ Nous nous marions le week-end du 20 fevrier 2027 a Roca Azul, Jocotepec, Jalisco
 - Section speciale : Je viens de loin (transferts, vols, accompagnement)
 - Nos coups de coeur au Mexique
 - Services de Roca Azul
+- Nos sponsors et partenaires
 - FAQ
 - Mises a jour importantes

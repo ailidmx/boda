@@ -1,6 +1,12 @@
-import React, { useRef, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { useApp } from "../context/AppContext.jsx";
 import { submitPetanque, submitRsvp } from "../submit-forms.js";
+import { RsvpQuestion } from "./RsvpQuestion.jsx";
+import { RsvpRecap } from "./RsvpRecap.jsx";
+import { getGroupMembers } from "../guest-profiles.js";
+import { getActiveGuests } from "../guests.js";
+import { resolveRsvpAnswer, saveRsvpAnswers } from "../rsvp-responses.js";
+
 
 function optionsMarkup(options) {
   return (options || []).map((option) => (
@@ -14,10 +20,66 @@ export function RSVP() {
   const { t, profile, language, interfaceText } = useApp();
   const rsvp = t.rsvp || {};
   const petanque = rsvp.petanque || {};
+  const scale = rsvp.scale || {};
   const showTravelSection = profile?.guest?.comesFromFar === true;
 
   const formRef = useRef(null);
   const [status, setStatus] = useState("idle"); // idle | working | success | error
+
+  // The group's guests (the signed-in guest + the other members of their
+  // invitation group). These are the people the scale questions apply to.
+  const guests = useMemo(
+    () => getGroupMembers(profile?.guest, getActiveGuests()),
+    [profile?.guest],
+  );
+
+  // answers: questionId → { guestId → level }
+  const [answers, setAnswers] = useState(() => {
+    const initial = {};
+    (scale.questions || []).forEach((q) => {
+      initial[q.id] = {};
+      guests.forEach((guest) => {
+        initial[q.id][guest.id] = resolveRsvpAnswer(guest, q.id);
+      });
+    });
+    return initial;
+  });
+
+  const [saveStatus, setSaveStatus] = useState("idle"); // idle | working | saved | error
+
+  const handleAnswerChange = (questionId, guestId, level) => {
+    setAnswers((prev) => ({
+      ...prev,
+      [questionId]: {
+        ...(prev[questionId] || {}),
+        [guestId]: level,
+      },
+    }));
+  };
+
+  const handleSaveAnswers = async () => {
+    if (saveStatus === "working") return;
+    const editorGuestId = profile?.guest?.id;
+    if (!editorGuestId) return;
+    setSaveStatus("working");
+    try {
+      // Persist each guest's answers to their own rsvp_responses doc.
+      await Promise.all(
+        guests.map((guest) => {
+          const guestAnswers = {};
+          (scale.questions || []).forEach((q) => {
+            const level = answers[q.id]?.[guest.id];
+            if (level !== undefined) guestAnswers[q.id] = level;
+          });
+          return saveRsvpAnswers(guest, guestAnswers, editorGuestId);
+        }),
+      );
+      setSaveStatus("saved");
+    } catch (error) {
+      console.warn("[rsvp] scale save failed", error.code || error.message);
+      setSaveStatus("error");
+    }
+  };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -55,12 +117,65 @@ export function RSVP() {
           ? interfaceText.submitError
           : rsvp.previewNote;
 
+  const saveStatusText =
+    saveStatus === "working"
+      ? interfaceText.submitWorking
+      : saveStatus === "saved"
+        ? scale.savedNote
+        : saveStatus === "error"
+          ? interfaceText.submitError
+          : "";
+
   return (
-    <section className="rsvp-section section">
+    <section className="rsvp-section section story-bg">
       <div className="rsvp-frame reveal">
         <p className="eyebrow">{rsvp.eyebrow}</p>
         <h2>{rsvp.title}</h2>
         <p>{rsvp.body}</p>
+
+        {/* Scale-based questions: one row per guest, 0–5 likelihood selector */}
+        {scale.questions && scale.questions.length > 0 && guests.length > 0 && (
+          <fieldset className="rsvp-scale-fieldset">
+            <legend>{rsvp.groups.attendance}</legend>
+            <p className="fieldset-note">{scale.intro}</p>
+            <div className="rsvp-scale-questions">
+              {scale.questions.map((q) => (
+                <RsvpQuestion
+                  key={q.id}
+                  questionId={q.id}
+                  title={q.title}
+                  subtitle={q.subtitle}
+                  guests={guests}
+                  answers={answers[q.id] || {}}
+                  onChange={(guestId, level) =>
+                    handleAnswerChange(q.id, guestId, level)
+                  }
+                />
+              ))}
+            </div>
+
+            <RsvpRecap
+              questions={scale.questions}
+              guests={guests}
+              answers={answers}
+            />
+
+            <div className="rsvp-scale-save">
+              <button
+                className="button button-light"
+                type="button"
+                onClick={handleSaveAnswers}
+                disabled={saveStatus === "working"}
+              >
+                {scale.saveButton}
+              </button>
+              {saveStatusText ? (
+                <small data-form-status>{saveStatusText}</small>
+              ) : null}
+            </div>
+          </fieldset>
+        )}
+
         <form
           ref={formRef}
           className="rsvp-form"

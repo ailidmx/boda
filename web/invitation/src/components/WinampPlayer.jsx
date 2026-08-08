@@ -1,9 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useApp } from "../context/AppContext.jsx";
 import {
-  ensureSpotifyToken,
-  startSpotifyAuth,
-  createSpotifyPlayer,
   playTracks,
   togglePlay,
   nextTrack,
@@ -12,13 +9,10 @@ import {
   fetchCurrentTrack,
   onPlayerChange,
   getPlayerState,
-  onAuthMessage,
-  hasSpotifyToken,
-} from "../spotify-player.js";
-
-
-
-
+  getLoopState,
+  setLoopEnabled,
+  stopPlayback,
+} from "../stream-player.js";
 
 
 
@@ -26,12 +20,12 @@ import {
  * Ultra-thin Winamp-style pixelated music player.
  *
  * - Only mounts after the guest is authenticated to the invitation.
- * - Uses the Spotify Web Playback SDK + Web API to play two curated tracks in
- *   order.
+ * - Uses a self-hosted HTML5 <audio> stream player to play two curated tracks
+ *   in order (no external account or OAuth required).
  * - HIDDEN by default: it never auto-starts or auto-plays. The guest must
  *   explicitly enable it from the user menu (toggle). When enabled, the player
- *   connects to Spotify but does NOT start playback automatically — the guest
- *   presses play to begin.
+ *   is ready but does NOT start playback automatically — the guest presses play
+ *   to begin.
  * - A very thin, pixelated banner scrolls the artist + song name horizontally.
  *
  * SILENT FAILURE: Any failure is logged to the console and swallowed — the
@@ -47,38 +41,23 @@ export function WinampPlayer() {
   const [bannerOpen, setBannerOpen] = useState(false);
   const [positionMs, setPositionMs] = useState(0);
   const [durationMs, setDurationMs] = useState(0);
+  const [loop, setLoop] = useState(() => getLoopState());
   const initRef = useRef(false);
   const lastTrackIndex = useRef(-1);
-  // Set to true when the user explicitly presses play while no token exists.
-  // After the OAuth popup returns a token, we connect AND start playback.
-  const pendingPlayRef = useRef(false);
-
-
-
 
   // Only run when the guest is signed in AND has enabled the music player.
-  // No auto-play: we connect the player but never start playback on our own.
+  // When the guest toggles music ON (a user gesture), playback starts
+  // automatically. On a fresh page load with music already enabled, the browser
+  // may block autoplay — that failure is caught silently and the guest can
+  // press play manually.
   useEffect(() => {
     if (authState !== "signedIn" || !musicEnabled || initRef.current) return;
     initRef.current = true;
 
     let cancelled = false;
 
-    // Connect the player once we have a token. Does NOT auto-play.
-    const connect = async (token) => {
-      if (cancelled) return;
-      setStatus("connecting");
-      await createSpotifyPlayer(token);
-      if (cancelled) return;
-      const meta = await fetchCurrentTrack();
-      if (!cancelled) {
-        setTrack(meta);
-        setStatus("ready");
-      }
-    };
-
     // Pre-fetch the real title/artist for the first track so the banner shows
-    // real names even before playback starts (or if the API is slow).
+    // real names even before playback starts.
     const preloadTrackMeta = async () => {
       try {
         const meta = await fetchCurrentTrack();
@@ -89,52 +68,18 @@ export function WinampPlayer() {
     };
     preloadTrackMeta();
 
-    (async () => {
+    // The stream player needs no auth — it is immediately ready to play.
+    setStatus("ready");
 
-      try {
-        // If we already have a stored token (or are returning from a previous
-        // auth), use it directly.
-        const token = await ensureSpotifyToken();
-        if (cancelled) return;
-
-        if (token) {
-          await connect(token);
-          return;
-        }
-
-        // No token yet → do NOT auto-trigger the OAuth flow. The guest must
-        // explicitly press play, which will start the auth popup on demand.
-        setStatus("ready");
-      } catch (err) {
-        // SILENT failure: log it, but never block the app or show an error UI.
-        console.error("[winamp] init failed (silent)", err);
-        if (!cancelled) setStatus("error");
-      }
-    })();
-
-
-    // Receive the token from the OAuth popup and connect. If the user pressed
-    // play (pendingPlayRef), start playback after connecting.
-    const unsubscribeAuth = onAuthMessage(
-      (token) => {
-        connect(token)
-          .then(async () => {
-            if (pendingPlayRef.current) {
-              pendingPlayRef.current = false;
-              await playTracks();
-              setPlaying(true);
-            }
-          })
-          .catch((err) => {
-            console.error("[winamp] connect after popup auth failed (silent)", err);
-            if (!cancelled) setStatus("error");
-          });
-      },
-      (err) => {
-        console.error("[winamp] popup auth failed (silent)", err);
-        if (!cancelled) setStatus("error");
-      },
-    );
+    // Auto-play when the guest enables the player. If the browser blocks it
+    // (no user gesture, e.g. on page load), the rejection is caught silently.
+    playTracks()
+      .then(() => {
+        if (!cancelled) setPlaying(true);
+      })
+      .catch((err) => {
+        console.warn("[winamp] autoplay blocked (silent)", err);
+      });
 
 
     // Subscribe to player state changes (track changes, play/pause, position).
@@ -143,9 +88,7 @@ export function WinampPlayer() {
       setPlaying(state.playing);
       setPositionMs(state.positionMs || 0);
       setDurationMs(state.durationMs || 0);
-      // Only refresh the banner when the track actually changes, and fetch the
-      // real title/artist from the Web API (the module's placeholder track is
-      // just a fallback).
+      // Only refresh the banner when the track actually changes.
       if (state.trackIndex !== lastTrackIndex.current) {
         lastTrackIndex.current = state.trackIndex;
         fetchCurrentTrack().then((meta) => {
@@ -154,16 +97,19 @@ export function WinampPlayer() {
       }
     });
 
-
-
     return () => {
       cancelled = true;
-      unsubscribeAuth();
       unsubscribe();
     };
   }, [authState, musicEnabled]);
 
-
+  // When the guest disables the music player, stop playback immediately so the
+  // audio stops before the component unmounts.
+  useEffect(() => {
+    if (!musicEnabled) {
+      stopPlayback();
+    }
+  }, [musicEnabled]);
 
   // Hidden unless the guest explicitly enabled it from the user menu.
   if (authState !== "signedIn" || !musicEnabled) return null;
@@ -172,23 +118,12 @@ export function WinampPlayer() {
   const handleToggle = async () => {
     if (status !== "ready") return;
     try {
-      // If there's no Spotify token yet, the player isn't connected. Start the
-      // OAuth flow on demand — the popup posts the token back and we connect +
-      // play. This is the ONLY place the OAuth flow is triggered (never on
-      // mount, never automatically).
-      if (!hasSpotifyToken()) {
-        pendingPlayRef.current = true;
-        setStatus("connecting");
-        await startSpotifyAuth();
-        return;
-      }
       await togglePlay();
       setPlaying((p) => !p);
     } catch (err) {
       console.error("[winamp] toggle failed (silent)", err);
     }
   };
-
 
   const bannerText = `${track.artist} — ${track.title}`;
 
@@ -222,7 +157,14 @@ export function WinampPlayer() {
     }
   };
 
+  const handleLoopToggle = () => {
+    const next = !loop;
+    setLoopEnabled(next);
+    setLoop(next);
+  };
+
   const handleSeek = (e) => {
+
     if (status !== "ready" || !durationMs) return;
     const rect = e.currentTarget.getBoundingClientRect();
     const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width));
@@ -278,6 +220,17 @@ export function WinampPlayer() {
           >
             <span aria-hidden="true">⏭</span>
           </button>
+          <button
+            type="button"
+            className={`winamp-btn winamp-loop${loop ? " is-on" : ""}`}
+            onClick={handleLoopToggle}
+            disabled={status !== "ready"}
+            aria-label={loop ? "Desactivar repetición" : "Activar repetición"}
+            aria-pressed={loop}
+            title={loop ? "Repetición activada" : "Repetición desactivada"}
+          >
+            <span aria-hidden="true">🔁</span>
+          </button>
         </div>
 
         {/* Time display: current / remaining */}
@@ -286,6 +239,12 @@ export function WinampPlayer() {
           <span className="winamp-time-sep">/</span>
           <span className="winamp-time-remaining">-{fmt(remainingMs)}</span>
         </div>
+
+        {/* Copyright attribution */}
+        {track.copyright && (
+          <div className="winamp-copyright">© {track.copyright}</div>
+        )}
+
 
         {/* Thin pixelated progress bar (click to seek) */}
         <div
@@ -304,5 +263,3 @@ export function WinampPlayer() {
     </>
   );
 }
-
-

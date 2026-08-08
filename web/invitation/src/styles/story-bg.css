@@ -1,0 +1,262 @@
+/* ── "TELL ME A STORY" cinematic background ────────────────────────────
+   Shared pattern applied to every section except Hero and "Et après".
+   It keeps each section's own base background color and layers a rich,
+   animated composition on top:
+     • big blurred colour orbs that slowly drift
+     • a field of twinkling sparkles
+     • a breathing centre light bloom
+     • a subtle film grain
+     • a soft vignette
+   Each section gets its own themed orb palette (via CSS custom properties)
+   so every section tells its own story while staying in the base palette.
+
+   Usage: add the `story-bg` class to a section's root element. No extra
+   markup is required; everything is done with pseudo-elements.
+
+   Tuning per section (optional CSS custom properties):
+     --orb-a … --orb-e   blurred orb colours
+     --sparkle           sparkle colour
+     --bloom             centre light bloom colour
+     --vignette          edge vignette colour
+*/
+.story-bg {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+.story-bg::before,
+.story-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  /* Some sections (e.g. Gift) previously styled their own ::before/::after
+     with a blur filter; make sure that doesn't bleed into the cinematic
+     layers. */
+  filter: none;
+}
+
+/* ── Layer 1: drifting blurred orbs + film grain ─────────────────── */
+.story-bg::before {
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.28'/%3E%3C/svg%3E"),
+    radial-gradient(38rem 38rem at 14% 16%, var(--orb-a, rgb(198 139 43 / 34%)), transparent 62%),
+    radial-gradient(30rem 30rem at 84% 12%, var(--orb-b, rgb(169 77 49 / 36%)), transparent 62%),
+    radial-gradient(44rem 44rem at 78% 84%, var(--orb-c, rgb(122 139 122 / 32%)), transparent 62%),
+    radial-gradient(28rem 28rem at 16% 86%, var(--orb-d, rgb(198 139 43 / 30%)), transparent 62%),
+    radial-gradient(52rem 52rem at 50% 48%, var(--orb-e, rgb(255 183 77 / 16%)), transparent 65%);
+  background-size: 160px 160px, auto, auto, auto, auto, auto;
+  background-repeat: repeat, no-repeat, no-repeat, no-repeat, no-repeat, no-repeat;
+  animation: story-orbs 24s ease-in-out infinite alternate;
+}
+
+/* ── Layer 2: twinkling sparkles + breathing bloom + vignette ────── */
+.story-bg::after {
+  background-image:
+    radial-gradient(3px 3px at 10% 28%, var(--sparkle, rgb(255 255 255 / 95%)), transparent 100%),
+    radial-gradient(2px 2px at 22% 62%, var(--sparkle, rgb(255 255 255 / 85%)), transparent 100%),
+    radial-gradient(3px 3px at 34% 16%, var(--sparkle, rgb(255 255 255 / 90%)), transparent 100%),
+    radial-gradient(2px 2px at 46% 74%, var(--sparkle, rgb(255 255 255 / 80%)), transparent 100%),
+    radial-gradient(3px 3px at 58% 30%, var(--sparkle, rgb(255 255 255 / 95%)), transparent 100%),
+    radial-gradient(2px 2px at 70% 66%, var(--sparkle, rgb(255 255 255 / 85%)), transparent 100%),
+    radial-gradient(3px 3px at 82% 22%, var(--sparkle, rgb(255 255 255 / 90%)), transparent 100%),
+    radial-gradient(2px 2px at 92% 58%, var(--sparkle, rgb(255 255 255 / 80%)), transparent 100%),
+    radial-gradient(2px 2px at 16% 48%, var(--sparkle, rgb(255 255 255 / 75%)), transparent 100%),
+    radial-gradient(3px 3px at 64% 88%, var(--sparkle, rgb(255 255 255 / 85%)), transparent 100%),
+    radial-gradient(2px 2px at 40% 40%, var(--sparkle, rgb(255 255 255 / 70%)), transparent 100%),
+    radial-gradient(3px 3px at 88% 84%, var(--sparkle, rgb(255 255 255 / 80%)), transparent 100%),
+    radial-gradient(42rem 30rem at 50% 45%, var(--bloom, rgb(255 183 77 / 14%)), transparent 70%),
+    radial-gradient(120% 90% at 50% 45%, transparent 55%, var(--vignette, rgb(16 24 21 / 48%)) 100%);
+  animation: story-sparkle 9s ease-in-out infinite alternate;
+}
+
+@keyframes story-orbs {
+  from {
+    transform: translate3d(-2%, -1.5%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(2%, 1.5%, 0) scale(1.08);
+  }
+}
+
+@keyframes story-sparkle {
+  from {
+    opacity: 0.6;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.03);
+  }
+}
+
+/* ── Light sections: gentle but clearly visible glows ─────────────── */
+.story-section {
+  --orb-a: rgb(198 139 43 / 30%);
+  --orb-b: rgb(169 77 49 / 30%);
+  --orb-c: rgb(122 139 122 / 28%);
+  --orb-d: rgb(198 139 43 / 26%);
+  --orb-e: rgb(255 183 77 / 14%);
+  --sparkle: rgb(255 255 255 / 90%);
+  --bloom: rgb(255 183 77 / 12%);
+  --vignette: rgb(36 25 33 / 24%);
+}
+
+.facilities-section {
+  --orb-a: rgb(217 207 174 / 40%);
+  --orb-b: rgb(122 139 122 / 34%);
+  --orb-c: rgb(169 77 49 / 26%);
+  --orb-d: rgb(198 139 43 / 24%);
+  --orb-e: rgb(255 255 255 / 16%);
+  --sparkle: rgb(255 255 255 / 85%);
+  --bloom: rgb(255 183 77 / 11%);
+  --vignette: rgb(36 25 33 / 22%);
+}
+
+.weekend-section {
+  --orb-a: rgb(122 139 122 / 30%);
+  --orb-b: rgb(198 139 43 / 26%);
+  --orb-c: rgb(169 77 49 / 22%);
+  --orb-d: rgb(122 139 122 / 26%);
+  --orb-e: rgb(255 183 77 / 13%);
+  --sparkle: rgb(255 255 255 / 90%);
+  --bloom: rgb(255 183 77 / 11%);
+  --vignette: rgb(36 25 33 / 22%);
+}
+
+.accommodation-section {
+  --orb-a: rgb(122 139 122 / 32%);
+  --orb-b: rgb(217 207 174 / 38%);
+  --orb-c: rgb(198 139 43 / 26%);
+  --orb-d: rgb(122 139 122 / 28%);
+  --orb-e: rgb(255 255 255 / 15%);
+  --sparkle: rgb(255 255 255 / 85%);
+  --bloom: rgb(255 183 77 / 11%);
+  --vignette: rgb(36 25 33 / 22%);
+}
+
+.food-section {
+  --orb-a: rgb(169 77 49 / 34%);
+  --orb-b: rgb(198 139 43 / 32%);
+  --orb-c: rgb(169 77 49 / 26%);
+  --orb-d: rgb(198 139 43 / 28%);
+  --orb-e: rgb(255 183 77 / 16%);
+  --sparkle: rgb(255 255 255 / 90%);
+  --bloom: rgb(255 183 77 / 13%);
+  --vignette: rgb(36 25 33 / 24%);
+}
+
+.rsvp-section {
+  --orb-a: rgb(198 139 43 / 30%);
+  --orb-b: rgb(169 77 49 / 28%);
+  --orb-c: rgb(122 139 122 / 24%);
+  --orb-d: rgb(198 139 43 / 26%);
+  --orb-e: rgb(255 183 77 / 14%);
+  --sparkle: rgb(255 255 255 / 90%);
+  --bloom: rgb(255 183 77 / 12%);
+  --vignette: rgb(36 25 33 / 24%);
+}
+
+.photos-section {
+  --orb-a: rgb(198 139 43 / 26%);
+  --orb-b: rgb(122 139 122 / 26%);
+  --orb-c: rgb(169 77 49 / 20%);
+  --orb-d: rgb(198 139 43 / 22%);
+  --orb-e: rgb(255 255 255 / 18%);
+  --sparkle: rgb(255 255 255 / 95%);
+  --bloom: rgb(255 183 77 / 11%);
+  --vignette: rgb(36 25 33 / 20%);
+}
+
+.guest-cloud-section {
+  --orb-a: rgb(198 139 43 / 30%);
+  --orb-b: rgb(169 77 49 / 28%);
+  --orb-c: rgb(122 139 122 / 24%);
+  --orb-d: rgb(198 139 43 / 26%);
+  --orb-e: rgb(255 183 77 / 14%);
+  --sparkle: rgb(255 255 255 / 90%);
+  --bloom: rgb(255 183 77 / 12%);
+  --vignette: rgb(36 25 33 / 24%);
+}
+
+/* ── Dark sections: richer, more luminous glows ──────────────────── */
+.attire-section {
+  --orb-a: rgb(169 77 49 / 42%);
+  --orb-b: rgb(198 139 43 / 38%);
+  --orb-c: rgb(169 77 49 / 34%);
+  --orb-d: rgb(198 139 43 / 32%);
+  --orb-e: rgb(255 183 77 / 18%);
+  --sparkle: rgb(255 255 255 / 95%);
+  --bloom: rgb(255 183 77 / 15%);
+  --vignette: rgb(16 24 21 / 58%);
+}
+
+.petanque-section {
+  --orb-a: rgb(34 85 164 / 55%);
+  --orb-b: rgb(29 63 134 / 50%);
+  --orb-c: rgb(22 48 95 / 45%);
+  --orb-d: rgb(34 85 164 / 45%);
+  --orb-e: rgb(120 170 235 / 22%);
+  --sparkle: rgb(255 255 255 / 90%);
+  --bloom: rgb(150 195 255 / 16%);
+  --vignette: rgb(10 22 48 / 40%);
+}
+
+
+.music-section {
+  --orb-a: rgb(198 139 43 / 42%);
+  --orb-b: rgb(169 77 49 / 40%);
+  --orb-c: rgb(122 139 122 / 32%);
+  --orb-d: rgb(198 139 43 / 36%);
+  --orb-e: rgb(255 183 77 / 20%);
+  --sparkle: rgb(255 255 255 / 95%);
+  --bloom: rgb(255 183 77 / 16%);
+  --vignette: rgb(16 24 21 / 58%);
+}
+
+.travel-section {
+  --orb-a: rgb(122 139 122 / 40%);
+  --orb-b: rgb(41 59 53 / 42%);
+  --orb-c: rgb(198 139 43 / 34%);
+  --orb-d: rgb(122 139 122 / 36%);
+  --orb-e: rgb(255 183 77 / 18%);
+  --sparkle: rgb(255 255 255 / 95%);
+  --bloom: rgb(255 183 77 / 15%);
+  --vignette: rgb(16 24 21 / 58%);
+}
+
+.gift-section {
+  --orb-a: rgb(198 139 43 / 42%);
+  --orb-b: rgb(169 77 49 / 38%);
+  --orb-c: rgb(122 139 122 / 30%);
+  --orb-d: rgb(198 139 43 / 34%);
+  --orb-e: rgb(255 183 77 / 18%);
+  --sparkle: rgb(255 255 255 / 95%);
+  --bloom: rgb(255 183 77 / 15%);
+  --vignette: rgb(16 24 21 / 58%);
+}
+
+.site-footer {
+  --orb-a: rgb(198 139 43 / 34%);
+  --orb-b: rgb(169 77 49 / 30%);
+  --orb-c: rgb(122 139 122 / 26%);
+  --orb-d: rgb(198 139 43 / 28%);
+  --orb-e: rgb(255 183 77 / 16%);
+  --sparkle: rgb(255 255 255 / 90%);
+  --bloom: rgb(255 183 77 / 13%);
+  --vignette: rgb(16 24 21 / 60%);
+}
+
+/* ── Weather: light-to-dark gradient, balanced glows ─────────────── */
+.weather-section {
+  --orb-a: rgb(122 139 122 / 32%);
+  --orb-b: rgb(198 139 43 / 30%);
+  --orb-c: rgb(169 77 49 / 26%);
+  --orb-d: rgb(122 139 122 / 28%);
+  --orb-e: rgb(255 183 77 / 15%);
+  --sparkle: rgb(255 255 255 / 90%);
+  --bloom: rgb(255 183 77 / 13%);
+  --vignette: rgb(16 24 21 / 44%);
+}

@@ -96,7 +96,12 @@ export const MEDIA = {
     taquiza: cloudinaryImage("taquiza_zkqygq", { width: 600, height: 450, crop: "fill" }),
     tejuino: cloudinaryImage("tejuino_davqad", { width: 600, height: 450, crop: "fill" }),
     tequila: cloudinaryImage("tequila_k7ewqm", { width: 600, height: 450, crop: "fill" }),
+    // Dessert cards (previously missing photos).
+    gelatinas: cloudinaryImage("gelatinas_lheogf", { width: 600, height: 450, crop: "fill" }),
+    jericalla: cloudinaryImage("jericalla_tbwks9", { width: 600, height: 450, crop: "fill" }),
+    "postres-tapatios": cloudinaryImage("dulces_xvb1nz", { width: 600, height: 450, crop: "fill" }),
   },
+
 
 
 
@@ -123,9 +128,37 @@ export const MEDIA = {
     img("oaxaca-04", { width: 800 }),
     img("oaxaca-05", { width: 800 }),
   ],
+  // Wixárika (Huichol) photo montage shown in the dress-code section. These
+  // assets live at the Cloudinary account root (not under the `boda/` folder),
+  // so they are built directly with cloudinaryImage instead of the `img` helper.
+  wixarica: [
+    cloudinaryImage("wira_vciozb", { width: 800 }),
+    cloudinaryImage("huitchol2_qtdwsp", { width: 800 }),
+    cloudinaryImage("huitchol3_pu8upf", { width: 800 }),
+    cloudinaryImage("huitchol_nsx8i6", { width: 800 }),
+  ],
+
   // Party photo used as the background banner of the weekend section.
   weekendBanner: img("party-01", { width: 1600 }),
+
+  // Parchment texture used as the background of the detailed programme's
+  // timeline items (the "PROGRAMME DÉTAILLÉ" list). Lives at the account root
+  // (not under `boda/`), so it is built directly with cloudinaryImage.
+  parchment: cloudinaryImage("parch_m0kxlx", { width: 1200 }),
+
+
+  // Pétanque club logo (GDL), used as a large, blurred, far-away background
+  // motif in the pétanque section. The solid blue background is stripped via
+  // Cloudinary's AI background removal so the logo floats transparently over
+  // the section's blue base. Lives at the account root (not under `boda/`).
+  petanqueLogo: cloudinaryImage("logogdl_odbmyu", {
+    width: 1200,
+    format: "png",
+    effect: "backgroundRemoval",
+  }),
+
 };
+
 
 
 

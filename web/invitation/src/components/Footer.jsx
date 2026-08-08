@@ -3,13 +3,44 @@ import { EVENT } from "../content.js";
 import { useApp } from "../context/AppContext.jsx";
 import { CoupleNames, InitialsSwap } from "./ui.jsx";
 
+// Wedding planner contact shown in the footer contact bar.
+const PLANNER = {
+  label: "Manuel",
+  whatsapp: "https://wa.me/523311549397",
+};
+
 export function Footer() {
   const { t } = useApp();
   const footer = t.footer || {};
   const identity = t.identity || {};
+  const thanks = t.thanks || {};
 
   return (
-    <footer className="site-footer">
+    <footer className="site-footer story-bg">
+      {/* Full-width contact bar, styled like the top header bar. */}
+      <div className="site-footer-contacts">
+        <span className="site-footer-contacts-label">{thanks.cta}</span>
+        {Object.values(EVENT.contacts).map((contact, index) => (
+          <a
+            className="site-footer-contacts-link"
+            href={contact.whatsapp}
+            target="_blank"
+            rel="noreferrer"
+            key={index}
+          >
+            {contact.label} · ↗
+          </a>
+        ))}
+        <a
+          className="site-footer-contacts-link"
+          href={PLANNER.whatsapp}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {thanks.ctaPlanner} · {PLANNER.label} ↗
+        </a>
+      </div>
+
       {identity.whatsappUrl && (
         <div className="site-footer-whatsapp">
           <a

@@ -41,6 +41,10 @@ import {
 import { loadAttendanceResponses } from "../guest-attendance.js";
 import { loadRooms } from "../rooms.js";
 import { loadCabins } from "../cabins.js";
+import { loadThanks } from "../thanks.js";
+import { loadRsvpScale } from "../rsvp-scale.js";
+import { loadRsvpResponses } from "../rsvp-responses.js";
+
 
 const LANGUAGE_STORAGE_KEY = "boda-language";
 const USERNAME_STORAGE_KEY = "boda-username";
@@ -180,12 +184,13 @@ export function AppProvider({ children }) {
   // reopened from the user menu.
   const [identityPrompt, setIdentityPrompt] = useState(false);
 
-  // Whether the hidden Spotify music player is enabled. Defaults to OFF so the
-  // player never auto-starts or auto-plays. The guest can toggle it from the
-  // user menu. Persisted in localStorage so the choice survives reloads.
+  // Whether the hidden music player is enabled. Defaults to ON so the player
+  // is available to every guest; the guest can toggle it off from the user
+  // menu. Persisted in localStorage so the choice survives reloads.
   const [musicEnabled, setMusicEnabledState] = useState(
-    () => window.localStorage.getItem(MUSIC_ENABLED_KEY) === "1",
+    () => window.localStorage.getItem(MUSIC_ENABLED_KEY) !== "0",
   );
+
 
   // Avoid re-prompting on every auth state change within the same session.
   const langPromptShown = useRef(false);
@@ -254,7 +259,11 @@ export function AppProvider({ children }) {
           loadAttendanceResponses(invitationGroup),
           loadRooms(),
           loadCabins(),
+          loadThanks(),
+          loadRsvpScale(),
+          loadRsvpResponses(invitationGroup),
         ]);
+
 
         const groupMembers = getGroupMembers(resolvedGuest, getActiveGuests());
         const hasPendingIdentityVerification = groupMembers.some((member) => {
@@ -485,9 +494,10 @@ export function AppProvider({ children }) {
   // Reopen the identity-check modal from the user menu at any time.
   const openIdentityPrompt = () => setIdentityPrompt(true);
 
-  // Toggle the hidden Spotify music player on/off. Persisted so the choice
-  // survives reloads. Defaults to OFF (no auto-start, no auto-play).
+  // Toggle the hidden music player on/off. Persisted so the choice survives
+  // reloads. Defaults to ON.
   const setMusicEnabled = (enabled) => {
+
     setMusicEnabledState(enabled);
     window.localStorage.setItem(MUSIC_ENABLED_KEY, enabled ? "1" : "0");
   };

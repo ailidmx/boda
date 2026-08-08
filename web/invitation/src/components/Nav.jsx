@@ -4,7 +4,15 @@ import { useApp } from "../context/AppContext.jsx";
 import { LANGUAGE_FLAGS, LANGUAGE_FLAGS_ONLY } from "./ui.jsx";
 
 import { SUPPORTED_LANGUAGES } from "../content.js";
-import { resolveGuestName, resolveGuestPhoto } from "../guest-profiles.js";
+import {
+  resolveGuestName,
+  resolveGuestPhoto,
+  saveGuestPhoto,
+} from "../guest-profiles.js";
+import { uploadAvatar, validateAvatarFile } from "../cloudinary-upload.js";
+import { FEATURES } from "../features.js";
+
+
 
 
 const NAV_LINKS = [
@@ -18,17 +26,22 @@ const NAV_LINKS = [
 
   ["weather", "#weather"],
   ["programme", "#weekend-program"],
+  ["teAnimas", "#te-animas"],
+  ["travel", "#travel"],
   ["petanque", "#petanque"],
   ["accommodation", "#accommodation"],
   ["food", "#food"],
   ["music", "#music"],
   ["coast", "#coast"],
-  ["travel", "#travel"],
   ["photos", "#photos"],
+
   ["guests", "#guests"],
   ["gift", "#gift"],
+  ["rsvp", "#rsvp"],
   ["thanks", "#thanks"],
 ];
+
+
 
 
 
@@ -69,7 +82,13 @@ function UserMenu() {
 
 
   const [busy, setBusy] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [photoStatus, setPhotoStatus] = useState(null); // { type, text }
   const menuRef = useRef(null);
+  const photoInputRef = useRef(null);
+
+
 
   const guest = profile?.guest;
   const isAdmin = guest?.isAdmin === true;
@@ -142,6 +161,36 @@ function UserMenu() {
   const handleLogout = async () => {
     await signOut();
   };
+
+  // Change the signed-in guest's profile avatar photo from the user menu.
+  const handlePhoto = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const validation = validateAvatarFile(file);
+    if (validation) {
+      setPhotoStatus({ type: "error", text: validation });
+      return;
+    }
+    setUploading(true);
+    setPhotoStatus(null);
+    try {
+      const url = await uploadAvatar(file);
+      await saveGuestPhoto(guest, url, guest.id);
+      setPhotoStatus({ type: "success", text: identity.photoSaved || "Photo saved!" });
+    } catch (error) {
+      console.error("uploadAvatar failed", error);
+      const detail = error?.message || "";
+      const text =
+        detail && !detail.includes("Upload failed")
+          ? `${identity.photoError || "Could not upload the photo."} ${detail}`
+          : identity.photoError || "Could not upload the photo.";
+      setPhotoStatus({ type: "error", text });
+    } finally {
+      setUploading(false);
+      event.target.value = "";
+    }
+  };
+
 
   const handlePasswordSubmit = async (event) => {
     event.preventDefault();
@@ -313,11 +362,36 @@ function UserMenu() {
             <button
               className="user-menu__item"
               type="button"
+              disabled={uploading}
+              onClick={() => photoInputRef.current?.click()}
+            >
+              <span className="user-menu__item-icon">📷</span>
+              {uploading
+                ? identity.uploading || "Uploading…"
+                : identity.changePhoto || identity.addPhoto || "Change photo"}
+            </button>
+            <input
+              ref={photoInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handlePhoto}
+              disabled={uploading}
+              hidden
+            />
+            {photoStatus && (
+              <p className={`user-menu__status user-menu__status--${photoStatus.type}`}>
+                {photoStatus.text}
+              </p>
+            )}
+            <button
+              className="user-menu__item"
+              type="button"
               onClick={() => openAccountModal("email")}
             >
               <span className="user-menu__item-icon">✉</span>
               {nav.changeEmail}
             </button>
+
 
             <button
               className="user-menu__item"
@@ -350,9 +424,22 @@ function UserMenu() {
               <span className="user-menu__item-icon">↪</span>
               {nav.logout}
             </button>
+
+            <button
+              className="user-menu__item"
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                setAboutOpen(true);
+              }}
+            >
+              <span className="user-menu__item-icon">ℹ️</span>
+              {nav.about}
+            </button>
           </>
         </div>
       )}
+
 
 
       {accountModal && (
@@ -581,9 +668,63 @@ function UserMenu() {
           </div>
         </div>
       )}
+
+      {aboutOpen && (
+        <div
+          className="user-menu-modal__overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="about-modal-title"
+          onClick={() => setAboutOpen(false)}
+        >
+          <div
+            className="user-menu-modal__card user-menu-modal__card--about"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              className="user-menu-modal__close"
+              type="button"
+              aria-label={nav.aboutClose || nav.cancel}
+              onClick={() => setAboutOpen(false)}
+            >
+              ✕
+            </button>
+
+            <h3 id="about-modal-title" className="user-menu-modal__title">
+              {nav.aboutTitle || nav.about}
+            </h3>
+            <p className="user-menu-modal__subtitle">{nav.aboutSubtitle}</p>
+
+            <div className="user-menu-modal__features">
+              {(FEATURES[language] || []).map((feature, index) => (
+                <div className="user-menu-modal__feature" key={index}>
+                  <span className="user-menu-modal__feature-icon" aria-hidden="true">
+                    {feature.icon}
+                  </span>
+                  <div className="user-menu-modal__feature-text">
+                    <strong className="user-menu-modal__feature-title">{feature.title}</strong>
+                    <span className="user-menu-modal__feature-body">{feature.body}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="user-menu-modal__actions">
+              <button
+                className="user-menu-modal__btn user-menu-modal__btn--primary"
+                type="button"
+                onClick={() => setAboutOpen(false)}
+              >
+                {nav.aboutClose || nav.ok || "OK"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
 
 
 // Mobile navigation: a custom dropdown that mirrors the desktop nav's golden
@@ -894,10 +1035,15 @@ export function Nav() {
 
       <div className="site-header__actions">
         <UserMenu />
-        <a className="header-rsvp" href="#rsvp">
+        <a
+          className={`header-rsvp${activeKey === "rsvp" ? " is-active" : ""}`}
+          href="#rsvp"
+          aria-current={activeKey === "rsvp" ? "true" : undefined}
+        >
           {t.nav.rsvp}
         </a>
       </div>
+
     </header>
 
   );

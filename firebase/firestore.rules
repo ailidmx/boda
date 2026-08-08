@@ -341,11 +341,10 @@ service cloud.firestore {
           || isShortText(request.resource.data.messageAuthor, 200))
         && (!request.resource.data.keys().hasAny(["_deleted"])
           || request.resource.data._deleted is bool)
-        // `rsvp` is static data from the sheet (RVSP_* columns). It is
-        // populated by the migration script (Admin SDK) and is read-only
-        // from the client. We allow it in hasOnly() so existing documents
-        // with `rsvp` can still be updated by clients, but we do NOT allow
-        // clients to modify it (it's not in the writable field list above).
+        // `rsvp` holds the sheet-synced RVSP_* flags plus the client-submitted
+        // scale answers under `rsvp.answers` (see saveRsvpAnswers). It is
+        // allowed in hasOnly() and in the affectedKeys() lists so guests can
+        // save their answers; the structure is validated client-side.
         && (!request.resource.data.keys().hasAny(["rsvp"])
           || request.resource.data.rsvp is map);
     }
@@ -363,7 +362,7 @@ service cloud.firestore {
           "idCheckUser", "cloudinaryId", "messageAuthor",
           // Legacy flat identity writes allowed only during transition.
           "firstName", "middleName", "lastName", "maternalLastName", "gender", "cloudinaryId", "lang", "age", "phone",
-          "updatedBy", "updatedAt"
+          "rsvp", "updatedBy", "updatedAt"
         ]);
     }
 
@@ -379,7 +378,7 @@ service cloud.firestore {
           "guestId", "identity",
           "idCheckUser", "cloudinaryId", "messageAuthor",
           "firstName", "middleName", "lastName", "maternalLastName", "gender", "cloudinaryId", "lang", "age", "phone",
-          "invitationGroup", "updatedBy", "updatedAt", "_deleted"
+          "rsvp", "invitationGroup", "updatedBy", "updatedAt", "_deleted"
         ]);
     }
 
@@ -442,16 +441,15 @@ service cloud.firestore {
 
     match /guests/{guestId} {
 
-      // READ SCOPE: Administrators may read any guest. Any invited guest may
-      // also read any guest document so the accommodation section can resolve
-      // the cabin, room, and payment/coverage flags of every occupant sharing
-      // a cabin (a cabin can be shared by guests from different invitation
-      // groups). This intentionally relaxes the previous group-only read so
-      // the "Prix du gîte" reflects the whole cabin, not just the signed-in
-      // group's share. Writes remain strictly group-scoped.
+      // READ SCOPE: Administrators may read any guest. A regular authenticated
+      // guest may only read members of their OWN invitation group (resolved
+      // from `guests/{auth.uid}.invitationGroup`). This prevents a guest from
+      // seeing other groups' phone, cabin, room, table, payment, and admin
+      // data. The rule is query-compatible: a list query MUST filter by
+      // `where('invitationGroup', '==', <myGroup>)` for it to succeed.
       allow read: if isAdmin()
-        || isInvitedGuest();
-
+        || (request.auth != null
+            && resource.data.invitationGroup == editorInvitationGroup());
       // AGREED SCHEMA ENFORCEMENT: ALL writes must pass the schema validation.
       // Administrators use hasValidAdminGuestFields() (may additionally modify
       // `invitationGroup` and `_deleted`); regular guests use
@@ -464,7 +462,9 @@ service cloud.firestore {
             (isAdmin()
               ? hasValidAdminGuestFields()
               : hasValidGuestContactFields())
-            && (isAdmin() || editorInvitationGroup() == guestWriteInvitationGroup())
+            && (isAdmin()
+              || request.auth.uid == guestId
+              || editorInvitationGroup() == guestWriteInvitationGroup())
           )
           || hasValidGuestAuditTouch()
         );
@@ -549,60 +549,6 @@ service cloud.firestore {
     match /rooms/{roomId} {
       allow read: if true;
       allow create, update: if isAdmin() && hasValidRoomFields();
-      allow delete: if isAdmin();
-    }
-
-
-
-    // ── Cabins ──────────────────────────────────────────────────────────────
-    // Cabin inventory + showcase (id, name, capacity, pricing, booking flags,
-    // localized showcase descriptions, Cloudinary photo IDs). Readable by
-    // everyone (public content); writable only by the couple. The schema is
-    // enforced with hasOnly() so no extra fields can be added from the client.
-    function hasValidCabinFields() {
-      return request.resource.data.keys().hasAll([
-          "id", "name", "capacity", "totalPrice2Nights",
-          "pricePerPerson2Nights", "isPrivate"
-        ])
-        && request.resource.data.keys().hasOnly([
-          "id", "name", "capacity", "totalPrice2Nights",
-          "pricePerPerson2Nights", "isPrivate",
-          "isBooked", "isBookedXtra", "isPaid", "isPaidXtra",
-          "capacityRoomCheck", "cloudinaryIds", "key", "updatedAt",
-          "_source", "_migratedAt", "_showcaseMigratedAt"
-        ])
-
-        && isShortText(request.resource.data.id, 100)
-        && request.resource.data.id.size() > 0
-        && isShortText(request.resource.data.name, 150)
-        && request.resource.data.capacity is int
-        && request.resource.data.capacity > 0
-        && request.resource.data.totalPrice2Nights is int
-        && request.resource.data.totalPrice2Nights >= 0
-        && request.resource.data.pricePerPerson2Nights is int
-        && request.resource.data.pricePerPerson2Nights >= 0
-        && request.resource.data.isPrivate is bool
-        && (!request.resource.data.keys().hasAny(["isBooked"])
-          || request.resource.data.isBooked is bool)
-        && (!request.resource.data.keys().hasAny(["isBookedXtra"])
-          || request.resource.data.isBookedXtra is bool)
-        && (!request.resource.data.keys().hasAny(["isPaid"])
-          || request.resource.data.isPaid is bool)
-        && (!request.resource.data.keys().hasAny(["isPaidXtra"])
-          || request.resource.data.isPaidXtra is bool)
-        && (!request.resource.data.keys().hasAny(["capacityRoomCheck"])
-          || request.resource.data.capacityRoomCheck is int)
-        && (!request.resource.data.keys().hasAny(["cloudinaryIds"])
-          || (request.resource.data.cloudinaryIds is list
-            && request.resource.data.cloudinaryIds.size() <= 50
-            && request.resource.data.cloudinaryIds.all(id, id is string && id.size() <= 200)));
-
-
-    }
-
-    match /cabins/{cabinId} {
-      allow read: if true;
-      allow create, update: if isAdmin() && hasValidCabinFields();
       allow delete: if isAdmin();
     }
 
