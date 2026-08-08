@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { getActiveGuests } from "../guests.js";
 import { resolveGuestName, resolveGuestPhoto } from "../guest-profiles.js";
 import { useApp } from "../context/AppContext.jsx";
@@ -35,10 +35,6 @@ const NAME_MODES = {
   first: "first",
   last: "last",
 };
-
-const BASE_SCROLL_SPEED = 0.028;
-const FAST_SCROLL_SPEED = 0.085;
-const INTERACTION_IDLE_MS = 1400;
 
 function resolveCloudName(guest, mode) {
   const { firstName, middleName, lastName, maternalLastName, fullName } =
@@ -105,60 +101,24 @@ export function GuestCloud() {
       .filter(Boolean);
   }, []);
 
-  const viewportRef = useRef(null);
-  const userInteractingRef = useRef(false);
-  const speedRef = useRef(BASE_SCROLL_SPEED);
-  const idleTimerRef = useRef(null);
-
-  const carouselItems = useMemo(() => {
-    if (avatars.length <= 1) return avatars;
-    return [...avatars, ...avatars];
-  }, [avatars]);
-
-  const markInteracting = () => {
-    userInteractingRef.current = true;
-    window.clearTimeout(idleTimerRef.current);
-    idleTimerRef.current = window.setTimeout(() => {
-      userInteractingRef.current = false;
-    }, INTERACTION_IDLE_MS);
-  };
-
-  useEffect(() => {
-    const viewport = viewportRef.current;
-    if (!viewport || avatars.length <= 1) return undefined;
-
-    let rafId = 0;
-    let lastTs = 0;
-
-    const tick = (ts) => {
-      if (!viewport) return;
-      if (!lastTs) lastTs = ts;
-      const dt = ts - lastTs;
-      lastTs = ts;
-
-      const loopWidth = viewport.scrollWidth / 2;
-      if (loopWidth > 0 && userInteractingRef.current === false) {
-        viewport.scrollLeft += dt * speedRef.current;
-        if (viewport.scrollLeft >= loopWidth) {
-          viewport.scrollLeft -= loopWidth;
-        }
-      }
-
-      rafId = window.requestAnimationFrame(tick);
-    };
-
-    rafId = window.requestAnimationFrame(tick);
-
-    return () => {
-      window.cancelAnimationFrame(rafId);
-      window.clearTimeout(idleTimerRef.current);
-    };
-  }, [avatars.length]);
-
   const hasCarousel = avatars.length > 0;
 
+  // Render a single avatar card (used twice for the seamless marquee loop).
+  const renderAvatar = (av, key) => (
+    <figure className="guest-avatar-card" key={key}>
+      <img
+        className="guest-avatar-card__img"
+        src={av.photo}
+        alt={av.name}
+        loading="lazy"
+        decoding="async"
+      />
+      <figcaption className="guest-avatar-card__name">{av.name}</figcaption>
+    </figure>
+  );
+
   return (
-    <div className="guest-cloud-section">
+    <div className="guest-cloud-section story-bg">
       <div className="guest-cloud-frame">
 
         <div className="section-heading guest-cloud-heading">
@@ -215,42 +175,25 @@ export function GuestCloud() {
         <div
           className="guest-avatar-carousel"
           aria-label={cloud.avatarCarouselLabel || "Nuestros invitados"}
-          onMouseEnter={() => {
-            speedRef.current = FAST_SCROLL_SPEED;
-          }}
-          onMouseLeave={() => {
-            speedRef.current = BASE_SCROLL_SPEED;
-          }}
         >
-          <div
-            ref={viewportRef}
-            className="guest-avatar-carousel__viewport"
-            onScroll={markInteracting}
-            onPointerDown={markInteracting}
-            onTouchStart={markInteracting}
-          >
+          <div className="guest-avatar-carousel__viewport">
             <div className="guest-avatar-carousel__track">
-              {carouselItems.map((av, index) => (
-                <figure
-                  className="guest-avatar-card"
-                  key={`${av.id}-${index < avatars.length ? "a" : "b"}`}
-                >
-                  <img
-                    className="guest-avatar-card__img"
-                    src={av.photo}
-                    alt={av.name}
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <figcaption className="guest-avatar-card__name">
-                    {av.name}
-                  </figcaption>
-                </figure>
-              ))}
+              <div className="guest-avatar-carousel__half">
+                {avatars.map((av) => renderAvatar(av, `${av.id}-a`))}
+              </div>
+              <div className="guest-avatar-carousel__half">
+                {avatars.map((av) => renderAvatar(av, `${av.id}-b`))}
+              </div>
             </div>
           </div>
         </div>
       )}
+
+      <nav className="section-nav guest-cloud-section-nav" aria-label="Continue">
+        <a className="section-nav-link" href="#gift">
+          <span>{cloud.navNext}</span>
+        </a>
+      </nav>
     </div>
   );
 }

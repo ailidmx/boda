@@ -86,9 +86,8 @@ export default defineConfig({
           "react-vendor": ["react", "react-dom"],
           // The big trilingual content/data file (125 kB of translations).
           content: ["/src/content.js"],
-          // Spotify Web Playback SDK integration.
-          spotify: ["/src/spotify-player.js"],
           // Cloudinary image delivery SDK.
+
           cloudinary: ["@cloudinary/react", "@cloudinary/url-gen"],
           // Firebase SDK.
           firebase: ["firebase/app", "firebase/auth", "firebase/firestore", "firebase/storage"],

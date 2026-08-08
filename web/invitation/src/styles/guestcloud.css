@@ -48,12 +48,35 @@
   letter-spacing: -0.02em;
 }
 
+/* The "Chaque nom est une histoire partagée…" line is styled as a literary
+   citation: dark ink text, a marigold left rule, display serif, italic, with a
+   large opening quote mark — matching the citation style used in the Gift
+   section. */
 .guest-cloud-subtitle {
-  max-width: 42rem;
-  margin: 0 auto 3rem;
-  color: rgb(36 33 25 / 78%);
-  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
-  line-height: 1.6;
+  position: relative;
+  max-width: 34rem;
+  margin: 1.5rem auto 3rem;
+  padding-left: 1.5rem;
+  border-left: 2px solid var(--marigold);
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.4vw, 1.8rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink);
+  text-align: left;
+}
+
+.guest-cloud-subtitle::before {
+  content: "“";
+  position: absolute;
+  top: -0.35em;
+  left: -0.15rem;
+  font-family: var(--font-display);
+  font-size: 3.5em;
+  line-height: 1;
+  color: var(--marigold);
+  opacity: 0.35;
 }
 
 .guest-cloud-mode {
@@ -154,27 +177,36 @@
 
 .guest-avatar-carousel__viewport {
   width: 100%;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-  cursor: grab;
+  overflow: hidden;
 }
 
-.guest-avatar-carousel__viewport::-webkit-scrollbar {
-  display: none;
-}
-
-.guest-avatar-carousel__viewport:active {
-  cursor: grabbing;
-}
-
+/* Pure CSS marquee: the track holds two identical halves and slides left by
+   exactly one half (-50%), so it loops seamlessly. */
 .guest-avatar-carousel__track {
+  display: flex;
+  width: max-content;
+  animation: guest-avatar-marquee 45s linear infinite;
+  will-change: transform;
+}
+
+.guest-avatar-carousel:hover .guest-avatar-carousel__track {
+  animation-play-state: paused;
+}
+
+.guest-avatar-carousel__half {
   display: flex;
   align-items: flex-start;
   gap: 1.25rem;
-  width: max-content;
-  padding: 0 2rem;
+  padding-right: 1.25rem;
+}
+
+@keyframes guest-avatar-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
 }
 
 .guest-avatar-card {
@@ -213,9 +245,9 @@
     margin-top: 2rem;
   }
 
-  .guest-avatar-carousel__track {
+  .guest-avatar-carousel__half {
     gap: 0.95rem;
-    padding: 0 1rem;
+    padding-right: 0.95rem;
   }
 
   .guest-avatar-card {
@@ -231,19 +263,11 @@
 }
 
 
-/* Desktop-only bottom nav linking to the next section (Gift / "CADEAUX").
-   The guest cloud is a full-width cream band, so the nav sits centered at the
-   bottom of the band. Hidden on mobile, where the stacked sections already
-   flow naturally. */
-@media (min-width: 900px) {
-  .guest-cloud-section-nav {
-    width: min(100%, 64rem);
-    margin: 2.5rem auto 0;
-  }
+/* Bottom nav linking to the next section (Gift / "CADEAUX"). The guest cloud
+   is a full-width cream band, so the nav sits centered at the bottom of the
+   band, visible on all screen sizes. */
+.guest-cloud-section-nav {
+  width: min(100%, 64rem);
+  margin: 2.5rem auto 0;
 }
 
-@media (max-width: 899px) {
-  .guest-cloud-section-nav {
-    display: none;
-  }
-}

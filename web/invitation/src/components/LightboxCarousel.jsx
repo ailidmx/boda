@@ -1,4 +1,5 @@
-import React, { useEffect, useCallback, useState } from "react";
+import React, { useEffect, useCallback, useRef, useState } from "react";
+
 
 /**
  * LightboxCarousel — a reusable, full-screen (or near full-screen) modal
@@ -16,6 +17,9 @@ import React, { useEffect, useCallback, useState } from "react";
 export function LightboxCarousel({ open, onClose, images, startIndex = 0, label = "Galería" }) {
   const [index, setIndex] = useState(startIndex);
   const count = images.length;
+  // Track the horizontal start of a touch so we can detect a swipe gesture.
+  const touchStartX = useRef(null);
+
 
   // Keep the active slide in sync when the modal opens with a new startIndex.
   useEffect(() => {
@@ -79,7 +83,23 @@ export function LightboxCarousel({ open, onClose, images, startIndex = 0, label 
         ‹
       </button>
 
-      <figure className="lightbox-stage" onClick={(e) => e.stopPropagation()}>
+      <figure
+        className="lightbox-stage"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={(e) => {
+          touchStartX.current = e.touches[0].clientX;
+        }}
+        onTouchEnd={(e) => {
+          if (touchStartX.current === null) return;
+          const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+          touchStartX.current = null;
+          // Swipe left → next, swipe right → previous. Ignore small movements
+          // and vertical scrolls so the gesture feels natural.
+          if (Math.abs(deltaX) < 50) return;
+          if (deltaX < 0) goTo(index + 1);
+          else goTo(index - 1);
+        }}
+      >
         <img
           src={current.full || current.src}
           alt={current.alt || ""}
@@ -89,6 +109,7 @@ export function LightboxCarousel({ open, onClose, images, startIndex = 0, label 
           {String(index + 1).padStart(2, "0")} / {String(count).padStart(2, "0")}
         </figcaption>
       </figure>
+
 
       <button
         className="lightbox-arrow lightbox-arrow--next"

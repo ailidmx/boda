@@ -2,7 +2,7 @@
 
 /* ── Responsive: mobile-first ──────────────────────────────────────────
    The music lineup is 4 columns on desktop, collapsing to 2 on tablet and 1
-   on mobile. The playlist section (heading | grid) stacks on tablet, and the
+   on mobile. The playlist section stacks its heading above the cards, and the
    playlist grid collapses to 1 column on mobile. */
 
 /* The music lineup is a single row of 4 cards on desktop. On mobile
@@ -22,6 +22,43 @@
   color: var(--white);
 }
 
+/* The music intro line is styled as a literary citation: a marigold left
+   rule, display serif, italic, with a large opening quote mark. It reads
+   smaller on mobile so it stays elegant on small screens. */
+.music-section .experience-heading .lead {
+  position: relative;
+  max-width: 40rem;
+  margin: 0;
+  padding-left: 1.5rem;
+  border-left: 2px solid var(--marigold);
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2.2vw, 1.7rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--white);
+}
+
+.music-section .experience-heading .lead::before {
+  content: "“";
+  position: absolute;
+  top: -0.35em;
+  left: -0.15rem;
+  font-family: var(--font-display);
+  font-size: 3.5em;
+  line-height: 1;
+  color: var(--marigold);
+  opacity: 0.35;
+}
+
+@media (max-width: 899px) {
+  .music-section .experience-heading .lead {
+    font-size: clamp(1rem, 4.5vw, 1.2rem);
+    padding-left: 1.1rem;
+  }
+}
+
+
 .music-lineup {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -29,15 +66,32 @@
 }
 
 .music-act {
+  position: relative;
   min-height: 22rem;
   padding: 2rem;
+  overflow: hidden;
   border: 1px solid rgb(255 255 255 / 22%);
   border-right: 0;
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgb(255 244 214 / 55%), transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgb(198 139 43 / 45%), transparent 60%),
+    linear-gradient(160deg, #e4b968 0%, #c99a4a 48%, #a97c33 100%);
+  transition: background 320ms ease, border-color 320ms ease;
 }
 
 .music-act:last-child {
   border-right: 1px solid rgb(255 255 255 / 22%);
 }
+
+.music-act:hover {
+  border-color: rgb(255 253 248 / 60%);
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgb(255 250 235 / 70%), transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgb(198 139 43 / 55%), transparent 60%),
+    linear-gradient(160deg, #f0c97e 0%, #d9ab58 48%, #b98a3c 100%);
+}
+
+
 
 .music-act__photo {
   position: relative;
@@ -48,10 +102,10 @@
 
 .music-act__photo img {
   display: block;
-  width: 100%;
   aspect-ratio: 4 / 3;
   object-fit: cover;
 }
+
 
 .music-act__logo {
   position: absolute;
@@ -67,23 +121,51 @@
 }
 
 
+/* The act number is a large, stylised display numeral that sits behind the
+   card content as a subtle background watermark. */
 .music-act__number {
-  color: #e4b968;
-  font-size: 0.65rem;
+  position: absolute;
+  z-index: 0;
+  top: 0.4rem;
+  right: 0.9rem;
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 9vw, 8rem);
+  font-weight: 400;
+  line-height: 1;
+  color: rgb(228 185 104 / 16%);
+  letter-spacing: -0.02em;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Keep the card's text content above the watermark number. */
+.music-act__photo,
+.music-act__moment,
+.music-act h3,
+.music-act small,
+.music-act__links {
+  position: relative;
+  z-index: 1;
+}
+
+
+.music-act h3 {
+  color: var(--ink);
 }
 
 .music-act__moment {
   min-height: 3.5rem;
   margin-top: 4rem;
-  color: rgb(255 255 255 / 62%);
+  color: rgb(36 33 25 / 72%);
   font-size: 0.7rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
 .music-act small {
-  color: rgb(255 255 255 / 70%);
+  color: rgb(36 33 25 / 78%);
 }
+
 
 .music-act__links {
   display: flex;
@@ -93,18 +175,24 @@
 }
 
 .music-act__links .text-link {
-  color: #e4b968;
+  color: #5a3d0e;
 }
 
 
+
+/* The playlist block stacks its heading above the cards (no side-by-side
+   columns): the eyebrow + title + citation lead sit on top, and the three
+   playlist cards appear directly below. */
 .playlist-section {
-  display: grid;
-  grid-template-columns: 0.7fr 1.3fr;
-  gap: clamp(2rem, 6vw, 6rem);
+  display: block;
   margin-bottom: clamp(4rem, 8vw, 8rem);
   padding: clamp(2rem, 5vw, 5rem);
   border: 1px solid rgb(255 255 255 / 22%);
   background: #182620;
+}
+
+.playlist-heading {
+  max-width: 46rem;
 }
 
 .playlist-heading h3 {
@@ -116,30 +204,79 @@
   line-height: 1;
 }
 
-.playlist-heading > p:last-child {
-  max-width: 30rem;
-  color: rgb(255 255 255 / 68%);
+/* The "Trois playlists…" line is styled as a literary citation: a marigold
+   left rule, display serif, italic, with a large opening quote mark. */
+.playlist-citation {
+  position: relative;
+  max-width: 34rem;
+  margin: 1.5rem 0 2.5rem;
+  padding-left: 1.5rem;
+
+  border-left: 2px solid var(--marigold);
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.4vw, 1.9rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--white);
+}
+
+.playlist-citation::before {
+  content: "“";
+  position: absolute;
+  top: -0.35em;
+  left: -0.15rem;
+  font-family: var(--font-display);
+  font-size: 3.5em;
+  line-height: 1;
+  color: var(--marigold);
+  opacity: 0.35;
 }
 
 .playlist-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(3, 1fr);
   gap: 1rem;
 }
+
 
 .playlist-card {
   position: relative;
   min-height: 22rem;
   padding: 2rem;
-  background: var(--cream);
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 100% 0%, rgb(198 139 43 / 12%), transparent 55%),
+    var(--cream);
   color: var(--ink);
 }
 
+/* The playlist number is a large, stylised display numeral that sits behind
+   the card content as a subtle background watermark. */
 .playlist-number {
-  color: var(--terracotta);
-  font-size: 0.65rem;
-  letter-spacing: 0.12em;
+  position: absolute;
+  z-index: 0;
+  top: 0.4rem;
+  right: 0.9rem;
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 9vw, 8rem);
+  font-weight: 400;
+  line-height: 1;
+  color: rgb(169 77 49 / 14%);
+  letter-spacing: -0.02em;
+  pointer-events: none;
+  user-select: none;
 }
+
+/* Keep the playlist card content above the watermark number. */
+.playlist-card .spotify-mark,
+.playlist-card h4,
+.playlist-card p,
+.playlist-card .text-link {
+  position: relative;
+  z-index: 1;
+}
+
 
 .spotify-mark {
   display: grid;

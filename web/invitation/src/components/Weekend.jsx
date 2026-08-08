@@ -9,7 +9,7 @@ export function Weekend() {
   const nav = t.nav || {};
 
   return (
-    <section className="weekend-section section">
+    <section className="weekend-section section story-bg">
       {/* ── Slide 1 · banner + the three days, one full-height slide ── */}
       <div className="weekend-slide">
         <div className="weekend-banner">
@@ -18,8 +18,9 @@ export function Weekend() {
             <div className="section-heading reveal">
               <p className="eyebrow">{weekend.eyebrow}</p>
               <h2>{weekend.title}</h2>
-              <p>{weekend.intro}</p>
+              <blockquote className="weekend-lead-citation">{weekend.intro}</blockquote>
             </div>
+
             <div className="weekend-dates" aria-hidden="true">
               <span className="weekend-date weekend-date--side">19 · 02 · 27</span>
               <span className="weekend-date weekend-date--center">20 · 02 · 27</span>
@@ -55,33 +56,27 @@ export function WeekendProgram() {
 
 // The detailed programme is a full-height slide with its own menu entry
 // ("programme"). It is laid out as a flex column: a header (eyebrow + title)
-// pinned to the top, the day-program slideset centered, and a footer nav
-// pinned to the bottom.
+// pinned to the top, a single long parchment-style list of all three days
+// below it, and a footer nav pinned to the bottom.
+//
+// Instead of three separate slides, all three days are stacked in ONE long
+// list (like reading a long parchment). The arrows beside each day's heading
+// scroll the container to the previous/next day, so the reader can jump
+// between days without losing their place.
 function DayProgramSlideset({ programs }) {
   const { t } = useApp();
   const weekend = t.weekend || {};
   const nav = t.nav || {};
-  const [active, setActive] = useState(0);
   const [warningOpen, setWarningOpen] = useState(false);
   const [programActive, setProgramActive] = useState(false);
-  const programTrackRef = useRef(null);
   const sectionRef = useRef(null);
   const fabRef = useRef(null);
   const panelRef = useRef(null);
   const closeRef = useRef(null);
-  const count = programs.length;
-  const current = programs[active] || {};
+  const dayRefs = useRef([]);
   // The FAB warning modal always shows the same traffic disclaimer (the
-  // Saturday note about the Guadalajara access), regardless of the day that
-  // is currently active in the programme slideset.
+  // Saturday note about the Guadalajara access).
   const traffic = weekend.saturday || {};
-
-
-  useEffect(() => {
-    programTrackRef.current
-      ?.querySelector(".day-program-slide.is-active")
-      ?.scrollTo({ top: 0, behavior: "auto" });
-  }, [active]);
 
   // Show the warning FAB only while the programme section is in view.
   useEffect(() => {
@@ -130,64 +125,63 @@ function DayProgramSlideset({ programs }) {
     };
   }, [warningOpen]);
 
+  // Scroll the long list to a given day's block (smoothly), so the arrows
+  // "jump" the reader to that part of the parchment.
+  const scrollToDay = (index) => {
+    const el = dayRefs.current[index];
+    if (!el) return;
+    el.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   return (
     <section className="weekend-program section" ref={sectionRef}>
       <div className="weekend-program__header">
         <div className="section-heading reveal">
-          <div className="weekend-program__eyebrow-row">
-            <button
-              type="button"
-              className={`day-program-slideset__arrow${active === 0 ? " is-hidden" : ""}`}
-              onClick={() => setActive((a) => (a - 1 + count) % count)}
-              aria-label="Día anterior"
-              tabIndex={active === 0 ? -1 : 0}
-            >
-              ←
-            </button>
-            <p className="eyebrow">{current.eyebrow}</p>
-            <button
-              type="button"
-              className={`day-program-slideset__arrow${active === count - 1 ? " is-hidden" : ""}`}
-              onClick={() => setActive((a) => (a + 1) % count)}
-              aria-label="Día siguiente"
-              tabIndex={active === count - 1 ? -1 : 0}
-            >
-              →
-            </button>
-          </div>
-          <h2>{current.title}</h2>
-          {current.citation && <p className="programme-citation">{current.citation}</p>}
+          <p className="eyebrow">{weekend.eyebrow}</p>
+          <h2>{weekend.title}</h2>
+          {weekend.intro && <p className="programme-citation">{weekend.intro}</p>}
         </div>
       </div>
 
-
-      <div className="day-program-slideset">
-        <div className="day-program-slideset__track" ref={programTrackRef}>
-          {programs.map((program, index) => (
-            <div
-              key={index}
-              className={`day-program-slide${index === active ? " is-active" : ""}`}
-              aria-hidden={index !== active}
-            >
-              <DayProgram program={program} index={index} />
-            </div>
-          ))}
-        </div>
-        <div className="day-program-slideset__nav">
-          <div className="day-program-slideset__dots">
-            {programs.map((_, i) => (
+      <div className="day-program-scroll">
+        {programs.map((program, index) => (
+          <div
+            key={index}
+            className="day-program-block"
+            ref={(el) => {
+              dayRefs.current[index] = el;
+            }}
+          >
+            <div className="day-program-block__head">
               <button
-                key={i}
                 type="button"
-                className={`day-program-slideset__dot${i === active ? " is-active" : ""}`}
-                onClick={() => setActive(i)}
-                aria-label={`Ir al día ${i + 1}`}
-                aria-current={i === active}
-              />
-            ))}
+                className="day-program-scroll__arrow"
+                onClick={() => scrollToDay(index - 1)}
+                disabled={index === 0}
+                aria-label="Día anterior"
+                tabIndex={index === 0 ? -1 : 0}
+              >
+                ←
+              </button>
+              <p className="eyebrow">{program.eyebrow}</p>
+              <button
+                type="button"
+                className="day-program-scroll__arrow"
+                onClick={() => scrollToDay(index + 1)}
+                disabled={index === programs.length - 1}
+                aria-label="Día siguiente"
+                tabIndex={index === programs.length - 1 ? -1 : 0}
+              >
+                →
+              </button>
+            </div>
+            <h3 className="day-program-block__title">{program.title}</h3>
+            {program.citation && (
+              <p className="programme-citation">{program.citation}</p>
+            )}
+            <DayProgram program={program} index={index} />
           </div>
-        </div>
-
+        ))}
       </div>
 
       <nav className="weekend-nav weekend-nav--light" aria-label="Programme navigation">
@@ -197,6 +191,7 @@ function DayProgramSlideset({ programs }) {
           <span aria-hidden="true">↓</span>
         </a>
       </nav>
+
 
       {/* Warning modal (mobile). Always shows the same traffic disclaimer
           (the Saturday Guadalajara note), independent of the active day. */}
@@ -362,7 +357,11 @@ function DayProgram({ program }) {
     <div className="day-program reveal">
       <ol className="day-program-timeline">
         {program.items.map((item, itemIndex) => (
-          <li key={itemIndex}>
+          <li
+            key={itemIndex}
+            className="day-program-timeline__item"
+            style={{ backgroundImage: `url(${MEDIA.parchment})` }}
+          >
             <time>{item.time}</time>
             <div>
               <h4>{item.title}</h4>
@@ -374,3 +373,4 @@ function DayProgram({ program }) {
     </div>
   );
 }
+

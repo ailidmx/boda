@@ -38,6 +38,17 @@
   margin: 0 auto 2rem;
 }
 
+/* The "Tu te lances" eyebrow sits on the dark green frame, so it uses the
+   golden marigold accent (instead of the default terracotta) to stay legible
+   and match the gold used across the RSVP frame. */
+.rsvp-frame .eyebrow {
+  color: #e4b968;
+}
+
+.rsvp-frame .eyebrow::before {
+  background: #e4b968;
+}
+
 .rsvp-frame > p:not(.eyebrow) {
   max-width: 34rem;
   margin: 0 auto 2rem;
@@ -211,3 +222,395 @@
 .petanque-intro a {
   color: #e4b968;
 }
+
+/* ── RSVP scale questions ─────────────────────────────────────────────── */
+
+.rsvp-question {
+  display: grid;
+  gap: 1.5rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgb(255 255 255 / 28%);
+}
+
+.rsvp-question-head {
+  text-align: left;
+}
+
+.rsvp-question-title {
+  margin: 0 0 0.5rem;
+  color: #e4b968;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+}
+
+.rsvp-question-subtitle {
+  margin: 0;
+  max-width: 46rem;
+  color: rgb(255 253 248 / 70%);
+}
+
+/* Legend: the 5 scale levels */
+.rsvp-scale-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px dashed rgb(228 185 104 / 45%);
+  background: rgb(255 255 255 / 4%);
+}
+
+.rsvp-scale-legend-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: rgb(255 253 248 / 80%);
+}
+
+.rsvp-scale-legend-emoji {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+/* Guest rows */
+.rsvp-question-guests {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.rsvp-question-guest {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgb(255 255 255 / 14%);
+  background: rgb(255 255 255 / 3%);
+}
+
+.rsvp-guest-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.rsvp-guest-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #e4b968;
+  flex: none;
+}
+
+.rsvp-guest-avatar--fallback {
+  display: grid;
+  place-items: center;
+  background: var(--terracotta);
+  color: var(--white);
+  font-weight: 700;
+}
+
+.rsvp-guest-name {
+  font-weight: 600;
+  color: var(--white);
+}
+
+/* 0–5 selector */
+.rsvp-scale-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.rsvp-scale-btn {
+  width: 2.4rem;
+  height: 2.4rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--white);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.rsvp-scale-btn:hover {
+  transform: scale(1.08);
+  border-color: #e4b968;
+}
+
+.rsvp-scale-btn.is-selected {
+  background: #e4b968;
+  border-color: #e4b968;
+  color: var(--deep-green);
+}
+
+.rsvp-scale-btn--zero {
+  font-size: 1rem;
+  color: rgb(255 253 248 / 60%);
+}
+
+.rsvp-scale-btn--zero.is-selected {
+  background: rgb(255 255 255 / 18%);
+  border-color: rgb(255 255 255 / 45%);
+  color: var(--white);
+}
+
+/* Boolean (Yes/No) selector — the same per-guest row look as the scale, but
+   with pill-style Yes/No toggles instead of the 0–5 emoji buttons. Used by
+   the pétanque tournament mini-RSVP. */
+.rsvp-boolean-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.rsvp-boolean-btn {
+  padding: 0.45rem 1.1rem;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--white);
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.rsvp-boolean-btn:hover {
+  transform: scale(1.04);
+  border-color: #e4b968;
+}
+
+.rsvp-boolean-btn.is-selected {
+  background: #e4b968;
+  border-color: #e4b968;
+  color: var(--deep-green);
+  font-weight: 600;
+}
+
+
+/* ── RSVP recap / summary ─────────────────────────────────────────────── */
+
+.rsvp-recap {
+  display: grid;
+  gap: 1.5rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgb(255 255 255 / 28%);
+  text-align: left;
+}
+
+.rsvp-recap-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.rsvp-recap-title {
+  margin: 0;
+  color: #e4b968;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+}
+
+.rsvp-recap-progress {
+  margin: 0;
+  color: rgb(255 253 248 / 70%);
+  font-size: 0.9rem;
+}
+
+.rsvp-recap-question {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.rsvp-recap-question-title {
+  margin: 0;
+  color: var(--white);
+  font-size: 1.05rem;
+}
+
+.rsvp-recap-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.rsvp-recap-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgb(255 255 255 / 12%);
+  background: rgb(255 255 255 / 3%);
+}
+
+.rsvp-recap-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.rsvp-recap-avatar {
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgb(255 255 255 / 30%);
+}
+
+.rsvp-recap-avatar--fallback {
+  display: grid;
+  place-items: center;
+  background: #e4b968;
+  color: var(--deep-green);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.rsvp-recap-name {
+  font-weight: 600;
+  color: var(--white);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rsvp-recap-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.rsvp-recap-answer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgb(255 253 248 / 85%);
+  font-size: 0.9rem;
+}
+
+.rsvp-recap-emoji {
+  font-size: 1.1rem;
+  margin-left: auto;
+}
+
+
+.rsvp-recap-answer--empty {
+  color: rgb(255 253 248 / 45%);
+}
+
+/* ── Flipable step card ───────────────────────────────────────────────── */
+
+.flip-step-card {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgb(255 255 255 / 28%);
+  background: rgb(255 255 255 / 3%);
+}
+
+.flip-step-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.flip-step-count {
+  color: #e4b968;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.flip-step-label {
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+}
+
+.flip-step-body {
+  position: relative;
+  perspective: 1200px;
+}
+
+.flip-step-face {
+  transition: transform 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: rotateY(0deg);
+}
+
+.flip-step-body.is-flipping.is-forward .flip-step-face {
+  transform: rotateY(90deg);
+}
+
+.flip-step-body.is-flipping.is-back .flip-step-face {
+  transform: rotateY(-90deg);
+}
+
+.flip-step-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.flip-step-btn {
+  padding: 0.5rem 1.25rem;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--white);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.flip-step-btn:hover:not(:disabled) {
+  transform: scale(1.04);
+  border-color: #e4b968;
+}
+
+.flip-step-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.flip-step-btn--primary {
+  background: #e4b968;
+  border-color: #e4b968;
+  color: var(--deep-green);
+  font-weight: 600;
+}
+
+.rsvp-recap-step {
+  display: grid;
+  gap: 1.5rem;
+}
+
+

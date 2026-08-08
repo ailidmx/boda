@@ -8,5 +8,6 @@ We are getting married on the weekend of February 20, 2027 at Roca Azul, Jocotep
 - Special section: Coming from far away (flights, transfers, support)
 - Our Mexico favorites
 - Roca Azul services
+- Our sponsors and partners
 - FAQ
 - Important updates

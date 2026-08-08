@@ -22,9 +22,31 @@
   margin: 0 0 1.5rem;
 }
 
-.travel-heading .lead {
+/* The "Je viens de loin" intro is a citation (blockquote): a large display
+   quote with a golden left rule and quotation marks. */
+.travel-lead-citation {
+  position: relative;
   margin: 0;
   max-width: 60rem;
+  padding: 0.25rem 0 0.25rem 1.75rem;
+  border-left: 3px solid var(--marigold);
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.6vw, 2rem);
+  line-height: 1.35;
+  color: #f3e6c8;
+}
+
+.travel-lead-citation::before {
+  content: "“";
+  position: absolute;
+  top: -0.55em;
+  left: 0.35rem;
+  font-family: var(--font-display);
+  font-size: 2.6em;
+  line-height: 1;
+  color: var(--marigold);
+  opacity: 0.55;
+  pointer-events: none;
 }
 
 .travel-layout {
@@ -50,8 +72,12 @@
 
 .travel-points span {
   color: #e4b968;
-  font-size: 0.65rem;
-  letter-spacing: 0.12em;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 1.5rem rgb(228 185 104 / 45%);
 }
 
 .travel-points p {
@@ -61,45 +87,28 @@
   font-size: clamp(1.2rem, 2.2vw, 1.75rem);
 }
 
-.travel-card {
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  align-items: center;
-  gap: 1rem;
-  padding: clamp(2rem, 5vw, 4rem);
-  background: var(--marigold);
-  color: var(--ink);
+/* Language-specific flight map. Clicking it opens the shared lightbox viewer.
+   It sits in the second column of the travel layout, filling the column. */
+.travel-vuelos {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: none;
+  cursor: zoom-in;
+  box-shadow: 0 1.5rem 3rem rgb(0 0 0 / 25%);
 }
 
-.travel-route {
-  font-size: 0.7rem;
-  font-weight: 600;
-  letter-spacing: 0.15em;
+.travel-vuelos img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 700ms ease;
 }
 
-.route-line {
-  position: relative;
-  height: 1px;
-  background: var(--ink);
+.travel-vuelos:hover img {
+  transform: scale(1.02);
 }
-
-.route-line::after {
-  position: absolute;
-  top: -3px;
-  right: 0;
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: var(--ink);
-  content: "";
-}
-
-.travel-card .button {
-  grid-column: 1 / -1;
-  margin-top: auto;
-}
-
-.travel-card small {
-  grid-column: 1 / -1;
-}
-

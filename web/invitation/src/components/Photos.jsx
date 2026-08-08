@@ -12,13 +12,14 @@ export function Photos() {
   const galleryPhotos = MEDIA.gallery || [];
 
   return (
-    <section className="photos-section section" id="photos">
+    <section className="photos-section section story-bg" id="photos">
       <div className="photos-gallery-block">
         <div className="gallery-heading section-heading reveal">
           <p className="eyebrow">{gallery.eyebrow}</p>
           <h2>{gallery.title}</h2>
-          <p className="lead">{gallery.body}</p>
+          <blockquote className="gallery-lead-citation">{gallery.body}</blockquote>
         </div>
+
 
         <div className="photo-gallery">
           {galleryPhotos.map((src, index) => (
@@ -41,25 +42,29 @@ export function Photos() {
       </div>
 
       <div className="photos-upload-block">
+
+
         <div className="photos-heading reveal">
           <h2>{photos.title}</h2>
-          <p className="lead">{photos.lead}</p>
+          <p className="lead photos-lead-citation">{photos.lead}</p>
         </div>
 
-        <div className="photos-before reveal">
-          <h3>{photos.beforeTitle}</h3>
-          <p>{photos.beforeBody}</p>
-        </div>
+        <div className="photos-cards">
+          <div className="photos-before reveal">
+            <h3>{photos.beforeTitle}</h3>
+            <p>{photos.beforeBody}</p>
+            <a className="button button-dark photos-upload-btn" href="#rsvp">
+              {photos.upload}
+            </a>
+          </div>
 
-        <div className="photos-during reveal">
-          <h3>{photos.duringTitle}</h3>
-          <p>{photos.duringBody}</p>
-        </div>
-
-        <div className="photos-upload reveal">
-          <a className="button button-dark" href="#rsvp">
-            {photos.upload}
-          </a>
+          <div className="photos-during reveal">
+            <h3>{photos.duringTitle}</h3>
+            <p>{photos.duringBody}</p>
+            <a className="button button-dark photos-upload-btn" href="#rsvp">
+              {photos.upload}
+            </a>
+          </div>
         </div>
 
         <p className="photos-note reveal">{photos.note}</p>

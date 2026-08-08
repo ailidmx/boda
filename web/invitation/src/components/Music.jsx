@@ -15,7 +15,7 @@ export function Music() {
   ];
 
   return (
-    <section className="music-section section" id="music">
+    <section className="music-section section story-bg" id="music">
 
       <div className="experience-heading reveal">
         <p className="eyebrow">{music.eyebrow}</p>
@@ -78,7 +78,7 @@ export function Music() {
         <div className="playlist-heading">
           <p className="eyebrow">{music.playlists.eyebrow}</p>
           <h3>{music.playlists.title}</h3>
-          <p>{music.playlists.body}</p>
+          <p className="playlist-citation">{music.playlists.body}</p>
         </div>
         <SwipeCardCarousel className="playlist-grid" label={music.playlists.title}>
           {playlists.map(([playlist, url], index) => (

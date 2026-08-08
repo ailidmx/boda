@@ -86,18 +86,18 @@ export function buildGuestNamePayload({ guestId, firstName, middleName, lastName
  * @param {string} input.editorGuestId
  * @returns {Object} explicit payload for setDoc(..., { merge: true })
  */
-export function buildGuestPhotoPayload({ guestId, cloudinaryId, invitationGroup, editorGuestId, timestamp }) {
+export function buildGuestPhotoPayload({ guestId, cloudinaryId, editorGuestId, timestamp }) {
   return {
     guestId,
     identity: {
       cloudinaryId: String(cloudinaryId ?? "").trim(),
     },
     cloudinaryId: String(cloudinaryId ?? "").trim(),
-    invitationGroup: String(invitationGroup ?? "").trim(),
     updatedBy: String(editorGuestId ?? "").trim(),
     updatedAt: timestamp,
   };
 }
+
 
 
 /**
@@ -110,18 +110,18 @@ export function buildGuestPhotoPayload({ guestId, cloudinaryId, invitationGroup,
  * @param {string} input.editorGuestId
  * @returns {Object} explicit payload for setDoc(..., { merge: true })
  */
-export function buildGuestContactPayload({ guestId, phone, invitationGroup, editorGuestId, timestamp }) {
+export function buildGuestContactPayload({ guestId, phone, editorGuestId, timestamp }) {
   const normalizedPhone = normalizeDbPhone(phone);
   return {
     guestId,
     identity: {
       phone: normalizedPhone,
     },
-    invitationGroup: String(invitationGroup ?? "").trim(),
     updatedBy: String(editorGuestId ?? "").trim(),
     updatedAt: timestamp,
   };
 }
+
 
 
 /**
@@ -134,15 +134,15 @@ export function buildGuestContactPayload({ guestId, phone, invitationGroup, edit
  * @param {string} input.editorGuestId
  * @returns {Object} explicit payload for setDoc(..., { merge: true })
  */
-export function buildGuestMessageAuthorPayload({ guestId, messageAuthor, invitationGroup, editorGuestId, timestamp }) {
+export function buildGuestMessageAuthorPayload({ guestId, messageAuthor, editorGuestId, timestamp }) {
   return {
     guestId,
     messageAuthor: String(messageAuthor ?? "").trim(),
-    invitationGroup: String(invitationGroup ?? "").trim(),
     updatedBy: String(editorGuestId ?? "").trim(),
     updatedAt: timestamp,
   };
 }
+
 
 
 /**
@@ -155,15 +155,15 @@ export function buildGuestMessageAuthorPayload({ guestId, messageAuthor, invitat
  * @param {string} input.editorGuestId
  * @returns {Object} explicit payload for setDoc(..., { merge: true })
  */
-export function buildIdentityCheckPayload({ guestId, passed, invitationGroup, editorGuestId, timestamp }) {
+export function buildIdentityCheckPayload({ guestId, passed, editorGuestId, timestamp }) {
   return {
     guestId,
     idCheckUser: passed === true,
-    invitationGroup: String(invitationGroup ?? "").trim(),
     updatedBy: String(editorGuestId ?? "").trim(),
     updatedAt: timestamp,
   };
 }
+
 
 
 /**
@@ -178,6 +178,42 @@ export function buildGuestDeletedPayload(guestId) {
     _deleted: true,
   };
 }
+
+
+/**
+ * Build a payload for saving a guest's RSVP answers.
+ *
+ * Answers are stored on the `guests` collection document, inside the nested
+ * `rsvp.answers` map (questionId → scale level, int 0–5). This keeps all live
+ * guest data in one place (the `guests` collection) instead of a separate
+ * `rsvp_responses` collection.
+ *
+ * @param {Object} input
+ * @param {string} input.guestId
+ * @param {Record<string, number>} input.answers  questionId → level (0–5)
+ * @param {string} input.invitationGroup
+ * @param {string} input.editorGuestId
+ * @returns {Object} explicit payload for setDoc(..., { merge: true })
+ */
+export function buildGuestRsvpPayload({ guestId, answers, editorGuestId, timestamp }) {
+  const normalized = {};
+  Object.entries(answers || {}).forEach(([questionId, level]) => {
+    const n = Number(level);
+    if (Number.isInteger(n) && n >= 0 && n <= 5) {
+      normalized[String(questionId)] = n;
+    }
+  });
+  return {
+    guestId,
+    rsvp: {
+      answers: normalized,
+    },
+    updatedBy: String(editorGuestId ?? "").trim(),
+    updatedAt: timestamp,
+  };
+}
+
+
 
 // ── Attendance responses collection ────────────────────────────────────
 

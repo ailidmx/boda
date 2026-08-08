@@ -60,6 +60,21 @@
   filter: saturate(1.1);
 }
 
+/* Wixárika (Huichol) photo montage — a full-width strip below the Oaxaca
+   montage, reusing the same tile treatment. Four tiles in a row on desktop,
+   collapsing to a 2×2 grid on mobile. */
+.wixarica-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  padding: 0.5rem;
+  max-width: 60rem;
+  margin: clamp(2.5rem, 6vw, 4rem) auto 0;
+  background: rgb(255 255 255 / 10%);
+  border: 0.5rem solid rgb(255 255 255 / 10%);
+}
+
+
 .attire-copy h2 {
   margin-bottom: 2rem;
 }
@@ -404,4 +419,15 @@
     padding: 0.4rem;
     border-width: 0.4rem;
   }
+
+  /* The Wixárika montage is a full-width strip, so on mobile the four tiles
+     collapse to a 2×2 grid to stay legible. */
+  .wixarica-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.35rem;
+    padding: 0.4rem;
+    border-width: 0.4rem;
+    margin-top: 1.5rem;
+  }
 }
+

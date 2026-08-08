@@ -35,7 +35,12 @@ export const collections = {
   attendanceResponses: "attendance_responses",
   /** Thanks / greetings (public content). */
   thanks: "thanks",
+  /** RSVP scale config table (levels 1–5, localized messages + emoji). */
+  rsvpScale: "rsvp_scale",
+  /** Per-guest RSVP answers (questionId → scale level). */
+  rsvpResponses: "rsvp_responses",
 };
+
 
 
 /**

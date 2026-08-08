@@ -17,6 +17,8 @@ import { autoGravity } from "@cloudinary/url-gen/qualifiers/gravity";
 import { format, quality } from "@cloudinary/url-gen/actions/delivery";
 import { auto as autoFormat } from "@cloudinary/url-gen/qualifiers/format";
 import { auto as autoQuality } from "@cloudinary/url-gen/qualifiers/quality";
+import { backgroundRemoval } from "@cloudinary/url-gen/actions/effect";
+
 
 export const CLOUD_NAME = "k2ajcgxv";
 export const CLOUDINARY_BASE = `https://res.cloudinary.com/${CLOUD_NAME}`;
@@ -65,13 +67,20 @@ export function cloudinaryImageObj(publicId, opts = {}) {
   if (f === "auto") img = img.format(autoFormat());
   else if (f) img = img.format(f);
 
-  const { width, height, crop: cropMode } = opts;
+  const { width, height, crop: cropMode, effect } = opts;
   if (width || height) {
     img = img.resize(resizeAction({ width, height, crop: cropMode }));
   }
 
+  // Optional effect, e.g. { effect: "backgroundRemoval" } to strip a solid
+  // background so a logo can sit transparently over a themed section.
+  if (effect === "backgroundRemoval") {
+    img = img.effect(backgroundRemoval());
+  }
+
   return img;
 }
+
 
 /**
  * Build a Cloudinary image delivery URL for a public id.

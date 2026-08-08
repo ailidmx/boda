@@ -43,7 +43,7 @@ import "./styles/winamp.css";
 import "./styles/responsive.css";
 
 import { App } from "./App.jsx";
-import { handleAuthCallback } from "./spotify-player.js";
+
 
 // Register the service worker for offline support + PWA installability.
 // Only in production: in dev the Vite server handles HMR and we don't want a
@@ -63,11 +63,5 @@ const container = document.querySelector("#app");
 // invitation build only renders the React invitation.
 const root = createRoot(container);
 
-// If this window is the Spotify OAuth popup returning with a `?code=`, handle
-// the callback (exchange code → post token to opener → close) WITHOUT rendering
-// the full invitation UI. This keeps the popup invisible and instant.
-handleAuthCallback().then((handled) => {
-  if (!handled) {
-    root.render(<App />);
-  }
-});
+root.render(<App />);
+

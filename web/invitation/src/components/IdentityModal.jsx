@@ -100,9 +100,18 @@ function formatPhone(e164) {
     if (digits.startsWith(cd) && cd.length > code.length) code = cd;
   }
   const national = code ? digits.slice(code.length) : digits;
-  const grouped = national.match(/.{1,2}/g)?.join(" ") || national;
+  let grouped;
+  if (code === "33") {
+    // French format: X XX XX XX XX (leading digit, then pairs).
+    const first = national.slice(0, 1);
+    const rest = national.slice(1).match(/.{1,2}/g)?.join(" ") || "";
+    grouped = [first, rest].filter(Boolean).join(" ");
+  } else {
+    grouped = national.match(/.{1,2}/g)?.join(" ") || national;
+  }
   return code ? `+${code} ${grouped}` : grouped;
 }
+
 
 function formatDisplayEmail(email) {
   const normalized = String(email || "").trim();
@@ -683,11 +692,21 @@ export function IdentityModal() {
       .replace("{count}", String(members.length))
     : (identity.titleSingle || identity.title || "");
 
+  // Clicking "Confirmer" means the guest has reviewed the identity of every
+  // member of their invitation group. We therefore record `idCheckUser = true`
+  // for the whole group (the signed-in guest + all their group members), so the
+  // identity window won't pop up again for any of them on their next visit.
+  // The Firestore rules allow a guest to write the identity-check flag of any
+  // member of their own invitation group.
   const handleConfirm = async () => {
     setSaving(true);
     setFooterMessage(null);
     try {
-      await saveIdentityCheckPassed(guest, true, guest.id);
+      await Promise.all(
+        members.map((member) =>
+          saveIdentityCheckPassed(member, true, guest.id),
+        ),
+      );
       confirmIdentityPrompt();
     } catch (error) {
       console.error("saveIdentityCheckPassed failed", error);
@@ -697,6 +716,7 @@ export function IdentityModal() {
       setSaving(false);
     }
   };
+
 
   return (
     <div
