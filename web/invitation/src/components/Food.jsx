@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { MEDIA } from "../media.js";
 import { useApp } from "../context/AppContext.jsx";
+import { SwipeCardCarousel } from "./SwipeCardCarousel.jsx";
 
 // Decorative icon for the drinks policy panel (a raised glass / toast).
 function DrinksIcon() {
@@ -17,20 +18,7 @@ export function Food() {
 
   const { t } = useApp();
   const food = t.food || {};
-
-  // Slideset: 3 cards per slide on desktop, 1 card per slide on mobile.
-  const [mobile, setMobile] = useState(() =>
-    typeof window !== "undefined" ? window.matchMedia("(max-width: 899px)").matches : false
-  );
-  const [active, setActive] = useState(0);
-  const [playing, setPlaying] = useState(true);
-  const pageSize = mobile ? 1 : 3;
-  const slides = [];
   const flavours = food.flavours || [];
-  for (let i = 0; i < flavours.length; i += pageSize) {
-    slides.push(flavours.slice(i, i + pageSize));
-  }
-  const count = slides.length;
 
   // Drinks policy: disclosure card on desktop, FAB-activated modal on mobile.
   const [drinksOpen, setDrinksOpen] = useState(false);
@@ -80,115 +68,41 @@ export function Food() {
     };
   }, [drinksOpen]);
 
-  // Track the breakpoint so the page size (and number of slides) updates.
-  useEffect(() => {
-    const mq = window.matchMedia("(max-width: 899px)");
-    const update = () => setMobile(mq.matches);
-    update();
-    mq.addEventListener?.("change", update);
-    return () => mq.removeEventListener?.("change", update);
-  }, []);
-
-  // Changing breakpoint changes the number of slides. Return to the first
-  // slide so no stale index can point beyond the current slide set.
-  useEffect(() => {
-    setActive(0);
-  }, [mobile]);
-
-  // Slow autoplay: give guests time to read each slide of flavours.
-  useEffect(() => {
-    if (!playing) return undefined;
-    const id = setInterval(() => {
-      setActive((a) => (a + 1) % count);
-    }, 10000);
-    return () => clearInterval(id);
-  }, [playing, count]);
-
   return (
-    <section className="food-section section" id="food" ref={sectionRef}>
+    <section className="food-section section story-bg" id="food" ref={sectionRef}>
       <div className="experience-heading reveal">
         <p className="eyebrow">{food.eyebrow}</p>
         <h2>{food.title}</h2>
         <p className="accommodation-citation">{food.body}</p>
       </div>
 
-      <div className="flavours-slideset reveal" aria-label={food.flavoursTitle}>
-        <div className="flavours-slideset__track">
-          {slides.map((slide, slideIndex) => (
-            <div
-              key={slideIndex}
-              className={`flavours-slide${slideIndex === active ? " is-active" : ""}`}
-              aria-hidden={slideIndex !== active}
-            >
-              {slide.map((flavour, index) => (
-                <article className="flavour-card" key={index}>
-                  {MEDIA.food[flavour.key] ? (
-                    <img
-                      src={MEDIA.food[flavour.key]}
-                      alt={flavour.title}
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  ) : (
-                    <div className="flavour-card__illustration" aria-hidden="true">
-                      <span>Pizza</span>
-                    </div>
-                  )}
-                  <div>
-                    {flavour.type && food.flavourType?.[flavour.type] ? (
-                      <span className={`flavour-card__type flavour-card__type--${flavour.type}`}>
-                        {food.flavourType[flavour.type]}
-                      </span>
-                    ) : null}
-                    <h3>{flavour.title}</h3>
-                    <p>{flavour.body}</p>
-                  </div>
-                </article>
-
-              ))}
-            </div>
-          ))}
-        </div>
-        <div className="flavours-slideset__nav">
-          <button
-            type="button"
-            className="flavours-slideset__arrow"
-            onClick={() => setActive((a) => (a - 1 + count) % count)}
-            aria-label="Anterior"
-          >
-            ←
-          </button>
-          <div className="flavours-slideset__dots">
-            {slides.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                className={`flavours-slideset__dot${i === active ? " is-active" : ""}`}
-                onClick={() => setActive(i)}
-                aria-label={`${food.flavoursTitle} ${i + 1}`}
-                aria-current={i === active}
+      <SwipeCardCarousel className="flavours-grid" label={food.flavoursTitle}>
+        {flavours.map((flavour, index) => (
+          <article className="flavour-card reveal" key={index}>
+            {MEDIA.food[flavour.key] ? (
+              <img
+                src={MEDIA.food[flavour.key]}
+                alt={flavour.title}
+                loading="lazy"
+                decoding="async"
               />
-            ))}
-          </div>
-          <button
-            type="button"
-            className="flavours-slideset__arrow"
-            onClick={() => setActive((a) => (a + 1) % count)}
-            aria-label="Siguiente"
-          >
-            →
-          </button>
-          <button
-            type="button"
-            className="flavours-slideset__toggle"
-            aria-pressed={!playing}
-            aria-label={playing ? "Pausar" : "Reproducir"}
-            onClick={() => setPlaying((p) => !p)}
-          >
-            {playing ? "❚❚" : "▶"}
-          </button>
-        </div>
-      </div>
+            ) : (
+              <div className="flavour-card__illustration" aria-hidden="true">
+                <span>{food.flavourPlaceholder}</span>
+              </div>
+            )}
+            <div>
+              {flavour.type && food.flavourType?.[flavour.type] ? (
+                <span className={`flavour-card__type flavour-card__type--${flavour.type}`}>
+                  {food.flavourType[flavour.type]}
+                </span>
+              ) : null}
+              <h3>{flavour.title}</h3>
+              <p>{flavour.body}</p>
+            </div>
+          </article>
+        ))}
+      </SwipeCardCarousel>
 
       <p className="experience-note reveal">{food.note}</p>
 

@@ -97,7 +97,7 @@ function runChecks(payload, checks) {
 // sheet-synced read-only). Mirrors the `hasOnly()` list in the rules.
 const GUEST_ALLOWED_FIELDS = [
   "guestId", "identity", "hosting", "idCheckUser", "cloudinaryId", "messageAuthor",
-  "invitationGroup", "updatedBy", "updatedAt", "_deleted",
+  "invitationGroup", "updatedBy", "updatedAt", "_deleted", "rsvp",
 ];
 
 const GUEST_IDENTITY_FIELDS = [
@@ -107,8 +107,9 @@ const GUEST_IDENTITY_FIELDS = [
 // Fields that clients may MODIFY (mirrors the `affectedKeys().hasOnly()` list).
 const GUEST_WRITABLE_FIELDS = [
   "guestId", "identity", "idCheckUser", "cloudinaryId", "messageAuthor",
-  "invitationGroup", "updatedBy", "updatedAt", "_deleted",
+  "invitationGroup", "updatedBy", "updatedAt", "_deleted", "rsvp",
 ];
+
 
 
 /**
@@ -150,10 +151,17 @@ export function validateGuestContactPayload(payload) {
     { check: !hasAnyKey(payload, ["cloudinaryId"]) || (isString(payload.cloudinaryId) && payload.cloudinaryId.length <= 200), message: "cloudinaryId must be a string ≤ 200 chars" },
     { check: !hasAnyKey(payload, ["messageAuthor"]) || isShortText(payload.messageAuthor, 200), message: "messageAuthor must be a string ≤ 200 chars" },
     { check: !hasAnyKey(payload, ["_deleted"]) || isBoolean(payload._deleted), message: "_deleted must be a boolean" },
+    // rsvp.answers map (questionId → int 0–5)
+    { check: !hasAnyKey(payload, ["rsvp"]) || isObject(payload.rsvp), message: "rsvp must be an object" },
+    { check: !hasAnyKey(payload, ["rsvp"]) || hasOnlyKeys(payload.rsvp, ["answers"]), message: `rsvp contains unsupported fields: ${Object.keys(payload.rsvp || {}).filter((k) => k !== "answers").join(", ")}` },
+    { check: !hasAnyKey(payload, ["rsvp"]) || !hasAnyKey(payload.rsvp, ["answers"]) || isObject(payload.rsvp.answers), message: "rsvp.answers must be an object" },
+    { check: !hasAnyKey(payload, ["rsvp"]) || !hasAnyKey(payload.rsvp, ["answers"]) || Object.keys(payload.rsvp.answers).length <= 100, message: "rsvp.answers must have ≤ 100 entries" },
+    { check: !hasAnyKey(payload, ["rsvp"]) || !hasAnyKey(payload.rsvp, ["answers"]) || Object.values(payload.rsvp.answers).every((v) => Number.isInteger(v) && v >= 0 && v <= 5), message: "rsvp.answers values must be integers 0–5" },
   ];
 
   return runChecks(payload, checks);
 }
+
 
 // ── Attendance responses validators ─────────────────────────────────────
 // Mirrors `hasValidAttendanceFields()` in firebase/firestore.rules.

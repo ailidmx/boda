@@ -1374,3 +1374,108 @@
     line-height: 1;
   }
 }
+
+
+/* ── Accommodation recap question ──────────────────────────────────────── */
+
+.accommodation-recap {
+  margin: 2.5rem 0 0;
+  padding-top: 2rem;
+  border-top: 1px solid rgb(36 33 25 / 18%);
+}
+
+.accommodation-recap-head h3 {
+  margin: 0.5rem 0 0.75rem;
+}
+
+.accommodation-recap-intro {
+  margin: 0 0 1.25rem;
+  color: rgb(36 33 25 / 78%);
+  line-height: 1.6;
+}
+
+.accommodation-recap-rows {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.accommodation-recap-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgb(36 33 25 / 14%);
+  border-radius: 0.75rem;
+  background: rgb(255 255 255 / 55%);
+}
+
+.accommodation-recap-person {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.accommodation-recap-person strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+
+.accommodation-recap-person span {
+  color: rgb(36 33 25 / 78%);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.accommodation-recap-toggle {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.5rem;
+}
+
+/* The recap sits on the light accommodation background, so the shared
+   .rsvp-boolean-btn (designed for the dark RSVP section) needs a light-theme
+   override: dark text + visible border by default, gold fill when selected. */
+.accommodation-recap-toggle .rsvp-boolean-btn {
+  background: rgb(255 255 255 / 60%);
+  border-color: rgb(36 33 25 / 28%);
+  color: var(--ink);
+}
+
+.accommodation-recap-toggle .rsvp-boolean-btn:hover {
+  border-color: var(--marigold, #d9b36a);
+}
+
+.accommodation-recap-toggle .rsvp-boolean-btn.is-selected {
+  background: #e4b968;
+  border-color: #e4b968;
+  color: var(--deep-green);
+  font-weight: 600;
+}
+
+.accommodation-recap-save {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.accommodation-recap-save small {
+  color: rgb(36 33 25 / 70%);
+  font-size: 0.85rem;
+}
+
+@media (max-width: 899px) {
+  .accommodation-recap-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .accommodation-recap-toggle {
+    width: 100%;
+  }
+
+  .accommodation-recap-toggle .rsvp-boolean-btn {
+    flex: 1 1 0;
+  }
+}

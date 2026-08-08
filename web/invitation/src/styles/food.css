@@ -30,8 +30,56 @@
 
 
 .food-section {
-  background: var(--cream);
+  position: relative;
+  background:
+    radial-gradient(60rem 40rem at 8% 0%, rgb(198 139 43 / 10%), transparent 60%),
+    radial-gradient(50rem 36rem at 95% 18%, rgb(169 77 49 / 9%), transparent 62%),
+    radial-gradient(70rem 50rem at 50% 100%, rgb(198 139 43 / 8%), transparent 60%),
+    var(--cream);
+  overflow: hidden;
 }
+
+/* Decorative floating orbs — soft, blurred colour glows that drift slowly
+   behind the cards for a warm, festive backdrop. */
+.food-section::before,
+.food-section::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  border-radius: 50%;
+  filter: blur(70px);
+  pointer-events: none;
+}
+
+.food-section::before {
+  top: 6%;
+  left: -8rem;
+  width: 26rem;
+  height: 26rem;
+  background: radial-gradient(circle, rgb(198 139 43 / 34%), transparent 68%);
+  animation: food-orb-drift 18s ease-in-out infinite alternate;
+}
+
+.food-section::after {
+  top: 42%;
+  right: -10rem;
+  width: 30rem;
+  height: 30rem;
+  background: radial-gradient(circle, rgb(169 77 49 / 26%), transparent 68%);
+  animation: food-orb-drift 22s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes food-orb-drift {
+  from { transform: translate3d(0, 0, 0) scale(1); }
+  to   { transform: translate3d(3rem, 2rem, 0) scale(1.12); }
+}
+
+/* Keep the section content above the decorative orbs. */
+.food-section > * {
+  position: relative;
+  z-index: 1;
+}
+
 
 /* "Sabores de Jalisco" heading — now a standalone elegant eyebrow. */
 .flavours-heading {
@@ -47,123 +95,13 @@
   letter-spacing: 0.22em;
 }
 
-/* Slideset: 3 cards per slide on desktop, 1 per slide on mobile. */
-.flavours-slideset {
-  position: relative;
-}
-
-.flavours-slideset__track {
-  position: relative;
-}
-
-/* Each slide is a 3-column grid (one row of three cards). The active slide is
-   in normal flow (it defines the container height); inactive slides are
-   absolutely stacked on top and hidden. */
-.flavours-slide {
-  position: absolute;
-  inset: 0;
+/* Flavour cards: a 3-column grid on desktop. On mobile (≤899px) the
+   SwipeCardCarousel takes over and shows one card per slide with native
+   scroll-snap, so no intermediate grid is needed here. */
+.flavours-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-rows: 1fr;
   gap: clamp(1.25rem, 3vw, 2.25rem);
-  opacity: 0;
-  visibility: hidden;
-  transform: translateX(1.5rem);
-  transition: opacity 400ms ease, transform 400ms ease, visibility 400ms;
-  pointer-events: none;
-}
-
-.flavours-slide.is-active {
-  position: relative;
-  opacity: 1;
-  visibility: visible;
-  transform: translateX(0);
-  pointer-events: auto;
-}
-
-/* Prev/next + dot navigation, centered just below the cards. The controls
-   echo the gold frame of the cards for a cohesive, refined look. */
-.flavours-slideset__nav {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1.25rem;
-  margin-top: 1.5rem;
-}
-
-.flavours-slideset__arrow {
-  display: inline-grid;
-  place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 1px solid rgb(198 139 43 / 45%);
-  border-radius: 50%;
-  background: rgb(255 253 248 / 70%);
-  color: var(--ink);
-  font-size: 1rem;
-  line-height: 1;
-  cursor: pointer;
-  box-shadow: 0 0.25rem 0.75rem rgb(36 33 25 / 8%);
-  transition: background 200ms ease, transform 200ms ease, border-color 200ms ease;
-}
-
-.flavours-slideset__arrow:hover {
-  background: var(--marigold);
-  border-color: var(--marigold);
-  color: var(--white);
-  transform: scale(1.08);
-}
-
-.flavours-slideset__dots {
-  display: flex;
-  align-items: center;
-  gap: 0.55rem;
-}
-
-.flavours-slideset__dot {
-  width: 0.55rem;
-  height: 0.55rem;
-  padding: 0;
-  border: 1px solid rgb(198 139 43 / 40%);
-  border-radius: 50%;
-  background: transparent;
-  cursor: pointer;
-  transition: background 200ms ease, transform 200ms ease, border-color 200ms ease;
-}
-
-.flavours-slideset__dot:hover {
-  border-color: var(--terracotta);
-}
-
-.flavours-slideset__dot.is-active {
-  background: var(--terracotta);
-  border-color: var(--terracotta);
-  transform: scale(1.25);
-}
-
-/* Play/pause toggle for the autoplaying slideset, shown at the end of the
-   nav row. */
-.flavours-slideset__toggle {
-  display: inline-grid;
-  place-items: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border: 1px solid rgb(198 139 43 / 45%);
-  border-radius: 50%;
-  background: rgb(255 253 248 / 70%);
-  color: var(--ink);
-  font-size: 0.8rem;
-  line-height: 1;
-  cursor: pointer;
-  box-shadow: 0 0.25rem 0.75rem rgb(36 33 25 / 8%);
-  transition: background 200ms ease, transform 200ms ease, border-color 200ms ease;
-}
-
-.flavours-slideset__toggle:hover {
-  background: var(--marigold);
-  border-color: var(--marigold);
-  color: var(--white);
-  transform: scale(1.08);
 }
 
 
@@ -177,6 +115,8 @@
   flex-direction: column;
   overflow: hidden;
   background:
+    radial-gradient(120% 90% at 15% 0%, rgb(255 253 248 / 95%), transparent 55%),
+    radial-gradient(90% 70% at 100% 100%, rgb(198 139 43 / 14%), transparent 60%),
     linear-gradient(180deg, #fffdf8 0%, #fbf5e9 100%);
   border: 1px solid rgb(198 139 43 / 28%);
   border-radius: 1.1rem;
@@ -185,6 +125,22 @@
     inset 0 0 0 1px rgb(255 253 248 / 60%);
   transition: transform 320ms ease, box-shadow 320ms ease, border-color 320ms ease;
 }
+
+/* A soft warm glow that breathes inside the card body, echoing the section
+   orbs for a cohesive, luminous feel. */
+.flavour-card::after {
+  content: "";
+  position: absolute;
+  z-index: 1;
+  top: -4rem;
+  right: -4rem;
+  width: 12rem;
+  height: 12rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(198 139 43 / 16%), transparent 70%);
+  pointer-events: none;
+}
+
 
 .flavour-card::before {
   content: "";
@@ -303,16 +259,6 @@
   color: rgb(36 33 25 / 70%);
   font-size: 0.95rem;
   line-height: 1.65;
-}
-
-
-
-/* Mobile: 1 card per slide. */
-@media (max-width: 899px) {
-  .flavours-slide {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
 }
 
 

@@ -85,7 +85,7 @@ export function Attire() {
   }, [pictoOpen]);
 
   return (
-    <section className="attire-section section" ref={sectionRef}>
+    <section className="attire-section section story-bg" ref={sectionRef}>
       <p className="eyebrow attire-eyebrow">{attire.eyebrow}</p>
 
       {/* Row 1: photos (1/3) + citation (2/3) */}
@@ -110,8 +110,25 @@ export function Attire() {
         </div>
       </div>
 
+      {/* Wixárika (Huichol) photo montage — same treatment as the Oaxaca
+          montage above, shown as an additional full-width strip. */}
+      <div className="wixarica-grid" aria-label="Wixárika">
+        {MEDIA.wixarica.map((src, i) => (
+          <img
+            className="oaxaca-tile"
+            src={src}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            style={{ "--tile-index": i }}
+            key={i}
+          />
+        ))}
+      </div>
+
       {/* Row 2: dress-code text, full width (1/1). The pictograms live in a
           modal opened by the FAB so the text stays clean and readable. */}
+
       {attire.dressCode && (
         <div className="attire-dress-code reveal">
           <p className="attire-dress-code__title">{attire.dressCode.title}</p>

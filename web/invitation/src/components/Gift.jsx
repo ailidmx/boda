@@ -7,7 +7,7 @@ export function Gift() {
   const gift = t.gift || {};
 
   return (
-    <section className="gift-section section">
+    <section className="gift-section section story-bg">
       <div className="gift-copy reveal">
         <div className="section-heading">
           <p className="eyebrow">{gift.eyebrow}</p>
@@ -20,7 +20,7 @@ export function Gift() {
             {Object.entries(gift.accounts).map(([currency, account]) => (
               <details
                 className="gift-account"
-                open={currency === "eur"}
+                open
                 key={currency}
               >
                 <summary>{account.title}</summary>

@@ -13,6 +13,8 @@ import {
 import { getCabin } from "../cabins.js";
 import { getRoom, getRoomDescription, getRoomsByCabin } from "../rooms.js";
 import { cloudinaryImage } from "../cloudinary.js";
+import { RsvpQuestion, BOOLEAN_YES, BOOLEAN_NO } from "./RsvpQuestion.jsx";
+import { resolveRsvpAnswer, saveRsvpAnswers } from "../rsvp-responses.js";
 
 
 
@@ -159,7 +161,7 @@ function PlanPrice({ original, toPay, language, covered = false }) {
 
 
 export function Accommodation() {
-  const { t, profile, language } = useApp();
+  const { t, profile, language, interfaceText } = useApp();
   const accommodation = t.accommodation || {};
   const guest = profile?.guest;
   const activeGuests = getActiveGuests();
@@ -349,6 +351,53 @@ export function Accommodation() {
   const noteCloseRef = useRef(null);
   const occupancyCloseRef = useRef(null);
 
+  // ── Accommodation recap question ───────────────────────────────────────
+  // A boolean question per group member: confirm the accommodation option.
+  // The question text is conditional — members with a cabin confirm their
+  // on-site option, members without one express interest in a freed cabin.
+  const recap = accommodation.recap || {};
+  const recapQuestion = { id: 'accommodationConfirm', title: recap.title, variant: 'boolean' };
+  const [recapAnswers, setRecapAnswers] = useState(() => {
+    const initial = {};
+    groupMembers.forEach((member) => {
+      initial[member.id] = resolveRsvpAnswer(member, recapQuestion.id);
+    });
+    return initial;
+  });
+  const [recapSaveStatus, setRecapSaveStatus] = useState('idle');
+
+  const handleRecapChange = (guestId, level) => {
+    setRecapAnswers((prev) => ({ ...prev, [guestId]: level }));
+  };
+
+  const handleRecapSave = async () => {
+    if (recapSaveStatus === 'working') return;
+    const editorGuestId = guest?.id;
+    if (!editorGuestId) return;
+    setRecapSaveStatus('working');
+    try {
+      await Promise.all(
+        groupMembers.map((member) =>
+          saveRsvpAnswers(member, { [recapQuestion.id]: recapAnswers[member.id] }, editorGuestId),
+        ),
+      );
+      setRecapSaveStatus('saved');
+    } catch (error) {
+      console.warn('[accommodation] recap save failed', error.code || error.message);
+      setRecapSaveStatus('error');
+    }
+  };
+
+  const recapStatusText =
+    recapSaveStatus === 'working'
+      ? interfaceText?.submitWorking
+      : recapSaveStatus === 'saved'
+        ? recap.success
+        : recapSaveStatus === 'error'
+          ? recap.error
+          : '';
+
+
 
   useEffect(() => {
     const section = sectionRef.current;
@@ -409,7 +458,7 @@ export function Accommodation() {
 
 
   return (
-    <section className="accommodation-section section" ref={sectionRef}>
+    <section className="accommodation-section section story-bg" ref={sectionRef}>
       <div className="accommodation-copy reveal" id="accommodation-overview">
         <p className="eyebrow">{accommodation.eyebrow}</p>
         <h2>{accommodation.title}</h2>
@@ -874,6 +923,61 @@ export function Accommodation() {
             {option.button}
           </a>
         </div>
+        {recap.title && groupMembers.length > 0 && (
+          <div className="accommodation-recap">
+            <div className="accommodation-recap-head">
+              <p className="eyebrow">{recap.eyebrow}</p>
+              <h3>{recap.title}</h3>
+              <p className="accommodation-recap-intro">{recap.intro}</p>
+            </div>
+            <div className="accommodation-recap-rows">
+              {groupMembers.map((member) => {
+                const name = resolveGuestName(member).fullName;
+                const hasCabin = Boolean(resolveMemberCabin(member));
+                const questionText = hasCabin ? recap.hasCabinQuestion : recap.noCabinQuestion;
+                const current = recapAnswers[member.id] || 0;
+                return (
+                  <div className="accommodation-recap-row" key={member.id}>
+                    <div className="accommodation-recap-person">
+                      <strong>{name}</strong>
+                      <span>{questionText}</span>
+                    </div>
+                    <div className="accommodation-recap-toggle">
+                      <button
+                        type="button"
+                        className={`rsvp-boolean-btn${current === BOOLEAN_YES ? ' is-selected' : ''}`}
+                        aria-pressed={current === BOOLEAN_YES}
+                        onClick={() => handleRecapChange(member.id, BOOLEAN_YES)}
+                      >
+                        {recap.yesLabel}
+                      </button>
+                      <button
+                        type="button"
+                        className={`rsvp-boolean-btn${current === BOOLEAN_NO ? ' is-selected' : ''}`}
+                        aria-pressed={current === BOOLEAN_NO}
+                        onClick={() => handleRecapChange(member.id, BOOLEAN_NO)}
+                      >
+                        {recap.noLabel}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+            <div className="accommodation-recap-save">
+              <button
+                className="button button-light"
+                type="button"
+                onClick={handleRecapSave}
+                disabled={recapSaveStatus === 'working'}
+              >
+                {recap.button}
+              </button>
+              {recapStatusText ? <small data-form-status>{recapStatusText}</small> : null}
+            </div>
+          </div>
+        )}
+
         <nav className="accommodation-subnav accommodation-subnav--back" aria-label={option.backLabel}>
 
           <a href="#accommodation-overview">

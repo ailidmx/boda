@@ -117,6 +117,35 @@
   outline-offset: 2px;
 }
 
+/* Loop button: highlighted when active (ON by default). */
+.winamp-btn.winamp-loop.is-on {
+  background: linear-gradient(180deg, #c68b2b 0%, #8a5a12 100%);
+  color: #0a0a0a;
+  box-shadow: 0 2px 0 #000, inset 0 0 0 1px #e4b968;
+}
+
+.winamp-btn.winamp-loop.is-on:hover {
+  background: linear-gradient(180deg, #d99a35 0%, #9a6a18 100%);
+}
+
+/* ── Copyright attribution ────────────────────────────────────────────── */
+
+.winamp-copyright {
+  display: none;
+  padding: 0 0.5rem 0.35rem;
+  font-family: "Bitcount Grid Single", monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  color: rgb(228 185 104 / 70%);
+  text-shadow: 1px 1px 0 #000;
+  white-space: nowrap;
+}
+
+.winamp-banner.is-open .winamp-copyright {
+  display: block;
+}
+
+
 /* ── Time display (current / remaining) ───────────────────────────────── */
 
 .winamp-time {

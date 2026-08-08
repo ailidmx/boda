@@ -1,12 +1,84 @@
 /* ── Gift section ─────────────────────────────────────────────────────── */
 
 .gift-section {
-  display: grid;
-  grid-template-columns: 1fr 0.9fr;
+  position: relative;
+  display: flex;
+  flex-direction: column;
   gap: clamp(3rem, 8vw, 8rem);
   align-items: center;
   background: var(--deep-green);
   color: var(--white);
+  overflow: hidden;
+}
+
+/* ── Thankful symbolic orbs ─────────────────────────────────────────────
+   Soft, colourful, lightly-drawn orbs floating behind the copy. They read as
+   an elegant, art-worked thank-you motif rather than a flat background. */
+.gift-section::before,
+.gift-section::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Large warm orb, top-left. */
+.gift-section::before {
+  top: -12rem;
+  left: -10rem;
+  width: 34rem;
+  height: 34rem;
+  background:
+    radial-gradient(circle at 35% 35%, rgb(198 139 43 / 34%), transparent 62%),
+    radial-gradient(circle at 60% 60%, rgb(169 77 49 / 22%), transparent 70%);
+  filter: blur(6px);
+}
+
+/* Large cool orb, bottom-right. */
+.gift-section::after {
+  right: -12rem;
+  bottom: -12rem;
+  width: 36rem;
+  height: 36rem;
+  background:
+    radial-gradient(circle at 60% 40%, rgb(122 139 122 / 30%), transparent 62%),
+    radial-gradient(circle at 40% 65%, rgb(198 139 43 / 20%), transparent 70%);
+  filter: blur(6px);
+}
+
+/* Two smaller accent orbs tucked behind the copy column. */
+.gift-copy::before,
+.gift-copy::after {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(4px);
+}
+
+.gift-copy::before {
+  top: 8%;
+  right: -6rem;
+  width: 14rem;
+  height: 14rem;
+  background: radial-gradient(circle, rgb(212 175 55 / 26%), transparent 68%);
+}
+
+.gift-copy::after {
+  bottom: 4%;
+  left: -5rem;
+  width: 12rem;
+  height: 12rem;
+  background: radial-gradient(circle, rgb(169 77 49 / 24%), transparent 68%);
+}
+
+/* Keep the copy and controls above the decorative orbs. */
+.gift-copy,
+.gift-section-nav {
+  position: relative;
+  z-index: 1;
 }
 
 .gift-copy h2 {
@@ -19,12 +91,43 @@
   border-bottom-color: rgb(255 255 255 / 25%);
 }
 
+/* The "Votre présence…" line is styled as a literary citation: clear/white
+   text, a marigold left rule, display serif, italic, with a large opening
+   quote mark. It stands apart from the muted note and account details that
+   follow. */
+.gift-section .gift-copy .lead {
+  position: relative;
+  max-width: 34rem;
+  margin: 1.5rem 0 2rem;
+  padding-left: 1.5rem;
+
+  border-left: 2px solid var(--marigold);
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--white) !important;
+}
+
+.gift-copy .lead::before {
+  content: "“";
+  position: absolute;
+  top: -0.35em;
+  left: -0.15rem;
+  font-family: var(--font-display);
+  font-size: 3.5em;
+  line-height: 1;
+  color: var(--marigold);
+  opacity: 0.35;
+}
+
 .gift-copy .note {
   margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgb(255 255 255 / 35%);
   font-size: 0.8rem;
+  color: rgb(255 255 255 / 72%);
 }
+
 
 .gift-accounts {
   margin-top: 1.5rem;

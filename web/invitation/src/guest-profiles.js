@@ -354,10 +354,10 @@ export async function saveGuestPhoto(guest, cloudinaryId, editorGuestId) {
   const next = buildGuestPhotoPayload({
     guestId: guest.id,
     cloudinaryId,
-    invitationGroup,
     editorGuestId,
     timestamp: serverTimestamp(),
   });
+
 
   // Runtime validation mirrors the Firestore rules (hasValidGuestContactFields).
   const result = validateGuestContactPayload(next);
@@ -431,10 +431,10 @@ export async function saveGuestContact(guest, contact, editorGuestId) {
   const next = buildGuestContactPayload({
     guestId: guest.id,
     phone: contact.phone !== undefined ? contact.phone : existing.phone,
-    invitationGroup,
     editorGuestId,
     timestamp: serverTimestamp(),
   });
+
 
   // Runtime validation mirrors the Firestore rules (hasValidGuestContactFields).
   const result = validateGuestContactPayload(next);
@@ -488,10 +488,10 @@ export async function saveGuestMessageAuthor(guest, messageAuthor, editorGuestId
   const next = buildGuestMessageAuthorPayload({
     guestId: guest.id,
     messageAuthor,
-    invitationGroup,
     editorGuestId,
     timestamp: serverTimestamp(),
   });
+
 
   // Runtime validation mirrors the Firestore rules (hasValidGuestContactFields).
   const result = validateGuestContactPayload(next);
@@ -548,10 +548,10 @@ export async function saveIdentityCheckPassed(guest, passed, editorGuestId) {
   const next = buildIdentityCheckPayload({
     guestId: guest.id,
     passed,
-    invitationGroup,
     editorGuestId,
     timestamp: serverTimestamp(),
   });
+
 
   // Runtime validation mirrors the Firestore rules (hasValidGuestContactFields).
   const result = validateGuestContactPayload(next);

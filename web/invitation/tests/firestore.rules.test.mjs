@@ -7,7 +7,6 @@ import {
 } from "@firebase/rules-unit-testing";
 import { doc, getDoc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 
-
 const projectId = "boda-rules-test";
 const guestUid = "yfu7MMCmFaPCK7UW4czr5c3x7Aa2";
 let environment;
@@ -289,7 +288,6 @@ test("a group member can update a guest identity without sending invitationGroup
 });
 
 test("a group member cannot store an email on the guests collection (email lives in Firebase Auth)", async () => {
-
   await seedGuestAuth();
   const db = environment.authenticatedContext(editorUid).firestore();
   await assertFails(
@@ -363,6 +361,62 @@ test("an unauthenticated visitor cannot edit a guest record", async () => {
       updatedBy: "david_aili",
       updatedAt: serverTimestamp(),
     }),
+  );
+});
+
+// ── RSVP scale answers & identity check (self-write) ────────────────────
+// The RSVP scale save writes `rsvp.answers` to each group member's own
+// document (saveRsvpAnswers → setDoc with merge), and the identity check
+// writes `idCheckUser: true` to the whole group. Both are self-writes
+// (auth.uid == guestId) and must be allowed even when the group-resolution
+// edge cases apply. These mirror the exact payloads from rsvp-responses.js
+// and IdentityModal.jsx.
+
+test("a guest can save RSVP scale answers to their own document", async () => {
+  await seedGuestAuth();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "guests", editorUid), {
+      guestId: editorUid,
+      rsvp: { answers: { q1: 5, q2: 3 } },
+      updatedBy: editorUid,
+      updatedAt: serverTimestamp(),
+    }, { merge: true }),
+  );
+});
+
+test("a guest can save RSVP scale answers to a group member's document", async () => {
+  await seedGuestAuth();
+  await environment.withSecurityRulesDisabled(async (admin) => {
+    await setDoc(doc(admin.firestore(), "guests", "catherine"), {
+      guestId: "catherine",
+      identity: { firstName: "Catherine", lastName: "Martin" },
+      invitationGroup: editorGroup,
+      updatedBy: "seed",
+      updatedAt: serverTimestamp(),
+    });
+  });
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "guests", "catherine"), {
+      guestId: "catherine",
+      rsvp: { answers: { q1: 4, q2: 2 } },
+      updatedBy: editorUid,
+      updatedAt: serverTimestamp(),
+    }, { merge: true }),
+  );
+});
+
+test("a guest can confirm identity (idCheckUser) on their own document", async () => {
+  await seedGuestAuth();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "guests", editorUid), {
+      guestId: editorUid,
+      idCheckUser: true,
+      updatedBy: editorUid,
+      updatedAt: serverTimestamp(),
+    }, { merge: true }),
   );
 });
 
@@ -603,7 +657,7 @@ test("an admin can read any guest document", async () => {
   await assertSucceeds(getDoc(doc(db, "guests", "sebastien")));
 });
 
-test("an invited guest can read a guest from another group", async () => {
+test("a guest cannot read a guest from another group", async () => {
   await seedGuestAuth();
   await environment.withSecurityRulesDisabled(async (admin) => {
     await setDoc(doc(admin.firestore(), "guests", "sebastien"), {
@@ -614,7 +668,7 @@ test("an invited guest can read a guest from another group", async () => {
     });
   });
   const db = environment.authenticatedContext(editorUid).firestore();
-  await assertSucceeds(getDoc(doc(db, "guests", "sebastien")));
+  await assertFails(getDoc(doc(db, "guests", "sebastien")));
 });
 
 // ── Invitation groups: group-scoped reads ─────────────────────────────

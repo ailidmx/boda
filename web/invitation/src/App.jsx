@@ -1,4 +1,4 @@
-import React, { Suspense, lazy } from "react";
+import React, { Suspense, lazy, useEffect } from "react";
 import { AppProvider, useApp } from "./context/AppContext.jsx";
 import { AuthGate } from "./components/AuthGate.jsx";
 import { Nav } from "./components/Nav.jsx";
@@ -11,9 +11,6 @@ import { WinampPlayer } from "./components/WinampPlayer.jsx";
 import { useVersionCheck } from "./hooks/useVersionCheck.js";
 
 
-
-
-
 // Below-the-fold sections are code-split and only mounted (and their JS chunk
 // fetched) when they scroll into view. This keeps the initial bundle small and
 // the first paint fast on a long one-page invitation.
@@ -22,7 +19,6 @@ import { useVersionCheck } from "./hooks/useVersionCheck.js";
 // named export via `.then((m) => ({ default: m.X }))` — React.lazy requires a
 // default export.
 const Story = lazy(() =>
-
   import("./components/Story.jsx").then((m) => ({ default: m.Story })),
 );
 
@@ -41,7 +37,6 @@ const Petanque = lazy(() =>
 const Accommodation = lazy(() =>
   import("./components/Accommodation.jsx").then((m) => ({ default: m.Accommodation })),
 );
-
 
 const Weather = lazy(() =>
   import("./components/Weather.jsx").then((m) => ({ default: m.Weather })),
@@ -67,6 +62,10 @@ const Coast = lazy(() =>
 const RSVP = lazy(() =>
   import("./components/RSVP.jsx").then((m) => ({ default: m.RSVP })),
 );
+const TeAnimas = lazy(() =>
+  import("./components/TeAnimas.jsx").then((m) => ({ default: m.TeAnimas })),
+);
+
 const Guests = lazy(() =>
   import("./components/GuestCloud.jsx").then((m) => ({ default: m.GuestCloud })),
 );
@@ -81,8 +80,6 @@ const Footer = lazy(() =>
 );
 
 
-
-
 function Invitation() {
   const { authState } = useApp();
 
@@ -91,8 +88,22 @@ function Invitation() {
   // a newer release has shipped. Runs for all auth states.
   useVersionCheck();
 
-  if (authState === "loading") {
+  // On first load (direct visit, refresh, or a shared link with a hash like
+  // `#thanks`), clear any hash from the URL. The sections are lazy-loaded and
+  // gated behind sign-in, so the browser cannot scroll to a hash target that
+  // does not exist yet — leaving it in place can crash or leave the page stuck
+  // mid-scroll. Redirecting to the root (no hash) lets the app boot normally.
+  useEffect(() => {
+    if (window.location.hash) {
+      window.history.replaceState(
+        null,
+        "",
+        window.location.pathname + window.location.search,
+      );
+    }
+  }, []);
 
+  if (authState === "loading") {
     return <div className="app-loading" aria-label="Loading" />;
   }
 
@@ -108,12 +119,8 @@ function Invitation() {
       <Nav />
       <WinampPlayer />
       <main>
-
-
-
         <Hero />
         <LazySection id="story" className="lazy-section">
-
           <Suspense fallback={null}>
             <Story />
           </Suspense>
@@ -144,6 +151,19 @@ function Invitation() {
             <WeekendProgram />
           </Suspense>
         </LazySection>
+        {/* "Vous vous lancez ?" — placed right after the programme. */}
+        <LazySection id="te-animas" className="lazy-section">
+          <Suspense fallback={null}>
+            <TeAnimas />
+          </Suspense>
+        </LazySection>
+        {/* "Je viens de loin" — placed right after the programme. */}
+        <LazySection id="travel" className="lazy-section">
+          <Suspense fallback={null}>
+            <Travel />
+          </Suspense>
+        </LazySection>
+
         <LazySection id="petanque" className="lazy-section">
           <Suspense fallback={null}>
             <Petanque />
@@ -155,7 +175,6 @@ function Invitation() {
           </Suspense>
         </LazySection>
         <LazySection id="food" className="lazy-section">
-
           <Suspense fallback={null}>
             <Food />
           </Suspense>
@@ -168,16 +187,6 @@ function Invitation() {
         <LazySection id="coast" className="lazy-section">
           <Suspense fallback={null}>
             <Coast />
-          </Suspense>
-        </LazySection>
-        <LazySection id="travel" className="lazy-section">
-          <Suspense fallback={null}>
-            <Travel />
-          </Suspense>
-        </LazySection>
-        <LazySection id="rsvp" className="lazy-section">
-          <Suspense fallback={null}>
-            <RSVP />
           </Suspense>
         </LazySection>
         <LazySection id="photos" className="lazy-section">
@@ -195,16 +204,21 @@ function Invitation() {
             <Gift />
           </Suspense>
         </LazySection>
+        {/* The final RSVP form sits right before the thank-you section. */}
+        <LazySection id="rsvp" className="lazy-section">
+          <Suspense fallback={null}>
+            <RSVP />
+          </Suspense>
+        </LazySection>
         <LazySection id="thanks" className="lazy-section">
           <Suspense fallback={null}>
             <Thanks />
           </Suspense>
         </LazySection>
+
       </main>
 
-
       <LazySection id="footer" className="lazy-section">
-
         <Suspense fallback={null}>
           <Footer />
         </Suspense>
