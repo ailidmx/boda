@@ -137,9 +137,20 @@ export function Attire() {
               {paragraph}
             </p>
           ))}
+          {/* Section FAB: opens the pictogram modal. Anchored to the dress-code
+              block so it stays within the section's contained width on desktop. */}
+          <button
+            ref={fabRef}
+            className={`attire-picto-fab${attireActive && !pictoOpen ? " is-visible" : ""}`}
+            type="button"
+            aria-label={attire.dressCode.title}
+            aria-haspopup="dialog"
+            onClick={() => setPictoOpen(true)}
+          >
+            <PaletteIcon />
+          </button>
         </div>
       )}
-
       {/* Dress-code pictogram modal */}
       {attire.dressCode && (
         <div
@@ -167,20 +178,6 @@ export function Attire() {
 
           </div>
         </div>
-      )}
-
-      {/* Section FAB: opens the pictogram modal */}
-      {attire.dressCode && (
-        <button
-          ref={fabRef}
-          className={`attire-picto-fab${attireActive && !pictoOpen ? " is-visible" : ""}`}
-          type="button"
-          aria-label={attire.dressCode.title}
-          aria-haspopup="dialog"
-          onClick={() => setPictoOpen(true)}
-        >
-          <PaletteIcon />
-        </button>
       )}
 
       <nav className="attire-nav" aria-label="Attire navigation">

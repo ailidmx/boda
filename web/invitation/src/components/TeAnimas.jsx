@@ -122,22 +122,20 @@ export function TeAnimas() {
   ];
 
   return (
-    <section className="rsvp-section section story-bg">
-      <div className="rsvp-frame reveal">
-        <p className="eyebrow">{t.nav.teAnimas}</p>
-        <p>{scale.intro}</p>
+    <section className="rsvp-section section story-bg reveal">
+      <p className="eyebrow">{t.nav.teAnimas}</p>
+      <p>{scale.intro}</p>
 
-        {questions.length > 0 && guests.length > 0 && (
-          <FlipStepCard
-            steps={steps}
-            copy={{
-              step: interfaceText.stepLabel || "Step",
-              next: interfaceText.next || "Next",
-              back: interfaceText.back || "Back",
-            }}
-          />
-        )}
-      </div>
+      {questions.length > 0 && guests.length > 0 && (
+        <FlipStepCard
+          steps={steps}
+          copy={{
+            step: interfaceText.stepLabel || "Step",
+            next: interfaceText.next || "Next",
+            back: interfaceText.back || "Back",
+          }}
+        />
+      )}
     </section>
   );
 }

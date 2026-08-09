@@ -16,10 +16,11 @@ export function Weekend() {
           <img src={MEDIA.weekendBanner} alt="" loading="lazy" decoding="async" />
           <div className="weekend-banner-content">
             <div className="section-heading reveal">
-              <p className="eyebrow">{weekend.eyebrow}</p>
+              <p className="eyebrow">{weekend.bannerEyebrow}</p>
               <h2>{weekend.title}</h2>
               <blockquote className="weekend-lead-citation">{weekend.intro}</blockquote>
             </div>
+
 
             <div className="weekend-dates" aria-hidden="true">
               <span className="weekend-date weekend-date--side">19 · 02 · 27</span>
@@ -143,8 +144,12 @@ function DayProgramSlideset({ programs }) {
         </div>
       </div>
 
-      <div className="day-program-scroll">
+      <div
+        className="day-program-scroll"
+        style={{ backgroundImage: `url(${MEDIA.parchment})` }}
+      >
         {programs.map((program, index) => (
+
           <div
             key={index}
             className="day-program-block"
@@ -357,11 +362,7 @@ function DayProgram({ program }) {
     <div className="day-program reveal">
       <ol className="day-program-timeline">
         {program.items.map((item, itemIndex) => (
-          <li
-            key={itemIndex}
-            className="day-program-timeline__item"
-            style={{ backgroundImage: `url(${MEDIA.parchment})` }}
-          >
+          <li key={itemIndex} className="day-program-timeline__item">
             <time>{item.time}</time>
             <div>
               <h4>{item.title}</h4>
@@ -369,6 +370,7 @@ function DayProgram({ program }) {
             </div>
           </li>
         ))}
+
       </ol>
     </div>
   );

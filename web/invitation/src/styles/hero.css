@@ -1,13 +1,70 @@
 /* ── Hero ─────────────────────────────────────────────────────────────── */
 
-.hero {
+/* ── Responsive: mobile-first ──────────────────────────────────────────
+   Base (mobile): the hero title scales fluidly, the scroll cue is hidden
+   (no room on small screens), and the slideshow controls sit in the corner. */
 
+/* Small phones: tighten the hero title, stack the identity swap, and
+   reposition the image note + slideshow controls. */
+@media (max-width: 600px) {
+  .hero h1 {
+    gap: 0.1rem;
+    font-size: clamp(2.15rem, 9.5vw, 3.1rem);
+  }
+
+  .identity-swap--hero {
+    font-size: clamp(2.6rem, 11.5vw, 3.9rem);
+    line-height: 1.16;
+  }
+
+  .identity-swap--hero .identity-swap-state {
+    flex-direction: row;
+    gap: 0.12em;
+    align-items: baseline;
+    justify-content: center;
+    white-space: nowrap;
+  }
+
+  .identity-swap--hero .identity-connector {
+    font-size: 0.42em;
+  }
+
+  .hero h1 i {
+    margin: 0;
+  }
+
+  .hero-content {
+    padding-top: 9rem;
+  }
+
+  .hero-image-note {
+    right: 1rem;
+    bottom: 4.5rem;
+  }
+
+  /* Guest name reduced by ~3x on mobile so it doesn't dominate the hero. */
+  .hero-guest-name {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    letter-spacing: 0.05em;
+  }
+}
+
+@media (max-width: 899px) {
+  .hero-guest-name {
+    font-size: 1.5rem;
+  }
+}
+
+
+
+
+
+.hero {
   position: relative;
   display: grid;
-  grid-template-rows: 1fr auto;
   min-height: calc(100svh - var(--countdown-height) - var(--header-height));
   overflow: hidden;
-
 
   background:
     linear-gradient(90deg, rgb(36 33 25 / 52%), transparent 55%),
@@ -21,10 +78,8 @@
   z-index: 0;
   inset: 0;
   overflow: hidden;
-  background:
-    radial-gradient(circle at 72% 32%, rgb(231 194 125 / 40%), transparent 23%),
-    linear-gradient(135deg, #9b735e 0%, #6e6857 44%, #33423a 100%);
 }
+
 
 .hero-photo {
   position: absolute;
@@ -106,71 +161,6 @@
   content: "";
 }
 
-.hero-art.has-photo .sun-disc,
-.hero-art.has-photo .motif {
-  display: none;
-}
-
-.hero-art::after {
-  position: absolute;
-  z-index: 1;
-  inset: 0;
-  background:
-    linear-gradient(180deg, transparent 55%, rgb(24 32 28 / 68%)),
-    radial-gradient(circle at 50% 120%, #263a33 0 37%, transparent 38%);
-  content: "";
-}
-
-.sun-disc {
-  position: absolute;
-  top: 16%;
-  right: 13%;
-  width: min(30vw, 23rem);
-  aspect-ratio: 1;
-  border: 1px solid rgb(255 238 194 / 38%);
-  border-radius: 50%;
-  box-shadow:
-    0 0 0 3rem rgb(255 238 194 / 4%),
-    0 0 0 7rem rgb(255 238 194 / 3%);
-}
-
-.motif {
-  position: absolute;
-  z-index: 2;
-  bottom: -4rem;
-  width: 16rem;
-  height: 32rem;
-  opacity: 0.45;
-  transform: rotate(-12deg);
-}
-
-.motif::before,
-.motif::after {
-  position: absolute;
-  border: 1px solid rgb(255 244 214 / 65%);
-  border-radius: 70% 0 70% 0;
-  content: "";
-}
-
-.motif::before {
-  inset: 0 50% 40% 0;
-  box-shadow:
-    4rem 5rem 0 -0.15rem rgb(255 255 255 / 0%),
-    4rem 5rem 0 0 rgb(255 244 214 / 52%);
-}
-
-.motif::after {
-  inset: 35% 0 0 45%;
-}
-
-.motif-left {
-  left: 6%;
-}
-
-.motif-right {
-  right: 4%;
-  transform: rotate(18deg) scaleX(-1);
-}
 
 .hero-image-note {
   position: absolute;
@@ -193,6 +183,13 @@
   text-align: center;
   overflow: visible;
 }
+
+@media (max-width: 899px) {
+  .hero-content {
+    padding: 1.5rem 0 1.5rem;
+  }
+}
+
 
 .hero-section-nav {
   position: relative;
@@ -224,18 +221,15 @@
   justify-content: center;
   gap: clamp(0.6rem, 2vw, 1.5rem);
   margin: 0;
-  padding-block: 1em;
   font-family: var(--font-calligraphy);
-  font-size: clamp(7rem, 18vw, 14rem);
+  font-size: clamp(7rem, 18vw, 13rem);
   font-weight: 400;
+
   font-optical-sizing: auto;
   letter-spacing: 0.02em;
   line-height: 1.5;
   overflow: visible;
 }
-
-
-
 
 
 
@@ -523,12 +517,21 @@
 
 
 .hero-date-label {
+  margin-top: 1.5rem;
   font-size: clamp(1rem, 1.8vw, 1.4rem);
   font-weight: 700;
   letter-spacing: 0.24em;
   color: rgb(241 211 144 / 70%);
   text-transform: uppercase;
 }
+
+@media (max-width: 899px) {
+  .hero-date-label {
+    display: none;
+  }
+}
+
+
 
 .hero-place {
   margin: 0 0 3rem;
@@ -539,6 +542,14 @@
   text-transform: uppercase;
 }
 
+@media (max-width: 899px) {
+  .hero-place {
+    font-size: 0.6rem;
+  }
+}
+
+
+
 
 
 
@@ -548,6 +559,7 @@
   margin: 0 0 3rem;
   font-family: var(--font-display);
   font-size: 4.6rem;
+
   font-weight: 700;
   letter-spacing: 0.06em;
   line-height: 1.05;
@@ -568,8 +580,7 @@
 .hero-eyebrow {
   margin: 0 0 2rem;
   font-family: var(--font-display);
-  font-size: clamp(1.8rem, 5.6vw, 7rem);
-
+  font-size: clamp(2rem, 5.6vw, 5rem);
   font-style: italic;
   font-weight: 500;
   letter-spacing: 0.02em;
@@ -578,30 +589,39 @@
   text-shadow: 0 2px 24px rgb(0 0 0 / 45%);
 }
 
-
-
-
-
-
-
-
+@media (max-width: 899px) {
+  .hero-eyebrow {
+    font-size: 1.5rem;
+  }
+}
 
 .hero-group-name {
+
+  /* Float the group badge above the hero content so it does not consume
+     layout space and break the vertical harmony of the slide. It overlays
+     the top padding area of .hero-content (which is position: relative). */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translateX(-50%);
+
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  margin: 0.5rem auto 0.75rem;
+  margin: 0;
   border: 1px solid rgb(241 211 144 / 55%);
   border-radius: 999px;
   padding: 0.45rem 1.2rem;
   background: rgb(20 24 20 / 45%);
   color: #f1d390;
-  font-size: clamp(0.7rem, 1.1vw, 0.85rem);
+  font-size: clamp(0.8rem, 1.4vw, 1rem);
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   backdrop-filter: blur(6px);
 }
+
+
 
 .hero-group-name::before {
   content: "✦";
@@ -609,11 +629,21 @@
   font-size: 0.8em;
 }
 
+@media (max-width: 899px) {
+  .hero-group-name {
+    top: 39%;
+    font-size: 0.5rem;
+  }
+}
+
+
 
 .hero-invitation {
+
   margin: 3rem auto 0;
-  font-family: var(--font-body);
+  font-family: var(--font-calligraphy);
   font-size: clamp(2.6rem, 5.5vw, 4.2rem);
+
   font-weight: 700;
   letter-spacing: 0.02em;
   line-height: 1.2;
@@ -621,52 +651,43 @@
 }
 
 .hero-invitation--custom {
-  display: block;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: center;
+  gap: 0.5rem;
   max-width: min(88vw, 42rem);
 }
 
 .hero-invitation__message {
-  font-family: var(--font-calligraphy);
-  font-size: clamp(2.8rem, 6vw, 4.6rem);
-  font-weight: 400;
+  font: inherit;
   line-height: 1.22;
-  letter-spacing: 0.02em;
 }
 
+/* Citation author: plain italic light text, no badge, no calligraphy. The
+   em-dash ::before reads as the classic "— author" attribution. */
 .hero-invitation__author {
   display: inline;
-  margin-left: 0.5rem;
-  color: var(--white);
+  color: rgb(255 255 255 / 0.85);
   font-family: var(--font-body);
-  font-size: clamp(1rem, 2.2vw, 1.35rem);
+  font-size: clamp(1rem, 2.4vw, 1.4rem);
   font-style: italic;
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-weight: 300;
+  letter-spacing: 0.02em;
   text-transform: none;
   text-shadow: 0 1px 10px rgb(0 0 0 / 35%);
 }
 
 .hero-invitation__author::before {
   content: "—";
-  margin-right: 0.4rem;
+  margin-right: 0.5em;
   color: rgb(241 211 144 / 70%);
-  font-size: 1.6em;
-  font-style: normal;
-  font-weight: 400;
-  line-height: 0;
-  transform: translateY(0.08em);
 }
 
 @media (max-width: 899px) {
-
-
   .hero-invitation {
     font-size: clamp(1.5rem, 6vw, 2.2rem);
     margin-top: 2.2rem;
-  }
-
-  .hero-invitation__message {
-    font-size: clamp(1.8rem, 6vw, 2.6rem);
   }
 
   .hero-invitation__author {
@@ -713,67 +734,5 @@
   .hero-slideshow-controls {
     display: none;
   }
-
-  .hero h1 {
-    gap: 0.1rem;
-    font-size: clamp(2.15rem, 9.5vw, 3.1rem);
-    padding-block: 0.4em;
-  }
-
-
-
-
-  .identity-swap--hero {
-    font-size: clamp(2.6rem, 11.5vw, 3.9rem);
-    line-height: 1.16;
-  }
-
-  .identity-swap--hero .identity-swap-state {
-    flex-direction: row;
-    gap: 0.12em;
-    align-items: baseline;
-    justify-content: center;
-    white-space: nowrap;
-  }
-
-  .identity-swap--hero .identity-connector {
-    font-size: 0.42em;
-  }
-
-  .hero h1 i {
-    margin: 0;
-  }
-
-  .hero-content {
-    padding: 1rem 0 1rem;
-  }
-
-
-  .hero-image-note {
-    right: 1rem;
-    bottom: 4.5rem;
-  }
-
-  /* Guest name reduced by ~3x on mobile so it doesn't dominate the hero. */
-  .hero-guest-name {
-    font-size: 1.5rem;
-    margin-bottom: 1rem;
-    letter-spacing: 0.05em;
-  }
-
-  /* Reduce hero-date margin and hide its label on mobile. */
-  .hero-date {
-    margin: 0.5rem 0 0.5rem;
-  }
-
-  .hero-date-label {
-    display: none;
-  }
-
-  .hero-place {
-    margin: 0 0 1.5rem;
-  }
 }
-
-
 
