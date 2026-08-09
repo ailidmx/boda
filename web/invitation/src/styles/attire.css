@@ -110,6 +110,7 @@
    grid. It holds the title and the text paragraphs; the pictograms live in a
    modal opened by the section FAB. */
 .attire-dress-code {
+  position: relative;
   max-width: 52rem;
   margin: clamp(2.5rem, 6vw, 4rem) auto 0;
   padding-top: clamp(1.5rem, 3vw, 2rem);
@@ -285,6 +286,23 @@
 .attire-picto-fab svg {
   width: 2.4rem;
   height: 2.4rem;
+}
+
+/* On desktop the FAB is anchored to the dress-code block (the section's
+   contained width) instead of floating at the viewport edge. It sits at the
+   right edge of the block, vertically centred on the dress-code text. */
+@media (min-width: 721px) {
+  .attire-picto-fab {
+    position: absolute;
+    right: 1rem;
+    bottom: auto;
+    top: 50%;
+    transform: translateY(-50%) scale(0.9);
+  }
+
+  .attire-picto-fab.is-visible {
+    transform: translateY(-50%) scale(1);
+  }
 }
 
 .attire-copy .note {

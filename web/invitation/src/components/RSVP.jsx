@@ -127,11 +127,10 @@ export function RSVP() {
           : "";
 
   return (
-    <section className="rsvp-section section story-bg">
-      <div className="rsvp-frame reveal">
-        <p className="eyebrow">{rsvp.eyebrow}</p>
-        <h2>{rsvp.title}</h2>
-        <p>{rsvp.body}</p>
+    <section className="rsvp-section section story-bg reveal">
+      <p className="eyebrow">{rsvp.eyebrow}</p>
+      <h2>{rsvp.title}</h2>
+      <p>{rsvp.body}</p>
 
         {/* Scale-based questions: one row per guest, 0–5 likelihood selector */}
         {scale.questions && scale.questions.length > 0 && guests.length > 0 && (
@@ -469,7 +468,6 @@ export function RSVP() {
             {statusText}
           </small>
         </form>
-      </div>
     </section>
   );
 }

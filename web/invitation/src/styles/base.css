@@ -515,5 +515,17 @@ p {
   color: var(--marigold);
 }
 
+/* ── Mobile typography ───────────────────────────────────────────────── */
+@media (max-width: 899px) {
+  h2 {
+    font-size: 1.25rem;
+  }
+
+  .handwritten {
+    font-size: 0.6rem;
+  }
+}
+
+
 
 

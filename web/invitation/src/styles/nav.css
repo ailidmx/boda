@@ -18,6 +18,16 @@
   position: relative;
   display: flex;
   align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+/* Each split dropdown (Part I / Part II) is its own positioned group so the
+   floating panel anchors to its own trigger. */
+.mobile-nav__group {
+  position: relative;
+  display: flex;
+  align-items: center;
   min-width: 0;
 }
 
@@ -38,6 +48,48 @@
   letter-spacing: 0.11em;
   text-transform: uppercase;
 }
+
+/* REPONDRE call-to-action in the mobile nav: a compact round icon-only CTA
+   that stands out from the two dropdown triggers while leaving more room for
+   the menu dropdowns. The text label is hidden on mobile; only the checkmark
+   icon shows. */
+.mobile-nav__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--terracotta);
+  color: var(--white);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.mobile-nav__cta-icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.mobile-nav__cta-label {
+  display: none;
+}
+
+.mobile-nav__cta:hover,
+.mobile-nav__cta:focus-visible {
+  background: var(--marigold);
+  color: var(--deep-green);
+  transform: translateY(-1px);
+}
+
+
 
 .mobile-nav__label {
   flex: 1 1 auto;
@@ -125,7 +177,9 @@
 }
 
 
-/* Tablet+: restore the desktop nav and hide the mobile dropdown. */
+/* Tablet+: restore the desktop nav and hide the mobile dropdown. The mobile
+   round RSVP CTA (now in the header actions) is hidden too; the desktop
+   pill `.header-rsvp` takes over. */
 @media (min-width: 900px) {
   .desktop-nav-wrap,
   .nav-underline,
@@ -133,9 +187,11 @@
     display: flex;
   }
 
-  .mobile-nav {
+  .mobile-nav,
+  .mobile-nav__cta {
     display: none;
   }
+
 
   .site-header {
     grid-template-columns: minmax(0, 1fr) auto;
@@ -178,7 +234,6 @@
   }
 
   body.mobile-nav-only .countdown-bar {
-
     transform: translateY(-100%);
     opacity: 0;
     pointer-events: none;
@@ -399,16 +454,6 @@
   padding: 0.65rem 1rem;
   border: 1px solid var(--white);
 }
-
-/* When the guest is inside the final RSVP section, the REPONDRE button gets
-   the same marigold "selected" treatment as the active nav link: golden
-   border + text with a soft glow. */
-.header-rsvp.is-active {
-  border-color: var(--marigold);
-  color: var(--marigold);
-  box-shadow: 0 0 12px rgb(198 139 43 / 55%), 0 0 26px rgb(198 139 43 / 30%);
-}
-
 
 /* ── User menu (avatar + dropdown) ───────────────────────────────────── */
 .user-menu {
@@ -689,16 +734,6 @@
   color: rgb(255 255 255 / 90%);
   font-size: 0.72rem;
   line-height: 1.35;
-  /* Keep the notice inside its container: grid items default to
-     min-width:auto, which lets long text (e.g. the French warning) blow
-     past the card edge. min-width:0 lets the text wrap instead. */
-  min-width: 0;
-  overflow-wrap: break-word;
-  word-break: break-word;
-}
-
-.user-menu__notice > * {
-  min-width: 0;
 }
 
 .user-menu__notice-title {
@@ -706,7 +741,6 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
 }
-
 
 .user-menu__current-email {
   display: grid;
@@ -756,17 +790,6 @@
   color: #f6d48a;
 }
 
-/* Success message shown in its own modal (after changing email/password).
-   Larger, centered text so it reads as a confirmation rather than a cramped
-   inline note inside the dropdown. */
-.user-menu__status--modal {
-  margin: 0.25rem 0 0.75rem;
-  font-size: 0.9rem;
-  line-height: 1.5;
-  text-align: center;
-}
-
-
 .user-menu-modal__overlay {
   position: fixed;
   inset: 0;
@@ -788,13 +811,7 @@
   background: linear-gradient(180deg, rgb(25 23 18 / 96%), rgb(19 18 14 / 96%));
   box-shadow: 0 24px 58px rgb(0 0 0 / 42%);
   color: var(--white);
-  /* The modal lives inside .site-header__actions, which sets
-     white-space: nowrap. That nowrap is inherited by the modal and prevents
-     the notice text from wrapping, so it bleeds out of the card. Reset it
-     here so all modal text wraps normally. */
-  white-space: normal;
 }
-
 
 .user-menu-modal__close {
   position: absolute;
@@ -882,94 +899,3 @@
 .user-menu-modal__btn--primary:hover {
   background: #d99a3a;
 }
-
-/* ── "What's new" (About) modal ─────────────────────────────────────────
-   Reuses the shared user-menu modal shell (overlay + card + close + title)
-   and adds a scrollable, feature-first list of recent additions. */
-.user-menu-modal__card--about {
-  width: min(38rem, 100%);
-  max-height: min(82vh, 42rem);
-  display: flex;
-  flex-direction: column;
-  padding: 1.1rem;
-}
-
-.user-menu-modal__subtitle {
-  margin: 0 0 0.9rem;
-  font-size: 0.82rem;
-  line-height: 1.45;
-  color: rgb(255 255 255 / 72%);
-}
-
-.user-menu-modal__features {
-  display: grid;
-  gap: 0.55rem;
-  overflow-y: auto;
-  padding-right: 0.35rem;
-  margin-bottom: 0.9rem;
-}
-
-.user-menu-modal__feature {
-  display: flex;
-  gap: 0.7rem;
-  align-items: flex-start;
-  padding: 0.6rem 0.7rem;
-  border: 1px solid rgb(255 255 255 / 10%);
-  border-radius: 0.6rem;
-  background: rgb(255 255 255 / 4%);
-}
-
-.user-menu-modal__feature-icon {
-  flex: 0 0 auto;
-  font-size: 1.15rem;
-  line-height: 1.3;
-}
-
-.user-menu-modal__feature-text {
-  display: flex;
-  flex-direction: column;
-  gap: 0.15rem;
-  min-width: 0;
-}
-
-.user-menu-modal__feature-title {
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--marigold);
-}
-
-.user-menu-modal__feature-body {
-  font-size: 0.76rem;
-  line-height: 1.45;
-  color: rgb(255 255 255 / 82%);
-}
-
-/* ── Mobile: fixed header (Android sticky workaround) ──────────────────
-
-   Android (older Chrome / WebView) has a long-standing bug where
-   `position: sticky` silently fails when an ancestor has `overflow-x`
-   (the `body { overflow-x: clip }` fallback to `hidden`). `position: fixed`
-   is immune to that bug, so on mobile we pin the header with `fixed` instead.
-
-   This rule is placed AFTER the base `.site-header` rule so it wins the
-   cascade. The vertical offset is driven by the existing `body.mobile-nav-only`
-   class (defined above): at the very top the header sits below the countdown
-   (`top: var(--countdown-height)`), and once the user scrolls the countdown
-   hides and the header snaps to `top: 0`.
-
-   Because the header is now out of flow, we push the page content down by the
-   header height so it is never hidden underneath. The countdown stays in flow
-   above it, so only the header height needs compensating. */
-@media (max-width: 899px) {
-  .site-header {
-    position: fixed;
-    top: var(--countdown-height);
-    right: 0;
-    left: 0;
-  }
-
-  main {
-    padding-top: var(--header-height);
-  }
-}
-
