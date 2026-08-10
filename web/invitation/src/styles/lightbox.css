@@ -10,11 +10,11 @@
   align-items: center;
   gap: 1rem;
   padding: clamp(1rem, 3vw, 2.5rem);
-  background: rgb(13 16 13 / 94%);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
+  /* Fully opaque background so the page behind is completely hidden. */
+  background: #0d100d;
   color: var(--white);
 }
+
 
 .lightbox-close {
   position: absolute;
@@ -82,6 +82,39 @@
   min-width: 0;
   max-height: 100%;
 }
+
+/* Swipeable-card feel: the active image slides in from the side matching the
+   direction of the change (next → from the right, prev → from the left). */
+.lightbox-stage--next {
+  animation: lightbox-slide-in-right 0.28s ease;
+}
+
+.lightbox-stage--prev {
+  animation: lightbox-slide-in-left 0.28s ease;
+}
+
+@keyframes lightbox-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(4%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes lightbox-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-4%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 
 .lightbox-stage img {
   display: block;

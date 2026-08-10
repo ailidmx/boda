@@ -262,7 +262,53 @@ const RUNTIME_ONLY_FIRESTORE_FIELDS = new Set([
   "createdAt",
   "guestId",
   "_deleted",
+  // cloudinaryId is a runtime-only field (set by the app when a guest uploads
+  // a photo). It is not sourced from the sheet, so it must not block the sync.
+  "cloudinaryId",
 ]);
+
+// RSVP fields are protected: they are set by the guest through the RSVP flow,
+// not by the sheet. The sync must never overwrite them, and they must not
+// block the refresh of other fields (e.g. hosting.xtraCabin / hosting.xtraRoom).
+const PROTECTED_FIRESTORE_FIELDS = new Set([
+  "rsvp.friday",
+  "rsvp.saturday",
+  "rsvp.sunday",
+  "rsvp.confirmCabin",
+  "rsvp.cabinWaitingList",
+  "rsvp.xtra",
+  "rsvp.playa",
+  "rsvp.petanca",
+  "rsvp.needBalls",
+  "rsvp.answers",
+]);
+
+function isProtectedField(path) {
+  if (PROTECTED_FIRESTORE_FIELDS.has(path)) return true;
+  // Nested runtime answers (e.g. rsvp.answers.petanqueParticipation).
+  if (path.startsWith("rsvp.answers.")) return true;
+  return false;
+}
+
+// Remove protected (RSVP) fields from a payload so the sync never overwrites
+// guest RSVP responses. Returns a shallow copy with the rsvp object stripped.
+function stripProtectedFields(payload) {
+  const copy = { ...payload };
+  if (copy.rsvp && typeof copy.rsvp === "object") {
+    const rsvp = { ...copy.rsvp };
+    for (const key of Object.keys(rsvp)) {
+      if (isProtectedField(`rsvp.${key}`)) delete rsvp[key];
+    }
+    if (Object.keys(rsvp).length === 0) {
+      delete copy.rsvp;
+    } else {
+      copy.rsvp = rsvp;
+    }
+  }
+  return copy;
+}
+
+
 
 function parseCsv(text) {
   const rows = [];
@@ -686,12 +732,14 @@ function compareLeaves(sheetPayload, firestorePayload) {
 
   const mismatches = [];
   for (const path of CANONICAL_COMPARE_FIELDS) {
+    if (isProtectedField(path)) continue;
     const sheetValue = comparableValue(path, sheetLeaves[path]);
     const firestoreValue = comparableValue(path, firestoreLeaves[path]);
     if (!deepEqual(sheetValue, firestoreValue)) {
       mismatches.push({ path, sheetValue, firestoreValue });
     }
   }
+
 
   // Compatibility copies must mirror their canonical nested sources when they exist.
   const compatChecks = [
@@ -927,9 +975,10 @@ function summarizeAlerts(sheetLeaves, firestoreLeaves) {
     .map(([path]) => path);
 
   const firestoreUnknown = Object.entries(firestoreLeaves)
-    .filter(([path, value]) => !sheetLeaves.hasOwnProperty(path) && !isCompatField(path) && !path.startsWith("_") && !RUNTIME_ONLY_FIRESTORE_FIELDS.has(path) && hasActualValue(value))
+    .filter(([path, value]) => !sheetLeaves.hasOwnProperty(path) && !isCompatField(path) && !path.startsWith("_") && !RUNTIME_ONLY_FIRESTORE_FIELDS.has(path) && !isProtectedField(path) && hasActualValue(value))
     .map(([path]) => path);
   return { sheetUnknown, firestoreUnknown };
+
 }
 
 function mdEscape(value) {
@@ -1208,6 +1257,30 @@ function writeReportMarkdown(report) {
       lines.push("");
     }
   }
+
+  // Dedicated summary of cabin / extra-cabin assignments detected in the sheet.
+  const hostingPaths = ["hosting.cabin", "hosting.room", "hosting.xtraCabin", "hosting.xtraRoom"];
+  const hostingRows = [];
+  for (const item of report.changed) {
+    const row = { id: item.id };
+    for (const mismatch of item.mismatches) {
+      if (hostingPaths.includes(mismatch.path)) {
+        row[mismatch.path] = formatValue(mismatch.sheetValue);
+      }
+    }
+    if (Object.keys(row).length > 1) hostingRows.push(row);
+  }
+  if (hostingRows.length > 0) {
+    lines.push("## Cabin & Extra Cabin Assignments");
+    lines.push("");
+    lines.push("| Guest | Cabaña | Cuarto | Xtra Cabaña | Xtra Cuarto |");
+    lines.push("|---|---|---|---|---|");
+    for (const row of hostingRows) {
+      lines.push(`| ${mdEscape(row.id)} | ${mdEscape(row["hosting.cabin"] || "")} | ${mdEscape(row["hosting.room"] || "")} | ${mdEscape(row["hosting.xtraCabin"] || "")} | ${mdEscape(row["hosting.xtraRoom"] || "")} |`);
+    }
+    lines.push("");
+  }
+
 
   const comparisonAuditToRender = report.comparisonAudit.filter((item) => item.status !== "unchanged");
   if (comparisonAuditToRender.length > 0) {
@@ -1497,7 +1570,7 @@ async function main() {
   for (const item of report.added) {
     await db.collection(GUEST_COLLECTION).doc(item.id).set(
       {
-        ...item.payload,
+        ...stripProtectedFields(item.payload),
         updatedBy: "sync_script",
         updatedAt: FieldValue.serverTimestamp(),
       },
@@ -1509,7 +1582,7 @@ async function main() {
   for (const item of report.changed) {
     await db.collection(GUEST_COLLECTION).doc(item.id).set(
       {
-        ...item.payload,
+        ...stripProtectedFields(item.payload),
         updatedBy: "sync_script",
         updatedAt: FieldValue.serverTimestamp(),
       },
@@ -1517,6 +1590,7 @@ async function main() {
     );
     written++;
   }
+
 
   if (MARK_STALE && report.stale.length > 0) {
     for (const item of report.stale) {

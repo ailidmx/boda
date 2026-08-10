@@ -172,12 +172,177 @@
 
 .facilities-section {
   overflow-x: clip;
-  background: #d9d5c5;
+  background:
+    radial-gradient(circle at 72% 32%, rgb(231 194 125 / 40%), transparent 23%),
+    linear-gradient(180deg, #efecea 0%, #9edffc9c 44%, #d9b36a 100%);
 }
+
+
+
+/* ── Arty background scene · symbolic geography of Roca Azul ──────────
+   A decorative layer behind the venue content that tells the story of the
+   place: a glowing sun, layered mountain silhouettes and a lake reflection.
+   It sits above the story-bg orbs (z-index -1) but below the content
+   (z-index 1), is purely visual and never intercepts pointer events. */
+.venue-scene {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.venue-scene__sun {
+  position: absolute;
+  top: 6%;
+  right: 8%;
+  width: clamp(9rem, 22vw, 20rem);
+  height: clamp(9rem, 22vw, 20rem);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 38% 34%,
+    rgb(255 214 140 / 95%),
+    rgb(228 185 104 / 55%) 42%,
+    rgb(198 139 43 / 0%) 72%
+  );
+  filter: blur(1px);
+  opacity: 0.55;
+  animation: venue-sun-breathe 9s ease-in-out infinite alternate;
+}
+
+/* Far mountain ridge — soft, hazy, receding into the distance. */
+.venue-scene__mountains--far {
+  position: absolute;
+  right: -4%;
+  bottom: 0;
+  left: -4%;
+  height: 46%;
+  background: linear-gradient(180deg, rgb(122 139 122 / 0%), rgb(122 139 122 / 34%));
+  clip-path: polygon(
+    0% 100%, 0% 62%, 9% 48%, 17% 58%, 26% 40%, 34% 55%,
+    43% 34%, 52% 52%, 61% 38%, 70% 56%, 79% 44%, 88% 58%,
+    100% 46%, 100% 100%
+  );
+  opacity: 0.5;
+}
+
+/* Near mountain ridge — darker, more defined, closer to the viewer. */
+.venue-scene__mountains--near {
+  position: absolute;
+  right: -6%;
+  bottom: 0;
+  left: -6%;
+  height: 34%;
+  background: linear-gradient(180deg, rgb(50 69 62 / 0%), rgb(50 69 62 / 42%));
+  clip-path: polygon(
+    0% 100%, 0% 74%, 12% 60%, 22% 72%, 33% 52%, 45% 70%,
+    56% 58%, 68% 74%, 79% 62%, 90% 76%, 100% 64%, 100% 100%
+  );
+  opacity: 0.55;
+}
+
+/* Lake reflection — a soft gradient band with a shimmering highlight. */
+.venue-scene__lake {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 22%;
+  background:
+    linear-gradient(180deg, rgb(122 139 122 / 0%), rgb(122 139 122 / 30%) 60%, rgb(122 139 122 / 12%)),
+    repeating-linear-gradient(
+      178deg,
+      rgb(255 255 255 / 10%) 0 1px,
+      transparent 1px 1.6rem
+    );
+  opacity: 0.6;
+}
+
+@keyframes venue-sun-breathe {
+  from {
+    transform: scale(0.96);
+    opacity: 0.45;
+  }
+  to {
+    transform: scale(1.05);
+    opacity: 0.6;
+  }
+}
+
+/* ── Migrated hero decorative elements ─────────────────────────────────
+   The sun-disc (concentric rings) and the calligraphic motifs were moved
+   from the hero to the venue scene so the hero shows only its photo + photo
+   filter. Scoped under .venue-scene so they layer with the existing sun,
+   mountains and lake. */
+.venue-scene__sun-disc {
+  position: absolute;
+  top: 16%;
+  right: 13%;
+  width: min(30vw, 23rem);
+  aspect-ratio: 1;
+  border: 1px solid rgb(255 238 194 / 38%);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 3rem rgb(255 238 194 / 4%),
+    0 0 0 7rem rgb(255 238 194 / 3%);
+}
+
+.venue-scene__motif {
+  position: absolute;
+  z-index: 2;
+  bottom: -4rem;
+  width: 16rem;
+  height: 32rem;
+  opacity: 0.45;
+  transform: rotate(-12deg);
+}
+
+.venue-scene__motif::before,
+.venue-scene__motif::after {
+  position: absolute;
+  border: 1px solid rgb(255 244 214 / 65%);
+  border-radius: 70% 0 70% 0;
+  content: "";
+}
+
+.venue-scene__motif::before {
+  inset: 0 50% 40% 0;
+  box-shadow:
+    4rem 5rem 0 -0.15rem rgb(255 255 255 / 0%),
+    4rem 5rem 0 0 rgb(255 244 214 / 52%);
+}
+
+.venue-scene__motif::after {
+  inset: 35% 0 0 45%;
+}
+
+.venue-scene__motif--left {
+  left: 6%;
+}
+
+.venue-scene__motif--right {
+  right: 4%;
+  transform: rotate(18deg) scaleX(-1);
+}
+
+/* Bottom vignette + radial glow migrated from the hero's .hero-art::after. */
+.venue-scene::after {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  background:
+    linear-gradient(180deg, transparent 55%, rgb(24 32 28 / 68%)),
+    radial-gradient(circle at 50% 120%, #263a33 0 37%, transparent 38%);
+  content: "";
+}
+
 
 /* The venue is a single slide that fills the viewport height (minus the
    countdown + header), so it reads as one full-screen section. */
 .venue-slide {
+  position: relative;
+
+  z-index: 1;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
@@ -187,6 +352,7 @@
      the pinned navigation, even when the content is short. */
   padding-bottom: clamp(2rem, 4vw, 4rem);
 }
+
 
 
 
@@ -669,9 +835,127 @@
   line-height: 1.85;
 }
 
-.venue-privacy__close,
-.venue-privacy-fab {
+/* The privacy disclosure is a FAB-activated modal on every screen size.
+   The inline panel is hidden by default; a floating lock button opens it as
+   a dimmed overlay. The close button only appears once the modal is open. */
+.venue-privacy-shell {
   display: none;
+}
+
+/* INTIMITE modal — styled like the other section FAB modals (weather
+   advice / attire pictogram): a white rounded panel with a display-font
+   title and a bordered close button over a dimmed overlay. */
+.venue-privacy-shell.is-mobile-open {
+  position: fixed;
+  z-index: 240;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: rgb(36 33 25 / 55%);
+}
+
+.venue-privacy-shell.is-mobile-open .venue-privacy {
+  position: relative;
+  display: block;
+  width: min(100%, 26rem);
+  max-height: 80svh;
+  margin: 0;
+  padding: 2rem 1.5rem 1.5rem;
+  overflow-y: auto;
+  border: 0;
+  border-radius: 1.25rem;
+  background: var(--white);
+  box-shadow: 0 1.5rem 3.5rem rgb(36 33 25 / 35%);
+  overscroll-behavior: contain;
+}
+
+.venue-privacy__header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding-right: 2.5rem;
+}
+
+.venue-privacy__header .venue-privacy__icon {
+  width: 3.25rem;
+  height: 3.25rem;
+  flex-basis: 3.25rem;
+  border-radius: 50%;
+}
+
+.venue-privacy__header .venue-privacy__icon svg {
+  width: 1.9rem;
+  height: 1.9rem;
+}
+
+.venue-privacy__header h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.venue-privacy__body {
+  margin-top: 1rem;
+}
+
+.venue-privacy__body p {
+  color: rgb(36 33 25 / 78%);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.venue-privacy__close {
+  position: absolute;
+  z-index: 2;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgb(36 33 25 / 22%);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.venue-privacy-fab {
+  position: fixed;
+  z-index: 130;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  width: 4.25rem;
+  height: 4.25rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 3px solid var(--marigold);
+  border-radius: 50%;
+  background: var(--terracotta);
+  box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
+  color: var(--white);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(1rem) scale(0.9);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.venue-privacy-fab.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.venue-privacy-fab svg {
+  width: 2.4rem;
+  height: 2.4rem;
 }
 
 
@@ -961,9 +1245,31 @@
 @media (max-width: 899px) {
   /* Match the mobile Story heading rhythm:
      1. eyebrow, 2. venue link, 3. title, 4. citation. */
+  .facilities-section {
+    padding: 1.2rem;
+  }
+
+  /* The section adds 1.2rem of vertical padding on each side (2.4rem total).
+     The slide's min-height is border-box, so subtract that padding here to
+     keep the whole venue section exactly one viewport tall (minus the
+     countdown + header) instead of overflowing by 2.4rem. */
+  .venue-slide {
+    min-height: calc(100svh - var(--countdown-height) - var(--header-height) - 2.4rem);
+  }
+
+  /* Tighten the gallery source line on mobile so it doesn't push the section
+     taller than expected. */
+  .venue-slide--one .venue-gallery-source {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: inline-flex;
+  }
+
   .facilities-section .experience-heading {
     gap: 0;
   }
+
+
 
   .facilities-section .experience-heading-row {
     width: 100%;
@@ -1000,8 +1306,9 @@
   }
 
   .facilities-section .facilities-lead {
-    font-size: clamp(1rem, 2.6vw, 2rem);
+    font-size: 0.8rem;
   }
+
 
   .facility-slide {
     grid-template-columns: 1fr;
@@ -1084,126 +1391,5 @@
     width: 3rem;
     height: 3rem;
     font-size: 1.1rem;
-  }
-
-  /* Keep the long privacy disclosure out of the mobile Venue layout. */
-  .venue-privacy-shell {
-    display: none;
-  }
-
-  /* INTIMITE modal — styled like the other section FAB modals (weather
-     advice / attire pictogram): a white rounded panel with a display-font
-     title and a bordered close button over a dimmed overlay. */
-  .venue-privacy-shell.is-mobile-open {
-    position: fixed;
-    z-index: 240;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    padding: 1.25rem;
-    background: rgb(36 33 25 / 55%);
-  }
-
-  .venue-privacy-shell.is-mobile-open .venue-privacy {
-    position: relative;
-    display: block;
-    width: min(100%, 26rem);
-    max-height: 80svh;
-    margin: 0;
-    padding: 2rem 1.5rem 1.5rem;
-    overflow-y: auto;
-    border: 0;
-    border-radius: 1.25rem;
-    background: var(--white);
-    box-shadow: 0 1.5rem 3.5rem rgb(36 33 25 / 35%);
-    overscroll-behavior: contain;
-  }
-
-  .venue-privacy__header {
-    display: flex;
-    align-items: center;
-    gap: 0.85rem;
-    padding-right: 2.5rem;
-  }
-
-  .venue-privacy__header .venue-privacy__icon {
-    width: 3.25rem;
-    height: 3.25rem;
-    flex-basis: 3.25rem;
-    border-radius: 50%;
-  }
-
-  .venue-privacy__header .venue-privacy__icon svg {
-    width: 1.9rem;
-    height: 1.9rem;
-  }
-
-  .venue-privacy__header h3 {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: 1.35rem;
-    font-weight: 400;
-    color: var(--ink);
-  }
-
-  .venue-privacy__body {
-    margin-top: 1rem;
-  }
-
-  .venue-privacy__body p {
-    color: rgb(36 33 25 / 78%);
-    font-size: 1rem;
-    line-height: 1.5;
-  }
-
-  .venue-privacy__close {
-    position: absolute;
-    z-index: 2;
-    top: 0.75rem;
-    right: 0.75rem;
-    display: grid;
-    width: 2.25rem;
-    height: 2.25rem;
-    place-items: center;
-    padding: 0;
-    border: 1px solid rgb(36 33 25 / 22%);
-    border-radius: 50%;
-    background: transparent;
-    color: var(--ink);
-    font-size: 1.4rem;
-    line-height: 1;
-    cursor: pointer;
-  }
-
-  .venue-privacy-fab {
-    position: fixed;
-    z-index: 130;
-    right: max(1rem, env(safe-area-inset-right));
-    bottom: max(1rem, env(safe-area-inset-bottom));
-    width: 4.25rem;
-    height: 4.25rem;
-    display: grid;
-    place-items: center;
-    padding: 0;
-    border: 3px solid var(--marigold);
-    border-radius: 50%;
-    background: var(--terracotta);
-    box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
-    color: var(--white);
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(1rem) scale(0.9);
-    transition: opacity 180ms ease, transform 180ms ease;
-  }
-
-  .venue-privacy-fab.is-visible {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0) scale(1);
-  }
-
-  .venue-privacy-fab svg {
-    width: 2.4rem;
-    height: 2.4rem;
   }
 }

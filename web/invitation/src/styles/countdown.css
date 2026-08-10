@@ -46,9 +46,15 @@
 }
 
 .countdown-bar {
+
   position: sticky;
-  z-index: 100;
-  top: 0;
+  z-index: 90;
+  /* The nav bar sits on top (sticky at top:0); the countdown sticks just
+     below it on desktop. On mobile it is non-sticky (see above) and scrolls
+     away. */
+  top: var(--header-height);
+
+
   display: flex;
   min-height: var(--countdown-height);
   align-items: center;
@@ -197,5 +203,18 @@
     font-size: clamp(1.3rem, 2.2vw, 1.7rem);
   }
 }
+
+/* On mobile the countdown is NOT sticky: it scrolls away naturally so the
+   nav bar can stay pinned to the very top at all times. The countdown
+   reappears when the user scrolls back up to the top of the page. This
+   override lives AFTER the base `.countdown-bar` rule so it wins in the
+   cascade (equal specificity, later source order). */
+@media (max-width: 899px) {
+  .countdown-bar {
+    position: relative;
+    top: auto;
+  }
+}
+
 
 

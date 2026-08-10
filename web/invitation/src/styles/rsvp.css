@@ -5,7 +5,7 @@
    mobile. The frame padding tightens on small screens. */
 
 @media (max-width: 600px) {
-  .rsvp-frame {
+  .rsvp-section {
     padding: clamp(2rem, 6vw, 3rem);
     outline-offset: -0.4rem;
   }
@@ -16,40 +16,35 @@
 }
 
 
+/* The RSVP section is a single container: the section itself is the dark
+   green frame (border, outline, padding, white text). No nested wrapper. */
 .rsvp-section {
-  display: grid;
-  place-items: center;
   min-height: 78svh;
-  background: var(--cream);
+  background: var(--deep-green);
+  color: var(--white);
   text-align: center;
-}
-
-.rsvp-frame {
-  width: min(100%, 76rem);
-  padding: clamp(3rem, 8vw, 7rem);
+  padding: clamp(3rem, 8vw, 7rem) clamp(1.25rem, 6vw, 6rem);
   border: 1px solid #e4b968;
   outline: 1px solid #e4b968;
   outline-offset: -0.7rem;
-  background: var(--deep-green);
-  color: var(--white);
 }
 
-.rsvp-frame h2 {
+.rsvp-section h2 {
   margin: 0 auto 2rem;
 }
 
 /* The "Tu te lances" eyebrow sits on the dark green frame, so it uses the
    golden marigold accent (instead of the default terracotta) to stay legible
    and match the gold used across the RSVP frame. */
-.rsvp-frame .eyebrow {
+.rsvp-section .eyebrow {
   color: #e4b968;
 }
 
-.rsvp-frame .eyebrow::before {
+.rsvp-section .eyebrow::before {
   background: #e4b968;
 }
 
-.rsvp-frame > p:not(.eyebrow) {
+.rsvp-section > p:not(.eyebrow) {
   max-width: 34rem;
   margin: 0 auto 2rem;
 }
@@ -111,17 +106,47 @@
   text-align: center;
 }
 
-.rsvp-frame .button {
+.rsvp-section .button {
   margin: 1rem auto;
 }
 
-.rsvp-frame small {
+.rsvp-section small {
   display: block;
+
   margin-top: 1rem;
   color: #e4b968;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+
+/* Bottom "continue" nav inside the "¡Te animas!" RSVP section. Mirrors the
+   elegant bottom nav used on the weekend slides: a hairline top border and a
+   small-caps link that points to the next section (FLIGHTS for guests who
+   travel by plane, otherwise Pétanque). */
+.te-animas-nav {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(255 255 255 / 22%);
+}
+
+.te-animas-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--white);
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 250ms ease;
+}
+
+.te-animas-nav-link:hover,
+.te-animas-nav-link:focus-visible {
+  color: #e4b968;
+  text-decoration: underline;
+}
+
 
 /* ── Pétanque tournament ── */
 .petanque-section {
@@ -228,9 +253,10 @@
 .rsvp-question {
   display: grid;
   gap: 1.5rem;
-  padding: clamp(1.25rem, 3vw, 2rem);
-  border: 1px solid rgb(255 255 255 / 28%);
+  padding: 0;
+  border: none;
 }
+
 
 .rsvp-question-head {
   text-align: left;
@@ -528,8 +554,8 @@
   display: grid;
   gap: 1rem;
   margin-top: 2rem;
-  padding: clamp(1.25rem, 3vw, 2rem);
-  border: 1px solid rgb(255 255 255 / 28%);
+  padding: 0;
+  border: 0;
   background: rgb(255 255 255 / 3%);
 }
 
@@ -612,5 +638,197 @@
   display: grid;
   gap: 1.5rem;
 }
+
+/* ── Mobile scale legend modal + FAB ────────────────────────────────────
+   On desktop the 5-level legend is shown inline. On mobile it is collapsed
+   into a FAB-activated modal (mirroring the Story "facts" explorer) so the
+   question stays compact. The FAB appears only while the question is in view
+   and is hidden at desktop widths. */
+
+.rsvp-legend-fab,
+.rsvp-legend-modal {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  /* Hide the inline legend on mobile; it lives in the FAB modal instead. */
+  .rsvp-scale-legend-inline {
+    display: none;
+  }
+
+  /* The modal is removed from the flow until the FAB is pressed. */
+  .rsvp-legend-modal {
+    display: none;
+  }
+
+  .rsvp-legend-modal.is-mobile-open {
+    position: fixed;
+    z-index: 240;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding:
+      max(1rem, env(safe-area-inset-top))
+      1rem
+      max(1rem, env(safe-area-inset-bottom));
+    background: rgb(18 27 24 / 72%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .rsvp-legend-panel {
+    position: relative;
+    width: min(100%, 34rem);
+    max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow-y: auto;
+    padding: 1.5rem 1.25rem 1.25rem;
+    border: 1px solid rgb(198 139 43 / 48%);
+    border-radius: 1.25rem;
+    background: var(--cream);
+    box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 38%);
+    overscroll-behavior: contain;
+  }
+
+  .rsvp-legend-title {
+    margin: 0 0 1rem;
+    padding-right: 2.5rem;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+  }
+
+  /* The legend items sit on the cream panel, so restyle them for contrast. */
+  .rsvp-legend-panel .rsvp-scale-legend {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .rsvp-legend-panel .rsvp-scale-legend-item {
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  .rsvp-legend-panel .rsvp-scale-legend-emoji {
+    font-size: 1.4rem;
+  }
+
+  .rsvp-legend-close {
+    position: absolute;
+    z-index: 2;
+    top: 0.65rem;
+    right: 0.75rem;
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    place-items: center;
+    padding: 0;
+    border: 1px solid rgb(36 33 25 / 20%);
+    border-radius: 50%;
+    background: rgb(255 253 248 / 88%);
+    color: var(--ink);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  /* Circular, marigold-bordered FAB fixed to the bottom-right. Appears only
+     while the question is in view. */
+  .rsvp-legend-fab {
+    position: fixed;
+    z-index: 130;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    display: grid;
+    width: 4.25rem;
+    height: 4.25rem;
+    place-items: center;
+    padding: 0;
+    border: 3px solid var(--marigold);
+    border-radius: 50%;
+    background: var(--terracotta);
+    color: var(--white);
+    box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
+    font-size: 1.9rem;
+    line-height: 1;
+
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(1rem) scale(0.9);
+    transition: opacity 180ms ease, transform 180ms ease;
+  }
+
+  .rsvp-legend-fab.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* ── RSVP progress checklist ────────────────────────────────────────────
+   A compact checklist that shows which mini-RSVP flows (Te animas, Pétanque,
+   Coast) still need to be walked through before the final form can be
+   submitted. Each row shows a mark, a label, and a state. */
+.rsvp-progress {
+  display: grid;
+  gap: 0.6rem;
+  max-width: 34rem;
+  margin: 0 auto 2rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgb(228 185 104 / 45%);
+  background: rgb(255 255 255 / 4%);
+  text-align: left;
+}
+
+.rsvp-progress-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  color: rgb(255 253 248 / 75%);
+}
+
+.rsvp-progress-mark {
+  flex: none;
+  display: grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 50%;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.rsvp-progress-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.rsvp-progress-state {
+  flex: none;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(255 253 248 / 55%);
+}
+
+.rsvp-progress-item.is-done {
+  color: var(--white);
+}
+
+.rsvp-progress-item.is-done .rsvp-progress-mark {
+  background: #e4b968;
+  border-color: #e4b968;
+  color: var(--deep-green);
+}
+
+.rsvp-progress-item.is-done .rsvp-progress-state {
+  color: #e4b968;
+}
+
 
 

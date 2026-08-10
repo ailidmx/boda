@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { useApp } from "../context/AppContext.jsx";
+import { useRsvp, RSVP_FLOWS } from "../context/RsvpContext.jsx";
 import { LightboxCarousel } from "./LightboxCarousel.jsx";
 import { RsvpQuestion, BOOLEAN_YES } from "./RsvpQuestion.jsx";
 import { RsvpRecap } from "./RsvpRecap.jsx";
@@ -9,7 +10,7 @@ import { PETANQUE_PLACEHOLDERS } from "../petanqueGallery.js";
 import { MEDIA } from "../media.js";
 import { getGroupMembers } from "../guest-profiles.js";
 import { getActiveGuests } from "../guests.js";
-import { resolveRsvpAnswer, saveRsvpAnswers } from "../rsvp-responses.js";
+import { resolveRsvpAnswer } from "../rsvp-responses.js";
 
 
 /**
@@ -32,9 +33,11 @@ import { resolveRsvpAnswer, saveRsvpAnswers } from "../rsvp-responses.js";
  */
 export function Petanque() {
   const { t, language, profile, interfaceText } = useApp();
+  const { answers, setAnswer, markResume, saveFlow } = useRsvp();
   const petanque = t.petanqueTribute || {};
   const nav = t.nav || {};
   const rsvpMini = petanque.rsvpMini || {};
+  const flow = RSVP_FLOWS.petanque;
 
   // Full-screen lightbox state for the pétanque photo set.
   const [lightbox, setLightbox] = useState(null);
@@ -69,18 +72,6 @@ export function Petanque() {
     return qs;
   }, [rsvpMini]);
 
-  // answers: questionId → { guestId → level }
-  const [answers, setAnswers] = useState(() => {
-    const initial = {};
-    questions.forEach((q) => {
-      initial[q.id] = {};
-      guests.forEach((guest) => {
-        initial[q.id][guest.id] = resolveRsvpAnswer(guest, q.id);
-      });
-    });
-    return initial;
-  });
-
   const [saveStatus, setSaveStatus] = useState("idle"); // idle | working | saved | error
 
   // Only guests who said "yes" to the tournament should see the boules
@@ -106,24 +97,12 @@ export function Petanque() {
 
 
   const handleAnswerChange = (questionId, guestId, level) => {
-    setAnswers((prev) => {
-      const next = {
-        ...prev,
-        [questionId]: {
-          ...(prev[questionId] || {}),
-          [guestId]: level,
-        },
-      };
-      // If participation is no longer "yes", clear the boules answer for that
-      // guest so it doesn't linger as a stale "yes"/"no".
-      if (questionId === "petanqueParticipation" && level !== BOOLEAN_YES) {
-        next.petanqueOwnBoules = {
-          ...(next.petanqueOwnBoules || {}),
-          [guestId]: 0,
-        };
-      }
-      return next;
-    });
+    setAnswer(questionId, guestId, level);
+    // If participation is no longer "yes", clear the boules answer for that
+    // guest so it doesn't linger as a stale "yes"/"no".
+    if (questionId === "petanqueParticipation" && level !== BOOLEAN_YES) {
+      setAnswer("petanqueOwnBoules", guestId, 0);
+    }
   };
 
   const handleSaveAnswers = async () => {
@@ -133,17 +112,7 @@ export function Petanque() {
     setSaveStatus("working");
     try {
       // Persist each guest's answers to their own rsvp_responses doc.
-      await Promise.all(
-        guests.map((guest) => {
-          const guestAnswers = {};
-          visibleQuestions.forEach((q) => {
-            const level = answers[q.id]?.[guest.id];
-            if (level !== undefined) guestAnswers[q.id] = level;
-          });
-
-          return saveRsvpAnswers(guest, guestAnswers, editorGuestId);
-        }),
-      );
+      await saveFlow({ flow, questions: visibleQuestions, guests, editorGuestId });
       setSaveStatus("saved");
     } catch (error) {
       console.warn("[petanque] rsvp save failed", error.code || error.message);
@@ -232,6 +201,7 @@ export function Petanque() {
             </div>
 
             <FlipStepCard
+              onDone={() => markResume(flow)}
               steps={[
                 {
                   id: "participation",
@@ -294,10 +264,20 @@ export function Petanque() {
                         >
                           {rsvpMini.button}
                         </button>
-                        {saveStatusText ? (
-                          <small data-form-status>{saveStatusText}</small>
+                        {saveStatus === "saved" ? (
+                          <p className="rsvp-confirmation" role="status">
+                            <span aria-hidden="true">✓</span>
+                            {rsvpMini.success}
+                          </p>
+                        ) : saveStatus === "error" ? (
+                          <p className="rsvp-confirmation rsvp-confirmation--error" role="alert">
+                            {rsvpMini.error}
+                          </p>
+                        ) : saveStatus === "working" ? (
+                          <small data-form-status>{interfaceText.submitWorking}</small>
                         ) : null}
                       </div>
+
                     </div>
                   ),
                 },
@@ -314,10 +294,10 @@ export function Petanque() {
       </div>
 
 
-      {/* Desktop-only bottom nav: leads to the accommodation section. */}
+      {/* Desktop-only bottom nav: leads to the food section. */}
       <nav className="petanque-nav" aria-label="Continue">
-        <a className="petanque-nav-link" href="#accommodation">
-          <span>{petanque.navNext || nav.accommodation}</span>
+        <a className="petanque-nav-link" href="#food">
+          <span>{petanque.navNext || nav.food}</span>
           <span aria-hidden="true">↓</span>
         </a>
       </nav>

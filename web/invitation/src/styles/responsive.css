@@ -147,7 +147,6 @@
   .story-section,
   .venue-section,
   .accommodation-section,
-  .coast-section,
   .attire-section,
   .gift-section,
   .travel-layout,
@@ -155,8 +154,9 @@
   .open-stage,
   .playlist-section,
   .route-map-diagram {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
   }
+
 }
 
 /* ── Shared mobile carousel controls ───────────────────────────────────

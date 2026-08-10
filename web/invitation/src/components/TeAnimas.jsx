@@ -1,11 +1,12 @@
 import React, { useMemo, useState } from "react";
 import { useApp } from "../context/AppContext.jsx";
+import { useRsvp, RSVP_FLOWS } from "../context/RsvpContext.jsx";
 import { RsvpQuestion } from "./RsvpQuestion.jsx";
 import { RsvpRecap } from "./RsvpRecap.jsx";
 import { FlipStepCard } from "./FlipStepCard.jsx";
 import { getGroupMembers } from "../guest-profiles.js";
 import { getActiveGuests } from "../guests.js";
-import { resolveRsvpAnswer, saveRsvpAnswers } from "../rsvp-responses.js";
+import { resolveRsvpAnswer } from "../rsvp-responses.js";
 
 /**
  * "¡Te animas!" — a dedicated section for the RSVP scale questions
@@ -18,36 +19,34 @@ import { resolveRsvpAnswer, saveRsvpAnswers } from "../rsvp-responses.js";
  */
 export function TeAnimas() {
   const { t, profile, interfaceText } = useApp();
+  const { answers, setAnswer, markResume, saveFlow } = useRsvp();
   const rsvp = t.rsvp || {};
   const scale = rsvp.scale || {};
   const questions = scale.questions || [];
+  const flow = RSVP_FLOWS.teAnimas;
+
+  // The section that follows "¡Te animas!" depends on whether the guest
+  // travels by plane: guests who fly continue to the FLIGHTS section, everyone
+  // else skips straight to the accommodation section. The guest's travel
+  // status is stored as `travelStatus` ("booked" | "planning" | "local");
+  // anyone who is not local travels by plane.
+  const travelsByPlane = ["booked", "planning"].includes(
+    profile?.guest?.travelStatus,
+  );
+  const nextHref = travelsByPlane ? "#travel" : "#accommodation";
+  const nextLabel = travelsByPlane ? t.nav.travel : t.nav.accommodation;
+
+
 
   const guests = useMemo(
     () => getGroupMembers(profile?.guest, getActiveGuests()),
     [profile?.guest],
   );
 
-  const [answers, setAnswers] = useState(() => {
-    const initial = {};
-    questions.forEach((q) => {
-      initial[q.id] = {};
-      guests.forEach((guest) => {
-        initial[q.id][guest.id] = resolveRsvpAnswer(guest, q.id);
-      });
-    });
-    return initial;
-  });
-
   const [saveStatus, setSaveStatus] = useState("idle");
 
   const handleAnswerChange = (questionId, guestId, level) => {
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: {
-        ...(prev[questionId] || {}),
-        [guestId]: level,
-      },
-    }));
+    setAnswer(questionId, guestId, level);
   };
 
   const handleSaveAnswers = async () => {
@@ -56,16 +55,7 @@ export function TeAnimas() {
     if (!editorGuestId) return;
     setSaveStatus("working");
     try {
-      await Promise.all(
-        guests.map((guest) => {
-          const guestAnswers = {};
-          questions.forEach((q) => {
-            const level = answers[q.id]?.[guest.id];
-            if (level !== undefined) guestAnswers[q.id] = level;
-          });
-          return saveRsvpAnswers(guest, guestAnswers, editorGuestId);
-        }),
-      );
+      await saveFlow({ flow, questions, guests, editorGuestId });
       setSaveStatus("saved");
     } catch (error) {
       console.warn("[te-animas] scale save failed", error.code || error.message);
@@ -122,22 +112,29 @@ export function TeAnimas() {
   ];
 
   return (
-    <section className="rsvp-section section story-bg">
-      <div className="rsvp-frame reveal">
-        <p className="eyebrow">{t.nav.teAnimas}</p>
-        <p>{scale.intro}</p>
+    <section className="rsvp-section section story-bg reveal">
+      <p className="eyebrow">{t.nav.teAnimas}</p>
+      <p>{scale.intro}</p>
 
-        {questions.length > 0 && guests.length > 0 && (
-          <FlipStepCard
-            steps={steps}
-            copy={{
-              step: interfaceText.stepLabel || "Step",
-              next: interfaceText.next || "Next",
-              back: interfaceText.back || "Back",
-            }}
-          />
-        )}
-      </div>
+      {questions.length > 0 && guests.length > 0 && (
+        <FlipStepCard
+          steps={steps}
+          onDone={() => markResume(flow)}
+          copy={{
+            step: interfaceText.stepLabel || "Step",
+            next: interfaceText.next || "Next",
+            back: interfaceText.back || "Back",
+          }}
+        />
+      )}
+
+      <nav className="te-animas-nav" aria-label="Continue">
+        <a className="te-animas-nav-link" href={nextHref}>
+          <span>{nextLabel}</span>
+          <span aria-hidden="true">→</span>
+        </a>
+      </nav>
     </section>
   );
 }
+

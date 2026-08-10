@@ -29,6 +29,7 @@ let CABINS = [];
 let cabinsLoaded = false;
 
 function logDb(event, detail) {
+
   console.log(`[db][cabins][${event}]`, detail);
 }
 
@@ -73,6 +74,9 @@ export async function loadCabins() {
 
 /**
  * Look up a cabin by its ID or name (case-insensitive).
+ *
+ * The Firestore `cabins` collection is the single source of truth. No local
+ * fallback data is used — if a cabin is not in the DB it is not returned.
  * @param {string} cabinIdOrName
  * @returns {import("./cabins.js").Cabin | null}
  */
@@ -84,3 +88,5 @@ export function getCabin(cabinIdOrName) {
       || cabin.name?.toLocaleUpperCase() === normalized,
   ) || null;
 }
+
+

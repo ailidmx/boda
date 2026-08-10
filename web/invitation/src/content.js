@@ -41,14 +41,17 @@ export const content = {
     nav: {
       home: "Inicio",
       you: "Tú",
-      story: "Nosotros",
+      story: "Invitación",
+
 
       weekend: "Guarden la fecha",
       programme: "Programa",
       venue: "El lugar",
       accommodation: "Alojamiento",
-      travel: "Vengo de lejos",
+      travel: "VUELOS",
       attire: "Vestuario",
+
+
       weather: "Clima",
       gift: "Regalos",
       photos: "Fotos",
@@ -89,7 +92,36 @@ export const content = {
       cancel: "Cancelar",
       save: "Guardar",
       working: "Guardando…",
+
+      teAnimas: "¿Te animas?",
+
+      petanque: "Petanca",
+      food: "Comida",
+      coast: "¿Y después?",
+
+      menu1: "Menú",
+      menu2: "Más",
+
+      about: "Acerca de",
+
+      aboutTitle: "Acerca de esta invitación",
+      aboutSubtitle:
+        "Una invitación digital hecha con cariño para celebrar nuestro fin de semana junto al lago de Chapala.",
+      aboutClose: "Cerrar",
+      close: "Cerrar",
+      ok: "Aceptar",
+      successTitle: "¡Listo!",
+      currentPasswordLabel: "Contraseña actual",
+      currentPasswordPlaceholder: "Escribe tu contraseña actual",
+      confirmPasswordLabel: "Confirmar contraseña",
+      confirmPasswordPlaceholder: "Repite la nueva contraseña",
+      passwordMismatch: "Las contraseñas no coinciden.",
+      passwordReauthRequired: "Confirma tu contraseña actual para continuar.",
+      passwordWrongCurrent: "La contraseña actual es incorrecta.",
+      emailDomainError: "Este correo no pertenece a un dominio permitido.",
+      emailErrorTitle: "No pudimos actualizar el correo",
     },
+
 
 
     countdown: {
@@ -105,8 +137,11 @@ export const content = {
 
 
     hero: {
-      eyebrow: "nos casamos",
-      invitation: "Queremos celebrar este momento con ustedes",
+      eyebrow: "Estás invitado a nuestra boda",
+      eyebrowF: "Estás invitada a nuestra boda",
+      invitation: "Queremos celebrar este momento contigo",
+
+
 
       scroll: "Empecemos",
       navStory: "Descubrir nuestra invitación",
@@ -145,6 +180,8 @@ export const content = {
 
       correctNumber: "Corregir número",
       edit: "Editar",
+      verify: "Verificar",
+      membersLabel: "Grupo de invitación",
 
 
       addPhoto: "Subir foto",
@@ -155,7 +192,9 @@ export const content = {
       saving: "Guardando…",
       cancel: "Cancelar",
       saved: "¡Listo! Lo actualizamos.",
+      savedWithName: "¡Listo! {name} está actualizado.",
       saveError: "No pudimos guardar. Revisa tu conexión e inténtalo de nuevo.",
+
       nameRequired: "Escribe al menos tu nombre.",
       photoSaved: "¡Foto guardada! Gracias.",
       photoError: "No pudimos subir la foto. Inténtalo de nuevo.",
@@ -219,8 +258,10 @@ export const content = {
       ],
       anecdotesLabel: "El lago de Chapala en 12 anécdotas",
       navNext: "Descubrir el lugar",
+      mapLabel: "Mapa del lago de Chapala",
 
     },
+
 
 
     gallery: {
@@ -253,10 +294,12 @@ export const content = {
     },
     weekend: {
       eyebrow: "Programa detallado",
+      bannerEyebrow: "Guarden la fecha",
 
 
 
       title: "Tres días para celebrar",
+
       intro:
         "Nosotros estaremos en Roca Azul desde el jueves. Los invitados pueden llegar desde el viernes alrededor del mediodía y la celebración principal será una boda de tarde el sábado.",
       navSchedule: "Ver los tres días",
@@ -282,7 +325,8 @@ export const content = {
         },
       ],
       saturday: {
-        eyebrow: "Sábado 20 · programa",
+        eyebrow: "Sábado 20",
+
         title: "La tarde, paso a paso",
         warning:
           "Quienes vengan desde Guadalajara: salgan con bastante anticipación. Los accesos hacia Jocotepec pueden congestionarse fácilmente y necesitamos que todos estén en Roca Azul a las 13:00.",
@@ -299,7 +343,8 @@ export const content = {
         ],
       },
       friday: {
-        eyebrow: "Viernes 19 · programa",
+        eyebrow: "Viernes 19",
+
         title: "Llegada y bienvenida",
         warning:
           "Un primer encuentro relajado para instalarnos, convivir y empezar el fin de semana sin prisas.",
@@ -310,7 +355,8 @@ export const content = {
         ],
       },
       sunday: {
-        eyebrow: "Domingo 21 · programa",
+        eyebrow: "Domingo 21",
+
         title: "Desayuno y despedida",
         warning: "Una última mañana juntos antes de los regresos.",
         items: [
@@ -633,6 +679,10 @@ export const content = {
         onSiteTitle: "Una plaza está prevista en Roca Azul",
         onSiteBody:
           "Esta es la opción registrada para tu perfil. Te confirmaremos directamente cualquier ajuste.",
+        onSiteCoveredBody:
+          "Tu estancia está cubierta por los novios: no tendrás que pagar nada.",
+        onSitePayBody:
+          "Tu estancia no está cubierta por los novios: pagarás tu parte.",
         independentTitle: "Alojamiento por tu cuenta",
         independentBody:
           "Les recomendamos buscar un hotel o un Airbnb en los alrededores.",
@@ -640,8 +690,9 @@ export const content = {
         roomLabel: "Habitación",
         cabinCapacityLabel: "Capacidad de la casa",
         roomCapacityLabel: "Capacidad del cuarto",
-        cabinPriceLabel: "Precio de la cabaña · 2 días",
-        personPriceLabel: "Precio por persona · 2 noches",
+        cabinPriceLabel: "Precio de la cabaña",
+        personPriceLabel: "A pagar por persona",
+        groupPriceLabel: "A pagar por el grupo",
         coveredPriceLabel: "Pagado por los novios",
         peopleLabel: "personas",
         cabinOccupancyLabel: "Modalidad de la cabaña",
@@ -681,11 +732,17 @@ export const content = {
           pending: "Por confirmar",
         },
         extraCabinLabel: "Alojamiento adicional",
-        button: "Actualizar mi RSVP",
+        planCardTitle: "Tu plan de alojamiento",
+        planCardPerPerson: "Por persona · 2 noches",
+        planCardSaleLabel: "Cubierto por los novios",
+        planCardGroupTotal: "Total del grupo",
+        planCardEurDisclaimer: "Precio estimado en MXN",
+        planCardEstimate: "El importe final se confirmará directamente.",
       },
 
 
       contactPrompt: "Más info",
+
 
       cabinsShowcase: {
         eyebrow: "Conozcan las cabañas",
@@ -817,8 +874,25 @@ export const content = {
         ],
         button: "Responder al RSVP",
       },
+      navNext: "Petanca",
+      recap: {
+        eyebrow: "Confirmación de alojamiento",
+        title: "¿Confirman su alojamiento?",
+        intro:
+          "Indiquen por cada persona si se quedará en Roca Azul para poder organizar las cabañas.",
+        hasCabinQuestion: "¿Se queda en Roca Azul?",
+        hasCabinQuestionCabin: "¿Ok para {cabin}?",
+        noCabinQuestion: "¿Me avisan si se libera un alojamiento?",
+        yesLabel: "Sí",
+
+        noLabel: "No",
+        button: "Guardar mi confirmación",
+        success: "Confirmación guardada. ¡Gracias!",
+        error: "No se pudo guardar. Inténtalo de nuevo.",
+      },
     },
     travel: {
+
       eyebrow: "Vengo de lejos",
       title: "Su viaje también forma parte de la celebración",
       body:
@@ -871,17 +945,41 @@ export const content = {
       cta: "Compartir mis datos de viaje",
 
       ctaNote: "El formulario privado ya está disponible más abajo.",
+      vuelosImage: "vuelos_c6qdcq",
+      vuelosLabel: "Mapa de vuelos",
     },
     attire: {
+
       eyebrow: "Vestuario",
       title: "Estética mexicana y código de vestimenta",
       body:
         "Hemos elegido una estética mexicana para nuestra boda como un homenaje a la cultura, la comida, la música y el lugar que nos reúne. Queremos que todo se sienta festivo, colorido y profundamente mexicano.",
       dressCode: {
-        title: "No hay código de vestimenta",
-        body:
-          "Queremos que se sientan ustedes mismos, sin disfraces. Si quieren ser elegantes, sean elegantes; si quieren ir relajados, vayan relajados. Lo importante es que se sientan cómodos. Tengan en cuenta que necesitarán un conjunto completo de ropa: habrá natación, baño de vapor, deportes, la ceremonia, el baile y, si la noche se alarga junto a la fogata, un suéter ligero.",
+        title: "Vístete de color",
+        paragraphs: [
+          "Nos hace muchísima ilusión compartir este día con ustedes, y queremos que, así como cada persona ha dejado una huella especial en nuestra vida, también cada uno aporte un poco de su esencia a esta celebración.",
+          "Creemos que los colores transmiten energía, alegría y personalidad. Por eso, nos encantaría que nos acompañaran vistiendo tonos llenos de vida, procurando evitar el negro, el gris y el blanco.",
+          "Nuestra boda tendrá una inspiración mexicana, con una decoración en tonos blancos y detalles artesanales. David llevará una guayabera de lino blanco con bordados dorados, y ambos vestiremos piezas bordadas por artesanas de una comunidad de Oaxaca, como un homenaje a la riqueza de nuestras tradiciones.",
+          "La única regla es que se sientan ustedes mismos: elegantes, cómodos y listos para celebrar, bailar y llenar este día de color, amor y buena energía.",
+          "¡Gracias por ser parte de nuestra historia! ✨🌼",
+        ],
+        pictograms: {
+          ariaLabel: "Pictogramas del código de vestimenta",
+          noWhite: "Evita el blanco",
+          noBlack: "Evita el negro",
+          noGrey: "Evita el gris",
+          colorGreen: "Verde",
+          colorTeal: "Turquesa",
+          colorMarigold: "Amarillo",
+          dressNoWhite: "Vestido: evita el blanco",
+          dressNoBlack: "Vestido: evita el negro",
+          dressNoGrey: "Vestido: evita el gris",
+          dressColor: "Vestido de color",
+          funky: "Estampados divertidos",
+          mexican: "Patrones mexicanos",
+        },
       },
+
       guestNote:
         "Lo más importante es que se sientan cómodos y celebren con nosotros. Si tienen dudas, escríbanos.",
       navNext: "Alojamiento",
@@ -942,7 +1040,13 @@ export const content = {
         title: "Todos los que nos acompañan",
         subtitle:
           "Cada nombre es una historia compartida. Gracias por ser parte de este día.",
+        navNext: "Ver el programa",
+        modeGroupLabel: "Modo de nombre",
+        modeFull: "Nombre completo",
+        modeFirst: "Nombre",
+        modeLast: "Apellidos",
       },
+
     },
     coast: {
       eyebrow: "¿Y después?",
@@ -1004,9 +1108,66 @@ export const content = {
         previewNote:
           "Vista previa: este sondeo se activará junto con el RSVP privado.",
       },
+      rsvpMini: {
+        eyebrow: "¿Y después?",
+        title: "¿Se apuntan?",
+        intro:
+          "Cuéntenos qué tan probable es que se unan a cada plan. Pueden cambiar su respuesta en cualquier momento.",
+        questions: [
+          {
+            id: "rocaAzul",
+            title: "Plan 1 · Quedarse en Roca Azul",
+            subtitle: "Del domingo al martes, dos noches más en el lugar.",
+          },
+          {
+            id: "playa",
+            title: "Plan 2 · La playa",
+            subtitle: "Del martes al sábado, en Barra de Navidad.",
+          },
+        ],
+        recapTitle: "Resumen",
+        recapProgress: "respondidos",
+        button: "Guardar mis respuestas",
+        success: "¡Gracias! Guardamos sus respuestas.",
+        error: "No pudimos guardar. Revisa tu conexión e inténtalo de nuevo.",
+      },
+      suggestions: {
+        eyebrow: "Dónde alojarse",
+        title: "Sugerencias en Barra de Navidad",
+        body:
+          "Si el plan de la playa les interesa, estas opciones aparecieron en la zona para las noches del 23 al 28 de febrero de 2027. Confirma la disponibilidad y el precio directamente.",
+        airbnbTitle: "Airbnbs cerca de Barra de Navidad",
+        airbnbBody:
+          "Estas opciones aparecieron en la zona para las noches del 23 al 28 de febrero de 2027. Confirma la disponibilidad y el precio directamente en Airbnb.",
+        airbnbAreaPrice: "Precio de entrada observado en la zona",
+        fromPrice: "Desde · tarifa orientativa",
+        perNight: "por noche",
+        beforeTaxes: "sin impuestos",
+        airbnbGuests: "huéspedes",
+        airbnbBedrooms: "habitaciones",
+        airbnbBeds: "camas",
+        airbnbRating: "Calificación",
+        airbnbView: "Ver alojamiento",
+        airbnbSearchAll: "Ver toda la búsqueda en Airbnb",
+        hotelTitle: "Hoteles en Barra de Navidad",
+        hotelBody:
+          "Tarifas de referencia observadas actualmente. Consulta con cada hotel la disponibilidad, los impuestos y el precio final.",
+        hotelLocation: "Zona",
+        hotelView: "Ver hotel",
+        hotelTypes: {
+          budgetHotel: "Hotel económico",
+          beachHotel: "Hotel frente a la playa",
+          boutiqueHotel: "Hotel boutique",
+        },
+      },
+      extraStay: {
+        eyebrow: "Tu estancia · domingo a martes",
+        title: "Tu cabaña para la segunda estancia",
+      },
     },
 
     rsvp: {
+
       eyebrow: "RSVP",
       title: "¿Nos acompañan?",
       body:
@@ -1114,6 +1275,12 @@ export const content = {
       button: "Enviar mi respuesta",
       previewNote:
         "Su respuesta se guardará de forma privada y solo los novios podrán consultarla.",
+      progressLabel: "Antes de enviar, completa cada sección:",
+      progressTeAnimas: "¿Te animas? (viernes, sábado, domingo)",
+      progressPetanque: "Torneo de petanca",
+      progressCoast: "¿Y después? (playa)",
+      progressResume: "Completado",
+      progressPending: "Pendiente",
       recap: {
         title: "Resumen",
         answered: "respondidos",
@@ -1145,6 +1312,41 @@ export const content = {
         ],
       },
     },
+    petanqueTribute: {
+      eyebrow: "Petanca",
+      title: "Un homenaje a la petanca",
+      intro:
+        "La petanca nos ha unido con una comunidad maravillosa de amigos y compañeros de club en México y en el mundo.",
+      body:
+        "El viernes por la tarde organizaremos un torneo de petanca para celebrar este juego que tanto queremos. No hace falta experiencia: solo ganas de jugar, reír y compartir.",
+      homage: "¡Te animas!",
+      photosLabel: "Fotografías de petanca",
+      photoAlts: [
+        "Jugadores de petanca en el club",
+        "Boules sobre la cancha",
+        "Un tiro de petanca",
+        "El círculo de lanzamiento",
+      ],
+      navNext: "A la mesa",
+      rsvpMini: {
+        eyebrow: "Torneo de petanca",
+        title: "¿Se apuntan?",
+        intro: "El viernes por la tarde organizaremos un torneo de petanca. ¿Se apuntan?",
+        organizerLabel: "Organiza: David",
+        organizerWhatsapp: "https://wa.me/523332017504",
+        fields: {
+          participation: "¿Participan en el torneo?",
+          ownBoules: "¿Traen sus propias boules?",
+          ownBoulesHint: "Si no traen, no se preocupen: tendremos algunas para compartir.",
+        },
+        yesLabel: "Sí",
+        noLabel: "No",
+        success: "¡Gracias! Guardamos sus respuestas.",
+        error: "No pudimos guardar. Revisa tu conexión e inténtalo de nuevo.",
+        button: "Guardar mis respuestas",
+        recapTitle: "Resumen",
+      },
+    },
     footer: {
       line: "Con amor, desde México y Francia",
 
@@ -1153,6 +1355,7 @@ export const content = {
     },
   },
   fr: {
+
     locale: "fr-FR",
     skip: "Aller au contenu",
     metaDescription:
@@ -1160,14 +1363,17 @@ export const content = {
     nav: {
       home: "Accueil",
       you: "Vous",
-      story: "Nous",
+      story: "Invitation",
+
 
       weekend: "Réservez la date",
       programme: "Programme",
       venue: "Le lieu",
       accommodation: "Hébergement",
-      travel: "Je viens de loin",
+      travel: "VOLS",
       attire: "Code vestimentaire",
+
+
       weather: "Météo",
       gift: "Cadeaux",
       photos: "Photos",
@@ -1208,7 +1414,36 @@ export const content = {
       cancel: "Annuler",
       save: "Enregistrer",
       working: "Enregistrement…",
+
+      teAnimas: "ça te tente ?",
+
+      petanque: "Pétanque",
+      food: "Cuisine",
+      coast: "Et après ?",
+
+      menu1: "Menu",
+      menu2: "Plus",
+
+      about: "À propos",
+
+      aboutTitle: "À propos de cette invitation",
+      aboutSubtitle:
+        "Une invitation numérique réalisée avec soin pour célébrer notre week-end au bord du lac de Chapala.",
+      aboutClose: "Fermer",
+      close: "Fermer",
+      ok: "OK",
+      successTitle: "C’est fait !",
+      currentPasswordLabel: "Mot de passe actuel",
+      currentPasswordPlaceholder: "Saisissez votre mot de passe actuel",
+      confirmPasswordLabel: "Confirmer le mot de passe",
+      confirmPasswordPlaceholder: "Répétez le nouveau mot de passe",
+      passwordMismatch: "Les mots de passe ne correspondent pas.",
+      passwordReauthRequired: "Confirmez votre mot de passe actuel pour continuer.",
+      passwordWrongCurrent: "Le mot de passe actuel est incorrect.",
+      emailDomainError: "Cette adresse n’appartient pas à un domaine autorisé.",
+      emailErrorTitle: "Impossible de mettre à jour l’adresse e-mail",
     },
+
 
 
     countdown: {
@@ -1224,8 +1459,10 @@ export const content = {
 
 
     hero: {
-      eyebrow: "nous nous marions",
+      eyebrow: "Tu es invité à notre mariage",
+      eyebrowF: "Tu es invitée à notre mariage",
       invitation: "Nous voulons vivre ce moment avec vous",
+
 
       scroll: "Commençons",
       navStory: "Découvrir notre invitation",
@@ -1264,6 +1501,8 @@ export const content = {
 
       correctNumber: "Corriger le numéro",
       edit: "Modifier",
+      verify: "Vérifier",
+      membersLabel: "Groupe d'invitation",
 
 
       addPhoto: "Déposer une photo",
@@ -1304,8 +1543,9 @@ export const content = {
       next: "Continuer",
       finish: "Terminer",
       confirm: "Confirmer",
-      ok: "Confirm",
+      ok: "Oui, c’est correct",
       contactSaved: "C’est fait ! Merci d’avoir confirmé vos coordonnées.",
+
 
       whatsappLabel: "Ajoutez-moi au groupe WhatsApp",
       whatsappHint:
@@ -1340,8 +1580,10 @@ export const content = {
       ],
       anecdotesLabel: "Le lac de Chapala en 12 anecdotes",
       navNext: "Découvrir le lieu",
+      mapLabel: "Carte du lac de Chapala",
 
     },
+
 
 
     gallery: {
@@ -1374,8 +1616,10 @@ export const content = {
     },
     weekend: {
       eyebrow: "Programme détaillé",
+      bannerEyebrow: "Réserver la date",
 
       title: "Trois jours pour célébrer",
+
 
       intro:
         "Nous serons à Roca Azul dès le jeudi. Les invités pourront arriver à partir du vendredi vers midi, et la célébration principale sera un mariage d’après-midi le samedi.",
@@ -1402,7 +1646,8 @@ export const content = {
         },
       ],
       saturday: {
-        eyebrow: "Samedi 20 · programme",
+        eyebrow: "Samedi 20",
+
         title: "L’après-midi, pas à pas",
         warning:
           "Pour celles et ceux qui viennent de Guadalajara : partez très en avance. Les accès vers Jocotepec peuvent facilement être embouteillés et nous avons besoin que tout le monde soit à Roca Azul à 13 h.",
@@ -1419,7 +1664,8 @@ export const content = {
         ],
       },
       friday: {
-        eyebrow: "Vendredi 19 · programme",
+        eyebrow: "Vendredi 19",
+
         title: "Arrivée et bienvenue",
         warning:
           "Un premier moment détendu pour s’installer, se retrouver et commencer le week-end sans se presser.",
@@ -1430,7 +1676,8 @@ export const content = {
         ],
       },
       sunday: {
-        eyebrow: "Dimanche 21 · programme",
+        eyebrow: "Dimanche 21",
+
         title: "Petit-déjeuner et au revoir",
         warning: "Une dernière matinée ensemble avant les départs.",
         items: [
@@ -1652,7 +1899,8 @@ export const content = {
     },
     facilities: {
       eyebrow: "Le lieu",
-      title: "Tout le club à votre disposition",
+      title: "Tout le club à ta disposition",
+
       body:
         "Entre cérémonie et célébration, tout le club est à nous : piscines, jardins, terrains et gîtes pour se retrouver, explorer ou simplement se reposer.",
 
@@ -1749,9 +1997,14 @@ export const content = {
         membersLabel: "Membres du groupe",
         linkLabel: "Voir l’option prévue pour vous",
         backLabel: "Retour à l’hébergement",
-        onSiteTitle: "Une place est prévue à Roca Azul",
+        onSiteTitle: "Nous avons un place pour toi!",
         onSiteBody:
-          "Voici l’option enregistrée pour votre profil. Nous vous confirmerons directement tout ajustement.",
+          "Voici l’option que nous avons prévu pour toi, nous esperons qu’elle te plaira",
+        onSiteCoveredBody:
+          "Ton séjour est pris en charge par les mariés : tu n’auras rien à payer!",
+
+        onSitePayBody:
+          "Votre séjour n’est pas pris en charge par les mariés : vous paierez votre part.",
         independentTitle: "Hébergement de votre côté",
         independentBody:
           "Nous vous recommandons de chercher un hôtel ou un Airbnb dans les environs.",
@@ -1759,8 +2012,9 @@ export const content = {
         roomLabel: "Chambre",
         cabinCapacityLabel: "Capacité du gîte",
         roomCapacityLabel: "Capacité de la chambre",
-        cabinPriceLabel: "Prix du gîte · 2 nuits",
-        personPriceLabel: "Prix par personne · 2 nuits",
+        cabinPriceLabel: "Prix du gîte",
+        personPriceLabel: "A payer par personne",
+        groupPriceLabel: "A payer par le groupe",
         coveredPriceLabel: "Pris en charge par les mariés",
         peopleLabel: "personnes",
         cabinOccupancyLabel: "Modalité du gîte",
@@ -1800,11 +2054,17 @@ export const content = {
           pending: "À confirmer",
         },
         extraCabinLabel: "Hébergement supplémentaire",
-        button: "Mettre à jour mon RSVP",
+        planCardTitle: "Votre plan d’hébergement",
+        planCardPerPerson: "Par personne · 2 nuits",
+        planCardSaleLabel: "Pris en charge par les mariés",
+        planCardGroupTotal: "Total du groupe",
+        planCardEurDisclaimer: "Prix estimé en MXN",
+        planCardEstimate: "Le montant final sera confirmé directement.",
       },
 
 
       contactPrompt: "Plus d'infos",
+
 
       cabinsShowcase: {
         eyebrow: "Découvrez les gîtes",
@@ -1936,8 +2196,25 @@ export const content = {
         ],
         button: "Répondre au RSVP",
       },
+      navNext: "Pétanque",
+      recap: {
+        eyebrow: "Confirmation de l’hébergement",
+        title: "Confirmez-vous votre hébergement ?",
+        intro:
+          "Indiquez pour chaque personne si elle restera à Roca Azul afin que nous puissions organiser les gîtes.",
+        hasCabinQuestion: "Reste-t-elle à Roca Azul ?",
+        hasCabinQuestionCabin: "Ok pour {cabin} ?",
+        noCabinQuestion: "Me prévenir si un logement se libère",
+        yesLabel: "Oui",
+
+        noLabel: "Non",
+        button: "Enregistrer ma confirmation",
+        success: "Confirmation enregistrée. Merci !",
+        error: "Impossible d’enregistrer. Réessayez.",
+      },
     },
     travel: {
+
       eyebrow: "Je viens de loin",
       title: "Votre voyage fait aussi partie de la fête",
       body:
@@ -1990,17 +2267,41 @@ export const content = {
       cta: "Partager mes informations de voyage",
 
       ctaNote: "Le formulaire privé est maintenant disponible plus bas.",
+      vuelosImage: "vol_chr0ri",
+      vuelosLabel: "Carte des vols",
     },
     attire: {
+
       eyebrow: "Code vestimentaire",
       title: "Esthétique mexicaine",
       body:
         "Nous avons choisi une esthétique mexicaine pour notre mariage en hommage à la culture, la cuisine, la musique et le lieu qui nous réunit. Nous voulons que tout soit festif, coloré et profondément mexicain.",
       dressCode: {
-        title: "Pas de code vestimentaire",
-        body:
-          "Nous voulons que vous soyez vous-mêmes, sans déguisement. Si vous voulez être élégants, soyez élégants ; si vous préférez être décontractés, soyez décontractés. L’important est que vous vous sentiez à l’aise. Prévoyez une tenue complète : il y aura de la natation, un bain de vapeur, du sport, la cérémonie, la danse et, si la soirée se prolonge autour du feu, un pull léger.",
+        title: "Habillez-vous en couleur",
+        paragraphs: [
+          "Nous sommes immensément heureux de partager ce jour avec vous, et nous souhaitons que, tout comme chaque personne a laissé une empreinte spéciale dans notre vie, chacun apporte un peu de son essence à cette célébration.",
+          "Nous croyons que les couleurs transmettent de l’énergie, de la joie et de la personnalité. C’est pourquoi nous aimerions que vous nous accompagniez en portant des tons pleins de vie, en évitant le noir, le gris et le blanc.",
+          "Notre mariage aura une inspiration mexicaine, avec une décoration aux tons blancs et des détails artisanaux. David portera une guayabera en lin blanc avec des broderies dorées, et nous porterons tous les deux des pièces brodées par des artisanes d’une communauté d’Oaxaca, en hommage à la richesse de nos traditions.",
+          "La seule règle est que vous soyez vous-mêmes : élégants, à l’aise et prêts à célébrer, danser et remplir ce jour de couleur, d’amour et de bonne énergie.",
+          "Merci de faire partie de notre histoire ! ✨🌼",
+        ],
+        pictograms: {
+          ariaLabel: "Pictogrammes du code vestimentaire",
+          noWhite: "Évitez le blanc",
+          noBlack: "Évitez le noir",
+          noGrey: "Évitez le gris",
+          colorGreen: "Vert",
+          colorTeal: "Turquoise",
+          colorMarigold: "Jaune",
+          dressNoWhite: "Robe : évitez le blanc",
+          dressNoBlack: "Robe : évitez le noir",
+          dressNoGrey: "Robe : évitez le gris",
+          dressColor: "Robe colorée",
+          funky: "Imprimés amusants",
+          mexican: "Motifs mexicains",
+        },
       },
+
       guestNote:
         "Le plus important est que vous soyez à l'aise et que vous célébriez avec nous. Si vous avez des questions, écrivez-nous.",
       navNext: "Hébergement",
@@ -2029,11 +2330,12 @@ export const content = {
         mx: {
           title: "Virement en MXN",
           details: [
-            "Cuenta Clave : 012 320 01559313382 0",
+            "CLABE : 012 320 01559313382 0",
             "Banque : BBVA",
             "Nom : David AILI",
           ],
         },
+
       },
       cta: "Parler aux mariés",
     },
@@ -2041,7 +2343,8 @@ export const content = {
       eyebrow: "Remerciements",
       title: "Merci",
       subtitle:
-        "Sans nos padrinos et nos aides, rien de tout cela ne serait possible. Nous tenons à remercier avec toute notre gratitude…",
+        "Sans nos parrains et nos aides, rien de tout cela ne serait possible. Nous tenons à remercier avec toute notre gratitude…",
+
       credits: [
         { name: "Manuel Amuezca", role: "Wedding planner" },
         { name: "Manuel Amuezca", role: "Pizzas du vendredi" },
@@ -2050,7 +2353,8 @@ export const content = {
         { name: "Isabel Guadalupe", role: "Tenues des mariés" },
       ],
       humor: [
-        "Si vous voulez apparaître ici, contactez notre programme d’affiliation au programme de padrino.",
+        "Si vous voulez apparaître ici, contactez notre programme d’affiliation au programme de parrain.",
+
         "Vous apparaissez ici sans le savoir : une mission vous a été confiée. Dommage, mais il est impossible de l’effacer : l’admin IT de la page est en vacances, on ne peut pas le supprimer, donc il faut s’y tenir.",
         "Vous avez apporté votre aide et vous n’apparaissez pas. Dommage. L’IT est peut-être en vacances, mais envoyez vos réclamations aux mariés ou au wedding planner.",
       ],
@@ -2061,7 +2365,13 @@ export const content = {
         title: "Tous ceux qui nous accompagnent",
         subtitle:
           "Chaque nom est une histoire partagée. Merci de faire partie de ce jour.",
+        navNext: "Voir le programme",
+        modeGroupLabel: "Mode du nom",
+        modeFull: "Nom complet",
+        modeFirst: "Prénom",
+        modeLast: "Nom de famille",
       },
+
     },
     coast: {
       eyebrow: "Et après ?",
@@ -2123,9 +2433,66 @@ export const content = {
         previewNote:
           "Aperçu : ce sondage sera activé avec le RSVP privé.",
       },
+      rsvpMini: {
+        eyebrow: "Et après ?",
+        title: "Vous vous inscrivez ?",
+        intro:
+          "Dites-nous quelle est la probabilité que vous rejoigniez chaque plan. Vous pouvez modifier votre réponse à tout moment.",
+        questions: [
+          {
+            id: "rocaAzul",
+            title: "Plan 1 · Rester à Roca Azul",
+            subtitle: "Du dimanche au mardi, deux nuits de plus sur place.",
+          },
+          {
+            id: "playa",
+            title: "Plan 2 · La plage",
+            subtitle: "Du mardi au samedi, à Barra de Navidad.",
+          },
+        ],
+        recapTitle: "Résumé",
+        recapProgress: "répondu·e·s",
+        button: "Enregistrer mes réponses",
+        success: "Merci ! Nous avons enregistré vos réponses.",
+        error: "Impossible d’enregistrer. Vérifiez votre connexion et réessayez.",
+      },
+      suggestions: {
+        eyebrow: "Où dormir",
+        title: "Suggestions à Barra de Navidad",
+        body:
+          "Si le plan plage vous intéresse, ces options sont apparues dans la zone pour les nuits du 23 au 28 février 2027. Vérifiez la disponibilité et le tarif directement.",
+        airbnbTitle: "Airbnbs près de Barra de Navidad",
+        airbnbBody:
+          "Ces options sont apparues dans la zone pour les nuits du 23 au 28 février 2027. Vérifiez la disponibilité et le tarif directement sur Airbnb.",
+        airbnbAreaPrice: "Prix d’entrée observé dans la zone",
+        fromPrice: "À partir de · tarif indicatif",
+        perNight: "par nuit",
+        beforeTaxes: "hors taxes",
+        airbnbGuests: "voyageurs",
+        airbnbBedrooms: "chambres",
+        airbnbBeds: "lits",
+        airbnbRating: "Note",
+        airbnbView: "Voir le logement",
+        airbnbSearchAll: "Voir toute la recherche sur Airbnb",
+        hotelTitle: "Hôtels à Barra de Navidad",
+        hotelBody:
+          "Tarifs indicatifs observés actuellement. Vérifiez auprès de chaque hôtel les disponibilités, les taxes et le prix final.",
+        hotelLocation: "Secteur",
+        hotelView: "Voir l’hôtel",
+        hotelTypes: {
+          budgetHotel: "Hôtel économique",
+          beachHotel: "Hôtel face à la plage",
+          boutiqueHotel: "Hôtel boutique",
+        },
+      },
+      extraStay: {
+        eyebrow: "Votre séjour · dimanche à mardi",
+        title: "Votre gîte pour le second séjour",
+      },
     },
 
     rsvp: {
+
       eyebrow: "RSVP",
       title: "Serez-vous avec nous ?",
       body:
@@ -2233,6 +2600,12 @@ export const content = {
       button: "Envoyer ma réponse",
       previewNote:
         "Votre réponse sera enregistrée de façon privée et accessible uniquement aux mariés.",
+      progressLabel: "Avant d’envoyer, complétez chaque section :",
+      progressTeAnimas: "Ça te tente ? (vendredi, samedi, dimanche)",
+      progressPetanque: "Tournoi de pétanque",
+      progressCoast: "Et après ? (plage)",
+      progressResume: "Terminé",
+      progressPending: "En attente",
       recap: {
         title: "Résumé",
         answered: "répondu·e·s",
@@ -2242,7 +2615,7 @@ export const content = {
 
       scale: {
         intro:
-          "Dites-nous, jour par jour, quelle est la probabilité que vous soyez avec nous. Vous pouvez modifier votre réponse à tout moment.",
+          "Dis-nous, jour par jour, quelle est la probabilité que tu sois avec nous. Tu peux modifier ta réponse à tout moment.",
         saveButton: "Enregistrer mes réponses",
         savedNote: "Merci ! Nous avons enregistré vos réponses.",
         questions: [
@@ -2264,6 +2637,42 @@ export const content = {
         ],
       },
     },
+    petanqueTribute: {
+      eyebrow: "Pétanque",
+      title: "Un hommage à la pétanque",
+      intro:
+        "La pétanque nous a réunis autour d’une merveilleuse communauté d’amis et de coéquipiers de club, au Mexique et dans le monde.",
+      body:
+        "Le vendredi après-midi, nous organiserons un tournoi de pétanque pour célébrer ce jeu que nous aimons tant. Aucune expérience n’est requise : juste l’envie de jouer, de rire et de partager.",
+      homage: "Ça vous tente !",
+      photosLabel: "Photos de pétanque",
+
+      photoAlts: [
+        "Joueurs de pétanque au club",
+        "Boules sur le terrain",
+        "Un tir de pétanque",
+        "Le cercle de lancer",
+      ],
+      navNext: "À table",
+      rsvpMini: {
+        eyebrow: "Tournoi de pétanque",
+        title: "Vous vous inscrivez ?",
+        intro: "Le vendredi après-midi, nous organiserons un tournoi de pétanque. Vous participez ?",
+        organizerLabel: "Organise : David",
+        organizerWhatsapp: "https://wa.me/523332017504",
+        fields: {
+          participation: "Participez-vous au tournoi ?",
+          ownBoules: "Apportez-vous vos propres boules ?",
+          ownBoulesHint: "Si vous n’en avez pas, pas de souci : nous en aurons à partager.",
+        },
+        yesLabel: "Oui",
+        noLabel: "Non",
+        success: "Merci ! Nous avons enregistré vos réponses.",
+        error: "Impossible d’enregistrer. Vérifiez votre connexion et réessayez.",
+        button: "Enregistrer mes réponses",
+        recapTitle: "Résumé",
+      },
+    },
     footer: {
       line: "Avec amour, depuis le Mexique et la France",
 
@@ -2272,6 +2681,7 @@ export const content = {
     },
   },
   en: {
+
     locale: "en-GB",
     skip: "Skip to content",
     metaDescription:
@@ -2279,14 +2689,17 @@ export const content = {
     nav: {
       home: "Home",
       you: "You",
-      story: "Us",
+      story: "Invitation",
+
 
       weekend: "Save the date",
       programme: "Programme",
       venue: "The venue",
       accommodation: "Accommodation",
-      travel: "Coming from afar",
+      travel: "FLIGHTS",
       attire: "Attire",
+
+
       weather: "Weather",
       gift: "Gifts",
       photos: "Photos",
@@ -2327,7 +2740,35 @@ export const content = {
       cancel: "Cancel",
       save: "Save",
       working: "Saving…",
+
+      teAnimas: "Are you in?",
+      petanque: "Pétanque",
+      food: "Food",
+      coast: "And afterwards?",
+
+      menu1: "Menu",
+      menu2: "More",
+
+      about: "About",
+
+      aboutTitle: "About this invitation",
+      aboutSubtitle:
+        "A digital invitation made with care to celebrate our weekend by Lake Chapala.",
+      aboutClose: "Close",
+      close: "Close",
+      ok: "OK",
+      successTitle: "Done!",
+      currentPasswordLabel: "Current password",
+      currentPasswordPlaceholder: "Enter your current password",
+      confirmPasswordLabel: "Confirm password",
+      confirmPasswordPlaceholder: "Repeat the new password",
+      passwordMismatch: "The passwords do not match.",
+      passwordReauthRequired: "Confirm your current password to continue.",
+      passwordWrongCurrent: "The current password is incorrect.",
+      emailDomainError: "This email is not from an allowed domain.",
+      emailErrorTitle: "We could not update the email",
     },
+
 
 
     countdown: {
@@ -2343,8 +2784,9 @@ export const content = {
 
 
     hero: {
-      eyebrow: "we are getting married",
+      eyebrow: "You are invited to our wedding",
       invitation: "We want to celebrate this moment with you",
+
 
       scroll: "Let's begin",
       navStory: "Discover our invitation",
@@ -2383,6 +2825,8 @@ export const content = {
 
       correctNumber: "Correct number",
       edit: "Edit",
+      verify: "Verify",
+      membersLabel: "Invitation group",
 
       addPhoto: "Upload photo",
 
@@ -2393,7 +2837,9 @@ export const content = {
       saving: "Saving…",
       cancel: "Cancel",
       saved: "Done! We updated it.",
+      savedWithName: "Done! {name} is up to date.",
       saveError: "We could not save. Check your connection and try again.",
+
       nameRequired: "Please enter at least your first name.",
       photoSaved: "Photo saved! Thank you.",
       photoError: "We could not upload the photo. Please try again.",
@@ -2456,8 +2902,10 @@ export const content = {
       ],
       anecdotesLabel: "Lake Chapala in 12 anecdotes",
       navNext: "Discover the venue",
+      mapLabel: "Map of Lake Chapala",
 
     },
+
 
     gallery: {
 
@@ -2490,8 +2938,10 @@ export const content = {
     },
     weekend: {
       eyebrow: "Detailed programme",
+      bannerEyebrow: "Save the date",
 
       title: "Three days to celebrate",
+
 
       intro:
         "We will be at Roca Azul from Thursday. Guests may arrive from around midday on Friday, and Saturday’s main celebration will be an afternoon wedding.",
@@ -2518,7 +2968,8 @@ export const content = {
         },
       ],
       saturday: {
-        eyebrow: "Saturday 20 · programme",
+        eyebrow: "Saturday 20",
+
         title: "The afternoon, step by step",
         warning:
           "If you are travelling from Guadalajara, please leave plenty of time. The roads into Jocotepec can become congested very easily, and everyone needs to be at Roca Azul by 1 pm.",
@@ -2535,7 +2986,8 @@ export const content = {
         ],
       },
       friday: {
-        eyebrow: "Friday 19 · programme",
+        eyebrow: "Friday 19",
+
         title: "Arrival and welcome",
         warning:
           "A relaxed first gathering to settle in, connect, and ease into the weekend.",
@@ -2546,7 +2998,8 @@ export const content = {
         ],
       },
       sunday: {
-        eyebrow: "Sunday 21 · programme",
+        eyebrow: "Sunday 21",
+
         title: "Breakfast and farewell",
         warning: "One final morning together before the journeys home.",
         items: [
@@ -2868,6 +3321,10 @@ export const content = {
         onSiteTitle: "A place is planned for you at Roca Azul",
         onSiteBody:
           "This is the option currently recorded for your profile. We will confirm any adjustment directly.",
+        onSiteCoveredBody:
+          "Your stay is covered by the couple: you won’t have to pay anything.",
+        onSitePayBody:
+          "Your stay is not covered by the couple: you will pay your share.",
         independentTitle: "Independent accommodation",
         independentBody:
           "We recommend looking for a hotel or an Airbnb nearby.",
@@ -2875,8 +3332,9 @@ export const content = {
         roomLabel: "Room",
         cabinCapacityLabel: "Guest house capacity",
         roomCapacityLabel: "Room capacity",
-        cabinPriceLabel: "Guest house price · 2 nights",
-        personPriceLabel: "Price per person · 2 nights",
+        cabinPriceLabel: "Guest house price",
+        personPriceLabel: "To pay per person",
+        groupPriceLabel: "To pay for the group",
         coveredPriceLabel: "Covered by the couple",
         peopleLabel: "people",
         cabinOccupancyLabel: "Guest house arrangement",
@@ -2916,11 +3374,17 @@ export const content = {
           pending: "To be confirmed",
         },
         extraCabinLabel: "Additional accommodation",
-        button: "Update my RSVP",
+        planCardTitle: "Your accommodation plan",
+        planCardPerPerson: "Per person · 2 nights",
+        planCardSaleLabel: "Covered by the couple",
+        planCardGroupTotal: "Group total",
+        planCardEurDisclaimer: "Estimated price in MXN",
+        planCardEstimate: "The final amount will be confirmed directly.",
       },
 
 
       contactPrompt: "More info",
+
 
       cabinsShowcase: {
         eyebrow: "Explore the guest houses",
@@ -3052,8 +3516,25 @@ export const content = {
         ],
         button: "Answer the RSVP",
       },
+      navNext: "Pétanque",
+      recap: {
+        eyebrow: "Accommodation confirmation",
+        title: "Will you confirm your accommodation?",
+        intro:
+          "Let us know, for each person, whether they will stay at Roca Azul so we can organise the guest houses.",
+        hasCabinQuestion: "Will they stay at Roca Azul?",
+        hasCabinQuestionCabin: "OK for {cabin}?",
+        noCabinQuestion: "Notify me if a lodging becomes available",
+        yesLabel: "Yes",
+
+        noLabel: "No",
+        button: "Save my confirmation",
+        success: "Confirmation saved. Thank you!",
+        error: "We could not save. Please try again.",
+      },
     },
     travel: {
+
       eyebrow: "Coming from afar",
       title: "Your journey is part of the celebration too",
       body:
@@ -3070,7 +3551,8 @@ export const content = {
           "The times shown are indicative and can vary enormously. Please plan ahead and, even better, arrive early by booking accommodation if you can.",
         venue: "Roca Azul · Jocotepec",
         toVenueLabel: "GO TO ROCA AZUL",
-        toBeachLabel: "GO TO THE PLAYA",
+        toBeachLabel: "GO TO THE BEACH",
+
         originsLabel: "To the wedding",
         destinationsLabel: "After the wedding",
         mapLabel: "Map of Roca Azul and its surroundings",
@@ -3106,17 +3588,41 @@ export const content = {
       cta: "Share my travel details",
 
       ctaNote: "The private form is now available below.",
+      vuelosImage: "flights_ne6k2g",
+      vuelosLabel: "Flight map",
     },
     attire: {
+
       eyebrow: "Attire",
       title: "Mexican aesthetic and dress code",
       body:
         "We have chosen a Mexican aesthetic for our wedding as a tribute to the culture, the food, the music, and the place that brings us together. We want everything to feel festive, colorful, and deeply Mexican.",
       dressCode: {
-        title: "No dress code",
-        body:
-          "We want you to be yourselves, not dressed up. If you want to be elegant, be elegant; if you prefer to be relaxed, be relaxed. What matters is that you feel comfortable. Do bring a full set of clothes: there will be swimming, a steam bath, sports, the ceremony, dancing, and, if the night runs long around the fire, a light sweater.",
+        title: "Dress in colour",
+        paragraphs: [
+          "We are overjoyed to share this day with you, and just as each person has left a special mark on our lives, we want each of you to bring a little of your essence to this celebration.",
+          "We believe colours convey energy, joy, and personality. That is why we would love for you to join us wearing vibrant tones, trying to avoid black, grey, and white.",
+          "Our wedding will have a Mexican inspiration, with white-toned décor and artisanal details. David will wear a white linen guayabera with golden embroidery, and we will both wear pieces embroidered by artisans from a community in Oaxaca, as a tribute to the richness of our traditions.",
+          "The only rule is to be yourselves: elegant, comfortable, and ready to celebrate, dance, and fill this day with colour, love, and good energy.",
+          "Thank you for being part of our story! ✨🌼",
+        ],
+        pictograms: {
+          ariaLabel: "Dress code pictograms",
+          noWhite: "Avoid white",
+          noBlack: "Avoid black",
+          noGrey: "Avoid grey",
+          colorGreen: "Green",
+          colorTeal: "Teal",
+          colorMarigold: "Yellow",
+          dressNoWhite: "Dress: avoid white",
+          dressNoBlack: "Dress: avoid black",
+          dressNoGrey: "Dress: avoid grey",
+          dressColor: "Colourful dress",
+          funky: "Fun prints",
+          mexican: "Mexican patterns",
+        },
       },
+
       guestNote:
         "The most important thing is that you feel comfortable and celebrate with us. If you have any questions, write to us.",
       navNext: "Accommodation",
@@ -3144,11 +3650,12 @@ export const content = {
         mx: {
           title: "Transfer in MXN",
           details: [
-            "Cuenta Clave: 012 320 01559313382 0",
+            "CLABE: 012 320 01559313382 0",
             "Bank: BBVA",
             "Name: David AILI",
           ],
         },
+
       },
       cta: "Talk to the couple",
     },
@@ -3156,7 +3663,8 @@ export const content = {
       eyebrow: "Acknowledgements",
       title: "Thank you",
       subtitle:
-        "Without our padrinos and helpers, none of this would be possible. We want to thank, with all our gratitude…",
+        "Without our godparents and helpers, none of this would be possible. We want to thank, with all our gratitude…",
+
       credits: [
         { name: "Manuel Amuezca", role: "Wedding planner" },
         { name: "Manuel Amuezca", role: "Friday pizzas" },
@@ -3165,7 +3673,8 @@ export const content = {
         { name: "Isabel Guadalupe", role: "The couple’s outfits" },
       ],
       humor: [
-        "If you would like to appear here, contact our padrino affiliate programme service.",
+        "If you would like to appear here, contact our godparent affiliate programme service.",
+
         "You appear here without knowing it: you have been assigned a task. Too bad, but there is no way to remove it: the page’s IT admin is on holiday, we cannot delete it, so it has to be done.",
         "You helped out and you don’t appear. Too bad. The IT guy may be on holiday, but send your complaints to the couple or the wedding planner.",
       ],
@@ -3176,7 +3685,13 @@ export const content = {
         title: "Everyone joining us",
         subtitle:
           "Every name is a shared story. Thank you for being part of this day.",
+        navNext: "See the programme",
+        modeGroupLabel: "Name mode",
+        modeFull: "Full name",
+        modeFirst: "First name",
+        modeLast: "Last name",
       },
+
     },
     coast: {
       eyebrow: "And afterwards?",
@@ -3238,9 +3753,66 @@ export const content = {
         previewNote:
           "Preview: this survey will open with the private RSVP.",
       },
+      rsvpMini: {
+        eyebrow: "And afterwards?",
+        title: "Are you in?",
+        intro:
+          "Tell us how likely you are to join each plan. You can change your answer at any time.",
+        questions: [
+          {
+            id: "rocaAzul",
+            title: "Plan 1 · Stay at Roca Azul",
+            subtitle: "From Sunday to Tuesday, two more nights at the venue.",
+          },
+          {
+            id: "playa",
+            title: "Plan 2 · The beach",
+            subtitle: "From Tuesday to Saturday, in Barra de Navidad.",
+          },
+        ],
+        recapTitle: "Summary",
+        recapProgress: "answered",
+        button: "Save my answers",
+        success: "Thank you! We saved your answers.",
+        error: "We could not save. Check your connection and try again.",
+      },
+      suggestions: {
+        eyebrow: "Where to stay",
+        title: "Suggestions in Barra de Navidad",
+        body:
+          "If the beach plan interests you, these options appeared in the area for the nights of February 23–28, 2027. Confirm availability and pricing directly.",
+        airbnbTitle: "Airbnbs near Barra de Navidad",
+        airbnbBody:
+          "These options appeared in the area for the nights of February 23–28, 2027. Confirm availability and pricing directly on Airbnb.",
+        airbnbAreaPrice: "Starting price currently seen in the area",
+        fromPrice: "From · indicative rate",
+        perNight: "per night",
+        beforeTaxes: "before taxes",
+        airbnbGuests: "guests",
+        airbnbBedrooms: "bedrooms",
+        airbnbBeds: "beds",
+        airbnbRating: "Rating",
+        airbnbView: "View listing",
+        airbnbSearchAll: "View the full Airbnb search",
+        hotelTitle: "Hotels in Barra de Navidad",
+        hotelBody:
+          "Indicative rates currently observed. Check availability, taxes, and the final price with each hotel.",
+        hotelLocation: "Area",
+        hotelView: "View hotel",
+        hotelTypes: {
+          budgetHotel: "Budget hotel",
+          beachHotel: "Beachfront hotel",
+          boutiqueHotel: "Boutique hotel",
+        },
+      },
+      extraStay: {
+        eyebrow: "Your stay · Sunday to Tuesday",
+        title: "Your guest house for the second stay",
+      },
     },
 
     rsvp: {
+
       eyebrow: "RSVP",
       title: "Will you join us?",
       body:
@@ -3348,6 +3920,12 @@ export const content = {
       button: "Send my response",
       previewNote:
         "Your response will be stored privately and only the couple can view it.",
+      progressLabel: "Before sending, complete each section:",
+      progressTeAnimas: "Are you in? (Friday, Saturday, Sunday)",
+      progressPetanque: "Pétanque tournament",
+      progressCoast: "And afterwards? (beach)",
+      progressResume: "Completed",
+      progressPending: "Pending",
       recap: {
         title: "Summary",
         answered: "answered",
@@ -3379,6 +3957,42 @@ export const content = {
         ],
       },
     },
+    petanqueTribute: {
+      eyebrow: "Pétanque",
+      title: "A tribute to pétanque",
+      intro:
+        "Pétanque has brought us together with a wonderful community of friends and club teammates in Mexico and around the world.",
+      body:
+        "On Friday afternoon we will organise a pétanque tournament to celebrate this game we love so much. No experience needed: just the desire to play, laugh, and share.",
+      homage: "Are you in!",
+      photosLabel: "Pétanque photos",
+
+      photoAlts: [
+        "Pétanque players at the club",
+        "Boules on the pitch",
+        "A pétanque throw",
+        "The throwing circle",
+      ],
+      navNext: "To the table",
+      rsvpMini: {
+        eyebrow: "Pétanque tournament",
+        title: "Are you in?",
+        intro: "On Friday afternoon we will organise a pétanque tournament. Would you like to join?",
+        organizerLabel: "Organised by: David",
+        organizerWhatsapp: "https://wa.me/523332017504",
+        fields: {
+          participation: "Will you participate in the tournament?",
+          ownBoules: "Will you bring your own boules?",
+          ownBoulesHint: "If you don’t have any, no worries: we will have some to share.",
+        },
+        yesLabel: "Yes",
+        noLabel: "No",
+        success: "Thank you! We saved your answers.",
+        error: "We could not save. Check your connection and try again.",
+        button: "Save my answers",
+        recapTitle: "Summary",
+      },
+    },
     footer: {
       line: "With love, from Mexico and France",
 
@@ -3387,3 +4001,4 @@ export const content = {
     },
   },
 };
+

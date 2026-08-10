@@ -177,15 +177,8 @@ const COLLECTIONS = [
     description: "Guest registry (source of truth: Google Sheet INVITADOS tab)",
   },
   {
-    collection: "cabins",
-    csvPath: "invitados/cabanas_inventario.csv",
-    mapping: CABIN_MAPPING,
-    idField: "id",
-    excludeRows: (r) => String(r.ID || "").trim().toUpperCase() === "TOTAL",
-    description: "Cabin inventory (source of truth: Google Sheet HOSPEDAJE tab)",
-  },
-  {
     collection: "rooms",
+
     csvPath: "invitados/cuartos.csv",
     mapping: ROOM_MAPPING,
     idField: "id",

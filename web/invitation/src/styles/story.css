@@ -1,15 +1,86 @@
 /* ── Story section ────────────────────────────────────────────────────── */
 
 .story-section {
+  position: relative;
   display: grid;
-  grid-template-columns: 0.75fr 1.25fr;
+  grid-template-columns: 0.6fr 1.4fr;
+
   align-items: center;
   align-content: space-between;
   gap: clamp(2rem, 5vw, 5rem);
   min-height: calc(100svh - var(--countdown-height) - var(--header-height));
   padding-block: clamp(2rem, 4vw, 3.5rem);
-  background: var(--cream);
+  /* Light, airy gradient that tells the couple's story: a warm dawn rising
+     from the lake (sand) into a soft cream sky, with a faint golden glow
+     where the sun would sit. */
+  background:
+    radial-gradient(
+      circle at 78% 18%,
+      rgb(241 211 144 / 34%) 0%,
+      rgb(241 211 144 / 0%) 34%
+    ),
+    radial-gradient(
+      circle at 12% 88%,
+      rgb(169 77 49 / 12%) 0%,
+      rgb(169 77 49 / 0%) 40%
+    ),
+    linear-gradient(180deg, #fbf7ee 0%, var(--cream) 46%, #efe6d2 100%);
+  isolation: isolate;
 }
+
+/* Decorative background art: a soft sun disc, a winding "path" and diamond
+   motifs echoing the couple's journey. Purely decorative, sits behind the
+   content. */
+.story-section::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  background:
+    /* Sun disc (upper right) */
+    radial-gradient(
+      circle at 82% 16%,
+      rgb(198 139 43 / 22%) 0 3.5rem,
+      rgb(198 139 43 / 0%) 3.6rem
+    ),
+    /* Outer sun halo */
+    radial-gradient(
+      circle at 82% 16%,
+      rgb(198 139 43 / 10%) 0 5.5rem,
+      rgb(198 139 43 / 0%) 5.6rem
+    ),
+    /* Diamond motif (upper left) */
+    conic-gradient(
+      from 45deg at 14% 22%,
+      rgb(169 77 49 / 16%) 0 25%,
+      transparent 25% 50%,
+      rgb(169 77 49 / 16%) 50% 75%,
+      transparent 75% 100%
+    ),
+    /* Small diamond (lower right) */
+    conic-gradient(
+      from 45deg at 88% 82%,
+      rgb(122 139 122 / 18%) 0 25%,
+      transparent 25% 50%,
+      rgb(122 139 122 / 18%) 50% 75%,
+      transparent 75% 100%
+    ),
+    /* Winding path across the middle */
+    repeating-linear-gradient(
+      115deg,
+      transparent 0 2.2rem,
+      rgb(198 139 43 / 7%) 2.2rem 2.35rem,
+      transparent 2.35rem 4.4rem
+    );
+  content: "";
+}
+
+/* Keep the section's own children above the decorative background. */
+.story-section > * {
+  position: relative;
+  z-index: 1;
+}
+
 
 /* Pin the "continue" nav to the bottom of the full-height slide. The margin
    is kept tight so the link stays visible within the viewport height. */
@@ -64,11 +135,12 @@
   .story-mark {
     color: var(--terracotta);
     font-family: var(--font-display);
-    font-size: clamp(2rem, 2vw, 2rem);
+    font-size: 1rem;
     letter-spacing: -0.13em;
     line-height: 0.8;
     opacity: 0.9;
   }
+
 
   /* On mobile the map is hidden below the initials; it is instead opened via
      the old-map FAB on the left edge of the screen. */
@@ -199,8 +271,9 @@
 @media (max-width: 899px) {
   /* Reduce chapala photo height on mobile so the section fits within 100vh. */
   .chapala-photo {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 16 / 9;
   }
+
 
   /* The explorer is removed from the mobile section flow so the Story slide
      stays compact. It becomes a modal only after the avatar FAB is pressed. */
@@ -307,7 +380,8 @@
     overflow: hidden;
     border: 3px solid var(--marigold);
     border-radius: 50%;
-    background: var(--cream);
+    background: var(--terracotta);
+    color: var(--white);
     box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
     opacity: 0;
     pointer-events: none;
@@ -316,6 +390,7 @@
   }
 
   .story-facts-fab.is-visible {
+
     opacity: 1;
     pointer-events: auto;
     transform: translateY(0) scale(1);

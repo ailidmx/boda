@@ -2,23 +2,23 @@
   "mode": "dry-run",
   "ciMode": true,
   "failOnDrift": true,
-  "generatedAt": "2026-08-05T23:29:26.594Z",
+  "generatedAt": "2026-08-10T00:16:38.250Z",
   "source": "gsheet",
   "sourceRef": "spreadsheetId=1tvUs2WPksMWVbV10hdVoZ2NLNwTx6Q2R8Bs0sEbkqMg;sheet=Invitados",
   "authHealth": {
-    "authUsersTotal": 223,
+    "authUsersTotal": 219,
     "guestsTotal": 259,
-    "authUsersMappedToGuest": 223,
+    "authUsersMappedToGuest": 219,
     "authUsersWithoutGuestCount": 0,
     "authUsersWithoutSheetCount": 0,
     "authDisabledBySheetCount": 0,
     "authDeleteCandidatesCount": 0,
-    "sheetAuthExpectedCount": 223,
-    "sheetAuthDisabledCount": 36,
+    "sheetAuthExpectedCount": 219,
+    "sheetAuthDisabledCount": 40,
     "guestsWithoutAuthCount": 0,
     "sheetGuestsWithoutAuthCount": 0,
     "authEmailUpdateCandidatesCount": 0,
-    "authEmailUpdateBlockedInvalidCount": 1,
+    "authEmailUpdateBlockedInvalidCount": 0,
     "authEmailUpdateBlockedInUseCount": 0,
     "authCreateCandidatesCount": 0,
     "authCreateBlockedMissingEmailCount": 0,
@@ -32,15 +32,7 @@
     "guestsWithoutAuth": [],
     "sheetGuestsWithoutAuth": [],
     "authEmailUpdateCandidates": [],
-    "authEmailUpdateBlockedInvalid": [
-      {
-        "uid": "cyrielle_rigollet",
-        "invitationGroup": "Famille Rigollet",
-        "sheetEmail": "t juletcy69@gmail.com",
-        "authEmail": "cyrielle_rigollet@boda-david-y-ayde.web.app",
-        "authDisabled": false
-      }
-    ],
+    "authEmailUpdateBlockedInvalid": [],
     "authEmailUpdateBlockedInUse": [],
     "authCreateCandidates": [],
     "authCreateBlockedMissingEmail": [],
@@ -49,224 +41,7 @@
   },
   "invalidRows": [],
   "added": [],
-  "changed": [
-    {
-      "id": "pierre_wanecque",
-      "mismatches": [
-        {
-          "path": "identity.middleName",
-          "sheetValue": "Thomas Nicolas",
-          "firestoreValue": ""
-        },
-        {
-          "path": "identity.maternalLastName",
-          "sheetValue": "D'Ascencao",
-          "firestoreValue": ""
-        }
-      ],
-      "payload": {
-        "id": "pierre_wanecque",
-        "identity": {
-          "firstName": "Pierre",
-          "middleName": "Thomas Nicolas",
-          "lastName": "Wanecque",
-          "maternalLastName": "D'Ascencao",
-          "lang": "fr",
-          "age": "Adulto",
-          "gender": "H",
-          "phone": "523310212012",
-          "cloudinaryId": "pierre_avy8gg"
-        },
-        "hosting": {
-          "cabin": "VILLA AZALEA",
-          "room": "VILLA AZALEA-1",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {
-          "friday": false,
-          "saturday": false,
-          "sunday": false,
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "xtra": false,
-          "playa": false,
-          "petanca": false,
-          "needBalls": false
-        },
-        "sent": false,
-        "tagGroup": "PetanclubGDL",
-        "invitationGroup": "Familia Wanecque García",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Petanclub #1",
-        "modifiedAt": "",
-        "travelsByPlane": false,
-        "isAdmin": false,
-        "maternalLastName": "D'Ascencao"
-      },
-      "existing": {
-        "id": "pierre_wanecque",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "tagGroup": "PetanclubGDL",
-        "table": "Petanclub #1",
-        "sent": false,
-        "rsvp": {
-          "friday": false,
-          "saturday": false,
-          "sunday": false,
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "xtra": false,
-          "playa": false,
-          "petanca": false,
-          "needBalls": false
-        },
-        "modifiedAt": "",
-        "travelsByPlane": false,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:34.602Z",
-        "hosting": {
-          "cabin": "VILLA AZALEA",
-          "room": "VILLA AZALEA-1",
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": false,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "invitationGroup": "Familia Wanecque García",
-        "maternalLastName": "",
-        "identity": {
-          "age": "Adulto",
-          "firstName": "Pierre",
-          "lastName": "Wanecque",
-          "lang": "fr",
-          "cloudinaryId": "pierre_avy8gg",
-          "gender": "H",
-          "maternalLastName": "",
-          "phone": "523310212012",
-          "middleName": ""
-        }
-      }
-    },
-    {
-      "id": "marido_de_guillemette_renard",
-      "mismatches": [
-        {
-          "path": "identity.phone",
-          "sheetValue": "33633011221",
-          "firestoreValue": "33629248588"
-        }
-      ],
-      "payload": {
-        "id": "marido_de_guillemette_renard",
-        "identity": {
-          "firstName": "Matthieu",
-          "middleName": "",
-          "lastName": "Goury",
-          "maternalLastName": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "gender": "H",
-          "phone": "33633011221",
-          "cloudinaryId": ""
-        },
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {
-          "friday": false,
-          "saturday": false,
-          "sunday": false,
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "xtra": false,
-          "playa": false,
-          "petanca": false,
-          "needBalls": false
-        },
-        "sent": false,
-        "tagGroup": "Amigos de David",
-        "invitationGroup": "Guillemette et ...",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Mesa #8",
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "invitationGroup": "Guillemette et ...",
-        "tagGroup": "Amigos de David",
-        "modifiedAt": "",
-        "hosting": {
-          "xtraRoom": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "isXtraCabinPaid": false,
-          "isXtraCabinPaidByNovios": false,
-          "xtraCabin": "",
-          "cabin": "",
-          "room": ""
-        },
-        "idCheckUser": false,
-        "isAdmin": false,
-        "message": "",
-        "sent": false,
-        "travelsByPlane": true,
-        "rsvp": {
-          "playa": false,
-          "sunday": false,
-          "saturday": false,
-          "xtra": false,
-          "confirmCabin": false,
-          "needBalls": false,
-          "friday": false,
-          "petanca": false,
-          "cabinWaitingList": false
-        },
-        "maternalLastName": "",
-        "messageAuthor": "",
-        "id": "marido_de_guillemette_renard",
-        "table": "Mesa #8",
-        "updatedBy": "sync_script",
-        "identity": {
-          "maternalLastName": "",
-          "gender": "H",
-          "phone": "33629248588",
-          "cloudinaryId": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "firstName": "Matthieu",
-          "lastName": "Goury",
-          "middleName": ""
-        },
-        "updatedAt": {
-          "_seconds": 1785972056,
-          "_nanoseconds": 575000000
-        }
-      }
-    }
-  ],
+  "changed": [],
   "unchanged": [],
   "stale": [],
   "sheetAuth": [
@@ -379,7 +154,7 @@
       "id": "mika_rako",
       "uid": "mika_rako",
       "enabled": true,
-      "identifier": "mika_rako@boda-david-y-ayde.web.app",
+      "identifier": "guadapetanca@gmail.com",
       "passwordPresent": true
     },
     {
@@ -392,14 +167,14 @@
     {
       "id": "livier_rako",
       "uid": "livier_rako",
-      "enabled": true,
+      "enabled": false,
       "identifier": "livier_rako@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
       "id": "cathy_rako",
       "uid": "cathy_rako",
-      "enabled": true,
+      "enabled": false,
       "identifier": "cathy_rako@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
@@ -505,7 +280,7 @@
       "id": "esposa_clément",
       "uid": "esposa_clément",
       "enabled": true,
-      "identifier": "esposa_clément@boda-david-y-ayde.web.app",
+      "identifier": "maricruzsernah@gmail.com",
       "passwordPresent": true
     },
     {
@@ -624,7 +399,7 @@
       "id": "anne-sophie_charon",
       "uid": "anne-sophie_charon",
       "enabled": true,
-      "identifier": "anne-sophie_charon@boda-david-y-ayde.web.app",
+      "identifier": "annesophie.charon@gmail.com",
       "passwordPresent": true
     },
     {
@@ -638,7 +413,7 @@
       "id": "aswhin",
       "uid": "aswhin",
       "enabled": true,
-      "identifier": "aswhin@boda-david-y-ayde.web.app",
+      "identifier": "ashwinbhat10@gmail.com",
       "passwordPresent": true
     },
     {
@@ -708,7 +483,7 @@
       "id": "diego_aïli_vázquez",
       "uid": "diego_aïli_vázquez",
       "enabled": true,
-      "identifier": "diego_aïli_vázquez@boda-david-y-ayde.web.app",
+      "identifier": "ailidiego12@gmail.com",
       "passwordPresent": true
     },
     {
@@ -981,7 +756,7 @@
       "id": "karime",
       "uid": "karime",
       "enabled": true,
-      "identifier": "karime@boda-david-y-ayde.web.app",
+      "identifier": "ksamia85@gmail.com",
       "passwordPresent": true
     },
     {
@@ -1058,7 +833,7 @@
       "id": "cyrielle_rigollet",
       "uid": "cyrielle_rigollet",
       "enabled": true,
-      "identifier": "t juletcy69@gmail.com",
+      "identifier": "juletcy69@gmail.com",
       "passwordPresent": true
     },
     {
@@ -1625,7 +1400,7 @@
       "id": "fréderic_bonpard",
       "uid": "fréderic_bonpard",
       "enabled": true,
-      "identifier": "fréderic_bonpard@boda-david-y-ayde.web.app",
+      "identifier": "bonpard@hotmail.com",
       "passwordPresent": true
     },
     {
@@ -1660,14 +1435,14 @@
       "id": "virginie_bonpard",
       "uid": "virginie_bonpard",
       "enabled": true,
-      "identifier": "virginie_bonpard@boda-david-y-ayde.web.app",
+      "identifier": "v.bonpard@yahoo.fr",
       "passwordPresent": true
     },
     {
       "id": "brigitte_bonpard",
       "uid": "brigitte_bonpard",
       "enabled": true,
-      "identifier": "brigitte_bonpard@boda-david-y-ayde.web.app",
+      "identifier": "brig.lemery@yahoo.fr",
       "passwordPresent": true
     },
     {
@@ -1898,14 +1673,14 @@
       "id": "guillaume",
       "uid": "guillaume",
       "enabled": true,
-      "identifier": "guillaume@boda-david-y-ayde.web.app",
+      "identifier": "guillaume.lucas974@gmail.com",
       "passwordPresent": true
     },
     {
       "id": "muriel",
       "uid": "muriel",
       "enabled": true,
-      "identifier": "muriel@boda-david-y-ayde.web.app",
+      "identifier": "murielle.rime@gmail.com",
       "passwordPresent": true
     },
     {
@@ -2023,7 +1798,7 @@
     {
       "id": "pierrette",
       "uid": "pierrette",
-      "enabled": true,
+      "enabled": false,
       "identifier": "pierrette@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
@@ -2072,7 +1847,7 @@
     {
       "id": "guy",
       "uid": "guy",
-      "enabled": true,
+      "enabled": false,
       "identifier": "guy@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
@@ -2085,27 +1860,14 @@
     }
   ],
   "alerts": [],
-  "comparisonAudit": [
-    {
-      "id": "pierre_wanecque",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 2
-    },
-    {
-      "id": "marido_de_guillemette_renard",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 1
-    }
-  ],
+  "comparisonAudit": [],
   "writes": 0,
   "authPlan": {
     "emailUpdates": 0,
     "authCreates": 0,
     "authDeletes": 0,
     "blockedCreatesMissingEmail": 0,
-    "blockedEmailUpdatesInvalid": 1,
+    "blockedEmailUpdatesInvalid": 0,
     "blockedEmailUpdatesInUse": 0,
     "blockedCreatesInvalidEmail": 0,
     "blockedCreatesEmailInUse": 0
@@ -2116,5 +1878,5 @@
     "authCreatesApplied": 0,
     "failures": []
   },
-  "unchangedOmitted": 257
+  "unchangedOmitted": 259
 }

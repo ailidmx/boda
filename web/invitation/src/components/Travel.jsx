@@ -62,6 +62,14 @@ export function Travel() {
         startIndex={0}
         label={travel.vuelosLabel}
       />
+
+      {/* Desktop-only bottom nav: leads to the accommodation section. */}
+      <nav className="section-nav travel-section-nav" aria-label="Continue">
+        <a className="section-nav-link" href="#accommodation">
+          <span>{t.nav.accommodation}</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </nav>
     </section>
   );
 }

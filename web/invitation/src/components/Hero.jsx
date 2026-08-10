@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
 import { EVENT } from "../content.js";
 import { MEDIA } from "../media.js";
-import { getGroupTag } from "../invitation-profile.js";
+import { getActiveGuests } from "../guests.js";
 import { useApp } from "../context/AppContext.jsx";
-import { resolveGuestName } from "../guest-profiles.js";
+import { getGroupMembers, resolveGuestName } from "../guest-profiles.js";
 import { CoupleNames, HeroDate } from "./ui.jsx";
 
 function heroImages() {
@@ -47,28 +47,38 @@ export function Hero() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [paused, images.length]);
 
-  const groupTag = guest
-    ? getGroupTag(guest.invitationGroup || guest.group).label
+  // Invitation group badge: show the raw invitation group name (not the tag
+  // label), and only when the invitation covers more than one guest. A
+  // single-guest invitation omits the badge entirely.
+  const groupName = guest
+    ? String(guest.invitationGroup || guest.group || "").trim()
     : "";
-  const fullName = guest ? resolveGuestName(guest).fullName : "";
-  // Gender-aware invitation line: "M" = Mujer (feminine), "H" = Hombre
-  // (masculine). Falls back to the default eyebrow when gender is unknown.
-  const gender = String(guest?.gender || "").trim().toUpperCase();
-  const eyebrow = gender === "M" ? t.hero.eyebrowF : t.hero.eyebrowM;
+  const groupMembers = guest ? getGroupMembers(guest, getActiveGuests()) : [];
+  const showGroupBadge = Boolean(groupName) && groupMembers.length > 1;
+  const resolvedName = guest ? resolveGuestName(guest) : null;
+
+  const fullName = resolvedName?.fullName || "";
+  // Gender-variant eyebrow: "M" (mujer/female) uses the feminine form, all
+  // other values (including "H" male and missing) fall back to the default.
+  const eyebrow =
+    resolvedName?.gender === "M"
+      ? t.hero.eyebrowF || t.hero.eyebrow
+      : t.hero.eyebrow;
+
   const customMessage = String(
-    profile?.custom?.message
-      || profile?.guest?.customContent?.message
-      || profile?.guest?.message
-      || "",
+    profile?.custom?.message ||
+      profile?.guest?.customContent?.message ||
+      profile?.guest?.message ||
+      "",
   ).trim();
   const customMessageAuthor = String(
-    profile?.custom?.messageAuth
-      || profile?.custom?.messageAuthor
-      || profile?.guest?.customContent?.messageAuth
-      || profile?.guest?.customContent?.messageAuthor
-      || profile?.guest?.messageAuth
-      || profile?.guest?.messageAuthor
-      || "",
+    profile?.custom?.messageAuth ||
+      profile?.custom?.messageAuthor ||
+      profile?.guest?.customContent?.messageAuth ||
+      profile?.guest?.customContent?.messageAuthor ||
+      profile?.guest?.messageAuth ||
+      profile?.guest?.messageAuthor ||
+      "",
   ).trim();
   const hasCustomHeroMessage = Boolean(customMessage);
 
@@ -135,27 +145,16 @@ export function Hero() {
         ) : (
           <span className="hero-image-note">{t.hero.imageNote}</span>
         )}
-        <div className="sun-disc" />
-        <div className="motif motif-left" />
-        <div className="motif motif-right" />
       </div>
 
       <div className="hero-content">
-        {guest && <p className="hero-group-name">{groupTag}</p>}
-
-        {guest && (
-          <p className="hero-guest-name">
-                {fullName}
-          </p>
-        )}
-
+        {guest && <p className="hero-guest-name">{fullName}</p>}
         <p className="hero-eyebrow">{eyebrow}</p>
+        {showGroupBadge && <p className="hero-group-name">{groupName}</p>}
 
         <h1>
           <CoupleNames variant="identity-swap--hero" delay="-1.2s" />
         </h1>
-
-
         <p className="hero-date">
           <HeroDate />
         </p>
@@ -165,26 +164,24 @@ export function Hero() {
           {EVENT.place}
         </p>
         {hasCustomHeroMessage ? (
-
           <p className="hero-invitation hero-invitation--custom">
             <span className="hero-invitation__message">{customMessage}</span>
             {customMessageAuthor && (
-              <span className="hero-invitation__author">{customMessageAuthor}</span>
+              <span className="hero-invitation__author">
+                {customMessageAuthor}
+              </span>
             )}
           </p>
         ) : (
-          <p className="hero-invitation hero-invitation__message">
-            {t.hero.invitation}
-          </p>
+          <p className="hero-invitation">{t.hero.invitation}</p>
         )}
-
-
-        <p className="hero-date-label">{EVENT.dateShort}</p>
+        <div className="hero-date-label">{EVENT.dateShort}</div>
       </div>
 
-
-
-      <nav className="section-nav section-nav--light hero-section-nav" aria-label="Continue">
+      <nav
+        className="section-nav section-nav--light hero-section-nav"
+        aria-label="Continue"
+      >
         <a className="section-nav-link" href="#story">
           <span>{t.hero.navStory}</span>
           <span aria-hidden="true">↓</span>

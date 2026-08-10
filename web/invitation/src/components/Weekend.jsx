@@ -16,10 +16,11 @@ export function Weekend() {
           <img src={MEDIA.weekendBanner} alt="" loading="lazy" decoding="async" />
           <div className="weekend-banner-content">
             <div className="section-heading reveal">
-              <p className="eyebrow">{weekend.eyebrow}</p>
+              <p className="eyebrow">{weekend.bannerEyebrow}</p>
               <h2>{weekend.title}</h2>
               <blockquote className="weekend-lead-citation">{weekend.intro}</blockquote>
             </div>
+
 
             <div className="weekend-dates" aria-hidden="true">
               <span className="weekend-date weekend-date--side">19 · 02 · 27</span>
@@ -143,8 +144,12 @@ function DayProgramSlideset({ programs }) {
         </div>
       </div>
 
-      <div className="day-program-scroll">
+      <div
+        className="day-program-scroll"
+        style={{ backgroundImage: `url(${MEDIA.parchment})` }}
+      >
         {programs.map((program, index) => (
+
           <div
             key={index}
             className="day-program-block"
@@ -186,9 +191,10 @@ function DayProgramSlideset({ programs }) {
 
       <nav className="weekend-nav weekend-nav--light" aria-label="Programme navigation">
 
-        <a className="weekend-nav-link" href="#accommodation">
-          <span>{nav.accommodation}</span>
+        <a className="weekend-nav-link" href="#te-animas">
+          <span>{nav.teAnimas}</span>
           <span aria-hidden="true">↓</span>
+
         </a>
       </nav>
 
@@ -241,22 +247,33 @@ function DayProgramSlideset({ programs }) {
   );
 }
 
-/* Warning / info icon for the disclaimer panel and FAB. */
+/* Car icon for the traffic-disclaimer FAB (the note is about the roads into
+   Jocotepec / Guadalajara access). */
 function WarningIcon() {
   return (
     <svg viewBox="0 0 64 64" aria-hidden="true" focusable="false">
       <path
-        d="M32 8 58 52H6L32 8Z"
+        d="M14 40 18 28a4 4 0 0 1 3.8-2.8h20.4A4 4 0 0 1 46 28l4 12"
         fill="none"
         stroke="currentColor"
         strokeWidth="3"
+        strokeLinecap="round"
         strokeLinejoin="round"
       />
-      <path d="M32 24v14" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
-      <circle cx="32" cy="46" r="2.5" fill="currentColor" />
+      <path
+        d="M14 40h36v8a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-2H22v2a2 2 0 0 1-2 2h-4a2 2 0 0 1-2-2v-8Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <circle cx="22" cy="42" r="2.5" fill="currentColor" />
+      <circle cx="42" cy="42" r="2.5" fill="currentColor" />
     </svg>
   );
 }
+
 
 
 
@@ -357,11 +374,7 @@ function DayProgram({ program }) {
     <div className="day-program reveal">
       <ol className="day-program-timeline">
         {program.items.map((item, itemIndex) => (
-          <li
-            key={itemIndex}
-            className="day-program-timeline__item"
-            style={{ backgroundImage: `url(${MEDIA.parchment})` }}
-          >
+          <li key={itemIndex} className="day-program-timeline__item">
             <time>{item.time}</time>
             <div>
               <h4>{item.title}</h4>
@@ -369,6 +382,7 @@ function DayProgram({ program }) {
             </div>
           </li>
         ))}
+
       </ol>
     </div>
   );

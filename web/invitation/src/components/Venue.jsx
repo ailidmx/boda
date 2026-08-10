@@ -375,11 +375,9 @@ export function Venue() {
     const section = sectionRef.current;
     if (!section || typeof IntersectionObserver === "undefined") return undefined;
 
-    const mobile = window.matchMedia("(max-width: 899px)");
     let latestEntry = null;
     const syncVisibility = () => {
-      setVenueActive(Boolean(mobile.matches && latestEntry?.isIntersecting));
-      if (!mobile.matches) setPrivacyOpen(false);
+      setVenueActive(Boolean(latestEntry?.isIntersecting));
     };
     const observer = new IntersectionObserver(([entry]) => {
       latestEntry = entry;
@@ -387,11 +385,7 @@ export function Venue() {
     }, { rootMargin: "-45% 0px -45% 0px", threshold: 0 });
 
     observer.observe(section);
-    mobile.addEventListener?.("change", syncVisibility);
-    return () => {
-      observer.disconnect();
-      mobile.removeEventListener?.("change", syncVisibility);
-    };
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {
@@ -468,8 +462,24 @@ export function Venue() {
 
   return (
     <section className="facilities-section section story-bg" ref={sectionRef}>
+      {/* ── Arty background scene · symbolic geography of Roca Azul ────
+          A decorative layer behind the content: a glowing sun, layered
+          mountain silhouettes and a lake reflection. Purely visual
+          (pointer-events: none) and hidden from assistive tech. */}
+      <div className="venue-scene" aria-hidden="true">
+        <span className="venue-scene__sun" />
+        <span className="venue-scene__sun-disc" />
+        <span className="venue-scene__mountains venue-scene__mountains--far" />
+        <span className="venue-scene__mountains venue-scene__mountains--near" />
+        <span className="venue-scene__lake" />
+        <span className="venue-scene__motif venue-scene__motif--left" />
+        <span className="venue-scene__motif venue-scene__motif--right" />
+      </div>
+
+
       {/* ── Single slide · heading + photo-cards + gallery ───────────── */}
       <div className="venue-slide venue-slide--one">
+
         <div className="experience-heading reveal">
           {/* Row 1: eyebrow on the left, venue link on the right */}
           <div className="experience-heading-row">

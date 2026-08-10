@@ -3,7 +3,6 @@
 .coast-section {
   position: relative;
   display: grid;
-  grid-template-columns: 1fr 0.9fr;
   gap: clamp(3rem, 8vw, 8rem);
   align-items: start;
   min-width: 0;
@@ -153,6 +152,18 @@
 .coast-copy .section-heading {
   border-bottom-color: rgb(255 255 255 / 25%);
 }
+
+/* The coast eyebrow is marigold (matching the beach/sea palette) and its
+   little rule (the ::before bar) is marigold too, so it reads clearly over
+   the dark translucent panel. */
+.coast-copy .section-heading .eyebrow {
+  color: var(--marigold);
+}
+
+.coast-copy .section-heading .eyebrow::before {
+  background: var(--marigold);
+}
+
 
 /* The coast intro line is styled as a literary citation: a marigold left
    rule, display serif, italic, with a large opening quote mark. */
@@ -371,6 +382,30 @@
   font-size: 0.9rem;
 }
 
+/* Prominent confirmation shown after the answers are saved (light bg). */
+.coast-rsvp-save .rsvp-confirmation {
+  background: rgb(46 125 50 / 0.12);
+  border-color: rgb(46 125 50 / 0.4);
+  color: #1b5e20;
+}
+
+.coast-rsvp-save .rsvp-confirmation > span {
+  background: #2e7d32;
+  color: #fff;
+}
+
+.coast-rsvp-save .rsvp-confirmation--error {
+  background: rgb(211 47 47 / 0.1);
+  border-color: rgb(211 47 47 / 0.4);
+  color: #b71c1c;
+}
+
+.coast-rsvp-save .rsvp-confirmation--error > span {
+  background: #e53935;
+  color: #fff;
+}
+
+
 
 
 /* ── Coast accommodation suggestions ────────────────────────────────────────
@@ -472,6 +507,45 @@
 .coast-suggestions .accommodation-airbnb-search {
   color: #e4b968;
   border-color: rgb(255 255 255 / 25%);
+}
+
+/* ── Extra stay (Plan 1 · stay at Roca Azul, Sunday→Tuesday) ────────────────
+   Shown only when the active guest has an extra cabin assigned for the second
+   stay. Spans both columns and reuses the shared StayPlanCard (plan card +
+   details list). To match the Hébergement block exactly, the container uses
+   the same light cream panel as `.accommodation-form-wrap` and we do NOT
+   override the StayPlanCard's native light-background styles. */
+.coast-extra-stay {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin-top: clamp(3rem, 6vw, 5rem);
+  padding: clamp(2rem, 4vw, 4rem);
+  border: 1px solid rgb(36 33 25 / 12%);
+  background: rgb(255 253 248 / 72%);
+  box-shadow: 0 1.5rem 4rem rgb(36 33 25 / 9%);
+  backdrop-filter: blur(0.4rem);
+  -webkit-backdrop-filter: blur(0.4rem);
+}
+
+/* The heading sits on the light cream panel, so it uses the default dark ink
+   (matching `.accommodation-form-wrap h3`) instead of the light coast text. */
+.coast-extra-stay h3 {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--ink, #241f16);
+}
+
+.coast-extra-stay .eyebrow {
+  color: var(--terracotta, #b85c38);
+}
+
+@media (max-width: 899px) {
+  .coast-extra-stay {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 899px) {
