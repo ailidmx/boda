@@ -70,8 +70,8 @@
     linear-gradient(90deg, rgb(36 33 25 / 52%), transparent 55%),
     var(--sand);
   color: var(--white);
-  isolation: isolate;
 }
+
 
 .hero-art {
   position: absolute;

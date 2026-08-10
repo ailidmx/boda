@@ -6,7 +6,6 @@ import { useApp } from "../context/AppContext.jsx";
 import { getGroupMembers, resolveGuestName } from "../guest-profiles.js";
 import { CoupleNames, HeroDate } from "./ui.jsx";
 
-
 function heroImages() {
   const media = MEDIA.hero;
   return Array.isArray(media) ? media : media ? [media] : [];
@@ -148,12 +147,10 @@ export function Hero() {
         )}
       </div>
 
-
       <div className="hero-content">
         {guest && <p className="hero-guest-name">{fullName}</p>}
         <p className="hero-eyebrow">{eyebrow}</p>
         {showGroupBadge && <p className="hero-group-name">{groupName}</p>}
-
 
         <h1>
           <CoupleNames variant="identity-swap--hero" delay="-1.2s" />
@@ -178,7 +175,7 @@ export function Hero() {
         ) : (
           <p className="hero-invitation">{t.hero.invitation}</p>
         )}
-        <span className="hero-date-label">{EVENT.dateShort}</span>
+        <div className="hero-date-label">{EVENT.dateShort}</div>
       </div>
 
       <nav

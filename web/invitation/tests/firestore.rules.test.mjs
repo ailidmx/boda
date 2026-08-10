@@ -163,13 +163,14 @@ async function seedAdmin() {
   });
 }
 
-test("an invited guest cannot read submissions (admin-only)", async () => {
+test("an invited guest can read all submission collections (read-all policy)", async () => {
   const db = environment.authenticatedContext(guestUid).firestore();
-  await assertFails(getDoc(doc(db, "rsvp_submissions", "valid")));
-  await assertFails(getDoc(doc(db, "experience_suggestions", "valid")));
-  await assertFails(getDoc(doc(db, "coast_interest", "valid")));
-  await assertFails(getDoc(doc(db, "petanque_participation", "valid")));
+  await assertSucceeds(getDoc(doc(db, "rsvp_submissions", "valid")));
+  await assertSucceeds(getDoc(doc(db, "experience_suggestions", "valid")));
+  await assertSucceeds(getDoc(doc(db, "coast_interest", "valid")));
+  await assertSucceeds(getDoc(doc(db, "petanque_participation", "valid")));
 });
+
 
 test("an admin can read all submission collections", async () => {
   await seedAdmin();
@@ -180,15 +181,16 @@ test("an admin can read all submission collections", async () => {
   await assertSucceeds(getDoc(doc(db, "petanque_participation", "valid")));
 });
 
-test("a non-admin authenticated user cannot read submissions", async () => {
+test("a non-admin authenticated user can read submissions (read-all policy)", async () => {
   const db = environment
     .authenticatedContext("non-admin", {
       email: "someone@example.com",
       email_verified: true,
     })
     .firestore();
-  await assertFails(getDoc(doc(db, "rsvp_submissions", "valid")));
+  await assertSucceeds(getDoc(doc(db, "rsvp_submissions", "valid")));
 });
+
 
 test("an unauthenticated visitor cannot read submissions", async () => {
   const db = environment.unauthenticatedContext().firestore();
@@ -588,12 +590,13 @@ test("a guest can read attendance responses for their own group", async () => {
   await assertSucceeds(getDoc(doc(db, "attendance_responses", "catherine")));
 });
 
-test("a guest cannot read attendance responses for another group", async () => {
+test("a guest can read attendance responses for another group (read-all policy)", async () => {
   await seedGuestAuth();
   await seedAttendanceData();
   const db = environment.authenticatedContext(editorUid).firestore();
-  await assertFails(getDoc(doc(db, "attendance_responses", "sebastien")));
+  await assertSucceeds(getDoc(doc(db, "attendance_responses", "sebastien")));
 });
+
 
 test("an admin can read attendance responses for any group", async () => {
   await seedAdmin();
@@ -657,7 +660,7 @@ test("an admin can read any guest document", async () => {
   await assertSucceeds(getDoc(doc(db, "guests", "sebastien")));
 });
 
-test("a guest cannot read a guest from another group", async () => {
+test("a guest can read a guest from another group (read-all policy)", async () => {
   await seedGuestAuth();
   await environment.withSecurityRulesDisabled(async (admin) => {
     await setDoc(doc(admin.firestore(), "guests", "sebastien"), {
@@ -668,8 +671,9 @@ test("a guest cannot read a guest from another group", async () => {
     });
   });
   const db = environment.authenticatedContext(editorUid).firestore();
-  await assertFails(getDoc(doc(db, "guests", "sebastien")));
+  await assertSucceeds(getDoc(doc(db, "guests", "sebastien")));
 });
+
 
 // ── Invitation groups: group-scoped reads ─────────────────────────────
 // Group content (customContent, tag styling) is personalized per group.
@@ -709,12 +713,13 @@ test("a guest can read their own invitation group's document", async () => {
   await assertSucceeds(getDoc(doc(db, "invitation_groups", groupName)));
 });
 
-test("a guest cannot read another invitation group's document", async () => {
+test("a guest can read another invitation group's document (read-all policy)", async () => {
   await seedGuestAuth();
   await seedInvitationGroups();
   const db = environment.authenticatedContext(editorUid).firestore();
-  await assertFails(getDoc(doc(db, "invitation_groups", otherGroupName)));
+  await assertSucceeds(getDoc(doc(db, "invitation_groups", otherGroupName)));
 });
+
 
 test("an admin can read any invitation group's document", async () => {
   await seedAdmin();
@@ -757,3 +762,89 @@ test("an admin can write to invitation groups", async () => {
     }),
   );
 });
+
+// ── Cabins & rooms: invited-guest reads ─────────────────────────────────
+// The `cabins` and `rooms` collections are the source of truth for the
+// Accommodation section. They are readable by invited guests only (NOT the
+// public), and writable only by administrators. This prevents unauthenticated
+// visitors and non-invited users from reading the cabin inventory (capacity,
+// pricing) and room inventory.
+
+const cabinId = "VILLA AZALEA";
+const roomId = "VILLA AZALEA-1";
+
+async function seedCabinsAndRooms() {
+  await environment.withSecurityRulesDisabled(async (admin) => {
+    await setDoc(doc(admin.firestore(), "cabins", cabinId), {
+      id: cabinId,
+      name: "VILLA AZALEA - 12p",
+      capacity: 12,
+      totalPrice2Nights: 24000,
+      pricePerPerson2Nights: 2000,
+      isPrivate: false,
+      showcase: { es: "Villa", fr: "Villa", en: "Villa" },
+      cloudinaryIds: "cabin-azalea-01",
+    });
+    await setDoc(doc(admin.firestore(), "rooms", roomId), {
+      id: roomId,
+      cabin: cabinId,
+      description: { es: "Cuarto", fr: "Chambre", en: "Room" },
+      capacity: 2,
+      isShared: true,
+    });
+  });
+}
+
+test("an invited guest can read cabins and rooms", async () => {
+  await seedGuestAuth();
+  await seedCabinsAndRooms();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertSucceeds(getDoc(doc(db, "cabins", cabinId)));
+  await assertSucceeds(getDoc(doc(db, "rooms", roomId)));
+});
+
+test("an unauthenticated visitor cannot read cabins or rooms", async () => {
+  await seedCabinsAndRooms();
+  const db = environment.unauthenticatedContext().firestore();
+  await assertFails(getDoc(doc(db, "cabins", cabinId)));
+  await assertFails(getDoc(doc(db, "rooms", roomId)));
+});
+
+test("a non-invited authenticated user can read cabins or rooms (read-all policy)", async () => {
+  await seedCabinsAndRooms();
+  const db = environment
+    .authenticatedContext("not-invited", {
+      email: "stranger@example.com",
+      email_verified: true,
+    })
+    .firestore();
+  await assertSucceeds(getDoc(doc(db, "cabins", cabinId)));
+  await assertSucceeds(getDoc(doc(db, "rooms", roomId)));
+});
+
+
+test("a guest cannot write to cabins or rooms (admin-only)", async () => {
+  await seedGuestAuth();
+  await seedCabinsAndRooms();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertFails(
+    setDoc(doc(db, "cabins", cabinId), {
+      id: cabinId,
+      name: "Hacked",
+      capacity: 1,
+      totalPrice2Nights: 0,
+      pricePerPerson2Nights: 0,
+      isPrivate: false,
+    }),
+  );
+  await assertFails(
+    setDoc(doc(db, "rooms", roomId), {
+      id: roomId,
+      cabin: cabinId,
+      description: { es: "Hacked", fr: "Hacked", en: "Hacked" },
+      capacity: 1,
+      isShared: false,
+    }),
+  );
+});
+

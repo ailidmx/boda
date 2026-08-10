@@ -1,12 +1,25 @@
 import React, { useMemo, useRef, useState } from "react";
 import { useApp } from "../context/AppContext.jsx";
+import { useRsvp, RSVP_FLOWS } from "../context/RsvpContext.jsx";
 import { RsvpQuestion } from "./RsvpQuestion.jsx";
 import { RsvpRecap } from "./RsvpRecap.jsx";
+import { FlipStepCard } from "./FlipStepCard.jsx";
 import { BARRA_PHOTOS } from "../barraGallery.js";
-import { getGroupMembers } from "../guest-profiles.js";
+import {
+  getGroupMembers,
+  resolveGuestName,
+  resolveGuestPhoto,
+  resolveLiveGuest,
+} from "../guest-profiles.js";
+import { getCabin } from "../cabins.js";
+import { getRoom, getRoomsByCabin } from "../rooms.js";
+import { StayPlanCard } from "./StayPlanCard.jsx";
+import { CabinOccupancy } from "./CabinOccupancy.jsx";
+
+
 
 import { getActiveGuests } from "../guests.js";
-import { resolveRsvpAnswer, saveRsvpAnswers } from "../rsvp-responses.js";
+import { resolveRsvpAnswer } from "../rsvp-responses.js";
 
 
 
@@ -108,9 +121,11 @@ function formatPrice(amount, language) {
 export function Coast() {
 
   const { t, language, interfaceText, profile } = useApp();
+  const { answers, setAnswer, markResume, saveFlow } = useRsvp();
   const coast = t.coast || {};
   const suggestions = coast.suggestions || {};
   const rsvpMini = coast.rsvpMini || {};
+  const flow = RSVP_FLOWS.coast;
 
 
   const barraRef = useRef(null);
@@ -121,6 +136,114 @@ export function Coast() {
     () => getGroupMembers(profile?.guest, getActiveGuests()),
     [profile?.guest],
   );
+
+  // ── Extra stay (Plan 1 · stay at Roca Azul, Sunday→Tuesday) ────────────
+  // The second stay is stored on the guest's hosting record as an extra cabin
+  // (xtraCabin / xtraRoom). We reuse the same StayPlanCard used in the
+  // Accommodation section so the pricing, "paid by the couple" banner, and
+  // on-sale styling are identical.
+  const getXtraCabinId = (candidate) => {
+    const source = resolveLiveGuest(candidate);
+    const mHosting = source?.hosting || {};
+    const mXtraCabin = mHosting.xtraCabin || source?.xtraCabin;
+    const mXtraRoom = mHosting.xtraRoom || source?.xtraRoom;
+    const mRoom = mXtraRoom ? getRoom(mXtraRoom) : null;
+    return mRoom?.cabin || mXtraCabin;
+  };
+
+  const getXtraRoomId = (candidate) => {
+    const source = resolveLiveGuest(candidate);
+    return source?.hosting?.xtraRoom || source?.xtraRoom;
+  };
+
+  const resolveXtraCovered = (member) => {
+    const source = resolveLiveGuest(member);
+    return source?.hosting?.isXtraCabinPaidByNovios ?? source?.isXtraCabinPaidByNovios;
+  };
+
+  const resolveXtraPaid = (member) => {
+    const source = resolveLiveGuest(member);
+    return source?.hosting?.isXtraCabinPaid ?? source?.isXtraCabinPaid;
+  };
+
+  const liveActive = resolveLiveGuest(profile?.guest) || profile?.guest;
+  const extraCabinId = getXtraCabinId(liveActive);
+  const hasExtraCabin = Boolean(extraCabinId);
+  const extraCabin = getCabin(extraCabinId);
+  const extraRoom = getXtraRoomId(liveActive);
+  const option = t.accommodation?.guestOption || {};
+  const extraStay = coast.extraStay || {};
+
+  // ── Extra cabin occupancy ────────────────────────────────────────────────
+  // Occupancy is computed by parsing the whole guests collection and finding
+  // every guest who shares the SAME extra cabin (xtraCabin), not just those
+  // with a matching room id. Each occupant carries their room, their
+  // "paid by the couple" flag (isXtraCabinPaidByNovios), avatar and name so
+  // the modal shows the complete picture of who shares the extra cabin.
+  //
+  // NOTE: the live `xtraCabin`/`xtraRoom`/`isXtraCabinPaidByNovios` data lives
+  // in the Firestore `guests` collection. It is loaded for ALL guests at
+  // startup via `loadAllGuests()` (see AppContext), so guests from other
+  // invitation groups who share this extra cabin are included too.
+  const extraCabinRooms = extraCabin ? getRoomsByCabin(extraCabin.id) : [];
+
+  // All active guests assigned to this extra cabin (by resolved xtraCabin id).
+  const extraCabinOccupants = extraCabin
+    ? getActiveGuests()
+        .filter((candidate) => getXtraCabinId(candidate) === extraCabin.id)
+        .map((candidate) => {
+          const source = resolveLiveGuest(candidate);
+          const xtraRoomId = source?.hosting?.xtraRoom || source?.xtraRoom;
+          return {
+            id: candidate.id,
+            name: resolveGuestName(candidate).fullName,
+            photo: resolveGuestPhoto(candidate),
+            roomId: xtraRoomId,
+            covered: source?.hosting?.isXtraCabinPaidByNovios ?? source?.isXtraCabinPaidByNovios,
+          };
+        })
+        .filter((candidate) => candidate.name)
+    : [];
+
+  // Group those occupants by the extra cabin's rooms. Guests whose room id is
+  // not one of the cabin's registered rooms (or who have no room) are grouped
+  // under a synthetic "unassigned" entry so they are never dropped.
+  const extraRoomOccupants = extraCabinRooms.map((cabinRoom) => ({
+    room: cabinRoom,
+    occupants: extraCabinOccupants.filter((o) => o.roomId === cabinRoom.id),
+  }));
+  const unassignedExtraOccupants = extraCabinOccupants.filter(
+    (o) => !extraCabinRooms.some((r) => r.id === o.roomId),
+  );
+  if (unassignedExtraOccupants.length > 0) {
+    extraRoomOccupants.push({
+      room: { id: "__unassigned__", capacity: unassignedExtraOccupants.length, isShared: true },
+      occupants: unassignedExtraOccupants,
+    });
+  }
+
+  // Debug traces for the extra cabin occupancy calculation.
+  console.log("[coast][extra-cabin-occupancy]", {
+    activeGuestId: liveActive?.id,
+    extraCabinId,
+    extraCabinName: extraCabin?.name,
+    extraRoom,
+    totalActiveGuests: getActiveGuests().length,
+    matchedOccupants: extraCabinOccupants.map((o) => ({
+      id: o.id,
+      name: o.name,
+      roomId: o.roomId,
+      covered: o.covered,
+    })),
+    rooms: extraRoomOccupants.map(({ room, occupants }) => ({
+      roomId: room.id,
+      occupantCount: occupants.length,
+      occupantIds: occupants.map((o) => o.id),
+    })),
+  });
+
+
+
 
   // The two scale questions about the "Et après ?" plans. Levels: 0–5.
   const questions = useMemo(
@@ -134,29 +257,10 @@ export function Coast() {
     [rsvpMini],
   );
 
-  // answers: questionId → { guestId → level }
-  const [answers, setAnswers] = useState(() => {
-    const initial = {};
-    questions.forEach((q) => {
-      initial[q.id] = {};
-      guests.forEach((guest) => {
-        initial[q.id][guest.id] = resolveRsvpAnswer(guest, q.id);
-      });
-    });
-    return initial;
-  });
-
   const [saveStatus, setSaveStatus] = useState("idle"); // idle | working | saved | error
 
   const handleAnswerChange = (questionId, guestId, level) => {
-    console.log("[coast] answer change", { questionId, guestId, level });
-    setAnswers((prev) => ({
-      ...prev,
-      [questionId]: {
-        ...(prev[questionId] || {}),
-        [guestId]: level,
-      },
-    }));
+    setAnswer(questionId, guestId, level);
   };
 
   const handleSaveAnswers = async () => {
@@ -166,16 +270,7 @@ export function Coast() {
     setSaveStatus("working");
     try {
       // Persist each guest's answers to their own rsvp_responses doc.
-      await Promise.all(
-        guests.map((guest) => {
-          const guestAnswers = {};
-          questions.forEach((q) => {
-            const level = answers[q.id]?.[guest.id];
-            if (level !== undefined) guestAnswers[q.id] = level;
-          });
-          return saveRsvpAnswers(guest, guestAnswers, editorGuestId);
-        }),
-      );
+      await saveFlow({ flow, questions, guests, editorGuestId });
       setSaveStatus("saved");
     } catch (error) {
       console.warn("[coast] rsvp save failed", error.code || error.message);
@@ -288,10 +383,10 @@ export function Coast() {
         </div>
       </div>
 
-      {/* Mini RSVP — replaces the old "Sondage sans engagement" form. Uses the
-          same shared scale component as "¡Te animas!" so each guest rates how
-          likely they are to join each "Et après ?" plan (0–5). Answers are
-          saved per guest to Firestore via saveRsvpAnswers. */}
+      {/* Mini RSVP — a 3-step flipable card (like "¡Te animas!" and pétanque):
+          Step 1 = stay at Roca Azul, Step 2 = the beach plan, Step 3 = summary.
+          Each guest rates how likely they are to join each "Et après ?" plan
+          (0–5). Answers are saved per guest to Firestore via saveRsvpAnswers. */}
       <div className="coast-rsvp-mini reveal">
         <div className="coast-rsvp-mini-head">
           <p className="eyebrow">{rsvpMini.eyebrow}</p>
@@ -299,42 +394,96 @@ export function Coast() {
           <p className="coast-rsvp-mini-intro">{rsvpMini.intro}</p>
         </div>
 
-        <div className="coast-rsvp-questions">
-          {questions.map((question) => (
-            <RsvpQuestion
-              key={question.id}
-              questionId={question.id}
-              title={question.title}
-              subtitle={question.subtitle}
-              guests={guests}
-              answers={answers[question.id] || {}}
-              onChange={(guestId, level) =>
-                handleAnswerChange(question.id, guestId, level)
-              }
-            />
-          ))}
-        </div>
-
-        <RsvpRecap
-          questions={questions}
-          guests={guests}
-          answers={answers}
-          recapTitle={rsvpMini.recapTitle}
-          recapProgress={rsvpMini.recapProgress}
+        <FlipStepCard
+          onDone={() => markResume(flow)}
+          steps={[
+            ...questions.map((question) => ({
+              id: question.id,
+              label: question.title,
+              render: () => (
+                <RsvpQuestion
+                  questionId={question.id}
+                  title={question.title}
+                  subtitle={question.subtitle}
+                  variant="scale"
+                  guests={guests}
+                  answers={answers[question.id] || {}}
+                  onChange={(guestId, level) =>
+                    handleAnswerChange(question.id, guestId, level)
+                  }
+                />
+              ),
+            })),
+            {
+              id: "resumen",
+              label: rsvpMini.recapTitle || "Summary",
+              render: () => (
+                <div className="rsvp-recap-step">
+                  <RsvpRecap
+                    questions={questions}
+                    guests={guests}
+                    answers={answers}
+                    recapTitle={rsvpMini.recapTitle}
+                    recapProgress={rsvpMini.recapProgress}
+                  />
+                  <div className="coast-rsvp-save">
+                    <button
+                      className="button button-dark"
+                      type="button"
+                      onClick={handleSaveAnswers}
+                      disabled={saveStatus === "working"}
+                    >
+                      {rsvpMini.button}
+                    </button>
+                    {saveStatusText && <small>{saveStatusText}</small>}
+                  </div>
+                </div>
+              ),
+            },
+          ]}
+          copy={{
+            step: interfaceText.stepLabel || "Step",
+            next: interfaceText.next || "Next",
+            back: interfaceText.back || "Back",
+          }}
         />
-
-        <div className="coast-rsvp-save">
-          <button
-            className="button button-dark"
-            type="button"
-            onClick={handleSaveAnswers}
-            disabled={saveStatus === "working"}
-          >
-            {rsvpMini.button}
-          </button>
-          {saveStatusText && <small>{saveStatusText}</small>}
-        </div>
       </div>
+
+      {/* Extra stay (Plan 1 · stay at Roca Azul, Sunday→Tuesday) — shown only
+          when the active guest has an extra cabin assigned for the second
+          stay. Reuses the same StayPlanCard as the Hébergement section so the
+          pricing, "paid by the couple" banner, and on-sale styling match. */}
+      {hasExtraCabin && extraCabin && (
+        <div className="coast-extra-stay reveal">
+          <p className="eyebrow">{extraStay.eyebrow}</p>
+          <h3>{extraStay.title}</h3>
+          {extraRoomOccupants.length > 0 && (
+            <div className="accommodation-occupancy-top">
+              <CabinOccupancy
+                cabinName={extraCabin?.name?.replace(/\s+/g, " ") || extraCabinId}
+                rooms={extraRoomOccupants}
+                assignedRoomId={extraRoom}
+                activeMemberId={liveActive?.id}
+                option={option}
+                language={language}
+              />
+            </div>
+          )}
+          <StayPlanCard
+            activeMember={liveActive}
+            groupMembers={guests}
+            getAssignedCabinId={getXtraCabinId}
+            getAssignedRoomId={getXtraRoomId}
+            resolveMemberCovered={resolveXtraCovered}
+            resolveMemberPaid={resolveXtraPaid}
+            option={option}
+            language={language}
+            showExtraCabinRow={false}
+            extraCabin={extraCabin}
+            extraRoom={extraRoom}
+          />
+        </div>
+      )}
 
 
       {/* Coast accommodation suggestions — mirrors the Accommodation "no
@@ -426,6 +575,14 @@ export function Coast() {
           </section>
         </div>
       )}
+
+      {/* Desktop-only bottom nav: leads to the photos section. */}
+      <nav className="section-nav coast-section-nav" aria-label="Continue">
+        <a className="section-nav-link" href="#photos">
+          <span>{t.nav.photos}</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </nav>
     </section>
   );
 }

@@ -375,11 +375,9 @@ export function Venue() {
     const section = sectionRef.current;
     if (!section || typeof IntersectionObserver === "undefined") return undefined;
 
-    const mobile = window.matchMedia("(max-width: 899px)");
     let latestEntry = null;
     const syncVisibility = () => {
-      setVenueActive(Boolean(mobile.matches && latestEntry?.isIntersecting));
-      if (!mobile.matches) setPrivacyOpen(false);
+      setVenueActive(Boolean(latestEntry?.isIntersecting));
     };
     const observer = new IntersectionObserver(([entry]) => {
       latestEntry = entry;
@@ -387,11 +385,7 @@ export function Venue() {
     }, { rootMargin: "-45% 0px -45% 0px", threshold: 0 });
 
     observer.observe(section);
-    mobile.addEventListener?.("change", syncVisibility);
-    return () => {
-      observer.disconnect();
-      mobile.removeEventListener?.("change", syncVisibility);
-    };
+    return () => observer.disconnect();
   }, []);
 
   useEffect(() => {

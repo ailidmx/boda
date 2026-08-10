@@ -174,8 +174,9 @@
   overflow-x: clip;
   background:
     radial-gradient(circle at 72% 32%, rgb(231 194 125 / 40%), transparent 23%),
-    linear-gradient(135deg, #9b735e 0%, #6e6857 44%, #33423a 100%);
+    linear-gradient(180deg, #efecea 0%, #9edffc9c 44%, #d9b36a 100%);
 }
+
 
 
 /* ── Arty background scene · symbolic geography of Roca Azul ──────────
@@ -834,9 +835,127 @@
   line-height: 1.85;
 }
 
-.venue-privacy__close,
-.venue-privacy-fab {
+/* The privacy disclosure is a FAB-activated modal on every screen size.
+   The inline panel is hidden by default; a floating lock button opens it as
+   a dimmed overlay. The close button only appears once the modal is open. */
+.venue-privacy-shell {
   display: none;
+}
+
+/* INTIMITE modal — styled like the other section FAB modals (weather
+   advice / attire pictogram): a white rounded panel with a display-font
+   title and a bordered close button over a dimmed overlay. */
+.venue-privacy-shell.is-mobile-open {
+  position: fixed;
+  z-index: 240;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: rgb(36 33 25 / 55%);
+}
+
+.venue-privacy-shell.is-mobile-open .venue-privacy {
+  position: relative;
+  display: block;
+  width: min(100%, 26rem);
+  max-height: 80svh;
+  margin: 0;
+  padding: 2rem 1.5rem 1.5rem;
+  overflow-y: auto;
+  border: 0;
+  border-radius: 1.25rem;
+  background: var(--white);
+  box-shadow: 0 1.5rem 3.5rem rgb(36 33 25 / 35%);
+  overscroll-behavior: contain;
+}
+
+.venue-privacy__header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding-right: 2.5rem;
+}
+
+.venue-privacy__header .venue-privacy__icon {
+  width: 3.25rem;
+  height: 3.25rem;
+  flex-basis: 3.25rem;
+  border-radius: 50%;
+}
+
+.venue-privacy__header .venue-privacy__icon svg {
+  width: 1.9rem;
+  height: 1.9rem;
+}
+
+.venue-privacy__header h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.venue-privacy__body {
+  margin-top: 1rem;
+}
+
+.venue-privacy__body p {
+  color: rgb(36 33 25 / 78%);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.venue-privacy__close {
+  position: absolute;
+  z-index: 2;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgb(36 33 25 / 22%);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.venue-privacy-fab {
+  position: fixed;
+  z-index: 130;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  width: 4.25rem;
+  height: 4.25rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 3px solid var(--marigold);
+  border-radius: 50%;
+  background: var(--terracotta);
+  box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
+  color: var(--white);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(1rem) scale(0.9);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.venue-privacy-fab.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.venue-privacy-fab svg {
+  width: 2.4rem;
+  height: 2.4rem;
 }
 
 
@@ -1272,126 +1391,5 @@
     width: 3rem;
     height: 3rem;
     font-size: 1.1rem;
-  }
-
-  /* Keep the long privacy disclosure out of the mobile Venue layout. */
-  .venue-privacy-shell {
-    display: none;
-  }
-
-  /* INTIMITE modal — styled like the other section FAB modals (weather
-     advice / attire pictogram): a white rounded panel with a display-font
-     title and a bordered close button over a dimmed overlay. */
-  .venue-privacy-shell.is-mobile-open {
-    position: fixed;
-    z-index: 240;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    padding: 1.25rem;
-    background: rgb(36 33 25 / 55%);
-  }
-
-  .venue-privacy-shell.is-mobile-open .venue-privacy {
-    position: relative;
-    display: block;
-    width: min(100%, 26rem);
-    max-height: 80svh;
-    margin: 0;
-    padding: 2rem 1.5rem 1.5rem;
-    overflow-y: auto;
-    border: 0;
-    border-radius: 1.25rem;
-    background: var(--white);
-    box-shadow: 0 1.5rem 3.5rem rgb(36 33 25 / 35%);
-    overscroll-behavior: contain;
-  }
-
-  .venue-privacy__header {
-    display: flex;
-    align-items: center;
-    gap: 0.85rem;
-    padding-right: 2.5rem;
-  }
-
-  .venue-privacy__header .venue-privacy__icon {
-    width: 3.25rem;
-    height: 3.25rem;
-    flex-basis: 3.25rem;
-    border-radius: 50%;
-  }
-
-  .venue-privacy__header .venue-privacy__icon svg {
-    width: 1.9rem;
-    height: 1.9rem;
-  }
-
-  .venue-privacy__header h3 {
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: 1.35rem;
-    font-weight: 400;
-    color: var(--ink);
-  }
-
-  .venue-privacy__body {
-    margin-top: 1rem;
-  }
-
-  .venue-privacy__body p {
-    color: rgb(36 33 25 / 78%);
-    font-size: 1rem;
-    line-height: 1.5;
-  }
-
-  .venue-privacy__close {
-    position: absolute;
-    z-index: 2;
-    top: 0.75rem;
-    right: 0.75rem;
-    display: grid;
-    width: 2.25rem;
-    height: 2.25rem;
-    place-items: center;
-    padding: 0;
-    border: 1px solid rgb(36 33 25 / 22%);
-    border-radius: 50%;
-    background: transparent;
-    color: var(--ink);
-    font-size: 1.4rem;
-    line-height: 1;
-    cursor: pointer;
-  }
-
-  .venue-privacy-fab {
-    position: fixed;
-    z-index: 130;
-    right: max(1rem, env(safe-area-inset-right));
-    bottom: max(1rem, env(safe-area-inset-bottom));
-    width: 4.25rem;
-    height: 4.25rem;
-    display: grid;
-    place-items: center;
-    padding: 0;
-    border: 3px solid var(--marigold);
-    border-radius: 50%;
-    background: var(--terracotta);
-    box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
-    color: var(--white);
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(1rem) scale(0.9);
-    transition: opacity 180ms ease, transform 180ms ease;
-  }
-
-  .venue-privacy-fab.is-visible {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0) scale(1);
-  }
-
-  .venue-privacy-fab svg {
-    width: 2.4rem;
-    height: 2.4rem;
   }
 }

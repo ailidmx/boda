@@ -112,11 +112,41 @@
 
 .rsvp-section small {
   display: block;
+
   margin-top: 1rem;
   color: #e4b968;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
+
+/* Bottom "continue" nav inside the "¡Te animas!" RSVP section. Mirrors the
+   elegant bottom nav used on the weekend slides: a hairline top border and a
+   small-caps link that points to the next section (FLIGHTS for guests who
+   travel by plane, otherwise Pétanque). */
+.te-animas-nav {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(255 255 255 / 22%);
+}
+
+.te-animas-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--white);
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 250ms ease;
+}
+
+.te-animas-nav-link:hover,
+.te-animas-nav-link:focus-visible {
+  color: #e4b968;
+  text-decoration: underline;
+}
+
 
 /* ── Pétanque tournament ── */
 .petanque-section {
@@ -524,8 +554,8 @@
   display: grid;
   gap: 1rem;
   margin-top: 2rem;
-  padding: clamp(1.25rem, 3vw, 2rem);
-  border: 1px solid rgb(255 255 255 / 28%);
+  padding: 0;
+  border: 0;
   background: rgb(255 255 255 / 3%);
 }
 
@@ -719,10 +749,12 @@
     padding: 0;
     border: 3px solid var(--marigold);
     border-radius: 50%;
-    background: var(--cream);
+    background: var(--terracotta);
+    color: var(--white);
     box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
     font-size: 1.9rem;
     line-height: 1;
+
     opacity: 0;
     pointer-events: none;
     transform: translateY(1rem) scale(0.9);
@@ -734,6 +766,68 @@
     pointer-events: auto;
     transform: translateY(0) scale(1);
   }
+}
+
+/* ── RSVP progress checklist ────────────────────────────────────────────
+   A compact checklist that shows which mini-RSVP flows (Te animas, Pétanque,
+   Coast) still need to be walked through before the final form can be
+   submitted. Each row shows a mark, a label, and a state. */
+.rsvp-progress {
+  display: grid;
+  gap: 0.6rem;
+  max-width: 34rem;
+  margin: 0 auto 2rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgb(228 185 104 / 45%);
+  background: rgb(255 255 255 / 4%);
+  text-align: left;
+}
+
+.rsvp-progress-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  color: rgb(255 253 248 / 75%);
+}
+
+.rsvp-progress-mark {
+  flex: none;
+  display: grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 50%;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.rsvp-progress-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.rsvp-progress-state {
+  flex: none;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(255 253 248 / 55%);
+}
+
+.rsvp-progress-item.is-done {
+  color: var(--white);
+}
+
+.rsvp-progress-item.is-done .rsvp-progress-mark {
+  background: #e4b968;
+  border-color: #e4b968;
+  color: var(--deep-green);
+}
+
+.rsvp-progress-item.is-done .rsvp-progress-state {
+  color: #e4b968;
 }
 
 

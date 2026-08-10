@@ -6,6 +6,9 @@ import { LANGUAGE_FLAGS, LANGUAGE_FLAGS_ONLY } from "./ui.jsx";
 import { SUPPORTED_LANGUAGES } from "../content.js";
 import { resolveGuestName, resolveGuestPhoto } from "../guest-profiles.js";
 
+// The full ordered list of nav links. The FLIGHTS ("travel") entry is only
+// relevant for guests who travel by plane, so it is filtered out for everyone
+// else (see getNavLinks below).
 const NAV_LINKS = [
   ["home", "#top"],
   ["story", "#story"],
@@ -17,16 +20,27 @@ const NAV_LINKS = [
   ["programme", "#weekend-program"],
   ["teAnimas", "#te-animas"],
   ["travel", "#travel"],
-  ["petanque", "#petanque"],
   ["accommodation", "#accommodation"],
-
-
-  ["gift", "#gift"],
-
+  ["petanque", "#petanque"],
+  ["food", "#food"],
+  ["music", "#music"],
+  ["coast", "#after"],
   ["photos", "#photos"],
-  ["thanks", "#thanks"],
   ["guests", "#guests"],
+  ["gift", "#gift"],
+  ["rsvp", "#rsvp"],
+  ["thanks", "#thanks"],
 ];
+
+// Resolve the effective nav links for the signed-in guest. The FLIGHTS
+// ("travel") link is hidden for guests who do not travel by plane, matching
+// the section being removed from the DOM.
+function getNavLinks(travelsByPlane) {
+  return travelsByPlane
+    ? NAV_LINKS
+    : NAV_LINKS.filter(([key]) => key !== "travel");
+}
+
 
 function UserMenu() {
   const {
@@ -482,13 +496,16 @@ function UserMenu() {
 // Part II = travel and everything after) plus a REPONDRE CTA. The dropdowns
 // are borderless and translucent so they feel like a floating, integrated
 // menu rather than a boxed control.
+//
+// Part I always ends at "teAnimas". Part II starts at the first link after it
+// — normally "travel", but when the guest does not travel by plane (and the
+// FLIGHTS link is hidden) it starts at "petanque" instead.
 const PART_I_END = "teAnimas";
-const PART_II_START = "travel";
 
 
 
 function MobileNav({ activeKey }) {
-  const { t } = useApp();
+  const { t, profile } = useApp();
   const [openMenu, setOpenMenu] = useState(null); // null | "part1" | "part2"
   const menuRef = useRef(null);
 
@@ -503,16 +520,15 @@ function MobileNav({ activeKey }) {
     return () => document.removeEventListener("mousedown", onDocClick);
   }, [openMenu]);
 
-  const part1 = NAV_LINKS.filter(
-    ([key]) =>
-      NAV_LINKS.findIndex(([k]) => k === key) <=
-      NAV_LINKS.findIndex(([k]) => k === PART_I_END),
+  const travelsByPlane = ["booked", "planning"].includes(
+    profile?.guest?.travelStatus,
   );
-  const part2 = NAV_LINKS.filter(
-    ([key]) =>
-      NAV_LINKS.findIndex(([k]) => k === key) >=
-      NAV_LINKS.findIndex(([k]) => k === PART_II_START),
-  );
+  const links = getNavLinks(travelsByPlane);
+  const part1EndIndex = links.findIndex(([key]) => key === PART_I_END);
+
+  const part1 = links.slice(0, part1EndIndex + 1);
+  const part2 = links.slice(part1EndIndex + 1);
+
 
   const renderDropdown = (menuKey, label, links) => (
     <div className="mobile-nav__group">
@@ -561,7 +577,7 @@ function MobileNav({ activeKey }) {
 
 
 export function Nav() {
-  const { t } = useApp();
+  const { t, profile } = useApp();
 
   const navRef = useRef(null);
   const underlineRef = useRef(null);
@@ -569,6 +585,15 @@ export function Nav() {
   const [canRight, setCanRight] = useState(false);
   const [activeKey, setActiveKey] = useState("home");
   const [hoverKey, setHoverKey] = useState(null);
+
+  // The effective nav links for this guest (FLIGHTS hidden when not travelling
+  // by plane). Used by the desktop nav, the underline, and the scroll-spy.
+  const travelsByPlane = ["booked", "planning"].includes(
+    profile?.guest?.travelStatus,
+  );
+  const links = getNavLinks(travelsByPlane);
+
+
 
   // Keep CSS shell vars in sync with the real rendered sticky bar heights.
   // This avoids layout gaps when mobile bar heights differ from static rem
@@ -611,41 +636,8 @@ export function Nav() {
     };
   }, []);
 
-  // Mobile-only behavior: once the user leaves the very top, keep the
-  // countdown hidden and show only the sticky nav. Countdown reappears only
-  // when returning to the absolute top.
-  useEffect(() => {
-    const root = document.body;
-    const media = window.matchMedia("(max-width: 899px)");
-
-    const clearState = () => {
-      root.classList.remove("mobile-nav-only");
-    };
-
-    const update = () => {
-      if (!media.matches) {
-        clearState();
-        return;
-      }
-
-      const y = window.scrollY;
-      const nearTop = y <= 1;
-      const navOnly = !nearTop;
-      root.classList.toggle("mobile-nav-only", navOnly);
-    };
-
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    window.addEventListener("resize", update);
-
-    return () => {
-      clearState();
-      window.removeEventListener("scroll", update);
-      window.removeEventListener("resize", update);
-    };
-  }, []);
-
   const updateArrows = () => {
+
     const el = navRef.current;
     if (!el) return;
     setCanLeft(el.scrollLeft > 4);
@@ -668,9 +660,10 @@ export function Nav() {
   // differ, e.g. "you" → "#identity"), so the underline always finds the
   // correct link no matter how items are named or reordered.
   const hrefFor = (key) => {
-    const entry = NAV_LINKS.find(([k]) => k === key);
+    const entry = links.find(([k]) => k === key);
     return entry ? entry[1] : null;
   };
+
 
   // Position the golden underline under a given nav link (active by default,
   // or the hovered link). Measured via getBoundingClientRect so it stays
@@ -695,7 +688,8 @@ export function Nav() {
   // Scroll-spy: highlight the section currently in view and auto-scroll the
   // nav horizontally so the active link sits at the leading edge.
   useEffect(() => {
-    const ids = NAV_LINKS.map(([key, href]) => ({ key, id: href.slice(1) }));
+    const ids = links.map(([key, href]) => ({ key, id: href.slice(1) }));
+
     const headerOffset = () => {
       const countdown = document.querySelector(".countdown-bar");
       const header = document.querySelector(".site-header");
@@ -771,7 +765,8 @@ export function Nav() {
           ‹
         </button>
         <nav className="desktop-nav" ref={navRef} aria-label="Primary">
-          {NAV_LINKS.map(([key, href]) => (
+          {links.map(([key, href]) => (
+
             <a
               key={key}
               href={href}

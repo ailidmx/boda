@@ -224,53 +224,33 @@
   }
 }
 
-/* Mobile sticky header must stay fully opaque at the top.
-   Blur + alpha can look transparent on some mobile browsers while scrolling. */
+/* Mobile: the nav bar is ALWAYS pinned to the very top. The countdown bar
+   scrolls away naturally (see countdown.css) and reappears when the user
+   returns to the top of the page. The header must stay fully opaque at the
+   top — blur + alpha can look transparent on some mobile browsers.
+   `body .site-header` (higher specificity than the base `.site-header` rule
+   below) guarantees `top: 0` wins over `top: var(--countdown-height)`. */
 @media (max-width: 899px) {
-  .site-header {
+  body .site-header {
+    top: 0;
     background: var(--deep-green);
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-  }
-
-  body.mobile-nav-only .countdown-bar {
-    transform: translateY(-100%);
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  body.mobile-nav-only .site-header {
-    top: 0;
-    background: transparent;
-    border-bottom-color: transparent;
-    box-shadow: none;
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
-  }
-
-  body.mobile-nav-only .site-header::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background:
-      linear-gradient(180deg, rgb(18 27 24 / 70%) 0%, rgb(18 27 24 / 42%) 58%, rgb(18 27 24 / 22%) 100%),
-      linear-gradient(90deg, rgb(184 134 11 / 12%) 0%, rgb(184 134 11 / 0%) 55%);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
   }
 }
 
 
 
 
+
+
 .site-header {
   position: sticky;
-  z-index: 90;
-  top: var(--countdown-height);
+  z-index: 100;
+  top: 0;
   right: 0;
   left: 0;
+
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: stretch;
