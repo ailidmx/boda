@@ -103,6 +103,14 @@ export function Music() {
           ))}
         </SwipeCardCarousel>
       </div>
+
+      {/* Desktop-only bottom nav: leads to the "Et après ?" (coast) section. */}
+      <nav className="section-nav music-section-nav" aria-label="Continue">
+        <a className="section-nav-link" href="#coast">
+          <span>{t.nav.coast}</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </nav>
     </section>
   );
 }

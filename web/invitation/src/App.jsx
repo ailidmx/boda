@@ -1,5 +1,6 @@
 import React, { Suspense, lazy, useEffect } from "react";
 import { AppProvider, useApp } from "./context/AppContext.jsx";
+import { RsvpProvider } from "./context/RsvpContext.jsx";
 import { AuthGate } from "./components/AuthGate.jsx";
 import { Nav } from "./components/Nav.jsx";
 import { Countdown } from "./components/Countdown.jsx";
@@ -81,7 +82,20 @@ const Footer = lazy(() =>
 
 
 function Invitation() {
-  const { authState } = useApp();
+  const { authState, profile } = useApp();
+
+  // The FLIGHTS ("Je viens de loin") section is only relevant for guests who
+  // travel by plane. When the signed-in guest does NOT travel by plane, the
+  // section is hidden entirely: it is removed from the DOM, from the nav menu,
+  // and from the "next section" bottom links.
+  //
+  // The guest's travel status is stored on the guest doc as `travelStatus`
+  // ("booked" | "planning" | "local"). Guests who travel by plane are those
+  // who are NOT local.
+  const travelsByPlane = ["booked", "planning"].includes(
+    profile?.guest?.travelStatus,
+  );
+
 
   // Force guests onto the latest deployed version: periodically compare the
   // running build number against the deployed version.json and hard-reload if
@@ -115,9 +129,10 @@ function Invitation() {
     <>
       <LanguageModal />
       <IdentityModal />
-      <Countdown />
       <Nav />
+      <Countdown />
       <WinampPlayer />
+
       <main>
         <Hero />
         <LazySection id="story" className="lazy-section">
@@ -157,21 +172,25 @@ function Invitation() {
             <TeAnimas />
           </Suspense>
         </LazySection>
-        {/* "Je viens de loin" — placed right after the programme. */}
-        <LazySection id="travel" className="lazy-section">
-          <Suspense fallback={null}>
-            <Travel />
-          </Suspense>
-        </LazySection>
+        {/* "Je viens de loin" — placed right after the programme. Only shown
+            for guests who travel by plane (see travelsByPlane above). */}
+        {travelsByPlane && (
+          <LazySection id="travel" className="lazy-section">
+            <Suspense fallback={null}>
+              <Travel />
+            </Suspense>
+          </LazySection>
+        )}
 
-        <LazySection id="petanque" className="lazy-section">
-          <Suspense fallback={null}>
-            <Petanque />
-          </Suspense>
-        </LazySection>
+
         <LazySection id="accommodation" className="lazy-section">
           <Suspense fallback={null}>
             <Accommodation />
+          </Suspense>
+        </LazySection>
+        <LazySection id="petanque" className="lazy-section">
+          <Suspense fallback={null}>
+            <Petanque />
           </Suspense>
         </LazySection>
         <LazySection id="food" className="lazy-section">
@@ -230,7 +249,9 @@ function Invitation() {
 export function App() {
   return (
     <AppProvider>
-      <Invitation />
+      <RsvpProvider>
+        <Invitation />
+      </RsvpProvider>
     </AppProvider>
   );
 }

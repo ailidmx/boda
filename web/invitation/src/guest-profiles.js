@@ -18,7 +18,8 @@
  */
 
 
-import { collection, doc, getDoc, onSnapshot, query, setDoc, serverTimestamp, where } from "firebase/firestore";
+import { collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, serverTimestamp, where } from "firebase/firestore";
+
 
 import { db } from "./firebase.js";
 import { cloudinaryImage } from "./cloudinary.js";
@@ -43,6 +44,34 @@ import { validateGuestContactPayload } from "../../shared/validation.js";
  * @type {Map<string, Object>}
  */
 const guestsCache = new Map();
+
+// Subscribers notified whenever the live `guests` cache is updated (e.g. after
+// the onSnapshot listener in loadGuestProfiles() applies a batch of changes).
+// This lets consumers that read the cache reactively (like RsvpContext, which
+// hydrates the RSVP answers from `rsvp.answers`) re-read it once the live
+// records are actually available — the snapshot callback is asynchronous, so
+// reading the cache immediately after sign-in can miss the data.
+const guestsCacheListeners = new Set();
+
+/**
+ * Subscribe to live `guests` cache updates. Returns an unsubscribe function.
+ * @param {() => void} listener
+ * @returns {() => void}
+ */
+export function subscribeGuestsCache(listener) {
+  guestsCacheListeners.add(listener);
+  return () => guestsCacheListeners.delete(listener);
+}
+
+function notifyGuestsCacheChanged() {
+  guestsCacheListeners.forEach((listener) => {
+    try {
+      listener();
+    } catch (error) {
+      console.warn("[guest-profiles] guests cache listener error", error);
+    }
+  });
+}
 
 function logDb(event, detail) {
   console.log(`[db][guest-profiles][${event}]`, detail);
@@ -142,16 +171,72 @@ export function resolveGuestInvitationGroup(guest) {
 }
 
 /**
+ * Load the LIVE `hosting` + identity data for ALL guests into the cache.
+ *
+ * The extra-cabin occupancy (in the "Et après ?" section) needs to know every
+ * guest who shares the same `xtraCabin`, including guests from OTHER invitation
+ * groups. The group-scoped `loadGuestProfiles()` only loads the signed-in
+ * guest's own group, so it cannot see other groups' `xtraCabin` assignments.
+ *
+ * The Firestore rules now allow any authenticated guest to read the whole
+ * `guests` collection (`allow read: if request.auth != null`), so we can fetch
+ * all records here. We only merge the fields needed for occupancy/identity so
+ * we don't clobber the group-scoped live data with stale values.
+ *
+ * Call once at startup alongside loadGuestProfiles().
+ * @returns {Promise<void>}
+ */
+export async function loadAllGuests() {
+  try {
+    logDb("read:start", {
+      collection: collections.guests,
+      op: "getDocs",
+      scope: "all",
+    });
+    const snapshot = await getDocs(collection(db, collections.guests));
+    snapshot.forEach((docSnap) => {
+      const data = normalizeGuestRecord(docSnap.data());
+      const existing = guestsCache.get(docSnap.id) || {};
+      // Merge only the fields needed for occupancy/identity so we don't
+      // overwrite fresher group-scoped live data (e.g. rsvp answers).
+      guestsCache.set(docSnap.id, {
+        ...existing,
+        ...data,
+        identity: { ...(existing.identity || {}), ...(data.identity || {}) },
+        hosting: { ...(existing.hosting || {}), ...(data.hosting || {}) },
+      });
+    });
+    logDb("read:success", {
+      collection: collections.guests,
+      op: "getDocs",
+      scope: "all",
+      size: snapshot.size,
+    });
+    console.log(`[guest-profiles] Loaded ${snapshot.size} guest records (all groups)`);
+    notifyGuestsCacheChanged();
+  } catch (error) {
+    logDb("read:error", {
+      collection: collections.guests,
+      op: "getDocs",
+      scope: "all",
+      error: error.message,
+    });
+    console.warn("[guest-profiles] Could not load all guests", error.message);
+  }
+}
+
+
+/**
  * Subscribe to the Firestore `guests` collection and keep the in-memory cache
  * in sync with live changes. Uses the native `onSnapshot` listener so any
  * update made by another guest (or by the sync pipeline) is reflected
  * automatically — no manual re-fetch needed.
  *
- * SECURITY: The Firestore rules now allow any invited guest to read any guest
- * document so the accommodation section can resolve the cabin, room, and
- * payment/coverage flags of every occupant sharing a cabin (a cabin can be
- * shared by guests from different invitation groups). We therefore load the
- * whole collection here. Writes remain strictly group-scoped.
+ * SECURITY: The read is scoped to the signed-in guest's OWN invitation group
+ * (matching the Firestore rules' `guests` read rule). A guest must never
+ * receive other groups' phone, cabin, room, table, payment, or admin data.
+ * The couple (David & Aydé) pass their own group and read only their group's
+ * records here; the dashboard reads the full collection separately.
  *
  * Call once at startup alongside loadGroupCustomContent(). Returns an
  * unsubscribe function for cleanup.
@@ -167,9 +252,12 @@ export function loadGuestProfiles(invitationGroup) {
   logDb("read:start", {
     collection: collections.guests,
     op: "onSnapshot",
-    scope: "all-guests",
+    where: { invitationGroup: group },
   });
-  const q = query(collection(db, collections.guests));
+  const q = query(
+    collection(db, collections.guests),
+    where("invitationGroup", "==", group),
+  );
 
   return onSnapshot(
     q,
@@ -186,23 +274,25 @@ export function loadGuestProfiles(invitationGroup) {
       logDb("read:success", {
         collection: collections.guests,
         op: "onSnapshot",
-        scope: "all-guests",
+        where: { invitationGroup: group },
         size: snapshot.size,
       });
-      console.log(`[guest-profiles] Live sync — ${snapshot.size} guest records (all guests)`);
+      console.log(`[guest-profiles] Live sync — ${snapshot.size} guest records (group: ${group})`);
+      // Notify subscribers (e.g. RsvpContext) that the live cache has been
+      // updated so they can re-read `rsvp.answers` now that it is available.
+      notifyGuestsCacheChanged();
     },
     (error) => {
       logDb("read:error", {
         collection: collections.guests,
         op: "onSnapshot",
-        scope: "all-guests",
+        where: { invitationGroup: group },
         error: error.message,
       });
       console.warn("[guest-profiles] Live sync failed", error.message);
     },
   );
 }
-
 
 
 
@@ -354,10 +444,10 @@ export async function saveGuestPhoto(guest, cloudinaryId, editorGuestId) {
   const next = buildGuestPhotoPayload({
     guestId: guest.id,
     cloudinaryId,
+    invitationGroup,
     editorGuestId,
     timestamp: serverTimestamp(),
   });
-
 
   // Runtime validation mirrors the Firestore rules (hasValidGuestContactFields).
   const result = validateGuestContactPayload(next);
@@ -431,10 +521,10 @@ export async function saveGuestContact(guest, contact, editorGuestId) {
   const next = buildGuestContactPayload({
     guestId: guest.id,
     phone: contact.phone !== undefined ? contact.phone : existing.phone,
+    invitationGroup,
     editorGuestId,
     timestamp: serverTimestamp(),
   });
-
 
   // Runtime validation mirrors the Firestore rules (hasValidGuestContactFields).
   const result = validateGuestContactPayload(next);
@@ -488,10 +578,10 @@ export async function saveGuestMessageAuthor(guest, messageAuthor, editorGuestId
   const next = buildGuestMessageAuthorPayload({
     guestId: guest.id,
     messageAuthor,
+    invitationGroup,
     editorGuestId,
     timestamp: serverTimestamp(),
   });
-
 
   // Runtime validation mirrors the Firestore rules (hasValidGuestContactFields).
   const result = validateGuestContactPayload(next);
@@ -548,10 +638,10 @@ export async function saveIdentityCheckPassed(guest, passed, editorGuestId) {
   const next = buildIdentityCheckPayload({
     guestId: guest.id,
     passed,
+    invitationGroup,
     editorGuestId,
     timestamp: serverTimestamp(),
   });
-
 
   // Runtime validation mirrors the Firestore rules (hasValidGuestContactFields).
   const result = validateGuestContactPayload(next);

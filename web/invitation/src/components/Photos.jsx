@@ -69,6 +69,14 @@ export function Photos() {
 
         <p className="photos-note reveal">{photos.note}</p>
       </div>
+
+      {/* Desktop-only bottom nav: leads to the guests section. */}
+      <nav className="section-nav section-nav--light photos-section-nav" aria-label="Continue">
+        <a className="section-nav-link" href="#guests">
+          <span>{t.nav.guests}</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </nav>
     </section>
   );
 }

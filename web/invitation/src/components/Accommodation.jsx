@@ -15,6 +15,9 @@ import { getRoom, getRoomDescription, getRoomsByCabin } from "../rooms.js";
 import { cloudinaryImage } from "../cloudinary.js";
 import { RsvpQuestion, BOOLEAN_YES, BOOLEAN_NO } from "./RsvpQuestion.jsx";
 import { resolveRsvpAnswer, saveRsvpAnswers } from "../rsvp-responses.js";
+import { StayPlanCard } from "./StayPlanCard.jsx";
+import { CabinOccupancy } from "./CabinOccupancy.jsx";
+
 
 
 
@@ -76,8 +79,14 @@ const HOTEL_SUGGESTIONS = [
 ];
 
 function getAssignedRoom(candidate) {
-  return candidate?.hosting?.room || candidate?.room;
+  // Resolve the LIVE Firestore record first so the primary cabin occupancy
+  // sees every guest sharing the same room/cabin across ALL invitation groups
+  // (the static registry has no `hosting` data). Falls back to the static
+  // `room` field when no live record is loaded yet.
+  const source = resolveLiveGuest(candidate);
+  return source?.hosting?.room || source?.room;
 }
+
 
 function getInitials(name) {
   return name
@@ -241,6 +250,33 @@ export function Accommodation() {
     return source?.hosting?.isCabinPaidByNovios ?? source?.isCabinPaidByNovios;
   };
 
+  // Whether a member's primary stay is already paid.
+  const resolveMemberPaid = (member) => {
+    const source = resolveLiveGuest(member);
+    return source?.hosting?.isCabinPaid ?? source?.isCabinPaid;
+  };
+
+  // Resolve the cabin id assigned to a candidate for the primary stay.
+  const getAssignedCabinId = (candidate) => {
+    const source = resolveLiveGuest(candidate);
+    const mHosting = source?.hosting || {};
+    const mAssignedCabin =
+      mHosting.cabin ||
+      source?.cabin ||
+      source?.cabinLabel ||
+      source?.unit ||
+      source?.room;
+    const mAssignedRoom = mHosting.room || source?.room;
+    const mRoom = mAssignedRoom ? getRoom(mAssignedRoom) : null;
+    return mRoom?.cabin || mAssignedCabin;
+  };
+
+  // Resolve the room id assigned to a candidate for the primary stay.
+  const getAssignedRoomId = (candidate) => {
+    const source = resolveLiveGuest(candidate);
+    return source?.hosting?.room || source?.room;
+  };
+
   // ── Dynamic per-person pricing ─────────────────────────────────────────
   // The per-person price is no longer stored: it is derived from the cabin's
   // total price for two nights divided by the number of occupants. When the
@@ -344,23 +380,27 @@ export function Accommodation() {
   const anyCovered = groupMembers.some(resolveMemberCovered);
 
   const [noteOpen, setNoteOpen] = useState(false);
-  const [occupancyOpen, setOccupancyOpen] = useState(false);
   const [sectionActive, setSectionActive] = useState(false);
   const sectionRef = useRef(null);
   const noteFabRef = useRef(null);
   const noteCloseRef = useRef(null);
-  const occupancyCloseRef = useRef(null);
+
 
   // ── Accommodation recap question ───────────────────────────────────────
   // A boolean question per group member: confirm the accommodation option.
   // The question text is conditional — members with a cabin confirm their
   // on-site option, members without one express interest in a freed cabin.
   const recap = accommodation.recap || {};
-  const recapQuestion = { id: 'accommodationConfirm', title: recap.title, variant: 'boolean' };
+  // Each member answers a different question depending on whether they have a
+  // cabin: those with one confirm their on-site stay (accommodationConfirm),
+  // those without one ask to be notified if a lodging frees up
+  // (cabinWaitingList). Each answer is therefore stored under its own field.
+  const recapQuestionIdFor = (member) =>
+    resolveMemberCabin(member) ? 'accommodationConfirm' : 'cabinWaitingList';
   const [recapAnswers, setRecapAnswers] = useState(() => {
     const initial = {};
     groupMembers.forEach((member) => {
-      initial[member.id] = resolveRsvpAnswer(member, recapQuestion.id);
+      initial[member.id] = resolveRsvpAnswer(member, recapQuestionIdFor(member));
     });
     return initial;
   });
@@ -378,7 +418,11 @@ export function Accommodation() {
     try {
       await Promise.all(
         groupMembers.map((member) =>
-          saveRsvpAnswers(member, { [recapQuestion.id]: recapAnswers[member.id] }, editorGuestId),
+          saveRsvpAnswers(
+            member,
+            { [recapQuestionIdFor(member)]: recapAnswers[member.id] },
+            editorGuestId,
+          ),
         ),
       );
       setRecapSaveStatus('saved');
@@ -387,6 +431,7 @@ export function Accommodation() {
       setRecapSaveStatus('error');
     }
   };
+
 
   const recapStatusText =
     recapSaveStatus === 'working'
@@ -440,24 +485,8 @@ export function Accommodation() {
     };
   }, [noteOpen]);
 
-  useEffect(() => {
-    if (!occupancyOpen) return undefined;
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    occupancyCloseRef.current?.focus();
-
-    const onKeyDown = (event) => {
-      if (event.key === "Escape") setOccupancyOpen(false);
-    };
-    window.addEventListener("keydown", onKeyDown);
-    return () => {
-      document.body.style.overflow = previousOverflow;
-      window.removeEventListener("keydown", onKeyDown);
-    };
-  }, [occupancyOpen]);
-
-
   return (
+
     <section className="accommodation-section section story-bg" ref={sectionRef}>
       <div className="accommodation-copy reveal" id="accommodation-overview">
         <p className="eyebrow">{accommodation.eyebrow}</p>
@@ -568,11 +597,9 @@ export function Accommodation() {
         ) : (
           <>
             <p className="accommodation-citation">{option.onSiteBody}</p>
-            {paidByCouple && (
-              <p className="accommodation-covered-note">
-                <strong>{option.onSiteCoveredBody}</strong>
-              </p>
-            )}
+            <p className="accommodation-covered-note">
+              <strong>{paidByCouple ? option.onSiteCoveredBody : option.onSitePayBody}</strong>
+            </p>
             {cabinName && (
               <p className="accommodation-cabin-badge">{cabinName}</p>
             )}
@@ -600,48 +627,6 @@ export function Accommodation() {
                 </figcaption>
               </figure>
             ))}
-          </div>
-        )}
-
-        {!hasNoCabin && cabin && (
-          <div className="accommodation-plan-card">
-            <h4>{option.planCardTitle}</h4>
-
-            {activeCabinPerPerson > 0 && (
-              <div className="accommodation-plan-row">
-                <span className="accommodation-plan-label">
-                  {option.planCardPerPerson}
-                </span>
-                <PlanPrice
-                  original={activeCabinPerPerson}
-                  toPay={paidByCouple ? 0 : activeCabinPerPerson}
-                  language={language}
-                  covered={paidByCouple}
-                />
-                {paidByCouple && <em>{option.planCardSaleLabel}</em>}
-              </div>
-            )}
-
-
-            {groupMembers.length > 1 && (
-              <div className="accommodation-plan-row">
-                <span className="accommodation-plan-label">
-                  {option.planCardGroupTotal}
-                </span>
-                <PlanPrice
-                  original={groupTotal}
-                  toPay={priceToPay}
-                  language={language}
-                  covered={anyCovered}
-                />
-                {anyCovered && <em>{option.planCardSaleLabel}</em>}
-              </div>
-            )}
-
-            <p className="accommodation-plan-disclaimer">
-              {option.planCardEurDisclaimer} · {option.planCardEstimate}
-            </p>
-
           </div>
         )}
 
@@ -673,167 +658,38 @@ export function Accommodation() {
           </div>
         )}
 
-        {!hasNoCabin && (
-          <dl className="accommodation-option-details">
-
-
-
-            <div>
-              <dt>{option.cabinLabel}</dt>
-              <dd>{cabinName}</dd>
-            </div>
-            {roomDescription && (
-              <div>
-                <dt>{option.roomLabel}</dt>
-                <dd>{roomDescription}</dd>
-              </div>
-            )}
-            {cabin?.capacity && (
-              <div>
-                <dt>{option.cabinCapacityLabel}</dt>
-                <dd>{cabin.capacity} {option.peopleLabel}</dd>
-              </div>
-            )}
-            {room?.capacity && (
-              <div>
-                <dt>{option.roomCapacityLabel}</dt>
-                <dd>{room.capacity} {option.peopleLabel}</dd>
-              </div>
-            )}
-            {cabin?.totalPrice2Nights && (
-              <div>
-                <dt>{option.cabinPriceLabel}</dt>
-                <AccommodationPrice
-                  original={cabin.totalPrice2Nights}
-                  toPay={cabinPriceToPay}
-                  language={language}
-                  covered={cabinPriceToPay === 0}
-                  showSale={anyCabinCovered && cabinPriceToPay < cabin.totalPrice2Nights}
-                  coveredLabel={option.coveredPriceLabel}
-                />
-              </div>
-            )}
-
-
-
-            {activeCabinPerPerson > 0 && (
-              <div>
-                <dt>{option.personPriceLabel}</dt>
-                <AccommodationPrice
-                  original={activeCabinPerPerson}
-                  toPay={paidByCouple ? 0 : activeCabinPerPerson}
-                  language={language}
-                  covered={paidByCouple}
-                  coveredLabel={option.coveredPriceLabel}
-                />
-              </div>
-            )}
-
-
-            {cabinArrangement && (
-              <div>
-                <dt>{option.cabinOccupancyLabel}</dt>
-                <dd>{cabinArrangement}</dd>
-              </div>
-            )}
-            {roomArrangement && (
-              <div>
-                <dt>{option.roomOccupancyLabel}</dt>
-                <dd>{roomArrangement}</dd>
-              </div>
-            )}
-            {paymentLabel && (
-              <div>
-                <dt>{option.paymentLabel}</dt>
-                <dd>{paymentLabel}</dd>
-              </div>
-            )}
-            {extraCabin && (
-              <div>
-                <dt>{option.extraCabinLabel}</dt>
-                <dd>
-                  {getCabin(extraCabin)?.name || extraCabin}
-                  {extraRoom && getRoomDescription(getRoom(extraRoom), language)
-                    ? ` · ${getRoomDescription(getRoom(extraRoom), language)}`
-                    : ""}
-                </dd>
-              </div>
-            )}
-          </dl>
+        {!hasNoCabin && cabin && roomOccupants.length > 0 && (
+          <div className="accommodation-occupancy-top">
+            <CabinOccupancy
+              cabinName={cabinName}
+              rooms={roomOccupants}
+              assignedRoomId={assignedRoom}
+              activeMemberId={activeMember?.id}
+              option={option}
+              language={language}
+            />
+          </div>
         )}
 
-        {!hasNoCabin && roomOccupants.length > 0 && (
-          <>
-            {createPortal(
-
-              <div
-                className={`accommodation-occupancy-shell${occupancyOpen ? " is-open" : ""}`}
-                role={occupancyOpen ? "dialog" : undefined}
-                aria-modal={occupancyOpen ? "true" : undefined}
-                aria-labelledby={occupancyOpen ? "accommodation-occupancy-title" : undefined}
-                onMouseDown={(event) => {
-                  if (occupancyOpen && event.target === event.currentTarget) setOccupancyOpen(false);
-                }}
-              >
-                <div className="accommodation-occupancy-panel">
-                  <button
-                    ref={occupancyCloseRef}
-                    className="accommodation-occupancy-close"
-                    type="button"
-                    aria-label="Close"
-                    onClick={() => setOccupancyOpen(false)}
-                  >
-                    ×
-                  </button>
-                  <p className="eyebrow accommodation-occupancy-eyebrow">
-                    {option.wholeCabinTitle}
-                  </p>
-                  <h3 id="accommodation-occupancy-title">{cabinName}</h3>
-                  <p className="accommodation-occupancy-body">{option.wholeCabinBody}</p>
-                  <div className="accommodation-room-list">
-                    {roomOccupants.map(({ room: cabinRoom, occupants }) => (
-                      <article
-                        className={cabinRoom.id === assignedRoom ? "is-current" : undefined}
-                        key={cabinRoom.id}
-                      >
-                        <header>
-                          <strong>{getRoomDescription(cabinRoom, language)}</strong>
-                          <span>
-                            {cabinRoom.capacity} {option.peopleLabel} ·{
-                              " "
-                            }{option.occupancy?.[cabinRoom.isShared ? "compartida" : "privada"]}
-                          </span>
-                        </header>
-                        <div className="accommodation-room-occupants">
-                          {occupants.length > 0 ? occupants.map((occupant) => (
-                            <div className="accommodation-room-person" key={occupant.id}>
-                              <span className="accommodation-room-avatar" aria-hidden="true">
-                                {occupant.photo
-                                  ? <img src={occupant.photo} alt="" loading="lazy" />
-                                  : getInitials(occupant.name)}
-                              </span>
-                              <span>
-                                {occupant.name}
-                                {occupant.id === activeMember?.id && <small>{option.youLabel}</small>}
-                              </span>
-                            </div>
-                          )) : (
-                            <span className="accommodation-room-empty">{option.emptyRoom}</span>
-                          )}
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                </div>
-              </div>,
-              document.body,
-            )}
-          </>
+        {!hasNoCabin && cabin && (
+          <StayPlanCard
+            activeMember={activeMember}
+            groupMembers={groupMembers}
+            getAssignedCabinId={getAssignedCabinId}
+            getAssignedRoomId={getAssignedRoomId}
+            resolveMemberCovered={resolveMemberCovered}
+            resolveMemberPaid={resolveMemberPaid}
+            option={option}
+            language={language}
+            showExtraCabinRow
+            extraCabin={extraCabin}
+            extraRoom={extraRoom}
+          />
         )}
-
 
 
         {hasNoCabin && (
+
           <section className="accommodation-airbnb">
             <h4>{option.airbnbTitle}</h4>
             <p>{option.airbnbBody}</p>
@@ -908,22 +764,8 @@ export function Accommodation() {
           </section>
         )}
 
-        <div className="accommodation-actions">
-          {!hasNoCabin && roomOccupants.length > 0 && (
-            <button
-              type="button"
-              className="accommodation-occupancy-trigger"
-              aria-haspopup="dialog"
-              onClick={() => setOccupancyOpen(true)}
-            >
-              {option.wholeCabinTitle}
-            </button>
-          )}
-          <a className="button button-dark" href="#rsvp">
-            {option.button}
-          </a>
-        </div>
         {recap.title && groupMembers.length > 0 && (
+
           <div className="accommodation-recap">
             <div className="accommodation-recap-head">
               <p className="eyebrow">{recap.eyebrow}</p>
@@ -933,14 +775,26 @@ export function Accommodation() {
             <div className="accommodation-recap-rows">
               {groupMembers.map((member) => {
                 const name = resolveGuestName(member).fullName;
-                const hasCabin = Boolean(resolveMemberCabin(member));
-                const questionText = hasCabin ? recap.hasCabinQuestion : recap.noCabinQuestion;
+                const memberPhoto = resolveGuestPhoto(member);
+                const memberCabin = resolveMemberCabin(member);
+                const hasCabin = Boolean(memberCabin);
+                const cabinName = memberCabin?.name?.replace(/\s+/g, " ") || "";
+                const questionText = hasCabin
+                  ? recap.hasCabinQuestionCabin.replace("{cabin}", cabinName)
+                  : recap.noCabinQuestion;
                 const current = recapAnswers[member.id] || 0;
                 return (
                   <div className="accommodation-recap-row" key={member.id}>
                     <div className="accommodation-recap-person">
-                      <strong>{name}</strong>
-                      <span>{questionText}</span>
+                      <span className="accommodation-member-tab-avatar" aria-hidden="true">
+                        {memberPhoto
+                          ? <img src={memberPhoto} alt="" loading="lazy" />
+                          : getInitials(name)}
+                      </span>
+                      <span className="accommodation-recap-person-text">
+                        <strong>{name}</strong>
+                        <span>{questionText}</span>
+                      </span>
                     </div>
                     <div className="accommodation-recap-toggle">
                       <button
@@ -987,9 +841,9 @@ export function Accommodation() {
         </nav>
       </div>
 
-      {/* Desktop-only bottom nav linking to the next section (Food / "A TABLE"). */}
+      {/* Desktop-only bottom nav linking to the next section (Pétanque). */}
       <nav className="section-nav accommodation-section-nav" aria-label="Continue">
-        <a className="section-nav-link" href="#food">
+        <a className="section-nav-link" href="#petanque">
           <span>{accommodation.navNext}</span>
           <span aria-hidden="true">↓</span>
         </a>

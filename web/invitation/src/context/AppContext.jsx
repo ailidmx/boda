@@ -16,15 +16,19 @@ import {
   setPersistence,
   signInWithEmailAndPassword,
   signOut as firebaseSignOut,
+  updateEmail,
   updatePassword,
   verifyBeforeUpdateEmail,
 } from "firebase/auth";
 
-
 import { auth } from "../firebase.js";
 import { content, SUPPORTED_LANGUAGES } from "../content.js";
-import { AUTH_EMAIL_DOMAIN, getActiveGuests, getGuest } from "../guests.js";
-
+import {
+  AUTH_EMAIL_DOMAIN,
+  getActiveGuests,
+  getGuest,
+  getGuestByUsername,
+} from "../guests.js";
 
 import {
   getCustomContent,
@@ -32,19 +36,17 @@ import {
 } from "../invitation-profile.js";
 import {
   getGroupMembers,
+  loadAllGuests,
   loadGuestProfiles,
   loadOwnGuestProfile,
   resolveGuestInvitationGroup,
   resolveIdentityCheckPassed,
 } from "../guest-profiles.js";
 
+
 import { loadAttendanceResponses } from "../guest-attendance.js";
 import { loadRooms } from "../rooms.js";
 import { loadCabins } from "../cabins.js";
-import { loadThanks } from "../thanks.js";
-import { loadRsvpScale } from "../rsvp-scale.js";
-import { loadRsvpResponses } from "../rsvp-responses.js";
-
 
 const LANGUAGE_STORAGE_KEY = "boda-language";
 const USERNAME_STORAGE_KEY = "boda-username";
@@ -74,6 +76,10 @@ const interfaceText = {
     submitSuccess: "¡Gracias! Recibimos tu respuesta.",
     submitError:
       "No pudimos enviar la respuesta. Revisa tu conexión e inténtalo de nuevo.",
+    stepLabel: "Paso",
+    next: "Siguiente",
+    back: "Atrás",
+    finish: "Terminar",
     langPrompt: {
       title: "¿Idioma preferido?",
       body: "Tu invitación estaba en {current}, pero detectamos que tu idioma preferido podría ser {preferred}. ¿La cambiamos a {preferred}?",
@@ -103,6 +109,10 @@ const interfaceText = {
     submitWorking: "Envoi…",
     submitSuccess: "Merci ! Nous avons bien reçu votre réponse.",
     submitError: "L’envoi a échoué. Vérifiez votre connexion et réessayez.",
+    stepLabel: "Étape",
+    next: "Continuer",
+    back: "Retour",
+    finish: "Terminer",
     langPrompt: {
       title: "Langue préférée ?",
       body: "Votre navigateur est en {current}, mais nous pensons que votre langue préférée pourrait être {preferred}. On passe l'invitation en {preferred} ?",
@@ -134,6 +144,10 @@ const interfaceText = {
     submitSuccess: "Thank you! We received your response.",
     submitError:
       "We could not send your response. Check your connection and try again.",
+    stepLabel: "Step",
+    next: "Next",
+    back: "Back",
+    finish: "Finish",
     langPrompt: {
       title: "Preferred language?",
       body: "Your invitation was in {current}, but we think your preferred language might be {preferred}. Shall we switch it to {preferred}?",
@@ -184,13 +198,12 @@ export function AppProvider({ children }) {
   // reopened from the user menu.
   const [identityPrompt, setIdentityPrompt] = useState(false);
 
-  // Whether the hidden music player is enabled. Defaults to ON so the player
-  // is available to every guest; the guest can toggle it off from the user
-  // menu. Persisted in localStorage so the choice survives reloads.
+  // Whether the hidden Spotify music player is enabled. Defaults to OFF so the
+  // player never auto-starts or auto-plays. The guest can toggle it from the
+  // user menu. Persisted in localStorage so the choice survives reloads.
   const [musicEnabled, setMusicEnabledState] = useState(
-    () => window.localStorage.getItem(MUSIC_ENABLED_KEY) !== "0",
+    () => window.localStorage.getItem(MUSIC_ENABLED_KEY) === "1",
   );
-
 
   // Avoid re-prompting on every auth state change within the same session.
   const langPromptShown = useRef(false);
@@ -228,23 +241,7 @@ export function AppProvider({ children }) {
         // auth email.
         const guest = getGuest(user.uid);
         const liveGuest = await loadOwnGuestProfile(user.uid);
-        // Merge the static guest registry with the live Firestore record.
-        // Only defined live fields override the static data — the Firestore
-        // `guests` docs carry a subset of fields (identity, hosting, contact,
-        // rsvp, etc.) and do NOT include static-only flags like `isNovio`,
-        // `hasCabin`, `unit`, `occupancy`, `payment`, `cabinLabel`, `room`.
-        // Without this filter, spreading `liveGuest` would set those to
-        // `undefined` and break the accommodation section.
-
-        const resolvedGuest = liveGuest
-          ? {
-              ...guest,
-              ...Object.fromEntries(
-                Object.entries(liveGuest).filter(([, v]) => v !== undefined),
-              ),
-            }
-          : guest;
-
+        const resolvedGuest = liveGuest ? { ...guest, ...liveGuest } : guest;
         const storedUsername =
           window.localStorage.getItem(USERNAME_STORAGE_KEY);
 
@@ -256,12 +253,13 @@ export function AppProvider({ children }) {
         const [custom] = await Promise.all([
           loadGroupCustomContent(invitationGroup),
           loadGuestProfiles(invitationGroup),
+          // Load the LIVE hosting/identity data for ALL guests so the extra
+          // cabin occupancy (in the "Et après ?" section) can find every guest
+          // sharing the same xtraCabin, including those from other groups.
+          loadAllGuests(),
           loadAttendanceResponses(invitationGroup),
           loadRooms(),
           loadCabins(),
-          loadThanks(),
-          loadRsvpScale(),
-          loadRsvpResponses(invitationGroup),
         ]);
 
 
@@ -328,12 +326,17 @@ export function AppProvider({ children }) {
       .toLowerCase();
     // The identifier is always an email. If it already contains an "@", treat
     // it as a full email (e.g. david.aili.mx@gmail.com). Otherwise it's a bare
-    // username with no domain, so we always append the default auth domain
-    // (e.g. "david_aili" → "david_aili@boda-david-y-ayde.web.app").
-    const email = normalized.includes("@")
-      ? normalized
-      : `${normalized}@${AUTH_EMAIL_DOMAIN}`;
-
+    // username: look up the guest's real Firebase auth email first (some
+    // guests use their personal Gmail as the auth email, e.g. David's
+    // david.aili.mx@gmail.com), and only fall back to the default auth domain
+    // if no guest matches the username.
+    let email;
+    if (normalized.includes("@")) {
+      email = normalized;
+    } else {
+      const guest = getGuestByUsername(normalized);
+      email = guest?.firebaseEmail || `${normalized}@${AUTH_EMAIL_DOMAIN}`;
+    }
 
     // Validate against Firebase Auth's schema BEFORE hitting the network so we
     // fail fast with a clear reason instead of a cryptic 400.
@@ -398,12 +401,9 @@ export function AppProvider({ children }) {
     }
   };
 
-  const changePassword = async (currentPassword, newPassword) => {
+  const changePassword = async (newPassword) => {
     const user = auth.currentUser;
     if (!user) throw new Error("no-user");
-    // Re-authenticate with the current password before changing it.
-    const credential = EmailAuthProvider.credential(user.email, currentPassword);
-    await reauthenticateWithCredential(user, credential);
     await updatePassword(user, newPassword);
   };
 
@@ -425,53 +425,60 @@ export function AppProvider({ children }) {
   const changeEmail = async (newEmail) => {
     const user = auth.currentUser;
     if (!user) throw new Error("no-user");
-    const normalized = String(newEmail || "").trim().toLowerCase();
-    const currentEmail = String(user.email || "").trim().toLowerCase();
+    const normalized = String(newEmail || "")
+      .trim()
+      .toLowerCase();
+    const currentEmail = String(user.email || "")
+      .trim()
+      .toLowerCase();
 
     if (normalized && normalized === currentEmail) {
       return { status: "unchanged", email: currentEmail };
     }
 
-    // Always send a verification email to the new address before applying the
-    // change. Firebase Auth sends this email from its own backend (server-side),
-    // so no credentials are exposed. The change is only applied once the user
-    // clicks the verification link in the email.
-    const host = window.location.hostname;
-    const isLocalHost = host === "localhost" || host === "127.0.0.1";
-    const continueUrl = isLocalHost
-      ? "https://boda-500805.web.app"
-      : window.location.origin;
-
-    // Send the verification email to the new address. If this fails (e.g. the
-    // current origin is not in the Firebase "Authorized domains" list, which
-    // throws a 400), we let the error propagate so the caller can surface it to
-    // the user instead of silently pretending the change went through.
-    //
-    // We pass the user's current language as the `locale` so Firebase Auth uses
-    // the localized email template (configured in the Firebase console under
-    // Authentication → Templates) instead of the default English one.
     try {
-      await verifyBeforeUpdateEmail(user, normalized, {
-        url: continueUrl,
-        handleCodeInApp: false,
-        locale: language,
+      await updateEmail(user, normalized);
+      await user.reload();
+
+      // Keep the in-memory profile in sync immediately so the identity modal
+      // reflects the updated login email without requiring a full reload.
+      setProfile((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          email: user.email || normalized,
+        };
       });
 
+      return { status: "updated" };
     } catch (error) {
-      // Log the exact code/message so the unauthorized-domain (localhost) case
-      // is easy to diagnose in the console.
-      console.error("[changeEmail] verifyBeforeUpdateEmail failed", {
-        code: error?.code,
-        message: error?.message,
-        origin: window.location.origin,
-      });
+      // Some Firebase projects enforce verifying the new email before applying
+      // it. In that mode, send a verification link instead of hard failing.
+      if (error?.code === "auth/operation-not-allowed") {
+        // Some environments (localhost/preview hosts) are not authorized as
+        // continue URLs in Firebase Auth. Use a known authorized host there.
+        const host = window.location.hostname;
+        const isLocalHost = host === "localhost" || host === "127.0.0.1";
+        const continueUrl = isLocalHost
+          ? "https://boda-500805.web.app"
+          : window.location.origin;
+
+        try {
+          await verifyBeforeUpdateEmail(user, normalized, {
+            url: continueUrl,
+            handleCodeInApp: false,
+          });
+        } catch (verifyError) {
+          // Retry with SDK defaults in case project/email action settings are
+          // incompatible with explicit actionCodeSettings.
+          await verifyBeforeUpdateEmail(user, normalized);
+          return { status: "verification-sent", email: normalized };
+        }
+        return { status: "verification-sent", email: normalized };
+      }
       throw error;
     }
-    return { status: "verification-sent", email: normalized };
-
-
   };
-
 
   // Keep the preferred language (already active) and close the modal.
   const dismissLangPrompt = () => setLangPrompt(null);
@@ -494,10 +501,9 @@ export function AppProvider({ children }) {
   // Reopen the identity-check modal from the user menu at any time.
   const openIdentityPrompt = () => setIdentityPrompt(true);
 
-  // Toggle the hidden music player on/off. Persisted so the choice survives
-  // reloads. Defaults to ON.
+  // Toggle the hidden Spotify music player on/off. Persisted so the choice
+  // survives reloads. Defaults to OFF (no auto-start, no auto-play).
   const setMusicEnabled = (enabled) => {
-
     setMusicEnabledState(enabled);
     window.localStorage.setItem(MUSIC_ENABLED_KEY, enabled ? "1" : "0");
   };

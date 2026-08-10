@@ -380,7 +380,8 @@
     overflow: hidden;
     border: 3px solid var(--marigold);
     border-radius: 50%;
-    background: var(--cream);
+    background: var(--terracotta);
+    color: var(--white);
     box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
     opacity: 0;
     pointer-events: none;
@@ -389,6 +390,7 @@
   }
 
   .story-facts-fab.is-visible {
+
     opacity: 1;
     pointer-events: auto;
     transform: translateY(0) scale(1);

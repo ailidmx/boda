@@ -16,6 +16,9 @@ import React, { useEffect, useCallback, useRef, useState } from "react";
  */
 export function LightboxCarousel({ open, onClose, images, startIndex = 0, label = "Galería" }) {
   const [index, setIndex] = useState(startIndex);
+  // Direction of the last slide change ("next" | "prev") so the image can
+  // animate in from the correct side, like swipeable cards.
+  const [direction, setDirection] = useState("next");
   const count = images.length;
   // Track the horizontal start of a touch so we can detect a swipe gesture.
   const touchStartX = useRef(null);
@@ -29,9 +32,11 @@ export function LightboxCarousel({ open, onClose, images, startIndex = 0, label 
   const goTo = useCallback(
     (next) => {
       setIndex((next + count) % count);
+      setDirection(next > index ? "next" : "prev");
     },
-    [count],
+    [count, index],
   );
+
 
   // Close on Escape, and lock body scroll while open.
   useEffect(() => {
@@ -61,6 +66,19 @@ export function LightboxCarousel({ open, onClose, images, startIndex = 0, label 
       aria-modal="true"
       aria-label={label}
       onClick={onClose}
+      onTouchStart={(e) => {
+        touchStartX.current = e.touches[0].clientX;
+      }}
+      onTouchEnd={(e) => {
+        if (touchStartX.current === null) return;
+        const deltaX = e.changedTouches[0].clientX - touchStartX.current;
+        touchStartX.current = null;
+        // Swipe left → next, swipe right → previous. Ignore small movements
+        // and vertical scrolls so the gesture feels natural.
+        if (Math.abs(deltaX) < 50) return;
+        if (deltaX < 0) goTo(index + 1);
+        else goTo(index - 1);
+      }}
     >
       <button
         className="lightbox-close"
@@ -84,21 +102,8 @@ export function LightboxCarousel({ open, onClose, images, startIndex = 0, label 
       </button>
 
       <figure
-        className="lightbox-stage"
+        className={`lightbox-stage lightbox-stage--${direction}`}
         onClick={(e) => e.stopPropagation()}
-        onTouchStart={(e) => {
-          touchStartX.current = e.touches[0].clientX;
-        }}
-        onTouchEnd={(e) => {
-          if (touchStartX.current === null) return;
-          const deltaX = e.changedTouches[0].clientX - touchStartX.current;
-          touchStartX.current = null;
-          // Swipe left → next, swipe right → previous. Ignore small movements
-          // and vertical scrolls so the gesture feels natural.
-          if (Math.abs(deltaX) < 50) return;
-          if (deltaX < 0) goTo(index + 1);
-          else goTo(index - 1);
-        }}
       >
         <img
           src={current.full || current.src}
@@ -109,6 +114,7 @@ export function LightboxCarousel({ open, onClose, images, startIndex = 0, label 
           {String(index + 1).padStart(2, "0")} / {String(count).padStart(2, "0")}
         </figcaption>
       </figure>
+
 
 
       <button

@@ -154,70 +154,8 @@ p {
   font-size: 0.85rem;
 }
 
-/* ── Countdown bar ── */
-.countdown-bar {
-  position: fixed;
-  z-index: 100;
-  top: 0;
-  right: 0;
-  left: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(0.65rem, 3vw, 2rem);
-  height: var(--countdown-height);
-  padding-inline: 1rem;
-  background: var(--ink);
-  color: var(--white);
-}
-
-.countdown-prefix {
-  font-size: clamp(0.4rem, 0.85vw, 0.58rem);
-  font-weight: 600;
-  letter-spacing: 0.34em;
-  text-transform: uppercase;
-  color: #e4b968;
-  white-space: nowrap;
-}
-
-.countdown-values {
-  display: flex;
-  align-items: center;
-  gap: clamp(0.6rem, 2.5vw, 1.5rem);
-  width: min(100%, 32rem);
-}
-
-.countdown-unit {
-  display: flex;
-  min-width: 0;
-  flex: 1;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.15rem;
-  white-space: nowrap;
-}
-
-.countdown-unit strong {
-  min-width: 1.3em;
-  font-family: var(--font-countdown);
-  font-size: clamp(1.5rem, 4vw, 3rem);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  text-align: center;
-}
-
-.countdown-unit small {
-  color: rgb(255 253 248 / 72%);
-  font-size: clamp(0.6rem, 1.4vw, 1rem);
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  line-height: 1;
-  text-transform: uppercase;
-}
-
 /* ── Site shell ── */
+
 
 .site-shell {
   padding-top: var(--countdown-height);
@@ -252,7 +190,11 @@ p {
   flex-direction: column;
   justify-content: center;
   padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 6vw, 6rem);
+  /* Keep decorative/overflowing content (orbs, gradients, images) inside the
+     section so nothing bleeds into neighbouring sections. */
+  overflow: hidden;
 }
+
 
 
 .section-heading {

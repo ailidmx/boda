@@ -154,6 +154,14 @@ export function Food() {
       >
         <span>🍸</span>
       </button>
+
+      {/* Desktop-only bottom nav: leads to the music section. */}
+      <nav className="section-nav food-section-nav" aria-label="Continue">
+        <a className="section-nav-link" href="#music">
+          <span>{t.nav.music}</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </nav>
     </section>
   );
 }

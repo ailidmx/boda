@@ -119,11 +119,12 @@ service cloud.firestore {
         && hasSubmissionMetadata(3)
         && hasValidInvitationCode()
         && hasValidRsvpFields();
-      // RSVP submissions contain personal data (names, emails, phones,
-      // travel itineraries). Only administrators (back office) may read them.
-      allow read: if isAdmin();
+      // Any authenticated guest may read submissions so the app can compute
+      // correct prices and cabin occupancy across the whole guest list.
+      allow read: if request.auth != null;
       allow update, delete: if false;
     }
+
 
 
     match /experience_suggestions/{submissionId} {
@@ -143,10 +144,11 @@ service cloud.firestore {
         && isShortText(request.resource.data.songArtist, 300)
         && isShortText(request.resource.data.singInterest, 50)
         && isShortText(request.resource.data.extra, 2000);
-      // Only administrators (back office) may read submissions.
-      allow read: if isAdmin();
+      // Any authenticated guest may read submissions.
+      allow read: if request.auth != null;
       allow update, delete: if false;
     }
+
 
 
     match /coast_interest/{submissionId} {
@@ -165,10 +167,11 @@ service cloud.firestore {
         && isShortText(request.resource.data.destination, 100)
         && isShortText(request.resource.data.style, 100)
         && isShortText(request.resource.data.note, 2000);
-      // Only administrators (back office) may read submissions.
-      allow read: if isAdmin();
+      // Any authenticated guest may read submissions.
+      allow read: if request.auth != null;
       allow update, delete: if false;
     }
+
 
 
     match /petanque_participation/{submissionId} {
@@ -183,10 +186,11 @@ service cloud.firestore {
         && isShortText(request.resource.data.petanquePartySize, 2)
         && isShortText(request.resource.data.petanqueNames, 500)
         && isShortText(request.resource.data.petanqueOwnBoules, 30);
-      // Only administrators (back office) may read submissions.
-      allow read: if isAdmin();
+      // Any authenticated guest may read submissions.
+      allow read: if request.auth != null;
       allow update, delete: if false;
     }
+
 
 
     // Auth UIDs are set to the guest ID (from the Google Sheet `ID` column),
@@ -425,12 +429,9 @@ service cloud.firestore {
     }
 
     match /attendance_responses/{guestId} {
-      // Attendance responses are personal data. Only administrators (back
-      // office) may read the whole collection. Guests read only their own
-      // group's responses via a query filtered by `invitationGroup`.
-      allow read: if isAdmin()
-        || (request.auth != null
-            && resource.data.invitationGroup == editorInvitationGroup());
+      // Any authenticated guest may read all responses so the app can compute
+      // correct prices and cabin occupancy across the whole guest list.
+      allow read: if request.auth != null;
       allow create, update: if request.auth != null
         && hasValidAttendanceFields()
         && editorInvitationGroup() == request.resource.data.invitationGroup;
@@ -439,17 +440,13 @@ service cloud.firestore {
 
 
 
+
     match /guests/{guestId} {
 
-      // READ SCOPE: Administrators may read any guest. A regular authenticated
-      // guest may only read members of their OWN invitation group (resolved
-      // from `guests/{auth.uid}.invitationGroup`). This prevents a guest from
-      // seeing other groups' phone, cabin, room, table, payment, and admin
-      // data. The rule is query-compatible: a list query MUST filter by
-      // `where('invitationGroup', '==', <myGroup>)` for it to succeed.
-      allow read: if isAdmin()
-        || (request.auth != null
-            && resource.data.invitationGroup == editorInvitationGroup());
+      // READ SCOPE: Any authenticated guest may read all guests so the app can
+      // compute correct prices and cabin occupancy across the whole guest list.
+      allow read: if request.auth != null;
+
       // AGREED SCHEMA ENFORCEMENT: ALL writes must pass the schema validation.
       // Administrators use hasValidAdminGuestFields() (may additionally modify
       // `invitationGroup` and `_deleted`); regular guests use
@@ -515,19 +512,65 @@ service cloud.firestore {
     }
 
     match /invitation_groups/{groupId} {
-      allow read: if isAdmin()
-        || (request.auth != null
-            && groupId == editorInvitationGroup());
+      // Any authenticated guest may read all groups.
+      allow read: if request.auth != null;
       allow create, update: if isAdmin() && hasValidInvitationGroupFields();
       allow delete: if isAdmin();
     }
 
 
 
+
+    // ── Cabins ──────────────────────────────────────────────────────────────
+    // Cabin inventory (id, name, capacity, pricing, isPrivate, showcase,
+    // cloudinaryIds). Readable by invited guests only (the Accommodation
+    // section needs the assigned cabin's capacity, price and photos); writable
+    // only by the couple. The schema is enforced with hasOnly() so no extra
+    // fields can be added from the client.
+    function hasValidCabinFields() {
+      return request.resource.data.keys().hasAll([
+          "id", "name", "capacity", "totalPrice2Nights",
+          "pricePerPerson2Nights", "isPrivate", "showcase", "cloudinaryIds"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "id", "name", "capacity", "totalPrice2Nights",
+          "pricePerPerson2Nights", "isPrivate", "showcase", "cloudinaryIds",
+          "key", "_source", "_migratedAt"
+        ])
+        && isShortText(request.resource.data.id, 100)
+        && request.resource.data.id.size() > 0
+        && isShortText(request.resource.data.name, 150)
+        && request.resource.data.name.size() > 0
+        && request.resource.data.capacity is int
+        && request.resource.data.capacity > 0
+        && request.resource.data.totalPrice2Nights is number
+        && request.resource.data.totalPrice2Nights >= 0
+        && request.resource.data.pricePerPerson2Nights is number
+        && request.resource.data.pricePerPerson2Nights >= 0
+        && request.resource.data.isPrivate is bool
+        && (!request.resource.data.keys().hasAny(["showcase"])
+          || (request.resource.data.showcase is map
+            && request.resource.data.showcase.keys().hasOnly(["es", "fr", "en"])))
+        && (!request.resource.data.keys().hasAny(["cloudinaryIds"])
+          || isShortText(request.resource.data.cloudinaryIds, 2000));
+    }
+
+    match /cabins/{cabinId} {
+      // Any authenticated guest may read all cabins.
+      allow read: if request.auth != null;
+      allow create, update: if isAdmin() && hasValidCabinFields();
+      allow delete: if isAdmin();
+    }
+
+
+
+
     // ── Rooms ───────────────────────────────────────────────────────────────
     // Room inventory (id, cabin, description {es,fr,en}, capacity, isShared).
-    // Readable by everyone; writable only by the couple. The schema is
-    // enforced with hasOnly() so no extra fields can be added from the client.
+    // Readable by invited guests only (the Accommodation section needs the
+    // assigned room's capacity, sharing mode and description); writable only by
+    // the couple. The schema is enforced with hasOnly() so no extra fields can
+    // be added from the client.
     function hasValidRoomFields() {
       return request.resource.data.keys().hasAll([
           "id", "cabin", "description", "capacity", "isShared"
@@ -547,10 +590,13 @@ service cloud.firestore {
     }
 
     match /rooms/{roomId} {
-      allow read: if true;
+      // Any authenticated guest may read all rooms.
+      allow read: if request.auth != null;
       allow create, update: if isAdmin() && hasValidRoomFields();
       allow delete: if isAdmin();
     }
+
+
 
 
 
