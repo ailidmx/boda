@@ -16,6 +16,26 @@
 export const FEATURES = {
   es: [
     {
+      icon: "📝",
+      title: "Tu confirmación, todo en uno",
+      body: "Responde todo desde un solo lugar: tu asistencia, si participas en la pétanque y tus planes para quedarte unos días más.",
+    },
+    {
+      icon: "💰",
+      title: "Cuánto pagarás, claro",
+      body: "Antes de confirmar, mira un resumen de lo que pagarás por persona y por grupo por tu cabaña, con los descuentos aplicados.",
+    },
+    {
+      icon: "✅",
+      title: "Guarda todo con un toque",
+      body: "Un solo botón guarda todas tus respuestas y te confirma que las recibimos, sin pasos extra.",
+    },
+    {
+      icon: "💛",
+      title: "Te hablamos de tú",
+      body: "La invitación ahora te habla de forma cercana y personal, como una charla entre amigos.",
+    },
+    {
       icon: "🎬",
       title: "Créditos de cine",
       body: "La sección de agradecimientos ahora es una película: todos los invitados desfilan en una lista infinita con sus fotos.",
@@ -58,6 +78,26 @@ export const FEATURES = {
   ],
   fr: [
     {
+      icon: "📝",
+      title: "Ta confirmation, tout en un",
+      body: "Réponds à tout depuis un seul endroit : ta présence, ta participation à la pétanque et tes envies de rester quelques jours de plus.",
+    },
+    {
+      icon: "💰",
+      title: "Combien tu paieras, clair",
+      body: "Avant de confirmer, regarde un récapitulatif de ce que tu paieras par personne et par groupe pour ta cabane, remises appliquées.",
+    },
+    {
+      icon: "✅",
+      title: "Tout sauvegarder d'un geste",
+      body: "Un seul bouton enregistre toutes tes réponses et te confirme que nous les avons bien reçues, sans étapes en plus.",
+    },
+    {
+      icon: "💛",
+      title: "On te parle en tutoiement",
+      body: "L'invitation s'adresse maintenant à toi de façon chaleureuse et personnelle, comme une conversation entre amis.",
+    },
+    {
       icon: "🎬",
       title: "Générique de cinéma",
       body: "La section des remerciements est devenue un film : tous les invités défilent dans une liste infinie avec leurs photos.",
@@ -65,7 +105,7 @@ export const FEATURES = {
     {
       icon: "🍰",
       title: "Desserts à table",
-      body: "Découvrez les desserts qui vous attendent : jericalla, les plus tapatíos des desserts et gelées artisanales.",
+      body: "Découvre les desserts qui t'attendent : jericalla, les plus tapatíos des desserts et gelées artisanales.",
     },
     {
       icon: "🏖️",
@@ -80,7 +120,7 @@ export const FEATURES = {
     {
       icon: "🎵",
       title: "De la musique pour tous",
-      body: "Trois playlists à écouter dès maintenant, et un lecteur que vous pouvez activer depuis votre menu.",
+      body: "Trois playlists à écouter dès maintenant, et un lecteur que tu peux activer depuis ton menu.",
     },
     {
       icon: "🎳",
@@ -89,16 +129,36 @@ export const FEATURES = {
     },
     {
       icon: "🪪",
-      title: "Votre profil invité",
-      body: "Confirmez votre nom, ajoutez votre photo et votre téléphone pour que tout le monde vous reconnaisse.",
+      title: "Ton profil invité",
+      body: "Confirme ton nom, ajoute ta photo et ton téléphone pour que tout le monde te reconnaisse.",
     },
     {
       icon: "🌐",
-      title: "Dans votre langue",
-      body: "Changez la langue de l'invitation quand vous voulez : espagnol, français ou anglais.",
+      title: "Dans ta langue",
+      body: "Change la langue de l'invitation quand tu veux : espagnol, français ou anglais.",
     },
   ],
   en: [
+    {
+      icon: "📝",
+      title: "Your RSVP, all in one",
+      body: "Answer everything from one place: your attendance, whether you'll join the pétanque, and your plans to stay a few more days.",
+    },
+    {
+      icon: "💰",
+      title: "Know what you'll pay",
+      body: "Before confirming, see a clear summary of what you'll pay per person and per group for your cabin, with discounts applied.",
+    },
+    {
+      icon: "✅",
+      title: "Save it all in one tap",
+      body: "A single button saves all your answers and confirms we received them, with no extra steps.",
+    },
+    {
+      icon: "💛",
+      title: "We talk to you directly",
+      body: "The invitation now speaks to you in a warm, personal way, like a chat between friends.",
+    },
     {
       icon: "🎬",
       title: "Movie credits",

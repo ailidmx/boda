@@ -2,9 +2,11 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { useApp } from "../context/AppContext.jsx";
 import { LANGUAGE_FLAGS, LANGUAGE_FLAGS_ONLY } from "./ui.jsx";
+import { AboutModal } from "./AboutModal.jsx";
 
 import { SUPPORTED_LANGUAGES } from "../content.js";
 import { resolveGuestName, resolveGuestPhoto } from "../guest-profiles.js";
+
 
 // The full ordered list of nav links. The FLIGHTS ("travel") entry is only
 // relevant for guests who travel by plane, so it is filtered out for everyone
@@ -61,6 +63,7 @@ function UserMenu() {
 
   const [open, setOpen] = useState(false);
   const [accountModal, setAccountModal] = useState(null); // null | "email" | "password"
+  const [aboutOpen, setAboutOpen] = useState(false);
   const [password, setPassword] = useState("");
   const [draftEmail, setDraftEmail] = useState("");
   const [reauthPassword, setReauthPassword] = useState("");
@@ -69,6 +72,7 @@ function UserMenu() {
   const [modalStatus, setModalStatus] = useState(null); // { type, text }
   const [busy, setBusy] = useState(false);
   const menuRef = useRef(null);
+
 
   const guest = profile?.guest;
   const isAdmin = guest?.isAdmin === true;
@@ -279,7 +283,19 @@ function UserMenu() {
               <span className="user-menu__item-icon">🪪</span>
               {identity.eyebrow}
             </button>
+            <button
+              className="user-menu__item"
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                openIdentityPrompt();
+              }}
+            >
+              <span className="user-menu__item-icon">📷</span>
+              {identity.changePhoto}
+            </button>
             {isAdmin && (
+
               <a
                 className="user-menu__item user-menu__item--admin"
                 href="/dashboard"
@@ -325,6 +341,18 @@ function UserMenu() {
             </button>
 
             <button
+              className="user-menu__item"
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                setAboutOpen(true);
+              }}
+            >
+              <span className="user-menu__item-icon">ℹ️</span>
+              {nav.aboutTitle}
+            </button>
+
+            <button
               className="user-menu__item user-menu__item--danger"
               type="button"
               onClick={handleLogout}
@@ -332,6 +360,7 @@ function UserMenu() {
               <span className="user-menu__item-icon">↪</span>
               {nav.logout}
             </button>
+
 
             {menuStatus && (
               <p
@@ -488,11 +517,14 @@ function UserMenu() {
           </div>
         </div>
       )}
+
+      <AboutModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
     </div>
   );
 }
 
 // Mobile navigation: two split dropdowns (Part I = main invitation sections,
+
 // Part II = travel and everything after) plus a REPONDRE CTA. The dropdowns
 // are borderless and translucent so they feel like a floating, integrated
 // menu rather than a boxed control.

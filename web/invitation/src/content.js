@@ -2027,9 +2027,10 @@ export const content = {
         cabinCapacityLabel: "Capacité du gîte",
         roomCapacityLabel: "Capacité de la chambre",
         cabinPriceLabel: "Prix du gîte",
-        personPriceLabel: "A payer par personne",
-        groupPriceLabel: "A payer par le groupe",
+        personPriceLabel: "Participation aux frais par personne",
+        groupPriceLabel: "Participation aux frais par le groupe",
         coveredPriceLabel: "Pris en charge par les mariés",
+
         peopleLabel: "personnes",
         cabinOccupancyLabel: "Modalité du gîte",
         roomOccupancyLabel: "Modalité de la chambre",
@@ -2652,14 +2653,15 @@ export const content = {
         ],
       },
       payment: {
-        title: "À payer",
+        title: "Participation aux frais",
         intro:
-          "Voici le détail de ce que tu devras payer pour ton hébergement.",
+          "Voici le détail de ta participation aux frais pour ton hébergement.",
         cabinTitle: "Gîte du vendredi au dimanche",
         extraCabinTitle: "Gîte supplémentaire du dimanche au mardi",
-        perPerson: "À payer par personne",
-        perGroup: "À payer par le groupe",
+        perPerson: "Participation aux frais par personne",
+        perGroup: "Participation aux frais par le groupe",
         total: "Total",
+
         asterisk:
           "Nous apprécions ta compréhension : nous aurions aimé tout payer pour tout le monde, mais ce n’est pas possible. C’est une option que nous avons prévue pour toi, et nous comprenons si tu préfères autre chose. Fais-nous simplement part de ton choix.",
       },
