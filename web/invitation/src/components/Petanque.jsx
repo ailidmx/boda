@@ -257,10 +257,11 @@ export function Petanque() {
                       />
                       <div className="petanque-rsvp-save">
                         <button
-                          className="button button-light"
+                          className="button button--gold"
                           type="button"
                           onClick={handleSaveAnswers}
                           disabled={saveStatus === "working"}
+
                         >
                           {rsvpMini.button}
                         </button>

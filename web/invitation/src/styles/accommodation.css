@@ -1510,10 +1510,15 @@
   margin-top: 1.25rem;
 }
 
+.accommodation-recap-save .button {
+  width: 100%;
+}
+
 .accommodation-recap-save small {
   color: rgb(36 33 25 / 70%);
   font-size: 0.85rem;
 }
+
 
 @media (max-width: 899px) {
   .accommodation-recap-row {

@@ -820,13 +820,14 @@ export function Accommodation() {
             </div>
             <div className="accommodation-recap-save">
               <button
-                className="button button-light"
+                className="button button--gold"
                 type="button"
                 onClick={handleRecapSave}
                 disabled={recapSaveStatus === 'working'}
               >
                 {recap.button}
               </button>
+
               {recapStatusText ? <small data-form-status>{recapStatusText}</small> : null}
             </div>
           </div>

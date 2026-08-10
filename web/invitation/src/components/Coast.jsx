@@ -514,9 +514,10 @@ export function Coast() {
                   />
                   <div className="coast-rsvp-save">
                     <button
-                      className="button button-dark"
+                      className="button button--gold"
                       type="button"
                       onClick={handleSaveAnswers}
+
                       disabled={saveStatus === "working"}
                     >
                       {rsvpMini.button}

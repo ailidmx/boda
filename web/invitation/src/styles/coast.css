@@ -373,9 +373,10 @@
 }
 
 .coast-rsvp-save .button {
-  justify-self: start;
+  width: 100%;
   margin: 0;
 }
+
 
 .coast-rsvp-save small {
   color: #e4b968;

@@ -95,13 +95,14 @@ export function TeAnimas() {
           <RsvpRecap questions={questions} guests={guests} answers={answers} />
           <div className="rsvp-scale-save">
             <button
-              className="button button-light"
+              className="button button--gold"
               type="button"
               onClick={handleSaveAnswers}
               disabled={saveStatus === "working"}
             >
               {scale.saveButton}
             </button>
+
             {saveStatusText ? (
               <small data-form-status>{saveStatusText}</small>
             ) : null}

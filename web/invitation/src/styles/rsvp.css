@@ -543,6 +543,13 @@
   gap: 1.5rem;
 }
 
+/* The "¡Te animas!" save button sits inside the recap step; make it span the
+   full width so it reads as the primary call-to-action. */
+.rsvp-scale-save .button {
+  width: 100%;
+}
+
+
 /* ── Mobile scale legend modal + FAB ────────────────────────────────────
    On desktop the 5-level legend is shown inline. On mobile it is collapsed
    into a FAB-activated modal (mirroring the Story "facts" explorer) so the
@@ -917,8 +924,9 @@
 }
 
 .rsvp-submit .button {
-  justify-self: start;
+  width: 100%;
 }
+
 
 .rsvp-submit .rsvp-confirmation {
   display: flex;

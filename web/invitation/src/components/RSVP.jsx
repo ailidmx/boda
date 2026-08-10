@@ -429,13 +429,14 @@ export function RSVP() {
             a success/error confirmation. */}
         <div className="rsvp-submit">
           <button
-            className="button button-light"
+            className="button button--gold"
             type="button"
             onClick={handleSubmit}
             disabled={saveStatus === "working"}
           >
             {rsvp.button || scale.saveButton}
           </button>
+
 
           {saveStatus === "saved" ? (
             <p className="rsvp-confirmation" role="status">
