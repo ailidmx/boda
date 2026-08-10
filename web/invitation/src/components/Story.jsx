@@ -43,18 +43,16 @@ export function Story() {
   const factsPanelRef = useRef(null);
   const factsCloseRef = useRef(null);
 
-  // Show the mobile FAB only while the Story section occupies a meaningful
-  // part of the viewport. CSS keeps it hidden at desktop widths.
+  // Show the section FAB only while the Story section occupies a meaningful
+  // part of the viewport. The fun-facts FAB is active on every screen size
+  // (mobile and desktop), so no mobile-only gate is applied here.
   useEffect(() => {
     const section = sectionRef.current;
     if (!section || typeof IntersectionObserver === "undefined") return undefined;
 
-    const mobile = window.matchMedia("(max-width: 899px)");
     let latestEntry = null;
     const syncVisibility = () => {
-      const visible = mobile.matches && latestEntry?.isIntersecting;
-      setStoryActive(Boolean(visible));
-      if (!mobile.matches) setFactsOpen(false);
+      setStoryActive(Boolean(latestEntry?.isIntersecting));
     };
     const observer = new IntersectionObserver(([entry]) => {
       latestEntry = entry;
@@ -62,12 +60,9 @@ export function Story() {
     }, { rootMargin: "-45% 0px -45% 0px", threshold: 0 });
 
     observer.observe(section);
-    mobile.addEventListener?.("change", syncVisibility);
-    return () => {
-      observer.disconnect();
-      mobile.removeEventListener?.("change", syncVisibility);
-    };
+    return () => observer.disconnect();
   }, []);
+
 
   // Treat the mobile explorer as a real modal: lock background scrolling,
   // support Escape, focus the close button, then return focus to the FAB.

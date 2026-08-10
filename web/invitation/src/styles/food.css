@@ -229,30 +229,85 @@
   border-radius: 2px;
 }
 
-/* Food / drink badge — a small refined pill that tells guests at a glance
-   whether a card is a dish or a drink. */
+/* Food / drink / dessert badge — a small golden, shiny pill that tells
+   guests at a glance which category a card belongs to. */
 .flavour-card__type {
+  position: relative;
   align-self: flex-start;
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
   margin-bottom: 0.9rem;
-  padding: 0.28rem 0.75rem;
-  border: 1px solid rgb(198 139 43 / 35%);
+  padding: 0.3rem 0.85rem;
+  border: 1px solid rgb(198 139 43 / 55%);
   border-radius: 999px;
-  background: rgb(255 253 248 / 70%);
+  background: linear-gradient(
+    135deg,
+    rgb(255 244 200 / 95%),
+    rgb(240 196 96 / 95%) 45%,
+    rgb(214 158 52 / 95%)
+  );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 70%),
+    0 1px 3px rgb(120 84 20 / 35%);
   font-size: 0.68rem;
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--terracotta);
+  color: rgb(92 60 8 / 95%);
+  overflow: hidden;
+}
+
+/* A soft diagonal shine that sweeps across the golden badge. */
+.flavour-card__type::after {
+  content: "";
+  position: absolute;
+  top: -60%;
+  left: -40%;
+  width: 45%;
+  height: 220%;
+  transform: rotate(25deg);
+  background: linear-gradient(
+    90deg,
+    rgb(255 255 255 / 0%),
+    rgb(255 255 255 / 65%),
+    rgb(255 255 255 / 0%)
+  );
+  animation: flavour-badge-shine 3.2s ease-in-out infinite;
+}
+
+@keyframes flavour-badge-shine {
+  0% {
+    left: -45%;
+  }
+  55%,
+  100% {
+    left: 130%;
+  }
 }
 
 .flavour-card__type--drink {
-  border-color: rgb(169 77 49 / 30%);
-  background: rgb(255 253 248 / 70%);
-  color: var(--terracotta);
+  border-color: rgb(169 77 49 / 40%);
+  background: linear-gradient(
+    135deg,
+    rgb(255 236 214 / 95%),
+    rgb(240 178 122 / 95%) 45%,
+    rgb(214 128 74 / 95%)
+  );
+  color: rgb(92 44 12 / 95%);
 }
+
+.flavour-card__type--dessert {
+  border-color: rgb(198 139 43 / 60%);
+  background: linear-gradient(
+    135deg,
+    rgb(255 248 224 / 95%),
+    rgb(246 214 140 / 95%) 45%,
+    rgb(224 178 84 / 95%)
+  );
+  color: rgb(92 60 8 / 95%);
+}
+
 
 .flavour-card p {
   margin: 0;
@@ -375,131 +430,135 @@
 }
 
 
-/* Drinks policy modal — hidden on desktop (the inline card shows), and on
-   mobile the inline card is hidden while a FAB opens a full overlay. */
-.drinks-policy-shell,
-.drinks-policy-panel {
-  display: contents;
-}
-
-.drinks-policy-close,
-.drinks-policy-eyebrow,
-.drinks-policy-panel h3,
-.drinks-policy-fab,
-.drinks-policy-panel .drinks-policy,
-.drinks-policy-panel .drinks-policy-note {
+/* Drinks policy — FAB-activated modal on all screen sizes. The inline
+   disclosure card is hidden; a FAB opens a full overlay. */
+.drinks-policy {
   display: none;
 }
 
-@media (max-width: 899px) {
-  .drinks-policy {
-    display: none;
-  }
+.drinks-policy-shell {
+  position: fixed;
+  z-index: 190;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(36 33 25 / 58%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 180ms ease, visibility 180ms ease;
+}
 
-  .drinks-policy-shell {
-    position: fixed;
-    z-index: 190;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    padding: 1rem;
-    background: rgb(36 33 25 / 58%);
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-    transition: opacity 180ms ease, visibility 180ms ease;
-  }
+.drinks-policy-shell[aria-hidden="false"] {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
 
-  .drinks-policy-shell[aria-hidden="false"] {
-    opacity: 1;
-    visibility: visible;
-    pointer-events: auto;
-  }
+.drinks-policy-panel {
+  position: relative;
+  display: block;
+  width: min(100%, 28rem);
+  padding: 2.25rem 1.5rem 1.75rem;
+  border-top: 0.3rem solid var(--marigold);
+  background: var(--cream);
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 28%);
+}
 
-  .drinks-policy-panel {
-    position: relative;
-    display: block;
-    width: min(100%, 28rem);
-    padding: 2.25rem 1.5rem 1.75rem;
-    border-top: 0.3rem solid var(--marigold);
-    background: var(--cream);
-    box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 28%);
-  }
+.drinks-policy-close {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.75rem;
+  display: grid;
+  width: 2.1rem;
+  height: 2.1rem;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 1.6rem;
+  line-height: 1;
+}
 
-  .drinks-policy-close {
-    position: absolute;
-    top: 0.65rem;
-    right: 0.75rem;
-    display: grid;
-    width: 2.1rem;
-    height: 2.1rem;
-    place-items: center;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-    color: var(--ink);
-    font-size: 1.6rem;
-    line-height: 1;
-  }
+.drinks-policy-eyebrow {
+  display: block;
+  margin-bottom: 0.65rem;
+}
 
-  .drinks-policy-eyebrow {
-    display: block;
-    margin-bottom: 0.65rem;
-  }
+.drinks-policy-panel h3 {
+  display: block;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 10vw, 3.25rem);
+  font-weight: 400;
+  line-height: 0.95;
+}
 
-  .drinks-policy-panel h3 {
-    display: block;
-    margin: 0;
-    font-family: var(--font-display);
-    font-size: clamp(2rem, 10vw, 3.25rem);
-    font-weight: 400;
-    line-height: 0.95;
-  }
+.drinks-policy-panel .drinks-policy,
+.drinks-policy-panel .drinks-policy-note {
+  display: block;
+  margin: 1.25rem 0 0;
+  color: rgb(36 33 25 / 78%);
+  line-height: 1.6;
+}
 
-  .drinks-policy-panel .drinks-policy,
-  .drinks-policy-panel .drinks-policy-note {
-    display: block;
-    margin: 1.25rem 0 0;
-    color: rgb(36 33 25 / 78%);
-    line-height: 1.6;
-  }
+.drinks-policy-panel .drinks-policy-note {
+  color: var(--terracotta);
+  font-weight: 600;
+}
 
-  .drinks-policy-panel .drinks-policy-note {
-    color: var(--terracotta);
-    font-weight: 600;
-  }
+.drinks-policy-fab {
+  position: fixed;
+  z-index: 130;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  display: grid;
+  width: 4.25rem;
+  height: 4.25rem;
+  place-items: center;
+  padding: 0;
+  border: 3px solid var(--marigold);
+  border-radius: 50%;
+  background: var(--terracotta);
+  box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
+  color: var(--white);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(1rem) scale(0.9);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
 
+.drinks-policy-fab.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.drinks-policy-fab span {
+  font-size: 1.9rem;
+  line-height: 1;
+}
+
+/* ── Extra-large screens: contain the FAB within the 120rem main column ──
+   On very wide displays (≥1440px) the main content is constrained to a
+   centered 120rem container. The drinks-policy FAB is position:fixed, so it
+   would otherwise float at the far viewport edge, outside the container.
+   Anchor it to the container's right edge instead (50% + 60rem = right edge
+   of the centered 120rem column), keeping a 1rem breathing margin. */
+@media (min-width: 1440px) {
   .drinks-policy-fab {
-    position: fixed;
-    z-index: 130;
-    right: max(1rem, env(safe-area-inset-right));
-    bottom: max(1rem, env(safe-area-inset-bottom));
-    display: grid;
-    width: 4.25rem;
-    height: 4.25rem;
-    place-items: center;
-    padding: 0;
-    border: 3px solid var(--marigold);
-    border-radius: 50%;
-    background: var(--terracotta);
-    box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
-    color: var(--white);
-    opacity: 0;
-    pointer-events: none;
-    transform: translateY(1rem) scale(0.9);
-    transition: opacity 180ms ease, transform 180ms ease;
+    left: 50%;
+    right: auto;
+    transform: translateX(calc(60rem - 100% - 1rem)) translateY(1rem) scale(0.9);
   }
 
   .drinks-policy-fab.is-visible {
-    opacity: 1;
-    pointer-events: auto;
-    transform: translateY(0) scale(1);
-  }
-
-  .drinks-policy-fab span {
-    font-size: 1.9rem;
-    line-height: 1;
+    transform: translateX(calc(60rem - 100% - 1rem)) translateY(0) scale(1);
   }
 }
+
+
 

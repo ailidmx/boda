@@ -958,6 +958,25 @@
   height: 2.4rem;
 }
 
+/* ── Extra-large screens: contain the FAB within the 120rem main column ──
+   On very wide displays (≥1440px) the main content is constrained to a
+   centered 120rem container. The privacy FAB is position:fixed, so it would
+   otherwise float at the far viewport edge, outside the container. Anchor it
+   to the container's right edge instead (50% + 60rem = right edge of the
+   centered 120rem column), keeping a 1rem breathing margin. */
+@media (min-width: 1440px) {
+  .venue-privacy-fab {
+    left: 50%;
+    right: auto;
+    transform: translateX(calc(60rem - 100% - 1rem)) translateY(1rem) scale(0.9);
+  }
+
+  .venue-privacy-fab.is-visible {
+    transform: translateX(calc(60rem - 100% - 1rem)) translateY(0) scale(1);
+  }
+}
+
+
 
 
 .facilities-note {

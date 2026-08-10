@@ -44,10 +44,16 @@ export function Music() {
 
               <span className="music-act__number">0{index + 1}</span>
               <p className="music-act__moment">{act.moment}</p>
-              <h3>{act.name}</h3>
-              <small>{act.note}</small>
-              {act.link && (
-                <div className="music-act__links">
+              <div className="music-act__inner">
+                <h3>{act.name}</h3>
+                <small>{act.note}</small>
+              </div>
+              {/* The links row is always rendered as a placeholder so every
+                  card keeps the same height and the bottom area is ready for
+                  the links/videos/logos that will be added once the contracts
+                  are validated. */}
+              <div className="music-act__links">
+                {act.link && (
                   <a
                     className="text-link"
                     href={act.link}
@@ -56,18 +62,20 @@ export function Music() {
                   >
                     {music.listenLabel || "Listen"} ↗
                   </a>
-                  {act.website && (
-                    <a
-                      className="text-link"
-                      href={act.website}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      {music.websiteLabel || "Website"} ↗
-                    </a>
-                  )}
-                </div>
-              )}
+                )}
+                {act.website && (
+                  <a
+                    className="text-link"
+                    href={act.website}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {music.websiteLabel || "Website"} ↗
+                  </a>
+                )}
+              </div>
+
+
             </article>
           );
         })}
@@ -104,8 +112,14 @@ export function Music() {
         </SwipeCardCarousel>
       </div>
 
-      {/* Desktop-only bottom nav: leads to the "Et après ?" (coast) section. */}
-      <nav className="section-nav music-section-nav" aria-label="Continue">
+      {/* Desktop-only bottom nav: leads to the "Et après ?" (coast) section.
+          The music section sits on a dark ink background, so the nav uses the
+          light variant to keep the link visible. */}
+      <nav
+        className="section-nav section-nav--light music-section-nav"
+        aria-label="Continue"
+      >
+
         <a className="section-nav-link" href="#coast">
           <span>{t.nav.coast}</span>
           <span aria-hidden="true">↓</span>

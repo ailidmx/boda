@@ -21,7 +21,8 @@ import { CabinOccupancy } from "./CabinOccupancy.jsx";
 
 
 import { getActiveGuests } from "../guests.js";
-import { resolveRsvpAnswer } from "../rsvp-responses.js";
+import { computeInitialStepIndex } from "../rsvp-responses.js";
+
 
 
 
@@ -278,11 +279,36 @@ export function Coast() {
     [rsvpMini],
   );
 
+  // Auto-detect the starting step: the first question that is not fully
+  // answered by every group member, or the recap when everything is answered.
+  const initialStep = computeInitialStepIndex(questions, guests, answers);
+
   const [saveStatus, setSaveStatus] = useState("idle"); // idle | working | saved | error
+
+  // ── Barra de Navidad budget estimate ─────────────────────────────────────
+  // A hotel night in Barra de Navidad runs ~1,200–2,500 MXN per person. The
+  // beach plan (Plan 2 · La plage) is 4 nights (Tue–Sat). We estimate the
+  // group total from how many group members rated the beach plan as
+  // interested (level ≥ 3 on the 0–5 scale).
+  const BARRA_NIGHTS = 4;
+  const BARRA_MIN_PER_NIGHT = 1200;
+  const BARRA_MAX_PER_NIGHT = 2500;
+  const INTEREST_THRESHOLD = 3;
+  const interestedCount = useMemo(
+    () =>
+      guests.filter(
+        (guest) => (answers.playa?.[guest.id] ?? 0) >= INTEREST_THRESHOLD,
+      ).length,
+    [guests, answers.playa],
+  );
+  const barraMinTotal = BARRA_MIN_PER_NIGHT * BARRA_NIGHTS * interestedCount;
+  const barraMaxTotal = BARRA_MAX_PER_NIGHT * BARRA_NIGHTS * interestedCount;
+  const budget = coast.budget || {};
 
   const handleAnswerChange = (questionId, guestId, level) => {
     setAnswer(questionId, guestId, level);
   };
+
 
   const handleSaveAnswers = async () => {
     if (saveStatus === "working") return;
@@ -468,76 +494,10 @@ export function Coast() {
         </div>
       )}
 
-      {/* Mini RSVP — a 3-step flipable card (like "¡Te animas!" and pétanque):
-          Step 1 = stay at Roca Azul, Step 2 = the beach plan, Step 3 = summary.
-          Each guest rates how likely they are to join each "Et après ?" plan
-          (0–5). Answers are saved per guest to Firestore via saveRsvpAnswers. */}
-      <div className="coast-rsvp-mini reveal">
-
-        <div className="coast-rsvp-mini-head">
-          <p className="eyebrow">{rsvpMini.eyebrow}</p>
-          <h3>{rsvpMini.title}</h3>
-          <p className="coast-rsvp-mini-intro">{rsvpMini.intro}</p>
-        </div>
-
-        <FlipStepCard
-          onDone={() => markResume(flow)}
-          steps={[
-            ...questions.map((question) => ({
-              id: question.id,
-              label: question.title,
-              render: () => (
-                <RsvpQuestion
-                  questionId={question.id}
-                  title={question.title}
-                  subtitle={question.subtitle}
-                  variant="scale"
-                  guests={guests}
-                  answers={answers[question.id] || {}}
-                  onChange={(guestId, level) =>
-                    handleAnswerChange(question.id, guestId, level)
-                  }
-                />
-              ),
-            })),
-            {
-              id: "resumen",
-              label: rsvpMini.recapTitle || "Summary",
-              render: () => (
-                <div className="rsvp-recap-step">
-                  <RsvpRecap
-                    questions={questions}
-                    guests={guests}
-                    answers={answers}
-                    recapTitle={rsvpMini.recapTitle}
-                    recapProgress={rsvpMini.recapProgress}
-                  />
-                  <div className="coast-rsvp-save">
-                    <button
-                      className="button button-dark"
-                      type="button"
-                      onClick={handleSaveAnswers}
-                      disabled={saveStatus === "working"}
-                    >
-                      {rsvpMini.button}
-                    </button>
-                    {saveStatusText && <small>{saveStatusText}</small>}
-                  </div>
-                </div>
-              ),
-            },
-          ]}
-          copy={{
-            step: interfaceText.stepLabel || "Step",
-            next: interfaceText.next || "Next",
-            back: interfaceText.back || "Back",
-          }}
-        />
-      </div>
-
       {/* Coast accommodation suggestions — mirrors the Accommodation "no
           cabin" pattern: an Airbnb section (one listing per group size) and a
           hotel section (a short selection ordered by price). */}
+
 
       {suggestions.title && (
         <div className="coast-suggestions reveal">
@@ -626,8 +586,136 @@ export function Coast() {
         </div>
       )}
 
+      {/* Barra de Navidad budget estimate — a "budget to plan" block that
+          turns the per-night per-person rate (1,200–2,500 MXN) into a group
+          total for the 4 beach nights, based on how many group members rated
+          the beach plan as interested (level ≥ 3). */}
+      {budget.title && (
+        <div className="coast-budget reveal">
+          <div className="section-heading">
+            <p className="eyebrow">{budget.eyebrow}</p>
+            <h3>{budget.title}</h3>
+            <p className="coast-budget-intro">{budget.intro}</p>
+          </div>
+
+          <div className="coast-budget-figures">
+            <div className="coast-budget-figure">
+              <span className="coast-budget-figure__label">
+                {formatPrice(BARRA_MIN_PER_NIGHT, language)}–{formatPrice(BARRA_MAX_PER_NIGHT, language)} MXN
+              </span>
+              <small>{budget.perNightPerPerson}</small>
+            </div>
+            <div className="coast-budget-figure">
+              <span className="coast-budget-figure__label">{BARRA_NIGHTS}</span>
+              <small>{budget.nights}</small>
+            </div>
+            <div className="coast-budget-figure">
+              <span className="coast-budget-figure__label">{interestedCount}</span>
+              <small>{budget.interested}</small>
+            </div>
+          </div>
+
+          <div className="coast-budget-totals">
+            <div className="coast-budget-total coast-budget-total--min">
+              <span>{budget.minLabel}</span>
+              <strong>{formatPrice(barraMinTotal, language)} MXN</strong>
+              <small>≈ {formatPrice(barraMinTotal / MXN_PER_EUR, language)} €</small>
+            </div>
+            <div className="coast-budget-total coast-budget-total--max">
+              <span>{budget.maxLabel}</span>
+              <strong>{formatPrice(barraMaxTotal, language)} MXN</strong>
+              <small>≈ {formatPrice(barraMaxTotal / MXN_PER_EUR, language)} €</small>
+            </div>
+          </div>
+
+          <div className="coast-budget-big">
+            <span>{budget.bigTotal}</span>
+            <strong>
+              {formatPrice(barraMinTotal, language)}–{formatPrice(barraMaxTotal, language)} MXN
+            </strong>
+            <small>
+              ≈ {formatPrice(barraMinTotal / MXN_PER_EUR, language)}–{formatPrice(barraMaxTotal / MXN_PER_EUR, language)} €
+            </small>
+          </div>
+
+          <p className="coast-budget-disclaimer">{budget.disclaimer}</p>
+        </div>
+      )}
+
+      {/* Mini RSVP — a 3-step flipable card (like "¡Te animas!" and pétanque):
+          Step 1 = stay at Roca Azul, Step 2 = the beach plan, Step 3 = summary.
+          Each guest rates how likely they are to join each "Et après ?" plan
+          (0–5). Answers are saved per guest to Firestore via saveRsvpAnswers. */}
+      <div className="coast-rsvp-mini reveal">
+
+        <div className="coast-rsvp-mini-head">
+          <p className="eyebrow">{rsvpMini.eyebrow}</p>
+          <h3>{rsvpMini.title}</h3>
+          <p className="coast-rsvp-mini-intro">{rsvpMini.intro}</p>
+        </div>
+
+        <FlipStepCard
+          onDone={() => markResume(flow)}
+          initialIndex={initialStep}
+          steps={[
+            ...questions.map((question) => ({
+
+              id: question.id,
+              label: question.title,
+              render: () => (
+                <RsvpQuestion
+                  questionId={question.id}
+                  title={question.title}
+                  subtitle={question.subtitle}
+                  variant="scale"
+                  guests={guests}
+                  answers={answers[question.id] || {}}
+                  onChange={(guestId, level) =>
+                    handleAnswerChange(question.id, guestId, level)
+                  }
+                />
+              ),
+            })),
+            {
+              id: "resumen",
+              label: rsvpMini.recapTitle || "Summary",
+              render: () => (
+                <div className="rsvp-recap-step">
+                  <RsvpRecap
+                    questions={questions}
+                    guests={guests}
+                    answers={answers}
+                    recapTitle={rsvpMini.recapTitle}
+                    recapProgress={rsvpMini.recapProgress}
+                  />
+                  <div className="coast-rsvp-save">
+                    <button
+                      className="button button--gold"
+                      type="button"
+                      onClick={handleSaveAnswers}
+
+                      disabled={saveStatus === "working"}
+                    >
+                      {rsvpMini.button}
+                    </button>
+                    {saveStatusText && <small>{saveStatusText}</small>}
+                  </div>
+                </div>
+              ),
+            },
+          ]}
+          copy={{
+            step: interfaceText.stepLabel || "Step",
+            next: interfaceText.next || "Next",
+            back: interfaceText.back || "Back",
+          }}
+        />
+      </div>
+
       {/* Desktop-only bottom nav: leads to the photos section. */}
       <nav className="section-nav coast-section-nav" aria-label="Continue">
+
+
         <a className="section-nav-link" href="#photos">
           <span>{t.nav.photos}</span>
           <span aria-hidden="true">↓</span>
