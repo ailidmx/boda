@@ -100,18 +100,9 @@ function formatPhone(e164) {
     if (digits.startsWith(cd) && cd.length > code.length) code = cd;
   }
   const national = code ? digits.slice(code.length) : digits;
-  let grouped;
-  if (code === "33") {
-    // French format: X XX XX XX XX (leading digit, then pairs).
-    const first = national.slice(0, 1);
-    const rest = national.slice(1).match(/.{1,2}/g)?.join(" ") || "";
-    grouped = [first, rest].filter(Boolean).join(" ");
-  } else {
-    grouped = national.match(/.{1,2}/g)?.join(" ") || national;
-  }
+  const grouped = national.match(/.{1,2}/g)?.join(" ") || national;
   return code ? `+${code} ${grouped}` : grouped;
 }
-
 
 function formatDisplayEmail(email) {
   const normalized = String(email || "").trim();
@@ -170,7 +161,8 @@ function MemberCard({
     .join(" ")
     .trim();
   const phone = resolveGuestPhone(guest);
-  const identityVerified = resolveIdentityCheckPassed(guest) || guest?.idCheckUser === true;
+  const identityVerified =
+    resolveIdentityCheckPassed(guest) || guest?.idCheckUser === true;
 
   // Email display: for the signed-in guest it comes from the auth profile
   // (the real login credential). For other group members it is read-only from
@@ -335,8 +327,16 @@ function MemberCard({
     >
       <span
         className={`identity-member-status${identityVerified ? " is-verified" : " is-pending"}`}
-        aria-label={identityVerified ? "Identity verified" : "Identity verification pending"}
-        title={identityVerified ? "Identity verified" : "Identity verification pending"}
+        aria-label={
+          identityVerified
+            ? "Identity verified"
+            : "Identity verification pending"
+        }
+        title={
+          identityVerified
+            ? "Identity verified"
+            : "Identity verification pending"
+        }
       >
         {identityVerified ? "✓" : "?"}
       </span>
@@ -351,12 +351,11 @@ function MemberCard({
             e.stopPropagation();
             startEdit();
           }}
-          aria-label={identityVerified ? copy.edit : copy.verify}
+          aria-label={copy.edit}
           aria-pressed={false}
         >
-          {identityVerified ? copy.edit || "Edit" : copy.verify || "Verify"}
+          {copy.edit || "Edit"}
         </button>
-
       )}
 
       <div className="identity-member-flip">
@@ -385,9 +384,7 @@ function MemberCard({
 
             <div className="identity-member-id">
               <div className="identity-member-name">
-                <strong>
-                  {fullName}
-                </strong>
+                <strong>{fullName}</strong>
                 {isSelf && (
                   <span className="identity-member-tag">{copy.you}</span>
                 )}
@@ -408,7 +405,9 @@ function MemberCard({
               </div>
               <div className="identity-member-email">
                 <span aria-hidden="true">✉</span>
-                <span>{email ? formatDisplayEmail(email) : copy.emailPlaceholder}</span>
+                <span>
+                  {email ? formatDisplayEmail(email) : copy.emailPlaceholder}
+                </span>
               </div>
             </div>
           </div>
@@ -491,7 +490,9 @@ function MemberCard({
                         id={`identity-maternalLastName-${guest.id}`}
                         type="text"
                         value={draftMaternalLastName}
-                        onChange={(e) => setDraftMaternalLastName(e.target.value)}
+                        onChange={(e) =>
+                          setDraftMaternalLastName(e.target.value)
+                        }
                         autoFocus
                       />
                     </div>
@@ -516,7 +517,6 @@ function MemberCard({
                   </div>
                 </div>
               )}
-
             </div>
 
             {/* Reserved bottom rail — Back/Cancel on the left, Next/Save
@@ -558,7 +558,6 @@ function MemberCard({
                 </button>
               )}
             </div>
-
           </form>
         </div>
       </div>
@@ -637,6 +636,11 @@ export function IdentityModal() {
   // scroll the selected member into view.
   const listRef = useRef(null);
   const tabsRef = useRef(null);
+  // Ref to the scrollable modal body. When the modal opens with several
+  // members, the browser can render it scrolled to the bottom; we reset it to
+  // the top once everything is laid out.
+  const bodyRef = useRef(null);
+
 
   const scrollTabToLeft = (id, behavior = "smooth") => {
     const tabs = tabsRef.current;
@@ -679,34 +683,58 @@ export function IdentityModal() {
     setActiveId(guest.id);
   }, [identityPrompt, guest?.id]);
 
+  // When the modal opens with several members, the browser can render the
+  // scrollable body already scrolled to the bottom (the last member card is
+  // focused/active). After all elements are laid out we reset the scroll
+  // position back to the top so the guest always starts at the first member.
+  useEffect(() => {
+    if (!identityPrompt || !guest?.id) return;
+    const body = bodyRef.current;
+    if (!body) return;
+    // Double requestAnimationFrame guarantees the DOM is fully painted and
+    // laid out (member cards, tabs, avatars) before we touch scrollTop.
+    const raf1 = requestAnimationFrame(() => {
+      const raf2 = requestAnimationFrame(() => {
+        console.log("[IdentityModal] resetting modal body scroll to top");
+        console.log(
+          `[IdentityModal] before: scrollTop=${body.scrollTop}, scrollHeight=${body.scrollHeight}, clientHeight=${body.clientHeight}`,
+        );
+        body.scrollTop = 0;
+        console.log(
+          `[IdentityModal] after: scrollTop=${body.scrollTop}`,
+        );
+      });
+      return raf2;
+    });
+    return () => cancelAnimationFrame(raf1);
+  }, [identityPrompt, guest?.id]);
+
   if (!identityPrompt || !guest) return null;
+
 
   const members = getGroupMembers(guest, getActiveGuests());
   const activeMember = members.find((m) => m.id === activeId) || guest;
-  const invitationGroup = resolveGuestInvitationGroup(guest) || guest.invitationGroup || guest.group || "";
+  const invitationGroup =
+    resolveGuestInvitationGroup(guest) ||
+    guest.invitationGroup ||
+    guest.group ||
+    "";
   const invitationGroupLabel = invitationGroup
     ? getGroupTag(invitationGroup).label || invitationGroup
     : "";
-  const identityTitle = members.length > 1
-    ? (identity.titleGroup || identity.title || "")
-      .replace("{count}", String(members.length))
-    : (identity.titleSingle || identity.title || "");
+  const identityTitle =
+    members.length > 1
+      ? (identity.titleGroup || identity.title || "").replace(
+          "{count}",
+          String(members.length),
+        )
+      : identity.titleSingle || identity.title || "";
 
-  // Clicking "Confirmer" means the guest has reviewed the identity of every
-  // member of their invitation group. We therefore record `idCheckUser = true`
-  // for the whole group (the signed-in guest + all their group members), so the
-  // identity window won't pop up again for any of them on their next visit.
-  // The Firestore rules allow a guest to write the identity-check flag of any
-  // member of their own invitation group.
   const handleConfirm = async () => {
     setSaving(true);
     setFooterMessage(null);
     try {
-      await Promise.all(
-        members.map((member) =>
-          saveIdentityCheckPassed(member, true, guest.id),
-        ),
-      );
+      await saveIdentityCheckPassed(guest, true, guest.id);
       confirmIdentityPrompt();
     } catch (error) {
       console.error("saveIdentityCheckPassed failed", error);
@@ -716,7 +744,6 @@ export function IdentityModal() {
       setSaving(false);
     }
   };
-
 
   return (
     <div
@@ -749,7 +776,10 @@ export function IdentityModal() {
             {identity.eyebrow}
           </h2>
           {invitationGroupLabel && (
-            <p className="identity-group-badge" aria-label={identity.membersLabel || "Invitation group"}>
+            <p
+              className="identity-group-badge"
+              aria-label={identity.membersLabel || "Invitation group"}
+            >
               {invitationGroupLabel}
             </p>
           )}
@@ -769,7 +799,8 @@ export function IdentityModal() {
         </div>
 
         {/* Body — only this scrolls vertically */}
-        <div className="identity-modal-body">
+        <div className="identity-modal-body" ref={bodyRef}>
+
           {/* Extended scrollable list of every member in the invitation group.
               Each card has a fixed height so the front/back flip never changes
               the layout. The badge selector above scrolls to and highlights
@@ -815,7 +846,7 @@ export function IdentityModal() {
               onClick={handleConfirm}
               disabled={saving}
             >
-              {saving ? identity.saving : (identity.confirm || identity.ok)}
+              {saving ? identity.saving : identity.confirm || identity.ok}
             </button>
           </div>
         </div>

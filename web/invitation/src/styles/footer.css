@@ -1,56 +1,10 @@
 /* ── Site footer ──────────────────────────────────────────────────────── */
 
-/* The whole footer uses ONE single background colour (the ink) for every
-   element — the contact bar, the WhatsApp card and the inner block all sit
-   on the same dark surface, so the footer reads as one continuous band. */
 .site-footer {
   padding: 4rem 1.25rem;
   background: var(--ink);
   color: var(--white);
   text-align: center;
-}
-
-/* Full-width contact bar at the top of the footer, mirroring the top header
-   bar: spans the whole viewport on the same ink background, with a bottom
-   border and a flex row that wraps on small screens. */
-.site-footer-contacts {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem 1.5rem;
-  margin: -4rem -1.25rem 2.5rem;
-  padding: 0.85rem clamp(1.25rem, 4vw, 4rem);
-  border-bottom: 1px solid rgb(255 255 255 / 25%);
-  background: transparent;
-}
-
-.site-footer-contacts-label {
-  font-size: 0.85rem;
-  opacity: 0.8;
-}
-
-/* Contact links as simple text links on the ink background — no gradient
-   pill, no flash sheen, no sparkle. Just a clean, legible link. */
-.site-footer-contacts-link {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.4rem 0.6rem;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: var(--white);
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.85rem;
-  letter-spacing: 0.02em;
-  transition: color 180ms ease;
-}
-
-.site-footer-contacts-link:hover {
-  color: var(--marigold);
 }
 
 .site-footer-whatsapp {
@@ -59,22 +13,13 @@
   text-align: left;
 }
 
-/* The WhatsApp card sits on the same ink background as the rest of the
-   footer — no light card, no green tint. */
 .site-footer-whatsapp .identity-whatsapp-link {
-  background: transparent;
-  border-color: rgb(255 255 255 / 22%);
-  color: var(--white);
-}
-
-.site-footer-whatsapp .identity-whatsapp-link:hover {
-  background: rgb(255 255 255 / 8%);
-  border-color: var(--marigold);
+  color: var(--ink);
 }
 
 .site-footer-whatsapp .identity-whatsapp-text small,
 .site-footer-whatsapp .identity-whatsapp-arrow {
-  color: rgb(255 255 255 / 72%);
+  color: rgb(36 33 25 / 78%);
 }
 
 .footer-monogram {
@@ -86,19 +31,9 @@
 
 .site-footer p {
   font-family: var(--font-display);
-  font-size: 0.95rem;
+  font-size: 1.15rem;
 }
 
 .site-footer small {
   color: rgb(255 255 255 / 55%);
-}
-
-/* Build number label — subtle, for verifying the deployed version. */
-.footer-build {
-  margin-top: 1.5rem;
-  font-family: var(--font-body) !important;
-  font-size: 0.7rem !important;
-  letter-spacing: 0.08em;
-  color: rgb(255 255 255 / 35%);
-  user-select: none;
 }
