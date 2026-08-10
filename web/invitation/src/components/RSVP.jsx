@@ -1,32 +1,28 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useApp } from "../context/AppContext.jsx";
 import { useRsvp, RSVP_FLOWS } from "../context/RsvpContext.jsx";
-import { submitPetanque, submitRsvp } from "../submit-forms.js";
-import { RsvpQuestion } from "./RsvpQuestion.jsx";
+import { RsvpQuestion, BOOLEAN_YES } from "./RsvpQuestion.jsx";
 import { RsvpRecap } from "./RsvpRecap.jsx";
-import { getGroupMembers } from "../guest-profiles.js";
+import { getGroupMembers, resolveLiveGuest } from "../guest-profiles.js";
 import { getActiveGuests } from "../guests.js";
-import { resolveRsvpAnswer } from "../rsvp-responses.js";
-
-
-function optionsMarkup(options) {
-  return (options || []).map((option) => (
-    <option value={option.value} key={option.value}>
-      {option.label}
-    </option>
-  ));
-}
+import { getCabin } from "../cabins.js";
+import { getRoom } from "../rooms.js";
+import {
+  PaymentSummary,
+  computeStayAmounts,
+  formatPrice,
+} from "./PaymentSummary.jsx";
 
 export function RSVP() {
   const { t, profile, language, interfaceText } = useApp();
-  const { answers, setAnswer, progress } = useRsvp();
+  const { answers, setAnswer, progress, saveFlow } = useRsvp();
   const rsvp = t.rsvp || {};
-  const petanque = rsvp.petanque || {};
   const scale = rsvp.scale || {};
-  const showTravelSection = profile?.guest?.comesFromFar === true;
-
-  const formRef = useRef(null);
-  const [status, setStatus] = useState("idle"); // idle | working | success | error
+  const petanque = rsvp.petanque || {};
+  const petanqueTribute = t.petanqueTribute || {};
+  const petanqueMini = petanqueTribute.rsvpMini || {};
+  const coast = t.coast || {};
+  const coastRsvpMini = coast.rsvpMini || {};
 
   // The group's guests (the signed-in guest + the other members of their
   // invitation group). These are the people the scale questions apply to.
@@ -35,53 +31,148 @@ export function RSVP() {
     [profile?.guest],
   );
 
-  const handleAnswerChange = (questionId, guestId, level) => {
-    setAnswer(questionId, guestId, level);
-  };
+  // ── Petanque questions (boolean variant) ────────────────────────────────
+  // Mirrors the mini-RSVP in the Petanque section: participation + own boules.
+  const petanqueQuestions = useMemo(() => {
+    const qs = [];
+    if (petanque.fields?.participation) {
+      qs.push({
+        id: "petanqueParticipation",
+        title: petanque.fields.participation,
+        subtitle: petanque.intro,
+        variant: "boolean",
+      });
+    }
+    if (petanque.fields?.ownBoules) {
+      qs.push({
+        id: "petanqueOwnBoules",
+        title: petanque.fields.ownBoules,
+        subtitle: petanqueMini.fields?.ownBoulesHint,
+        variant: "boolean",
+      });
+    }
+    return qs;
+  }, [petanque, petanqueMini]);
 
-  // The final RSVP cannot be submitted until every mini-RSVP flow has been
-  // walked through to its recap step ("resume"). Each flow reports its state
-  // via the shared RsvpContext.
-  const allResume = [RSVP_FLOWS.teAnimas, RSVP_FLOWS.petanque, RSVP_FLOWS.coast].every(
-    (flow) => progress[flow] === "resume",
+  // Only guests who said "yes" to the tournament should see the boules
+  // question (same rule as the Petanque mini-RSVP).
+  const boulesGuests = useMemo(
+    () =>
+      guests.filter(
+        (guest) => answers.petanqueParticipation?.[guest.id] === BOOLEAN_YES,
+      ),
+    [guests, answers.petanqueParticipation],
+  );
+  const visiblePetanqueQuestions = useMemo(
+    () =>
+      boulesGuests.length === 0
+        ? petanqueQuestions.filter((q) => q.id !== "petanqueOwnBoules")
+        : petanqueQuestions,
+    [petanqueQuestions, boulesGuests.length],
   );
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (status === "working") return;
-    if (!allResume) return;
-    const form = formRef.current;
-    if (!form) return;
+  // ── Extra-stay questions (scale variant) ────────────────────────────────
+  // Mirrors the mini-RSVP in the Coast section: rocaAzul + playa.
+  const extraStayQuestions = useMemo(
+    () =>
+      (coastRsvpMini.questions || []).map((q) => ({
+        id: q.id,
+        title: q.title,
+        subtitle: q.subtitle,
+        variant: "scale",
+      })),
+    [coastRsvpMini],
+  );
 
-    const formData = new FormData(form);
-    const context = {
-      email: profile?.email || "",
-      language,
-    };
+  // ── Save status for the final submit ────────────────────────────────────
+  const [saveStatus, setSaveStatus] = useState("idle"); // idle | working | saved | error
 
-    setStatus("working");
-    try {
-      // The RSVP form also collects the petanque section. Both submissions are
-      // independent documents, so we submit them sequentially and only report
-      // success if both succeed.
-      await submitRsvp(formData, context);
-      await submitPetanque(formData, context);
-      setStatus("success");
-      form.reset();
-    } catch (error) {
-      console.warn("[rsvp] submission failed", error.code || error.message);
-      setStatus("error");
+  const handleAnswerChange = (questionId, guestId, level) => {
+    setAnswer(questionId, guestId, level);
+    // If participation is no longer "yes", clear the boules answer for that
+    // guest so it doesn't linger as a stale "yes"/"no".
+    if (questionId === "petanqueParticipation" && level !== BOOLEAN_YES) {
+      setAnswer("petanqueOwnBoules", guestId, 0);
     }
   };
 
-  const statusText =
-    status === "working"
-      ? interfaceText.submitWorking
-      : status === "success"
-        ? interfaceText.submitSuccess
-        : status === "error"
-          ? interfaceText.submitError
-          : rsvp.previewNote;
+  // Persist every flow's answers (attendance scale, petanque, extra stay) for
+  // every guest in the group, then surface a success/error message.
+  const handleSubmit = async () => {
+    if (saveStatus === "working") return;
+    const editorGuestId = profile?.guest?.id;
+    if (!editorGuestId) return;
+    setSaveStatus("working");
+    try {
+      const flows = [
+        { flow: RSVP_FLOWS.teAnimas, questions: scale.questions || [] },
+        { flow: RSVP_FLOWS.petanque, questions: visiblePetanqueQuestions },
+        { flow: RSVP_FLOWS.coast, questions: extraStayQuestions },
+      ];
+      for (const { flow, questions } of flows) {
+        if (questions.length === 0) continue;
+        await saveFlow({ flow, questions, guests, editorGuestId });
+      }
+      setSaveStatus("saved");
+    } catch (error) {
+      console.warn("[rsvp] final save failed", error.code || error.message);
+      setSaveStatus("error");
+    }
+  };
+
+
+  // ── Payment summary resolvers ──────────────────────────────────────────
+  // These mirror the resolvers used by StayPlanCard so the read-only "À payer"
+  // block shows exactly the same amounts as the Hébergement section.
+  const payment = rsvp.payment || {};
+  const guestOption = t.accommodation?.guestOption || {};
+  const coveredLabel = guestOption.payment?.covered || "";
+
+  // Primary stay (Fri→Sun): cabin + room + covered flag.
+  const getAssignedCabinId = (candidate) => {
+    const source = resolveLiveGuest(candidate);
+    const mHosting = source?.hosting || {};
+    const mAssignedCabin =
+      mHosting.cabin ||
+      source?.cabin ||
+      source?.cabinLabel ||
+      source?.unit ||
+      source?.room;
+    const mAssignedRoom = mHosting.room || source?.room;
+    const mRoom = mAssignedRoom ? getRoom(mAssignedRoom) : null;
+    return mRoom?.cabin || mAssignedCabin;
+  };
+  const getAssignedRoomId = (candidate) => {
+    const source = resolveLiveGuest(candidate);
+    const mHosting = source?.hosting || {};
+    return mHosting.room || source?.room;
+  };
+  const resolveMemberCovered = (member) => {
+    const source = resolveLiveGuest(member);
+    return source?.hosting?.isCabinPaidByNovios ?? source?.isCabinPaidByNovios;
+  };
+
+  // Extra stay (Sun→Tue): extra cabin + room + covered flag.
+  const getXtraCabinId = (candidate) => {
+    const source = resolveLiveGuest(candidate);
+    const mHosting = source?.hosting || {};
+    const mXtraCabin = mHosting.xtraCabin || source?.xtraCabin;
+    const mXtraRoom = mHosting.xtraRoom || source?.xtraRoom;
+    const mRoom = mXtraRoom ? getRoom(mXtraRoom) : null;
+    return mRoom?.cabin || mXtraCabin;
+  };
+  const getXtraRoomId = (candidate) => {
+    const source = resolveLiveGuest(candidate);
+    const mHosting = source?.hosting || {};
+    return mHosting.xtraRoom || source?.xtraRoom;
+  };
+  const resolveXtraCovered = (member) => {
+    const source = resolveLiveGuest(member);
+    return (
+      source?.hosting?.isXtraCabinPaidByNovios ??
+      source?.isXtraCabinPaidByNovios
+    );
+  };
 
   return (
     <section className="rsvp-section section story-bg reveal">
@@ -90,8 +181,8 @@ export function RSVP() {
       <p>{rsvp.body}</p>
 
         {/* Progress checklist: each mini-RSVP flow must be walked through to
-            its recap step ("resume") before the final form can be submitted.
-            The state is shared with the mini-flows via RsvpContext. */}
+            its recap step ("resume"). The state is shared with the mini-flows
+            via RsvpContext. */}
         <div className="rsvp-progress" aria-label={rsvp.progressLabel}>
           {[
             { flow: RSVP_FLOWS.teAnimas, label: rsvp.progressTeAnimas },
@@ -145,303 +236,224 @@ export function RSVP() {
           </fieldset>
         )}
 
-        <form
-          ref={formRef}
-          className="rsvp-form"
-          data-form-kind="rsvp"
-          aria-describedby="rsvp-preview-note"
-          onSubmit={handleSubmit}
-        >
-          <fieldset>
-            <legend>{rsvp.groups.attendance}</legend>
-            <div className="rsvp-form-grid">
-              <div className="form-field">
-                <label htmlFor="rsvp-full-name">{rsvp.fields.fullName}</label>
-                <input
-                  id="rsvp-full-name"
-                  name="fullName"
-                  type="text"
-                  autoComplete="name"
-                  required
+        {/* Pétanque questions: one row per guest, Yes/No toggle for the
+            Friday tournament (participation + own boules). Mirrors the
+            mini-RSVP in the Pétanque section. */}
+        {visiblePetanqueQuestions.length > 0 && guests.length > 0 && (
+          <fieldset className="rsvp-scale-fieldset">
+            <legend>{rsvp.progressPetanque}</legend>
+            <p className="fieldset-note">{petanque.intro}</p>
+            <div className="rsvp-scale-questions">
+              {visiblePetanqueQuestions.map((q) => (
+                <RsvpQuestion
+                  key={q.id}
+                  questionId={q.id}
+                  title={q.title}
+                  subtitle={q.subtitle}
+                  variant="boolean"
+                  guests={q.id === "petanqueOwnBoules" ? boulesGuests : guests}
+                  answers={answers[q.id] || {}}
+                  onChange={(guestId, level) =>
+                    handleAnswerChange(q.id, guestId, level)
+                  }
                 />
-              </div>
-              <div className="form-field">
-                <label htmlFor="rsvp-whatsapp">{rsvp.fields.whatsapp}</label>
-                <input
-                  id="rsvp-whatsapp"
-                  name="whatsapp"
-                  type="tel"
-                  autoComplete="tel"
-                  inputMode="tel"
-                  required
-                />
-              </div>
-              <div className="form-field">
-                <label htmlFor="rsvp-attendance">{rsvp.fields.attendance}</label>
-                <select id="rsvp-attendance" name="attendance">
-                  {optionsMarkup(rsvp.options.attendance)}
-                </select>
-              </div>
-              <div className="form-field">
-                <label htmlFor="rsvp-group-mode">{rsvp.fields.groupMode}</label>
-                <select id="rsvp-group-mode" name="groupMode">
-                  {optionsMarkup(rsvp.options.groupMode)}
-                </select>
-              </div>
-              <div className="form-field">
-                <label htmlFor="rsvp-group-name">{rsvp.fields.groupName}</label>
-                <input id="rsvp-group-name" name="groupName" type="text" />
-              </div>
-              <div className="form-field">
-                <label htmlFor="rsvp-party-size">{rsvp.fields.partySize}</label>
-                <input
-                  id="rsvp-party-size"
-                  name="partySize"
-                  type="number"
-                  min="1"
-                  max="12"
-                  defaultValue="1"
-                />
-              </div>
-              <div className="form-field">
-                <label htmlFor="rsvp-adults">{rsvp.fields.adults}</label>
-                <input
-                  id="rsvp-adults"
-                  name="adults"
-                  type="number"
-                  min="1"
-                  max="12"
-                  defaultValue="1"
-                />
-              </div>
-              <div className="form-field">
-                <label htmlFor="rsvp-children">{rsvp.fields.children}</label>
-                <input
-                  id="rsvp-children"
-                  name="children"
-                  type="number"
-                  min="0"
-                  max="12"
-                  defaultValue="0"
-                />
-              </div>
-              <div className="form-field">
-                <label htmlFor="rsvp-guests">{rsvp.fields.guests}</label>
-                <input id="rsvp-guests" name="guests" type="text" />
-              </div>
-              <div className="form-field form-field-wide">
-                <label htmlFor="rsvp-accommodation">
-                  {rsvp.fields.accommodation}
-                </label>
-                <select id="rsvp-accommodation" name="accommodation">
-                  {optionsMarkup(rsvp.options.accommodation)}
-                </select>
-              </div>
-              <div className="form-field" data-independent-stay hidden>
-                <label htmlFor="rsvp-independent-arrival">
-                  {rsvp.fields.independentArrival}
-                </label>
-                <select
-                  id="rsvp-independent-arrival"
-                  name="independentArrival"
-                  disabled
-                >
-                  {optionsMarkup(rsvp.options.independentArrival)}
-                </select>
-              </div>
-              <div className="form-field" data-independent-stay hidden>
-                <label htmlFor="rsvp-sunday-morning">
-                  {rsvp.fields.sundayMorning}
-                </label>
-                <select
-                  id="rsvp-sunday-morning"
-                  name="sundayMorning"
-                  disabled
-                >
-                  {optionsMarkup(rsvp.options.sundayMorning)}
-                </select>
-              </div>
+              ))}
             </div>
+
+            <RsvpRecap
+              questions={visiblePetanqueQuestions}
+              guests={guests}
+              answers={answers}
+            />
           </fieldset>
+        )}
 
-          {showTravelSection && (
-            <fieldset>
-              <legend>{rsvp.groups.travel}</legend>
-              <p className="fieldset-note">{rsvp.travelNote}</p>
-              <div className="rsvp-form-grid">
-                <div className="form-field form-field-wide">
-                  <label htmlFor="travel-status">{rsvp.fields.travelStatus}</label>
-                  <select id="travel-status" name="travelStatus">
-                    {optionsMarkup(rsvp.options.travelStatus)}
-                  </select>
-                </div>
-                <div className="form-field">
-                  <label htmlFor="arrival-from">{rsvp.fields.arrivalFrom}</label>
-                  <input id="arrival-from" name="arrivalFrom" type="text" />
-                </div>
-                <div className="form-field">
-                  <label htmlFor="arrival-to">{rsvp.fields.arrivalTo}</label>
-                  <input
-                    id="arrival-to"
-                    name="arrivalTo"
-                    type="text"
-                    placeholder="GDL"
-                  />
-                </div>
-                <div className="form-field">
-                  <label htmlFor="arrival-date">{rsvp.fields.arrivalDate}</label>
-                  <input id="arrival-date" name="arrivalDate" type="date" />
-                </div>
-                <div className="form-field">
-                  <label htmlFor="arrival-time">{rsvp.fields.arrivalTime}</label>
-                  <input id="arrival-time" name="arrivalTime" type="time" />
-                </div>
-                <div className="form-field">
-                  <label htmlFor="arrival-airline">
-                    {rsvp.fields.arrivalAirline}
-                  </label>
-                  <input id="arrival-airline" name="arrivalAirline" type="text" />
-                </div>
-                <div className="form-field">
-                  <label htmlFor="arrival-flight">
-                    {rsvp.fields.arrivalFlight}
-                  </label>
-                  <input id="arrival-flight" name="arrivalFlight" type="text" />
-                </div>
-                <div className="form-field">
-                  <label htmlFor="departure-from">
-                    {rsvp.fields.departureFrom}
-                  </label>
-                  <input
-                    id="departure-from"
-                    name="departureFrom"
-                    type="text"
-                    placeholder="GDL"
-                  />
-                </div>
-                <div className="form-field">
-                  <label htmlFor="departure-to">{rsvp.fields.departureTo}</label>
-                  <input id="departure-to" name="departureTo" type="text" />
-                </div>
-                <div className="form-field">
-                  <label htmlFor="departure-date">
-                    {rsvp.fields.departureDate}
-                  </label>
-                  <input id="departure-date" name="departureDate" type="date" />
-                </div>
-                <div className="form-field">
-                  <label htmlFor="departure-time">
-                    {rsvp.fields.departureTime}
-                  </label>
-                  <input id="departure-time" name="departureTime" type="time" />
-                </div>
-                <div className="form-field">
-                  <label htmlFor="departure-airline">
-                    {rsvp.fields.departureAirline}
-                  </label>
-                  <input
-                    id="departure-airline"
-                    name="departureAirline"
-                    type="text"
-                  />
-                </div>
-                <div className="form-field">
-                  <label htmlFor="departure-flight">
-                    {rsvp.fields.departureFlight}
-                  </label>
-                  <input
-                    id="departure-flight"
-                    name="departureFlight"
-                    type="text"
-                  />
-                </div>
-                <div className="form-field form-field-wide">
-                  <label htmlFor="travel-route">{rsvp.fields.route}</label>
-                  <input
-                    id="travel-route"
-                    name="route"
-                    type="text"
-                    placeholder={rsvp.fields.routePlaceholder}
-                  />
-                </div>
-              </div>
-            </fieldset>
-          )}
-
-          <fieldset className="petanque-fieldset">
-            <legend>{petanque.eyebrow}</legend>
-            <div className="petanque-intro">
-              <p>{petanque.intro}</p>
-              <a
-                className="text-link"
-                href={petanque.organizerWhatsapp}
-                target="_blank"
-                rel="noreferrer"
-              >
-                {petanque.organizerLabel} ↗
-              </a>
-            </div>
-            <div className="rsvp-form-grid">
-              <div className="form-field">
-                <label htmlFor="petanque-participation">
-                  {petanque.fields.participation}
-                </label>
-                <select id="petanque-participation" name="petanqueParticipation">
-                  {optionsMarkup(petanque.options.participation)}
-                </select>
-              </div>
-              <div className="form-field">
-                <label htmlFor="petanque-party-size">
-                  {petanque.fields.partySize}
-                </label>
-                <input
-                  id="petanque-party-size"
-                  name="petanquePartySize"
-                  type="number"
-                  min="0"
-                  max="12"
-                  defaultValue="0"
+        {/* Extra-stay questions: one row per guest, 0–5 likelihood selector
+            for the "Et après ?" plans (stay at Roca Azul + beach). Mirrors the
+            mini-RSVP in the Coast section. */}
+        {extraStayQuestions.length > 0 && guests.length > 0 && (
+          <fieldset className="rsvp-scale-fieldset">
+            <legend>{rsvp.progressCoast}</legend>
+            <p className="fieldset-note">{coastRsvpMini.intro}</p>
+            <div className="rsvp-scale-questions">
+              {extraStayQuestions.map((q) => (
+                <RsvpQuestion
+                  key={q.id}
+                  questionId={q.id}
+                  title={q.title}
+                  subtitle={q.subtitle}
+                  guests={guests}
+                  answers={answers[q.id] || {}}
+                  onChange={(guestId, level) =>
+                    handleAnswerChange(q.id, guestId, level)
+                  }
                 />
-              </div>
-              <div className="form-field form-field-wide">
-                <label htmlFor="petanque-names">{petanque.fields.names}</label>
-                <input
-                  id="petanque-names"
-                  name="petanqueNames"
-                  type="text"
-                  placeholder={petanque.fields.namesPlaceholder}
-                />
-              </div>
-              <div className="form-field">
-                <label htmlFor="petanque-own-boules">
-                  {petanque.fields.ownBoules}
-                </label>
-                <select id="petanque-own-boules" name="petanqueOwnBoules">
-                  {optionsMarkup(petanque.options.ownBoules)}
-                </select>
-              </div>
+              ))}
             </div>
-          </fieldset>
 
-          <fieldset>
-            <legend>{rsvp.groups.notes}</legend>
-            <div className="form-field">
-              <label htmlFor="rsvp-notes">{rsvp.fields.notes}</label>
-              <textarea id="rsvp-notes" name="notes" rows="4" />
-            </div>
+            <RsvpRecap
+              questions={extraStayQuestions}
+              guests={guests}
+              answers={answers}
+            />
           </fieldset>
+        )}
 
+        {/* Read-only "À payer" summary: shows the per-person and per-group
+            amounts for the primary cabin and, when present, the extra cabin.
+            Amounts follow the same pricing rules as the Hébergement section. */}
+        {payment.title && (
+          <section className="rsvp-payment" aria-label={payment.title}>
+            <h3>{payment.title}</h3>
+            <p>{payment.intro}</p>
+
+            <PaymentSummary
+              activeMember={profile?.guest}
+              groupMembers={guests}
+              getAssignedCabinId={getAssignedCabinId}
+              getAssignedRoomId={getAssignedRoomId}
+              resolveMemberCovered={resolveMemberCovered}
+              language={language}
+              payment={payment}
+              coveredLabel={coveredLabel}
+            />
+
+            {getXtraCabinId(profile?.guest) && (
+              <PaymentSummary
+                activeMember={profile?.guest}
+                groupMembers={guests}
+                getAssignedCabinId={getXtraCabinId}
+                getAssignedRoomId={getXtraRoomId}
+                resolveMemberCovered={resolveXtraCovered}
+                language={language}
+                payment={{ ...payment, cabinTitle: payment.extraCabinTitle }}
+                coveredLabel={coveredLabel}
+              />
+            )}
+
+            {/* Total: sums the primary stay and the extra stay (when present). */}
+            {(() => {
+              const primary = computeStayAmounts({
+                activeMember: profile?.guest,
+                groupMembers: guests,
+                getAssignedCabinId,
+                resolveMemberCovered,
+              });
+              const extra = getXtraCabinId(profile?.guest)
+                ? computeStayAmounts({
+                    activeMember: profile?.guest,
+                    groupMembers: guests,
+                    getAssignedCabinId: getXtraCabinId,
+                    resolveMemberCovered: resolveXtraCovered,
+                  })
+                : null;
+
+              const perPersonTotal =
+                (primary?.perPersonToPay || 0) + (extra?.perPersonToPay || 0);
+              const perPersonOriginal =
+                (primary?.activeCabinPerPerson || 0) +
+                (extra?.activeCabinPerPerson || 0);
+              const groupTotal =
+                (primary?.groupToPay || 0) + (extra?.groupToPay || 0);
+              const groupOriginal =
+                (primary?.groupTotal || 0) + (extra?.groupTotal || 0);
+
+              const perPersonSale =
+                (primary?.perPersonSale || false) ||
+                (extra?.perPersonSale || false);
+              const groupSale =
+                (primary?.groupSale || false) || (extra?.groupSale || false);
+
+              return (
+                <div className="rsvp-payment-block rsvp-payment-total">
+                  <h4 className="rsvp-payment-block-title">{payment.total}</h4>
+                  <dl className="rsvp-payment-rows">
+                    <div className="rsvp-payment-row">
+                      <dt>{payment.perPerson}</dt>
+                      <dd
+                        className={`rsvp-payment-value${perPersonSale ? " is-sale" : ""}`}
+                      >
+                        <span className="rsvp-payment-line">
+                          {perPersonSale && (
+                            <span className="rsvp-payment-original">
+                              {formatPrice(perPersonOriginal, language)} MXN
+                            </span>
+                          )}
+                          <strong>{formatPrice(perPersonTotal, language)} MXN</strong>
+                        </span>
+                        <span className="rsvp-payment-line">
+                          {perPersonSale && (
+                            <span className="rsvp-payment-original">
+                              ≈ {formatPrice(perPersonOriginal / 20, language)} €
+                            </span>
+                          )}
+                          <small>≈ {formatPrice(perPersonTotal / 20, language)} €</small>
+                        </span>
+                      </dd>
+                    </div>
+                    <div className="rsvp-payment-row">
+                      <dt>{payment.perGroup}</dt>
+                      <dd
+                        className={`rsvp-payment-value${groupSale ? " is-sale" : ""}`}
+                      >
+                        <span className="rsvp-payment-line">
+                          {groupSale && (
+                            <span className="rsvp-payment-original">
+                              {formatPrice(groupOriginal, language)} MXN
+                            </span>
+                          )}
+                          <strong>{formatPrice(groupTotal, language)} MXN</strong>
+                        </span>
+                        <span className="rsvp-payment-line">
+                          {groupSale && (
+                            <span className="rsvp-payment-original">
+                              ≈ {formatPrice(groupOriginal / 20, language)} €
+                            </span>
+                          )}
+                          <small>≈ {formatPrice(groupTotal / 20, language)} €</small>
+                        </span>
+                      </dd>
+                    </div>
+                  </dl>
+                </div>
+              );
+            })()}
+
+            {payment.asterisk && (
+              <p className="rsvp-payment-asterisk">{payment.asterisk}</p>
+            )}
+          </section>
+        )}
+
+        {/* Final submit: persists every flow's answers to Firestore and shows
+            a success/error confirmation. */}
+        <div className="rsvp-submit">
           <button
             className="button button-light"
-            type="submit"
-            disabled={!allResume || status === "working"}
+            type="button"
+            onClick={handleSubmit}
+            disabled={saveStatus === "working"}
           >
-            {rsvp.button}
+            {rsvp.button || scale.saveButton}
           </button>
-          <small id="rsvp-preview-note" data-form-status>
-            {statusText}
-          </small>
-        </form>
+
+          {saveStatus === "saved" ? (
+            <p className="rsvp-confirmation" role="status">
+              <span aria-hidden="true">✓</span>
+              {scale.savedNote || interfaceText.submitSuccess}
+            </p>
+          ) : saveStatus === "error" ? (
+            <p className="rsvp-confirmation rsvp-confirmation--error" role="alert">
+              {interfaceText.submitError}
+            </p>
+          ) : saveStatus === "working" ? (
+            <small data-form-status>{interfaceText.submitWorking}</small>
+          ) : null}
+
+          {rsvp.previewNote && (
+            <p className="rsvp-preview-note">{rsvp.previewNote}</p>
+          )}
+        </div>
 
         {/* Desktop-only bottom nav: leads to the thanks section. */}
         <nav className="section-nav section-nav--light rsvp-section-nav" aria-label="Continue">

@@ -155,7 +155,28 @@ npm run test:rules  # Firestore rules tests (uses emulators)
 - **Always run both apps + network mode** when developing locally (see §1).
 - **Verify translation keys exist** in all three languages before relying on
   them (empty keys render blank).
+- **French uses TU (tutoiement)** — the invitation addresses each guest
+  personally and warmly, so French copy must use the informal singular
+  "tu / ton / ta / tes" (e.g. "Saisis ton mot de passe", "Participes-tu au
+  tournoi ?"), never "vous / votre / vos". This applies to `content.js` and to
+  the `interfaceText` in `AppContext.jsx`. Spanish likewise uses the informal
+  "tú / tu / tus".
 - **Don't hardcode copy** — use `content.js`.
 - **Reuse existing components** (carousels, modals) instead of reinventing.
 - **Keep container nesting shallow** — one container level per section.
+- **Extra cabin display mirrors the primary cabin** — the "Et après ?" (Coast)
+  section renders the extra cabin (`xtraCabin`/`xtraRoom`) with the same
+  treatment as the primary cabin in Hébergement: covered note
+  (`accommodation-covered-note`), cabin badge (`accommodation-cabin-badge`),
+  photo carousel (`accommodation-photo-carousel`), and the `CabinOccupancy`
+  modal. Reuse these existing classes/components rather than building a new
+  layout. The extra cabin's photos come from the same `cloudinaryIds` field.
+- **Cabin photo storage convention** — a cabin's `cloudinaryIds` are stored
+  **relative to the `boda/` prefix**; the app renders them as
+  `cloudinaryImage(\`boda/${id}\`)`. So a photo at `boda/cabin/casona/foo` is
+  stored as `cabin/casona/foo`. When wiring up new cabin photos, move the
+  Cloudinary assets into `boda/cabin/<slug>/` (via `uploader.rename`) and store
+  the relative IDs. See `scripts/update-casona-lavanda-photos.mjs` for a
+  working example (it also shows how to split a batch of uploads by timestamp).
 - *(Add new lessons here as you discover them.)*
+

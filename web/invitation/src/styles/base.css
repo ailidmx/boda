@@ -293,9 +293,7 @@ p {
   gap: 0.45rem;
 }
 
-.form-field-wide,
-.rsvp-form .button,
-.rsvp-form > small {
+.form-field-wide {
   grid-column: 1 / -1;
 }
 

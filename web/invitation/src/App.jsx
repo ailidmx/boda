@@ -209,6 +209,8 @@ function Invitation() {
           </Suspense>
         </LazySection>
         <LazySection id="photos" className="lazy-section">
+
+
           <Suspense fallback={null}>
             <Photos />
           </Suspense>
@@ -230,6 +232,8 @@ function Invitation() {
           </Suspense>
         </LazySection>
         <LazySection id="thanks" className="lazy-section">
+
+
           <Suspense fallback={null}>
             <Thanks />
           </Suspense>

@@ -13,8 +13,10 @@ import {
 } from "../guest-profiles.js";
 import { getCabin } from "../cabins.js";
 import { getRoom, getRoomsByCabin } from "../rooms.js";
+import { cloudinaryImage } from "../cloudinary.js";
 import { StayPlanCard } from "./StayPlanCard.jsx";
 import { CabinOccupancy } from "./CabinOccupancy.jsx";
+
 
 
 
@@ -174,7 +176,26 @@ export function Coast() {
   const option = t.accommodation?.guestOption || {};
   const extraStay = coast.extraStay || {};
 
+  // Extra cabin display name (normalised whitespace, like the primary cabin).
+  const extraCabinName = extraCabin?.name?.replace(/\s+/g, " ") || extraCabinId;
+
+  // Photos come from the DB (Cloudinary IDs). cloudinaryIds may be an array
+  // (new format) or a comma-separated string (legacy format).
+  const rawXtraCloudinaryIds = extraCabin?.cloudinaryIds;
+  const xtraCloudinaryIdList = Array.isArray(rawXtraCloudinaryIds)
+    ? rawXtraCloudinaryIds
+    : typeof rawXtraCloudinaryIds === "string"
+      ? rawXtraCloudinaryIds.split(",").map((id) => id.trim()).filter(Boolean)
+      : [];
+  const extraCabinPhotos = xtraCloudinaryIdList.map((id) =>
+    cloudinaryImage(`boda/${id}`, { width: 1200 }),
+  );
+
+  // Whether the active guest's extra stay is covered by the couple.
+  const extraPaidByCouple = resolveXtraCovered(liveActive);
+
   // ── Extra cabin occupancy ────────────────────────────────────────────────
+
   // Occupancy is computed by parsing the whole guests collection and finding
   // every guest who shares the SAME extra cabin (xtraCabin), not just those
   // with a matching room id. Each occupant carries their room, their
@@ -383,11 +404,76 @@ export function Coast() {
         </div>
       </div>
 
+      {/* Extra stay (Plan 1 · stay at Roca Azul, Sunday→Tuesday) — shown only
+          when the active guest has an extra cabin assigned for the second
+          stay. Reuses the same StayPlanCard as the Hébergement section so the
+          pricing, "paid by the couple" banner, and on-sale styling match. */}
+      {hasExtraCabin && extraCabin && (
+        <div className="coast-extra-stay reveal">
+          <p className="eyebrow">{extraStay.eyebrow}</p>
+          <h3>{extraStay.title}</h3>
+          <p className="accommodation-covered-note">
+            <strong>{extraPaidByCouple ? option.onSiteCoveredBody : option.onSitePayBody}</strong>
+          </p>
+          {extraCabinName && (
+            <p className="accommodation-cabin-badge">{extraCabinName}</p>
+          )}
+          {extraCabinPhotos.length > 0 && (
+            <div className="accommodation-photo-carousel" aria-label={extraCabinName}>
+              {extraCabinPhotos.map((photo, index) => (
+                <figure className="accommodation-photo" key={index}>
+                  <img
+                    src={photo}
+                    alt=""
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <figcaption>
+                    <span>{extraCabinName}</span>
+                    <small>
+                      {String(index + 1).padStart(2, "0")} /{" "}
+                      {String(extraCabinPhotos.length).padStart(2, "0")}
+                    </small>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          )}
+          {extraRoomOccupants.length > 0 && (
+            <div className="accommodation-occupancy-top">
+              <CabinOccupancy
+                cabinName={extraCabinName}
+                rooms={extraRoomOccupants}
+                assignedRoomId={extraRoom}
+                activeMemberId={liveActive?.id}
+                option={option}
+                language={language}
+              />
+            </div>
+          )}
+          <StayPlanCard
+
+            activeMember={liveActive}
+            groupMembers={guests}
+            getAssignedCabinId={getXtraCabinId}
+            getAssignedRoomId={getXtraRoomId}
+            resolveMemberCovered={resolveXtraCovered}
+            resolveMemberPaid={resolveXtraPaid}
+            option={option}
+            language={language}
+            showExtraCabinRow={false}
+            extraCabin={extraCabin}
+            extraRoom={extraRoom}
+          />
+        </div>
+      )}
+
       {/* Mini RSVP — a 3-step flipable card (like "¡Te animas!" and pétanque):
           Step 1 = stay at Roca Azul, Step 2 = the beach plan, Step 3 = summary.
           Each guest rates how likely they are to join each "Et après ?" plan
           (0–5). Answers are saved per guest to Firestore via saveRsvpAnswers. */}
       <div className="coast-rsvp-mini reveal">
+
         <div className="coast-rsvp-mini-head">
           <p className="eyebrow">{rsvpMini.eyebrow}</p>
           <h3>{rsvpMini.title}</h3>
@@ -449,46 +535,10 @@ export function Coast() {
         />
       </div>
 
-      {/* Extra stay (Plan 1 · stay at Roca Azul, Sunday→Tuesday) — shown only
-          when the active guest has an extra cabin assigned for the second
-          stay. Reuses the same StayPlanCard as the Hébergement section so the
-          pricing, "paid by the couple" banner, and on-sale styling match. */}
-      {hasExtraCabin && extraCabin && (
-        <div className="coast-extra-stay reveal">
-          <p className="eyebrow">{extraStay.eyebrow}</p>
-          <h3>{extraStay.title}</h3>
-          {extraRoomOccupants.length > 0 && (
-            <div className="accommodation-occupancy-top">
-              <CabinOccupancy
-                cabinName={extraCabin?.name?.replace(/\s+/g, " ") || extraCabinId}
-                rooms={extraRoomOccupants}
-                assignedRoomId={extraRoom}
-                activeMemberId={liveActive?.id}
-                option={option}
-                language={language}
-              />
-            </div>
-          )}
-          <StayPlanCard
-            activeMember={liveActive}
-            groupMembers={guests}
-            getAssignedCabinId={getXtraCabinId}
-            getAssignedRoomId={getXtraRoomId}
-            resolveMemberCovered={resolveXtraCovered}
-            resolveMemberPaid={resolveXtraPaid}
-            option={option}
-            language={language}
-            showExtraCabinRow={false}
-            extraCabin={extraCabin}
-            extraRoom={extraRoom}
-          />
-        </div>
-      )}
-
-
       {/* Coast accommodation suggestions — mirrors the Accommodation "no
           cabin" pattern: an Airbnb section (one listing per group size) and a
           hotel section (a short selection ordered by price). */}
+
       {suggestions.title && (
         <div className="coast-suggestions reveal">
           <div className="section-heading">

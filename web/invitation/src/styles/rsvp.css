@@ -1,17 +1,12 @@
 /* ── RSVP section ─────────────────────────────────────────────────────── */
 
 /* ── Responsive: mobile-first ──────────────────────────────────────────
-   The RSVP form grid is 2 columns on desktop, collapsing to 1 column on
-   mobile. The frame padding tightens on small screens. */
+   The frame padding tightens on small screens. */
 
 @media (max-width: 600px) {
   .rsvp-section {
     padding: clamp(2rem, 6vw, 3rem);
     outline-offset: -0.4rem;
-  }
-
-  .rsvp-form-grid {
-    grid-template-columns: 1fr;
   }
 }
 
@@ -49,74 +44,10 @@
   margin: 0 auto 2rem;
 }
 
-.rsvp-form {
-  display: grid;
-  gap: 2.5rem;
-  margin-top: 3rem;
-  text-align: left;
-}
-
-.rsvp-form fieldset {
-  margin: 0;
-  border: 1px solid rgb(255 255 255 / 28%);
-  padding: clamp(1.25rem, 3vw, 2rem);
-}
-
-.rsvp-form legend {
-  padding: 0 0.75rem;
-  color: #e4b968;
-  font-family: var(--font-display);
-  font-size: clamp(1.4rem, 2.5vw, 2rem);
-}
-
-.rsvp-form-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.25rem;
-}
-
-.rsvp-form .form-field label {
-  color: rgb(255 253 248 / 75%);
-}
-
-.rsvp-form .form-field input,
-.rsvp-form .form-field select,
-.rsvp-form .form-field textarea {
-  border-color: rgb(255 255 255 / 45%);
-  color: var(--white);
-}
-
-.rsvp-form .form-field select option {
-  color: var(--ink);
-}
-
-.rsvp-form .form-field input:focus,
-.rsvp-form .form-field select:focus,
-.rsvp-form .form-field textarea:focus {
-  outline-color: #e4b968;
-}
-
 .fieldset-note {
   max-width: 46rem;
   margin: 0 0 1.5rem;
   color: rgb(255 253 248 / 70%);
-}
-
-.rsvp-form > small {
-  text-align: center;
-}
-
-.rsvp-section .button {
-  margin: 1rem auto;
-}
-
-.rsvp-section small {
-  display: block;
-
-  margin-top: 1rem;
-  color: #e4b968;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
 }
 
 /* Bottom "continue" nav inside the "¡Te animas!" RSVP section. Mirrors the
@@ -219,33 +150,6 @@
   outline: none;
   border-color: var(--terracotta);
   box-shadow: 0 0 0 2px rgb(169 77 49 / 15%);
-}
-
-/* ── Pétanque inside RSVP (dark background) ── */
-.petanque-fieldset {
-  margin: 0;
-  border: 1px solid rgb(255 255 255 / 28%);
-  padding: clamp(1.25rem, 3vw, 2rem);
-}
-
-.petanque-fieldset legend {
-  padding: 0 0.75rem;
-  color: #e4b968;
-  font-family: var(--font-display);
-  font-size: clamp(1.4rem, 2.5vw, 2rem);
-}
-
-.petanque-intro {
-  margin-bottom: 1.25rem;
-}
-
-.petanque-intro p {
-  margin: 0 0 0.75rem;
-  color: rgb(255 253 248 / 70%);
-}
-
-.petanque-intro a {
-  color: #e4b968;
 }
 
 /* ── RSVP scale questions ─────────────────────────────────────────────── */
@@ -828,6 +732,237 @@
 
 .rsvp-progress-item.is-done .rsvp-progress-state {
   color: #e4b968;
+}
+
+
+/* ── RSVP "À payer" payment summary ─────────────────────────────────────
+   A read-only block shown before the final form. It lists the per-person and
+   per-group amounts for the primary cabin and (when present) the extra cabin.
+   It sits on the dark green RSVP frame, so it uses white text, gold accents,
+   and the same red "on sale" price treatment as the Hébergement section. */
+.rsvp-payment {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgb(228 185 104 / 45%);
+  background: rgb(255 255 255 / 4%);
+  text-align: left;
+}
+
+.rsvp-payment h3 {
+  margin: 0;
+  color: #e4b968;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+}
+
+.rsvp-payment > p {
+  margin: 0;
+  max-width: 46rem;
+  color: rgb(255 253 248 / 70%);
+}
+
+.rsvp-payment-block {
+  display: grid;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px dashed rgb(228 185 104 / 35%);
+}
+
+.rsvp-payment-block-title {
+  margin: 0;
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+
+.rsvp-payment-rows {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.rsvp-payment-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid rgb(255 255 255 / 12%);
+  background: rgb(255 255 255 / 3%);
+}
+
+.rsvp-payment-row dt {
+  color: rgb(255 253 248 / 75%);
+  font-size: 0.9rem;
+}
+
+.rsvp-payment-value {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  text-align: right;
+}
+
+.rsvp-payment-line {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.rsvp-payment-line strong {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--white);
+}
+
+.rsvp-payment-line small {
+  color: rgb(255 253 248 / 70%);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+/* Struck-through original price, muted, shown next to the discounted price
+   when a stay is covered by the couple (e-commerce "on sale" pattern). */
+.rsvp-payment-original {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  opacity: 0.55;
+  text-decoration-color: var(--terracotta);
+  text-decoration-line: line-through;
+  text-decoration-thickness: 0.12em;
+}
+
+.rsvp-payment-original strong,
+.rsvp-payment-original small {
+  font-size: 0.85em;
+}
+
+/* When a price is discounted (covered by the couple), the price to pay turns
+   red, mirroring the Hébergement sale treatment. */
+.rsvp-payment-value.is-sale .rsvp-payment-line > strong,
+.rsvp-payment-value.is-sale .rsvp-payment-line > small {
+  color: #c0392b;
+}
+
+/* "Covered by the couple" banner: a small gold tag next to the price. */
+.rsvp-payment-value em {
+  padding: 0.32rem 0.48rem;
+  background: var(--marigold);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.58rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  line-height: 1;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+
+/* Cabin · room label shown above the per-person price, and the list of
+   cabin · room labels shown above the per-group price. Small, muted, and
+   left-aligned so the price stays right-aligned. */
+.rsvp-payment-cabinroom {
+  display: block;
+  max-width: 100%;
+  color: rgb(255 253 248 / 62%);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  text-align: right;
+}
+
+.rsvp-payment-cabinroom-list {
+  display: grid;
+  gap: 0.15rem;
+  margin-bottom: 0.35rem;
+}
+
+/* The "Total" block: visually distinct from the per-stay blocks with a
+   stronger top border and a slightly larger title. */
+.rsvp-payment-total {
+  border-top: 1px solid rgb(228 185 104 / 70%);
+}
+
+.rsvp-payment-total .rsvp-payment-block-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.rsvp-payment-asterisk {
+  font-size: 0.85rem;
+  color: rgb(255 253 248 / 55%);
+}
+
+/* Final submit block: the button that persists every flow's answers to
+   Firestore, plus the success/error confirmation and the preview note. */
+.rsvp-submit {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.9rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(228 185 104 / 40%);
+}
+
+.rsvp-submit .button {
+  justify-self: start;
+}
+
+.rsvp-submit .rsvp-confirmation {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1rem;
+  border-radius: 0.75rem;
+  background: rgb(46 125 50 / 0.12);
+  color: rgb(255 253 248 / 92%);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.rsvp-submit .rsvp-confirmation > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #2e7d32;
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.rsvp-submit .rsvp-confirmation--error {
+  background: rgb(211 47 47 / 0.16);
+}
+
+.rsvp-submit .rsvp-confirmation--error > span {
+  background: #e53935;
+}
+
+.rsvp-submit small[data-form-status] {
+  color: #e4b968;
+  font-size: 0.9rem;
+}
+
+.rsvp-preview-note {
+  max-width: 46rem;
+  color: rgb(255 253 248 / 62%);
+  font-size: 0.9rem;
+  line-height: 1.5;
 }
 
 

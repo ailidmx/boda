@@ -1,6 +1,6 @@
 import React from "react";
 import { getActiveGuests } from "../guests.js";
-import { resolveLiveGuest } from "../guest-profiles.js";
+import { resolveLiveGuest, resolveGuestName } from "../guest-profiles.js";
 import { getCabin } from "../cabins.js";
 import { getRoom, getRoomDescription } from "../rooms.js";
 
@@ -114,6 +114,7 @@ export function StayPlanCard({
 
   // Active member's cabin / room for this stay.
   const liveActive = resolveLiveGuest(activeMember) || activeMember;
+  const { firstName: activeFirstName } = resolveGuestName(liveActive);
   const assignedCabin = getAssignedCabinId(liveActive);
   const assignedRoom = getAssignedRoomId(liveActive);
   const room = assignedRoom ? getRoom(assignedRoom) : null;
@@ -181,7 +182,7 @@ export function StayPlanCard({
         {activeCabinPerPerson > 0 && (
           <div className="accommodation-plan-row">
             <span className="accommodation-plan-label">
-              {option.planCardPerPerson}
+              {option.planCardPerPerson.replace("{name}", activeFirstName || "")}
             </span>
             <PlanPrice
               original={activeCabinPerPerson}
