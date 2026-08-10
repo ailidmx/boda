@@ -20,7 +20,8 @@ export function Food() {
   const food = t.food || {};
   const flavours = food.flavours || [];
 
-  // Drinks policy: disclosure card on desktop, FAB-activated modal on mobile.
+  // Drinks policy: FAB-activated modal on all screen sizes.
+
   const [drinksOpen, setDrinksOpen] = useState(false);
   const [drinksActive, setDrinksActive] = useState(false);
   const sectionRef = useRef(null);
@@ -31,11 +32,10 @@ export function Food() {
     const section = sectionRef.current;
     if (!section || typeof IntersectionObserver === "undefined") return undefined;
 
-    const mobile = window.matchMedia("(max-width: 899px)");
     let latestEntry = null;
     const syncVisibility = () => {
-      setDrinksActive(Boolean(mobile.matches && latestEntry?.isIntersecting));
-      if (!mobile.matches) setDrinksOpen(false);
+      setDrinksActive(Boolean(latestEntry?.isIntersecting));
+      if (!latestEntry?.isIntersecting) setDrinksOpen(false);
     };
     const observer = new IntersectionObserver(([entry]) => {
       latestEntry = entry;
@@ -43,12 +43,9 @@ export function Food() {
     }, { rootMargin: "-45% 0px -45% 0px", threshold: 0 });
 
     observer.observe(section);
-    mobile.addEventListener?.("change", syncVisibility);
-    return () => {
-      observer.disconnect();
-      mobile.removeEventListener?.("change", syncVisibility);
-    };
+    return () => observer.disconnect();
   }, []);
+
 
   useEffect(() => {
     if (!drinksOpen) return undefined;
@@ -107,10 +104,10 @@ export function Food() {
       <p className="experience-note reveal">{food.note}</p>
 
 
-      {/* Drinks policy — disclosure card on desktop, FAB modal on mobile.
-          The desktop panel mirrors the venue privacy panel: a decorative
-          icon, a header (icon + title) and a body of text. */}
+      {/* Drinks policy — FAB-activated modal on all screen sizes. The
+          inline card is hidden; a FAB opens a full overlay. */}
       <article className="drinks-policy reveal">
+
         <div className="drinks-policy__header">
           <span className="drinks-policy__icon" aria-hidden="true">
             <DrinksIcon />

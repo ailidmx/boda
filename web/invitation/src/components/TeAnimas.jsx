@@ -6,7 +6,8 @@ import { RsvpRecap } from "./RsvpRecap.jsx";
 import { FlipStepCard } from "./FlipStepCard.jsx";
 import { getGroupMembers } from "../guest-profiles.js";
 import { getActiveGuests } from "../guests.js";
-import { resolveRsvpAnswer } from "../rsvp-responses.js";
+import { computeInitialStepIndex } from "../rsvp-responses.js";
+
 
 /**
  * "¡Te animas!" — a dedicated section for the RSVP scale questions
@@ -95,13 +96,14 @@ export function TeAnimas() {
           <RsvpRecap questions={questions} guests={guests} answers={answers} />
           <div className="rsvp-scale-save">
             <button
-              className="button button-light"
+              className="button button--gold"
               type="button"
               onClick={handleSaveAnswers}
               disabled={saveStatus === "working"}
             >
               {scale.saveButton}
             </button>
+
             {saveStatusText ? (
               <small data-form-status>{saveStatusText}</small>
             ) : null}
@@ -111,6 +113,11 @@ export function TeAnimas() {
     },
   ];
 
+  // Auto-detect the starting step: the first question that is not fully
+  // answered by every group member, or the recap when everything is answered.
+  const initialStep = computeInitialStepIndex(questions, guests, answers);
+
+
   return (
     <section className="rsvp-section section story-bg reveal">
       <p className="eyebrow">{t.nav.teAnimas}</p>
@@ -119,6 +126,7 @@ export function TeAnimas() {
       {questions.length > 0 && guests.length > 0 && (
         <FlipStepCard
           steps={steps}
+          initialIndex={initialStep}
           onDone={() => markResume(flow)}
           copy={{
             step: interfaceText.stepLabel || "Step",
@@ -127,6 +135,7 @@ export function TeAnimas() {
           }}
         />
       )}
+
 
       <nav className="te-animas-nav" aria-label="Continue">
         <a className="te-animas-nav-link" href={nextHref}>

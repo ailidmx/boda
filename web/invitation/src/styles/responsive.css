@@ -155,7 +155,14 @@
     grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
   }
 
+  /* The Story section uses a tighter gap between its two columns than the
+     other editorial sections. */
+  .story-section {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 1.5rem;
+  }
 }
+
 
 /* ── Shared mobile carousel controls ───────────────────────────────────
    Keep arrows and play/pause actions visually light and borderless across

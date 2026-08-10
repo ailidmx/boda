@@ -1,25 +1,28 @@
 /* ── Thanks / Agradecimientos (cinema-credit style) ── */
 
 /* ── Cinematic backdrop ────────────────────────────────────────────────
-   The section is a Mexican-rose "screen" lit by warm marigold + terracotta
-   glows, a slow drifting light bloom, a subtle film-grain texture and a
-   vignette — a big, cinematic thank-you to the guests. */
+   The section is a deep midnight-indigo "screen" lit by jewel-toned glows
+   (gold, teal, violet, magenta), a slow drifting light bloom, a subtle
+   film-grain texture and a vignette — a big, cinematic thank-you to the
+   guests. The dark base keeps the light text readable while the jewel
+   accents add colour, shine and elegance. */
 .thanks-section {
   position: relative;
-  /* Mexican rose (rosa mexicano) gradient base — a vibrant magenta-pink
-     screen that deepens toward the bottom. */
+  /* Deep indigo → violet → near-black gradient base. Dark enough to keep
+     the light text crisp, but with a rich, colourful undertone. */
   background: linear-gradient(
     165deg,
-    #e4007c 0%,
-    #c2185b 42%,
-    #8e0e4f 100%
+    #241a4d 0%,
+    #1a1033 38%,
+    #0d0a1f 72%,
+    #070512 100%
   );
   color: var(--white);
   overflow: hidden;
   isolation: isolate;
 }
 
-/* Warm radial glows drifting behind the content. */
+/* Warm jewel-toned radial glows drifting behind the content. */
 .thanks-section::before,
 .thanks-section::after {
   content: "";
@@ -31,12 +34,12 @@
 
 .thanks-section::before {
   background:
-    radial-gradient(60rem 40rem at 12% 8%, rgb(255 183 77 / 26%), transparent 60%),
-    radial-gradient(50rem 36rem at 88% 18%, rgb(255 105 180 / 30%), transparent 62%),
-    radial-gradient(70rem 50rem at 50% 112%, rgb(255 183 77 / 22%), transparent 65%),
-    radial-gradient(40rem 30rem at 20% 90%, rgb(255 255 255 / 12%), transparent 60%),
-    radial-gradient(36rem 28rem at 80% 70%, rgb(255 105 180 / 22%), transparent 62%),
-    linear-gradient(180deg, rgb(255 255 255 / 6%), transparent 45%);
+    radial-gradient(60rem 40rem at 12% 8%, rgb(245 197 66 / 22%), transparent 60%),
+    radial-gradient(50rem 36rem at 88% 18%, rgb(167 139 250 / 30%), transparent 62%),
+    radial-gradient(70rem 50rem at 50% 112%, rgb(45 212 191 / 20%), transparent 65%),
+    radial-gradient(40rem 30rem at 20% 90%, rgb(244 114 182 / 18%), transparent 60%),
+    radial-gradient(36rem 28rem at 80% 70%, rgb(34 211 238 / 20%), transparent 62%),
+    linear-gradient(180deg, rgb(255 255 255 / 5%), transparent 45%);
   animation: thanks-glow-drift 26s ease-in-out infinite alternate;
 }
 
@@ -44,7 +47,7 @@
 .thanks-section::after {
   background: radial-gradient(
     42rem 30rem at 50% 45%,
-    rgb(255 183 77 / 10%),
+    rgb(245 197 66 / 9%),
     transparent 70%
   );
   animation: thanks-bloom 14s ease-in-out infinite alternate;
@@ -99,9 +102,151 @@
   background: radial-gradient(
     120% 90% at 50% 45%,
     transparent 55%,
-    rgb(16 24 21 / 55%) 100%
+    rgb(7 5 18 / 60%) 100%
   );
 }
+
+/* ── Geometric art-deco backdrop ──────────────────────────────────────
+   A decorative layer of jewel-toned geometric shapes (sunburst rays,
+   diamonds, rings, arcs, triangles, dots) and a metallic sheen floating
+   over the deep indigo base. Purely visual; sits behind the content. */
+.thanks-art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Sunburst rays — a slow-spinning radial burst in the top-right. */
+.thanks-art__sunburst {
+  position: absolute;
+  top: -18%;
+  right: -12%;
+  width: 46rem;
+  height: 46rem;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgb(245 197 66 / 10%) 0deg 8deg,
+    transparent 8deg 22deg
+  );
+  border-radius: 50%;
+  -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 68%);
+  mask-image: radial-gradient(circle, #000 0%, transparent 68%);
+  animation: thanks-sunburst-spin 90s linear infinite;
+  opacity: 0.9;
+}
+
+@keyframes thanks-sunburst-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Shared shape base. */
+.thanks-art__shape {
+  position: absolute;
+  display: block;
+}
+
+/* Diamond — a rotated square with a gold gradient and glow. */
+.thanks-art__shape--diamond {
+  top: 16%;
+  left: 6%;
+  width: 7rem;
+  height: 7rem;
+  transform: rotate(45deg);
+  background: linear-gradient(135deg, rgb(245 197 66 / 55%), rgb(255 138 101 / 35%));
+  border: 1px solid rgb(255 255 255 / 30%);
+  box-shadow: 0 0 3rem rgb(245 197 66 / 35%);
+  border-radius: 0.5rem;
+  animation: thanks-float 12s ease-in-out infinite alternate;
+}
+
+/* Ring — a hollow circle outline in teal. */
+.thanks-art__shape--ring {
+  bottom: 22%;
+  right: 8%;
+  width: 9rem;
+  height: 9rem;
+  border: 2px solid rgb(45 212 191 / 45%);
+  border-radius: 50%;
+  box-shadow: 0 0 2.5rem rgb(45 212 191 / 25%), inset 0 0 2rem rgb(45 212 191 / 15%);
+  animation: thanks-float 16s ease-in-out infinite alternate-reverse;
+}
+
+/* Arc — a quarter-circle stroke in violet. */
+.thanks-art__shape--arc {
+  top: 30%;
+  right: 18%;
+  width: 8rem;
+  height: 8rem;
+  border: 2px solid rgb(167 139 250 / 50%);
+  border-radius: 50%;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  box-shadow: 0 0 2rem rgb(167 139 250 / 25%);
+  animation: thanks-float 14s ease-in-out infinite alternate;
+}
+
+/* Triangle — a small coral triangle near the bottom-left. */
+.thanks-art__shape--triangle {
+  bottom: 12%;
+  left: 16%;
+  width: 0;
+  height: 0;
+  border-left: 3.5rem solid transparent;
+  border-right: 3.5rem solid transparent;
+  border-bottom: 6rem solid rgb(255 107 107 / 40%);
+  filter: drop-shadow(0 0 1.5rem rgb(255 107 107 / 30%));
+  animation: thanks-float 18s ease-in-out infinite alternate-reverse;
+}
+
+/* Dots — small glowing circles scattered around. */
+.thanks-art__shape--dot {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  background: rgb(244 114 182 / 70%);
+  box-shadow: 0 0 1rem rgb(244 114 182 / 60%);
+  animation: thanks-pulse 4s ease-in-out infinite alternate;
+}
+
+.thanks-art__shape--dot-1 { top: 12%; left: 30%; }
+.thanks-art__shape--dot-2 { top: 48%; left: 12%; background: rgb(34 211 238 / 70%); box-shadow: 0 0 1rem rgb(34 211 238 / 60%); animation-delay: 0.6s; }
+.thanks-art__shape--dot-3 { bottom: 30%; right: 26%; background: rgb(245 197 66 / 70%); box-shadow: 0 0 1rem rgb(245 197 66 / 60%); animation-delay: 1.2s; }
+.thanks-art__shape--dot-4 { top: 22%; right: 34%; background: rgb(167 139 250 / 70%); box-shadow: 0 0 1rem rgb(167 139 250 / 60%); animation-delay: 1.8s; }
+
+@keyframes thanks-float {
+  from { transform: translateY(0) rotate(0deg); }
+  to { transform: translateY(-1.5rem) rotate(6deg); }
+}
+
+@keyframes thanks-pulse {
+  from { opacity: 0.4; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1.25); }
+}
+
+/* Metallic sheen — a soft diagonal light sweep across the whole section. */
+.thanks-art__sheen {
+  position: absolute;
+  inset: -20%;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgb(255 255 255 / 5%) 45%,
+    rgb(255 255 255 / 9%) 50%,
+    rgb(255 255 255 / 5%) 55%,
+    transparent 70%
+  );
+  animation: thanks-sheen-sweep 16s ease-in-out infinite;
+}
+
+@keyframes thanks-sheen-sweep {
+  0% { transform: translateX(-30%); }
+  50% { transform: translateX(30%); }
+  100% { transform: translateX(-30%); }
+}
+
 
 .thanks-frame {
   position: relative;

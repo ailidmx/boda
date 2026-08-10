@@ -553,17 +553,6 @@ export function Venue() {
           </div>
         </div>
 
-        <button
-          ref={privacyFabRef}
-          className={`venue-privacy-fab${venueActive && !privacyOpen ? " is-visible" : ""}`}
-          type="button"
-          aria-label={facilities.privacyTitle}
-          aria-haspopup="dialog"
-          onClick={() => setPrivacyOpen(true)}
-        >
-          <PrivacyLockIcon />
-        </button>
-
         <nav className="venue-nav venue-nav--dark" aria-label="Venue navigation">
           <a className="venue-nav-link" href="#weekend">
             <span>{facilities.navContinue}</span>
@@ -571,6 +560,21 @@ export function Venue() {
           </a>
         </nav>
       </div>
+
+      {/* Privacy FAB: a real floating action button, a direct child of the
+          section (like the other section FABs), fixed to the viewport edge
+          and contained within the 120rem column on wide screens. */}
+      <button
+        ref={privacyFabRef}
+        className={`venue-privacy-fab${venueActive && !privacyOpen ? " is-visible" : ""}`}
+        type="button"
+        aria-label={facilities.privacyTitle}
+        aria-haspopup="dialog"
+        onClick={() => setPrivacyOpen(true)}
+      >
+        <PrivacyLockIcon />
+      </button>
+
 
       {/* Shared full-screen lightbox carousel */}
       <LightboxCarousel
