@@ -220,18 +220,21 @@ function Invitation() {
             <Guests />
           </Suspense>
         </LazySection>
-        <LazySection id="gift" className="lazy-section">
-          <Suspense fallback={null}>
-            <Gift />
-          </Suspense>
-        </LazySection>
         {/* The final RSVP form sits right before the thank-you section. */}
         <LazySection id="rsvp" className="lazy-section">
           <Suspense fallback={null}>
             <RSVP />
           </Suspense>
         </LazySection>
+        {/* "Cadeaux" (gift) sits right after the RSVP and before the
+            thank-you section. */}
+        <LazySection id="gift" className="lazy-section">
+          <Suspense fallback={null}>
+            <Gift />
+          </Suspense>
+        </LazySection>
         <LazySection id="thanks" className="lazy-section">
+
 
 
           <Suspense fallback={null}>

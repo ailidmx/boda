@@ -27,7 +27,8 @@ export const EVENT = {
   playlists: {
     general: "https://open.spotify.com/playlist/4izmJJXTOnsUz3BQsrkZBh",
     karaoke: "https://open.spotify.com/playlist/6hmu5velXNH68JAhQ3xaU4",
-    shared: "https://open.spotify.com/playlist/4izmJJXTOnsUz3BQsrkZBh",
+    shared: "https://open.spotify.com/playlist/15OzUIqhOrY5m9yu8qj3Xj?si=9bc8cefe86f646de&pt=f01f85e8d5b1171163c30140263eb9f1",
+
   },
 
 };
@@ -37,7 +38,8 @@ export const content = {
     locale: "es-MX",
     skip: "Saltar al contenido",
     metaDescription:
-      "David y Aydé se casan el 20 de febrero de 2027 en Roca Azul, Jocotepec, Jalisco.",
+      "David y Aydé celebran su unión el 20 de febrero de 2027 en Roca Azul, Jocotepec, Jalisco.",
+
     nav: {
       home: "Inicio",
       you: "Tú",
@@ -125,20 +127,22 @@ export const content = {
 
 
     countdown: {
-      prefix: "Casados en",
+      prefix: "Unidos en",
       years: "años",
       months: "meses",
       days: "días",
       hours: "horas",
       minutes: "min",
-      arrived: "Casados desde",
+      arrived: "Unidos desde",
     },
 
 
 
+
     hero: {
-      eyebrow: "Estás invitado a nuestra boda",
-      eyebrowF: "Estás invitada a nuestra boda",
+      eyebrow: "Estás invitado a celebrar nuestra unión",
+      eyebrowF: "Estás invitada a celebrar nuestra unión",
+
       invitation: "Queremos celebrar este momento contigo",
 
 
@@ -204,7 +208,8 @@ export const content = {
       step2Title: "¿Cuál es tu número de celular?",
       step3Title: "¿Cuál es tu correo electrónico?",
       step2Body:
-        "Lo usaremos solo para comunicarnos contigo sobre la boda (confirmaciones, cambios de última hora o coordinación de traslados).",
+        "Lo usaremos solo para comunicarnos contigo sobre la celebración (confirmaciones, cambios de última hora o coordinación de traslados).",
+
       step3Body:
         "Te enviaremos la invitación formal y cualquier información importante antes del gran día.",
       contactFor: "Contacto de",
@@ -282,13 +287,22 @@ export const content = {
     photos: {
       title: "Comparte tus fotos",
       lead:
-        "Queremos ver la boda a través de tus ojos. Hemos creado dos álbumes compartidos de Google Photos donde puedes subir tus fotos.",
-      beforeTitle: "📸 Antes de la boda",
+        "Queremos ver la celebración a través de tus ojos. Hemos creado dos álbumes compartidos de Google Photos donde puedes subir tus fotos.",
+      beforeTitle: "📸 Antes de la celebración",
       beforeBody: "Comparte tus fotos favoritas de nosotros antes del gran día.",
-      duringTitle: "🎉 La boda vista por los invitados",
+      duringTitle: "🎉 La celebración vista por los invitados",
       duringBody:
-        "Después de la boda, comparte aquí las fotos que tomaste durante la celebración.",
+        "Después de la celebración, comparte aquí las fotos que tomaste durante la celebración.",
+      beforeLink: "https://photos.app.goo.gl/Df3QwjTKQTGVEqEU6",
+      duringLink: "https://photos.app.goo.gl/Vhg2AY3gXzXL2iKp8",
+
+
+
+
+
+
       upload: "Subir fotos ↗",
+
       note:
         'Solicita acceso al álbum haciendo clic en "Subir fotos". Una vez dentro, podrás subir todas las fotos que quieras. ¡Gracias por capturar estos momentos con nosotros!',
     },
@@ -301,7 +315,8 @@ export const content = {
       title: "Tres días para celebrar",
 
       intro:
-        "Nosotros estaremos en Roca Azul desde el jueves. Los invitados pueden llegar desde el viernes alrededor del mediodía y la celebración principal será una boda de tarde el sábado.",
+        "Nosotros estaremos en Roca Azul desde el jueves. Los invitados pueden llegar desde el viernes alrededor del mediodía y la celebración principal será una ceremonia de tarde el sábado.",
+
       navSchedule: "Ver los tres días",
       navProgram: "Programa detallado",
 
@@ -377,10 +392,12 @@ export const content = {
         { value: "≈ 18:55", label: "puesta de sol", note: "Muy cerca de la ceremonia en el faro" },
       ],
       moments: [
+        { time: "Mañana", title: "Luz de lago al amanecer", body: "El lago en calma refleja la luz dorada del amanecer." },
         { time: "13:00–17:30", title: "Tarde luminosa", body: "Sol y temperatura agradable a cálida; convienen protector solar, lentes y agua." },
         { time: "18:00", title: "Ceremonia y atardecer", body: "La luz comenzará a bajar durante la ceremonia en el faro." },
         { time: "Desde 19:00", title: "La noche refresca", body: "La temperatura puede bajar rápido junto al lago." },
       ],
+
       adviceTitle: "Qué traer",
       advice: [
         "Una capa ligera, saco, suéter o chal para la cena y el baile.",
@@ -401,35 +418,84 @@ export const content = {
       flavours: [
         {
           key: "carnitas",
+          type: "food",
           title: "Carnitas",
           body: "Cerdo cocido lentamente hasta quedar tierno y dorado, servido con tortillas, cebolla, cilantro, salsas y limón.",
         },
         {
-          key: "taquiza",
-          title: "Taquiza",
-          body: "Una mesa con varios guisos mexicanos, tortillas calientes y acompañamientos para que cada quien arme sus propios tacos.",
-        },
-        {
           key: "tejuino",
+          type: "drink",
           title: "Tejuino",
           body: "Bebida tapatía de maíz fermentado, dulce y ácida, servida muy fría con limón y sal. También habrá tejuino loco con tequila o mezcal.",
         },
         {
+          key: "jericalla",
+          type: "dessert",
+          title: "Jericalla",
+          body: "El postre más tapatío: una crema horneada con canela y vainilla, con su característica capa dorada.",
+        },
+        {
+          key: "taquiza",
+          type: "food",
+          title: "Taquiza",
+          body: "Una mesa con varios guisos mexicanos, tortillas calientes y acompañamientos para que cada quien arme sus propios tacos.",
+        },
+        {
+          key: "aguas",
+          type: "drink",
+          title: "Aguas de sabor",
+          body: "Aguas frescas de jamaica, horchata y limón para acompañar la comida.",
+        },
+        {
+          key: "gelatinas",
+          type: "dessert",
+          title: "Gelatinas",
+          body: "Gelatinas de sabores, frescas y ligeras, para cerrar la comida con algo dulce.",
+        },
+        {
           key: "nopales",
+          type: "food",
           title: "Ensalada de nopales",
           body: "Nopal tierno con tomate, cebolla, hierbas y queso: una opción fresca, mexicana y vegetariana.",
         },
         {
+          key: "tequila",
+          type: "drink",
+          title: "Tequila",
+          body: "Tequila para brindar y celebrar, servido con sal y limón.",
+        },
+        {
+          key: "postres-tapatios",
+          type: "dessert",
+          title: "Dulces mexicanos",
+          body: "Una selección de dulces tradicionales mexicanos para endulzar el final de la comida.",
+        },
+        {
           key: "guacamole",
+          type: "food",
           title: "Guacamole y opciones vegetarianas",
           body: "Habrá guacamole, tortillas, salsas y otros acompañamientos sin carne. Podrán indicar sus restricciones en el RSVP.",
         },
         {
           key: "pizza",
+          type: "food",
           title: "Pizza",
           body: "Pizzas para compartir el viernes por la noche: una bienvenida sencilla e informal después de las llegadas y la petanca.",
         },
+        {
+          key: "esquites",
+          type: "food",
+          title: "Esquites",
+          body: "Maíz tierno cocido con epazote, chile, limón y queso: un clásico callejero mexicano.",
+        },
       ],
+
+      flavourType: {
+        food: "Comida",
+        drink: "Bebida",
+        dessert: "Postre",
+      },
+
       days: [
         {
           day: "Viernes por la noche",
@@ -480,25 +546,37 @@ export const content = {
         {
           moment: "Después del aperitivo",
           name: "Marimba",
-          note: "Para acompañar el primer brindis antes de las carnitas.",
+          note: "La marimba es un idiófono de teclado de madera: barras de hormiguillo que se percuten con baquetas y resuenan en tubos. Su timbre cálido y melódico, herencia del sureste mexicano y de Guatemala, acompaña el primer brindis antes de las carnitas.",
+          image: "marimba",
         },
 
         {
           moment: "Después de la ceremonia en el faro",
           name: "Mariachi",
-          note: "Una entrada festiva para abrir la cena.",
+          note: "El mariachi es la orquesta tradicional mexicana por excelencia: violines, trompetas, vihuela y guitarrón. Sus sones y rancheras, con su característico grito, abren la cena con una entrada festiva.",
+          image: "mariachi",
         },
         {
           moment: "Después de la cena",
           name: "Norteño",
-          note: "Para abrir la fiesta, cantar y empezar a bailar.",
+          note: "El norteño es el sonido del norte de México: acordeón y bajo sexto, con polkas, corridos y cumbias. Su ritmo bailable abre la pista y la fiesta.",
+          image: "norteno",
         },
+
         {
-          moment: "Si se animan",
-          name: "Una banda francesa",
-          note: "Un pequeño puente musical entre nuestras dos culturas.",
+          moment: "¿El set de más?",
+          name: "Banda",
+
+
+          note: "38 tonnes, una fanfarria francesa que mezcla vientos y percusión. Descúbrelos en su web y en su increíble video en Guča, con aparición del novio y un solo inolvidable.",
+          image: "frenchBand",
+          logo: "frenchBandLogo",
+          website: "https://www.38tonnes.fr/",
+          link: "https://www.youtube.com/watch?v=eq_MLyQsdr8",
         },
+
       ],
+
       stage: {
         eyebrow: "Escena abierta",
         title: "¿Hay una canción que quieras cantar?",
@@ -889,9 +967,13 @@ export const content = {
         button: "Guardar mi confirmación",
         success: "Confirmación guardada. ¡Gracias!",
         error: "No se pudo guardar. Inténtalo de nuevo.",
+        summaryTitle: "Resumen de tu confirmación",
+        summaryIntro:
+          "Esto es lo que indicaste para cada persona. Puedes modificarlo y volver a guardar cuando quieras.",
       },
     },
     travel: {
+
 
       eyebrow: "Vengo de lejos",
       title: "Tu viaje también forma parte de la celebración",
@@ -1160,11 +1242,27 @@ export const content = {
           boutiqueHotel: "Hotel boutique",
         },
       },
+      budget: {
+        eyebrow: "Presupuesto estimado",
+        title: "¿Cuánto costaría la playa?",
+        intro:
+          "Con una noche de hotel en Barra de Navidad de $1,200 a $2,500 MXN por persona, calculamos un estimado para las 4 noches del plan de playa (martes a sábado), según cuántas personas de tu grupo se apuntaron.",
+        perNightPerPerson: "por noche y por persona",
+        nights: "noches",
+        interested: "personas interesadas",
+        minLabel: "Estimado mínimo",
+        maxLabel: "Estimado máximo",
+        totalLabel: "Total estimado para tu grupo",
+        bigTotal: "Total estimado",
+        disclaimer:
+          "Estimado orientativo. El precio final dependerá del alojamiento elegido, la temporada y la confirmación directa con cada hotel o Airbnb.",
+      },
       extraStay: {
         eyebrow: "Tu estancia · domingo a martes",
         title: "Tu cabaña para la segunda estancia",
       },
     },
+
 
     rsvp: {
 
@@ -1187,8 +1285,9 @@ export const content = {
           partySize: "¿Cuántas personas?",
           names: "Nombres de los participantes",
           namesPlaceholder: "Ej. David, Aydé, Dimitar…",
-          ownBoules: "¿Traes tus propias boules?",
+          ownBoules: "¿Necesitas que te prestemos unas boules?",
         },
+
         options: {
           participation: [
             { value: "yes", label: "Sí, queremos jugar" },
@@ -1350,8 +1449,8 @@ export const content = {
         organizerWhatsapp: "https://wa.me/523332017504",
         fields: {
           participation: "¿Participas en el torneo?",
-          ownBoules: "¿Traes tus propias boules?",
-          ownBoulesHint: "Si no traes, no te preocupes: tendremos algunas para compartir.",
+          ownBoules: "¿Necesitas que te prestemos unas boules?",
+          ownBoulesHint: "Si no tienes, no te preocupes: te prestamos unas para jugar.",
         },
         yesLabel: "Sí",
         noLabel: "No",
@@ -1363,6 +1462,7 @@ export const content = {
     },
     footer: {
       line: "Con amor, desde México y Francia",
+
 
 
       privacy: "Invitación privada · Respuestas protegidas",
@@ -1624,7 +1724,10 @@ export const content = {
       duringTitle: "🎉 Le mariage vu par les invités",
       duringBody:
         "Après le mariage, partage ici les photos que tu as prises pendant la célébration.",
+      beforeLink: "https://photos.app.goo.gl/Df3QwjTKQTGVEqEU6",
+      duringLink: "https://photos.app.goo.gl/Vhg2AY3gXzXL2iKp8",
       upload: "Déposer des photos ↗",
+
       note:
         'Demande l’accès à l’album en cliquant sur « Déposer des photos ». Une fois à l’intérieur, tu pourras déposer toutes les photos que tu veux. Merci de capturer ces moments avec nous !',
     },
@@ -1712,10 +1815,12 @@ export const content = {
         { value: "≈ 18 h 55", label: "coucher du soleil", note: "Presque au même moment que la cérémonie au phare" },
       ],
       moments: [
+        { time: "Matin", title: "Lumière du lac à l’aube", body: "Le lac calme reflète la lumière dorée de l’aube." },
         { time: "13 h–17 h 30", title: "Après-midi lumineuse", body: "Soleil et douceur à chaleur ; crème solaire, lunettes et eau seront utiles." },
         { time: "18 h", title: "Cérémonie et coucher du soleil", body: "La lumière commencera à baisser pendant la cérémonie au phare." },
         { time: "Dès 19 h", title: "La soirée se rafraîchit", body: "La température peut baisser rapidement au bord du lac." },
       ],
+
       adviceTitle: "À prévoir",
       advice: [
         "Une veste légère, un pull ou un châle pour le dîner et la danse.",
@@ -1736,35 +1841,84 @@ export const content = {
       flavours: [
         {
           key: "carnitas",
+          type: "food",
           title: "Carnitas",
           body: "Du porc longuement confit jusqu’à devenir tendre et doré, servi avec tortillas, oignon, coriandre, sauces et citron vert.",
         },
         {
-          key: "taquiza",
-          title: "Taquiza",
-          body: "Une table de plusieurs plats mijotés mexicains, tortillas chaudes et garnitures pour que chacun compose ses propres tacos.",
-        },
-        {
           key: "tejuino",
+          type: "drink",
           title: "Tejuino",
           body: "Une boisson typique de Guadalajara à base de maïs fermenté, douce et acidulée, servie très fraîche avec citron vert et sel. Version « loco » à la tequila ou au mezcal en option.",
         },
         {
+          key: "jericalla",
+          type: "dessert",
+          title: "Jericalla",
+          body: "Le dessert le plus tapatío : une crème cuite à la cannelle et à la vanille, avec sa couche dorée caractéristique.",
+        },
+        {
+          key: "taquiza",
+          type: "food",
+          title: "Taquiza",
+          body: "Une table de plusieurs plats mijotés mexicains, tortillas chaudes et garnitures pour que chacun compose ses propres tacos.",
+        },
+        {
+          key: "aguas",
+          type: "drink",
+          title: "Aguas de sabor",
+          body: "Des boissons fraîches à la jamaïque, à l’horchata et au citron vert pour accompagner le repas.",
+        },
+        {
+          key: "gelatinas",
+          type: "dessert",
+          title: "Gelées mexicaines",
+          body: "Des gelées de fruits, fraîches et légères, pour terminer le repas sur une note sucrée.",
+        },
+        {
           key: "nopales",
+          type: "food",
           title: "Salade de nopales",
           body: "Du cactus nopal tendre avec tomate, oignon, herbes et fromage : une option fraîche, mexicaine et végétarienne.",
         },
         {
+          key: "tequila",
+          type: "drink",
+          title: "Tequila",
+          body: "De la tequila pour trinquer et célébrer, servie avec sel et citron vert.",
+        },
+        {
+          key: "postres-tapatios",
+          type: "dessert",
+          title: "Dulces mexicanos",
+          body: "Une sélection de douceurs traditionnelles mexicaines pour sucrer la fin du repas.",
+        },
+        {
           key: "guacamole",
+          type: "food",
           title: "Guacamole et options végétariennes",
           body: "Il y aura du guacamole, des tortillas, des sauces et d’autres accompagnements sans viande. Tu pourras préciser tes restrictions dans le RSVP.",
         },
         {
           key: "pizza",
+          type: "food",
           title: "Pizza",
           body: "Des pizzas à partager le vendredi soir : un accueil simple et informel après les arrivées et la pétanque.",
         },
+        {
+          key: "esquites",
+          type: "food",
+          title: "Esquites",
+          body: "Du maïs tendre cuit avec de l’épazote, du piment, du citron vert et du fromage : un classique de la rue mexicaine.",
+        },
       ],
+
+      flavourType: {
+        food: "Plat",
+        drink: "Boisson",
+        dessert: "Dessert",
+      },
+
       days: [
         {
           day: "Vendredi soir",
@@ -1798,8 +1952,9 @@ export const content = {
         "Les détails sont encore en préparation. Nous pensons aussi à l’eau, aux boissons sans alcool, au café, aux options pour les enfants et aux besoins alimentaires particuliers.",
       photoCredits: "Crédits photographiques",
       drinks: {
-        eyebrow: "Pour trinquer",
+        eyebrow: "Alcool avec modération",
         title: "La politique des munitions",
+
         body:
           "Nous prévoirons une quantité raisonnable d’alcool par invité, principalement de la bière et de la tequila, ainsi que des sodas et des boissons sans alcool.",
         note:
@@ -1815,25 +1970,37 @@ export const content = {
         {
           moment: "Après l’apéro",
           name: "Marimba",
-          note: "Pour accompagner le premier verre avant les carnitas.",
+          note: "La marimba est un idiophone à clavier de bois : des lames de bois dur frappées avec des mailloches qui résonnent dans des tubes. Son timbre chaleureux et mélodique, héritage du sud-est du Mexique et du Guatemala, accompagne le premier verre avant les carnitas.",
+          image: "marimba",
         },
 
         {
           moment: "Après la cérémonie au phare",
           name: "Mariachi",
-          note: "Une entrée festive pour ouvrir le dîner.",
+          note: "Le mariachi est l’orchestre traditionnel mexicain par excellence : violons, trompettes, vihuela et guitarrón. Ses sones et rancheras, avec son cri caractéristique, ouvrent le dîner d’une entrée festive.",
+          image: "mariachi",
         },
         {
           moment: "Après le dîner",
           name: "Norteño",
-          note: "Pour ouvrir la fête, chanter et commencer à danser.",
+          note: "Le norteño est le son du nord du Mexique : accordéon et bajo sexto, avec polkas, corridos et cumbias. Son rythme dansant ouvre la piste et la fête.",
+          image: "norteno",
         },
+
         {
-          moment: "S’ils se lancent",
-          name: "Un groupe français",
-          note: "Un petit pont musical entre nos deux cultures.",
+          moment: "Le set de trop ?",
+          name: "Fanfare",
+
+
+          note: "38 tonnes, une fanfare française qui mêle cuivres et percussions. Découvre-les sur leur site et dans leur incroyable vidéo à Guča, avec une apparition du marié et un solo inoubliable.",
+          image: "frenchBand",
+          logo: "frenchBandLogo",
+          website: "https://www.38tonnes.fr/",
+          link: "https://www.youtube.com/watch?v=eq_MLyQsdr8",
         },
+
       ],
+
       stage: {
         eyebrow: "Scène ouverte",
         title: "Une chanson que tu aimerais chanter ?",
@@ -2226,9 +2393,13 @@ export const content = {
         button: "Enregistrer ma confirmation",
         success: "Confirmation enregistrée. Merci !",
         error: "Impossible d’enregistrer. Réessaie.",
+        summaryTitle: "Résumé de ta confirmation",
+        summaryIntro:
+          "Voici ce que tu as indiqué pour chaque personne. Tu peux le modifier et réenregistrer quand tu veux.",
       },
     },
     travel: {
+
 
       eyebrow: "Je viens de loin",
       title: "Ton voyage fait aussi partie de la fête",
@@ -2500,12 +2671,28 @@ export const content = {
           boutiqueHotel: "Hôtel boutique",
         },
       },
+      budget: {
+        eyebrow: "Budget estimé",
+        title: "Combien coûterait la plage ?",
+        intro:
+          "Avec une nuit d’hôtel à Barra de Navidad de 1 200 à 2 500 MXN par personne, nous calculons une estimation pour les 4 nuits du plan plage (mardi à samedi), selon le nombre de personnes de ton groupe qui se sont inscrites.",
+        perNightPerPerson: "par nuit et par personne",
+        nights: "nuits",
+        interested: "personnes intéressées",
+        minLabel: "Estimation minimale",
+        maxLabel: "Estimation maximale",
+        totalLabel: "Total estimé pour ton groupe",
+        bigTotal: "Total estimé",
+        disclaimer:
+          "Estimation indicative. Le prix final dépendra de l’hébergement choisi, de la saison et de la confirmation directe avec chaque hôtel ou Airbnb.",
+      },
       extraStay: {
         eyebrow: "Ton séjour · dimanche à mardi",
         title: "Ton gîte du dimanche au mardi",
 
       },
     },
+
 
     rsvp: {
 
@@ -2528,8 +2715,9 @@ export const content = {
           partySize: "Combien de personnes ?",
           names: "Noms des participants",
           namesPlaceholder: "Ex. David, Aydé, Dimitar…",
-          ownBoules: "Apportes-tu tes propres boules ?",
+          ownBoules: "As-tu besoin que nous te prêtions des boules ?",
         },
+
         options: {
           participation: [
             { value: "yes", label: "Oui, nous voulons jouer" },
@@ -2693,8 +2881,8 @@ export const content = {
         organizerWhatsapp: "https://wa.me/523332017504",
         fields: {
           participation: "Participes-tu au tournoi ?",
-          ownBoules: "Apportes-tu tes propres boules ?",
-          ownBoulesHint: "Si tu n’en as pas, pas de souci : nous en aurons à partager.",
+          ownBoules: "As-tu besoin que nous te prêtions des boules ?",
+          ownBoulesHint: "Si tu n’en as pas, pas de souci : nous t’en prêterons pour jouer.",
         },
         yesLabel: "Oui",
         noLabel: "Non",
@@ -2706,6 +2894,7 @@ export const content = {
     },
     footer: {
       line: "Avec amour, depuis le Mexique et la France",
+
 
 
       privacy: "Invitation privée · Réponses protégées",
@@ -2963,7 +3152,10 @@ export const content = {
       duringTitle: "🎉 The wedding through guests’ eyes",
       duringBody:
         "After the wedding, share the photos you took during the celebration here.",
+      beforeLink: "https://photos.app.goo.gl/Df3QwjTKQTGVEqEU6",
+      duringLink: "https://photos.app.goo.gl/Vhg2AY3gXzXL2iKp8",
       upload: "Upload photos ↗",
+
       note:
         'Request access to the album by clicking “Upload photos”. Once inside, you can upload as many photos as you like. Thank you for capturing these moments with us!',
     },
@@ -3051,10 +3243,12 @@ export const content = {
         { value: "≈ 6:55 pm", label: "sunset", note: "Very close to the lighthouse ceremony" },
       ],
       moments: [
+        { time: "Morning", title: "Lake light at dawn", body: "The calm lake mirrors the golden morning light." },
         { time: "1–5:30 pm", title: "A bright afternoon", body: "Sunny and pleasantly warm; sunscreen, sunglasses, and water will help." },
         { time: "6 pm", title: "Ceremony and sunset", body: "The light will begin to fade during the lighthouse ceremony." },
         { time: "From 7 pm", title: "A cooler evening", body: "Temperatures can fall quickly beside the lake." },
       ],
+
       adviceTitle: "What to bring",
       advice: [
         "A light jacket, sweater, or wrap for dinner and dancing.",
@@ -3075,35 +3269,84 @@ export const content = {
       flavours: [
         {
           key: "carnitas",
+          type: "food",
           title: "Carnitas",
           body: "Pork cooked slowly until tender and golden, served with tortillas, onion, coriander, salsa, and lime.",
         },
         {
-          key: "taquiza",
-          title: "Taquiza",
-          body: "A spread of Mexican stews, warm tortillas, and toppings so everyone can assemble their own tacos.",
-        },
-        {
           key: "tejuino",
+          type: "drink",
           title: "Tejuino",
           body: "A sweet-and-tangy Guadalajara drink made from fermented corn, served ice-cold with lime and salt. A tequila or mezcal “tejuino loco” will also be available.",
         },
         {
+          key: "jericalla",
+          type: "dessert",
+          title: "Jericalla",
+          body: "The most tapatío dessert: a baked custard with cinnamon and vanilla, with its signature golden top.",
+        },
+        {
+          key: "taquiza",
+          type: "food",
+          title: "Taquiza",
+          body: "A spread of Mexican stews, warm tortillas, and toppings so everyone can assemble their own tacos.",
+        },
+        {
+          key: "aguas",
+          type: "drink",
+          title: "Aguas de sabor",
+          body: "Fresh fruit waters (jamaica, horchata, lime) to accompany the meal.",
+        },
+        {
+          key: "gelatinas",
+          type: "dessert",
+          title: "Mexican jellies",
+          body: "Fresh, light fruit jellies to end the meal on a sweet note.",
+        },
+        {
           key: "nopales",
+          type: "food",
           title: "Nopal cactus salad",
           body: "Tender nopal cactus with tomato, onion, herbs, and cheese: a fresh, Mexican, vegetarian option.",
         },
         {
+          key: "tequila",
+          type: "drink",
+          title: "Tequila",
+          body: "Tequila to toast and celebrate, served with salt and lime.",
+        },
+        {
+          key: "postres-tapatios",
+          type: "dessert",
+          title: "Mexican sweets",
+          body: "A selection of traditional Mexican sweets to sweeten the end of the meal.",
+        },
+        {
           key: "guacamole",
+          type: "food",
           title: "Guacamole and vegetarian options",
           body: "There will be guacamole, tortillas, salsas, and other meat-free sides. You can share dietary restrictions in the RSVP.",
         },
         {
           key: "pizza",
+          type: "food",
           title: "Pizza",
           body: "Pizzas to share on Friday evening: a simple, informal welcome after arrivals and pétanque.",
         },
+        {
+          key: "esquites",
+          type: "food",
+          title: "Esquites",
+          body: "Tender corn cooked with epazote, chili, lime, and cheese: a Mexican street-food classic.",
+        },
       ],
+
+      flavourType: {
+        food: "Food",
+        drink: "Drink",
+        dessert: "Dessert",
+      },
+
       days: [
         {
           day: "Friday evening",
@@ -3154,25 +3397,38 @@ export const content = {
         {
           moment: "After the aperitif",
           name: "Marimba",
-          note: "For the first toast before the carnitas.",
+          note: "The marimba is a wooden keyboard idiophone: bars of hormiguillo struck with mallets that resonate through tubes. Its warm, melodic timbre, a legacy of southeastern Mexico and Guatemala, accompanies the first toast before the carnitas.",
+          image: "marimba",
         },
 
         {
           moment: "After the lighthouse ceremony",
           name: "Mariachi",
-          note: "A festive opening to dinner.",
+          note: "The mariachi is the quintessential traditional Mexican ensemble: violins, trumpets, vihuela, and guitarrón. Its sones and rancheras, with their signature grito, open dinner with a festive entrance.",
+          image: "mariachi",
         },
         {
           moment: "After dinner",
           name: "Norteño",
-          note: "To open the party, sing, and start dancing.",
+          note: "Norteño is the sound of northern Mexico: accordion and bajo sexto, with polkas, corridos, and cumbias. Its danceable rhythm opens the dance floor and the party.",
+          image: "norteno",
         },
+
         {
-          moment: "If they are up for it",
-          name: "A French band",
-          note: "A small musical bridge between our two cultures.",
+          moment: "The unnecessary set?",
+          name: "Brass Band",
+
+
+
+          note: "38 tonnes, a French brass band blending brass and percussion. Discover them on their website and in their incredible video from Guča, featuring an appearance by the groom and an unforgettable solo.",
+          image: "frenchBand",
+          logo: "frenchBandLogo",
+          website: "https://www.38tonnes.fr/",
+          link: "https://www.youtube.com/watch?v=eq_MLyQsdr8",
         },
+
       ],
+
       stage: {
         eyebrow: "Open stage",
         title: "Is there a song you would like to sing?",
@@ -3562,9 +3818,13 @@ export const content = {
         button: "Save my confirmation",
         success: "Confirmation saved. Thank you!",
         error: "We could not save. Please try again.",
+        summaryTitle: "Summary of your confirmation",
+        summaryIntro:
+          "Here is what you indicated for each person. You can change it and save again whenever you like.",
       },
     },
     travel: {
+
 
       eyebrow: "Coming from afar",
       title: "Your journey is part of the celebration too",
@@ -3863,8 +4123,9 @@ export const content = {
           partySize: "How many people?",
           names: "Names of participants",
           namesPlaceholder: "E.g. David, Aydé, Dimitar…",
-          ownBoules: "Will you bring your own boules?",
+          ownBoules: "Do you need us to provide you with some boules?",
         },
+
         options: {
           participation: [
             { value: "yes", label: "Yes, we want to play" },
@@ -4027,8 +4288,8 @@ export const content = {
         organizerWhatsapp: "https://wa.me/523332017504",
         fields: {
           participation: "Will you participate in the tournament?",
-          ownBoules: "Will you bring your own boules?",
-          ownBoulesHint: "If you don’t have any, no worries: we will have some to share.",
+          ownBoules: "Do you need us to provide you with some boules?",
+          ownBoulesHint: "If you don’t have any, no worries: we will lend you some to play.",
         },
         yesLabel: "Yes",
         noLabel: "No",
@@ -4040,6 +4301,7 @@ export const content = {
     },
     footer: {
       line: "With love, from Mexico and France",
+
 
 
       privacy: "Private invitation · Protected responses",

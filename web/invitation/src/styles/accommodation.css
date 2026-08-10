@@ -201,31 +201,79 @@
   font-weight: 700;
 }
 
-/* Cabin name badge — golden pill echoing the hero's group label. */
+/* Cabin name badge — a golden, metallic pill echoing the hero's group label.
+   Used for BOTH the primary cabin (Hébergement) and the extra cabin
+   ("Et après ?" / Coast). A subtle gold gradient + a moving sheen give it a
+   polished, shiny look. */
 .accommodation-cabin-badge {
+  position: relative;
   display: flex;
   width: fit-content;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
   margin: 1rem auto 0;
-  border: 1px solid rgb(198 139 43 / 45%);
+  overflow: hidden;
+  border: 1px solid rgb(198 139 43 / 55%);
   border-radius: 999px;
-  padding: 0.45rem 1.2rem;
-  background: color-mix(in srgb, var(--marigold) 14%, var(--white));
-  color: var(--terracotta);
+  padding: 0.5rem 1.35rem;
+  background:
+    linear-gradient(
+      180deg,
+      #f7e6b8 0%,
+      #e9c878 45%,
+      #d9a94e 55%,
+      #f0d795 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 65%),
+    inset 0 -1px 0 rgb(120 80 20 / 35%),
+    0 0.35rem 0.9rem rgb(120 80 20 / 28%);
+  color: #5c3a0e;
   font-size: clamp(0.7rem, 1.1vw, 0.85rem);
-  font-weight: 600;
+  font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 45%);
 }
 
+/* Moving sheen that sweeps across the badge. */
+.accommodation-cabin-badge::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 45%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgb(255 255 255 / 55%) 50%,
+    transparent 100%
+  );
+  transform: skewX(-20deg);
+  animation: cabin-badge-shine 3.2s ease-in-out infinite;
+}
+
+@keyframes cabin-badge-shine {
+  0% {
+    left: -60%;
+  }
+  55% {
+    left: 130%;
+  }
+  100% {
+    left: 130%;
+  }
+}
 
 .accommodation-cabin-badge::before {
   content: "✦";
-  color: var(--marigold);
+  color: #8a5a12;
   font-size: 0.8em;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 45%);
 }
+
 
 
 .accommodation-contacts {
@@ -271,14 +319,30 @@
   backdrop-filter: blur(0.4rem);
 }
 
+/* Header row of the accommodation form: the eyebrow on the left and the
+   member tabs on the right, on the same line on desktop. On mobile the tabs
+   wrap below the eyebrow. */
+.accommodation-form-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.accommodation-form-head .eyebrow {
+  margin: 0;
+}
+
 /* Member tabs — switch between group members' accommodation details.
    Each tab is an avatar chip: circular photo/initials + name. */
 .accommodation-member-tabs {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  margin: 0 0 1.5rem;
+  margin: 0;
 }
+
 
 .accommodation-member-tab {
   display: inline-flex;
@@ -1503,7 +1567,24 @@
   font-weight: 600;
 }
 
+/* The flip-step-card (shared with the dark RSVP section) is reused here on the
+   light accommodation background, so its white title and toggle need a
+   light-theme override to stay readable and clickable. */
+.accommodation-recap .flip-step-card-title {
+  color: var(--ink);
+}
+
+.accommodation-recap .flip-step-card-toggle {
+  border-color: rgb(36 33 25 / 28%);
+  color: var(--ink);
+}
+
+.accommodation-recap .flip-step-card-toggle:hover {
+  border-color: var(--marigold, #d9b36a);
+}
+
 .accommodation-recap-save {
+
   display: flex;
   align-items: center;
   gap: 1rem;
@@ -1519,8 +1600,143 @@
   font-size: 0.85rem;
 }
 
+/* Summary of the accommodation confirmation: a quiet panel listing each
+   person's Oui/Non choice once at least one answer has been given, plus a
+   confirmation banner once the confirmation has been sent. */
+.accommodation-recap-summary {
+  margin-top: 1.75rem;
+  padding: 1.5rem 1.5rem 1.25rem;
+  border: 1px solid rgb(36 33 25 / 14%);
+  border-left: 0.3rem solid var(--marigold, #d9b36a);
+  background: rgb(255 255 255 / 45%);
+}
+
+.accommodation-recap-summary h4 {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.accommodation-recap-summary-intro {
+  margin: 0 0 1rem;
+  color: rgb(36 33 25 / 70%);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.accommodation-recap-summary-list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.accommodation-recap-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px dashed rgb(36 33 25 / 14%);
+}
+
+.accommodation-recap-summary-row:last-child {
+  border-bottom: 0;
+}
+
+.accommodation-recap-summary-person {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+/* The avatar face in the resumen mirrors the question step: a circular
+   photo/initials badge sized like the recap rows. */
+.accommodation-recap-summary-person .accommodation-member-tab-avatar {
+  flex: 0 0 2.4rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  font-size: 0.75rem;
+}
+
+.accommodation-recap-summary-person-text {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.accommodation-recap-summary-person-text strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.accommodation-recap-summary-person-text small {
+  color: rgb(36 33 25 / 62%);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+
+.accommodation-recap-summary-value {
+  flex: 0 0 auto;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: rgb(36 33 25 / 8%);
+  color: rgb(36 33 25 / 72%);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.accommodation-recap-summary-value.is-yes {
+  background: color-mix(in srgb, var(--sage, #7a9b76) 22%, transparent);
+  color: #2f4d2c;
+}
+
+.accommodation-recap-summary-value.is-no {
+  background: color-mix(in srgb, var(--terracotta, #c96f4a) 16%, transparent);
+  color: #8a3d24;
+}
+
+.accommodation-recap-confirmation {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--sage, #7a9b76) 18%, transparent);
+  color: #2f4d2c;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.accommodation-recap-confirmation span {
+  display: grid;
+  flex: 0 0 auto;
+  width: 1.4rem;
+  height: 1.4rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--sage, #7a9b76);
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.accommodation-recap-confirmation.is-error {
+  background: color-mix(in srgb, #b23b3b 14%, transparent);
+  color: #7a1f1f;
+}
+
 
 @media (max-width: 899px) {
+
   .accommodation-recap-row {
     align-items: flex-start;
     flex-direction: column;

@@ -510,6 +510,175 @@
   border-color: rgb(255 255 255 / 25%);
 }
 
+/* ── Barra de Navidad budget estimate ───────────────────────────────────────
+   A "budget to plan" block that turns the per-night per-person rate
+   (1,200–2,500 MXN) into a group total for the 4 beach nights, based on how
+   many group members rated the beach plan as interested (level ≥ 3). Spans
+   both columns and reuses the dark translucent panel of the suggestions. */
+.coast-budget {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin-top: clamp(3rem, 6vw, 5rem);
+  padding: clamp(2rem, 4vw, 3rem);
+  border-radius: 1.25rem;
+  background: rgb(15 40 50 / 42%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.coast-budget .section-heading {
+  border-bottom-color: rgb(255 255 255 / 25%);
+}
+
+.coast-budget .section-heading h3 {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.coast-budget-intro {
+  max-width: 46rem;
+  color: rgb(255 255 255 / 82%);
+}
+
+/* The three input figures: rate per night, number of nights, interested
+   people. Laid out as a responsive row of small stat cards. */
+.coast-budget-figures {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 1.75rem 0;
+}
+
+.coast-budget-figure {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 0.9rem;
+  background: rgb(20 40 44 / 55%);
+}
+
+.coast-budget-figure__label {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.4vw, 2rem);
+  line-height: 1.1;
+  color: #f3e6c8;
+}
+
+.coast-budget-figure small {
+  color: rgb(255 255 255 / 72%);
+  font-size: 0.9rem;
+}
+
+/* The min / max totals for the whole group. */
+.coast-budget-totals {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+.coast-budget-total {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 1rem;
+}
+
+.coast-budget-total span {
+  font-size: 0.95rem;
+  color: rgb(255 255 255 / 78%);
+}
+
+.coast-budget-total strong {
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 3vw, 2.4rem);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.coast-budget-total small {
+  color: rgb(255 255 255 / 68%);
+  font-size: 0.9rem;
+}
+
+.coast-budget-total--min {
+  border: 1px solid rgb(255 255 255 / 18%);
+  background: rgb(20 40 44 / 55%);
+}
+
+.coast-budget-total--min strong {
+  color: #f3e6c8;
+}
+
+.coast-budget-total--max {
+  border: 1px solid rgb(228 185 104 / 45%);
+  background: rgb(228 185 104 / 12%);
+}
+
+.coast-budget-total--max strong {
+  color: var(--marigold, #e4b968);
+}
+
+/* The big headline total for the whole group. */
+.coast-budget-big {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 1.75rem 1.5rem;
+  border-radius: 1.1rem;
+  text-align: center;
+  background: rgb(228 185 104 / 14%);
+  border: 1px solid rgb(228 185 104 / 45%);
+}
+
+.coast-budget-big span {
+  font-size: 0.95rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 78%);
+}
+
+.coast-budget-big strong {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4.5vw, 3.4rem);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--marigold, #e4b968);
+}
+
+.coast-budget-big small {
+  color: rgb(255 255 255 / 68%);
+  font-size: 0.95rem;
+}
+
+.coast-budget-disclaimer {
+  margin: 1.25rem 0 0;
+  max-width: 46rem;
+  font-size: 0.9rem;
+  color: rgb(255 255 255 / 62%);
+}
+
+@media (max-width: 899px) {
+  .coast-budget {
+    grid-column: 1 / -1;
+  }
+
+  .coast-budget-figures {
+    grid-template-columns: 1fr;
+  }
+
+  .coast-budget-totals {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* ── Extra stay (Plan 1 · stay at Roca Azul, Sunday→Tuesday) ────────────────
    Shown only when the active guest has an extra cabin assigned for the second
    stay. Spans both columns and reuses the shared StayPlanCard (plan card +
@@ -517,6 +686,7 @@
    the same light cream panel as `.accommodation-form-wrap` and we do NOT
    override the StayPlanCard's native light-background styles. */
 .coast-extra-stay {
+
   grid-column: 1 / -1;
   min-width: 0;
   margin-top: clamp(3rem, 6vw, 5rem);

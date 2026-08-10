@@ -10,7 +10,8 @@ import { PETANQUE_PLACEHOLDERS } from "../petanqueGallery.js";
 import { MEDIA } from "../media.js";
 import { getGroupMembers } from "../guest-profiles.js";
 import { getActiveGuests } from "../guests.js";
-import { resolveRsvpAnswer } from "../rsvp-responses.js";
+import { computeInitialStepIndex } from "../rsvp-responses.js";
+
 
 
 /**
@@ -95,8 +96,20 @@ export function Petanque() {
     [questions, boulesGuests.length],
   );
 
+  // Auto-detect the starting step: the first visible question that is not fully
+  // answered by every group member, or the recap when everything is answered.
+  // The "own boules" question only applies to the guests who said "yes" to the
+  // tournament, so it is only considered answered once THOSE guests have
+  // answered it — otherwise a guest who said "no" to participation (and thus
+  // has no boules answer) would block the flow from ever reaching the recap.
+  const initialStep = computeInitialStepIndex(visibleQuestions, guests, answers, {
+    petanqueOwnBoules: boulesGuests,
+  });
+
+
 
   const handleAnswerChange = (questionId, guestId, level) => {
+
     setAnswer(questionId, guestId, level);
     // If participation is no longer "yes", clear the boules answer for that
     // guest so it doesn't linger as a stale "yes"/"no".
@@ -202,7 +215,9 @@ export function Petanque() {
 
             <FlipStepCard
               onDone={() => markResume(flow)}
+              initialIndex={initialStep}
               steps={[
+
                 {
                   id: "participation",
                   label: rsvpMini.fields?.participation,

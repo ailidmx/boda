@@ -79,6 +79,59 @@ export function resolveRsvpAnswer(guest, questionId) {
 }
 
 /**
+ * Whether a question is fully answered by every guest in the group.
+ *
+ * A guest counts as "answered" when their level is > 0 — this covers both the
+ * scale variant (levels 1–5) and the boolean variant (1 = yes, 2 = no). Level 0
+ * (UNANSWERED_LEVEL) means the guest has not answered yet.
+ *
+ * @param {string} questionId
+ * @param {Array<Object>} guests  the group members
+ * @param {Object} answers  questionId → { guestId → level }
+ * @param {Array<Object>} [applicableGuests]  optional subset of guests that
+ *   must answer this question. When provided, only these guests are checked
+ *   (e.g. a conditional question that only applies to some group members).
+ * @returns {boolean}
+ */
+export function isQuestionAnswered(questionId, guests, answers, applicableGuests) {
+  const toCheck = applicableGuests || guests;
+  if (!toCheck || toCheck.length === 0) return false;
+  const qAnswers = answers?.[questionId] || {};
+  return toCheck.every((guest) => Number(qAnswers[guest.id]) > 0);
+}
+
+
+/**
+ * Compute the initial step index for a FlipStepCard RSVP flow.
+ *
+ * Walks the question steps in order and returns the index of the first question
+ * that is NOT fully answered by every group member. When every question is
+ * answered, it returns the index of the last step (the recap / "resumen") so
+ * the flow opens directly on the summary.
+ *
+ * @param {Array<{ id: string }>} questions  the question steps (in order)
+ * @param {Array<Object>} guests  the group members
+ * @param {Object} answers  questionId → { guestId → level }
+ * @param {Object} [questionGuests]  optional map of questionId → array of
+ *   guests that must answer that question. When a question is present in this
+ *   map, only those guests are checked for completion (e.g. a conditional
+ *   question that only applies to a subset of the group).
+ * @returns {number}  the initial step index (0-based)
+ */
+export function computeInitialStepIndex(questions, guests, answers, questionGuests) {
+  for (let i = 0; i < questions.length; i++) {
+    const applicable = questionGuests?.[questions[i].id];
+    if (!isQuestionAnswered(questions[i].id, guests, answers, applicable)) {
+      return i;
+    }
+  }
+  // Every question is answered → jump straight to the recap (last step).
+  return questions.length;
+}
+
+
+
+/**
  * Save a guest's RSVP answers (a map of questionId → scale level). The
  * authenticated user must be the guest themselves or a member of the same
  * invitation group (enforced by rules).

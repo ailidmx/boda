@@ -7,6 +7,8 @@ import { getGroupMembers, resolveLiveGuest } from "../guest-profiles.js";
 import { getActiveGuests } from "../guests.js";
 import { getCabin } from "../cabins.js";
 import { getRoom } from "../rooms.js";
+import { computeInitialStepIndex } from "../rsvp-responses.js";
+
 import {
   PaymentSummary,
   computeStayAmounts,
@@ -84,7 +86,28 @@ export function RSVP() {
     [coastRsvpMini],
   );
 
+  // ── Current step per fieldset ───────────────────────────────────────────
+  // Each fieldset shows ONLY its current step by default: the first question
+  // that is not fully answered by every group member, or the recap when all
+  // questions are answered. `computeInitialStepIndex` returns the index of the
+  // first unanswered question, or `questions.length` when everything is done.
+  const scaleQuestions = scale.questions || [];
+  const scaleStep = computeInitialStepIndex(scaleQuestions, guests, answers);
+  const petanqueStep = computeInitialStepIndex(
+    visiblePetanqueQuestions,
+    guests,
+    answers,
+    { petanqueOwnBoules: boulesGuests },
+  );
+
+  const extraStayStep = computeInitialStepIndex(
+    extraStayQuestions,
+    guests,
+    answers,
+  );
+
   // ── Save status for the final submit ────────────────────────────────────
+
   const [saveStatus, setSaveStatus] = useState("idle"); // idle | working | saved | error
 
   const handleAnswerChange = (questionId, guestId, level) => {
@@ -207,97 +230,122 @@ export function RSVP() {
           })}
         </div>
 
-        {/* Scale-based questions: one row per guest, 0–5 likelihood selector */}
-        {scale.questions && scale.questions.length > 0 && guests.length > 0 && (
+        {/* Scale-based questions: one row per guest, 0–5 likelihood selector.
+            Shows ONLY the current step by default: the first question that is
+            not fully answered by every group member, or the recap when all
+            questions are answered. */}
+        {scaleQuestions.length > 0 && guests.length > 0 && (
           <fieldset className="rsvp-scale-fieldset">
             <legend>{rsvp.groups.attendance}</legend>
             <p className="fieldset-note">{scale.intro}</p>
-            <div className="rsvp-scale-questions">
-              {scale.questions.map((q) => (
-                <RsvpQuestion
-                  key={q.id}
-                  questionId={q.id}
-                  title={q.title}
-                  subtitle={q.subtitle}
-                  guests={guests}
-                  answers={answers[q.id] || {}}
-                  onChange={(guestId, level) =>
-                    handleAnswerChange(q.id, guestId, level)
-                  }
-                />
-              ))}
-            </div>
-
-            <RsvpRecap
-              questions={scale.questions}
-              guests={guests}
-              answers={answers}
-            />
+            {scaleStep < scaleQuestions.length ? (
+              <div className="rsvp-scale-questions">
+                {(() => {
+                  const q = scaleQuestions[scaleStep];
+                  return (
+                    <RsvpQuestion
+                      key={q.id}
+                      questionId={q.id}
+                      title={q.title}
+                      subtitle={q.subtitle}
+                      guests={guests}
+                      answers={answers[q.id] || {}}
+                      onChange={(guestId, level) =>
+                        handleAnswerChange(q.id, guestId, level)
+                      }
+                    />
+                  );
+                })()}
+              </div>
+            ) : (
+              <RsvpRecap
+                questions={scaleQuestions}
+                guests={guests}
+                answers={answers}
+              />
+            )}
           </fieldset>
         )}
 
+
         {/* Pétanque questions: one row per guest, Yes/No toggle for the
             Friday tournament (participation + own boules). Mirrors the
-            mini-RSVP in the Pétanque section. */}
+            mini-RSVP in the Pétanque section. Shows ONLY the current step by
+            default: the first question not fully answered by every group
+            member, or the recap when all questions are answered. */}
         {visiblePetanqueQuestions.length > 0 && guests.length > 0 && (
           <fieldset className="rsvp-scale-fieldset">
             <legend>{rsvp.progressPetanque}</legend>
             <p className="fieldset-note">{petanque.intro}</p>
-            <div className="rsvp-scale-questions">
-              {visiblePetanqueQuestions.map((q) => (
-                <RsvpQuestion
-                  key={q.id}
-                  questionId={q.id}
-                  title={q.title}
-                  subtitle={q.subtitle}
-                  variant="boolean"
-                  guests={q.id === "petanqueOwnBoules" ? boulesGuests : guests}
-                  answers={answers[q.id] || {}}
-                  onChange={(guestId, level) =>
-                    handleAnswerChange(q.id, guestId, level)
-                  }
-                />
-              ))}
-            </div>
-
-            <RsvpRecap
-              questions={visiblePetanqueQuestions}
-              guests={guests}
-              answers={answers}
-            />
+            {petanqueStep < visiblePetanqueQuestions.length ? (
+              <div className="rsvp-scale-questions">
+                {(() => {
+                  const q = visiblePetanqueQuestions[petanqueStep];
+                  return (
+                    <RsvpQuestion
+                      key={q.id}
+                      questionId={q.id}
+                      title={q.title}
+                      subtitle={q.subtitle}
+                      variant="boolean"
+                      guests={q.id === "petanqueOwnBoules" ? boulesGuests : guests}
+                      answers={answers[q.id] || {}}
+                      onChange={(guestId, level) =>
+                        handleAnswerChange(q.id, guestId, level)
+                      }
+                    />
+                  );
+                })()}
+              </div>
+            ) : (
+              <RsvpRecap
+                questions={visiblePetanqueQuestions}
+                guests={guests}
+                answers={answers}
+              />
+            )}
           </fieldset>
         )}
 
+
         {/* Extra-stay questions: one row per guest, 0–5 likelihood selector
             for the "Et après ?" plans (stay at Roca Azul + beach). Mirrors the
-            mini-RSVP in the Coast section. */}
+            mini-RSVP in the Coast section. Shows ONLY the current step by
+            default: the first question not fully answered by every group
+            member, or the recap when all questions are answered. */}
         {extraStayQuestions.length > 0 && guests.length > 0 && (
           <fieldset className="rsvp-scale-fieldset">
             <legend>{rsvp.progressCoast}</legend>
             <p className="fieldset-note">{coastRsvpMini.intro}</p>
-            <div className="rsvp-scale-questions">
-              {extraStayQuestions.map((q) => (
-                <RsvpQuestion
-                  key={q.id}
-                  questionId={q.id}
-                  title={q.title}
-                  subtitle={q.subtitle}
-                  guests={guests}
-                  answers={answers[q.id] || {}}
-                  onChange={(guestId, level) =>
-                    handleAnswerChange(q.id, guestId, level)
-                  }
-                />
-              ))}
-            </div>
-
-            <RsvpRecap
-              questions={extraStayQuestions}
-              guests={guests}
-              answers={answers}
-            />
+            {extraStayStep < extraStayQuestions.length ? (
+              <div className="rsvp-scale-questions">
+                {(() => {
+                  const q = extraStayQuestions[extraStayStep];
+                  return (
+                    <RsvpQuestion
+                      key={q.id}
+                      questionId={q.id}
+                      title={q.title}
+                      subtitle={q.subtitle}
+                      guests={guests}
+                      answers={answers[q.id] || {}}
+                      onChange={(guestId, level) =>
+                        handleAnswerChange(q.id, guestId, level)
+                      }
+                    />
+                  );
+                })()}
+              </div>
+            ) : (
+              <RsvpRecap
+                questions={extraStayQuestions}
+                guests={guests}
+                answers={answers}
+              />
+            )}
           </fieldset>
         )}
+
 
         {/* Read-only "À payer" summary: shows the per-person and per-group
             amounts for the primary cabin and, when present, the extra cabin.

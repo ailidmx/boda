@@ -53,7 +53,12 @@ export function Photos() {
           <div className="photos-before reveal">
             <h3>{photos.beforeTitle}</h3>
             <p>{photos.beforeBody}</p>
-            <a className="button button-dark photos-upload-btn" href="#rsvp">
+            <a
+              className="button button-dark photos-upload-btn"
+              href={photos.beforeLink}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               {photos.upload}
             </a>
           </div>
@@ -61,10 +66,16 @@ export function Photos() {
           <div className="photos-during reveal">
             <h3>{photos.duringTitle}</h3>
             <p>{photos.duringBody}</p>
-            <a className="button button-dark photos-upload-btn" href="#rsvp">
+            <a
+              className="button button-dark photos-upload-btn"
+              href={photos.duringLink}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               {photos.upload}
             </a>
           </div>
+
         </div>
 
         <p className="photos-note reveal">{photos.note}</p>

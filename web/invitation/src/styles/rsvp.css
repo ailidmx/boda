@@ -458,10 +458,50 @@
   display: grid;
   gap: 1rem;
   margin-top: 2rem;
-  padding: 0;
+  padding: 1.25rem;
   border: 0;
   background: rgb(255 255 255 / 3%);
 }
+
+/* Stepped RSVP mini used by the accommodation recap: a card with a header
+   (title + flip toggle) and a body that swaps between the question step and
+   the resumen (summary) step. */
+.flip-step-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.flip-step-card-title {
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+}
+
+.flip-step-card-toggle {
+  padding: 0.5rem 1.25rem;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--white);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.flip-step-card-toggle:hover {
+  transform: scale(1.04);
+  border-color: #e4b968;
+}
+
+.flip-step-card-body {
+  display: grid;
+  gap: 1rem;
+}
+
 
 .flip-step-head {
   display: flex;

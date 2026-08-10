@@ -137,20 +137,23 @@ export function Attire() {
               {paragraph}
             </p>
           ))}
-          {/* Section FAB: opens the pictogram modal. Anchored to the dress-code
-              block so it stays within the section's contained width on desktop. */}
-          <button
-            ref={fabRef}
-            className={`attire-picto-fab${attireActive && !pictoOpen ? " is-visible" : ""}`}
-            type="button"
-            aria-label={attire.dressCode.title}
-            aria-haspopup="dialog"
-            onClick={() => setPictoOpen(true)}
-          >
-            <PaletteIcon />
-          </button>
         </div>
       )}
+
+      {/* Dress-code section FAB: a real floating action button, a direct child
+          of the section (like the other section FABs), fixed to the viewport
+          edge and contained within the 120rem column on wide screens. */}
+      <button
+        ref={fabRef}
+        className={`attire-picto-fab${attireActive && !pictoOpen ? " is-visible" : ""}`}
+        type="button"
+        aria-label={attire.dressCode.title}
+        aria-haspopup="dialog"
+        onClick={() => setPictoOpen(true)}
+      >
+        <PaletteIcon />
+      </button>
+
       {/* Dress-code pictogram modal */}
       {attire.dressCode && (
         <div

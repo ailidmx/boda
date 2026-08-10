@@ -255,7 +255,8 @@
 
 /* ── Dress-code section FAB ─────────────────────────────────────────────
    A floating action button that appears while the attire section is in view
-   and opens the pictogram modal. */
+   and opens the pictogram modal. It is a real FAB on every screen size
+   (fixed to the viewport edge), matching the other section FABs. */
 .attire-picto-fab {
   position: fixed;
   z-index: 130;
@@ -289,21 +290,24 @@
   height: 2.4rem;
 }
 
-/* On desktop the FAB is anchored to the dress-code block (the section's
-   contained width) instead of floating at the viewport edge. It sits at the
-   right edge of the block, aligned to the bottom like the other section FABs. */
-@media (min-width: 721px) {
+/* ── Extra-large screens: contain the FAB within the 120rem main column ──
+   On very wide displays (≥1440px) the main content is constrained to a
+   centered 120rem container. The dress-code FAB is position:fixed, so it
+   would otherwise float at the far viewport edge, outside the container.
+   Anchor it to the container's right edge instead (50% + 60rem = right edge
+   of the centered 120rem column), keeping a 1rem breathing margin. */
+@media (min-width: 1440px) {
   .attire-picto-fab {
-    position: absolute;
-    right: 1rem;
-    bottom: 1rem;
-    transform: translateY(0) scale(0.9);
+    left: 50%;
+    right: auto;
+    transform: translateX(calc(60rem - 100% - 1rem)) translateY(1rem) scale(0.9);
   }
 
   .attire-picto-fab.is-visible {
-    transform: translateY(0) scale(1);
+    transform: translateX(calc(60rem - 100% - 1rem)) translateY(0) scale(1);
   }
 }
+
 
 
 .attire-copy .note {

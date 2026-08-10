@@ -29,10 +29,11 @@ const NAV_LINKS = [
   ["coast", "#after"],
   ["photos", "#photos"],
   ["guests", "#guests"],
-  ["gift", "#gift"],
   ["rsvp", "#rsvp"],
+  ["gift", "#gift"],
   ["thanks", "#thanks"],
 ];
+
 
 // Resolve the effective nav links for the signed-in guest. The FLIGHTS
 // ("travel") link is hidden for guests who do not travel by plane, matching
