@@ -542,6 +542,13 @@
   color: var(--terracotta, #b85c38);
 }
 
+/* The extra cabin's price (the "À payer" strong figure) uses the terracotta
+   accent inside the coast section, matching the eyebrow, instead of the
+   default ink inherited from the shared accommodation price styles. */
+.coast-extra-stay .accommodation-plan-price strong {
+  color: var(--terracotta, #b85c38);
+}
+
 @media (max-width: 899px) {
   .coast-extra-stay {
     grid-column: 1 / -1;

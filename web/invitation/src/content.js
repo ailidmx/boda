@@ -733,7 +733,7 @@ export const content = {
         },
         extraCabinLabel: "Alojamiento adicional",
         planCardTitle: "Tu plan de alojamiento",
-        planCardPerPerson: "Por persona · 2 noches",
+        planCardPerPerson: "Para {name} · 2 noches",
         planCardSaleLabel: "Cubierto por los novios",
         planCardGroupTotal: "Total del grupo",
         planCardEurDisclaimer: "Precio estimado en MXN",
@@ -1315,13 +1315,15 @@ export const content = {
         title: "A pagar",
         intro:
           "Aquí está el detalle de lo que deberás pagar por tu alojamiento.",
-        cabinTitle: "Cabaña",
-        extraCabinTitle: "Cabaña extra",
+        cabinTitle: "Cabaña del viernes al domingo",
+        extraCabinTitle: "Cabaña extra del domingo al martes",
         perPerson: "A pagar por persona",
         perGroup: "A pagar por el grupo",
+        total: "Total",
         asterisk:
           "Agradecemos tu comprensión: nos encantaría pagar por todos, pero no es posible. Esta es solo una opción que planeamos para ti, y entendemos si prefieres otra cosa. Solo háznos saber tu elección.",
       },
+
     },
     petanqueTribute: {
       eyebrow: "Petanca",
@@ -2067,7 +2069,7 @@ export const content = {
         },
         extraCabinLabel: "Hébergement supplémentaire",
         planCardTitle: "Ton plan d’hébergement",
-        planCardPerPerson: "Par personne · 2 nuits",
+        planCardPerPerson: "Pour {name} · 2 nuits",
         planCardSaleLabel: "Pris en charge par les mariés",
         planCardGroupTotal: "Total du groupe",
         planCardEurDisclaimer: "Prix estimé en MXN",
@@ -2499,7 +2501,8 @@ export const content = {
       },
       extraStay: {
         eyebrow: "Ton séjour · dimanche à mardi",
-        title: "Ton gîte pour le second séjour",
+        title: "Ton gîte du dimanche au mardi",
+
       },
     },
 
@@ -2652,13 +2655,15 @@ export const content = {
         title: "À payer",
         intro:
           "Voici le détail de ce que tu devras payer pour ton hébergement.",
-        cabinTitle: "Gîte",
-        extraCabinTitle: "Gîte supplémentaire",
+        cabinTitle: "Gîte du vendredi au dimanche",
+        extraCabinTitle: "Gîte supplémentaire du dimanche au mardi",
         perPerson: "À payer par personne",
         perGroup: "À payer par le groupe",
+        total: "Total",
         asterisk:
           "Nous apprécions ta compréhension : nous aurions aimé tout payer pour tout le monde, mais ce n’est pas possible. C’est une option que nous avons prévue pour toi, et nous comprenons si tu préfères autre chose. Fais-nous simplement part de ton choix.",
       },
+
     },
     petanqueTribute: {
       eyebrow: "Pétanque",
@@ -3399,7 +3404,7 @@ export const content = {
         },
         extraCabinLabel: "Additional accommodation",
         planCardTitle: "Your accommodation plan",
-        planCardPerPerson: "Per person · 2 nights",
+        planCardPerPerson: "For {name} · 2 nights",
         planCardSaleLabel: "Covered by the couple",
         planCardGroupTotal: "Group total",
         planCardEurDisclaimer: "Estimated price in MXN",
@@ -3984,13 +3989,15 @@ export const content = {
         title: "To pay",
         intro:
           "Here is the breakdown of what you will pay for your accommodation.",
-        cabinTitle: "Guest house",
-        extraCabinTitle: "Extra guest house",
+        cabinTitle: "Guest house, Friday to Sunday",
+        extraCabinTitle: "Extra guest house, Sunday to Tuesday",
         perPerson: "To pay per person",
         perGroup: "To pay for the group",
+        total: "Total",
         asterisk:
           "We appreciate your understanding: we would love to pay for everyone, but it is not possible. This is only an option we planned for you, and we understand if you prefer something else. Just let us know your choice.",
       },
+
     },
     petanqueTribute: {
       eyebrow: "Pétanque",

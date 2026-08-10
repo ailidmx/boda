@@ -91,31 +91,31 @@ const interfaceText = {
   fr: {
     gateEyebrow: "Invitation privée",
     gateBody:
-      "Saisissez votre identifiant ou e-mail et le mot de passe que nous vous avons envoyés.",
+      "Saisis ton identifiant ou e-mail et le mot de passe que nous t’avons envoyés.",
     gateUsernameLabel: "Identifiant ou e-mail",
-    gateUsernamePlaceholder: "Votre identifiant ou e-mail",
+    gateUsernamePlaceholder: "Ton identifiant ou e-mail",
 
     gateLabel: "Mot de passe",
     gateButton: "Entrer",
     gateWorking: "Ouverture…",
     gateError:
-      "L’identifiant ou le mot de passe n’est pas correct. Vérifiez-les ou demandez-nous de vous les renvoyer.",
+      "L’identifiant ou le mot de passe n’est pas correct. Vérifie-les ou demande-nous de te les renvoyer.",
     gateNoProfile:
-      "Aucun invité ne correspond à cet identifiant. Vérifiez-le ou écrivez-nous pour obtenir de l’aide.",
+      "Aucun invité ne correspond à cet identifiant. Vérifie-le ou écris-nous pour obtenir de l’aide.",
     gateLost:
-      "Identifiant ou mot de passe perdu ? Écrivez-nous et nous vous les renverrons.",
+      "Identifiant ou mot de passe perdu ? Écris-nous et nous te les renverrons.",
     gateDisclosure:
       "J’accepte que mon nom et ma photo puissent être affichés aux autres invités.",
     submitWorking: "Envoi…",
-    submitSuccess: "Merci ! Nous avons bien reçu votre réponse.",
-    submitError: "L’envoi a échoué. Vérifiez votre connexion et réessayez.",
+    submitSuccess: "Merci ! Nous avons bien reçu ta réponse.",
+    submitError: "L’envoi a échoué. Vérifie ta connexion et réessaie.",
     stepLabel: "Étape",
     next: "Continuer",
     back: "Retour",
     finish: "Terminer",
     langPrompt: {
       title: "Langue préférée ?",
-      body: "Votre navigateur est en {current}, mais nous pensons que votre langue préférée pourrait être {preferred}. On passe l'invitation en {preferred} ?",
+      body: "Ton navigateur est en {current}, mais nous pensons que ta langue préférée pourrait être {preferred}. On passe l'invitation en {preferred} ?",
 
       keep: "Oui, passer en {preferred}",
       switch: "Non, garder {current}",

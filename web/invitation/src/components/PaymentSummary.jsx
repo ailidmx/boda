@@ -2,10 +2,12 @@ import React from "react";
 import { getActiveGuests } from "../guests.js";
 import { resolveLiveGuest } from "../guest-profiles.js";
 import { getCabin } from "../cabins.js";
+import { getRoom, getRoomDescription } from "../rooms.js";
 
 const MXN_PER_EUR = 20;
 
-function formatPrice(amount, language) {
+export function formatPrice(amount, language) {
+
   const locale =
     language === "fr" ? "fr-FR" : language === "en" ? "en-US" : "es-MX";
   return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(
@@ -41,33 +43,27 @@ function PriceLines({ original, toPay, language, showSale }) {
 }
 
 /**
- * Read-only "À payer" summary block shown in the final RSVP. It renders the
- * per-person and per-group amounts for a given stay (primary cabin or extra
- * cabin), following the same pricing rules as StayPlanCard:
+ * Compute the per-person and per-group amounts for a given stay (primary cabin
+ * or extra cabin), following the same pricing rules as StayPlanCard:
  *
  *   - per-person price = cabin total ÷ number of occupants (capped at capacity)
  *   - per-person to pay = 0 when the current guest is covered by the couple
  *   - group total = sum of per-person prices across all group members
  *   - group to pay = group total − covered total
  *
- * When a price differs from its original (i.e. someone is covered), the block
- * shows the original struck through next to the discounted price and a
- * "covered by the couple" banner, following e-commerce sale conventions.
- *
- * The stay is described by two resolvers so the same component drives either
- * the primary cabin (`hosting.cabin` / `isCabinPaidByNovios`) or the extra
- * cabin (`hosting.xtraCabin` / `isXtraCabinPaidByNovios`):
+ * The stay is described by two resolvers so the same logic drives either the
+ * primary cabin (`hosting.cabin` / `isCabinPaidByNovios`) or the extra cabin
+ * (`hosting.xtraCabin` / `isXtraCabinPaidByNovios`):
  *   - getAssignedCabinId(candidate) → cabin id for this stay
  *   - resolveMemberCovered(member)  → whether this stay is paid by the couple
+ *
+ * Returns null when the active member has no cabin assigned for this stay.
  */
-export function PaymentSummary({
+export function computeStayAmounts({
   activeMember,
   groupMembers,
   getAssignedCabinId,
   resolveMemberCovered,
-  language,
-  payment,
-  coveredLabel,
 }) {
   const activeGuests = getActiveGuests();
 
@@ -118,8 +114,103 @@ export function PaymentSummary({
   const groupToPay = Math.max(0, groupTotal - coveredTotal);
   const anyCovered = groupMembers.some(resolveMemberCovered);
 
-  const perPersonSale = paidByCouple && perPersonToPay < activeCabinPerPerson;
-  const groupSale = anyCovered && groupToPay < groupTotal;
+  return {
+    cabin,
+    assignedCabin,
+    liveActive,
+    activeCabinPerPerson,
+    paidByCouple,
+    perPersonToPay,
+    groupTotal,
+    coveredTotal,
+    groupToPay,
+    anyCovered,
+    perPersonSale: paidByCouple && perPersonToPay < activeCabinPerPerson,
+    groupSale: anyCovered && groupToPay < groupTotal,
+  };
+}
+
+/**
+ * Resolve a human-readable "Cabin · Room" label for a candidate on a given
+ * stay. Falls back to just the cabin name when no room is assigned.
+ */
+function resolveCabinRoomLabel(candidate, getAssignedCabinId, getAssignedRoomId, language) {
+  const cabinId = getAssignedCabinId(candidate);
+  const cabin = getCabin(cabinId);
+  const cabinName = cabin?.name || cabin?.id || cabinId || "";
+
+  const roomId = getAssignedRoomId ? getAssignedRoomId(candidate) : null;
+  const room = roomId ? getRoom(roomId) : null;
+  const roomName = room ? getRoomDescription(room, language) : "";
+
+  if (cabinName && roomName) return `${cabinName} · ${roomName}`;
+  return cabinName || roomName || "";
+}
+
+/**
+ * Read-only "À payer" summary block shown in the final RSVP. It renders the
+ * per-person and per-group amounts for a given stay (primary cabin or extra
+ * cabin), following the same pricing rules as StayPlanCard.
+ *
+ * When a price differs from its original (i.e. someone is covered), the block
+ * shows the original struck through next to the discounted price and a
+ * "covered by the couple" banner, following e-commerce sale conventions.
+ *
+ * The stay is described by two resolvers so the same component drives either
+ * the primary cabin (`hosting.cabin` / `isCabinPaidByNovios`) or the extra
+ * cabin (`hosting.xtraCabin` / `isXtraCabinPaidByNovios`):
+ *   - getAssignedCabinId(candidate) → cabin id for this stay
+ *   - getAssignedRoomId(candidate)  → room id for this stay (optional)
+ *   - resolveMemberCovered(member)  → whether this stay is paid by the couple
+ */
+export function PaymentSummary({
+  activeMember,
+  groupMembers,
+  getAssignedCabinId,
+  getAssignedRoomId,
+  resolveMemberCovered,
+  language,
+  payment,
+  coveredLabel,
+}) {
+  const amounts = computeStayAmounts({
+    activeMember,
+    groupMembers,
+    getAssignedCabinId,
+    resolveMemberCovered,
+  });
+  if (!amounts) return null;
+
+  const {
+    activeCabinPerPerson,
+    paidByCouple,
+    perPersonToPay,
+    groupTotal,
+    groupToPay,
+    anyCovered,
+    perPersonSale,
+    groupSale,
+  } = amounts;
+
+  // The active guest's own cabin · room label.
+  const activeLabel = resolveCabinRoomLabel(
+    amounts.liveActive,
+    getAssignedCabinId,
+    getAssignedRoomId,
+    language,
+  );
+
+  // One "Cabin · Room" label per group member (deduplicated, in order).
+  const groupLabels = [];
+  groupMembers.forEach((member) => {
+    const label = resolveCabinRoomLabel(
+      member,
+      getAssignedCabinId,
+      getAssignedRoomId,
+      language,
+    );
+    if (label && !groupLabels.includes(label)) groupLabels.push(label);
+  });
 
   return (
     <div className="rsvp-payment-block">
@@ -128,6 +219,9 @@ export function PaymentSummary({
         <div className="rsvp-payment-row">
           <dt>{payment.perPerson}</dt>
           <dd className={`rsvp-payment-value${perPersonSale ? " is-sale" : ""}`}>
+            {activeLabel && (
+              <span className="rsvp-payment-cabinroom">{activeLabel}</span>
+            )}
             <PriceLines
               original={activeCabinPerPerson}
               toPay={perPersonToPay}
@@ -140,6 +234,15 @@ export function PaymentSummary({
         <div className="rsvp-payment-row">
           <dt>{payment.perGroup}</dt>
           <dd className={`rsvp-payment-value${groupSale ? " is-sale" : ""}`}>
+            {groupLabels.length > 0 && (
+              <span className="rsvp-payment-cabinroom-list">
+                {groupLabels.map((label) => (
+                  <span key={label} className="rsvp-payment-cabinroom">
+                    {label}
+                  </span>
+                ))}
+              </span>
+            )}
             <PriceLines
               original={groupTotal}
               toPay={groupToPay}
