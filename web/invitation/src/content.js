@@ -242,7 +242,7 @@ export const content = {
       body:
         "Entre México y Francia, entre nuestras familias y amistades, elegimos reunirnos junto al lago de Chapala para celebrar el amor, la amistad y todo lo que nos trajo hasta aquí.",
       note:
-        "Nos hará inmensamente felices compartir este fin de semana con ustedes.",
+        "Nos hará inmensamente felices compartir este fin de semana contigo.",
       photosLabel: "Vistas del lago de Chapala y de Jocotepec",
       photoAlts: [
         "Atardecer sobre el lago de Chapala",
@@ -395,7 +395,7 @@ export const content = {
       eyebrow: "A la mesa",
       title: "Un fin de semana para probar, brindar y compartir",
       body:
-        "Queremos que cada comida sea sencilla, generosa y muy mexicana. Este es el menú que estamos imaginando; todavía puede crecer con sus ideas.",
+        "Queremos que cada comida sea sencilla, generosa y muy mexicana. Este es el menú que estamos imaginando; todavía puede crecer con tus ideas.",
       flavoursEyebrow: "Sabores de Jalisco y México",
       flavoursTitle: "¿Qué vamos a probar?",
       flavours: [
@@ -468,7 +468,7 @@ export const content = {
         body:
           "Tendremos una cantidad razonable de alcohol por invitado, principalmente cerveza y tequila, además de refrescos y opciones sin alcohol.",
         note:
-          "Si quieren asegurarse de que su noche quede especialmente bien regada, pueden traer sus propias municiones para compartir y disfrutar responsablemente.",
+          "Si quieres asegurarte de que tu noche quede especialmente bien regada, puedes traer tus propias municiones para compartir y disfrutar responsablemente.",
       },
     },
     music: {
@@ -501,15 +501,15 @@ export const content = {
       ],
       stage: {
         eyebrow: "Escena abierta",
-        title: "¿Hay una canción que quieran cantar?",
+        title: "¿Hay una canción que quieras cantar?",
         body:
-          "Agreguen aquí sus títulos para el ambiente, el baile o el karaoke. Quizá podamos aprovechar a alguno de los músicos en vivo para acompañarlos y convertir una canción en un momento inolvidable.",
+          "Agrega aquí tus títulos para el ambiente, el baile o el karaoke. Quizá podamos aprovechar a alguno de los músicos en vivo para acompañarte y convertir una canción en un momento inolvidable.",
       },
       playlists: {
-        eyebrow: "Escuchen desde ahora",
+        eyebrow: "Escucha desde ahora",
         title: "La banda sonora empieza aquí",
         body:
-          "Tres playlists para entrar en ambiente, descubrir canciones y empezar a preparar sus grandes interpretaciones.",
+          "Tres playlists para entrar en ambiente, descubrir canciones y empezar a preparar tus grandes interpretaciones.",
         general: {
           title: "Ambiente de la boda",
           body: "La selección general para viajar, brindar, convivir y bailar.",
@@ -527,12 +527,12 @@ export const content = {
     },
     suggestions: {
       fields: {
-        name: "Su nombre",
-        dessert: "¿Qué postre prefieren?",
-        food: "¿Qué falta o qué les gustaría agregar?",
+        name: "Tu nombre",
+        dessert: "¿Qué postre prefieres?",
+        food: "¿Qué falta o qué te gustaría agregar?",
         song: "Canción sugerida",
         artist: "Artista o versión",
-        sing: "¿Quieren cantarla?",
+        sing: "¿Quieres cantarla?",
         extra: "Otra idea para la fiesta",
         genres: "¿Qué géneros no pueden faltar?",
       },
@@ -574,7 +574,7 @@ export const content = {
       },
       button: "Enviar mis sugerencias",
       previewNote:
-        "Sus canciones, votos e ideas se guardarán de forma privada.",
+        "Tus canciones, votos e ideas se guardarán de forma privada.",
     },
     facilities: {
       eyebrow: "El lugar",
@@ -656,7 +656,7 @@ export const content = {
       citation:
         "Nosotros estaremos en Roca Azul desde el jueves. Los invitados pueden llegar desde el viernes alrededor del mediodía y la celebración principal será una boda de tarde el sábado.",
       body:
-        "Contamos con alojamiento en el lugar para aproximadamente 80 personas. Como necesitamos distribuir las cabañas y las habitaciones con cuidado, les pedimos que nos indiquen cuanto antes si desean aprovechar esta opción.",
+        "Contamos con alojamiento en el lugar para aproximadamente 80 personas. Como necesitamos distribuir las cabañas y las habitaciones con cuidado, te pedimos que nos indiques cuanto antes si deseas aprovechar esta opción.",
       facts: [
         { value: "≈ 80–90", label: "lugares disponibles" },
         {
@@ -670,7 +670,7 @@ export const content = {
         "El alojamiento se reserva únicamente como paquete completo de dos noches, del viernes 19 al domingo 21: no es posible reservar una sola noche. El precio estimado es de $1,200 MXN por persona por las dos noches e incluye los dos desayunos del fin de semana.",
       noteTitle: "A tener en cuenta",
       noCabinRecommendation:
-        "Les recomendamos buscar un hotel o un Airbnb en los alrededores.",
+        "Te recomendamos buscar un hotel o un Airbnb en los alrededores.",
       guestOption: {
         eyebrow: "Tu alojamiento",
         membersLabel: "Miembros del grupo",
@@ -685,7 +685,7 @@ export const content = {
           "Tu estancia no está cubierta por los novios: pagarás tu parte.",
         independentTitle: "Alojamiento por tu cuenta",
         independentBody:
-          "Les recomendamos buscar un hotel o un Airbnb en los alrededores.",
+          "Te recomendamos buscar un hotel o un Airbnb en los alrededores.",
         cabinLabel: "Cabaña",
         roomLabel: "Habitación",
         cabinCapacityLabel: "Capacidad de la casa",
@@ -864,11 +864,11 @@ export const content = {
       },
       plan: {
         eyebrow: "¿Cómo funciona?",
-        title: "Díganos qué prefieren",
+        title: "Dinos qué prefieres",
         body:
-          "Su respuesta nos permitirá reservar las cabañas de manera justa y organizada.",
+          "Tu respuesta nos permitirá reservar las cabañas de manera justa y organizada.",
         steps: [
-          "Indiquen su preferencia de alojamiento en el RSVP.",
+          "Indica tu preferencia de alojamiento en el RSVP.",
           "Organizaremos las cabañas según grupos, fechas y disponibilidad.",
           "Confirmaremos directamente la asignación, el precio final y la forma de pago.",
         ],
@@ -877,12 +877,12 @@ export const content = {
       navNext: "Petanca",
       recap: {
         eyebrow: "Confirmación de alojamiento",
-        title: "¿Confirman su alojamiento?",
+        title: "¿Confirmas tu alojamiento?",
         intro:
-          "Indiquen por cada persona si se quedará en Roca Azul para poder organizar las cabañas.",
+          "Indica por cada persona si se quedará en Roca Azul para poder organizar las cabañas.",
         hasCabinQuestion: "¿Se queda en Roca Azul?",
         hasCabinQuestionCabin: "¿Ok para {cabin}?",
-        noCabinQuestion: "¿Me avisan si se libera un alojamiento?",
+        noCabinQuestion: "¿Me avisas si se libera un alojamiento?",
         yesLabel: "Sí",
 
         noLabel: "No",
@@ -894,19 +894,19 @@ export const content = {
     travel: {
 
       eyebrow: "Vengo de lejos",
-      title: "Su viaje también forma parte de la celebración",
+      title: "Tu viaje también forma parte de la celebración",
       body:
         "Acompañaremos personalmente a quienes vienen desde Europa y otros lugares: elección de vuelos, llegada a Guadalajara, alojamiento y traslados.",
       points: [
         "Madrid–Guadalajara es la ruta directa prioritaria desde Europa.",
-        "Coordinaremos las recogidas cuando tengamos sus números de vuelo.",
+        "Coordinaremos las recogidas cuando tengamos tus números de vuelo.",
         "Cada viajero tendrá un itinerario de llegada, estancia y regreso.",
       ],
       routes: {
         eyebrow: "Mapa de trayectos",
         title: "Llegar a Roca Azul y seguir hacia la costa",
         note:
-          "Las duraciones indicadas son orientativas y pueden variar enormemente. Sean previsores y, mejor aún, estén en el lugar con anticipación reservando un alojamiento si pueden.",
+          "Las duraciones indicadas son orientativas y pueden variar enormemente. Sé previsor y, mejor aún, está en el lugar con anticipación reservando un alojamiento si puedes.",
         venue: "Roca Azul · Jocotepec",
         toVenueLabel: "Hacia Roca Azul",
         toBeachLabel: "Hacia la playa",
@@ -957,10 +957,10 @@ export const content = {
       dressCode: {
         title: "Vístete de color",
         paragraphs: [
-          "Nos hace muchísima ilusión compartir este día con ustedes, y queremos que, así como cada persona ha dejado una huella especial en nuestra vida, también cada uno aporte un poco de su esencia a esta celebración.",
-          "Creemos que los colores transmiten energía, alegría y personalidad. Por eso, nos encantaría que nos acompañaran vistiendo tonos llenos de vida, procurando evitar el negro, el gris y el blanco.",
+          "Nos hace muchísima ilusión compartir este día contigo, y queremos que, así como cada persona ha dejado una huella especial en nuestra vida, también cada uno aporte un poco de su esencia a esta celebración.",
+          "Creemos que los colores transmiten energía, alegría y personalidad. Por eso, nos encantaría que nos acompañaras vistiendo tonos llenos de vida, procurando evitar el negro, el gris y el blanco.",
           "Nuestra boda tendrá una inspiración mexicana, con una decoración en tonos blancos y detalles artesanales. David llevará una guayabera de lino blanco con bordados dorados, y ambos vestiremos piezas bordadas por artesanas de una comunidad de Oaxaca, como un homenaje a la riqueza de nuestras tradiciones.",
-          "La única regla es que se sientan ustedes mismos: elegantes, cómodos y listos para celebrar, bailar y llenar este día de color, amor y buena energía.",
+          "La única regla es que te sientas tú mismo: elegante, cómodo y listo para celebrar, bailar y llenar este día de color, amor y buena energía.",
           "¡Gracias por ser parte de nuestra historia! ✨🌼",
         ],
         pictograms: {
@@ -981,18 +981,18 @@ export const content = {
       },
 
       guestNote:
-        "Lo más importante es que se sientan cómodos y celebren con nosotros. Si tienen dudas, escríbanos.",
+        "Lo más importante es que te sientas cómodo y celebres con nosotros. Si tienes dudas, escríbenos.",
       navNext: "Alojamiento",
 
     },
     gift: {
       eyebrow: "Regalos",
 
-      title: "Lo más importante es su presencia",
+      title: "Lo más importante es tu presencia",
       body:
-        "Su compañía es el mejor regalo que podemos recibir. Si además desean hacernos un detalle, agradecemos cualquier contribución para nuestra luna de miel o nuestros proyectos de pareja.",
+        "Tu compañía es el mejor regalo que podemos recibir. Si además deseas hacernos un detalle, agradecemos cualquier contribución para nuestra luna de miel o nuestros proyectos de pareja.",
       note:
-        "No hay ninguna obligación ni expectativa — lo que realmente nos hace felices es compartir este fin de semana con ustedes.",
+        "No hay ninguna obligación ni expectativa — lo que realmente nos hace felices es compartir este fin de semana contigo.",
       accounts: {
         eur: {
           title: "Transferencia en EUR (SEPA)",
@@ -1059,26 +1059,26 @@ export const content = {
         {
           title: "Plan 1 · Quedarse en Roca Azul",
           body:
-            "Rentar una cabaña dos noches más, del domingo al martes, para seguir conviviendo en el lugar. Si les interesa, indíquenlo en el RSVP y organizaremos la cabaña para su grupo.",
+            "Rentar una cabaña dos noches más, del domingo al martes, para seguir conviviendo en el lugar. Si te interesa, indícalo en el RSVP y organizaremos la cabaña para tu grupo.",
         },
         {
           title: "Plan 2 · La playa",
           body:
-            "Del martes al sábado nos vamos a la costa. No es luna de miel — están todos cordialmente invitados a seguir la fiesta en Barra de Navidad. Podemos organizar transportes en común.",
+            "Del martes al sábado nos vamos a la costa. No es luna de miel — estás cordialmente invitado a seguir la fiesta en Barra de Navidad. Podemos organizar transportes en común.",
         },
       ],
       note:
         "Las fechas exactas, el transporte y el presupuesto dependerán del número de personas interesadas. Una noche de hotel en Barra de Navidad en esta temporada ronda los $1,200–$2,500 MXN por persona.",
       form: {
         eyebrow: "Sondeo sin compromiso",
-        title: "¿Se apuntan?",
+        title: "¿Te apuntas?",
         body:
-          "Cuéntennos qué plan les interesa para ir organizando la logística.",
+          "Cuéntanos qué plan te interesa para ir organizando la logística.",
         fields: {
           name: "Nombre",
           interest: "Nivel de interés",
           partySize: "Personas interesadas",
-          plan: "Plan que les interesa",
+          plan: "Plan que te interesa",
           destination: "Destino preferido",
           style: "Forma de alojarse",
           note: "Fechas, presupuesto o comentarios",
@@ -1110,9 +1110,9 @@ export const content = {
       },
       rsvpMini: {
         eyebrow: "¿Y después?",
-        title: "¿Se apuntan?",
+        title: "¿Te apuntas?",
         intro:
-          "Cuéntenos qué tan probable es que se unan a cada plan. Pueden cambiar su respuesta en cualquier momento.",
+          "Cuéntanos qué tan probable es que te unas a cada plan. Puedes cambiar tu respuesta en cualquier momento.",
         questions: [
           {
             id: "rocaAzul",
@@ -1128,14 +1128,14 @@ export const content = {
         recapTitle: "Resumen",
         recapProgress: "respondidos",
         button: "Guardar mis respuestas",
-        success: "¡Gracias! Guardamos sus respuestas.",
+        success: "¡Gracias! Guardamos tus respuestas.",
         error: "No pudimos guardar. Revisa tu conexión e inténtalo de nuevo.",
       },
       suggestions: {
         eyebrow: "Dónde alojarse",
         title: "Sugerencias en Barra de Navidad",
         body:
-          "Si el plan de la playa les interesa, estas opciones aparecieron en la zona para las noches del 23 al 28 de febrero de 2027. Confirma la disponibilidad y el precio directamente.",
+          "Si el plan de la playa te interesa, estas opciones aparecieron en la zona para las noches del 23 al 28 de febrero de 2027. Confirma la disponibilidad y el precio directamente.",
         airbnbTitle: "Airbnbs cerca de Barra de Navidad",
         airbnbBody:
           "Estas opciones aparecieron en la zona para las noches del 23 al 28 de febrero de 2027. Confirma la disponibilidad y el precio directamente en Airbnb.",
@@ -1169,9 +1169,9 @@ export const content = {
     rsvp: {
 
       eyebrow: "RSVP",
-      title: "¿Nos acompañan?",
+      title: "¿Nos acompañas?",
       body:
-        "Una sola respuesta nos permitirá organizar su asistencia, alojamiento y viaje. Si todavía no tienen sus vuelos, podrán enviarlos más adelante.",
+        "Una sola respuesta nos permitirá organizar tu asistencia, alojamiento y viaje. Si todavía no tienes tus vuelos, podrás enviarlos más adelante.",
       groups: {
         attendance: "Asistencia y alojamiento",
         travel: "Vengo desde lejos",
@@ -1179,15 +1179,15 @@ export const content = {
       },
       petanque: {
         eyebrow: "Torneo de petanca",
-        intro: "El viernes por la tarde organizaremos un torneo de petanca. ¿Se apuntan?",
+        intro: "El viernes por la tarde organizaremos un torneo de petanca. ¿Te apuntas?",
         organizerLabel: "Organiza: David",
         organizerWhatsapp: "https://wa.me/523332017504",
         fields: {
-          participation: "¿Participan en el torneo?",
+          participation: "¿Participas en el torneo?",
           partySize: "¿Cuántas personas?",
           names: "Nombres de los participantes",
           namesPlaceholder: "Ej. David, Aydé, Dimitar…",
-          ownBoules: "¿Traen sus propias boules?",
+          ownBoules: "¿Traes tus propias boules?",
         },
         options: {
           participation: [
@@ -1202,22 +1202,22 @@ export const content = {
         },
       },
       travelNote:
-        "Completen esta parte únicamente si viajan desde otra ciudad o país. Necesitamos los datos del trayecto de llegada y de regreso para coordinar los traslados.",
+        "Completa esta parte únicamente si viajas desde otra ciudad o país. Necesitamos los datos del trayecto de llegada y de regreso para coordinar los traslados.",
       fields: {
         fullName: "Nombre completo",
         whatsapp: "WhatsApp (para las comunicaciones posteriores)",
 
-        attendance: "¿Nos acompañan?",
-        groupMode: "¿Responden solos o en grupo?",
+        attendance: "¿Nos acompañas?",
+        groupMode: "¿Respondes solo o en grupo?",
         groupName: "Nombre del grupo o familia",
-        partySize: "Personas en su grupo",
+        partySize: "Personas en tu grupo",
         adults: "Adultos de 18 años o más",
         children: "Menores de 18 años",
         guests: "Nombres de acompañantes",
         accommodation: "Plan de alojamiento",
-        independentArrival: "¿Cuándo piensan llegar a Roca Azul?",
+        independentArrival: "¿Cuándo piensas llegar a Roca Azul?",
         sundayMorning: "¿Nos veremos el domingo por la mañana?",
-        travelStatus: "Situación de su viaje",
+        travelStatus: "Situación de tu viaje",
         arrivalFrom: "Llegada desde",
         arrivalTo: "Llegada a",
         arrivalDate: "Fecha de llegada",
@@ -1274,7 +1274,7 @@ export const content = {
       },
       button: "Enviar mi respuesta",
       previewNote:
-        "Su respuesta se guardará de forma privada y solo los novios podrán consultarla.",
+        "Tu respuesta se guardará de forma privada y solo los novios podrán consultarla.",
       progressLabel: "Antes de enviar, completa cada sección:",
       progressTeAnimas: "¿Te animas? (viernes, sábado, domingo)",
       progressPetanque: "Torneo de petanca",
@@ -1290,9 +1290,9 @@ export const content = {
 
       scale: {
         intro:
-          "Cuéntenos, día por día, qué tan probable es que estén con nosotros. Pueden cambiar su respuesta en cualquier momento.",
+          "Cuéntanos, día por día, qué tan probable es que estés con nosotros. Puedes cambiar tu respuesta en cualquier momento.",
         saveButton: "Guardar mis respuestas",
-        savedNote: "¡Gracias! Guardamos sus respuestas.",
+        savedNote: "¡Gracias! Guardamos tus respuestas.",
         questions: [
           {
             id: "friday",
@@ -1311,9 +1311,21 @@ export const content = {
           },
         ],
       },
+      payment: {
+        title: "A pagar",
+        intro:
+          "Aquí está el detalle de lo que deberás pagar por tu alojamiento.",
+        cabinTitle: "Cabaña",
+        extraCabinTitle: "Cabaña extra",
+        perPerson: "A pagar por persona",
+        perGroup: "A pagar por el grupo",
+        asterisk:
+          "Agradecemos tu comprensión: nos encantaría pagar por todos, pero no es posible. Esta es solo una opción que planeamos para ti, y entendemos si prefieres otra cosa. Solo háznos saber tu elección.",
+      },
     },
     petanqueTribute: {
       eyebrow: "Petanca",
+
       title: "Un homenaje a la petanca",
       intro:
         "La petanca nos ha unido con una comunidad maravillosa de amigos y compañeros de club en México y en el mundo.",
@@ -1330,18 +1342,18 @@ export const content = {
       navNext: "A la mesa",
       rsvpMini: {
         eyebrow: "Torneo de petanca",
-        title: "¿Se apuntan?",
-        intro: "El viernes por la tarde organizaremos un torneo de petanca. ¿Se apuntan?",
+        title: "¿Te apuntas?",
+        intro: "El viernes por la tarde organizaremos un torneo de petanca. ¿Te apuntas?",
         organizerLabel: "Organiza: David",
         organizerWhatsapp: "https://wa.me/523332017504",
         fields: {
-          participation: "¿Participan en el torneo?",
-          ownBoules: "¿Traen sus propias boules?",
-          ownBoulesHint: "Si no traen, no se preocupen: tendremos algunas para compartir.",
+          participation: "¿Participas en el torneo?",
+          ownBoules: "¿Traes tus propias boules?",
+          ownBoulesHint: "Si no traes, no te preocupes: tendremos algunas para compartir.",
         },
         yesLabel: "Sí",
         noLabel: "No",
-        success: "¡Gracias! Guardamos sus respuestas.",
+        success: "¡Gracias! Guardamos tus respuestas.",
         error: "No pudimos guardar. Revisa tu conexión e inténtalo de nuevo.",
         button: "Guardar mis respuestas",
         recapTitle: "Resumen",
@@ -1362,7 +1374,7 @@ export const content = {
       "David et Aydé se marient le 20 février 2027 à Roca Azul, Jocotepec, Jalisco.",
     nav: {
       home: "Accueil",
-      you: "Vous",
+      you: "Toi",
       story: "Invitation",
 
 
@@ -1391,21 +1403,21 @@ export const content = {
 
       emailWarningTitle: "Attention avant de changer l’adresse e-mail",
       emailWarningBody:
-        "Votre accès à l’invitation passera par cette nouvelle adresse. Un e-mail de vérification sera envoyé et devra être confirmé.",
+        "Ton accès à l’invitation passera par cette nouvelle adresse. Un e-mail de vérification sera envoyé et devra être confirmé.",
       currentEmailLabel: "Adresse actuelle",
       newEmailLabel: "Nouvelle adresse",
       newEmailPlaceholder: "nouveau@email.com",
-      emailInvalid: "Saisissez une adresse e-mail valide.",
+      emailInvalid: "Saisis une adresse e-mail valide.",
       emailSuccess: "Adresse e-mail mise à jour.",
-      emailUnchanged: "Cette adresse est déjà active sur votre compte.",
-      emailError: "Impossible de changer l’adresse e-mail. Réessayez.",
+      emailUnchanged: "Cette adresse est déjà active sur ton compte.",
+      emailError: "Impossible de changer l’adresse e-mail. Réessaie.",
       emailVerificationSent:
-        "Un e-mail de vérification a été envoyé à la nouvelle adresse. Confirmez-le pour finaliser le changement.",
+        "Un e-mail de vérification a été envoyé à la nouvelle adresse. Confirme-le pour finaliser le changement.",
       emailReauthRequired:
-        "Pour des raisons de sécurité, confirmez votre mot de passe pour changer l’adresse e-mail.",
+        "Pour des raisons de sécurité, confirme ton mot de passe pour changer l’adresse e-mail.",
       emailReauthLabel: "Mot de passe actuel",
-      emailReauthPlaceholder: "Saisissez votre mot de passe",
-      emailReauthPasswordRequired: "Saisissez votre mot de passe actuel.",
+      emailReauthPlaceholder: "Saisis ton mot de passe",
+      emailReauthPasswordRequired: "Saisis ton mot de passe actuel.",
 
       newPasswordLabel: "Nouveau mot de passe",
       newPasswordPlaceholder: "6 caractères minimum",
@@ -1434,11 +1446,11 @@ export const content = {
       ok: "OK",
       successTitle: "C’est fait !",
       currentPasswordLabel: "Mot de passe actuel",
-      currentPasswordPlaceholder: "Saisissez votre mot de passe actuel",
+      currentPasswordPlaceholder: "Saisis ton mot de passe actuel",
       confirmPasswordLabel: "Confirmer le mot de passe",
-      confirmPasswordPlaceholder: "Répétez le nouveau mot de passe",
+      confirmPasswordPlaceholder: "Répète le nouveau mot de passe",
       passwordMismatch: "Les mots de passe ne correspondent pas.",
-      passwordReauthRequired: "Confirmez votre mot de passe actuel pour continuer.",
+      passwordReauthRequired: "Confirme ton mot de passe actuel pour continuer.",
       passwordWrongCurrent: "Le mot de passe actuel est incorrect.",
       emailDomainError: "Cette adresse n’appartient pas à un domaine autorisé.",
       emailErrorTitle: "Impossible de mettre à jour l’adresse e-mail",
@@ -1461,7 +1473,7 @@ export const content = {
     hero: {
       eyebrow: "Tu es invité à notre mariage",
       eyebrowF: "Tu es invitée à notre mariage",
-      invitation: "Nous voulons vivre ce moment avec vous",
+      invitation: "Nous voulons vivre ce moment avec toi",
 
 
       scroll: "Commençons",
@@ -1475,16 +1487,16 @@ export const content = {
     },
     identity: {
       eyebrow: "Vérification d'identité",
-      title: "Votre nom est-il bien écrit ?",
+      title: "Ton nom est-il bien écrit ?",
       titleGroup: "Les infos des {count} invités sont-elles correctes ?",
-      titleSingle: "Vos infos personelles sont elles correctes ?",
+      titleSingle: "Tes infos personnelles sont-elles correctes ?",
 
       body:
-        "Nous voulons que chaque invité se sente reconnu. Si votre nom ou celui d’un membre de votre groupe est mal orthographié, corrigez-le ici et nous l’utiliserons dans l’invitation et à table.",
+        "Nous voulons que chaque invité se sente reconnu. Si ton nom ou celui d’un membre de ton groupe est mal orthographié, corrige-le ici et nous l’utiliserons dans l’invitation et à table.",
       note:
-        "Vous pouvez aussi déposer une photo de votre visage si vous le souhaitez, pour le souvenir (un joli portrait de préférence).",
+        "Tu peux aussi déposer une photo de ton visage si tu le souhaites, pour le souvenir (un joli portrait de préférence).",
 
-      you: "Vous",
+      you: "Toi",
       firstName: "Prénom",
       lastName: "Nom",
       firstNameLabel: "Prénom",
@@ -1514,42 +1526,42 @@ export const content = {
       cancel: "Annuler",
       saved: "C’est fait ! Nous l’avons mis à jour.",
       savedWithName: "C'est fait, {name} est à jour.",
-      saveError: "Impossible d’enregistrer. Vérifiez votre connexion et réessayez.",
-      nameRequired: "Écrivez au moins votre prénom.",
+      saveError: "Impossible d’enregistrer. Vérifie ta connexion et réessaie.",
+      nameRequired: "Écris au moins ton prénom.",
       photoSaved: "Photo enregistrée ! Merci.",
-      photoError: "Impossible de déposer la photo. Réessayez.",
+      photoError: "Impossible de déposer la photo. Réessaie.",
 
       stepLabel: "Étape",
-      step1Title: "Votre nom est-il bien écrit ?",
-      step2Title: "Quel est votre numéro de portable ?",
-      step3Title: "Quelle est votre adresse e-mail ?",
+      step1Title: "Ton nom est-il bien écrit ?",
+      step2Title: "Quel est ton numéro de portable ?",
+      step3Title: "Quelle est ton adresse e-mail ?",
       step2Body:
-        "Nous l’utiliserons uniquement pour vous contacter au sujet du mariage (confirmations, changements de dernière minute ou coordination des transferts).",
+        "Nous l’utiliserons uniquement pour te contacter au sujet du mariage (confirmations, changements de dernière minute ou coordination des transferts).",
       step3Body:
-        "Nous vous enverrons l’invitation officielle et toute information importante avant le grand jour.",
+        "Nous t’enverrons l’invitation officielle et toute information importante avant le grand jour.",
       contactFor: "Contact de",
       phoneLabel: "Numéro de portable",
 
       phonePlaceholder: "Ex. 33 12 34 56 78",
       phoneMissing: "Numéro de portable manquant",
       emailLabel: "Adresse e-mail",
-      emailPlaceholder: "votrecourriel@exemple.com",
-      phoneRequired: "Écrivez votre numéro de portable.",
-      emailRequired: "Écrivez votre adresse e-mail.",
-      emailInvalid: "Écrivez une adresse e-mail valide.",
-      emailVerificationSent: "Un e-mail de vérification a été envoyé à la nouvelle adresse. Confirmez-le pour finaliser le changement.",
-      emailUpdateError: "Impossible de mettre à jour l’adresse e-mail. Vérifiez qu’elle est valide et, si un e-mail de vérification est envoyé, confirmez-le d’abord.",
+      emailPlaceholder: "toncourriel@exemple.com",
+      phoneRequired: "Écris ton numéro de portable.",
+      emailRequired: "Écris ton adresse e-mail.",
+      emailInvalid: "Écris une adresse e-mail valide.",
+      emailVerificationSent: "Un e-mail de vérification a été envoyé à la nouvelle adresse. Confirme-le pour finaliser le changement.",
+      emailUpdateError: "Impossible de mettre à jour l’adresse e-mail. Vérifie qu’elle est valide et, si un e-mail de vérification est envoyé, confirme-le d’abord.",
       back: "Retour",
       next: "Continuer",
       finish: "Terminer",
       confirm: "Confirmer",
       ok: "Oui, c’est correct",
-      contactSaved: "C’est fait ! Merci d’avoir confirmé vos coordonnées.",
+      contactSaved: "C’est fait ! Merci d’avoir confirmé tes coordonnées.",
 
 
-      whatsappLabel: "Ajoutez-moi au groupe WhatsApp",
+      whatsappLabel: "Ajoute-moi au groupe WhatsApp",
       whatsappHint:
-        "Rejoignez le groupe pour recevoir les avis, la coordination des transferts et les nouveautés du week-end.",
+        "Rejoins le groupe pour recevoir les avis, la coordination des transferts et les nouveautés du week-end.",
       whatsappUrl: "https://chat.whatsapp.com/E8LP2oj0sK4GM5Slo1VIFD?s=cl&p=a&ilr=4",
       navStory: "Découvrir l’invitation",
     },
@@ -1564,7 +1576,7 @@ export const content = {
         "Entre le Mexique et la France, entre nos familles et nos amis, nous avons choisi de nous réunir à Jocotepec, au bord du lac de Chapala, pour célébrer l’amour, l’amitié et tout ce qui nous a conduits jusqu’ici.",
 
       note:
-        "Nous serons immensément heureux de partager ce week-end avec vous.",
+        "Nous serons immensément heureux de partager ce week-end avec toi.",
       photosLabel: "Vues du lac de Chapala et de Jocotepec",
       photoAlts: [
         "Coucher de soleil sur le lac de Chapala",
@@ -1602,17 +1614,17 @@ export const content = {
       ],
     },
     photos: {
-      title: "Partagez vos photos",
+      title: "Partage tes photos",
       lead:
-        "Nous voulons voir le mariage à travers vos yeux. Nous avons créé deux albums Google Photos partagés où vous pouvez déposer vos photos.",
+        "Nous voulons voir le mariage à travers tes yeux. Nous avons créé deux albums Google Photos partagés où tu peux déposer tes photos.",
       beforeTitle: "📸 Avant le mariage",
-      beforeBody: "Partagez vos photos préférées de nous avant le grand jour.",
+      beforeBody: "Partage tes photos préférées de nous avant le grand jour.",
       duringTitle: "🎉 Le mariage vu par les invités",
       duringBody:
-        "Après le mariage, partagez ici les photos que vous avez prises pendant la célébration.",
+        "Après le mariage, partage ici les photos que tu as prises pendant la célébration.",
       upload: "Déposer des photos ↗",
       note:
-        'Demandez l’accès à l’album en cliquant sur « Déposer des photos ». Une fois à l’intérieur, vous pourrez déposer toutes les photos que vous voulez. Merci de capturer ces moments avec nous !',
+        'Demande l’accès à l’album en cliquant sur « Déposer des photos ». Une fois à l’intérieur, tu pourras déposer toutes les photos que tu veux. Merci de capturer ces moments avec nous !',
     },
     weekend: {
       eyebrow: "Programme détaillé",
@@ -1716,7 +1728,7 @@ export const content = {
       eyebrow: "À table",
       title: "Un week-end pour goûter, trinquer et partager",
       body:
-        "Nous voulons que chaque repas soit simple, généreux et profondément mexicain. Voici le menu que nous imaginons ; il peut encore évoluer grâce à vos idées.",
+        "Nous voulons que chaque repas soit simple, généreux et profondément mexicain. Voici le menu que nous imaginons ; il peut encore évoluer grâce à tes idées.",
       flavoursEyebrow: "Saveurs du Jalisco et du Mexique",
       flavoursTitle: "Qu’allons-nous goûter ?",
       flavours: [
@@ -1743,7 +1755,7 @@ export const content = {
         {
           key: "guacamole",
           title: "Guacamole et options végétariennes",
-          body: "Il y aura du guacamole, des tortillas, des sauces et d’autres accompagnements sans viande. Vous pourrez préciser vos restrictions dans le RSVP.",
+          body: "Il y aura du guacamole, des tortillas, des sauces et d’autres accompagnements sans viande. Tu pourras préciser tes restrictions dans le RSVP.",
         },
         {
           key: "pizza",
@@ -1789,7 +1801,7 @@ export const content = {
         body:
           "Nous prévoirons une quantité raisonnable d’alcool par invité, principalement de la bière et de la tequila, ainsi que des sodas et des boissons sans alcool.",
         note:
-          "Si vous voulez être certains que la soirée soit particulièrement bien arrosée, vous pouvez apporter vos propres munitions, à partager et à savourer avec modération.",
+          "Si tu veux être certain que la soirée soit particulièrement bien arrosée, tu peux apporter tes propres munitions, à partager et à savourer avec modération.",
       },
     },
     music: {
@@ -1822,15 +1834,15 @@ export const content = {
       ],
       stage: {
         eyebrow: "Scène ouverte",
-        title: "Une chanson que vous aimeriez chanter ?",
+        title: "Une chanson que tu aimerais chanter ?",
         body:
-          "Ajoutez ici vos titres pour l’ambiance, la danse ou le karaoké. Nous pourrons peut-être profiter de la présence des musiciens pour vous accompagner et en faire un moment inoubliable.",
+          "Ajoute ici tes titres pour l’ambiance, la danse ou le karaoké. Nous pourrons peut-être profiter de la présence des musiciens pour t’accompagner et en faire un moment inoubliable.",
       },
       playlists: {
         eyebrow: "À écouter dès maintenant",
         title: "La bande-son commence ici",
         body:
-          "Trois playlists pour se mettre dans l’ambiance, découvrir des chansons et préparer vos plus belles interprétations.",
+          "Trois playlists pour se mettre dans l’ambiance, découvrir des chansons et préparer tes plus belles interprétations.",
         general: {
           title: "Ambiance du mariage",
           body: "La sélection générale pour voyager, trinquer, se retrouver et danser.",
@@ -1848,12 +1860,12 @@ export const content = {
     },
     suggestions: {
       fields: {
-        name: "Votre nom",
-        dessert: "Quel dessert préférez-vous ?",
-        food: "Que manque-t-il ou qu’aimeriez-vous ajouter ?",
+        name: "Ton nom",
+        dessert: "Quel dessert préfères-tu ?",
+        food: "Que manque-t-il ou qu’aimerais-tu ajouter ?",
         song: "Chanson proposée",
         artist: "Artiste ou version",
-        sing: "Souhaitez-vous la chanter ?",
+        sing: "Souhaites-tu la chanter ?",
         extra: "Une autre idée pour la fête",
         genres: "Quels genres ne peuvent pas manquer ?",
       },
@@ -1889,13 +1901,13 @@ export const content = {
         ],
         sing: [
           { value: "yes", label: "Oui, j’aimerais la chanter" },
-          { value: "maybe", label: "Peut-être, encouragez-moi" },
+          { value: "maybe", label: "Peut-être, encourage-moi" },
           { value: "request", label: "Je veux simplement l’entendre" },
         ],
       },
       button: "Envoyer mes suggestions",
       previewNote:
-        "Vos chansons, votes et idées seront enregistrés de façon privée.",
+        "Tes chansons, votes et idées seront enregistrés de façon privée.",
     },
     facilities: {
       eyebrow: "Le lieu",
@@ -1968,7 +1980,7 @@ export const content = {
         "Liste fondée sur les services publiés par Roca Azul. Certains espaces, horaires, activités ou suppléments devront être confirmés à l’approche de la date.",
       navNext: "Découvrir le lieu",
       navContinue: "Réserver la date",
-      navIdentity: "Votre nom est-il bien écrit ?",
+      navIdentity: "Ton nom est-il bien écrit ?",
     },
     accommodation: {
 
@@ -1977,7 +1989,7 @@ export const content = {
       citation:
         "La fête commence dès le vendredi ou le samedi dans l’après-midi. Il est conseillé de réserver un logement sur place.",
       body:
-        "Nous disposons d’environ 80 places sur le lieu. Malheureusement, nous ne pouvons pas proposer cette option à tout le monde. Comme les gîtes et les chambres doivent être répartis avec soin, merci de nous indiquer dès que possible l’option d’hébergement que vous aurez choisie.",
+        "Nous disposons d’environ 80 places sur le lieu. Malheureusement, nous ne pouvons pas proposer cette option à tout le monde. Comme les gîtes et les chambres doivent être répartis avec soin, merci de nous indiquer dès que possible l’option d’hébergement que tu auras choisie.",
       facts: [
         { value: "≈ 80–90", label: "places disponibles" },
         {
@@ -1991,11 +2003,11 @@ export const content = {
         "L’hébergement se réserve uniquement sous la forme d’un forfait complet de deux nuits, du vendredi 19 au dimanche 21 : une seule nuit n’est pas possible. Le tarif estimatif est de 1 200 MXN par personne pour les deux nuits et comprend les deux petits-déjeuners du week-end.",
       noteTitle: "À savoir",
       noCabinRecommendation:
-        "Nous vous recommandons de chercher un hôtel ou un Airbnb dans les environs.",
+        "Nous te recommandons de chercher un hôtel ou un Airbnb dans les environs.",
       guestOption: {
-        eyebrow: "Votre hébergement",
+        eyebrow: "Ton hébergement",
         membersLabel: "Membres du groupe",
-        linkLabel: "Voir l’option prévue pour vous",
+        linkLabel: "Voir l’option prévue pour toi",
         backLabel: "Retour à l’hébergement",
         onSiteTitle: "Nous avons un place pour toi!",
         onSiteBody:
@@ -2004,10 +2016,10 @@ export const content = {
           "Ton séjour est pris en charge par les mariés : tu n’auras rien à payer!",
 
         onSitePayBody:
-          "Votre séjour n’est pas pris en charge par les mariés : vous paierez votre part.",
-        independentTitle: "Hébergement de votre côté",
+          "Ton séjour n’est pas pris en charge par les mariés : tu paieras ta part.",
+        independentTitle: "Hébergement de ton côté",
         independentBody:
-          "Nous vous recommandons de chercher un hôtel ou un Airbnb dans les environs.",
+          "Nous te recommandons de chercher un hôtel ou un Airbnb dans les environs.",
         cabinLabel: "Gîte",
         roomLabel: "Chambre",
         cabinCapacityLabel: "Capacité du gîte",
@@ -2023,10 +2035,10 @@ export const content = {
         wholeCabinTitle: "Occupation complète du gîte",
         wholeCabinBody: "Toutes les chambres et les personnes affectées à chacune d’elles.",
         emptyRoom: "Aucune personne affectée",
-        youLabel: "Vous",
+        youLabel: "Toi",
         airbnbTitle: "Airbnbs près de Roca Azul",
         airbnbBody:
-          "Ces options sont apparues dans la zone pour les nuits du 19 au 21 février 2027. Vérifiez la disponibilité et le tarif directement sur Airbnb.",
+          "Ces options sont apparues dans la zone pour les nuits du 19 au 21 février 2027. Vérifie la disponibilité et le tarif directement sur Airbnb.",
         airbnbAreaPrice: "Prix d’entrée observé dans la zone",
         fromPrice: "À partir de · tarif indicatif",
         perNight: "par nuit",
@@ -2039,7 +2051,7 @@ export const content = {
         airbnbSearchAll: "Voir toute la recherche sur Airbnb",
         hotelTitle: "Hôtels près de Roca Azul",
         hotelBody:
-          "Tarifs indicatifs observés actuellement. Vérifiez auprès de chaque hôtel les disponibilités, les taxes et le prix final pour les nuits du 19 au 21 février 2027.",
+          "Tarifs indicatifs observés actuellement. Vérifie auprès de chaque hôtel les disponibilités, les taxes et le prix final pour les nuits du 19 au 21 février 2027.",
         hotelLocation: "Secteur",
         hotelView: "Voir l’hôtel",
         hotelTypes: {
@@ -2054,7 +2066,7 @@ export const content = {
           pending: "À confirmer",
         },
         extraCabinLabel: "Hébergement supplémentaire",
-        planCardTitle: "Votre plan d’hébergement",
+        planCardTitle: "Ton plan d’hébergement",
         planCardPerPerson: "Par personne · 2 nuits",
         planCardSaleLabel: "Pris en charge par les mariés",
         planCardGroupTotal: "Total du groupe",
@@ -2067,7 +2079,7 @@ export const content = {
 
 
       cabinsShowcase: {
-        eyebrow: "Découvrez les gîtes",
+        eyebrow: "Découvre les gîtes",
         privateVideoEyebrow: "Vidéo privée",
         privateVideoTitle: "Une visite des gîtes",
         key: "azalea",
@@ -2186,11 +2198,11 @@ export const content = {
       },
       plan: {
         eyebrow: "Comment ça marche ?",
-        title: "Dites-nous ce que vous préférez",
+        title: "Dis-nous ce que tu préfères",
         body:
-          "Votre réponse nous permettra de répartir les gîtes de façon juste et organisée.",
+          "Ta réponse nous permettra de répartir les gîtes de façon juste et organisée.",
         steps: [
-          "Indiquez votre préférence d’hébergement dans le RSVP.",
+          "Indique ta préférence d’hébergement dans le RSVP.",
           "Nous organiserons les gîtes selon les groupes, les dates et les disponibilités.",
           "Nous confirmerons directement l’attribution, le tarif final et le paiement.",
         ],
@@ -2199,9 +2211,9 @@ export const content = {
       navNext: "Pétanque",
       recap: {
         eyebrow: "Confirmation de l’hébergement",
-        title: "Confirmez-vous votre hébergement ?",
+        title: "Confirme-tu ton hébergement ?",
         intro:
-          "Indiquez pour chaque personne si elle restera à Roca Azul afin que nous puissions organiser les gîtes.",
+          "Indique pour chaque personne si elle restera à Roca Azul afin que nous puissions organiser les gîtes.",
         hasCabinQuestion: "Reste-t-elle à Roca Azul ?",
         hasCabinQuestionCabin: "Ok pour {cabin} ?",
         noCabinQuestion: "Me prévenir si un logement se libère",
@@ -2210,25 +2222,25 @@ export const content = {
         noLabel: "Non",
         button: "Enregistrer ma confirmation",
         success: "Confirmation enregistrée. Merci !",
-        error: "Impossible d’enregistrer. Réessayez.",
+        error: "Impossible d’enregistrer. Réessaie.",
       },
     },
     travel: {
 
       eyebrow: "Je viens de loin",
-      title: "Votre voyage fait aussi partie de la fête",
+      title: "Ton voyage fait aussi partie de la fête",
       body:
         "Nous accompagnerons personnellement celles et ceux qui viennent d’Europe et d’ailleurs : choix des vols, arrivée à Guadalajara, hébergement et transferts.",
       points: [
         "Madrid–Guadalajara est la liaison directe prioritaire depuis l’Europe.",
-        "Nous coordonnerons les accueils dès réception de vos numéros de vol.",
+        "Nous coordonnerons les accueils dès réception de tes numéros de vol.",
         "Chaque voyageur aura un itinéraire d’arrivée, de séjour et de retour.",
       ],
       routes: {
         eyebrow: "Schéma des trajets",
         title: "Rejoindre Roca Azul, puis continuer vers la côte",
         note:
-          "Les durées indiquées sont indicatives et peuvent varier énormément. Soyez prévoyants et, encore mieux, soyez sur place en avance en réservant un logement si vous pouvez.",
+          "Les durées indiquées sont indicatives et peuvent varier énormément. Sois prévoyant et, encore mieux, sois sur place en avance en réservant un logement si tu peux.",
         venue: "Roca Azul · Jocotepec",
         toVenueLabel: "Vers Roca Azul",
         toBeachLabel: "Vers la plage",
@@ -2277,25 +2289,25 @@ export const content = {
       body:
         "Nous avons choisi une esthétique mexicaine pour notre mariage en hommage à la culture, la cuisine, la musique et le lieu qui nous réunit. Nous voulons que tout soit festif, coloré et profondément mexicain.",
       dressCode: {
-        title: "Habillez-vous en couleur",
+        title: "Habille-toi en couleur",
         paragraphs: [
-          "Nous sommes immensément heureux de partager ce jour avec vous, et nous souhaitons que, tout comme chaque personne a laissé une empreinte spéciale dans notre vie, chacun apporte un peu de son essence à cette célébration.",
-          "Nous croyons que les couleurs transmettent de l’énergie, de la joie et de la personnalité. C’est pourquoi nous aimerions que vous nous accompagniez en portant des tons pleins de vie, en évitant le noir, le gris et le blanc.",
+          "Nous sommes immensément heureux de partager ce jour avec toi, et nous souhaitons que, tout comme chaque personne a laissé une empreinte spéciale dans notre vie, chacun apporte un peu de son essence à cette célébration.",
+          "Nous croyons que les couleurs transmettent de l’énergie, de la joie et de la personnalité. C’est pourquoi nous aimerions que tu nous accompagnes en portant des tons pleins de vie, en évitant le noir, le gris et le blanc.",
           "Notre mariage aura une inspiration mexicaine, avec une décoration aux tons blancs et des détails artisanaux. David portera une guayabera en lin blanc avec des broderies dorées, et nous porterons tous les deux des pièces brodées par des artisanes d’une communauté d’Oaxaca, en hommage à la richesse de nos traditions.",
-          "La seule règle est que vous soyez vous-mêmes : élégants, à l’aise et prêts à célébrer, danser et remplir ce jour de couleur, d’amour et de bonne énergie.",
+          "La seule règle est que tu sois toi-même : élégant, à l’aise et prêt à célébrer, danser et remplir ce jour de couleur, d’amour et de bonne énergie.",
           "Merci de faire partie de notre histoire ! ✨🌼",
         ],
         pictograms: {
           ariaLabel: "Pictogrammes du code vestimentaire",
-          noWhite: "Évitez le blanc",
-          noBlack: "Évitez le noir",
-          noGrey: "Évitez le gris",
+          noWhite: "Évite le blanc",
+          noBlack: "Évite le noir",
+          noGrey: "Évite le gris",
           colorGreen: "Vert",
           colorTeal: "Turquoise",
           colorMarigold: "Jaune",
-          dressNoWhite: "Robe : évitez le blanc",
-          dressNoBlack: "Robe : évitez le noir",
-          dressNoGrey: "Robe : évitez le gris",
+          dressNoWhite: "Robe : évite le blanc",
+          dressNoBlack: "Robe : évite le noir",
+          dressNoGrey: "Robe : évite le gris",
           dressColor: "Robe colorée",
           funky: "Imprimés amusants",
           mexican: "Motifs mexicains",
@@ -2303,19 +2315,19 @@ export const content = {
       },
 
       guestNote:
-        "Le plus important est que vous soyez à l'aise et que vous célébriez avec nous. Si vous avez des questions, écrivez-nous.",
+        "Le plus important est que tu sois à l'aise et que tu célèbres avec nous. Si tu as des questions, écris-nous.",
       navNext: "Hébergement",
 
     },
     gift: {
       eyebrow: "Cadeaux",
 
-      title: "Le plus beau cadeau, c'est votre présence",
+      title: "Le plus beau cadeau, c'est ta présence",
 
       body:
-        "Votre présence est le plus beau cadeau que nous puissions recevoir. Si vous souhaitez tout de même nous faire un geste, nous serons touchés par toute contribution pour notre lune de miel ou nos projets de couple.",
+        "Ta présence est le plus beau cadeau que nous puissions recevoir. Si tu souhaites tout de même nous faire un geste, nous serons touchés par toute contribution pour notre lune de miel ou nos projets de couple.",
       note:
-        "Il n'y a aucune obligation ni attente — ce qui nous rend vraiment heureux, c'est de partager ce week-end avec vous.",
+        "Il n'y a aucune obligation ni attente — ce qui nous rend vraiment heureux, c'est de partager ce week-end avec toi.",
       accounts: {
         eur: {
           title: "Virement en EUR (SEPA)",
@@ -2353,10 +2365,10 @@ export const content = {
         { name: "Isabel Guadalupe", role: "Tenues des mariés" },
       ],
       humor: [
-        "Si vous voulez apparaître ici, contactez notre programme d’affiliation au programme de parrain.",
+        "Si tu veux apparaître ici, contacte notre programme d’affiliation au programme de parrain.",
 
-        "Vous apparaissez ici sans le savoir : une mission vous a été confiée. Dommage, mais il est impossible de l’effacer : l’admin IT de la page est en vacances, on ne peut pas le supprimer, donc il faut s’y tenir.",
-        "Vous avez apporté votre aide et vous n’apparaissez pas. Dommage. L’IT est peut-être en vacances, mais envoyez vos réclamations aux mariés ou au wedding planner.",
+        "Tu apparais ici sans le savoir : une mission t’a été confiée. Dommage, mais il est impossible de l’effacer : l’admin IT de la page est en vacances, on ne peut pas le supprimer, donc il faut s’y tenir.",
+        "Tu as apporté ton aide et tu n’apparais pas. Dommage. L’IT est peut-être en vacances, mais envoie tes réclamations aux mariés ou au wedding planner.",
       ],
       cta: "Contacter les mariés",
       ctaPlanner: "Wedding planner",
@@ -2384,26 +2396,26 @@ export const content = {
         {
           title: "Plan 1 · Rester à Roca Azul",
           body:
-            "Louer un gîte deux nuits de plus, du dimanche au mardi, pour continuer à se retrouver sur place. Si cela vous intéresse, indiquez-le dans le RSVP et nous organiserons le gîte pour votre groupe.",
+            "Louer un gîte deux nuits de plus, du dimanche au mardi, pour continuer à se retrouver sur place. Si cela t’intéresse, indique-le dans le RSVP et nous organiserons le gîte pour ton groupe.",
         },
         {
           title: "Plan 2 · La plage",
           body:
-            "Du mardi au samedi, nous partons sur la côte. Ce n’est pas une lune de miel — vous êtes tous cordialement invités à continuer la fête à Barra de Navidad. Nous pouvons organiser des transports en commun.",
+            "Du mardi au samedi, nous partons sur la côte. Ce n’est pas une lune de miel — tu es cordialement invité à continuer la fête à Barra de Navidad. Nous pouvons organiser des transports en commun.",
         },
       ],
       note:
         "Les dates exactes, le transport et le budget dépendront du nombre de personnes intéressées. Une nuit d’hôtel à Barra de Navidad à cette saison coûte environ 1 200–2 500 MXN par personne.",
       form: {
         eyebrow: "Sondage sans engagement",
-        title: "Vous vous inscrivez ?",
+        title: "Tu t’inscris ?",
         body:
-          "Dites-nous quel plan vous intéresse pour qu’on commence à organiser la logistique.",
+          "Dis-nous quel plan t’intéresse pour qu’on commence à organiser la logistique.",
         fields: {
           name: "Nom",
           interest: "Niveau d’intérêt",
           partySize: "Personnes intéressées",
-          plan: "Plan qui vous intéresse",
+          plan: "Plan qui t’intéresse",
           destination: "Destination préférée",
           style: "Formule d’hébergement",
           note: "Dates, budget ou commentaires",
@@ -2435,9 +2447,9 @@ export const content = {
       },
       rsvpMini: {
         eyebrow: "Et après ?",
-        title: "Vous vous inscrivez ?",
+        title: "Tu t’inscris ?",
         intro:
-          "Dites-nous quelle est la probabilité que vous rejoigniez chaque plan. Vous pouvez modifier votre réponse à tout moment.",
+          "Dis-nous quelle est la probabilité que tu rejoignes chaque plan. Tu peux modifier ta réponse à tout moment.",
         questions: [
           {
             id: "rocaAzul",
@@ -2453,17 +2465,17 @@ export const content = {
         recapTitle: "Résumé",
         recapProgress: "répondu·e·s",
         button: "Enregistrer mes réponses",
-        success: "Merci ! Nous avons enregistré vos réponses.",
-        error: "Impossible d’enregistrer. Vérifiez votre connexion et réessayez.",
+        success: "Merci ! Nous avons enregistré tes réponses.",
+        error: "Impossible d’enregistrer. Vérifie ta connexion et réessaie.",
       },
       suggestions: {
         eyebrow: "Où dormir",
         title: "Suggestions à Barra de Navidad",
         body:
-          "Si le plan plage vous intéresse, ces options sont apparues dans la zone pour les nuits du 23 au 28 février 2027. Vérifiez la disponibilité et le tarif directement.",
+          "Si le plan plage t’intéresse, ces options sont apparues dans la zone pour les nuits du 23 au 28 février 2027. Vérifie la disponibilité et le tarif directement.",
         airbnbTitle: "Airbnbs près de Barra de Navidad",
         airbnbBody:
-          "Ces options sont apparues dans la zone pour les nuits du 23 au 28 février 2027. Vérifiez la disponibilité et le tarif directement sur Airbnb.",
+          "Ces options sont apparues dans la zone pour les nuits du 23 au 28 février 2027. Vérifie la disponibilité et le tarif directement sur Airbnb.",
         airbnbAreaPrice: "Prix d’entrée observé dans la zone",
         fromPrice: "À partir de · tarif indicatif",
         perNight: "par nuit",
@@ -2476,7 +2488,7 @@ export const content = {
         airbnbSearchAll: "Voir toute la recherche sur Airbnb",
         hotelTitle: "Hôtels à Barra de Navidad",
         hotelBody:
-          "Tarifs indicatifs observés actuellement. Vérifiez auprès de chaque hôtel les disponibilités, les taxes et le prix final.",
+          "Tarifs indicatifs observés actuellement. Vérifie auprès de chaque hôtel les disponibilités, les taxes et le prix final.",
         hotelLocation: "Secteur",
         hotelView: "Voir l’hôtel",
         hotelTypes: {
@@ -2486,17 +2498,17 @@ export const content = {
         },
       },
       extraStay: {
-        eyebrow: "Votre séjour · dimanche à mardi",
-        title: "Votre gîte pour le second séjour",
+        eyebrow: "Ton séjour · dimanche à mardi",
+        title: "Ton gîte pour le second séjour",
       },
     },
 
     rsvp: {
 
       eyebrow: "RSVP",
-      title: "Serez-vous avec nous ?",
+      title: "Seras-tu avec nous ?",
       body:
-        "Une seule réponse nous permettra d’organiser votre présence, votre hébergement et votre voyage. Si vos vols ne sont pas encore réservés, vous pourrez nous les transmettre plus tard.",
+        "Une seule réponse nous permettra d’organiser ta présence, ton hébergement et ton voyage. Si tes vols ne sont pas encore réservés, tu pourras nous les transmettre plus tard.",
       groups: {
         attendance: "Présence et hébergement",
         travel: "Je viens de loin",
@@ -2504,21 +2516,21 @@ export const content = {
       },
       petanque: {
         eyebrow: "Tournoi de pétanque",
-        intro: "Le vendredi après-midi, nous organiserons un tournoi de pétanque. Vous participez ?",
+        intro: "Le vendredi après-midi, nous organiserons un tournoi de pétanque. Tu participes ?",
         organizerLabel: "Organise : David",
         organizerWhatsapp: "https://wa.me/523332017504",
         fields: {
-          participation: "Participez-vous au tournoi ?",
+          participation: "Participes-tu au tournoi ?",
           partySize: "Combien de personnes ?",
           names: "Noms des participants",
           namesPlaceholder: "Ex. David, Aydé, Dimitar…",
-          ownBoules: "Apportez-vous vos propres boules ?",
+          ownBoules: "Apportes-tu tes propres boules ?",
         },
         options: {
           participation: [
             { value: "yes", label: "Oui, nous voulons jouer" },
             { value: "no", label: "Pas cette fois" },
-            { value: "maybe", label: "Peut-être, décidez pour nous" },
+            { value: "maybe", label: "Peut-être, décide pour nous" },
           ],
           ownBoules: [
             { value: "yes", label: "Oui, nous apportons" },
@@ -2527,22 +2539,22 @@ export const content = {
         },
       },
       travelNote:
-        "Remplissez cette partie uniquement si vous venez d’une autre ville ou d’un autre pays. Nous avons besoin des trajets aller et retour pour organiser les transferts.",
+        "Remplis cette partie uniquement si tu viens d’une autre ville ou d’un autre pays. Nous avons besoin des trajets aller et retour pour organiser les transferts.",
       fields: {
         fullName: "Nom complet",
         whatsapp: "WhatsApp (pour les communications à venir)",
 
-        attendance: "Serez-vous avec nous ?",
-        groupMode: "Répondez-vous seul·e ou en groupe ?",
+        attendance: "Seras-tu avec nous ?",
+        groupMode: "Réponds-tu seul·e ou en groupe ?",
         groupName: "Nom du groupe ou de la famille",
-        partySize: "Personnes dans votre groupe",
+        partySize: "Personnes dans ton groupe",
         adults: "Adultes de 18 ans ou plus",
         children: "Mineurs de moins de 18 ans",
         guests: "Noms des accompagnants",
         accommodation: "Projet d’hébergement",
-        independentArrival: "Quand pensez-vous arriver à Roca Azul ?",
+        independentArrival: "Quand penses-tu arriver à Roca Azul ?",
         sundayMorning: "Nous verrons-nous dimanche matin ?",
-        travelStatus: "État de votre voyage",
+        travelStatus: "État de ton voyage",
         arrivalFrom: "Arrivée depuis",
         arrivalTo: "Arrivée à",
         arrivalDate: "Date d’arrivée",
@@ -2599,8 +2611,8 @@ export const content = {
       },
       button: "Envoyer ma réponse",
       previewNote:
-        "Votre réponse sera enregistrée de façon privée et accessible uniquement aux mariés.",
-      progressLabel: "Avant d’envoyer, complétez chaque section :",
+        "Ta réponse sera enregistrée de façon privée et accessible uniquement aux mariés.",
+      progressLabel: "Avant d’envoyer, complète chaque section :",
       progressTeAnimas: "Ça te tente ? (vendredi, samedi, dimanche)",
       progressPetanque: "Tournoi de pétanque",
       progressCoast: "Et après ? (plage)",
@@ -2617,7 +2629,7 @@ export const content = {
         intro:
           "Dis-nous, jour par jour, quelle est la probabilité que tu sois avec nous. Tu peux modifier ta réponse à tout moment.",
         saveButton: "Enregistrer mes réponses",
-        savedNote: "Merci ! Nous avons enregistré vos réponses.",
+        savedNote: "Merci ! Nous avons enregistré tes réponses.",
         questions: [
           {
             id: "friday",
@@ -2636,15 +2648,27 @@ export const content = {
           },
         ],
       },
+      payment: {
+        title: "À payer",
+        intro:
+          "Voici le détail de ce que tu devras payer pour ton hébergement.",
+        cabinTitle: "Gîte",
+        extraCabinTitle: "Gîte supplémentaire",
+        perPerson: "À payer par personne",
+        perGroup: "À payer par le groupe",
+        asterisk:
+          "Nous apprécions ta compréhension : nous aurions aimé tout payer pour tout le monde, mais ce n’est pas possible. C’est une option que nous avons prévue pour toi, et nous comprenons si tu préfères autre chose. Fais-nous simplement part de ton choix.",
+      },
     },
     petanqueTribute: {
       eyebrow: "Pétanque",
+
       title: "Un hommage à la pétanque",
       intro:
         "La pétanque nous a réunis autour d’une merveilleuse communauté d’amis et de coéquipiers de club, au Mexique et dans le monde.",
       body:
         "Le vendredi après-midi, nous organiserons un tournoi de pétanque pour célébrer ce jeu que nous aimons tant. Aucune expérience n’est requise : juste l’envie de jouer, de rire et de partager.",
-      homage: "Ça vous tente !",
+      homage: "Ça te tente !",
       photosLabel: "Photos de pétanque",
 
       photoAlts: [
@@ -2656,19 +2680,19 @@ export const content = {
       navNext: "À table",
       rsvpMini: {
         eyebrow: "Tournoi de pétanque",
-        title: "Vous vous inscrivez ?",
-        intro: "Le vendredi après-midi, nous organiserons un tournoi de pétanque. Vous participez ?",
+        title: "Tu t’inscris ?",
+        intro: "Le vendredi après-midi, nous organiserons un tournoi de pétanque. Tu participes ?",
         organizerLabel: "Organise : David",
         organizerWhatsapp: "https://wa.me/523332017504",
         fields: {
-          participation: "Participez-vous au tournoi ?",
-          ownBoules: "Apportez-vous vos propres boules ?",
-          ownBoulesHint: "Si vous n’en avez pas, pas de souci : nous en aurons à partager.",
+          participation: "Participes-tu au tournoi ?",
+          ownBoules: "Apportes-tu tes propres boules ?",
+          ownBoulesHint: "Si tu n’en as pas, pas de souci : nous en aurons à partager.",
         },
         yesLabel: "Oui",
         noLabel: "Non",
-        success: "Merci ! Nous avons enregistré vos réponses.",
-        error: "Impossible d’enregistrer. Vérifiez votre connexion et réessayez.",
+        success: "Merci ! Nous avons enregistré tes réponses.",
+        error: "Impossible d’enregistrer. Vérifie ta connexion et réessaie.",
         button: "Enregistrer mes réponses",
         recapTitle: "Résumé",
       },
@@ -3956,10 +3980,22 @@ export const content = {
           },
         ],
       },
+      payment: {
+        title: "To pay",
+        intro:
+          "Here is the breakdown of what you will pay for your accommodation.",
+        cabinTitle: "Guest house",
+        extraCabinTitle: "Extra guest house",
+        perPerson: "To pay per person",
+        perGroup: "To pay for the group",
+        asterisk:
+          "We appreciate your understanding: we would love to pay for everyone, but it is not possible. This is only an option we planned for you, and we understand if you prefer something else. Just let us know your choice.",
+      },
     },
     petanqueTribute: {
       eyebrow: "Pétanque",
       title: "A tribute to pétanque",
+
       intro:
         "Pétanque has brought us together with a wonderful community of friends and club teammates in Mexico and around the world.",
       body:

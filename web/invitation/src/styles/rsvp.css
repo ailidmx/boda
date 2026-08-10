@@ -831,4 +831,141 @@
 }
 
 
+/* ── RSVP "À payer" payment summary ─────────────────────────────────────
+   A read-only block shown before the final form. It lists the per-person and
+   per-group amounts for the primary cabin and (when present) the extra cabin.
+   It sits on the dark green RSVP frame, so it uses white text, gold accents,
+   and the same red "on sale" price treatment as the Hébergement section. */
+.rsvp-payment {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgb(228 185 104 / 45%);
+  background: rgb(255 255 255 / 4%);
+  text-align: left;
+}
+
+.rsvp-payment h3 {
+  margin: 0;
+  color: #e4b968;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+}
+
+.rsvp-payment > p {
+  margin: 0;
+  max-width: 46rem;
+  color: rgb(255 253 248 / 70%);
+}
+
+.rsvp-payment-block {
+  display: grid;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px dashed rgb(228 185 104 / 35%);
+}
+
+.rsvp-payment-block-title {
+  margin: 0;
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+
+.rsvp-payment-rows {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.rsvp-payment-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid rgb(255 255 255 / 12%);
+  background: rgb(255 255 255 / 3%);
+}
+
+.rsvp-payment-row dt {
+  color: rgb(255 253 248 / 75%);
+  font-size: 0.9rem;
+}
+
+.rsvp-payment-value {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  text-align: right;
+}
+
+.rsvp-payment-line {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.rsvp-payment-line strong {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--white);
+}
+
+.rsvp-payment-line small {
+  color: rgb(255 253 248 / 70%);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+/* Struck-through original price, muted, shown next to the discounted price
+   when a stay is covered by the couple (e-commerce "on sale" pattern). */
+.rsvp-payment-original {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  opacity: 0.55;
+  text-decoration-color: var(--terracotta);
+  text-decoration-line: line-through;
+  text-decoration-thickness: 0.12em;
+}
+
+.rsvp-payment-original strong,
+.rsvp-payment-original small {
+  font-size: 0.85em;
+}
+
+/* When a price is discounted (covered by the couple), the price to pay turns
+   red, mirroring the Hébergement sale treatment. */
+.rsvp-payment-value.is-sale .rsvp-payment-line > strong,
+.rsvp-payment-value.is-sale .rsvp-payment-line > small {
+  color: #c0392b;
+}
+
+/* "Covered by the couple" banner: a small gold tag next to the price. */
+.rsvp-payment-value em {
+  padding: 0.32rem 0.48rem;
+  background: var(--marigold);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.58rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  line-height: 1;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+
+.rsvp-payment-asterisk {
+  font-size: 0.85rem;
+  color: rgb(255 253 248 / 55%);
+}
+
 

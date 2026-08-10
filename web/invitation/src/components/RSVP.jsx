@@ -4,9 +4,13 @@ import { useRsvp, RSVP_FLOWS } from "../context/RsvpContext.jsx";
 import { submitPetanque, submitRsvp } from "../submit-forms.js";
 import { RsvpQuestion } from "./RsvpQuestion.jsx";
 import { RsvpRecap } from "./RsvpRecap.jsx";
-import { getGroupMembers } from "../guest-profiles.js";
+import { getGroupMembers, resolveLiveGuest } from "../guest-profiles.js";
 import { getActiveGuests } from "../guests.js";
 import { resolveRsvpAnswer } from "../rsvp-responses.js";
+import { getCabin } from "../cabins.js";
+import { getRoom } from "../rooms.js";
+import { PaymentSummary } from "./PaymentSummary.jsx";
+
 
 
 function optionsMarkup(options) {
@@ -35,9 +39,53 @@ export function RSVP() {
     [profile?.guest],
   );
 
+  // ── Payment summary resolvers ──────────────────────────────────────────
+  // These mirror the resolvers used by StayPlanCard so the read-only "À payer"
+  // block shows exactly the same amounts as the Hébergement section.
+  const payment = rsvp.payment || {};
+  const guestOption = t.accommodation?.guestOption || {};
+  const coveredLabel = guestOption.payment?.covered || "";
+
+  // Primary stay (Fri→Sun): cabin + covered flag.
+  const getAssignedCabinId = (candidate) => {
+    const source = resolveLiveGuest(candidate);
+    const mHosting = source?.hosting || {};
+    const mAssignedCabin =
+      mHosting.cabin ||
+      source?.cabin ||
+      source?.cabinLabel ||
+      source?.unit ||
+      source?.room;
+    const mAssignedRoom = mHosting.room || source?.room;
+    const mRoom = mAssignedRoom ? getRoom(mAssignedRoom) : null;
+    return mRoom?.cabin || mAssignedCabin;
+  };
+  const resolveMemberCovered = (member) => {
+    const source = resolveLiveGuest(member);
+    return source?.hosting?.isCabinPaidByNovios ?? source?.isCabinPaidByNovios;
+  };
+
+  // Extra stay (Sun→Tue): extra cabin + covered flag.
+  const getXtraCabinId = (candidate) => {
+    const source = resolveLiveGuest(candidate);
+    const mHosting = source?.hosting || {};
+    const mXtraCabin = mHosting.xtraCabin || source?.xtraCabin;
+    const mXtraRoom = mHosting.xtraRoom || source?.xtraRoom;
+    const mRoom = mXtraRoom ? getRoom(mXtraRoom) : null;
+    return mRoom?.cabin || mXtraCabin;
+  };
+  const resolveXtraCovered = (member) => {
+    const source = resolveLiveGuest(member);
+    return (
+      source?.hosting?.isXtraCabinPaidByNovios ??
+      source?.isXtraCabinPaidByNovios
+    );
+  };
+
   const handleAnswerChange = (questionId, guestId, level) => {
     setAnswer(questionId, guestId, level);
   };
+
 
   // The final RSVP cannot be submitted until every mini-RSVP flow has been
   // walked through to its recap step ("resume"). Each flow reports its state
@@ -145,6 +193,42 @@ export function RSVP() {
           </fieldset>
         )}
 
+        {/* Read-only "À payer" summary: shows the per-person and per-group
+            amounts for the primary cabin and, when present, the extra cabin.
+            Amounts follow the same pricing rules as the Hébergement section. */}
+        {payment.title && (
+          <section className="rsvp-payment" aria-label={payment.title}>
+            <h3>{payment.title}</h3>
+            <p>{payment.intro}</p>
+
+            <PaymentSummary
+              activeMember={profile?.guest}
+              groupMembers={guests}
+              getAssignedCabinId={getAssignedCabinId}
+              resolveMemberCovered={resolveMemberCovered}
+              language={language}
+              payment={payment}
+              coveredLabel={coveredLabel}
+            />
+
+            {getXtraCabinId(profile?.guest) && (
+              <PaymentSummary
+                activeMember={profile?.guest}
+                groupMembers={guests}
+                getAssignedCabinId={getXtraCabinId}
+                resolveMemberCovered={resolveXtraCovered}
+                language={language}
+                payment={{ ...payment, cabinTitle: payment.extraCabinTitle }}
+                coveredLabel={coveredLabel}
+              />
+            )}
+
+            {payment.asterisk && (
+              <p className="rsvp-payment-asterisk">{payment.asterisk}</p>
+            )}
+          </section>
+        )}
+
         <form
           ref={formRef}
           className="rsvp-form"
@@ -152,6 +236,7 @@ export function RSVP() {
           aria-describedby="rsvp-preview-note"
           onSubmit={handleSubmit}
         >
+
           <fieldset>
             <legend>{rsvp.groups.attendance}</legend>
             <div className="rsvp-form-grid">
