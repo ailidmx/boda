@@ -2189,7 +2189,8 @@ export const content = {
         membersLabel: "Membres du groupe",
         linkLabel: "Voir l’option prévue pour toi",
         backLabel: "Retour à l’hébergement",
-        onSiteTitle: "Nous avons un place pour toi!",
+        onSiteTitle: "Nous avons une place pour toi!",
+
         onSiteBody:
           "Voici l’option que nous avons prévu pour toi, nous esperons qu’elle te plaira",
         onSiteCoveredBody:
