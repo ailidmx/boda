@@ -1,15 +1,15 @@
 /**
  * Guest profile helpers.
  *
- * The Google Sheet (via the generated `guests.js` registry) is the source of
- * truth for identity (names, avatar `cloudinaryId`, group, cabin). The
- * `guests` Firestore collection is the source of truth for live, user-editable
- * data: contact details (phone) and the identity-check acknowledgement
- * (`idCheckUser`). Email is intentionally NOT stored in Firestore; it is only
- * used transiently for authentication (see `resolveGuestEmail`).
+ * The `guests` Firestore collection is the source of truth for guest records:
+ * identity (names, avatar `cloudinaryId`, group, cabin refs) and live,
+ * user-editable data (contact details, identity-check acknowledgement). There
+ * is no static guest registry anymore — the in-memory `guestsCache` below is
+ * populated from Firestore by `loadGuestProfiles()` / `loadAllGuests()` and is
+ * what the guest registry (`guests.js`) reads.
  *
- * The legacy `guest_profiles` collection has been removed. All guest data now
- * flows from the sheet → `guests.js` (static) + `guests` (Firestore).
+ * Email is intentionally NOT stored in Firestore; it is only used transiently
+ * for authentication (see `resolveGuestEmail`).
  *
  * Firestore rules allow any authenticated guest to update the contact details
  * (phone) and the identity-check flag of themselves and of the other
@@ -72,6 +72,32 @@ function notifyGuestsCacheChanged() {
     }
   });
 }
+
+/**
+ * Read-only access to the live Firestore `guests` cache. Returns a snapshot
+ * array of the normalized guest records currently loaded (keyed by guest id).
+ *
+ * This lets the guest registry (`guests.js`) source its data from Firestore
+ * (the source of truth) instead of the static sheet snapshot, so the
+ * guest-facing lists (THANKS, GUEST CLOUD, group members, etc.) reflect live
+ * names, photos, and hosting data.
+ *
+ * @returns {Object[]}
+ */
+export function getGuestsCache() {
+  return Array.from(guestsCache.values());
+}
+
+/**
+ * Read a single normalized guest record from the live Firestore cache.
+ * @param {string} guestId
+ * @returns {Object|undefined}
+ */
+export function getGuestRecord(guestId) {
+  if (!guestId) return undefined;
+  return guestsCache.get(guestId);
+}
+
 
 function logDb(event, detail) {
   console.log(`[db][guest-profiles][${event}]`, detail);

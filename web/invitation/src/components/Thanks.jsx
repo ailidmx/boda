@@ -1,8 +1,12 @@
 import React from "react";
 import { EVENT } from "../content.js";
 import { useApp } from "../context/AppContext.jsx";
-import { getActiveGuests } from "../guests.js";
+import { getGuest } from "../guests.js";
+
 import { resolveGuestName, resolveGuestPhoto } from "../guest-profiles.js";
+import { loadThanksCredits } from "../thanks.js";
+
+
 
 // Wedding planner contact used in the humorous "credits" mentions.
 const PLANNER = {
@@ -19,66 +23,46 @@ function initialsOf(name) {
     .toUpperCase();
 }
 
-function normalizeName(value) {
-  return String(value || "")
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z\s]/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
-}
-
-function buildGuestSearchIndex() {
-  const guests = getActiveGuests();
-  return guests
-    .map((guest) => {
+// Resolve a credit to the live guest record (full name + photo) strictly by
+// its guestId (the agreed schema). No fuzzy name matching — if the guestId
+// doesn't resolve, the credit falls back to its own name with no photo.
+function resolveCredit(credit) {
+  if (credit.guestId) {
+    const guest = getGuest(credit.guestId);
+    if (guest) {
+      const { fullName } = resolveGuestName(guest);
       const photo = resolveGuestPhoto(guest);
-      if (!photo) return null;
-      const { firstName, middleName, lastName, maternalLastName, fullName } =
-        resolveGuestName(guest);
-      const variants = [
-        fullName,
-        [firstName, lastName].filter(Boolean).join(" "),
-        [firstName, middleName, lastName].filter(Boolean).join(" "),
-        [firstName, lastName, maternalLastName].filter(Boolean).join(" "),
-        firstName,
-        [lastName, maternalLastName].filter(Boolean).join(" "),
-      ]
-        .map(normalizeName)
-        .filter(Boolean);
-      return {
-        guest,
-        photo,
-        variants,
-      };
-    })
-    .filter(Boolean);
+      return { name: fullName || credit.name, photo: photo || null };
+    }
+  }
+  return { name: credit.name, photo: null };
 }
 
-function findCreditAvatar(creditName, index) {
-  const needle = normalizeName(creditName);
-  if (!needle) return null;
 
-  const exact = index.find((entry) => entry.variants.includes(needle));
-  if (exact) return exact.photo;
-
-  const includes = index.find((entry) =>
-    entry.variants.some(
-      (variant) => variant.includes(needle) || needle.includes(variant),
-    ),
-  );
-  return includes?.photo || null;
-}
 
 export function Thanks() {
-  const { t } = useApp();
+  const { t, language } = useApp();
   const thanks = t.thanks || {};
-  const credits = thanks.credits || [];
   const humor = thanks.humor || [];
-  const guestIndex = React.useMemo(() => buildGuestSearchIndex(), []);
+
+  // Credits are sourced from the Firestore `thanks` collection (the source of
+
+  // truth), not from hardcoded content. Each document carries a `guest` ID and
+  // the localized role/thanks text for the active language.
+  const [credits, setCredits] = React.useState([]);
+
+  React.useEffect(() => {
+    let active = true;
+    loadThanksCredits(language).then((loaded) => {
+      if (active) setCredits(loaded);
+    });
+    return () => {
+      active = false;
+    };
+  }, [language]);
 
   return (
+
     <section className="thanks-section section" id="thanks">
       {/* Geometric art-deco backdrop — jewel-toned shapes, sunburst rays and
           a metallic sheen over the deep indigo base. Purely decorative. */}
@@ -104,32 +88,37 @@ export function Thanks() {
         </blockquote>
 
         <ul className="thanks-credits">
-          {credits.map((credit, index) => (
-            <li className="thanks-credit" key={index}>
-              {findCreditAvatar(credit.name, guestIndex) ? (
-                <span
-                  className="thanks-avatar thanks-avatar--photo"
-                  aria-hidden="true"
-                >
-                  <img
-                    src={findCreditAvatar(credit.name, guestIndex)}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  />
+          {credits.map((credit, index) => {
+            const resolved = resolveCredit(credit);
+            return (
+
+              <li className="thanks-credit" key={index}>
+                {resolved.photo ? (
+                  <span
+                    className="thanks-avatar thanks-avatar--photo"
+                    aria-hidden="true"
+                  >
+                    <img
+                      src={resolved.photo}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </span>
+                ) : (
+                  <span className="thanks-avatar" aria-hidden="true">
+                    {initialsOf(resolved.name)}
+                  </span>
+                )}
+                <span className="thanks-credit-text">
+                  <strong className="thanks-name">{resolved.name}</strong>
+                  <span className="thanks-role">{credit.role}</span>
                 </span>
-              ) : (
-                <span className="thanks-avatar" aria-hidden="true">
-                  {initialsOf(credit.name)}
-                </span>
-              )}
-              <span className="thanks-credit-text">
-                <strong className="thanks-name">{credit.name}</strong>
-                <span className="thanks-role">{credit.role}</span>
-              </span>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
+
 
         <div className="thanks-humor">
           {humor.map((line, index) => (

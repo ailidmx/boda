@@ -1,26 +1,26 @@
 {
-  "mode": "dry-run",
-  "ciMode": true,
-  "failOnDrift": true,
-  "generatedAt": "2026-08-10T00:16:38.250Z",
+  "mode": "execute",
+  "ciMode": false,
+  "failOnDrift": false,
+  "generatedAt": "2026-08-11T14:17:42.868Z",
   "source": "gsheet",
   "sourceRef": "spreadsheetId=1tvUs2WPksMWVbV10hdVoZ2NLNwTx6Q2R8Bs0sEbkqMg;sheet=Invitados",
   "authHealth": {
-    "authUsersTotal": 219,
+    "authUsersTotal": 208,
     "guestsTotal": 259,
-    "authUsersMappedToGuest": 219,
+    "authUsersMappedToGuest": 208,
     "authUsersWithoutGuestCount": 0,
     "authUsersWithoutSheetCount": 0,
     "authDisabledBySheetCount": 0,
     "authDeleteCandidatesCount": 0,
-    "sheetAuthExpectedCount": 219,
-    "sheetAuthDisabledCount": 40,
+    "sheetAuthExpectedCount": 211,
+    "sheetAuthDisabledCount": 51,
     "guestsWithoutAuthCount": 0,
-    "sheetGuestsWithoutAuthCount": 0,
-    "authEmailUpdateCandidatesCount": 0,
+    "sheetGuestsWithoutAuthCount": 3,
+    "authEmailUpdateCandidatesCount": 1,
     "authEmailUpdateBlockedInvalidCount": 0,
     "authEmailUpdateBlockedInUseCount": 0,
-    "authCreateCandidatesCount": 0,
+    "authCreateCandidatesCount": 3,
     "authCreateBlockedMissingEmailCount": 0,
     "authCreateBlockedInvalidEmailCount": 0,
     "authCreateBlockedEmailInUseCount": 0,
@@ -30,18 +30,2009 @@
     "authDisabledBySheet": [],
     "authDeleteCandidates": [],
     "guestsWithoutAuth": [],
-    "sheetGuestsWithoutAuth": [],
-    "authEmailUpdateCandidates": [],
+    "sheetGuestsWithoutAuth": [
+      {
+        "uid": "maria.cristina",
+        "invitationGroup": "",
+        "sheetEmail": "maria.cristina@boda-david-y-ayde.web.app",
+        "passwordPresent": true
+      },
+      {
+        "uid": "lourdes",
+        "invitationGroup": "",
+        "sheetEmail": "lourdes@boda-david-y-ayde.web.app",
+        "passwordPresent": true
+      },
+      {
+        "uid": "claudia.torrez",
+        "invitationGroup": "",
+        "sheetEmail": "claudia.torrez@boda-david-y-ayde.web.app",
+        "passwordPresent": true
+      }
+    ],
+    "authEmailUpdateCandidates": [
+      {
+        "uid": "antoine",
+        "invitationGroup": "",
+        "sheetEmail": "antoine@boda-david-y-ayde.web.app",
+        "authEmail": "antoine_faure@boda-david-y-ayde.web.app",
+        "authDisabled": false
+      }
+    ],
     "authEmailUpdateBlockedInvalid": [],
     "authEmailUpdateBlockedInUse": [],
-    "authCreateCandidates": [],
+    "authCreateCandidates": [
+      {
+        "uid": "maria.cristina",
+        "invitationGroup": "",
+        "sheetEmail": "maria.cristina@boda-david-y-ayde.web.app",
+        "passwordPresent": true
+      },
+      {
+        "uid": "lourdes",
+        "invitationGroup": "",
+        "sheetEmail": "lourdes@boda-david-y-ayde.web.app",
+        "passwordPresent": true
+      },
+      {
+        "uid": "claudia.torrez",
+        "invitationGroup": "",
+        "sheetEmail": "claudia.torrez@boda-david-y-ayde.web.app",
+        "passwordPresent": true
+      }
+    ],
     "authCreateBlockedMissingEmail": [],
     "authCreateBlockedInvalidEmail": [],
     "authCreateBlockedEmailInUse": []
   },
   "invalidRows": [],
-  "added": [],
-  "changed": [],
+  "added": [
+    {
+      "id": "maria.cristina",
+      "auth": {
+        "uid": "maria.cristina",
+        "enabled": true,
+        "identifier": "maria.cristina@boda-david-y-ayde.web.app",
+        "password": "vivamexico"
+      },
+      "payload": {
+        "id": "maria.cristina",
+        "identity": {
+          "firstName": "María",
+          "middleName": "Cristina",
+          "lastName": "Esparza",
+          "maternalLastName": "Flores",
+          "lang": "es",
+          "age": "Adulto",
+          "gender": "M",
+          "phone": "",
+          "cloudinaryId": ""
+        },
+        "hosting": {
+          "cabin": "",
+          "room": "",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "Amigas de Isabel",
+        "invitationGroup": "",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "Sin Mesa",
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "maternalLastName": "Flores"
+      }
+    },
+    {
+      "id": "lourdes",
+      "auth": {
+        "uid": "lourdes",
+        "enabled": true,
+        "identifier": "lourdes@boda-david-y-ayde.web.app",
+        "password": "vivamexico"
+      },
+      "payload": {
+        "id": "lourdes",
+        "identity": {
+          "firstName": "Lourdes",
+          "middleName": "Adriana",
+          "lastName": "Vázquez",
+          "maternalLastName": "Herrera",
+          "lang": "es",
+          "age": "Adulto",
+          "gender": "M",
+          "phone": "",
+          "cloudinaryId": ""
+        },
+        "hosting": {
+          "cabin": "",
+          "room": "",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "Amigas de Isabel",
+        "invitationGroup": "",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "Sin Mesa",
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "maternalLastName": "Herrera"
+      }
+    },
+    {
+      "id": "claudia.torrez",
+      "auth": {
+        "uid": "claudia.torrez",
+        "enabled": true,
+        "identifier": "claudia.torrez@boda-david-y-ayde.web.app",
+        "password": "vivamexico"
+      },
+      "payload": {
+        "id": "claudia.torrez",
+        "identity": {
+          "firstName": "Claudia",
+          "middleName": "Montserrat",
+          "lastName": "Torrez",
+          "maternalLastName": "González",
+          "lang": "es",
+          "age": "Adulto",
+          "gender": "M",
+          "phone": "",
+          "cloudinaryId": ""
+        },
+        "hosting": {
+          "cabin": "",
+          "room": "",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "Amigas de Isabel",
+        "invitationGroup": "",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "Sin Mesa",
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "maternalLastName": "González"
+      }
+    }
+  ],
+  "changed": [
+    {
+      "id": "aydé_juárez_guadalupe",
+      "mismatches": [
+        {
+          "path": "idCheckUser",
+          "sheetValue": false,
+          "firestoreValue": true
+        }
+      ],
+      "payload": {
+        "id": "aydé_juárez_guadalupe",
+        "identity": {
+          "firstName": "Aydé",
+          "middleName": "",
+          "lastName": "Juárez",
+          "maternalLastName": "Guadalupe",
+          "lang": "es",
+          "age": "Adulto",
+          "gender": "M",
+          "phone": "523336616738",
+          "cloudinaryId": "v1785544747/IMG_3496_qzt2un.heic"
+        },
+        "hosting": {
+          "cabin": "VILLA HORTENCIA",
+          "room": "VILLA HORTENCIA-1",
+          "isCabinPaidByNovios": true,
+          "isCabinPaid": false,
+          "xtraCabin": "CASONA",
+          "xtraRoom": "CASONA-2",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "Novios",
+        "invitationGroup": "David y Aydé",
+        "idCheckUser": false,
+        "message": "No te pedí, solo me llegaste, mi regalo de Dios",
+        "messageAuthor": "",
+        "table": "Novios",
+        "modifiedAt": "dom 25 ene 26",
+        "travelsByPlane": false,
+        "isAdmin": true,
+        "maternalLastName": "Guadalupe"
+      },
+      "existing": {
+        "id": "aydé_juárez_guadalupe",
+        "message": "No te pedí, solo me llegaste, mi regalo de Dios",
+        "messageAuthor": "",
+        "invitationGroup": "David y Aydé",
+        "tagGroup": "Novios",
+        "table": "Novios",
+        "sent": false,
+        "travelsByPlane": false,
+        "isAdmin": true,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:34.372Z",
+        "modifiedAt": "dom 25 ene 26",
+        "maternalLastName": "Guadalupe",
+        "identity": {
+          "age": "Adulto",
+          "lang": "es",
+          "phone": "523336616738",
+          "cloudinaryId": "v1785544747/IMG_3496_qzt2un.heic",
+          "gender": "M",
+          "middleName": "",
+          "maternalLastName": "Guadalupe",
+          "firstName": "Aydé",
+          "lastName": "Juárez"
+        },
+        "guestId": "aydé_juárez_guadalupe",
+        "hosting": {
+          "xtraRoom": "CASONA-2",
+          "xtraCabin": "CASONA",
+          "isXtraCabinPaidByNovios": false,
+          "room": "VILLA HORTENCIA-1",
+          "cabin": "VILLA HORTENCIA",
+          "isXtraCabinPaid": false,
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": true
+        },
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "petanqueOwnBoules": 1,
+            "petanqueParticipation": 1,
+            "sunday": 5,
+            "saturday": 5,
+            "friday": 5,
+            "accommodationConfirm": 1,
+            "playa": 5,
+            "rocaAzul": 5
+          }
+        },
+        "updatedBy": "aydé_juárez_guadalupe",
+        "idCheckUser": true,
+        "updatedAt": {
+          "_seconds": 1786456750,
+          "_nanoseconds": 486000000
+        }
+      }
+    },
+    {
+      "id": "manu",
+      "mismatches": [
+        {
+          "path": "identity.firstName",
+          "sheetValue": "Manuel",
+          "firestoreValue": "Manu"
+        },
+        {
+          "path": "identity.lastName",
+          "sheetValue": "Hurtado",
+          "firestoreValue": ""
+        },
+        {
+          "path": "identity.maternalLastName",
+          "sheetValue": "Pedroza",
+          "firestoreValue": ""
+        }
+      ],
+      "payload": {
+        "id": "manu",
+        "identity": {
+          "firstName": "Manuel",
+          "middleName": "",
+          "lastName": "Hurtado",
+          "maternalLastName": "Pedroza",
+          "lang": "es",
+          "age": "Adulto",
+          "gender": "H",
+          "phone": "",
+          "cloudinaryId": ""
+        },
+        "hosting": {
+          "cabin": "",
+          "room": "",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "Golden",
+        "invitationGroup": "",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "Golden #1",
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "maternalLastName": "Pedroza"
+      },
+      "existing": {
+        "id": "manu",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "",
+        "tagGroup": "Golden",
+        "table": "Golden #1",
+        "sent": false,
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:37.634Z",
+        "hosting": {
+          "cabin": "",
+          "room": "",
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "identity": {
+          "age": "Adulto",
+          "firstName": "Manu",
+          "lastName": "",
+          "lang": "es",
+          "phone": "",
+          "cloudinaryId": "",
+          "gender": "H"
+        },
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "friday": 0,
+            "saturday": 0,
+            "sunday": 0,
+            "xtra": 0,
+            "playa": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "esposa_de_mauricio_vargas",
+      "mismatches": [
+        {
+          "path": "identity.firstName",
+          "sheetValue": "Paola",
+          "firestoreValue": "Esposa"
+        },
+        {
+          "path": "identity.middleName",
+          "sheetValue": "",
+          "firestoreValue": "De"
+        },
+        {
+          "path": "identity.lastName",
+          "sheetValue": "Alcaraz",
+          "firestoreValue": "Mauricio"
+        },
+        {
+          "path": "identity.maternalLastName",
+          "sheetValue": "González",
+          "firestoreValue": "Vargas"
+        }
+      ],
+      "payload": {
+        "id": "esposa_de_mauricio_vargas",
+        "identity": {
+          "firstName": "Paola",
+          "middleName": "",
+          "lastName": "Alcaraz",
+          "maternalLastName": "González",
+          "lang": "es",
+          "age": "Adulto",
+          "gender": "M",
+          "phone": "",
+          "cloudinaryId": ""
+        },
+        "hosting": {
+          "cabin": "VILLA DALIA",
+          "room": "VILLA DALIA-2",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "Pintura",
+        "invitationGroup": "Mauricio y su esposa",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "Pintura #1",
+        "modifiedAt": "",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "maternalLastName": "González"
+      },
+      "existing": {
+        "id": "esposa_de_mauricio_vargas",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "Mauricio y su esposa",
+        "tagGroup": "Pintura",
+        "table": "Pintura #1",
+        "sent": false,
+        "modifiedAt": "",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:38.031Z",
+        "hosting": {
+          "cabin": "VILLA DALIA",
+          "room": "VILLA DALIA-2",
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "maternalLastName": "Vargas",
+        "identity": {
+          "age": "Adulto",
+          "lang": "es",
+          "phone": "",
+          "cloudinaryId": "",
+          "gender": "M",
+          "firstName": "Esposa",
+          "lastName": "Mauricio",
+          "middleName": "De",
+          "maternalLastName": "Vargas"
+        },
+        "updatedBy": "sync_script",
+        "updatedAt": {
+          "_seconds": 1786173569,
+          "_nanoseconds": 584000000
+        },
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "friday": 0,
+            "saturday": 0,
+            "sunday": 0,
+            "xtra": 0,
+            "playa": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "jimena",
+      "mismatches": [
+        {
+          "path": "identity.firstName",
+          "sheetValue": "",
+          "firestoreValue": "Jimena"
+        }
+      ],
+      "payload": {
+        "id": "jimena",
+        "identity": {
+          "firstName": "",
+          "middleName": "",
+          "lastName": "",
+          "maternalLastName": "",
+          "lang": "es",
+          "age": "Adulto",
+          "gender": "M",
+          "phone": "",
+          "cloudinaryId": "gimena_k9swal"
+        },
+        "hosting": {
+          "cabin": "",
+          "room": "",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "Pintura",
+        "invitationGroup": "",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "Pintura #2",
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "maternalLastName": ""
+      },
+      "existing": {
+        "id": "jimena",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "",
+        "tagGroup": "Pintura",
+        "table": "Pintura #2",
+        "sent": false,
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:38.344Z",
+        "hosting": {
+          "cabin": "",
+          "room": "",
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "maternalLastName": "",
+        "identity": {
+          "age": "Adulto",
+          "firstName": "Jimena",
+          "lastName": "",
+          "lang": "es",
+          "phone": "",
+          "gender": "M",
+          "maternalLastName": "",
+          "middleName": "",
+          "cloudinaryId": "gimena_k9swal"
+        },
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "friday": 0,
+            "saturday": 0,
+            "sunday": 0,
+            "xtra": 0,
+            "playa": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "rene.linares",
+      "mismatches": [
+        {
+          "path": "identity.firstName",
+          "sheetValue": "René",
+          "firestoreValue": ""
+        },
+        {
+          "path": "identity.lastName",
+          "sheetValue": "Linares",
+          "firestoreValue": ""
+        }
+      ],
+      "payload": {
+        "id": "rene.linares",
+        "identity": {
+          "firstName": "René",
+          "middleName": "",
+          "lastName": "Linares",
+          "maternalLastName": "",
+          "lang": "es",
+          "age": "Adulto",
+          "gender": "H",
+          "phone": "523331532863",
+          "cloudinaryId": "rene_mszjpt"
+        },
+        "hosting": {
+          "cabin": "",
+          "room": "",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "Pintura",
+        "invitationGroup": "René y su esposa",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "Pintura #2",
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "maternalLastName": ""
+      },
+      "existing": {
+        "id": "rene.linares",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "René y su esposa",
+        "tagGroup": "Pintura",
+        "table": "Pintura #2",
+        "sent": false,
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:38.616Z",
+        "hosting": {
+          "cabin": "",
+          "room": "",
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "maternalLastName": "",
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "friday": 0,
+            "saturday": 0,
+            "sunday": 0,
+            "xtra": 0,
+            "playa": 0
+          }
+        },
+        "guestId": "rene.linares",
+        "updatedBy": "sync_script",
+        "identity": {
+          "age": "Adulto",
+          "lang": "es",
+          "gender": "H",
+          "maternalLastName": "",
+          "phone": "523331532863",
+          "middleName": "",
+          "cloudinaryId": "rene_mszjpt",
+          "firstName": "",
+          "lastName": ""
+        },
+        "updatedAt": {
+          "_seconds": 1786416490,
+          "_nanoseconds": 110000000
+        }
+      }
+    },
+    {
+      "id": "esposa_de_rené",
+      "mismatches": [
+        {
+          "path": "identity.firstName",
+          "sheetValue": "Esposa",
+          "firestoreValue": ""
+        },
+        {
+          "path": "identity.lastName",
+          "sheetValue": "René",
+          "firestoreValue": ""
+        }
+      ],
+      "payload": {
+        "id": "esposa_de_rené",
+        "identity": {
+          "firstName": "Esposa",
+          "middleName": "",
+          "lastName": "René",
+          "maternalLastName": "",
+          "lang": "es",
+          "age": "Adulto",
+          "gender": "M",
+          "phone": "",
+          "cloudinaryId": ""
+        },
+        "hosting": {
+          "cabin": "",
+          "room": "",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "Pintura",
+        "invitationGroup": "René y su esposa",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "Pintura #2",
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "maternalLastName": ""
+      },
+      "existing": {
+        "id": "esposa_de_rené",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "René y su esposa",
+        "tagGroup": "Pintura",
+        "table": "Pintura #2",
+        "sent": false,
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:38.646Z",
+        "hosting": {
+          "cabin": "",
+          "room": "",
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "maternalLastName": "",
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "friday": 0,
+            "saturday": 0,
+            "sunday": 0,
+            "xtra": 0,
+            "playa": 0
+          }
+        },
+        "updatedBy": "sync_script",
+        "identity": {
+          "age": "Adulto",
+          "lang": "es",
+          "phone": "",
+          "cloudinaryId": "",
+          "gender": "M",
+          "maternalLastName": "",
+          "firstName": "",
+          "lastName": "",
+          "middleName": ""
+        },
+        "updatedAt": {
+          "_seconds": 1786416490,
+          "_nanoseconds": 145000000
+        }
+      }
+    },
+    {
+      "id": "spomenka.petrovic",
+      "mismatches": [
+        {
+          "path": "hosting.xtraCabin",
+          "sheetValue": "CABAÑA 1",
+          "firestoreValue": "VILLA MARGARITA"
+        },
+        {
+          "path": "hosting.xtraRoom",
+          "sheetValue": "CABAÑA 1-1",
+          "firestoreValue": "VILLA MARGARITA-3"
+        }
+      ],
+      "payload": {
+        "id": "spomenka.petrovic",
+        "identity": {
+          "firstName": "Spomenka",
+          "middleName": "",
+          "lastName": "Petrovic",
+          "maternalLastName": "",
+          "lang": "fr",
+          "age": "Adulto",
+          "gender": "M",
+          "phone": "33667340474",
+          "cloudinaryId": "spomenka_b03vcf"
+        },
+        "hosting": {
+          "cabin": "CABAÑA 1",
+          "room": "CABAÑA 1-1",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "CABAÑA 1",
+          "xtraRoom": "CABAÑA 1-1",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "Amigos de HP - David",
+        "invitationGroup": "Spomeka y Guihem",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "Amigos David #1",
+        "modifiedAt": "dom 25 ene 26",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "maternalLastName": ""
+      },
+      "existing": {
+        "id": "spomenka.petrovic",
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "Spomeka y Guihem",
+        "table": "Amigos David #1",
+        "sent": false,
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:38.723Z",
+        "modifiedAt": "dom 25 ene 26",
+        "tagGroup": "Amigos de HP - David",
+        "maternalLastName": "",
+        "identity": {
+          "age": "Adulto",
+          "firstName": "Spomenka",
+          "lastName": "Petrovic",
+          "lang": "fr",
+          "gender": "M",
+          "maternalLastName": "",
+          "phone": "33667340474",
+          "middleName": "",
+          "cloudinaryId": "spomenka_b03vcf"
+        },
+        "guestId": "spomenka.petrovic",
+        "updatedBy": "sync_script",
+        "idCheckUser": false,
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "friday": 0,
+            "saturday": 0,
+            "sunday": 0,
+            "xtra": 0,
+            "playa": 0
+          }
+        },
+        "hosting": {
+          "cabin": "CABAÑA 1",
+          "room": "CABAÑA 1-1",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false,
+          "xtraRoom": "VILLA MARGARITA-3",
+          "xtraCabin": "VILLA MARGARITA"
+        },
+        "updatedAt": {
+          "_seconds": 1786416490,
+          "_nanoseconds": 233000000
+        }
+      }
+    },
+    {
+      "id": "guilhem.laubie",
+      "mismatches": [
+        {
+          "path": "hosting.xtraCabin",
+          "sheetValue": "CABAÑA 1",
+          "firestoreValue": "VILLA MARGARITA"
+        },
+        {
+          "path": "hosting.xtraRoom",
+          "sheetValue": "CABAÑA 1-1",
+          "firestoreValue": "VILLA MARGARITA-3"
+        }
+      ],
+      "payload": {
+        "id": "guilhem.laubie",
+        "identity": {
+          "firstName": "Guilhem",
+          "middleName": "",
+          "lastName": "Laubie",
+          "maternalLastName": "",
+          "lang": "fr",
+          "age": "Adulto",
+          "gender": "H",
+          "phone": "33674332050",
+          "cloudinaryId": "guilhem_dy6ag9"
+        },
+        "hosting": {
+          "cabin": "CABAÑA 1",
+          "room": "CABAÑA 1-1",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "CABAÑA 1",
+          "xtraRoom": "CABAÑA 1-1",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "Amigos de HP - David",
+        "invitationGroup": "Spomeka y Guihem",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "Amigos David #1",
+        "modifiedAt": "dom 25 ene 26",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "maternalLastName": ""
+      },
+      "existing": {
+        "id": "guilhem.laubie",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "Spomeka y Guihem",
+        "table": "Amigos David #1",
+        "sent": false,
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:38.754Z",
+        "modifiedAt": "dom 25 ene 26",
+        "tagGroup": "Amigos de HP - David",
+        "maternalLastName": "",
+        "identity": {
+          "age": "Adulto",
+          "firstName": "Guilhem",
+          "lang": "fr",
+          "gender": "H",
+          "maternalLastName": "",
+          "lastName": "Laubie",
+          "phone": "33674332050",
+          "middleName": "",
+          "cloudinaryId": "guilhem_dy6ag9"
+        },
+        "updatedBy": "sync_script",
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "friday": 0,
+            "saturday": 0,
+            "sunday": 0,
+            "xtra": 0,
+            "playa": 0
+          }
+        },
+        "guestId": "guilhem.laubie",
+        "hosting": {
+          "cabin": "CABAÑA 1",
+          "room": "CABAÑA 1-1",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false,
+          "xtraRoom": "VILLA MARGARITA-3",
+          "xtraCabin": "VILLA MARGARITA"
+        },
+        "updatedAt": {
+          "_seconds": 1786416490,
+          "_nanoseconds": 261000000
+        }
+      }
+    },
+    {
+      "id": "fred_38t",
+      "mismatches": [
+        {
+          "path": "hosting.xtraCabin",
+          "sheetValue": "VILLA AZALEA",
+          "firestoreValue": "VILLA MARGARITA"
+        },
+        {
+          "path": "hosting.xtraRoom",
+          "sheetValue": "VILLA AZALEA-2",
+          "firestoreValue": "VILLA MARGARITA-1"
+        }
+      ],
+      "payload": {
+        "id": "fred_38t",
+        "identity": {
+          "firstName": "Frédéric",
+          "middleName": "",
+          "lastName": "Bousquet",
+          "maternalLastName": "",
+          "lang": "fr",
+          "age": "Adulto",
+          "gender": "H",
+          "phone": "33688071318",
+          "cloudinaryId": "fredb_vjtnn5"
+        },
+        "hosting": {
+          "cabin": "VILLA LAVANDA",
+          "room": "VILLA LAVANDA",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "VILLA AZALEA",
+          "xtraRoom": "VILLA AZALEA-2",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "38 Tonnes",
+        "invitationGroup": "",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "38 tonnes #1",
+        "modifiedAt": "",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "maternalLastName": ""
+      },
+      "existing": {
+        "id": "fred_38t",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "",
+        "tagGroup": "38 Tonnes",
+        "table": "38 tonnes #1",
+        "sent": false,
+        "modifiedAt": "",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:38.943Z",
+        "maternalLastName": "",
+        "updatedBy": "sync_script",
+        "identity": {
+          "age": "Adulto",
+          "lastName": "Bousquet",
+          "lang": "fr",
+          "gender": "H",
+          "maternalLastName": "",
+          "phone": "33688071318",
+          "middleName": "",
+          "cloudinaryId": "fredb_vjtnn5",
+          "firstName": "Frédéric"
+        },
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "friday": 0,
+            "saturday": 0,
+            "sunday": 0,
+            "xtra": 0,
+            "playa": 0
+          }
+        },
+        "guestId": "fred_38t",
+        "hosting": {
+          "cabin": "VILLA LAVANDA",
+          "room": "VILLA LAVANDA",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false,
+          "xtraRoom": "VILLA MARGARITA-1",
+          "xtraCabin": "VILLA MARGARITA"
+        },
+        "updatedAt": {
+          "_seconds": 1786416490,
+          "_nanoseconds": 291000000
+        }
+      }
+    },
+    {
+      "id": "lolo_38t",
+      "mismatches": [
+        {
+          "path": "hosting.xtraCabin",
+          "sheetValue": "VILLA AZALEA",
+          "firestoreValue": "VILLA MARGARITA"
+        },
+        {
+          "path": "hosting.xtraRoom",
+          "sheetValue": "VILLA AZALEA-2",
+          "firestoreValue": "VILLA MARGARITA-1"
+        }
+      ],
+      "payload": {
+        "id": "lolo_38t",
+        "identity": {
+          "firstName": "Laurent",
+          "middleName": "",
+          "lastName": "Monte",
+          "maternalLastName": "",
+          "lang": "fr",
+          "age": "Adulto",
+          "gender": "H",
+          "phone": "33620561239",
+          "cloudinaryId": "lolo_d2zlhz"
+        },
+        "hosting": {
+          "cabin": "VILLA MARGARITA",
+          "room": "VILLA MARGARITA-3",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "VILLA AZALEA",
+          "xtraRoom": "VILLA AZALEA-2",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "38 Tonnes",
+        "invitationGroup": "",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "38 tonnes #1",
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "maternalLastName": ""
+      },
+      "existing": {
+        "id": "lolo_38t",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "",
+        "tagGroup": "38 Tonnes",
+        "table": "38 tonnes #1",
+        "sent": false,
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:38.971Z",
+        "maternalLastName": "",
+        "identity": {
+          "age": "Adulto",
+          "firstName": "Laurent",
+          "lastName": "Monte",
+          "lang": "fr",
+          "gender": "H",
+          "maternalLastName": "",
+          "phone": "33620561239",
+          "middleName": "",
+          "cloudinaryId": "lolo_d2zlhz"
+        },
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "friday": 0,
+            "saturday": 0,
+            "sunday": 0,
+            "xtra": 0,
+            "playa": 0
+          }
+        },
+        "guestId": "lolo_38t",
+        "updatedBy": "sync_script",
+        "hosting": {
+          "cabin": "VILLA MARGARITA",
+          "room": "VILLA MARGARITA-3",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false,
+          "xtraRoom": "VILLA MARGARITA-1",
+          "xtraCabin": "VILLA MARGARITA"
+        },
+        "updatedAt": {
+          "_seconds": 1786416490,
+          "_nanoseconds": 321000000
+        }
+      }
+    },
+    {
+      "id": "isa_38t",
+      "mismatches": [
+        {
+          "path": "hosting.xtraCabin",
+          "sheetValue": "VILLA AZALEA",
+          "firestoreValue": "VILLA MARGARITA"
+        },
+        {
+          "path": "hosting.xtraRoom",
+          "sheetValue": "VILLA AZALEA-2",
+          "firestoreValue": "VILLA MARGARITA-2"
+        }
+      ],
+      "payload": {
+        "id": "isa_38t",
+        "identity": {
+          "firstName": "Isabelle",
+          "middleName": "",
+          "lastName": "Panzica",
+          "maternalLastName": "",
+          "lang": "fr",
+          "age": "Adulto",
+          "gender": "M",
+          "phone": "33652053202",
+          "cloudinaryId": ""
+        },
+        "hosting": {
+          "cabin": "VILLA MARGARITA",
+          "room": "VILLA MARGARITA-3",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "VILLA AZALEA",
+          "xtraRoom": "VILLA AZALEA-2",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "38 Tonnes",
+        "invitationGroup": "",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "38 tonnes #1",
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "maternalLastName": ""
+      },
+      "existing": {
+        "id": "isa_38t",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "",
+        "tagGroup": "38 Tonnes",
+        "table": "38 tonnes #1",
+        "sent": false,
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:39.001Z",
+        "maternalLastName": "",
+        "identity": {
+          "age": "Adulto",
+          "firstName": "Isabelle",
+          "lastName": "Panzica",
+          "lang": "fr",
+          "cloudinaryId": "",
+          "gender": "M",
+          "maternalLastName": "",
+          "phone": "33652053202",
+          "middleName": ""
+        },
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "friday": 0,
+            "saturday": 0,
+            "sunday": 0,
+            "xtra": 0,
+            "playa": 0
+          }
+        },
+        "guestId": "isa_38t",
+        "updatedBy": "sync_script",
+        "hosting": {
+          "cabin": "VILLA MARGARITA",
+          "room": "VILLA MARGARITA-3",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false,
+          "xtraRoom": "VILLA MARGARITA-2",
+          "xtraCabin": "VILLA MARGARITA"
+        },
+        "updatedAt": {
+          "_seconds": 1786416490,
+          "_nanoseconds": 349000000
+        }
+      }
+    },
+    {
+      "id": "bobo_28t",
+      "mismatches": [
+        {
+          "path": "hosting.xtraCabin",
+          "sheetValue": "VILLA AZALEA",
+          "firestoreValue": "VILLA MARGARITA"
+        },
+        {
+          "path": "hosting.xtraRoom",
+          "sheetValue": "VILLA AZALEA-2",
+          "firestoreValue": "VILLA MARGARITA-1"
+        }
+      ],
+      "payload": {
+        "id": "bobo_28t",
+        "identity": {
+          "firstName": "Boris",
+          "middleName": "",
+          "lastName": "Bousquet",
+          "maternalLastName": "",
+          "lang": "fr",
+          "age": "Adulto",
+          "gender": "H",
+          "phone": "33621027727",
+          "cloudinaryId": "bobo_bh1wvo"
+        },
+        "hosting": {
+          "cabin": "VILLA LAVANDA",
+          "room": "VILLA LAVANDA",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "VILLA AZALEA",
+          "xtraRoom": "VILLA AZALEA-2",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "38 Tonnes",
+        "invitationGroup": "",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "38 tonnes #1",
+        "modifiedAt": "",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "maternalLastName": ""
+      },
+      "existing": {
+        "id": "bobo_28t",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "",
+        "tagGroup": "38 Tonnes",
+        "table": "38 tonnes #1",
+        "sent": false,
+        "modifiedAt": "",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:39.065Z",
+        "maternalLastName": "",
+        "identity": {
+          "age": "Adulto",
+          "firstName": "Boris",
+          "lastName": "Bousquet",
+          "lang": "fr",
+          "gender": "H",
+          "maternalLastName": "",
+          "phone": "33621027727",
+          "middleName": "",
+          "cloudinaryId": "bobo_bh1wvo"
+        },
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "friday": 0,
+            "saturday": 0,
+            "sunday": 0,
+            "xtra": 0,
+            "playa": 0
+          }
+        },
+        "guestId": "bobo_28t",
+        "updatedBy": "sync_script",
+        "hosting": {
+          "cabin": "VILLA LAVANDA",
+          "room": "VILLA LAVANDA",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false,
+          "xtraRoom": "VILLA MARGARITA-1",
+          "xtraCabin": "VILLA MARGARITA"
+        },
+        "updatedAt": {
+          "_seconds": 1786416490,
+          "_nanoseconds": 431000000
+        }
+      }
+    },
+    {
+      "id": "alexis",
+      "mismatches": [
+        {
+          "path": "hosting.xtraCabin",
+          "sheetValue": "VILLA AZALEA",
+          "firestoreValue": "VILLA MARGARITA"
+        },
+        {
+          "path": "hosting.xtraRoom",
+          "sheetValue": "VILLA AZALEA-3",
+          "firestoreValue": "VILLA MARGARITA-2"
+        }
+      ],
+      "payload": {
+        "id": "alexis",
+        "identity": {
+          "firstName": "Alexis",
+          "middleName": "",
+          "lastName": "Boilley",
+          "maternalLastName": "",
+          "lang": "fr",
+          "age": "Adulto",
+          "gender": "H",
+          "phone": "33669155441",
+          "cloudinaryId": "alex_iszpc2"
+        },
+        "hosting": {
+          "cabin": "VILLA LAVANDA",
+          "room": "VILLA LAVANDA",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "VILLA AZALEA",
+          "xtraRoom": "VILLA AZALEA-3",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "38 Tonnes",
+        "invitationGroup": "",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "38 tonnes #1",
+        "modifiedAt": "",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "maternalLastName": ""
+      },
+      "existing": {
+        "id": "alexis",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "",
+        "tagGroup": "38 Tonnes",
+        "table": "38 tonnes #1",
+        "sent": false,
+        "modifiedAt": "",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:39.126Z",
+        "maternalLastName": "",
+        "identity": {
+          "age": "Adulto",
+          "firstName": "Alexis",
+          "lastName": "Boilley",
+          "lang": "fr",
+          "gender": "H",
+          "maternalLastName": "",
+          "phone": "33669155441",
+          "middleName": "",
+          "cloudinaryId": "alex_iszpc2"
+        },
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "friday": 0,
+            "saturday": 0,
+            "sunday": 0,
+            "xtra": 0,
+            "playa": 0
+          }
+        },
+        "guestId": "alexis",
+        "updatedBy": "sync_script",
+        "hosting": {
+          "cabin": "VILLA LAVANDA",
+          "room": "VILLA LAVANDA",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false,
+          "xtraRoom": "VILLA MARGARITA-2",
+          "xtraCabin": "VILLA MARGARITA"
+        },
+        "updatedAt": {
+          "_seconds": 1786416490,
+          "_nanoseconds": 495000000
+        }
+      }
+    },
+    {
+      "id": "marion_38t",
+      "mismatches": [
+        {
+          "path": "hosting.xtraCabin",
+          "sheetValue": "VILLA AZALEA",
+          "firestoreValue": "VILLA MARGARITA"
+        },
+        {
+          "path": "hosting.xtraRoom",
+          "sheetValue": "VILLA AZALEA-3",
+          "firestoreValue": "VILLA MARGARITA-2"
+        }
+      ],
+      "payload": {
+        "id": "marion_38t",
+        "identity": {
+          "firstName": "Marion",
+          "middleName": "",
+          "lastName": "Livoti",
+          "maternalLastName": "",
+          "lang": "fr",
+          "age": "Adulto",
+          "gender": "M",
+          "phone": "33619993926",
+          "cloudinaryId": "marion_ujo5dw"
+        },
+        "hosting": {
+          "cabin": "VILLA MARGARITA",
+          "room": "VILLA MARGARITA-3",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "VILLA AZALEA",
+          "xtraRoom": "VILLA AZALEA-3",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "38 Tonnes",
+        "invitationGroup": "",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "38 tonnes #2",
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "maternalLastName": ""
+      },
+      "existing": {
+        "id": "marion_38t",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "",
+        "tagGroup": "38 Tonnes",
+        "table": "38 tonnes #2",
+        "sent": false,
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:39.306Z",
+        "maternalLastName": "",
+        "identity": {
+          "age": "Adulto",
+          "firstName": "Marion",
+          "lastName": "Livoti",
+          "lang": "fr",
+          "gender": "M",
+          "maternalLastName": "",
+          "phone": "33619993926",
+          "middleName": "",
+          "cloudinaryId": "marion_ujo5dw"
+        },
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "friday": 0,
+            "saturday": 0,
+            "sunday": 0,
+            "xtra": 0,
+            "playa": 0
+          }
+        },
+        "guestId": "marion_38t",
+        "updatedBy": "sync_script",
+        "hosting": {
+          "cabin": "VILLA MARGARITA",
+          "room": "VILLA MARGARITA-3",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false,
+          "xtraRoom": "VILLA MARGARITA-2",
+          "xtraCabin": "VILLA MARGARITA"
+        },
+        "updatedAt": {
+          "_seconds": 1786416490,
+          "_nanoseconds": 692000000
+        }
+      }
+    },
+    {
+      "id": "benoit_38t",
+      "mismatches": [
+        {
+          "path": "hosting.xtraCabin",
+          "sheetValue": "VILLA AZALEA",
+          "firestoreValue": "VILLA MARGARITA"
+        },
+        {
+          "path": "hosting.xtraRoom",
+          "sheetValue": "VILLA AZALEA-3",
+          "firestoreValue": "VILLA MARGARITA-2"
+        }
+      ],
+      "payload": {
+        "id": "benoit_38t",
+        "identity": {
+          "firstName": "Benoit",
+          "middleName": "",
+          "lastName": "Guinet",
+          "maternalLastName": "",
+          "lang": "fr",
+          "age": "Adulto",
+          "gender": "H",
+          "phone": "",
+          "cloudinaryId": "beng_wapegk"
+        },
+        "hosting": {
+          "cabin": "VILLA LAVANDA",
+          "room": "VILLA LAVANDA",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "VILLA AZALEA",
+          "xtraRoom": "VILLA AZALEA-3",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "38 Tonnes",
+        "invitationGroup": "",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "38 tonnes #2",
+        "modifiedAt": "",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "maternalLastName": ""
+      },
+      "existing": {
+        "id": "benoit_38t",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "",
+        "tagGroup": "38 Tonnes",
+        "table": "38 tonnes #2",
+        "sent": false,
+        "modifiedAt": "",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:39.335Z",
+        "maternalLastName": "",
+        "identity": {
+          "age": "Adulto",
+          "firstName": "Benoit",
+          "lastName": "Guinet",
+          "lang": "fr",
+          "phone": "",
+          "gender": "H",
+          "maternalLastName": "",
+          "middleName": "",
+          "cloudinaryId": "beng_wapegk"
+        },
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "friday": 0,
+            "saturday": 0,
+            "sunday": 0,
+            "xtra": 0,
+            "playa": 0
+          }
+        },
+        "guestId": "benoit_38t",
+        "updatedBy": "sync_script",
+        "hosting": {
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false,
+          "xtraRoom": "VILLA MARGARITA-2",
+          "xtraCabin": "VILLA MARGARITA",
+          "cabin": "VILLA LAVANDA",
+          "room": "VILLA LAVANDA"
+        },
+        "updatedAt": {
+          "_seconds": 1786416490,
+          "_nanoseconds": 722000000
+        }
+      }
+    },
+    {
+      "id": "dimitar",
+      "mismatches": [
+        {
+          "path": "hosting.xtraCabin",
+          "sheetValue": "VILLA AZALEA",
+          "firestoreValue": "VILLA MARGARITA"
+        },
+        {
+          "path": "hosting.xtraRoom",
+          "sheetValue": "VILLA AZALEA-1",
+          "firestoreValue": "VILLA MARGARITA-3"
+        }
+      ],
+      "payload": {
+        "id": "dimitar",
+        "identity": {
+          "firstName": "Dimitar",
+          "middleName": "",
+          "lastName": "Miriyski",
+          "maternalLastName": "",
+          "lang": "en",
+          "age": "Adulto",
+          "gender": "H",
+          "phone": "34600374224",
+          "cloudinaryId": ""
+        },
+        "hosting": {
+          "cabin": "VILLA MARGARITA",
+          "room": "VILLA MARGARITA-3",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "VILLA AZALEA",
+          "xtraRoom": "VILLA AZALEA-1",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "Amigos de HP - David",
+        "invitationGroup": "Dimitar",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "Amigos David #2",
+        "modifiedAt": "",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "maternalLastName": ""
+      },
+      "existing": {
+        "id": "dimitar",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "Dimitar",
+        "table": "Amigos David #2",
+        "sent": false,
+        "modifiedAt": "",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:39.511Z",
+        "tagGroup": "Amigos de HP - David",
+        "maternalLastName": "",
+        "identity": {
+          "age": "Adulto",
+          "firstName": "Dimitar",
+          "lang": "en",
+          "cloudinaryId": "",
+          "gender": "H",
+          "maternalLastName": "",
+          "lastName": "Miriyski",
+          "phone": "34600374224",
+          "middleName": ""
+        },
+        "updatedBy": "sync_script",
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "friday": 0,
+            "saturday": 0,
+            "sunday": 0,
+            "xtra": 0,
+            "playa": 0
+          }
+        },
+        "hosting": {
+          "cabin": "VILLA MARGARITA",
+          "room": "VILLA MARGARITA-3",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false,
+          "xtraRoom": "VILLA MARGARITA-3",
+          "xtraCabin": "VILLA MARGARITA"
+        },
+        "updatedAt": {
+          "_seconds": 1786416490,
+          "_nanoseconds": 792000000
+        }
+      }
+    },
+    {
+      "id": "acompagnante_de_dimitar",
+      "mismatches": [
+        {
+          "path": "hosting.xtraCabin",
+          "sheetValue": "VILLA AZALEA",
+          "firestoreValue": "VILLA MARGARITA"
+        },
+        {
+          "path": "hosting.xtraRoom",
+          "sheetValue": "VILLA AZALEA-1",
+          "firestoreValue": "VILLA MARGARITA-3"
+        }
+      ],
+      "payload": {
+        "id": "acompagnante_de_dimitar",
+        "identity": {
+          "firstName": "Acompagnante",
+          "middleName": "De",
+          "lastName": "Dimitar",
+          "maternalLastName": "",
+          "lang": "en",
+          "age": "Adulto",
+          "gender": "M",
+          "phone": "34600374224",
+          "cloudinaryId": ""
+        },
+        "hosting": {
+          "cabin": "VILLA MARGARITA",
+          "room": "VILLA MARGARITA-3",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "VILLA AZALEA",
+          "xtraRoom": "VILLA AZALEA-1",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "Amigos de HP - David",
+        "invitationGroup": "Dimitar",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "table": "Amigos David #2",
+        "modifiedAt": "",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "maternalLastName": ""
+      },
+      "existing": {
+        "id": "acompagnante_de_dimitar",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "invitationGroup": "Dimitar",
+        "table": "Amigos David #2",
+        "sent": false,
+        "modifiedAt": "",
+        "travelsByPlane": true,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:39.539Z",
+        "tagGroup": "Amigos de HP - David",
+        "maternalLastName": "",
+        "identity": {
+          "age": "Adulto",
+          "lastName": "Dimitar",
+          "lang": "en",
+          "cloudinaryId": "",
+          "gender": "M",
+          "firstName": "Acompagnante",
+          "middleName": "De",
+          "maternalLastName": "",
+          "phone": "34600374224"
+        },
+        "updatedBy": "sync_script",
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "friday": 0,
+            "saturday": 0,
+            "sunday": 0,
+            "xtra": 0,
+            "playa": 0
+          }
+        },
+        "hosting": {
+          "cabin": "VILLA MARGARITA",
+          "room": "VILLA MARGARITA-3",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false,
+          "xtraRoom": "VILLA MARGARITA-3",
+          "xtraCabin": "VILLA MARGARITA"
+        },
+        "updatedAt": {
+          "_seconds": 1786416490,
+          "_nanoseconds": 827000000
+        }
+      }
+    }
+  ],
   "unchanged": [],
   "stale": [],
   "sheetAuth": [
@@ -78,14 +2069,14 @@
       "uid": "iyali_soleil_cecillon_quezada",
       "enabled": false,
       "identifier": "iyali_soleil_cecillon_quezada@boda-david-y-ayde.web.app",
-      "passwordPresent": true
+      "passwordPresent": false
     },
     {
       "id": "ameli_cecillon_quezada",
       "uid": "ameli_cecillon_quezada",
       "enabled": false,
       "identifier": "ameli_cecillon_quezada@boda-david-y-ayde.web.app",
-      "passwordPresent": true
+      "passwordPresent": false
     },
     {
       "id": "pierre_wanecque",
@@ -109,10 +2100,10 @@
       "passwordPresent": true
     },
     {
-      "id": "carolina_saldana_suarez",
-      "uid": "carolina_saldana_suarez",
+      "id": "carolina",
+      "uid": "carolina",
       "enabled": false,
-      "identifier": "carolina_saldana_suarez@boda-david-y-ayde.web.app",
+      "identifier": "carolina@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -137,10 +2128,10 @@
       "passwordPresent": true
     },
     {
-      "id": "diego_hernandez",
-      "uid": "diego_hernandez",
+      "id": "diego.matraz",
+      "uid": "diego.matraz",
       "enabled": true,
-      "identifier": "diego_hernandez@boda-david-y-ayde.web.app",
+      "identifier": "diego.matraz@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -148,7 +2139,7 @@
       "uid": "esposa_de_diego_matraz",
       "enabled": false,
       "identifier": "esposa_de_diego_matraz@boda-david-y-ayde.web.app",
-      "passwordPresent": true
+      "passwordPresent": false
     },
     {
       "id": "mika_rako",
@@ -179,8 +2170,8 @@
       "passwordPresent": true
     },
     {
-      "id": "morgane_rako",
-      "uid": "morgane_rako",
+      "id": "morgane",
+      "uid": "morgane",
       "enabled": true,
       "identifier": "morgane_rakotonoera@yahoo.fr",
       "passwordPresent": true
@@ -193,17 +2184,17 @@
       "passwordPresent": true
     },
     {
-      "id": "aldo_díaz_de_sandi",
-      "uid": "aldo_díaz_de_sandi",
+      "id": "aldo.petanca",
+      "uid": "aldo.petanca",
       "enabled": true,
-      "identifier": "aldo_díaz_de_sandi@boda-david-y-ayde.web.app",
+      "identifier": "aldo.petanca@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "iopoch_díaz_de_sandi",
-      "uid": "iopoch_díaz_de_sandi",
+      "id": "iopoch",
+      "uid": "iopoch",
       "enabled": true,
-      "identifier": "iopoch_díaz_de_sandi@boda-david-y-ayde.web.app",
+      "identifier": "iopoch@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -211,14 +2202,14 @@
       "uid": "esposa_de_aldo_díaz_de_sandi",
       "enabled": false,
       "identifier": "esposa_de_aldo_díaz_de_sandi@boda-david-y-ayde.web.app",
-      "passwordPresent": true
+      "passwordPresent": false
     },
     {
       "id": "hija_de_aldo_díaz_de_sandi",
       "uid": "hija_de_aldo_díaz_de_sandi",
       "enabled": false,
       "identifier": "hija_de_aldo_díaz_de_sandi@boda-david-y-ayde.web.app",
-      "passwordPresent": true
+      "passwordPresent": false
     },
     {
       "id": "manu_vázquez",
@@ -232,7 +2223,7 @@
       "uid": "novia_de_manu_vázquez",
       "enabled": false,
       "identifier": "novia_de_manu_vázquez@boda-david-y-ayde.web.app",
-      "passwordPresent": true
+      "passwordPresent": false
     },
     {
       "id": "rodrigo_arana",
@@ -279,7 +2270,7 @@
     {
       "id": "esposa_clément",
       "uid": "esposa_clément",
-      "enabled": true,
+      "enabled": false,
       "identifier": "maricruzsernah@gmail.com",
       "passwordPresent": true
     },
@@ -291,10 +2282,10 @@
       "passwordPresent": true
     },
     {
-      "id": "dylan_maringolo",
-      "uid": "dylan_maringolo",
+      "id": "dylan",
+      "uid": "dylan",
       "enabled": true,
-      "identifier": "dylan_maringolo@boda-david-y-ayde.web.app",
+      "identifier": "dylan@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -309,7 +2300,7 @@
       "uid": "esposa_de_jeff",
       "enabled": false,
       "identifier": "esposa_de_jeff@boda-david-y-ayde.web.app",
-      "passwordPresent": true
+      "passwordPresent": false
     },
     {
       "id": "denis",
@@ -323,11 +2314,11 @@
       "uid": "esposa_de_denis",
       "enabled": false,
       "identifier": "esposa_de_denis@boda-david-y-ayde.web.app",
-      "passwordPresent": true
+      "passwordPresent": false
     },
     {
-      "id": "diego_möller",
-      "uid": "diego_möller",
+      "id": "moller",
+      "uid": "moller",
       "enabled": true,
       "identifier": "diegoalvarezmoller@gmail.com",
       "passwordPresent": true
@@ -347,10 +2338,10 @@
       "passwordPresent": true
     },
     {
-      "id": "pablo_galaud",
-      "uid": "pablo_galaud",
+      "id": "paablo",
+      "uid": "paablo",
       "enabled": true,
-      "identifier": "pablo_galaud@boda-david-y-ayde.web.app",
+      "identifier": "paablo@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -375,24 +2366,24 @@
       "passwordPresent": true
     },
     {
-      "id": "benjamin_saksik",
-      "uid": "benjamin_saksik",
+      "id": "benjamin",
+      "uid": "benjamin",
       "enabled": true,
-      "identifier": "benjamin_saksik@boda-david-y-ayde.web.app",
+      "identifier": "benjamin@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "raoul_le_bas",
-      "uid": "raoul_le_bas",
+      "id": "raoul",
+      "uid": "raoul",
       "enabled": true,
-      "identifier": "raoul_le_bas@boda-david-y-ayde.web.app",
+      "identifier": "raoul@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "cynthia_cobarrubias",
-      "uid": "cynthia_cobarrubias",
+      "id": "cynthia",
+      "uid": "cynthia",
       "enabled": true,
-      "identifier": "cynthia_cobarrubias@boda-david-y-ayde.web.app",
+      "identifier": "cynthia@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -487,10 +2478,10 @@
       "passwordPresent": true
     },
     {
-      "id": "oscar_aïli_vázquez",
-      "uid": "oscar_aïli_vázquez",
+      "id": "oscar",
+      "uid": "oscar",
       "enabled": true,
-      "identifier": "oscar_aïli_vázquez@boda-david-y-ayde.web.app",
+      "identifier": "oscar@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -515,17 +2506,17 @@
       "passwordPresent": true
     },
     {
-      "id": "elvira_guadalupe",
-      "uid": "elvira_guadalupe",
+      "id": "elvira.guadalupe",
+      "uid": "elvira.guadalupe",
       "enabled": true,
-      "identifier": "elvira_guadalupe@boda-david-y-ayde.web.app",
+      "identifier": "elvira.guadalupe@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "eduardo_de_guadalupe",
-      "uid": "eduardo_de_guadalupe",
+      "id": "eduardo.esparza",
+      "uid": "eduardo.esparza",
       "enabled": true,
-      "identifier": "eduardo_de_guadalupe@boda-david-y-ayde.web.app",
+      "identifier": "eduardo.esparza@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -578,24 +2569,24 @@
       "passwordPresent": true
     },
     {
-      "id": "noel_omar_guadalupe",
-      "uid": "noel_omar_guadalupe",
+      "id": "noel",
+      "uid": "noel",
       "enabled": true,
-      "identifier": "noel_omar_guadalupe@boda-david-y-ayde.web.app",
+      "identifier": "noel@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "carmen_de_juárez",
-      "uid": "carmen_de_juárez",
+      "id": "carmen",
+      "uid": "carmen",
       "enabled": true,
-      "identifier": "carmen_de_juárez@boda-david-y-ayde.web.app",
+      "identifier": "carmen@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "yadira_de_juárez",
-      "uid": "yadira_de_juárez",
+      "id": "yadira",
+      "uid": "yadira",
       "enabled": true,
-      "identifier": "yadira_de_juárez@boda-david-y-ayde.web.app",
+      "identifier": "yadira@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -606,17 +2597,17 @@
       "passwordPresent": true
     },
     {
-      "id": "jaime_juárez",
-      "uid": "jaime_juárez",
+      "id": "jaime",
+      "uid": "jaime",
       "enabled": true,
-      "identifier": "jaime_juárez@boda-david-y-ayde.web.app",
+      "identifier": "jaime@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "irma_juárez",
-      "uid": "irma_juárez",
+      "id": "irma",
+      "uid": "irma",
       "enabled": true,
-      "identifier": "irma_juárez@boda-david-y-ayde.web.app",
+      "identifier": "irma@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -629,7 +2620,7 @@
     {
       "id": "esposa_de_erik",
       "uid": "esposa_de_erik",
-      "enabled": true,
+      "enabled": false,
       "identifier": "esposa_de_erik@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
@@ -648,10 +2639,10 @@
       "passwordPresent": true
     },
     {
-      "id": "adriana_martínez",
-      "uid": "adriana_martínez",
+      "id": "adriana",
+      "uid": "adriana",
       "enabled": true,
-      "identifier": "adriana_martínez@boda-david-y-ayde.web.app",
+      "identifier": "adriana@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -669,10 +2660,10 @@
       "passwordPresent": true
     },
     {
-      "id": "susana_díaz",
-      "uid": "susana_díaz",
+      "id": "susana.diaz",
+      "uid": "susana.diaz",
       "enabled": true,
-      "identifier": "susana_díaz@boda-david-y-ayde.web.app",
+      "identifier": "susana.diaz@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -690,10 +2681,10 @@
       "passwordPresent": true
     },
     {
-      "id": "ernesto_ruelas",
-      "uid": "ernesto_ruelas",
+      "id": "ernesto.ruelas",
+      "uid": "ernesto.ruelas",
       "enabled": true,
-      "identifier": "ernesto_ruelas@boda-david-y-ayde.web.app",
+      "identifier": "ernesto.ruelas@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -718,31 +2709,31 @@
       "passwordPresent": true
     },
     {
-      "id": "diego_salmerón",
-      "uid": "diego_salmerón",
+      "id": "diego.salmeron",
+      "uid": "diego.salmeron",
       "enabled": true,
-      "identifier": "diego_salmerón@boda-david-y-ayde.web.app",
+      "identifier": "diego.salmeron@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "ana_peregrino",
-      "uid": "ana_peregrino",
+      "id": "ana.peregrino",
+      "uid": "ana.peregrino",
       "enabled": true,
-      "identifier": "ana_peregrino@boda-david-y-ayde.web.app",
+      "identifier": "ana.peregrino@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "samuel_lópez",
-      "uid": "samuel_lópez",
+      "id": "samuel",
+      "uid": "samuel",
       "enabled": true,
-      "identifier": "samuel_lópez@boda-david-y-ayde.web.app",
+      "identifier": "samuel@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "rodrigo_fernández_castillo",
-      "uid": "rodrigo_fernández_castillo",
+      "id": "rodrigo_rodriguez",
+      "uid": "rodrigo_rodriguez",
       "enabled": true,
-      "identifier": "rodrigo_fernández_castillo@boda-david-y-ayde.web.app",
+      "identifier": "rodrigo_rodriguez@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -788,16 +2779,16 @@
       "passwordPresent": true
     },
     {
-      "id": "fanny_golden",
-      "uid": "fanny_golden",
+      "id": "fanny.jasso",
+      "uid": "fanny.jasso",
       "enabled": true,
-      "identifier": "fanny_golden@boda-david-y-ayde.web.app",
+      "identifier": "fanny.jasso@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
       "id": "novio_de_fanny",
       "uid": "novio_de_fanny",
-      "enabled": true,
+      "enabled": false,
       "identifier": "novio_de_fanny@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
@@ -839,43 +2830,43 @@
     {
       "id": "julien_rigollet",
       "uid": "julien_rigollet",
-      "enabled": true,
+      "enabled": false,
       "identifier": "julien_rigollet@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
       "id": "fabio_rigollet",
       "uid": "fabio_rigollet",
-      "enabled": true,
+      "enabled": false,
       "identifier": "fabio_rigollet@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
       "id": "lenzo_rigollet",
       "uid": "lenzo_rigollet",
-      "enabled": true,
+      "enabled": false,
       "identifier": "lenzo_rigollet@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
       "id": "timeo_rigollet",
       "uid": "timeo_rigollet",
-      "enabled": true,
+      "enabled": false,
       "identifier": "timeo_rigollet@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "abraham_burciaga",
-      "uid": "abraham_burciaga",
+      "id": "abraham",
+      "uid": "abraham",
       "enabled": true,
-      "identifier": "abraham_burciaga@boda-david-y-ayde.web.app",
+      "identifier": "abraham@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "mauricio_vargas",
-      "uid": "mauricio_vargas",
+      "id": "mauricio",
+      "uid": "mauricio",
       "enabled": true,
-      "identifier": "mauricio_vargas@boda-david-y-ayde.web.app",
+      "identifier": "mauricio@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -886,10 +2877,10 @@
       "passwordPresent": true
     },
     {
-      "id": "victor_segoviano",
-      "uid": "victor_segoviano",
+      "id": "victor",
+      "uid": "victor",
       "enabled": true,
-      "identifier": "victor_segoviano@boda-david-y-ayde.web.app",
+      "identifier": "victor@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -900,10 +2891,10 @@
       "passwordPresent": true
     },
     {
-      "id": "juan_ignacio_sánchez",
-      "uid": "juan_ignacio_sánchez",
+      "id": "juan-ignacio",
+      "uid": "juan-ignacio",
       "enabled": true,
-      "identifier": "juan_ignacio_sánchez@boda-david-y-ayde.web.app",
+      "identifier": "juan-ignacio@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -935,10 +2926,10 @@
       "passwordPresent": true
     },
     {
-      "id": "erik_montañez",
-      "uid": "erik_montañez",
+      "id": "erik.montanez",
+      "uid": "erik.montanez",
       "enabled": true,
-      "identifier": "erik_montañez@boda-david-y-ayde.web.app",
+      "identifier": "erik.montanez@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -1012,73 +3003,73 @@
       "passwordPresent": true
     },
     {
-      "id": "rené_linares",
-      "uid": "rené_linares",
+      "id": "rene.linares",
+      "uid": "rene.linares",
       "enabled": true,
-      "identifier": "rené_linares@boda-david-y-ayde.web.app",
+      "identifier": "rene.linares@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
       "id": "esposa_de_rené",
       "uid": "esposa_de_rené",
-      "enabled": true,
+      "enabled": false,
       "identifier": "esposa_de_rené@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "carlos_la_pelona",
-      "uid": "carlos_la_pelona",
+      "id": "carlos.jimenez",
+      "uid": "carlos.jimenez",
       "enabled": true,
-      "identifier": "carlos_la_pelona@boda-david-y-ayde.web.app",
+      "identifier": "carlos.jimenez@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "alberto_trejo",
-      "uid": "alberto_trejo",
+      "id": "alberto.trejo",
+      "uid": "alberto.trejo",
       "enabled": true,
-      "identifier": "alberto_trejo@boda-david-y-ayde.web.app",
+      "identifier": "alberto.trejo@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "spomenka_petrovic",
-      "uid": "spomenka_petrovic",
+      "id": "spomenka.petrovic",
+      "uid": "spomenka.petrovic",
       "enabled": true,
-      "identifier": "spomenka_petrovic@boda-david-y-ayde.web.app",
+      "identifier": "spomenka.petrovic@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "guilhem_petrovic",
-      "uid": "guilhem_petrovic",
+      "id": "guilhem.laubie",
+      "uid": "guilhem.laubie",
       "enabled": true,
-      "identifier": "guilhem_petrovic@boda-david-y-ayde.web.app",
+      "identifier": "guilhem.laubie@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "pierre_berthelon",
-      "uid": "pierre_berthelon",
+      "id": "pierre.berthelon",
+      "uid": "pierre.berthelon",
       "enabled": true,
-      "identifier": "pierre_berthelon@boda-david-y-ayde.web.app",
+      "identifier": "pierre.berthelon@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "titis_berthelon",
-      "uid": "titis_berthelon",
+      "id": "titis",
+      "uid": "titis",
       "enabled": true,
-      "identifier": "titis_berthelon@boda-david-y-ayde.web.app",
+      "identifier": "titis@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "tristan_de_carne",
-      "uid": "tristan_de_carne",
+      "id": "tristan",
+      "uid": "tristan",
       "enabled": true,
-      "identifier": "tristan_de_carne@boda-david-y-ayde.web.app",
+      "identifier": "tristan@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "yari_de_carne",
-      "uid": "yari_de_carne",
+      "id": "yari",
+      "uid": "yari",
       "enabled": true,
-      "identifier": "yari_de_carne@boda-david-y-ayde.web.app",
+      "identifier": "yari@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -1096,136 +3087,136 @@
       "passwordPresent": true
     },
     {
-      "id": "frederic_bousquet",
-      "uid": "frederic_bousquet",
+      "id": "fred_38t",
+      "uid": "fred_38t",
       "enabled": true,
-      "identifier": "frederic_bousquet@boda-david-y-ayde.web.app",
+      "identifier": "fred_38t@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "laurent_monte",
-      "uid": "laurent_monte",
+      "id": "lolo_38t",
+      "uid": "lolo_38t",
       "enabled": true,
-      "identifier": "laurent_monte@boda-david-y-ayde.web.app",
+      "identifier": "lolo_38t@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "isabelle_panzica",
-      "uid": "isabelle_panzica",
+      "id": "isa_38t",
+      "uid": "isa_38t",
       "enabled": true,
-      "identifier": "isabelle_panzica@boda-david-y-ayde.web.app",
+      "identifier": "isa_38t@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "chansamone_thao_nantha_kouman",
-      "uid": "chansamone_thao_nantha_kouman",
+      "id": "chang_38t",
+      "uid": "chang_38t",
       "enabled": true,
-      "identifier": "chansamone_thao_nantha_kouman@boda-david-y-ayde.web.app",
+      "identifier": "chang_38t@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "boris_bousquet",
-      "uid": "boris_bousquet",
+      "id": "bobo_28t",
+      "uid": "bobo_28t",
       "enabled": true,
-      "identifier": "boris_bousquet@boda-david-y-ayde.web.app",
+      "identifier": "bobo_28t@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
       "id": "esposa_de_chang",
       "uid": "esposa_de_chang",
-      "enabled": true,
+      "enabled": false,
       "identifier": "esposa_de_chang@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "alexis_boilley",
-      "uid": "alexis_boilley",
+      "id": "alexis",
+      "uid": "alexis",
       "enabled": true,
-      "identifier": "alexis_boilley@boda-david-y-ayde.web.app",
+      "identifier": "alexis@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "florent_lagaye",
-      "uid": "florent_lagaye",
+      "id": "floof_38t",
+      "uid": "floof_38t",
       "enabled": true,
-      "identifier": "florent_lagaye@boda-david-y-ayde.web.app",
+      "identifier": "floof_38t@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "karine_lagaye",
-      "uid": "karine_lagaye",
+      "id": "karine",
+      "uid": "karine",
       "enabled": true,
-      "identifier": "karine_lagaye@boda-david-y-ayde.web.app",
+      "identifier": "karine@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "cyril_bertholin",
-      "uid": "cyril_bertholin",
+      "id": "beb_38t",
+      "uid": "beb_38t",
       "enabled": true,
-      "identifier": "cyril_bertholin@boda-david-y-ayde.web.app",
+      "identifier": "beb_38t@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "vincent",
-      "uid": "vincent",
+      "id": "vinvent_38t",
+      "uid": "vinvent_38t",
       "enabled": true,
-      "identifier": "vincent@boda-david-y-ayde.web.app",
+      "identifier": "vinvent_38t@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "celia",
-      "uid": "celia",
+      "id": "celia_38t",
+      "uid": "celia_38t",
       "enabled": true,
-      "identifier": "celia@boda-david-y-ayde.web.app",
+      "identifier": "celia_38t@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "marion_livoti",
-      "uid": "marion_livoti",
+      "id": "marion_38t",
+      "uid": "marion_38t",
       "enabled": true,
-      "identifier": "marion_livoti@boda-david-y-ayde.web.app",
+      "identifier": "marion_38t@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "benoit_guinet",
-      "uid": "benoit_guinet",
+      "id": "benoit_38t",
+      "uid": "benoit_38t",
       "enabled": true,
-      "identifier": "benoit_guinet@boda-david-y-ayde.web.app",
+      "identifier": "benoit_38t@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "antoine",
-      "uid": "antoine",
+      "id": "gm_38t",
+      "uid": "gm_38t",
       "enabled": true,
-      "identifier": "antoine@boda-david-y-ayde.web.app",
+      "identifier": "gm_38t@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "françois_lemery",
-      "uid": "françois_lemery",
+      "id": "francois",
+      "uid": "francois",
       "enabled": true,
-      "identifier": "françois_lemery@boda-david-y-ayde.web.app",
+      "identifier": "francois@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "mireille_lemery",
-      "uid": "mireille_lemery",
+      "id": "mireille",
+      "uid": "mireille",
       "enabled": true,
-      "identifier": "mireille_lemery@boda-david-y-ayde.web.app",
+      "identifier": "mireille@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "diego_henao",
-      "uid": "diego_henao",
+      "id": "diego.henao",
+      "uid": "diego.henao",
       "enabled": true,
-      "identifier": "diego_henao@boda-david-y-ayde.web.app",
+      "identifier": "diego.henao@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "ana_garcía",
-      "uid": "ana_garcía",
+      "id": "ana.garcia",
+      "uid": "ana.garcia",
       "enabled": true,
-      "identifier": "ana_garcía@boda-david-y-ayde.web.app",
+      "identifier": "ana.garcia@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -1243,10 +3234,10 @@
       "passwordPresent": true
     },
     {
-      "id": "jenny_di_fonzo",
-      "uid": "jenny_di_fonzo",
+      "id": "jenny",
+      "uid": "jenny",
       "enabled": true,
-      "identifier": "jenny_di_fonzo@boda-david-y-ayde.web.app",
+      "identifier": "jenny@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -1453,10 +3444,10 @@
       "passwordPresent": true
     },
     {
-      "id": "géraldine_toussaint",
-      "uid": "géraldine_toussaint",
+      "id": "geraldine.toussaint",
+      "uid": "geraldine.toussaint",
       "enabled": true,
-      "identifier": "géraldine_toussaint@boda-david-y-ayde.web.app",
+      "identifier": "geraldine.toussaint@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -1467,31 +3458,31 @@
       "passwordPresent": true
     },
     {
-      "id": "gaëtane_lefranc",
-      "uid": "gaëtane_lefranc",
+      "id": "gaetane",
+      "uid": "gaetane",
       "enabled": true,
-      "identifier": "gaëtane_lefranc@boda-david-y-ayde.web.app",
+      "identifier": "gaetane@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
       "id": "stéphane_bon",
       "uid": "stéphane_bon",
-      "enabled": true,
+      "enabled": false,
       "identifier": "stéphane_bon@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
       "id": "ange_bon",
       "uid": "ange_bon",
-      "enabled": true,
+      "enabled": false,
       "identifier": "ange_bon@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "josé_alberto_ricardo_valdés_villareal_miranda",
-      "uid": "josé_alberto_ricardo_valdés_villareal_miranda",
+      "id": "jose.valdes",
+      "uid": "jose.valdes",
       "enabled": true,
-      "identifier": "josé_alberto_ricardo_valdés_villareal_miranda@boda-david-y-ayde.web.app",
+      "identifier": "jose.valdes@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -1509,45 +3500,45 @@
       "passwordPresent": true
     },
     {
-      "id": "sébastien_mut",
-      "uid": "sébastien_mut",
+      "id": "touta.mut",
+      "uid": "touta.mut",
       "enabled": true,
-      "identifier": "sébastien_mut@boda-david-y-ayde.web.app",
+      "identifier": "touta.mut@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "carmene_mut_coudene",
-      "uid": "carmene_mut_coudene",
+      "id": "carmen.mut",
+      "uid": "carmen.mut",
       "enabled": true,
-      "identifier": "carmene_mut_coudene@boda-david-y-ayde.web.app",
+      "identifier": "carmen.mut@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "arsene_mut_coudene",
-      "uid": "arsene_mut_coudene",
+      "id": "arsene.mut",
+      "uid": "arsene.mut",
       "enabled": true,
-      "identifier": "arsene_mut_coudene@boda-david-y-ayde.web.app",
+      "identifier": "arsene.mut@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "gregory_nussbaumer",
-      "uid": "gregory_nussbaumer",
+      "id": "gregory.nussbaumer",
+      "uid": "gregory.nussbaumer",
       "enabled": true,
-      "identifier": "gregory_nussbaumer@boda-david-y-ayde.web.app",
+      "identifier": "gregory.nussbaumer@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "paul-henry_picard",
-      "uid": "paul-henry_picard",
+      "id": "paul-henry.picard",
+      "uid": "paul-henry.picard",
       "enabled": true,
-      "identifier": "paul-henry_picard@boda-david-y-ayde.web.app",
+      "identifier": "paul-henry.picard@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "victor_sirisakd",
-      "uid": "victor_sirisakd",
+      "id": "victor.sirisakd",
+      "uid": "victor.sirisakd",
       "enabled": true,
-      "identifier": "victor_sirisakd@boda-david-y-ayde.web.app",
+      "identifier": "victor.sirisakd@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -1565,10 +3556,10 @@
       "passwordPresent": true
     },
     {
-      "id": "sébastien_passelande",
-      "uid": "sébastien_passelande",
+      "id": "sebastien.passelande",
+      "uid": "sebastien.passelande",
       "enabled": true,
-      "identifier": "sébastien_passelande@boda-david-y-ayde.web.app",
+      "identifier": "sebastien.passelande@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -1586,24 +3577,24 @@
       "passwordPresent": true
     },
     {
-      "id": "yvon_leborgne",
-      "uid": "yvon_leborgne",
+      "id": "yvon.leborgne",
+      "uid": "yvon.leborgne",
       "enabled": true,
-      "identifier": "yvon_leborgne@boda-david-y-ayde.web.app",
+      "identifier": "yvon.leborgne@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "antoine_faure",
-      "uid": "antoine_faure",
+      "id": "antoine",
+      "uid": "antoine",
       "enabled": true,
-      "identifier": "antoine_faure@boda-david-y-ayde.web.app",
+      "identifier": "antoine@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "aurélien_neyrand",
-      "uid": "aurélien_neyrand",
+      "id": "aurelien.neyrand",
+      "uid": "aurelien.neyrand",
       "enabled": true,
-      "identifier": "aurélien_neyrand@boda-david-y-ayde.web.app",
+      "identifier": "aurelien.neyrand@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -1614,10 +3605,10 @@
       "passwordPresent": true
     },
     {
-      "id": "damien_gilles",
-      "uid": "damien_gilles",
+      "id": "damien.gilles",
+      "uid": "damien.gilles",
       "enabled": true,
-      "identifier": "damien_gilles@boda-david-y-ayde.web.app",
+      "identifier": "damien.gilles@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -1628,101 +3619,101 @@
       "passwordPresent": true
     },
     {
-      "id": "michaël_delarche",
-      "uid": "michaël_delarche",
+      "id": "michael.delarche",
+      "uid": "michael.delarche",
       "enabled": true,
-      "identifier": "michaël_delarche@boda-david-y-ayde.web.app",
+      "identifier": "michael.delarche@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "robin_haider",
-      "uid": "robin_haider",
+      "id": "robin.haider",
+      "uid": "robin.haider",
       "enabled": true,
-      "identifier": "robin_haider@boda-david-y-ayde.web.app",
+      "identifier": "robin.haider@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "esteban",
-      "uid": "esteban",
+      "id": "estaban.ambriz",
+      "uid": "estaban.ambriz",
       "enabled": true,
-      "identifier": "esteban@boda-david-y-ayde.web.app",
+      "identifier": "estaban.ambriz@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "sandra_gdl",
-      "uid": "sandra_gdl",
+      "id": "sandra.yanez",
+      "uid": "sandra.yanez",
       "enabled": true,
-      "identifier": "sandra_gdl@boda-david-y-ayde.web.app",
+      "identifier": "sandra.yanez@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "ilija_stankovic",
-      "uid": "ilija_stankovic",
+      "id": "ilija.stankovic",
+      "uid": "ilija.stankovic",
       "enabled": true,
-      "identifier": "ilija_stankovic@boda-david-y-ayde.web.app",
+      "identifier": "ilija.stankovic@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "jeanne_sergent",
-      "uid": "jeanne_sergent",
+      "id": "jeanne.sergent",
+      "uid": "jeanne.sergent",
       "enabled": true,
-      "identifier": "jeanne_sergent@boda-david-y-ayde.web.app",
+      "identifier": "jeanne.sergent@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "guillaume",
-      "uid": "guillaume",
+      "id": "gui.lucas",
+      "uid": "gui.lucas",
       "enabled": true,
       "identifier": "guillaume.lucas974@gmail.com",
       "passwordPresent": true
     },
     {
-      "id": "muriel",
-      "uid": "muriel",
+      "id": "muriel.rime",
+      "uid": "muriel.rime",
       "enabled": true,
       "identifier": "murielle.rime@gmail.com",
       "passwordPresent": true
     },
     {
-      "id": "julien_bryard",
-      "uid": "julien_bryard",
+      "id": "julien.bryard",
+      "uid": "julien.bryard",
       "enabled": true,
-      "identifier": "julien_bryard@boda-david-y-ayde.web.app",
+      "identifier": "julien.bryard@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
       "id": "lilou",
       "uid": "lilou",
       "enabled": true,
-      "identifier": "lilou@boda-david-y-ayde.web.app",
+      "identifier": "liloupaesano2468@yahoo.fr",
       "passwordPresent": true
     },
     {
       "id": "romane",
       "uid": "romane",
       "enabled": true,
-      "identifier": "romane@boda-david-y-ayde.web.app",
+      "identifier": "romanepaesano@gmail.com",
       "passwordPresent": true
     },
     {
-      "id": "mireille_guillermet",
-      "uid": "mireille_guillermet",
+      "id": "mireille.guillermet",
+      "uid": "mireille.guillermet",
       "enabled": true,
-      "identifier": "mireille_guillermet@boda-david-y-ayde.web.app",
+      "identifier": "mireille.guillermet@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "moussa_boutemine",
-      "uid": "moussa_boutemine",
+      "id": "moussa.boutemine",
+      "uid": "moussa.boutemine",
       "enabled": true,
-      "identifier": "moussa_boutemine@boda-david-y-ayde.web.app",
+      "identifier": "moussa.boutemine@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "sofiane_benalia",
-      "uid": "sofiane_benalia",
+      "id": "sofiane.benalia",
+      "uid": "sofiane.benalia",
       "enabled": true,
-      "identifier": "sofiane_benalia@boda-david-y-ayde.web.app",
+      "identifier": "sofiane.benalia@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -1733,45 +3724,45 @@
       "passwordPresent": true
     },
     {
-      "id": "berni_cardoso",
-      "uid": "berni_cardoso",
+      "id": "berni.cardosa",
+      "uid": "berni.cardosa",
       "enabled": false,
-      "identifier": "berni_cardoso@boda-david-y-ayde.web.app",
+      "identifier": "berni.cardosa@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "jorge_jr._cardoso",
-      "uid": "jorge_jr._cardoso",
+      "id": "jorge.cardosa.romero",
+      "uid": "jorge.cardosa.romero",
       "enabled": true,
-      "identifier": "jorge_jr._cardoso@boda-david-y-ayde.web.app",
+      "identifier": "jorge.cardosa.romero@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "juri_cardoso",
-      "uid": "juri_cardoso",
+      "id": "juri.romero",
+      "uid": "juri.romero",
       "enabled": true,
-      "identifier": "juri_cardoso@boda-david-y-ayde.web.app",
+      "identifier": "juri.romero@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "jorge_cardoso",
-      "uid": "jorge_cardoso",
+      "id": "jorge.cardosa",
+      "uid": "jorge.cardosa",
       "enabled": true,
-      "identifier": "jorge_cardoso@boda-david-y-ayde.web.app",
+      "identifier": "jorge.cardosa@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
-      "id": "guillemette_renard",
-      "uid": "guillemette_renard",
+      "id": "guillemette.renard",
+      "uid": "guillemette.renard",
       "enabled": true,
       "identifier": "domainedechevillard@gmail.com",
       "passwordPresent": true
     },
     {
-      "id": "marido_de_guillemette_renard",
-      "uid": "marido_de_guillemette_renard",
+      "id": "matthieu.goury",
+      "uid": "matthieu.goury",
       "enabled": false,
-      "identifier": "marido_de_guillemette_renard@boda-david-y-ayde.web.app",
+      "identifier": "matthieu.goury@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -1803,10 +3794,10 @@
       "passwordPresent": true
     },
     {
-      "id": "benjamin_besson",
-      "uid": "benjamin_besson",
+      "id": "benjamin.besson",
+      "uid": "benjamin.besson",
       "enabled": true,
-      "identifier": "benjamin_besson@boda-david-y-ayde.web.app",
+      "identifier": "benjamin.besson@boda-david-y-ayde.web.app",
       "passwordPresent": true
     },
     {
@@ -1838,6 +3829,27 @@
       "passwordPresent": true
     },
     {
+      "id": "maria.cristina",
+      "uid": "maria.cristina",
+      "enabled": true,
+      "identifier": "maria.cristina@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "lourdes",
+      "uid": "lourdes",
+      "enabled": true,
+      "identifier": "lourdes@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
+      "id": "claudia.torrez",
+      "uid": "claudia.torrez",
+      "enabled": true,
+      "identifier": "claudia.torrez@boda-david-y-ayde.web.app",
+      "passwordPresent": true
+    },
+    {
       "id": "stefan",
       "uid": "stefan",
       "enabled": true,
@@ -1860,11 +3872,132 @@
     }
   ],
   "alerts": [],
-  "comparisonAudit": [],
-  "writes": 0,
+  "comparisonAudit": [
+    {
+      "id": "aydé_juárez_guadalupe",
+      "status": "changed",
+      "comparedFields": 37,
+      "diffCount": 1
+    },
+    {
+      "id": "manu",
+      "status": "changed",
+      "comparedFields": 37,
+      "diffCount": 3
+    },
+    {
+      "id": "esposa_de_mauricio_vargas",
+      "status": "changed",
+      "comparedFields": 37,
+      "diffCount": 4
+    },
+    {
+      "id": "jimena",
+      "status": "changed",
+      "comparedFields": 37,
+      "diffCount": 1
+    },
+    {
+      "id": "rene.linares",
+      "status": "changed",
+      "comparedFields": 37,
+      "diffCount": 2
+    },
+    {
+      "id": "esposa_de_rené",
+      "status": "changed",
+      "comparedFields": 37,
+      "diffCount": 2
+    },
+    {
+      "id": "spomenka.petrovic",
+      "status": "changed",
+      "comparedFields": 37,
+      "diffCount": 2
+    },
+    {
+      "id": "guilhem.laubie",
+      "status": "changed",
+      "comparedFields": 37,
+      "diffCount": 2
+    },
+    {
+      "id": "fred_38t",
+      "status": "changed",
+      "comparedFields": 37,
+      "diffCount": 2
+    },
+    {
+      "id": "lolo_38t",
+      "status": "changed",
+      "comparedFields": 37,
+      "diffCount": 2
+    },
+    {
+      "id": "isa_38t",
+      "status": "changed",
+      "comparedFields": 37,
+      "diffCount": 2
+    },
+    {
+      "id": "bobo_28t",
+      "status": "changed",
+      "comparedFields": 37,
+      "diffCount": 2
+    },
+    {
+      "id": "alexis",
+      "status": "changed",
+      "comparedFields": 37,
+      "diffCount": 2
+    },
+    {
+      "id": "marion_38t",
+      "status": "changed",
+      "comparedFields": 37,
+      "diffCount": 2
+    },
+    {
+      "id": "benoit_38t",
+      "status": "changed",
+      "comparedFields": 37,
+      "diffCount": 2
+    },
+    {
+      "id": "dimitar",
+      "status": "changed",
+      "comparedFields": 37,
+      "diffCount": 2
+    },
+    {
+      "id": "acompagnante_de_dimitar",
+      "status": "changed",
+      "comparedFields": 37,
+      "diffCount": 2
+    },
+    {
+      "id": "maria.cristina",
+      "status": "candidate-add",
+      "comparedFields": 37,
+      "diffCount": 37
+    },
+    {
+      "id": "lourdes",
+      "status": "candidate-add",
+      "comparedFields": 37,
+      "diffCount": 37
+    },
+    {
+      "id": "claudia.torrez",
+      "status": "candidate-add",
+      "comparedFields": 37,
+      "diffCount": 37
+    }
+  ],
+  "writes": 20,
   "authPlan": {
-    "emailUpdates": 0,
-    "authCreates": 0,
+    "emailUpdates": 1,
+    "authCreates": 3,
     "authDeletes": 0,
     "blockedCreatesMissingEmail": 0,
     "blockedEmailUpdatesInvalid": 0,
@@ -1874,9 +4007,9 @@
   },
   "authResults": {
     "authDeletesApplied": 0,
-    "emailUpdatesApplied": 0,
-    "authCreatesApplied": 0,
+    "emailUpdatesApplied": 1,
+    "authCreatesApplied": 3,
     "failures": []
   },
-  "unchangedOmitted": 259
+  "unchangedOmitted": 242
 }
