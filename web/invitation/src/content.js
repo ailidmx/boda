@@ -51,7 +51,9 @@ export const content = {
       venue: "El lugar",
       accommodation: "Alojamiento",
       travel: "VUELOS",
-      attire: "Vestuario",
+      tematica: "Temática",
+      dressCode: "Código de vestimenta",
+
 
 
       weather: "Clima",
@@ -1037,8 +1039,9 @@ export const content = {
     },
     attire: {
 
-      eyebrow: "Vestuario",
-      title: "Estética mexicana y código de vestimenta",
+      eyebrow: "Temática",
+      title: "Estética mexicana",
+
       body:
         "Hemos elegido una estética mexicana para nuestra boda como un homenaje a la cultura, la comida, la música y el lugar que nos reúne. Queremos que todo se sienta festivo, colorido y profundamente mexicano.",
       dressCode: {
@@ -1496,7 +1499,9 @@ export const content = {
       venue: "Le lieu",
       accommodation: "Hébergement",
       travel: "VOLS",
-      attire: "Code vestimentaire",
+      tematica: "Thématique",
+      dressCode: "Code vestimentaire",
+
 
 
       weather: "Météo",
@@ -2942,7 +2947,9 @@ export const content = {
       venue: "The venue",
       accommodation: "Accommodation",
       travel: "FLIGHTS",
-      attire: "Attire",
+      tematica: "Theme",
+      dressCode: "Dress code",
+
 
 
       weather: "Weather",
@@ -3914,8 +3921,9 @@ export const content = {
     },
     attire: {
 
-      eyebrow: "Attire",
-      title: "Mexican aesthetic and dress code",
+      eyebrow: "Theme",
+      title: "Mexican aesthetic",
+
       body:
         "We have chosen a Mexican aesthetic for our wedding as a tribute to the culture, the food, the music, and the place that brings us together. We want everything to feel festive, colorful, and deeply Mexican.",
       dressCode: {

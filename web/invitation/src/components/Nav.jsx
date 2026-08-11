@@ -18,7 +18,9 @@ const NAV_LINKS = [
   ["venue", "#venue"],
   ["weekend", "#weekend"],
   ["attire", "#attire"],
+  ["dressCode", "#dress-code"],
   ["weather", "#weather"],
+
   ["programme", "#weekend-program"],
   ["teAnimas", "#te-animas"],
   ["travel", "#travel"],
