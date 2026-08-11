@@ -559,15 +559,26 @@ export function Accommodation() {
                           {memberCovered ? (
                             <>
                               <s>{formatPrice(memberPerPerson, language)} MXN</s>
+                              <s>≈ {formatPrice(memberPerPerson / MXN_PER_EUR, language)} €</s>
                               <strong>{recap.coveredLabel}</strong>
                             </>
                           ) : (
-                            <strong>{formatPrice(memberPerPerson, language)} MXN</strong>
+                            <>
+                              <strong>{formatPrice(memberPerPerson, language)} MXN</strong>
+                              <small>≈ {formatPrice(memberPerPerson / MXN_PER_EUR, language)} €</small>
+                            </>
                           )}
                         </span>
                       </div>
                     )}
+                    {memberCovered && (
+                      <div className="accommodation-recap-covered-banner">
+                        <span aria-hidden="true">✓</span>
+                        {recap.coveredLabel}
+                      </div>
+                    )}
                     <div className="accommodation-recap-toggle">
+
                       <button
                         type="button"
                         className={`rsvp-boolean-btn${current === BOOLEAN_YES ? ' is-selected' : ''}`}
@@ -645,15 +656,21 @@ export function Accommodation() {
                           {memberCovered ? (
                             <>
                               <s>{formatPrice(memberPerPerson, language)} MXN</s>
+                              <s>≈ {formatPrice(memberPerPerson / MXN_PER_EUR, language)} €</s>
                               <small>{recap.coveredLabel}</small>
                             </>
                           ) : (
-                            <strong>{formatPrice(memberPerPerson, language)} MXN</strong>
+                            <>
+                              <strong>{formatPrice(memberPerPerson, language)} MXN</strong>
+                              <small className="is-eur">≈ {formatPrice(memberPerPerson / MXN_PER_EUR, language)} €</small>
+                            </>
                           )}
                         </span>
                       )}
+
                       <span
                         className={`accommodation-recap-summary-value${
+
                           current === BOOLEAN_YES ? " is-yes" : " is-no"
                         }`}
                       >

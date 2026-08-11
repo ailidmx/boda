@@ -1522,6 +1522,7 @@
 
 .accommodation-recap-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
@@ -1530,6 +1531,7 @@
   border-radius: 0.75rem;
   background: rgb(255 255 255 / 55%);
 }
+
 
 .accommodation-recap-person {
   display: flex;
@@ -1608,6 +1610,43 @@
   font-size: 0.85rem;
   font-weight: 700;
 }
+
+.accommodation-recap-price-value small {
+  color: rgb(36 33 25 / 55%);
+  font-size: 0.8rem;
+}
+
+/* Full-width banner shown when a member's stay is covered by the couple.
+   The recap row wraps so this banner spans the whole row width. */
+.accommodation-recap-covered-banner {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: linear-gradient(90deg, rgb(201 111 74 / 14%), rgb(201 111 74 / 5%));
+  border: 1px solid rgb(201 111 74 / 28%);
+  color: var(--terracotta, #c96f4a);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.accommodation-recap-covered-banner span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  background: var(--terracotta, #c96f4a);
+  color: #fff;
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
 
 
 /* The recap sits on the light accommodation background, so the shared
@@ -1793,6 +1832,15 @@
   font-weight: 700;
   letter-spacing: 0.03em;
 }
+
+/* The EUR estimate in the non-covered summary price is muted, unlike the
+   terracotta "covered" label. */
+.accommodation-recap-summary-price small.is-eur {
+  color: rgb(36 33 25 / 55%);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
 
 .accommodation-recap-summary-price.is-covered strong {
   color: var(--terracotta, #c96f4a);
