@@ -162,7 +162,7 @@ export function DressCode() {
       {/* Full-bleed colour patchwork background behind the dress-code section. */}
       <div className="attire-bg attire-bg--patchwork" aria-hidden="true" />
 
-      <p className="eyebrow attire-eyebrow">{attire.eyebrow}</p>
+      <p className="eyebrow attire-eyebrow">{dressCode.eyebrow}</p>
 
       {dressCode.title && (
         <div className="attire-dress-code reveal">
@@ -215,7 +215,7 @@ export function DressCode() {
             >
               ×
             </button>
-            <p className="eyebrow attire-picto__eyebrow">{attire.eyebrow}</p>
+            <p className="eyebrow attire-picto__eyebrow">{dressCode.eyebrow}</p>
             <p className="attire-picto__title">{dressCode.title}</p>
             <DressCodePictograms labels={dressCode.pictograms} />
           </div>

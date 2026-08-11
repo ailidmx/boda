@@ -218,42 +218,45 @@
   }
 }
 
-/* The tematica grid: two columns on desktop. The title + citation share the
-   right column while the Oaxaca montage fills the left column. On mobile the
-   whole thing stacks vertically (see the mobile block below). */
+/* The tematica section is a single vertical stack on every screen size:
+   eyebrow → title → Oaxaca banner (row of 4) → citation → Huichol banner
+   (row of 4). This keeps the Oaxaca and Huichol photos as full-width rows of
+   four cards, matching the mobile treatment. */
 .attire-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(3rem, 8vw, 8rem);
-  align-items: center;
+  grid-template-columns: 1fr;
+  gap: clamp(2rem, 4vw, 3rem);
+  align-items: start;
 }
 
-/* Title sits at the top of the right column. */
+/* Title sits at the top of the stack, centred. */
 .attire-title {
-  grid-column: 2;
+  grid-column: 1;
   grid-row: 1;
-  margin: 0 0 2rem;
+  margin: 0 0 1rem;
+  text-align: center;
 }
 
-/* Oaxaca montage fills the left column, spanning both rows so it stays
-   vertically centred next to the title + citation. */
+/* Oaxaca montage: a single full-width row of four cards (banner). */
 .oaxaca-grid {
   grid-column: 1;
-  grid-row: 1 / span 2;
+  grid-row: 2;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.5rem;
   padding: 0.5rem;
-  max-width: 28rem;
+  max-width: 60rem;
   margin-inline: auto;
   background: rgb(255 255 255 / 10%);
   border: 0.5rem solid rgb(255 255 255 / 10%);
 }
 
-/* Citation sits below the title in the right column. */
+/* Citation sits below the Oaxaca banner, centred. */
 .attire-copy {
-  grid-column: 2;
-  grid-row: 2;
+  grid-column: 1;
+  grid-row: 3;
+  max-width: 52rem;
+  margin-inline: auto;
 }
 
 .oaxaca-tile {
@@ -272,8 +275,7 @@
 }
 
 /* Wixárika (Huichol) photo montage — a full-width strip below the Oaxaca
-   montage, reusing the same tile treatment. Four tiles in a row on desktop,
-   collapsing to a single row of four on mobile. */
+   montage, reusing the same tile treatment. Four tiles in a row. */
 .wixarica-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -312,15 +314,18 @@
   pointer-events: none;
 }
 
-/* The dress-code block is a full-width (1/1) row below the photos + citation
+/* The dress-code block is a full-width row below the photos + citation
    grid. It holds the title and the text paragraphs; the pictograms live in a
-   modal opened by the section FAB. */
+   modal opened by the section FAB. A soft dark overlay sits behind the text
+   so it stays legible over the colourful patchwork background. */
 .attire-dress-code {
   position: relative;
   max-width: 52rem;
   margin: clamp(2.5rem, 6vw, 4rem) auto 0;
-  padding-top: clamp(1.5rem, 3vw, 2rem);
+  padding: clamp(1.5rem, 3vw, 2rem);
   border-top: 1px solid rgb(255 255 255 / 35%);
+  background: rgb(36 33 25 / 38%);
+  border-radius: 1rem;
 }
 
 .attire-dress-code__title {
