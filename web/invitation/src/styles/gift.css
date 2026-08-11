@@ -6,25 +6,38 @@
   flex-direction: column;
   gap: clamp(3rem, 8vw, 8rem);
   align-items: center;
-  background: var(--deep-green);
   color: var(--white);
   overflow: hidden;
 }
 
-/* ── Thankful symbolic orbs ─────────────────────────────────────────────
-   Soft, colourful, lightly-drawn orbs floating behind the copy. They read as
-   an elegant, art-worked thank-you motif rather than a flat background. */
-.gift-section::before,
-.gift-section::after {
-  content: "";
+/* Full-bleed background behind the whole CADEAUX section. The base class only
+   handles positioning; the actual artwork lives in the variant classes
+   (--deep-green / --midnight / --terracotta) chosen by the temporary A/B
+   selector. The foreground content (copy + nav) stays above it. */
+.gift-bg {
   position: absolute;
   z-index: 0;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Variant A — deep green (the original): a rich forest-green base with soft,
+   colourful, lightly-drawn orbs floating behind the copy. They read as an
+   elegant, art-worked thank-you motif rather than a flat background. */
+.gift-bg--deep-green {
+  background: var(--deep-green);
+}
+
+.gift-bg--deep-green::before,
+.gift-bg--deep-green::after {
+  content: "";
+  position: absolute;
   border-radius: 50%;
   pointer-events: none;
 }
 
 /* Large warm orb, top-left. */
-.gift-section::before {
+.gift-bg--deep-green::before {
   top: -12rem;
   left: -10rem;
   width: 34rem;
@@ -36,7 +49,7 @@
 }
 
 /* Large cool orb, bottom-right. */
-.gift-section::after {
+.gift-bg--deep-green::after {
   right: -12rem;
   bottom: -12rem;
   width: 36rem;
@@ -45,6 +58,158 @@
     radial-gradient(circle at 60% 40%, rgb(122 139 122 / 30%), transparent 62%),
     radial-gradient(circle at 40% 65%, rgb(198 139 43 / 20%), transparent 70%);
   filter: blur(6px);
+}
+
+/* Variant B — midnight: a deep indigo/navy "night sky" with a soft gold
+   moon glow, a few scattered stars and a subtle diagonal sheen. */
+.gift-bg--midnight {
+  background:
+    /* Diagonal sheen */
+    linear-gradient(
+      115deg,
+      rgb(255 253 248 / 0.06) 0%,
+      rgb(255 253 248 / 0.015) 30%,
+      transparent 55%
+    ),
+    /* Gold moon glow (top-right) */
+    radial-gradient(
+      circle at 82% 12%,
+      rgb(217 179 106 / 0.4) 0%,
+      rgb(217 179 106 / 0.12) 22%,
+      transparent 46%
+    ),
+    /* Cool indigo base */
+    linear-gradient(
+      180deg,
+      #1c1a3a 0%,
+      #14122b 45%,
+      #0d0b1f 100%
+    );
+}
+
+/* Scattered stars over the midnight sky. */
+.gift-bg--midnight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 18% 22%, rgb(255 253 248 / 0.9) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 32% 68%, rgb(255 253 248 / 0.7) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 58% 30%, rgb(255 253 248 / 0.8) 0 1.5px, transparent 2px),
+    radial-gradient(circle at 74% 58%, rgb(255 253 248 / 0.6) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 88% 34%, rgb(255 253 248 / 0.7) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 12% 82%, rgb(255 253 248 / 0.6) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 46% 88%, rgb(255 253 248 / 0.7) 0 1px, transparent 1.5px),
+    radial-gradient(circle at 66% 12%, rgb(255 253 248 / 0.6) 0 1px, transparent 1.5px);
+}
+
+/* Variant C — terracotta: a warm earth gradient with a radiating sun and
+   floating warm orbs, echoing the dress-code section's terracotta palette. */
+.gift-bg--terracotta {
+  background:
+    /* Radiating sun rays (top-right) */
+    repeating-conic-gradient(
+      from 205deg at 80% 10%,
+      rgb(255 253 248 / 0.06) 0deg 5deg,
+      transparent 5deg 13deg
+    ),
+    /* Sun orb (top-right) */
+    radial-gradient(
+      circle at 80% 10%,
+      rgb(255 214 130 / 0.55) 0%,
+      rgb(217 179 106 / 0.28) 20%,
+      transparent 48%
+    ),
+    /* Warm earth glow rising from below */
+    radial-gradient(
+      circle at 50% 118%,
+      rgb(90 30 15 / 0.6) 0%,
+      transparent 58%
+    ),
+    /* Terracotta earth base */
+    linear-gradient(
+      180deg,
+      #b85a33 0%,
+      #a94d2a 42%,
+      #8f3f22 72%,
+      #7a341c 100%
+    );
+}
+
+/* Floating warm orbs over the terracotta earth. */
+.gift-bg--terracotta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 22% 78%, rgb(255 253 248 / 0.2) 0%, transparent 30%),
+    radial-gradient(circle at 88% 22%, rgb(255 253 248 / 0.16) 0%, transparent 28%),
+    radial-gradient(circle at 60% 55%, rgb(255 253 248 / 0.1) 0%, transparent 24%);
+}
+
+/* Soft dark wash over the abstract backgrounds so the section keeps its warm
+   tone and the foreground text remains legible. */
+.gift-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(18 27 24 / 45%) 0%,
+    rgb(18 27 24 / 28%) 45%,
+    rgb(18 27 24 / 48%) 100%
+  );
+}
+
+/* ── TEMPORARY A/B test selector ────────────────────────────────────────
+   A small pill bar at the top of the CADEAUX section to switch between the
+   background variants. Remove this block (and the JSX + state) once a final
+   background is chosen. */
+.gift-bg-switch {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 auto clamp(1.5rem, 4vw, 2.5rem);
+  padding: 0.3rem;
+  border: 1px solid rgb(255 253 248 / 30%);
+  border-radius: 999px;
+  background: rgb(18 27 24 / 35%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.gift-bg-switch__label {
+  padding: 0 0.5rem;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(255 253 248 / 70%);
+}
+
+.gift-bg-switch__btn {
+  padding: 0.45rem 0.9rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgb(255 253 248 / 85%);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.gift-bg-switch__btn:hover,
+.gift-bg-switch__btn:focus-visible {
+  background: rgb(255 253 248 / 14%);
+}
+
+.gift-bg-switch__btn.is-active {
+  background: var(--marigold, #d9b36a);
+  color: var(--ink, #242119);
 }
 
 /* Two smaller accent orbs tucked behind the copy column. */
@@ -80,6 +245,7 @@
   position: relative;
   z-index: 1;
 }
+
 
 .gift-copy h2 {
   margin-bottom: 2rem;

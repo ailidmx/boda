@@ -8,9 +8,6 @@ import {
   INVITATION_CODES,
   parseInvitationProfile,
 } from "../src/invitation-profile.js";
-import GUESTS from "../src/guests.js";
-
-const GUEST_IDS = GUESTS.map((g) => g.id);
 
 
 // ── Legacy profile codes ──────────────────────────────────────────────
@@ -43,29 +40,12 @@ test("unknown and malformed profiles are ignored", () => {
   );
 });
 
-// ── Per-guest codes ───────────────────────────────────────────────────
+// ── Per-guest codes are no longer supported ───────────────────────────
 
-test("every guest ID survives a Base64URL round trip", () => {
-  GUEST_IDS.forEach((id) => {
-    assert.equal(decodeInvitationCode(encodeInvitationCode(id)), id);
-  });
-});
-
-test("every guest URL decodes to its original ID", () => {
-  GUEST_IDS.forEach((id) => {
-    const url = buildInvitationUrl("https://example.web.app/", id);
-    assert.equal(getInvitationCodeFromUrl(url), id);
-  });
-});
-
-test("per-guest codes parse to a profile with guest data", () => {
-  GUEST_IDS.forEach((id) => {
-    const profile = parseInvitationProfile(id);
-    assert.notEqual(profile, null);
-    assert.equal(profile.code, id);
-    assert.ok(profile.guest, "guest property should be present");
-    assert.equal(profile.guest.id, id);
-  });
+test("per-guest IDs are no longer accepted as invitation codes", () => {
+  // Per-guest link resolution was removed; only profile codes are valid.
+  assert.equal(decodeInvitationCode(encodeInvitationCode("sebastien")), null);
+  assert.equal(parseInvitationProfile("sebastien"), null);
 });
 
 test("legacy codes parse without guest data", () => {

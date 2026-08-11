@@ -11,7 +11,6 @@
 
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "./firebase.js";
-import { getGuest } from "./guests.js";
 import { getRoom, getRoomDescription } from "./rooms.js";
 import { collections } from "../../shared/firestore-paths.js";
 
@@ -197,9 +196,8 @@ export function decodeInvitationCode(encoded) {
       .decode(base64ToBytes(padded))
       .normalize("NFC");
 
-    // Accept both profile codes and per-guest IDs
+    // Only profile codes are accepted (per-guest link resolution was removed).
     if (knownProfileCodes.has(code)) return code;
-    if (getGuest(code)) return code;
     return null;
   } catch {
     return null;
@@ -237,25 +235,7 @@ export function buildInvitationUrl(baseUrl, code) {
 export function parseInvitationProfile(code) {
   if (!code) return null;
 
-  // 1. Try per-guest lookup first
-  const guest = getGuest(code);
-  if (guest) {
-    const hosting = guest.hosting || {};
-    const roomId = hosting.room || guest.room;
-    const room = roomId ? getRoom(roomId) : null;
-    return {
-      code,
-      hasCabin: guest.hasCabin,
-      unit: guest.unit,
-      occupancy: guest.occupancy,
-      payment: guest.payment,
-      room: roomId,
-      roomDescription: room?.description || null,
-      guest, // full profile for personalised content
-    };
-  }
-
-  // 2. Fall back to profile code parsing
+  // Only profile codes are accepted (per-guest link resolution was removed).
   if (!knownProfileCodes.has(code)) return null;
   if (code === "sin_cabaña") {
     return { code, hasCabin: false };

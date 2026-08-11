@@ -32,3 +32,8 @@ users.json
 .idea/
 .vscode/
 *.swp
+
+# Temporary inspection/debug scripts (not for commit)
+_inspect-*.mjs
+scripts/_inspect-*.mjs
+web/invitation/_inspect-*.mjs

@@ -178,5 +178,19 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   Cloudinary assets into `boda/cabin/<slug>/` (via `uploader.rename`) and store
   the relative IDs. See `scripts/update-casona-lavanda-photos.mjs` for a
   working example (it also shows how to split a batch of uploads by timestamp).
+- **Guest data sourcing (Firestore-only)** — `web/invitation/src/guests.js` is
+  the guest registry and sources ALL data from the LIVE Firestore `guests`
+  cache (populated by `loadAllGuests()`/`loadGuestProfiles()` in
+  `guest-profiles.js`). There is NO static guest registry in the invitation
+  app anymore. `getActiveGuests()` returns the cache, `getGuest(id)` reads the
+  cache by id, and `getGuestsByUnit(unit)` filters by `hosting.cabin`. Login is
+  a normal Firebase Auth email/password login: if a guest types a bare username
+  (no "@"), the app silently appends `@${AUTH_EMAIL_DOMAIN}` to build a valid
+  email — no username lookup. Per-guest invitation-link resolution was removed;
+  only profile codes are accepted. When adding a new guest-facing list, read
+  through `getActiveGuests()` + `resolveGuestName`/`resolveGuestPhoto` so it
+  reflects live Firestore data. (The separate admin dashboard still reads the
+  static `web/shared/guests.js` snapshot; it is not part of the invitation app.)
 - *(Add new lessons here as you discover them.)*
+
 

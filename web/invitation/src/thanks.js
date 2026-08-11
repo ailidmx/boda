@@ -24,6 +24,9 @@ let thanksGuestIds = new Set();
 /** @type {boolean} */
 let thanksLoaded = false;
 
+/** @type {Array<{guestId: string, role: string}>} */
+let thanksCredits = [];
+
 function logDb(event, detail) {
   console.log(`[db][thanks][${event}]`, detail);
 }
@@ -65,6 +68,54 @@ export async function loadThanks() {
 }
 
 /**
+ * Load the full `thanks` collection and cache the credits (guest ID + the
+ * localized role/thanks text for the active language). Safe to call multiple
+ * times (idempotent).
+ *
+ * Each `thanks` document carries a `guest` field (the guest ID) plus localized
+ * messages (`es`, `fr`, `en`). The returned array preserves the collection
+ * order and is used to render the credits roll.
+ *
+ * @param {string} language  active language code ("es" | "fr" | "en")
+ * @returns {Promise<Array<{guestId: string, role: string}>>}
+ */
+export async function loadThanksCredits(language = "es") {
+  const lang = ["es", "fr", "en"].includes(language) ? language : "es";
+  try {
+    logDb("read:start", { collection: collections.thanks, op: "getDocs" });
+    const snapshot = await getDocs(collection(db, collections.thanks));
+
+    const credits = [];
+    const ids = new Set();
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const guestId = String(data.guest || "").trim();
+      if (!guestId) return;
+      ids.add(guestId);
+      const role = String(data[lang] || data.es || "").trim();
+      credits.push({ guestId, role });
+    });
+    thanksGuestIds = ids;
+    thanksCredits = credits;
+    thanksLoaded = true;
+    logDb("read:success", {
+      collection: collections.thanks,
+      op: "getDocs",
+      size: credits.length,
+    });
+    console.log(`[thanks] Loaded ${credits.length} credits from Firestore`);
+  } catch (error) {
+    logDb("read:error", {
+      collection: collections.thanks,
+      op: "getDocs",
+      error: error.message,
+    });
+    console.warn("[thanks] Could not load thanks collection", error.message);
+  }
+  return thanksCredits;
+}
+
+/**
  * Whether a guest has a thank-you entry in the `thanks` collection.
  * @param {string} guestId
  * @returns {boolean}
@@ -79,4 +130,12 @@ export function hasThanksEntry(guestId) {
  */
 export function getThanksGuestIds() {
   return thanksGuestIds;
+}
+
+/**
+ * The cached credits (guest ID + localized role) loaded from Firestore.
+ * @returns {Array<{guestId: string, role: string}>}
+ */
+export function getThanksCredits() {
+  return thanksCredits;
 }

@@ -1104,12 +1104,13 @@ export const content = {
         "Sin nuestros padrinos y ayudantes nada de esto sería posible. Queremos dar su lugar a todos los que ayudaron a que esto sea posible con toda nuestra gratitud a ...",
 
       credits: [
-        { name: "Manuel Amuezca", role: "Wedding planner" },
-        { name: "Manuel Amuezca", role: "Pizzas del viernes" },
-        { name: "Manuel Amuzeca", role: "Pizzas del viernes" },
-        { name: "Ismael", role: "Pizzas" },
-        { name: "Isabel Guadalupe", role: "Vestuario de los novios" },
+        { guestId: "manuel_amezcua", name: "Manuel Amuezca", role: "Wedding planner" },
+        { guestId: "manuel_amezcua", name: "Manuel Amuezca", role: "Pizzas del viernes" },
+        { guestId: "manuel_amezcua", name: "Manuel Amuzeca", role: "Pizzas del viernes" },
+        { guestId: "ismael", name: "Ismael", role: "Pizzas" },
+        { guestId: "isabel_guadalupe", name: "Isabel Guadalupe", role: "Vestuario de los novios" },
       ],
+
       humor: [
         "Si quieres aparecer aquí, contacta nuestro servicio de programa de afiliación a programa de padrino.",
         "Apareces aquí y no sabías: te asignaron tarea. Qué pena, pero no hay manera de borrarlo: el admin IT de la página se fue de vacaciones, no lo podemos borrar, así que hay que cumplir.",
@@ -2461,7 +2462,7 @@ export const content = {
       eyebrow: "Code vestimentaire",
       title: "Esthétique mexicaine",
       body:
-        "Nous avons choisi une esthétique mexicaine pour notre mariage en hommage à la culture, la cuisine, la musique et le lieu qui nous réunit. Nous voulons que tout soit festif, coloré et profondément mexicain.",
+        "Nous avons choisi une esthétique mexicaine pour notre cérémonie en hommage à la culture, la cuisine, la musique et le lieu qui nous réunit. Nous voulons que tout soit festif, coloré et profondément mexicain.",
       dressCode: {
         title: "Habille-toi en couleur",
         paragraphs: [
@@ -2532,12 +2533,13 @@ export const content = {
         "Sans nos parrains et nos aides, rien de tout cela ne serait possible. Nous tenons à remercier avec toute notre gratitude…",
 
       credits: [
-        { name: "Manuel Amuezca", role: "Wedding planner" },
-        { name: "Manuel Amuezca", role: "Pizzas du vendredi" },
-        { name: "Manuel Amuzeca", role: "Pizzas du vendredi" },
-        { name: "Ismael", role: "Pizzas" },
-        { name: "Isabel Guadalupe", role: "Tenues des mariés" },
+        { guestId: "manuel_amezcua", name: "Manuel Amuezca", role: "Wedding planner" },
+        { guestId: "manuel_amezcua", name: "Manuel Amuezca", role: "Pizzas du vendredi" },
+        { guestId: "manuel_amezcua", name: "Manuel Amuzeca", role: "Pizzas du vendredi" },
+        { guestId: "ismael", name: "Ismael", role: "Pizzas" },
+        { guestId: "isabel_guadalupe", name: "Isabel Guadalupe", role: "Tenues des mariés" },
       ],
+
       humor: [
         "Si tu veux apparaître ici, contacte notre programme d’affiliation au programme de parrain.",
 
@@ -3957,12 +3959,13 @@ export const content = {
         "Without our godparents and helpers, none of this would be possible. We want to thank, with all our gratitude…",
 
       credits: [
-        { name: "Manuel Amuezca", role: "Wedding planner" },
-        { name: "Manuel Amuezca", role: "Friday pizzas" },
-        { name: "Manuel Amuzeca", role: "Friday pizzas" },
-        { name: "Ismael", role: "Pizzas" },
-        { name: "Isabel Guadalupe", role: "The couple’s outfits" },
+        { guestId: "manuel_amezcua", name: "Manuel Amuezca", role: "Wedding planner" },
+        { guestId: "manuel_amezcua", name: "Manuel Amuezca", role: "Friday pizzas" },
+        { guestId: "manuel_amezcua", name: "Manuel Amuzeca", role: "Friday pizzas" },
+        { guestId: "ismael", name: "Ismael", role: "Pizzas" },
+        { guestId: "isabel_guadalupe", name: "Isabel Guadalupe", role: "The couple’s outfits" },
       ],
+
       humor: [
         "If you would like to appear here, contact our godparent affiliate programme service.",
 
