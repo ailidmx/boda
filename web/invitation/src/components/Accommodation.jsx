@@ -438,11 +438,16 @@ export function Accommodation() {
         ),
       );
       setRecapSaveStatus('saved');
+      // After a successful save, flip to the resumen (summary) view so the
+      // success confirmation is visible to the user instead of staying on the
+      // question view where it would be hidden.
+      setRecapStep('summary');
     } catch (error) {
       console.warn('[accommodation] recap save failed', error.code || error.message);
       setRecapSaveStatus('error');
     }
   };
+
 
 
   const recapStatusText =
@@ -790,26 +795,8 @@ export function Accommodation() {
             {/* Stepped RSVP mini: step 1 is the per-person question, step 2 is
                 the resumen (summary). The user flips between the two views. */}
             <div className="flip-step-card">
-              <div className="flip-step-card-head">
-                <span className="flip-step-card-title">
-                  {recapStep === "question" ? recap.title : recap.summaryTitle}
-                </span>
-                <button
-                  type="button"
-                  className="flip-step-card-toggle"
-                  onClick={() =>
-                    setRecapStep((step) =>
-                      step === "question" ? "summary" : "question",
-                    )
-                  }
-                >
-                  {recapStep === "question"
-                    ? recap.summaryTitle
-                    : recap.title}
-                </button>
-              </div>
-
               {recapStep === "question" ? (
+
                 <div className="flip-step-card-body">
                   <div className="accommodation-recap-rows">
                     {groupMembers.map((member) => {
@@ -823,6 +810,13 @@ export function Accommodation() {
                         ? recap.hasCabinQuestionCabin.replace("{cabin}", cabinName)
                         : recap.noCabinQuestion;
                       const current = recapAnswers[member.id] || 0;
+                      // Per-person price for this member's cabin (dynamic,
+                      // split among the cabin's actual occupants).
+                      const memberCount = memberCabin
+                        ? cabinOccupantCount(memberCabin.id)
+                        : 0;
+                      const memberPerPerson = cabinPerPersonPrice(memberCabin, memberCount);
+                      const memberCovered = resolveMemberCovered(member);
                       return (
                         <div className="accommodation-recap-row" key={member.id}>
                           <div className="accommodation-recap-person">
@@ -836,6 +830,21 @@ export function Accommodation() {
                               <span>{questionText}</span>
                             </span>
                           </div>
+                          {hasCabin && memberPerPerson > 0 && (
+                            <div className="accommodation-recap-price">
+                              <small>{recap.priceLabel}</small>
+                              <span className={`accommodation-recap-price-value${memberCovered ? " is-covered" : ""}`}>
+                                {memberCovered ? (
+                                  <>
+                                    <s>{formatPrice(memberPerPerson, language)} MXN</s>
+                                    <strong>{recap.coveredLabel}</strong>
+                                  </>
+                                ) : (
+                                  <strong>{formatPrice(memberPerPerson, language)} MXN</strong>
+                                )}
+                              </span>
+                            </div>
+                          )}
                           <div className="accommodation-recap-toggle">
                             <button
                               type="button"
@@ -857,6 +866,7 @@ export function Accommodation() {
                         </div>
                       );
                     })}
+
                   </div>
                   <div className="accommodation-recap-save">
                     <button
@@ -888,6 +898,13 @@ export function Accommodation() {
                           ? recap.hasCabinQuestionCabin.replace("{cabin}", cabinName)
                           : recap.noCabinQuestion;
                         const current = recapAnswers[member.id];
+                        // Per-person price for this member's cabin (dynamic,
+                        // split among the cabin's actual occupants).
+                        const memberCount = memberCabin
+                          ? cabinOccupantCount(memberCabin.id)
+                          : 0;
+                        const memberPerPerson = cabinPerPersonPrice(memberCabin, memberCount);
+                        const memberCovered = resolveMemberCovered(member);
                         return (
                           <li className="accommodation-recap-summary-row" key={member.id}>
                             <span className="accommodation-recap-summary-person">
@@ -901,6 +918,18 @@ export function Accommodation() {
                                 <small>{questionText}</small>
                               </span>
                             </span>
+                            {hasCabin && memberPerPerson > 0 && (
+                              <span className={`accommodation-recap-summary-price${memberCovered ? " is-covered" : ""}`}>
+                                {memberCovered ? (
+                                  <>
+                                    <s>{formatPrice(memberPerPerson, language)} MXN</s>
+                                    <small>{recap.coveredLabel}</small>
+                                  </>
+                                ) : (
+                                  <strong>{formatPrice(memberPerPerson, language)} MXN</strong>
+                                )}
+                              </span>
+                            )}
                             <span
                               className={`accommodation-recap-summary-value${
                                 current === BOOLEAN_YES ? " is-yes" : " is-no"
@@ -911,6 +940,7 @@ export function Accommodation() {
                           </li>
                         );
                       })}
+
                     </ul>
                     {recapSaveStatus === "saved" && (
                       <p className="accommodation-recap-confirmation" role="status">
@@ -924,10 +954,20 @@ export function Accommodation() {
                       </p>
                     )}
 
+                    <div className="accommodation-recap-save">
+                      <button
+                        className="button button--gold"
+                        type="button"
+                        onClick={() => setRecapStep("question")}
+                      >
+                        {recap.modifyButton}
+                      </button>
+                    </div>
                   </div>
                 </div>
               )}
             </div>
+
           </div>
         )}
 

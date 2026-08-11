@@ -200,7 +200,22 @@
     margin: 0;
     font-size: clamp(1.6rem, 6vw, 4.5rem);
   }
+
+  /* On mobile the shared flip-step-card and rsvp-recap panels (used by the
+     mini RSVP) need an explicit border, padding and background so they read
+     as distinct cards on the dark blue base instead of blending into it. */
+  .petanque-rsvp-mini .flip-step-card {
+    padding: 1.25rem;
+    border: 1px solid rgb(255 255 255 / 28%);
+    background: rgb(255 255 255 / 4%);
+  }
+
+  .petanque-rsvp-mini .rsvp-recap {
+    padding: 1.25rem;
+    border: 1px solid rgb(255 255 255 / 28%);
+  }
 }
+
 
 /* ── Mini RSVP question section ─────────────────────────────────────────
    A compact card at the end of the pétanque tribute asking guests whether

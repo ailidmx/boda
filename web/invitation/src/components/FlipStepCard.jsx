@@ -18,8 +18,11 @@ import React, { useEffect, useRef, useState } from "react";
  *                 answers are already saved opens directly on the current step
  *                 (or the recap when everything is answered). Once the user
  *                 navigates, the card stops following `initialIndex`.
+ *   hideBackOnLast  optional boolean. When true, the "Back" button is hidden
+ *                 on the last step (e.g. a read-only recap that only offers a
+ *                 "Modify my answers" action inside its own content).
  */
-export function FlipStepCard({ steps = [], onDone, copy = {}, initialIndex = 0 }) {
+export function FlipStepCard({ steps = [], onDone, copy = {}, initialIndex = 0, hideBackOnLast = false }) {
   const [index, setIndex] = useState(initialIndex);
   const [flipping, setFlipping] = useState(false);
   const [flipDir, setFlipDir] = useState(1);
@@ -57,8 +60,12 @@ export function FlipStepCard({ steps = [], onDone, copy = {}, initialIndex = 0 }
 
   const next = () => goTo(index + 1, 1);
   const back = () => goTo(index - 1, -1);
+  // Jump straight back to the first step (e.g. a "Modify my answers" action
+  // on a recap step). Uses a backward flip so it reads as going back.
+  const goToStart = () => goTo(0, -1);
 
   const step = steps[index];
+
 
   return (
     <div className="flip-step-card">
@@ -73,19 +80,22 @@ export function FlipStepCard({ steps = [], onDone, copy = {}, initialIndex = 0 }
         className={`flip-step-body${flipping ? ` is-flipping${flipDir > 0 ? " is-forward" : " is-back"}` : ""}`}
       >
         <div className="flip-step-face">
-          {step ? step.render({ next, back, isLast }) : null}
+          {step ? step.render({ next, back, goToStart, isLast }) : null}
         </div>
+
       </div>
 
       <div className="flip-step-nav">
-        <button
-          type="button"
-          className="flip-step-btn"
-          onClick={back}
-          disabled={index === 0 || flipping}
-        >
-          {copy.back || "← Back"}
-        </button>
+        {!(hideBackOnLast && isLast) && (
+          <button
+            type="button"
+            className="flip-step-btn"
+            onClick={back}
+            disabled={index === 0 || flipping}
+          >
+            {copy.back || "← Back"}
+          </button>
+        )}
         {!isLast && (
           <button
             type="button"

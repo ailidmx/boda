@@ -961,6 +961,8 @@ export const content = {
         hasCabinQuestion: "¿Se queda en Roca Azul?",
         hasCabinQuestionCabin: "¿Ok para {cabin}?",
         noCabinQuestion: "¿Me avisas si se libera un alojamiento?",
+        priceLabel: "Por persona",
+        coveredLabel: "Cubierto por los novios",
         yesLabel: "Sí",
 
         noLabel: "No",
@@ -970,7 +972,10 @@ export const content = {
         summaryTitle: "Resumen de tu confirmación",
         summaryIntro:
           "Esto es lo que indicaste para cada persona. Puedes modificarlo y volver a guardar cuando quieras.",
+        modifyButton: "Modificar mis respuestas",
       },
+
+
     },
     travel: {
 
@@ -1386,12 +1391,14 @@ export const content = {
         answered: "respondidos",
         yes: "Sí",
         no: "No",
+        modifyButton: "Modificar mis respuestas",
       },
 
       scale: {
         intro:
           "Cuéntanos, día por día, qué tan probable es que estés con nosotros. Puedes cambiar tu respuesta en cualquier momento.",
         saveButton: "Guardar mis respuestas",
+
         savedNote: "¡Gracias! Guardamos tus respuestas.",
         questions: [
           {
@@ -1432,7 +1439,7 @@ export const content = {
       intro:
         "La petanca nos ha unido con una comunidad maravillosa de amigos y compañeros de club en México y en el mundo.",
       body:
-        "El viernes por la tarde organizaremos un torneo de petanca para celebrar este juego que tanto queremos. No hace falta experiencia: solo ganas de jugar, reír y compartir.",
+        "El viernes por la tarde, Pierre organiza un torneo de petanca para celebrar este juego que tanto queremos. No hace falta experiencia: solo ganas de jugar, reír y compartir.",
       homage: "¡Te animas!",
       photosLabel: "Fotografías de petanca",
       photoAlts: [
@@ -1445,24 +1452,27 @@ export const content = {
       rsvpMini: {
         eyebrow: "Torneo de petanca",
         title: "¿Te apuntas?",
-        intro: "El viernes por la tarde organizaremos un torneo de petanca. ¿Te apuntas?",
-        organizerLabel: "Organiza: David",
+        intro: "El viernes por la tarde, Pierre organiza un torneo de petanca. ¿Te apuntas?",
+        organizerLabel: "Contacta a Pierre para más información",
         organizerWhatsapp: "https://wa.me/523332017504",
         fields: {
           participation: "¿Participas en el torneo?",
           ownBoules: "¿Necesitas que te prestemos unas boules?",
           ownBoulesHint: "Si no tienes, no te preocupes: te prestamos unas para jugar.",
         },
+
         yesLabel: "Sí",
         noLabel: "No",
         success: "¡Gracias! Guardamos tus respuestas.",
         error: "No pudimos guardar. Revisa tu conexión e inténtalo de nuevo.",
         button: "Guardar mis respuestas",
         recapTitle: "Resumen",
+        modifyButton: "Modificar mis respuestas",
       },
     },
     footer: {
       line: "Con amor, desde México y Francia",
+
 
 
 
@@ -2388,6 +2398,8 @@ export const content = {
         hasCabinQuestion: "Reste-t-elle à Roca Azul ?",
         hasCabinQuestionCabin: "Ok pour {cabin} ?",
         noCabinQuestion: "Me prévenir si un logement se libère",
+        priceLabel: "Par personne",
+        coveredLabel: "Pris en charge par les mariés",
         yesLabel: "Oui",
 
         noLabel: "Non",
@@ -2397,7 +2409,10 @@ export const content = {
         summaryTitle: "Résumé de ta confirmation",
         summaryIntro:
           "Voici ce que tu as indiqué pour chaque personne. Tu peux le modifier et réenregistrer quand tu veux.",
+        modifyButton: "Modifier mes réponses",
       },
+
+
     },
     travel: {
 
@@ -2817,11 +2832,13 @@ export const content = {
         answered: "répondu·e·s",
         yes: "Oui",
         no: "Non",
+        modifyButton: "Modifier mes réponses",
       },
 
       scale: {
         intro:
           "Dis-nous, jour par jour, quelle est la probabilité que tu sois avec nous. Tu peux modifier ta réponse à tout moment.",
+
         saveButton: "Enregistrer mes réponses",
         savedNote: "Merci ! Nous avons enregistré tes réponses.",
         questions: [
@@ -2864,7 +2881,7 @@ export const content = {
       intro:
         "La pétanque nous a réunis autour d’une merveilleuse communauté d’amis et de coéquipiers de club, au Mexique et dans le monde.",
       body:
-        "Le vendredi après-midi, nous organiserons un tournoi de pétanque pour célébrer ce jeu que nous aimons tant. Aucune expérience n’est requise : juste l’envie de jouer, de rire et de partager.",
+        "Le vendredi après-midi, Pierre organise un tournoi de pétanque pour célébrer ce jeu que nous aimons tant. Aucune expérience n’est requise : juste l’envie de jouer, de rire et de partager.",
       homage: "Ça te tente !",
       photosLabel: "Photos de pétanque",
 
@@ -2878,12 +2895,13 @@ export const content = {
       rsvpMini: {
         eyebrow: "Tournoi de pétanque",
         title: "Tu t’inscris ?",
-        intro: "Le vendredi après-midi, nous organiserons un tournoi de pétanque. Tu participes ?",
-        organizerLabel: "Organise : David",
+        intro: "Le vendredi après-midi, Pierre organise un tournoi de pétanque. Tu participes ?",
+        organizerLabel: "Contacte Pierre pour plus d’infos",
         organizerWhatsapp: "https://wa.me/523332017504",
+
         fields: {
           participation: "Participes-tu au tournoi ?",
-          ownBoules: "As-tu besoin que nous te prêtions des boules ?",
+          ownBoules: "Tu as besoin qu’on te prête des boules ?",
           ownBoulesHint: "Si tu n’en as pas, pas de souci : nous t’en prêterons pour jouer.",
         },
         yesLabel: "Oui",
@@ -2892,10 +2910,13 @@ export const content = {
         error: "Impossible d’enregistrer. Vérifie ta connexion et réessaie.",
         button: "Enregistrer mes réponses",
         recapTitle: "Résumé",
+        modifyButton: "Modifier mes réponses",
+
       },
     },
     footer: {
       line: "Avec amour, depuis le Mexique et la France",
+
 
 
 
@@ -3814,6 +3835,8 @@ export const content = {
         hasCabinQuestion: "Will they stay at Roca Azul?",
         hasCabinQuestionCabin: "OK for {cabin}?",
         noCabinQuestion: "Notify me if a lodging becomes available",
+        priceLabel: "Per person",
+        coveredLabel: "Covered by the couple",
         yesLabel: "Yes",
 
         noLabel: "No",
@@ -3823,7 +3846,10 @@ export const content = {
         summaryTitle: "Summary of your confirmation",
         summaryIntro:
           "Here is what you indicated for each person. You can change it and save again whenever you like.",
+        modifyButton: "Modify my answers",
       },
+
+
     },
     travel: {
 
@@ -4226,11 +4252,13 @@ export const content = {
         answered: "answered",
         yes: "Yes",
         no: "No",
+        modifyButton: "Modify my answers",
       },
 
       scale: {
         intro:
           "Tell us, day by day, how likely you are to be with us. You can change your answer at any time.",
+
         saveButton: "Save my answers",
         savedNote: "Thank you! We saved your answers.",
         questions: [
@@ -4272,7 +4300,7 @@ export const content = {
       intro:
         "Pétanque has brought us together with a wonderful community of friends and club teammates in Mexico and around the world.",
       body:
-        "On Friday afternoon we will organise a pétanque tournament to celebrate this game we love so much. No experience needed: just the desire to play, laugh, and share.",
+        "On Friday afternoon, Pierre is organising a pétanque tournament to celebrate this game we love so much. No experience needed: just the desire to play, laugh, and share.",
       homage: "Are you in!",
       photosLabel: "Pétanque photos",
 
@@ -4286,24 +4314,27 @@ export const content = {
       rsvpMini: {
         eyebrow: "Pétanque tournament",
         title: "Are you in?",
-        intro: "On Friday afternoon we will organise a pétanque tournament. Would you like to join?",
-        organizerLabel: "Organised by: David",
+        intro: "On Friday afternoon, Pierre is organising a pétanque tournament. Would you like to join?",
+        organizerLabel: "Contact Pierre for more info",
         organizerWhatsapp: "https://wa.me/523332017504",
         fields: {
           participation: "Will you participate in the tournament?",
-          ownBoules: "Do you need us to provide you with some boules?",
+          ownBoules: "Do you need us to lend you some boules?",
           ownBoulesHint: "If you don’t have any, no worries: we will lend you some to play.",
         },
+
         yesLabel: "Yes",
         noLabel: "No",
         success: "Thank you! We saved your answers.",
         error: "We could not save. Check your connection and try again.",
         button: "Save my answers",
         recapTitle: "Summary",
+        modifyButton: "Modify my answers",
       },
     },
     footer: {
       line: "With love, from Mexico and France",
+
 
 
 

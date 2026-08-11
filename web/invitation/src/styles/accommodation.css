@@ -1547,6 +1547,48 @@
   gap: 0.5rem;
 }
 
+/* Per-person price shown in the recap question rows. */
+.accommodation-recap-price {
+  display: grid;
+  gap: 0.15rem;
+  flex: 0 0 auto;
+  text-align: right;
+  min-width: 0;
+}
+
+.accommodation-recap-price small {
+  color: rgb(36 33 25 / 62%);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.accommodation-recap-price-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.accommodation-recap-price-value strong {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.accommodation-recap-price-value s {
+  color: rgb(36 33 25 / 45%);
+  font-size: 0.85rem;
+}
+
+.accommodation-recap-price-value.is-covered strong {
+  color: var(--terracotta, #c96f4a);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+
 /* The recap sits on the light accommodation background, so the shared
    .rsvp-boolean-btn (designed for the dark RSVP section) needs a light-theme
    override: dark text + visible border by default, gold fill when selected. */
@@ -1702,6 +1744,41 @@
   background: color-mix(in srgb, var(--terracotta, #c96f4a) 16%, transparent);
   color: #8a3d24;
 }
+
+/* Per-person price shown in the recap summary rows. */
+.accommodation-recap-summary-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.accommodation-recap-summary-price strong {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.accommodation-recap-summary-price s {
+  color: rgb(36 33 25 / 45%);
+  font-size: 0.8rem;
+}
+
+.accommodation-recap-summary-price small {
+  color: var(--terracotta, #c96f4a);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.accommodation-recap-summary-price.is-covered strong {
+  color: var(--terracotta, #c96f4a);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
 
 .accommodation-recap-confirmation {
   display: flex;

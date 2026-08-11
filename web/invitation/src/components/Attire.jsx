@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { MEDIA } from "../media.js";
 import { useApp } from "../context/AppContext.jsx";
 import { DressCodePictograms } from "./DressCodePictograms.jsx";
+
 
 /* Palette icon for the dress-code FAB. Kept inline so it inherits currentColor
    and stays crisp at any size. */
@@ -169,19 +171,25 @@ export function Attire() {
         </div>
       )}
 
-      {/* Dress-code section FAB: a real floating action button, a direct child
-          of the section (like the other section FABs), fixed to the viewport
-          edge and contained within the 120rem column on wide screens. */}
-      <button
-        ref={fabRef}
-        className={`attire-picto-fab${attireActive && !pictoOpen ? " is-visible" : ""}`}
-        type="button"
-        aria-label={attire.dressCode.title}
-        aria-haspopup="dialog"
-        onClick={() => setPictoOpen(true)}
-      >
-        <PaletteIcon />
-      </button>
+      {/* Dress-code section FAB: a real floating action button, fixed to the
+          viewport edge and contained within the 120rem column on wide screens.
+          It is rendered through a portal to <body> so it escapes the section's
+          overflow:hidden and always floats over the viewport (a true FAB),
+          matching the other section FABs. */}
+      {createPortal(
+        <button
+          ref={fabRef}
+          className={`attire-picto-fab${attireActive && !pictoOpen ? " is-visible" : ""}`}
+          type="button"
+          aria-label={attire.dressCode.title}
+          aria-haspopup="dialog"
+          onClick={() => setPictoOpen(true)}
+        >
+          <PaletteIcon />
+        </button>,
+        document.body
+      )}
+
 
       {/* Dress-code pictogram modal */}
       {attire.dressCode && (

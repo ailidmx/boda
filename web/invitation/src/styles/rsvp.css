@@ -8,7 +8,15 @@
     padding: clamp(2rem, 6vw, 3rem);
     outline-offset: -0.4rem;
   }
+
+  /* On mobile the recap sits directly on the dark green frame, so drop the
+     card border and padding to avoid a nested "box in a box" look. */
+  .rsvp-recap {
+    border: 0;
+    padding: 0;
+  }
 }
+
 
 
 /* The RSVP section is a single container: the section itself is the dark
@@ -589,6 +597,28 @@
   width: 100%;
 }
 
+/* Secondary "Modify my answers" action on the recap step. It replaces the
+   generic "Back" button on the last step and jumps back to the first question
+   so the guest can review and change their answers. */
+.rsvp-scale-modify {
+  width: 100%;
+  padding: 0.6rem 1.25rem;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--white);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease;
+}
+
+.rsvp-scale-modify:hover {
+  transform: scale(1.02);
+  border-color: #e4b968;
+}
+
+
 
 /* ── Mobile scale legend modal + FAB ────────────────────────────────────
    On desktop the 5-level legend is shown inline. On mobile it is collapsed
@@ -686,8 +716,9 @@
     cursor: pointer;
   }
 
-  /* Circular, marigold-bordered FAB fixed to the bottom-right. Appears only
-     while the question is in view. */
+  /* Circular, golden FAB fixed to the bottom-right. Appears only while the
+     question is in view. It is portaled to <body> so `position: fixed` is
+     resolved against the viewport (not a transformed ancestor). */
   .rsvp-legend-fab {
     position: fixed;
     z-index: 130;
@@ -700,10 +731,9 @@
     padding: 0;
     border: 3px solid var(--marigold);
     border-radius: 50%;
-    background: var(--terracotta);
-    color: var(--white);
+    background: var(--marigold);
+    color: var(--deep-green);
     box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
-    font-size: 1.9rem;
     line-height: 1;
 
     opacity: 0;
@@ -712,12 +742,20 @@
     transition: opacity 180ms ease, transform 180ms ease;
   }
 
+  .rsvp-legend-fab-icon {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
   .rsvp-legend-fab.is-visible {
     opacity: 1;
     pointer-events: auto;
     transform: translateY(0) scale(1);
   }
 }
+
 
 /* ── RSVP progress checklist ────────────────────────────────────────────
    A compact checklist that shows which mini-RSVP flows (Te animas, Pétanque,

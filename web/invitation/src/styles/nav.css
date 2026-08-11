@@ -882,11 +882,16 @@
 
 /* ── "À propos" (About) modal ────────────────────────────────────────────
    Reuses the user-menu modal shell (overlay/card/close/title/buttons) and
-   adds a scrollable feature list fed by features.js. */
+   adds a scrollable feature list fed by features.js. The card clips its
+   content to the rounded border and every inner element is constrained to
+   the card's width so nothing overflows horizontally (no horizontal scroll).
+   Long text wraps at the container border instead of spilling out. */
 .about-modal__card {
   display: flex;
   flex-direction: column;
   max-height: min(86vh, 42rem);
+  min-width: 0;
+  overflow: hidden;
 }
 
 .about-modal__subtitle {
@@ -896,6 +901,7 @@
   font-size: 0.82rem;
   line-height: 1.45;
   text-align: center;
+  overflow-wrap: anywhere;
 }
 
 
@@ -903,15 +909,18 @@
   display: grid;
   gap: 0.55rem;
   margin: 0;
-  padding: 0.15rem 0.4rem 0.4rem 0;
+  padding: 0.15rem 0.4rem 0.4rem;
   overflow-y: auto;
+  overflow-x: hidden;
   list-style: none;
+  min-width: 0;
 }
 
 .about-modal__item {
   display: flex;
   align-items: flex-start;
   gap: 0.7rem;
+  min-width: 0;
   border: 1px solid rgb(255 255 255 / 10%);
   border-radius: 0.6rem;
   padding: 0.7rem 0.8rem;
@@ -930,6 +939,8 @@
   display: grid;
   gap: 0.15rem;
   min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .about-modal__feature-title {
@@ -937,13 +948,16 @@
   font-weight: 700;
   letter-spacing: 0.02em;
   color: var(--marigold);
+  overflow-wrap: anywhere;
 }
 
 .about-modal__feature-body {
   color: rgb(255 255 255 / 82%);
   font-size: 0.76rem;
   line-height: 1.4;
+  overflow-wrap: anywhere;
 }
+
 
 .about-modal__actions {
   display: flex;

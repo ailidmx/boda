@@ -425,6 +425,22 @@
     font-size: clamp(0.75rem, 2.6vw, 0.9rem);
   }
 
+  /* The first meteo card (the temperature) carries the longest value and
+     label, so on mobile its title and content are reduced to keep the card
+     compact and avoid overflow in the 2×2 grid. */
+  .weather-fact:first-child strong {
+    font-size: clamp(1.15rem, 4.5vw, 1.6rem);
+  }
+
+  .weather-fact:first-child span {
+    font-size: clamp(0.72rem, 2.6vw, 0.88rem);
+  }
+
+  .weather-fact:first-child small {
+    font-size: clamp(0.65rem, 2.2vw, 0.78rem);
+  }
+
+
 
   /* ── Slideset (facts + moments) ──
      The facts and the moments become two slides of a compact carousel so the

@@ -756,9 +756,23 @@
     font-size: clamp(1.5rem, 6vw, 2rem);
   }
 
+  /* On mobile the timeline rows give the time and the content the same
+     width (1fr 1fr) so the columns align cleanly. The time gets a min-width
+     so short times don't collapse and the two columns stay balanced. */
+  .day-program-timeline li {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .day-program-timeline time {
+    min-width: 0;
+    justify-content: flex-start;
+  }
+
   .weekend-program .weekend-nav {
     flex: 0 0 auto;
   }
+
 
   .weekend-program .weekend-nav {
     margin-top: 0.75rem;

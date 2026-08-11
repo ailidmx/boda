@@ -91,7 +91,7 @@ export function TeAnimas() {
     {
       id: "resumen",
       label: rsvp.recap?.title || "Resumen",
-      render: () => (
+      render: ({ goToStart }) => (
         <div className="rsvp-recap-step">
           <RsvpRecap questions={questions} guests={guests} answers={answers} />
           <div className="rsvp-scale-save">
@@ -107,11 +107,20 @@ export function TeAnimas() {
             {saveStatusText ? (
               <small data-form-status>{saveStatusText}</small>
             ) : null}
+
+            <button
+              className="rsvp-scale-modify"
+              type="button"
+              onClick={goToStart}
+            >
+              {rsvp.recap?.modifyButton || "Modifier mes réponses"}
+            </button>
           </div>
         </div>
       ),
     },
   ];
+
 
   // Auto-detect the starting step: the first question that is not fully
   // answered by every group member, or the recap when everything is answered.
@@ -128,12 +137,14 @@ export function TeAnimas() {
           steps={steps}
           initialIndex={initialStep}
           onDone={() => markResume(flow)}
+          hideBackOnLast
           copy={{
             step: interfaceText.stepLabel || "Step",
             next: interfaceText.next || "Next",
             back: interfaceText.back || "Back",
           }}
         />
+
       )}
 
 
