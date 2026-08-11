@@ -2481,8 +2481,9 @@ export const content = {
     },
     attire: {
 
-      eyebrow: "Code vestimentaire",
+      eyebrow: "Thématique",
       title: "Esthétique mexicaine",
+
       body:
         "Nous avons choisi une esthétique mexicaine pour notre cérémonie en hommage à la culture, la cuisine, la musique et le lieu qui nous réunit. Nous voulons que tout soit festif, coloré et profondément mexicain.",
       dressCode: {
