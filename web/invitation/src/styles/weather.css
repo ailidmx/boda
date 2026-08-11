@@ -297,7 +297,11 @@
 /* ── Slideset (facts + moments) ─────────────────────────────────────────
    On desktop the slideset is a plain block: both slides render in their
    usual layout and the navigation is hidden. On mobile the two slides
-   become a compact 2-slide carousel. */
+   become a compact 2-slide carousel with big side arrows and swipe. */
+.weather-slideset {
+  position: relative;
+}
+
 .weather-slideset__track {
   display: block;
 }
@@ -306,7 +310,7 @@
   display: block;
 }
 
-.weather-slideset__nav {
+.weather-slideset__arrow {
   display: none;
 }
 
@@ -473,76 +477,48 @@
     }
   }
 
-  .weather-slideset__nav {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 1.25rem;
-    margin-top: 1.25rem;
-  }
-
+  /* Big side arrows, vertically centred on the left/right edges of the
+     slideset. They float over the section background (the dark sage band)
+     so they read clearly against it. */
   .weather-slideset__arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
     display: grid;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 3.25rem;
+    height: 3.25rem;
     place-items: center;
-    border: 1px solid rgb(255 255 255 / 40%);
+    padding: 0;
+    border: 2px solid rgb(255 253 248 / 55%);
     border-radius: 50%;
-    background: transparent;
+    background: rgb(36 33 25 / 28%);
     color: var(--white);
-    font-size: 1.1rem;
+    font-size: 1.6rem;
     line-height: 1;
     cursor: pointer;
-    transition: background 0.2s ease, border-color 0.2s ease;
+    transform: translateY(-50%);
+    transition: background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+  }
+
+  .weather-slideset__arrow--prev {
+    left: 0.25rem;
+  }
+
+  .weather-slideset__arrow--next {
+    right: 0.25rem;
   }
 
   .weather-slideset__arrow:disabled {
-    opacity: 0.35;
+    opacity: 0.3;
     cursor: default;
   }
 
   .weather-slideset__arrow:not(:disabled):hover {
-    background: rgb(255 255 255 / 12%);
-    border-color: rgb(255 255 255 / 70%);
+    background: rgb(255 253 248 / 18%);
+    border-color: rgb(255 253 248 / 85%);
   }
 
   .weather-slideset__arrow:focus-visible {
-    outline: 2px solid var(--marigold);
-    outline-offset: 2px;
-  }
-
-  .weather-slideset__dots {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .weather-slideset__dot {
-    display: grid;
-    width: 1.5rem;
-    height: 1.5rem;
-    place-items: center;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    cursor: pointer;
-  }
-
-  .weather-slideset__dot span {
-    display: block;
-    width: 0.5rem;
-    height: 0.5rem;
-    border-radius: 50%;
-    background: rgb(255 255 255 / 40%);
-    transition: background 0.2s ease, transform 0.2s ease;
-  }
-
-  .weather-slideset__dot.is-active span {
-    background: var(--marigold);
-    transform: scale(1.25);
-  }
-
-  .weather-slideset__dot:focus-visible {
     outline: 2px solid var(--marigold);
     outline-offset: 2px;
   }
