@@ -40,8 +40,11 @@ export function Attire() {
 
       <p className="eyebrow attire-eyebrow">{attire.eyebrow}</p>
 
-      {/* Row 1: photos (1/3) + citation (2/3) */}
+      {/* Vertical stack: title, Oaxaca montage, citation. On desktop the
+          title + citation share the right column while the Oaxaca montage
+          fills the left column; on mobile everything stacks. */}
       <div className="attire-grid">
+        <h2 className="attire-title reveal">{attire.title}</h2>
         <div className="oaxaca-grid" aria-label={attire.eyebrow}>
           {MEDIA.oaxaca.map((src, i) => (
             <img
@@ -56,7 +59,6 @@ export function Attire() {
           ))}
         </div>
         <div className="attire-copy reveal">
-          <h2>{attire.title}</h2>
           <p className="attire-citation">{attire.body}</p>
           <p className="note">{attire.guestNote}</p>
         </div>

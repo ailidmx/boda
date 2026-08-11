@@ -218,6 +218,9 @@
   }
 }
 
+/* The tematica grid: two columns on desktop. The title + citation share the
+   right column while the Oaxaca montage fills the left column. On mobile the
+   whole thing stacks vertically (see the mobile block below). */
 .attire-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -225,7 +228,18 @@
   align-items: center;
 }
 
+/* Title sits at the top of the right column. */
+.attire-title {
+  grid-column: 2;
+  grid-row: 1;
+  margin: 0 0 2rem;
+}
+
+/* Oaxaca montage fills the left column, spanning both rows so it stays
+   vertically centred next to the title + citation. */
 .oaxaca-grid {
+  grid-column: 1;
+  grid-row: 1 / span 2;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0.5rem;
@@ -234,6 +248,12 @@
   margin-inline: auto;
   background: rgb(255 255 255 / 10%);
   border: 0.5rem solid rgb(255 255 255 / 10%);
+}
+
+/* Citation sits below the title in the right column. */
+.attire-copy {
+  grid-column: 2;
+  grid-row: 2;
 }
 
 .oaxaca-tile {
@@ -253,7 +273,7 @@
 
 /* Wixárika (Huichol) photo montage — a full-width strip below the Oaxaca
    montage, reusing the same tile treatment. Four tiles in a row on desktop,
-   collapsing to a 2×2 grid on mobile. */
+   collapsing to a single row of four on mobile. */
 .wixarica-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -263,11 +283,6 @@
   margin: clamp(2.5rem, 6vw, 4rem) auto 0;
   background: rgb(255 255 255 / 10%);
   border: 0.5rem solid rgb(255 255 255 / 10%);
-}
-
-
-.attire-copy h2 {
-  margin-bottom: 2rem;
 }
 
 /* Citation-style lead: large quote mark + left border, echoing the venue's
@@ -548,17 +563,35 @@
     margin-bottom: 1rem;
   }
 
-  /* On mobile the images sit on the left (1/3) and the citation on the
-     right (2/3), so the section stays compact instead of stacking. */
+  /* On mobile the tematica section stacks vertically in this order:
+     eyebrow → title → Oaxaca banner → citation → Huichol banner. */
   .attire-grid {
-    grid-template-columns: 1fr 2fr;
-    gap: 1rem;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
     align-items: start;
   }
 
-  .attire-copy h2 {
-    margin-bottom: 1rem;
+  .attire-title {
+    grid-column: 1;
+    grid-row: 1;
+    margin-bottom: 0.5rem;
     font-size: clamp(1.35rem, 5.2vw, 1.65rem);
+  }
+
+  .oaxaca-grid {
+    grid-column: 1;
+    grid-row: 2;
+    /* A single full-width row of four cards (banner). */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.35rem;
+    padding: 0.4rem;
+    border-width: 0.4rem;
+    max-width: none;
+  }
+
+  .attire-copy {
+    grid-column: 1;
+    grid-row: 3;
   }
 
   .attire-citation {
@@ -624,24 +657,13 @@
     display: none;
   }
 
-
-  /* The images now live in a narrow 1/3 column, so the four tiles sit in a
-     2×2 grid to stay legible. */
-  .oaxaca-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.35rem;
-    padding: 0.4rem;
-    border-width: 0.4rem;
-  }
-
   /* The Wixárika montage is a full-width strip, so on mobile the four tiles
-     collapse to a 2×2 grid to stay legible. */
+     stay in a single row of four (banner). */
   .wixarica-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 0.35rem;
     padding: 0.4rem;
     border-width: 0.4rem;
     margin-top: 1.5rem;
   }
 }
-
