@@ -9,13 +9,6 @@
     outline-offset: -0.4rem;
   }
 
-  /* On mobile the recap sits directly on the dark green frame, so drop the
-     card border and padding to avoid a nested "box in a box" look. */
-  .rsvp-recap {
-    border: 0;
-    padding: 0;
-  }
-
   /* Compact the 0–5 scale buttons on mobile so the per-guest rows stay snug
      and the selector doesn't overflow on narrow screens. */
   .rsvp-question-guest .rsvp-scale-btn {
@@ -24,6 +17,7 @@
     font-size: 0.9rem;
   }
 }
+
 
 
 
@@ -367,7 +361,18 @@
   text-align: left;
 }
 
+/* On mobile the recap sits directly on the dark green frame, so drop the
+   card border and padding to avoid a nested "box in a box" look. This rule
+   must come AFTER the base .rsvp-recap rule so it wins the cascade. */
+@media (max-width: 600px) {
+  .rsvp-recap {
+    border: 0;
+    padding: 0;
+  }
+}
+
 .rsvp-recap-head {
+
   display: flex;
   align-items: baseline;
   justify-content: space-between;
