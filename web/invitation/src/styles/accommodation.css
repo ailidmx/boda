@@ -21,6 +21,7 @@
 
 .accommodation-copy {
   position: relative;
+  min-width: 0;
 }
 
 .accommodation-copy h2 {
@@ -312,6 +313,7 @@
 
 
 .accommodation-form-wrap {
+  min-width: 0;
   padding: clamp(2rem, 4vw, 4rem);
   border: 1px solid rgb(36 33 25 / 12%);
   background: rgb(255 253 248 / 72%);
@@ -1487,9 +1489,12 @@
 
 /* The recap is rendered once, in its own full-width space below the
    two-column grid (copy + form-wrap), so it always sits below the
-   accommodation options on every breakpoint. */
+   accommodation options on every breakpoint. `min-width: 0` lets the grid
+   item shrink within its track so long nowrap content (e.g. the per-person
+   price) can't push it past the container edge. */
 .accommodation-recap--inline {
   grid-column: 1 / -1;
+  min-width: 0;
   margin: 0;
   padding: clamp(2.5rem, 8vw, 4rem) clamp(1.25rem, 6vw, 2rem);
   border-top: 1px solid rgb(36 33 25 / 18%);
@@ -1885,5 +1890,13 @@
 
   .accommodation-recap-toggle .rsvp-boolean-btn {
     flex: 1 1 0;
+  }
+
+  /* Let the nowrap per-person price wrap on narrow screens so it can't push
+     past the container edge. */
+  .accommodation-recap-price-value,
+  .accommodation-recap-summary-price {
+    flex-wrap: wrap;
+    white-space: normal;
   }
 }
