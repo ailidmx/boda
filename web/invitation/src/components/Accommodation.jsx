@@ -994,6 +994,14 @@ export function Accommodation() {
 
       </div>
 
+      {/* Accommodation recap: rendered in its own full-width space below the
+          two-column grid (copy + form-wrap), so it always sits below the
+          accommodation options on every breakpoint. */}
+      {recap.title && groupMembers.length > 0 && (
+        <div className="accommodation-recap accommodation-recap--inline">
+          {recapContent}
+        </div>
+      )}
 
       {/* Desktop-only bottom nav linking to the next section (Pétanque). */}
       <nav className="section-nav accommodation-section-nav" aria-label="Continue">
@@ -1002,15 +1010,6 @@ export function Accommodation() {
           <span aria-hidden="true">↓</span>
         </a>
       </nav>
-
-      {/* Accommodation recap: rendered in its own space at the bottom of the
-          section, outside the form-wrap, so it always sits below the
-          accommodation options. */}
-      {recap.title && groupMembers.length > 0 && (
-        <div className="accommodation-recap accommodation-recap--inline">
-          {recapContent}
-        </div>
-      )}
     </section>
   );
 }

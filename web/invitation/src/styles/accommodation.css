@@ -1171,17 +1171,18 @@
 }
 
 /* Desktop-only bottom nav linking to the next section (Food / "A TABLE").
-   The section is a 2-column grid, so the nav spans both columns and sits in
-   its own bottom row. Hidden on mobile, where the stacked panels already
-   provide their own sub-navigation. */
+   The section is a 2-column grid: row 1 holds the copy + form-wrap, row 2
+   holds the full-width recap, and row 3 holds the nav spanning both columns.
+   Hidden on mobile, where the stacked panels already provide their own
+   sub-navigation. */
 @media (min-width: 900px) {
   .accommodation-section {
-    grid-template-rows: 1fr auto;
+    grid-template-rows: 1fr auto auto;
   }
 
   .accommodation-section-nav {
     grid-column: 1 / -1;
-    grid-row: 2;
+    grid-row: 3;
     align-self: end;
     margin-top: 0;
   }
@@ -1484,10 +1485,11 @@
   border-top: 1px solid rgb(36 33 25 / 18%);
 }
 
-/* The recap is rendered once, in its own space at the bottom of the
-   accommodation section (outside the form-wrap), so it always sits below the
+/* The recap is rendered once, in its own full-width space below the
+   two-column grid (copy + form-wrap), so it always sits below the
    accommodation options on every breakpoint. */
 .accommodation-recap--inline {
+  grid-column: 1 / -1;
   margin: 0;
   padding: clamp(2.5rem, 8vw, 4rem) clamp(1.25rem, 6vw, 2rem);
   border-top: 1px solid rgb(36 33 25 / 18%);
