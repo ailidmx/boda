@@ -27,7 +27,6 @@ import {
   AUTH_EMAIL_DOMAIN,
   getActiveGuests,
   getGuest,
-  getGuestByUsername,
 } from "../guests.js";
 
 import {
@@ -326,17 +325,11 @@ export function AppProvider({ children }) {
       .toLowerCase();
     // The identifier is always an email. If it already contains an "@", treat
     // it as a full email (e.g. david.aili.mx@gmail.com). Otherwise it's a bare
-    // username: look up the guest's real Firebase auth email first (some
-    // guests use their personal Gmail as the auth email, e.g. David's
-    // david.aili.mx@gmail.com), and only fall back to the default auth domain
-    // if no guest matches the username.
-    let email;
-    if (normalized.includes("@")) {
-      email = normalized;
-    } else {
-      const guest = getGuestByUsername(normalized);
-      email = guest?.firebaseEmail || `${normalized}@${AUTH_EMAIL_DOMAIN}`;
-    }
+    // username: silently append the default auth domain so we always attempt a
+    // normal Firebase Auth email/password login.
+    const email = normalized.includes("@")
+      ? normalized
+      : `${normalized}@${AUTH_EMAIL_DOMAIN}`;
 
     // Validate against Firebase Auth's schema BEFORE hitting the network so we
     // fail fast with a clear reason instead of a cryptic 400.

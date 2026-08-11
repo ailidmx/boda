@@ -1,15 +1,15 @@
 /**
  * Guest profile helpers.
  *
- * The Google Sheet (via the generated `guests.js` registry) is the source of
- * truth for identity (names, avatar `cloudinaryId`, group, cabin). The
- * `guests` Firestore collection is the source of truth for live, user-editable
- * data: contact details (phone) and the identity-check acknowledgement
- * (`idCheckUser`). Email is intentionally NOT stored in Firestore; it is only
- * used transiently for authentication (see `resolveGuestEmail`).
+ * The `guests` Firestore collection is the source of truth for guest records:
+ * identity (names, avatar `cloudinaryId`, group, cabin refs) and live,
+ * user-editable data (contact details, identity-check acknowledgement). There
+ * is no static guest registry anymore — the in-memory `guestsCache` below is
+ * populated from Firestore by `loadGuestProfiles()` / `loadAllGuests()` and is
+ * what the guest registry (`guests.js`) reads.
  *
- * The legacy `guest_profiles` collection has been removed. All guest data now
- * flows from the sheet → `guests.js` (static) + `guests` (Firestore).
+ * Email is intentionally NOT stored in Firestore; it is only used transiently
+ * for authentication (see `resolveGuestEmail`).
  *
  * Firestore rules allow any authenticated guest to update the contact details
  * (phone) and the identity-check flag of themselves and of the other
