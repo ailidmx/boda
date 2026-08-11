@@ -18,12 +18,13 @@
 
   /* Compact the 0–5 scale buttons on mobile so the per-guest rows stay snug
      and the selector doesn't overflow on narrow screens. */
-  .rsvp-scale-btn {
+  .rsvp-question-guest .rsvp-scale-btn {
     width: 2.0rem;
     height: 2.0rem;
     font-size: 0.9rem;
   }
 }
+
 
 
 
