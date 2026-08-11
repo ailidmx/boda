@@ -267,7 +267,11 @@
 .rsvp-guest-name {
   font-weight: 600;
   color: var(--white);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
 
 /* 0–5 selector */
 .rsvp-scale-selector {
