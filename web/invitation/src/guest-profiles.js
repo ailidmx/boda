@@ -73,6 +73,32 @@ function notifyGuestsCacheChanged() {
   });
 }
 
+/**
+ * Read-only access to the live Firestore `guests` cache. Returns a snapshot
+ * array of the normalized guest records currently loaded (keyed by guest id).
+ *
+ * This lets the guest registry (`guests.js`) source its data from Firestore
+ * (the source of truth) instead of the static sheet snapshot, so the
+ * guest-facing lists (THANKS, GUEST CLOUD, group members, etc.) reflect live
+ * names, photos, and hosting data.
+ *
+ * @returns {Object[]}
+ */
+export function getGuestsCache() {
+  return Array.from(guestsCache.values());
+}
+
+/**
+ * Read a single normalized guest record from the live Firestore cache.
+ * @param {string} guestId
+ * @returns {Object|undefined}
+ */
+export function getGuestRecord(guestId) {
+  if (!guestId) return undefined;
+  return guestsCache.get(guestId);
+}
+
+
 function logDb(event, detail) {
   console.log(`[db][guest-profiles][${event}]`, detail);
 }
