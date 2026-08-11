@@ -178,5 +178,17 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   Cloudinary assets into `boda/cabin/<slug>/` (via `uploader.rename`) and store
   the relative IDs. See `scripts/update-casona-lavanda-photos.mjs` for a
   working example (it also shows how to split a batch of uploads by timestamp).
+- **Guest data sourcing** — `web/invitation/src/guests.js` is the guest
+  registry. `getActiveGuests()` and `getGuest()` prefer the LIVE Firestore
+  `guests` cache (loaded via `loadAllGuests()`/`loadGuestProfiles()` in
+  `guest-profiles.js`), falling back to the static sheet snapshot
+  (`web/shared/guests.js`) for pre-auth lookups (login via
+  `getGuestByUsername`/`getGuestByEmail`, and invitation-link resolution via
+  `getGuest`) and for guests not yet loaded. The default export of `guests.js`
+  is intentionally the static array (used by the invitation-profile test);
+  app components should use the named helpers. When adding a new guest-facing
+  list, read through `getActiveGuests()` + `resolveGuestName`/`resolveGuestPhoto`
+  so it reflects live data, not the static snapshot.
 - *(Add new lessons here as you discover them.)*
+
 
