@@ -2207,7 +2207,8 @@ export const content = {
         roomCapacityLabel: "Capacité de la chambre",
         cabinPriceLabel: "Prix du gîte",
         personPriceLabel: "Participation aux frais par personne",
-        groupPriceLabel: "Participation aux frais par le groupe",
+        groupPriceLabel: "Participation aux frais pour l'ensemble du groupe",
+
         coveredPriceLabel: "Pris en charge par les mariés",
 
         peopleLabel: "personnes",

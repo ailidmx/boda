@@ -980,18 +980,8 @@ export function Accommodation() {
             {recapContent}
           </div>
         )}
-
-
-
-        <nav className="accommodation-subnav accommodation-subnav--back" aria-label={option.backLabel}>
-
-
-          <a href="#accommodation-overview">
-            <span aria-hidden="true">↑</span>
-            <span>{option.backLabel}</span>
-          </a>
-        </nav>
       </div>
+
 
       {/* Desktop-only bottom nav linking to the next section (Pétanque). */}
       <nav className="section-nav accommodation-section-nav" aria-label="Continue">
