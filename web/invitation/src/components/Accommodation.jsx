@@ -992,11 +992,6 @@ export function Accommodation() {
           </section>
         )}
 
-        {recap.title && groupMembers.length > 0 && (
-          <div className="accommodation-recap accommodation-recap--inline">
-            {recapContent}
-          </div>
-        )}
       </div>
 
 
@@ -1008,11 +1003,11 @@ export function Accommodation() {
         </a>
       </nav>
 
-      {/* Mobile-only recap: rendered as the last element of the accommodation
-          section so it sits below the form-wrap on small screens. Hidden on
-          desktop (the inline copy inside the form-wrap is shown instead). */}
+      {/* Accommodation recap: rendered in its own space at the bottom of the
+          section, outside the form-wrap, so it always sits below the
+          accommodation options. */}
       {recap.title && groupMembers.length > 0 && (
-        <div className="accommodation-recap accommodation-recap--section">
+        <div className="accommodation-recap accommodation-recap--inline">
           {recapContent}
         </div>
       )}
