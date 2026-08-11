@@ -192,11 +192,15 @@ export function Petanque() {
           ))}
         </div>
 
-        {/* Mini RSVP question section: friendly Friday pétanque tournament.
-            Presented as flipable step cards: Step 1 = participation, Step 2 =
-            own boules (only if someone said yes), Step 3 = resumen. */}
-        {rsvpMini.title && guests.length > 0 && visibleQuestions.length > 0 && (
-          <div className="petanque-rsvp-mini">
+      </div>
+
+      {/* Mini RSVP question section: friendly Friday pétanque tournament.
+          Presented as flipable step cards: Step 1 = participation, Step 2 =
+          own boules (only if someone said yes), Step 3 = resumen. Rendered as
+          a direct child of the section so it spans the full section width
+          instead of being constrained by the centered copy column. */}
+      {rsvpMini.title && guests.length > 0 && visibleQuestions.length > 0 && (
+        <div className="petanque-rsvp-mini">
             <div className="petanque-rsvp-mini-head">
               <p className="eyebrow">{rsvpMini.eyebrow}</p>
               <h3>{rsvpMini.title}</h3>
@@ -333,11 +337,8 @@ export function Petanque() {
             />
 
 
-          </div>
-        )}
-
-      </div>
-
+        </div>
+      )}
 
       {/* Desktop-only bottom nav: leads to the food section. */}
       <nav className="petanque-nav" aria-label="Continue">
