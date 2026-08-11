@@ -70,13 +70,13 @@ export function TeAnimas() {
     }
   };
 
-  // "Modifier mes réponses" jumps back to the first question; scroll the RSVP
-  // back into view so the guest lands at the top of the flow instead of being
-  // left mid-page.
-  const handleModify = (goToStart) => {
-    goToStart();
+  // Scroll the RSVP back into view on every step change (next/back/modify) so
+  // the guest always lands at the top of the flow instead of being left
+  // mid-page.
+  const handleNavigate = () => {
     sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
+
 
   const saveStatusText =
     saveStatus === "working"
@@ -95,7 +95,7 @@ export function TeAnimas() {
       return {
         id: q.id,
         label: q.title,
-        render: ({ next }) => (
+        render: () => (
           <div className="rsvp-recap-step">
             <RsvpQuestion
               questionId={q.id}
@@ -106,26 +106,12 @@ export function TeAnimas() {
               onChange={(guestId, level) => handleAnswerChange(q.id, guestId, level)}
             />
 
-            {isLastQuestion && (
-              <div className="rsvp-scale-save">
-                <button
-                  className="button button--gold"
-                  type="button"
-                  onClick={async () => {
-                    const ok = await handleSaveAnswers();
-                    if (ok) next();
-                  }}
-                  disabled={saveStatus === "working"}
-                >
-                  {scale.saveButton}
-                </button>
-
-                {saveStatus === "error" ? (
-                  <small data-form-status>{saveStatusText}</small>
-                ) : null}
-              </div>
-            )}
-
+            {/* The success/error confirmation appears right here on the last
+                question step after "Enregistrer mes réponses" is pressed. */}
+            {isLastQuestion &&
+            (saveStatus === "saved" || saveStatus === "error") ? (
+              <small data-form-status>{saveStatusText}</small>
+            ) : null}
           </div>
         ),
       };
@@ -137,7 +123,7 @@ export function TeAnimas() {
         <div className="rsvp-recap-step">
           <RsvpRecap questions={questions} guests={guests} answers={answers} />
 
-          {saveStatusText ? (
+          {saveStatus === "saved" || saveStatus === "error" ? (
             <small data-form-status>{saveStatusText}</small>
           ) : null}
 
@@ -145,15 +131,17 @@ export function TeAnimas() {
             <button
               className="rsvp-scale-modify"
               type="button"
-              onClick={() => handleModify(goToStart)}
+              onClick={goToStart}
             >
               {rsvp.recap?.modifyButton || "Modifier mes réponses"}
             </button>
           </div>
         </div>
       ),
+
     },
   ];
+
 
 
 
@@ -174,12 +162,37 @@ export function TeAnimas() {
           onDone={() => markResume(flow)}
           hideBackOnLast
           hideNextOn={[lastQuestionIndex]}
+          countSteps={questions.length}
+          onNavigate={handleNavigate}
+          navRight={({ index, next }) => {
+            // On the last question step, replace the "Next" button with the
+            // gold "Enregistrer mes réponses" CTA, on the same line as Back.
+            if (index !== lastQuestionIndex) return null;
+            return (
+              <button
+                className="flip-step-btn flip-step-btn--primary"
+                type="button"
+                onClick={async () => {
+                  const ok = await handleSaveAnswers();
+                  if (ok) {
+                    // Let the success message show on this step before
+                    // advancing to the review.
+                    window.setTimeout(() => next(), 900);
+                  }
+                }}
+                disabled={saveStatus === "working"}
+              >
+                {scale.saveButton}
+              </button>
+            );
+          }}
           copy={{
             step: interfaceText.stepLabel || "Step",
             next: interfaceText.next || "Next",
             back: interfaceText.back || "Back",
           }}
         />
+
 
       )}
 

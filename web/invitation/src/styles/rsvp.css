@@ -577,6 +577,15 @@
   font-size: clamp(1.1rem, 2vw, 1.5rem);
 }
 
+/* On mobile the step label is redundant with the "Étape X / Y" counter, so
+   hide it to keep the step header compact. */
+@media (max-width: 600px) {
+  .flip-step-label {
+    display: none;
+  }
+}
+
+
 .flip-step-body {
   position: relative;
   perspective: 1200px;
