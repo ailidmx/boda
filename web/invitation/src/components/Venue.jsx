@@ -275,6 +275,36 @@ function FacilitySlideset({ items, playbackPaused = false }) {
   }
   const count = pages.length;
 
+  // Touch swipe support: track the horizontal drag so a swipe advances or
+  // retreats the active page (mirrors the prev/next arrows). A `swiped` flag
+  // suppresses the card's click (which opens the lightbox) right after a
+  // swipe, so a swipe never accidentally opens a photo.
+  const touchStartX = useRef(null);
+  const swiped = useRef(false);
+  const onTouchStart = (event) => {
+    touchStartX.current = event.touches[0].clientX;
+  };
+  const onTouchEnd = (event) => {
+    if (touchStartX.current === null) return;
+    const deltaX = event.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(deltaX) < 40) return;
+    swiped.current = true;
+    if (deltaX < 0) {
+      setActive((a) => (a + 1) % count);
+    } else {
+      setActive((a) => (a - 1 + count) % count);
+    }
+  };
+  const onTrackClick = (event) => {
+    if (!swiped.current) return;
+    swiped.current = false;
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
+
+
   useEffect(() => {
     const media = window.matchMedia("(max-width: 899px)");
     const update = () => setMobile(media.matches);
@@ -300,7 +330,13 @@ function FacilitySlideset({ items, playbackPaused = false }) {
 
   return (
     <div className="facility-slideset">
-      <div className="facility-slideset__track">
+      <div
+        className="facility-slideset__track"
+        onTouchStart={onTouchStart}
+        onTouchEnd={onTouchEnd}
+        onClick={onTrackClick}
+      >
+
         {pages.map((page, i) => (
           <div
             key={i}
@@ -311,6 +347,7 @@ function FacilitySlideset({ items, playbackPaused = false }) {
           </div>
         ))}
       </div>
+
       <div className="facility-slideset__nav">
         <button
           type="button"
