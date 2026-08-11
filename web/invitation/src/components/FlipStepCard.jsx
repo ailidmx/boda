@@ -21,8 +21,12 @@ import React, { useEffect, useRef, useState } from "react";
  *   hideBackOnLast  optional boolean. When true, the "Back" button is hidden
  *                 on the last step (e.g. a read-only recap that only offers a
  *                 "Modify my answers" action inside its own content).
+ *   hideNextOn    optional array of step indices where the "Next" button is
+ *                 hidden. Used when a step provides its own primary action to
+ *                 advance (e.g. a "Save" button on the last question step).
  */
-export function FlipStepCard({ steps = [], onDone, copy = {}, initialIndex = 0, hideBackOnLast = false }) {
+export function FlipStepCard({ steps = [], onDone, copy = {}, initialIndex = 0, hideBackOnLast = false, hideNextOn = [] }) {
+
   const [index, setIndex] = useState(initialIndex);
   const [flipping, setFlipping] = useState(false);
   const [flipDir, setFlipDir] = useState(1);
@@ -96,7 +100,7 @@ export function FlipStepCard({ steps = [], onDone, copy = {}, initialIndex = 0, 
             {copy.back || "← Back"}
           </button>
         )}
-        {!isLast && (
+        {!isLast && !hideNextOn.includes(index) && (
           <button
             type="button"
             className="flip-step-btn flip-step-btn--primary"
@@ -106,6 +110,7 @@ export function FlipStepCard({ steps = [], onDone, copy = {}, initialIndex = 0, 
             {copy.next || "Next →"}
           </button>
         )}
+
       </div>
     </div>
   );

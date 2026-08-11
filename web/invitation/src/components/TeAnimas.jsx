@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
+
 import { useApp } from "../context/AppContext.jsx";
 import { useRsvp, RSVP_FLOWS } from "../context/RsvpContext.jsx";
 import { RsvpQuestion } from "./RsvpQuestion.jsx";
@@ -45,23 +46,36 @@ export function TeAnimas() {
   );
 
   const [saveStatus, setSaveStatus] = useState("idle");
+  const sectionRef = useRef(null);
 
   const handleAnswerChange = (questionId, guestId, level) => {
     setAnswer(questionId, guestId, level);
   };
 
+  // Persist the scale answers. Returns true on success so the caller can
+  // advance to the review step, false on failure (the error stays visible).
   const handleSaveAnswers = async () => {
-    if (saveStatus === "working") return;
+    if (saveStatus === "working") return false;
     const editorGuestId = profile?.guest?.id;
-    if (!editorGuestId) return;
+    if (!editorGuestId) return false;
     setSaveStatus("working");
     try {
       await saveFlow({ flow, questions, guests, editorGuestId });
       setSaveStatus("saved");
+      return true;
     } catch (error) {
       console.warn("[te-animas] scale save failed", error.code || error.message);
       setSaveStatus("error");
+      return false;
     }
+  };
+
+  // "Modifier mes réponses" jumps back to the first question; scroll the RSVP
+  // back into view so the guest lands at the top of the flow instead of being
+  // left mid-page.
+  const handleModify = (goToStart) => {
+    goToStart();
+    sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   const saveStatusText =
@@ -73,45 +87,65 @@ export function TeAnimas() {
           ? interfaceText.submitError
           : "";
 
+  const lastQuestionIndex = questions.length - 1;
+
   const steps = [
-    ...questions.map((q) => ({
-      id: q.id,
-      label: q.title,
-      render: () => (
-        <RsvpQuestion
-          questionId={q.id}
-          title={q.title}
-          subtitle={q.subtitle}
-          guests={guests}
-          answers={answers[q.id] || {}}
-          onChange={(guestId, level) => handleAnswerChange(q.id, guestId, level)}
-        />
-      ),
-    })),
+    ...questions.map((q, i) => {
+      const isLastQuestion = i === lastQuestionIndex;
+      return {
+        id: q.id,
+        label: q.title,
+        render: ({ next }) => (
+          <div className="rsvp-recap-step">
+            <RsvpQuestion
+              questionId={q.id}
+              title={q.title}
+              subtitle={q.subtitle}
+              guests={guests}
+              answers={answers[q.id] || {}}
+              onChange={(guestId, level) => handleAnswerChange(q.id, guestId, level)}
+            />
+
+            {isLastQuestion && (
+              <div className="rsvp-scale-save">
+                <button
+                  className="button button--gold"
+                  type="button"
+                  onClick={async () => {
+                    const ok = await handleSaveAnswers();
+                    if (ok) next();
+                  }}
+                  disabled={saveStatus === "working"}
+                >
+                  {scale.saveButton}
+                </button>
+
+                {saveStatus === "error" ? (
+                  <small data-form-status>{saveStatusText}</small>
+                ) : null}
+              </div>
+            )}
+
+          </div>
+        ),
+      };
+    }),
     {
       id: "resumen",
       label: rsvp.recap?.title || "Resumen",
       render: ({ goToStart }) => (
         <div className="rsvp-recap-step">
           <RsvpRecap questions={questions} guests={guests} answers={answers} />
+
+          {saveStatusText ? (
+            <small data-form-status>{saveStatusText}</small>
+          ) : null}
+
           <div className="rsvp-scale-save">
-            <button
-              className="button button--gold"
-              type="button"
-              onClick={handleSaveAnswers}
-              disabled={saveStatus === "working"}
-            >
-              {scale.saveButton}
-            </button>
-
-            {saveStatusText ? (
-              <small data-form-status>{saveStatusText}</small>
-            ) : null}
-
             <button
               className="rsvp-scale-modify"
               type="button"
-              onClick={goToStart}
+              onClick={() => handleModify(goToStart)}
             >
               {rsvp.recap?.modifyButton || "Modifier mes réponses"}
             </button>
@@ -122,13 +156,14 @@ export function TeAnimas() {
   ];
 
 
+
   // Auto-detect the starting step: the first question that is not fully
   // answered by every group member, or the recap when everything is answered.
   const initialStep = computeInitialStepIndex(questions, guests, answers);
 
 
   return (
-    <section className="rsvp-section section story-bg reveal">
+    <section ref={sectionRef} className="rsvp-section section story-bg reveal">
       <p className="eyebrow">{t.nav.teAnimas}</p>
       <p>{scale.intro}</p>
 
@@ -138,6 +173,7 @@ export function TeAnimas() {
           initialIndex={initialStep}
           onDone={() => markResume(flow)}
           hideBackOnLast
+          hideNextOn={[lastQuestionIndex]}
           copy={{
             step: interfaceText.stepLabel || "Step",
             next: interfaceText.next || "Next",
@@ -146,6 +182,7 @@ export function TeAnimas() {
         />
 
       )}
+
 
 
       <nav className="te-animas-nav" aria-label="Continue">
