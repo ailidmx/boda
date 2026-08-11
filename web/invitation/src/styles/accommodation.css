@@ -1879,6 +1879,12 @@
 
 @media (max-width: 899px) {
 
+  /* On mobile the section already provides its own horizontal padding, so
+     trim the recap's side padding to give the child rows more width. */
+  .accommodation-recap--inline {
+    padding-inline: clamp(0.5rem, 2vw, 1rem);
+  }
+
   .accommodation-recap-row {
     align-items: flex-start;
     flex-direction: column;
