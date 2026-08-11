@@ -256,6 +256,16 @@
   line-height: 1;
 }
 
+/* The playlist eyebrow and its little rule are marigold in this section. */
+.playlist-heading .eyebrow {
+  color: var(--marigold);
+}
+
+.playlist-heading .eyebrow::before {
+  background: var(--marigold);
+}
+
+
 /* The "Trois playlists…" line is styled as a literary citation: a marigold
    left rule, display serif, italic, with a large opening quote mark. */
 .playlist-citation {
@@ -461,4 +471,9 @@
   .open-stage > * {
     min-width: 0;
   }
+
+  .playlist-citation {
+    font-size: 1rem;
+  }
 }
+
