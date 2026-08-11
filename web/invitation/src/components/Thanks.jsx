@@ -1,8 +1,9 @@
 import React from "react";
 import { EVENT } from "../content.js";
 import { useApp } from "../context/AppContext.jsx";
-import { getActiveGuests } from "../guests.js";
+import { getActiveGuests, getGuest } from "../guests.js";
 import { resolveGuestName, resolveGuestPhoto } from "../guest-profiles.js";
+
 
 // Wedding planner contact used in the humorous "credits" mentions.
 const PLANNER = {
@@ -71,6 +72,22 @@ function findCreditAvatar(creditName, index) {
   return includes?.photo || null;
 }
 
+// Resolve a credit to the live guest record (full name + photo) when it
+// carries a guestId. Falls back to the hardcoded name + fuzzy photo match
+// for credits without a guestId (backward compatibility).
+function resolveCredit(credit, guestIndex) {
+  if (credit.guestId) {
+    const guest = getGuest(credit.guestId);
+    if (guest) {
+      const { fullName } = resolveGuestName(guest);
+      const photo = resolveGuestPhoto(guest);
+      return { name: fullName || credit.name, photo: photo || null };
+    }
+  }
+  return { name: credit.name, photo: findCreditAvatar(credit.name, guestIndex) };
+}
+
+
 export function Thanks() {
   const { t } = useApp();
   const thanks = t.thanks || {};
@@ -104,32 +121,36 @@ export function Thanks() {
         </blockquote>
 
         <ul className="thanks-credits">
-          {credits.map((credit, index) => (
-            <li className="thanks-credit" key={index}>
-              {findCreditAvatar(credit.name, guestIndex) ? (
-                <span
-                  className="thanks-avatar thanks-avatar--photo"
-                  aria-hidden="true"
-                >
-                  <img
-                    src={findCreditAvatar(credit.name, guestIndex)}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  />
+          {credits.map((credit, index) => {
+            const resolved = resolveCredit(credit, guestIndex);
+            return (
+              <li className="thanks-credit" key={index}>
+                {resolved.photo ? (
+                  <span
+                    className="thanks-avatar thanks-avatar--photo"
+                    aria-hidden="true"
+                  >
+                    <img
+                      src={resolved.photo}
+                      alt=""
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </span>
+                ) : (
+                  <span className="thanks-avatar" aria-hidden="true">
+                    {initialsOf(resolved.name)}
+                  </span>
+                )}
+                <span className="thanks-credit-text">
+                  <strong className="thanks-name">{resolved.name}</strong>
+                  <span className="thanks-role">{credit.role}</span>
                 </span>
-              ) : (
-                <span className="thanks-avatar" aria-hidden="true">
-                  {initialsOf(credit.name)}
-                </span>
-              )}
-              <span className="thanks-credit-text">
-                <strong className="thanks-name">{credit.name}</strong>
-                <span className="thanks-role">{credit.role}</span>
-              </span>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
+
 
         <div className="thanks-humor">
           {humor.map((line, index) => (
