@@ -133,6 +133,9 @@
 
 @media (max-width: 899px) {
   .story-mark {
+    position: absolute;
+    top: 10%;
+    right: 15%;
     color: var(--terracotta);
     font-family: var(--font-display);
     font-size: 1rem;
@@ -140,6 +143,7 @@
     line-height: 0.8;
     opacity: 0.9;
   }
+
 
 
   /* On mobile the map is hidden below the initials; it is instead opened via
@@ -154,9 +158,10 @@
 }
 
 .identity-swap--story .identity-swap-state i {
-  color: #d4af37;
+  color: var(--marigold);
   font-size: 0.32em;
 }
+
 
 
 .story-copy {
