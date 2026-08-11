@@ -1,0 +1,34 @@
+{
+  "isabel_guadalupe__vestuario_de_los_novios": {
+    "guest": "isabel_guadalupe",
+    "fr": "Tenues des mariés",
+    "es": "Vestuario de los novios",
+    "en": "The couple’s outfits",
+    "_source": "mock_fe_migration",
+    "_migratedAt": "2026-08-02T23:15:33.325Z"
+  },
+  "ismael__pizzas": {
+    "guest": "ismael",
+    "fr": "Pizzas",
+    "es": "Pizzas",
+    "en": "Pizzas",
+    "_source": "mock_fe_migration",
+    "_migratedAt": "2026-08-02T23:15:33.325Z"
+  },
+  "manuel_amezcua__pizzas_del_viernes": {
+    "guest": "manuel_amezcua",
+    "fr": "Pizzas du vendredi",
+    "es": "Pizzas del viernes",
+    "en": "Friday pizzas",
+    "_source": "mock_fe_migration",
+    "_migratedAt": "2026-08-02T23:15:33.325Z"
+  },
+  "manuel_amezcua__wedding_planner": {
+    "guest": "manuel_amezcua",
+    "fr": "Wedding planner",
+    "es": "Wedding planner",
+    "en": "Wedding planner",
+    "_source": "mock_fe_migration",
+    "_migratedAt": "2026-08-02T23:15:33.324Z"
+  }
+}

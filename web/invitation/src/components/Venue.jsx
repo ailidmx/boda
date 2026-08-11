@@ -462,21 +462,6 @@ export function Venue() {
 
   return (
     <section className="facilities-section section story-bg" ref={sectionRef}>
-      {/* ── Arty background scene · symbolic geography of Roca Azul ────
-          A decorative layer behind the content: a glowing sun, layered
-          mountain silhouettes and a lake reflection. Purely visual
-          (pointer-events: none) and hidden from assistive tech. */}
-      <div className="venue-scene" aria-hidden="true">
-        <span className="venue-scene__sun" />
-        <span className="venue-scene__sun-disc" />
-        <span className="venue-scene__mountains venue-scene__mountains--far" />
-        <span className="venue-scene__mountains venue-scene__mountains--near" />
-        <span className="venue-scene__lake" />
-        <span className="venue-scene__motif venue-scene__motif--left" />
-        <span className="venue-scene__motif venue-scene__motif--right" />
-      </div>
-
-
       {/* ── Single slide · heading + photo-cards + gallery ───────────── */}
       <div className="venue-slide venue-slide--one">
 

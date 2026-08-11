@@ -50,7 +50,7 @@
   }
 }
 
-@media (max-width: 899px) {
+@media (max-width: 1200px) {
   .hero-guest-name {
     font-size: 1.5rem;
   }
@@ -184,7 +184,7 @@
   overflow: visible;
 }
 
-@media (max-width: 899px) {
+@media (max-width: 1200px) {
   .hero-content {
     padding: 1.5rem 0 1.5rem;
   }
@@ -525,7 +525,7 @@
   text-transform: uppercase;
 }
 
-@media (max-width: 899px) {
+@media (max-width: 1200px) {
   .hero-date-label {
     display: none;
   }
@@ -542,7 +542,7 @@
   text-transform: uppercase;
 }
 
-@media (max-width: 899px) {
+@media (max-width: 1200px) {
   .hero-place {
     font-size: 0.6rem;
   }
@@ -569,7 +569,7 @@
 
 /* Hard mobile override: keep guest name compact on phones regardless of
    earlier cascade order. */
-@media (max-width: 899px), (hover: none) and (pointer: coarse) {
+@media (max-width: 1200px), (hover: none) and (pointer: coarse) {
   .hero-guest-name {
     font-size: 1.5rem !important;
     margin-bottom: 1rem !important;
@@ -589,7 +589,7 @@
   text-shadow: 0 2px 24px rgb(0 0 0 / 45%);
 }
 
-@media (max-width: 899px) {
+@media (max-width: 1200px) {
   .hero-eyebrow {
     font-size: 1.5rem;
   }
@@ -715,7 +715,7 @@
   color: rgb(241 211 144 / 70%);
 }
 
-@media (max-width: 899px) {
+@media (max-width: 1200px) {
   .hero-invitation {
     font-size: clamp(1.5rem, 6vw, 2.2rem);
     margin-top: 2.2rem;
@@ -766,4 +766,5 @@
     display: none;
   }
 }
+
 

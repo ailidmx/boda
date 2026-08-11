@@ -1,9 +1,200 @@
 /* ── Attire section ───────────────────────────────────────────────────── */
 
 .attire-section {
+  position: relative;
   background: var(--terracotta);
   color: var(--white);
   padding-top: clamp(3rem, 8vw, 6rem);
+  overflow: hidden;
+}
+
+/* Full-bleed background behind the whole dress-code section. The base class
+   only handles positioning; the actual artwork lives in the variant classes
+   (--patchwork / --terracotta) chosen by the temporary A/B selector. The
+   foreground content (montages + text) stays above it. */
+.attire-bg {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Variant A — Mexican colour patchwork: a 4×3 quilt of classical Mexican
+   colours (rosa mexicano, verde limón, violeta, amarillo, naranja, turquesa,
+   azul). Each layer paints one block. */
+.attire-bg--patchwork {
+  background:
+    /* Row 1 */
+    linear-gradient(135deg, #e4007c 0 100%) 0 0 / 25% 33.333% no-repeat,
+    linear-gradient(135deg, #f7c600 0 100%) 25% 0 / 25% 33.333% no-repeat,
+    linear-gradient(135deg, #00b5ad 0 100%) 50% 0 / 25% 33.333% no-repeat,
+    linear-gradient(135deg, #7b2d8b 0 100%) 75% 0 / 25% 33.333% no-repeat,
+    /* Row 2 */
+    linear-gradient(135deg, #a8e000 0 100%) 0 33.333% / 25% 33.333% no-repeat,
+    linear-gradient(135deg, #ff7f00 0 100%) 25% 33.333% / 25% 33.333% no-repeat,
+    linear-gradient(135deg, #e4007c 0 100%) 50% 33.333% / 25% 33.333% no-repeat,
+    linear-gradient(135deg, #1e90ff 0 100%) 75% 33.333% / 25% 33.333% no-repeat,
+    /* Row 3 */
+    linear-gradient(135deg, #f7c600 0 100%) 0 66.666% / 25% 33.333% no-repeat,
+    linear-gradient(135deg, #7b2d8b 0 100%) 25% 66.666% / 25% 33.333% no-repeat,
+    linear-gradient(135deg, #00b5ad 0 100%) 50% 66.666% / 25% 33.333% no-repeat,
+    linear-gradient(135deg, #a8e000 0 100%) 75% 66.666% / 25% 33.333% no-repeat;
+}
+
+/* Variant B — terracotta earth with a sun and moon, radiating light and
+   subtle Mesoamerican geometric motifs. */
+.attire-bg--terracotta {
+  background:
+    /* Radiating sun rays (top-right) */
+    repeating-conic-gradient(
+      from 205deg at 80% 10%,
+      rgb(255 253 248 / 0.06) 0deg 5deg,
+      transparent 5deg 13deg
+    ),
+    /* Sun orb (top-right) */
+    radial-gradient(
+      circle at 80% 10%,
+      rgb(255 214 130 / 0.6) 0%,
+      rgb(217 179 106 / 0.3) 20%,
+      transparent 48%
+    ),
+    /* Warm earth glow rising from below */
+    radial-gradient(
+      circle at 50% 118%,
+      rgb(90 30 15 / 0.6) 0%,
+      transparent 58%
+    ),
+    /* Terracotta earth base */
+    linear-gradient(
+      180deg,
+      #b85a33 0%,
+      #a94d2a 42%,
+      #8f3f22 72%,
+      #7a341c 100%
+    );
+}
+
+/* Soft light effects over the patchwork — a few warm glows and a subtle
+   diagonal sheen — so the quilt feels festive and luminous rather than flat. */
+.attire-bg--patchwork::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background:
+    /* Diagonal sheen across the whole quilt */
+    linear-gradient(
+      115deg,
+      rgb(255 253 248 / 0.14) 0%,
+      rgb(255 253 248 / 0.02) 30%,
+      transparent 55%
+    ),
+    /* Floating warm orbs (light effects) */
+    radial-gradient(circle at 22% 78%, rgb(255 253 248 / 0.22) 0%, transparent 30%),
+    radial-gradient(circle at 88% 22%, rgb(255 253 248 / 0.18) 0%, transparent 28%),
+    radial-gradient(circle at 60% 55%, rgb(255 253 248 / 0.12) 0%, transparent 24%);
+}
+
+/* Moon orb (top-left), a subtle sun-calendar ring motif, and floating warm
+   orbs — the "light effects" that give the terracotta earth a cosmic feel. */
+.attire-bg--terracotta::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background:
+    /* Concentric sun-calendar rings (subtle, centre) */
+    radial-gradient(
+      circle at 50% 46%,
+      transparent 0 30%,
+      rgb(255 253 248 / 0.05) 30% 30.6%,
+      transparent 30.6% 36%,
+      rgb(255 253 248 / 0.04) 36% 36.6%,
+      transparent 36.6% 42%,
+      rgb(255 253 248 / 0.03) 42% 42.6%,
+      transparent 42.6%
+    ),
+    /* Moon orb (top-left) */
+    radial-gradient(
+      circle at 14% 16%,
+      rgb(255 253 248 / 0.55) 0%,
+      rgb(255 253 248 / 0.2) 28%,
+      transparent 52%
+    ),
+    /* Floating warm orbs (light effects) */
+    radial-gradient(circle at 26% 80%, rgb(255 205 120 / 0.2) 0%, transparent 30%),
+    radial-gradient(circle at 90% 66%, rgb(255 253 248 / 0.12) 0%, transparent 26%),
+    radial-gradient(circle at 62% 26%, rgb(255 205 120 / 0.14) 0%, transparent 24%);
+}
+
+/* Soft dark wash over the abstract background so the section keeps its warm
+   tone and the foreground text remains legible. */
+.attire-bg::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(36 33 25 / 45%) 0%,
+    rgb(36 33 25 / 28%) 45%,
+    rgb(36 33 25 / 48%) 100%
+  );
+  content: "";
+}
+
+/* ── TEMPORARY A/B test selector ────────────────────────────────────────
+   A small pill bar at the top of the attire section to switch between the
+   background variants. Remove this block (and the JSX + state) once a final
+   background is chosen. */
+.attire-bg-switch {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 auto clamp(1.5rem, 4vw, 2.5rem);
+  padding: 0.3rem;
+  border: 1px solid rgb(255 253 248 / 30%);
+  border-radius: 999px;
+  background: rgb(36 33 25 / 35%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.attire-bg-switch__label {
+  padding: 0 0.5rem;
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(255 253 248 / 70%);
+}
+
+.attire-bg-switch__btn {
+  padding: 0.45rem 0.9rem;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: rgb(255 253 248 / 85%);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.attire-bg-switch__btn:hover,
+.attire-bg-switch__btn:focus-visible {
+  background: rgb(255 253 248 / 14%);
+}
+
+.attire-bg-switch__btn.is-active {
+  background: var(--marigold, #d9b36a);
+  color: var(--ink, #242119);
+}
+
+/* Keep all foreground content (eyebrow, montages, dress-code text, nav)
+   above the full-bleed background layer. */
+.attire-section > :not(.attire-bg) {
+  position: relative;
+  z-index: 1;
 }
 
 .attire-eyebrow {

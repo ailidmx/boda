@@ -30,8 +30,12 @@ export function Attire() {
 
   // Dress-code pictogram modal state.
   const [pictoOpen, setPictoOpen] = useState(false);
+  // TEMPORARY A/B test: which background variant to show. Remove this state,
+  // the selector UI and the variant classes once a final background is chosen.
+  const [bgVariant, setBgVariant] = useState("patchwork");
   // Whether the attire section is currently in view (drives the FAB).
   const [attireActive, setAttireActive] = useState(false);
+
   const sectionRef = useRef(null);
   const fabRef = useRef(null);
   const panelRef = useRef(null);
@@ -86,6 +90,31 @@ export function Attire() {
 
   return (
     <section className="attire-section section story-bg" ref={sectionRef}>
+      {/* Full-bleed background behind the whole dress-code section. The
+          variant class (patchwork / terracotta) is chosen by the temporary
+          A/B selector below. The photo montages stay in the foreground. */}
+      <div className={`attire-bg attire-bg--${bgVariant}`} aria-hidden="true" />
+
+      {/* TEMPORARY A/B test selector — remove once a final background is
+          chosen. Lets us switch between the background suggestions. */}
+      <div className="attire-bg-switch" role="group" aria-label="Background A/B test">
+        <span className="attire-bg-switch__label">Fondo</span>
+        <button
+          type="button"
+          className={`attire-bg-switch__btn${bgVariant === "patchwork" ? " is-active" : ""}`}
+          onClick={() => setBgVariant("patchwork")}
+        >
+          Patchwork
+        </button>
+        <button
+          type="button"
+          className={`attire-bg-switch__btn${bgVariant === "terracotta" ? " is-active" : ""}`}
+          onClick={() => setBgVariant("terracotta")}
+        >
+          Terracota
+        </button>
+      </div>
+
       <p className="eyebrow attire-eyebrow">{attire.eyebrow}</p>
 
       {/* Row 1: photos (1/3) + citation (2/3) */}
