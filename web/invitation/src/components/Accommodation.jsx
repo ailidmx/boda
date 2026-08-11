@@ -502,9 +502,200 @@ export function Accommodation() {
     };
   }, [noteOpen]);
 
+  // The recap (per-person accommodation confirmation) is rendered in two
+  // places: inside the form-wrap on desktop, and as the last element of the
+  // whole accommodation section on mobile. The content is identical; only the
+  // wrapper differs so CSS can show/hide each copy per breakpoint.
+  const recapContent = (
+    <>
+      <div className="accommodation-recap-head">
+        <p className="eyebrow">{recap.eyebrow}</p>
+        <h3>{recap.title}</h3>
+        <p className="accommodation-recap-intro">{recap.intro}</p>
+      </div>
+
+      {/* Stepped RSVP mini: step 1 is the per-person question, step 2 is
+          the resumen (summary). The user flips between the two views. */}
+      <div className="flip-step-card">
+        {recapStep === "question" ? (
+
+          <div className="flip-step-card-body">
+            <div className="accommodation-recap-rows">
+              {groupMembers.map((member) => {
+                const name = resolveGuestName(member).fullName;
+                const memberPhoto = resolveGuestPhoto(member);
+                const memberCabin = resolveMemberCabin(member);
+                const hasCabin = Boolean(memberCabin);
+                const cabinName =
+                  memberCabin?.name?.replace(/\s+/g, " ") || "";
+                const questionText = hasCabin
+                  ? recap.hasCabinQuestionCabin.replace("{cabin}", cabinName)
+                  : recap.noCabinQuestion;
+                const current = recapAnswers[member.id] || 0;
+                // Per-person price for this member's cabin (dynamic,
+                // split among the cabin's actual occupants).
+                const memberCount = memberCabin
+                  ? cabinOccupantCount(memberCabin.id)
+                  : 0;
+                const memberPerPerson = cabinPerPersonPrice(memberCabin, memberCount);
+                const memberCovered = resolveMemberCovered(member);
+                return (
+                  <div className="accommodation-recap-row" key={member.id}>
+                    <div className="accommodation-recap-person">
+                      <span className="accommodation-member-tab-avatar" aria-hidden="true">
+                        {memberPhoto
+                          ? <img src={memberPhoto} alt="" loading="lazy" />
+                          : getInitials(name)}
+                      </span>
+                      <span className="accommodation-recap-person-text">
+                        <strong>{name}</strong>
+                        <span>{questionText}</span>
+                      </span>
+                    </div>
+                    {hasCabin && memberPerPerson > 0 && (
+                      <div className="accommodation-recap-price">
+                        <small>{recap.priceLabel}</small>
+                        <span className={`accommodation-recap-price-value${memberCovered ? " is-covered" : ""}`}>
+                          {memberCovered ? (
+                            <>
+                              <s>{formatPrice(memberPerPerson, language)} MXN</s>
+                              <strong>{recap.coveredLabel}</strong>
+                            </>
+                          ) : (
+                            <strong>{formatPrice(memberPerPerson, language)} MXN</strong>
+                          )}
+                        </span>
+                      </div>
+                    )}
+                    <div className="accommodation-recap-toggle">
+                      <button
+                        type="button"
+                        className={`rsvp-boolean-btn${current === BOOLEAN_YES ? ' is-selected' : ''}`}
+                        aria-pressed={current === BOOLEAN_YES}
+                        onClick={() => handleRecapChange(member.id, BOOLEAN_YES)}
+                      >
+                        {recap.yesLabel}
+                      </button>
+                      <button
+                        type="button"
+                        className={`rsvp-boolean-btn${current === BOOLEAN_NO ? ' is-selected' : ''}`}
+                        aria-pressed={current === BOOLEAN_NO}
+                        onClick={() => handleRecapChange(member.id, BOOLEAN_NO)}
+                      >
+                        {recap.noLabel}
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+
+            </div>
+            <div className="accommodation-recap-save">
+              <button
+                className="button button--gold"
+                type="button"
+                onClick={handleRecapSave}
+                disabled={recapSaveStatus === 'working'}
+              >
+                {recap.button}
+              </button>
+              {recapStatusText ? <small data-form-status>{recapStatusText}</small> : null}
+            </div>
+          </div>
+        ) : (
+          <div className="flip-step-card-body">
+            <div className="accommodation-recap-summary">
+              <p className="accommodation-recap-summary-intro">
+                {recap.summaryIntro}
+              </p>
+              <ul className="accommodation-recap-summary-list">
+                {groupMembers.map((member) => {
+                  const name = resolveGuestName(member).fullName;
+                  const memberPhoto = resolveGuestPhoto(member);
+                  const memberCabin = resolveMemberCabin(member);
+                  const hasCabin = Boolean(memberCabin);
+                  const cabinName =
+                    memberCabin?.name?.replace(/\s+/g, " ") || "";
+                  const questionText = hasCabin
+                    ? recap.hasCabinQuestionCabin.replace("{cabin}", cabinName)
+                    : recap.noCabinQuestion;
+                  const current = recapAnswers[member.id];
+                  // Per-person price for this member's cabin (dynamic,
+                  // split among the cabin's actual occupants).
+                  const memberCount = memberCabin
+                    ? cabinOccupantCount(memberCabin.id)
+                    : 0;
+                  const memberPerPerson = cabinPerPersonPrice(memberCabin, memberCount);
+                  const memberCovered = resolveMemberCovered(member);
+                  return (
+                    <li className="accommodation-recap-summary-row" key={member.id}>
+                      <span className="accommodation-recap-summary-person">
+                        <span className="accommodation-member-tab-avatar" aria-hidden="true">
+                          {memberPhoto
+                            ? <img src={memberPhoto} alt="" loading="lazy" />
+                            : getInitials(name)}
+                        </span>
+                        <span className="accommodation-recap-summary-person-text">
+                          <strong>{name}</strong>
+                          <small>{questionText}</small>
+                        </span>
+                      </span>
+                      {hasCabin && memberPerPerson > 0 && (
+                        <span className={`accommodation-recap-summary-price${memberCovered ? " is-covered" : ""}`}>
+                          {memberCovered ? (
+                            <>
+                              <s>{formatPrice(memberPerPerson, language)} MXN</s>
+                              <small>{recap.coveredLabel}</small>
+                            </>
+                          ) : (
+                            <strong>{formatPrice(memberPerPerson, language)} MXN</strong>
+                          )}
+                        </span>
+                      )}
+                      <span
+                        className={`accommodation-recap-summary-value${
+                          current === BOOLEAN_YES ? " is-yes" : " is-no"
+                        }`}
+                      >
+                        {current === BOOLEAN_YES ? recap.yesLabel : recap.noLabel}
+                      </span>
+                    </li>
+                  );
+                })}
+
+              </ul>
+              {recapSaveStatus === "saved" && (
+                <p className="accommodation-recap-confirmation" role="status">
+                  <span aria-hidden="true">✓</span>
+                  {recap.success}
+                </p>
+              )}
+              {recapSaveStatus === "error" && (
+                <p className="accommodation-recap-confirmation is-error" role="alert">
+                  {recap.error}
+                </p>
+              )}
+
+              <div className="accommodation-recap-save">
+                <button
+                  className="button button--gold"
+                  type="button"
+                  onClick={() => setRecapStep("question")}
+                >
+                  {recap.modifyButton}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </>
+  );
+
   return (
 
     <section className="accommodation-section section story-bg" ref={sectionRef}>
+
       <div className="accommodation-copy reveal" id="accommodation-overview">
         <p className="eyebrow">{accommodation.eyebrow}</p>
         <h2>{accommodation.title}</h2>
@@ -785,195 +976,15 @@ export function Accommodation() {
         )}
 
         {recap.title && groupMembers.length > 0 && (
-          <div className="accommodation-recap">
-            <div className="accommodation-recap-head">
-              <p className="eyebrow">{recap.eyebrow}</p>
-              <h3>{recap.title}</h3>
-              <p className="accommodation-recap-intro">{recap.intro}</p>
-            </div>
-
-            {/* Stepped RSVP mini: step 1 is the per-person question, step 2 is
-                the resumen (summary). The user flips between the two views. */}
-            <div className="flip-step-card">
-              {recapStep === "question" ? (
-
-                <div className="flip-step-card-body">
-                  <div className="accommodation-recap-rows">
-                    {groupMembers.map((member) => {
-                      const name = resolveGuestName(member).fullName;
-                      const memberPhoto = resolveGuestPhoto(member);
-                      const memberCabin = resolveMemberCabin(member);
-                      const hasCabin = Boolean(memberCabin);
-                      const cabinName =
-                        memberCabin?.name?.replace(/\s+/g, " ") || "";
-                      const questionText = hasCabin
-                        ? recap.hasCabinQuestionCabin.replace("{cabin}", cabinName)
-                        : recap.noCabinQuestion;
-                      const current = recapAnswers[member.id] || 0;
-                      // Per-person price for this member's cabin (dynamic,
-                      // split among the cabin's actual occupants).
-                      const memberCount = memberCabin
-                        ? cabinOccupantCount(memberCabin.id)
-                        : 0;
-                      const memberPerPerson = cabinPerPersonPrice(memberCabin, memberCount);
-                      const memberCovered = resolveMemberCovered(member);
-                      return (
-                        <div className="accommodation-recap-row" key={member.id}>
-                          <div className="accommodation-recap-person">
-                            <span className="accommodation-member-tab-avatar" aria-hidden="true">
-                              {memberPhoto
-                                ? <img src={memberPhoto} alt="" loading="lazy" />
-                                : getInitials(name)}
-                            </span>
-                            <span className="accommodation-recap-person-text">
-                              <strong>{name}</strong>
-                              <span>{questionText}</span>
-                            </span>
-                          </div>
-                          {hasCabin && memberPerPerson > 0 && (
-                            <div className="accommodation-recap-price">
-                              <small>{recap.priceLabel}</small>
-                              <span className={`accommodation-recap-price-value${memberCovered ? " is-covered" : ""}`}>
-                                {memberCovered ? (
-                                  <>
-                                    <s>{formatPrice(memberPerPerson, language)} MXN</s>
-                                    <strong>{recap.coveredLabel}</strong>
-                                  </>
-                                ) : (
-                                  <strong>{formatPrice(memberPerPerson, language)} MXN</strong>
-                                )}
-                              </span>
-                            </div>
-                          )}
-                          <div className="accommodation-recap-toggle">
-                            <button
-                              type="button"
-                              className={`rsvp-boolean-btn${current === BOOLEAN_YES ? ' is-selected' : ''}`}
-                              aria-pressed={current === BOOLEAN_YES}
-                              onClick={() => handleRecapChange(member.id, BOOLEAN_YES)}
-                            >
-                              {recap.yesLabel}
-                            </button>
-                            <button
-                              type="button"
-                              className={`rsvp-boolean-btn${current === BOOLEAN_NO ? ' is-selected' : ''}`}
-                              aria-pressed={current === BOOLEAN_NO}
-                              onClick={() => handleRecapChange(member.id, BOOLEAN_NO)}
-                            >
-                              {recap.noLabel}
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-
-                  </div>
-                  <div className="accommodation-recap-save">
-                    <button
-                      className="button button--gold"
-                      type="button"
-                      onClick={handleRecapSave}
-                      disabled={recapSaveStatus === 'working'}
-                    >
-                      {recap.button}
-                    </button>
-                    {recapStatusText ? <small data-form-status>{recapStatusText}</small> : null}
-                  </div>
-                </div>
-              ) : (
-                <div className="flip-step-card-body">
-                  <div className="accommodation-recap-summary">
-                    <p className="accommodation-recap-summary-intro">
-                      {recap.summaryIntro}
-                    </p>
-                    <ul className="accommodation-recap-summary-list">
-                      {groupMembers.map((member) => {
-                        const name = resolveGuestName(member).fullName;
-                        const memberPhoto = resolveGuestPhoto(member);
-                        const memberCabin = resolveMemberCabin(member);
-                        const hasCabin = Boolean(memberCabin);
-                        const cabinName =
-                          memberCabin?.name?.replace(/\s+/g, " ") || "";
-                        const questionText = hasCabin
-                          ? recap.hasCabinQuestionCabin.replace("{cabin}", cabinName)
-                          : recap.noCabinQuestion;
-                        const current = recapAnswers[member.id];
-                        // Per-person price for this member's cabin (dynamic,
-                        // split among the cabin's actual occupants).
-                        const memberCount = memberCabin
-                          ? cabinOccupantCount(memberCabin.id)
-                          : 0;
-                        const memberPerPerson = cabinPerPersonPrice(memberCabin, memberCount);
-                        const memberCovered = resolveMemberCovered(member);
-                        return (
-                          <li className="accommodation-recap-summary-row" key={member.id}>
-                            <span className="accommodation-recap-summary-person">
-                              <span className="accommodation-member-tab-avatar" aria-hidden="true">
-                                {memberPhoto
-                                  ? <img src={memberPhoto} alt="" loading="lazy" />
-                                  : getInitials(name)}
-                              </span>
-                              <span className="accommodation-recap-summary-person-text">
-                                <strong>{name}</strong>
-                                <small>{questionText}</small>
-                              </span>
-                            </span>
-                            {hasCabin && memberPerPerson > 0 && (
-                              <span className={`accommodation-recap-summary-price${memberCovered ? " is-covered" : ""}`}>
-                                {memberCovered ? (
-                                  <>
-                                    <s>{formatPrice(memberPerPerson, language)} MXN</s>
-                                    <small>{recap.coveredLabel}</small>
-                                  </>
-                                ) : (
-                                  <strong>{formatPrice(memberPerPerson, language)} MXN</strong>
-                                )}
-                              </span>
-                            )}
-                            <span
-                              className={`accommodation-recap-summary-value${
-                                current === BOOLEAN_YES ? " is-yes" : " is-no"
-                              }`}
-                            >
-                              {current === BOOLEAN_YES ? recap.yesLabel : recap.noLabel}
-                            </span>
-                          </li>
-                        );
-                      })}
-
-                    </ul>
-                    {recapSaveStatus === "saved" && (
-                      <p className="accommodation-recap-confirmation" role="status">
-                        <span aria-hidden="true">✓</span>
-                        {recap.success}
-                      </p>
-                    )}
-                    {recapSaveStatus === "error" && (
-                      <p className="accommodation-recap-confirmation is-error" role="alert">
-                        {recap.error}
-                      </p>
-                    )}
-
-                    <div className="accommodation-recap-save">
-                      <button
-                        className="button button--gold"
-                        type="button"
-                        onClick={() => setRecapStep("question")}
-                      >
-                        {recap.modifyButton}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-
+          <div className="accommodation-recap accommodation-recap--inline">
+            {recapContent}
           </div>
         )}
 
 
 
         <nav className="accommodation-subnav accommodation-subnav--back" aria-label={option.backLabel}>
+
 
           <a href="#accommodation-overview">
             <span aria-hidden="true">↑</span>
@@ -989,7 +1000,17 @@ export function Accommodation() {
           <span aria-hidden="true">↓</span>
         </a>
       </nav>
+
+      {/* Mobile-only recap: rendered as the last element of the accommodation
+          section so it sits below the form-wrap on small screens. Hidden on
+          desktop (the inline copy inside the form-wrap is shown instead). */}
+      {recap.title && groupMembers.length > 0 && (
+        <div className="accommodation-recap accommodation-recap--section">
+          {recapContent}
+        </div>
+      )}
     </section>
   );
 }
+
 

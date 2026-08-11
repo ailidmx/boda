@@ -1484,6 +1484,27 @@
   border-top: 1px solid rgb(36 33 25 / 18%);
 }
 
+/* The recap is rendered twice: once inside the form-wrap (desktop) and once
+   as the last element of the accommodation section (mobile). Only one copy is
+   visible per breakpoint. */
+.accommodation-recap--section {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .accommodation-recap--inline {
+    display: none;
+  }
+
+  .accommodation-recap--section {
+    display: block;
+    margin: 0;
+    padding: clamp(2.5rem, 8vw, 4rem) clamp(1.25rem, 6vw, 2rem);
+    border-top: 1px solid rgb(36 33 25 / 18%);
+  }
+}
+
+
 .accommodation-recap-head h3 {
   margin: 0.5rem 0 0.75rem;
 }
