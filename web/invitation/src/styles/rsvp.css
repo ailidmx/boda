@@ -393,16 +393,36 @@
   font-size: 0.9rem;
 }
 
-.rsvp-recap-question {
+/* Each guest gets one card with a row per question (e.g. Friday, Saturday,
+   Sunday). The card is intentionally light/transparent so it reads as a
+   grouped list rather than a nested box. */
+.rsvp-recap-guest {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  padding: 0.9rem 0.25rem;
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
 }
 
-.rsvp-recap-question-title {
-  margin: 0;
-  color: var(--white);
-  font-size: 1.05rem;
+.rsvp-recap-guest:last-child {
+  border-bottom: 0;
 }
+
+.rsvp-recap-guest-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  margin-bottom: 0.25rem;
+}
+
+.rsvp-recap-question-label {
+  color: rgb(255 253 248 / 70%);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 
 .rsvp-recap-list {
   list-style: none;
@@ -418,10 +438,14 @@
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid rgb(255 255 255 / 12%);
-  background: rgb(255 255 255 / 3%);
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid rgb(255 255 255 / 8%);
 }
+
+.rsvp-recap-row:last-child {
+  border-bottom: 0;
+}
+
 
 .rsvp-recap-identity {
   display: flex;
