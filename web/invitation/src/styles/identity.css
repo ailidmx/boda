@@ -47,12 +47,13 @@
 }
 
 .identity-swap--initials .identity-swap-state i {
-  color: #e4b968;
+  color: var(--marigold, #d9b36a);
   font-family: var(--font-display);
   font-size: 0.72em;
   font-style: italic;
   font-weight: 400;
 }
+
 
 /* Each initial is split into a letter + a golden dot so the dot can be
    accented independently. */
