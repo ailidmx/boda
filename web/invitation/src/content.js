@@ -1719,9 +1719,9 @@ export const content = {
       title: "Partage tes photos",
       lead:
         "Nous voulons voir le mariage à travers tes yeux. Nous avons créé deux albums Google Photos partagés où tu peux déposer tes photos.",
-      beforeTitle: "📸 Avant le mariage",
+      beforeTitle: "📸 Avant le jour J",
       beforeBody: "Partage tes photos préférées de nous avant le grand jour.",
-      duringTitle: "🎉 Le mariage vu par les invités",
+      duringTitle: "🎉 Le week-end vu par les invités",
       duringBody:
         "Après le mariage, partage ici les photos que tu as prises pendant la célébration.",
       beforeLink: "https://photos.app.goo.gl/Df3QwjTKQTGVEqEU6",
@@ -2013,7 +2013,7 @@ export const content = {
         body:
           "Trois playlists pour se mettre dans l’ambiance, découvrir des chansons et préparer tes plus belles interprétations.",
         general: {
-          title: "Ambiance du mariage",
+          title: "Ambiance du week-end",
           body: "La sélection générale pour voyager, trinquer, se retrouver et danser.",
         },
         karaoke: {
