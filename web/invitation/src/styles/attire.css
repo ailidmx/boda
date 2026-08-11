@@ -74,6 +74,73 @@
     );
 }
 
+/* Variant C — confetti fiesta: a festive burst of scattered Mexican-colour
+   confetti dots over a deep warm base, evoking celebration and joy. */
+.attire-bg--confetti {
+  background:
+    /* Scattered confetti dots in Mexican colours */
+    radial-gradient(circle at 12% 18%, #e4007c 0 2.2%, transparent 2.4%),
+    radial-gradient(circle at 28% 8%, #f7c600 0 1.8%, transparent 2%),
+    radial-gradient(circle at 44% 22%, #00b5ad 0 2.4%, transparent 2.6%),
+    radial-gradient(circle at 62% 12%, #7b2d8b 0 1.9%, transparent 2.1%),
+    radial-gradient(circle at 78% 26%, #a8e000 0 2.2%, transparent 2.4%),
+    radial-gradient(circle at 90% 14%, #ff7f00 0 1.8%, transparent 2%),
+    radial-gradient(circle at 8% 42%, #1e90ff 0 2%, transparent 2.2%),
+    radial-gradient(circle at 22% 58%, #e4007c 0 2.4%, transparent 2.6%),
+    radial-gradient(circle at 38% 44%, #f7c600 0 1.8%, transparent 2%),
+    radial-gradient(circle at 55% 62%, #00b5ad 0 2.2%, transparent 2.4%),
+    radial-gradient(circle at 70% 46%, #7b2d8b 0 2%, transparent 2.2%),
+    radial-gradient(circle at 86% 60%, #a8e000 0 2.4%, transparent 2.6%),
+    radial-gradient(circle at 16% 78%, #ff7f00 0 1.9%, transparent 2.1%),
+    radial-gradient(circle at 34% 88%, #1e90ff 0 2.2%, transparent 2.4%),
+    radial-gradient(circle at 50% 76%, #e4007c 0 1.8%, transparent 2%),
+    radial-gradient(circle at 66% 90%, #f7c600 0 2.4%, transparent 2.6%),
+    radial-gradient(circle at 82% 78%, #00b5ad 0 2%, transparent 2.2%),
+    radial-gradient(circle at 94% 88%, #7b2d8b 0 1.9%, transparent 2.1%),
+    /* Warm festive base */
+    linear-gradient(160deg, #7a341c 0%, #a94d2a 45%, #8f3f22 100%);
+}
+
+/* Variant D — sunburst: radiating Mexican-colour rays from a warm centre,
+   like a festive sun or a piñata burst of colour. */
+.attire-bg--sunburst {
+  background:
+    /* Radiating colour rays from the centre */
+    repeating-conic-gradient(
+      from 0deg at 50% 50%,
+      #e4007c 0deg 12deg,
+      #f7c600 12deg 24deg,
+      #00b5ad 24deg 36deg,
+      #7b2d8b 36deg 48deg,
+      #a8e000 48deg 60deg,
+      #ff7f00 60deg 72deg,
+      #1e90ff 72deg 84deg,
+      #e4007c 84deg 96deg,
+      #f7c600 96deg 108deg,
+      #00b5ad 108deg 120deg,
+      #7b2d8b 120deg 132deg,
+      #a8e000 132deg 144deg,
+      #ff7f00 144deg 156deg,
+      #1e90ff 156deg 168deg,
+      #e4007c 168deg 180deg,
+      #f7c600 180deg 192deg,
+      #00b5ad 192deg 204deg,
+      #7b2d8b 204deg 216deg,
+      #a8e000 216deg 228deg,
+      #ff7f00 228deg 240deg,
+      #1e90ff 240deg 252deg,
+      #e4007c 252deg 264deg,
+      #f7c600 264deg 276deg,
+      #00b5ad 276deg 288deg,
+      #7b2d8b 288deg 300deg,
+      #a8e000 300deg 312deg,
+      #ff7f00 312deg 324deg,
+      #1e90ff 324deg 336deg,
+      #e4007c 336deg 348deg,
+      #f7c600 348deg 360deg
+    );
+}
+
 /* Soft light effects over the patchwork — a few warm glows and a subtle
    diagonal sheen — so the quilt feels festive and luminous rather than flat. */
 .attire-bg--patchwork::before {

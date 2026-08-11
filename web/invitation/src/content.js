@@ -1045,7 +1045,7 @@ export const content = {
       body:
         "Hemos elegido una estética mexicana para nuestra boda como un homenaje a la cultura, la comida, la música y el lugar que nos reúne. Queremos que todo se sienta festivo, colorido y profundamente mexicano.",
       dressCode: {
-        title: "Vístete de color",
+        title: "¡Viva el color!",
         eyebrow: "Código de vestimenta",
         paragraphs: [
           "Nos hace muchísima ilusión compartir este día contigo, y queremos que, así como cada persona ha dejado una huella especial en nuestra vida, también cada uno aporte un poco de su esencia a esta celebración.",
@@ -2488,7 +2488,7 @@ export const content = {
       body:
         "Nous avons choisi une esthétique mexicaine pour notre cérémonie en hommage à la culture, la cuisine, la musique et le lieu qui nous réunit. Nous voulons que tout soit festif, coloré et profondément mexicain.",
       dressCode: {
-        title: "Habille-toi en couleur",
+        title: "Vive la couleur !",
         eyebrow: "Code vestimentaire",
         paragraphs: [
           "Nous sommes immensément heureux de partager ce jour avec toi, et nous souhaitons que, tout comme chaque personne a laissé une empreinte spéciale dans notre vie, chacun apporte un peu de son essence à cette célébration.",
@@ -3930,7 +3930,7 @@ export const content = {
       body:
         "We have chosen a Mexican aesthetic for our wedding as a tribute to the culture, the food, the music, and the place that brings us together. We want everything to feel festive, colorful, and deeply Mexican.",
       dressCode: {
-        title: "Dress in colour",
+        title: "Long live colour!",
         eyebrow: "Dress code",
         paragraphs: [
           "We are overjoyed to share this day with you, and just as each person has left a special mark on our lives, we want each of you to bring a little of your essence to this celebration.",

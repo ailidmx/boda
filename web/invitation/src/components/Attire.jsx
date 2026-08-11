@@ -104,6 +104,16 @@ export function DressCode() {
   const [pictoOpen, setPictoOpen] = useState(false);
   // Whether the dress-code section is currently in view (drives the FAB).
   const [dressCodeActive, setDressCodeActive] = useState(false);
+  // Selected background variant for the dress-code section (3 suggestions).
+  const [bgVariant, setBgVariant] = useState("patchwork");
+
+  // The 3 background suggestions for the dress-code section, all celebrating
+  // Mexican colour. Each maps to an `attire-bg--*` variant class.
+  const bgOptions = [
+    { key: "patchwork", label: "Patchwork" },
+    { key: "confetti", label: "Confetti" },
+    { key: "sunburst", label: "Sunburst" },
+  ];
 
   const sectionRef = useRef(null);
   const fabRef = useRef(null);
@@ -159,10 +169,29 @@ export function DressCode() {
 
   return (
     <section className="attire-section attire-section--dresscode section story-bg" ref={sectionRef}>
-      {/* Full-bleed colour patchwork background behind the dress-code section. */}
-      <div className="attire-bg attire-bg--patchwork" aria-hidden="true" />
+      {/* Full-bleed colour background behind the dress-code section. The
+          variant is chosen by the temporary selector below. */}
+      <div className={`attire-bg attire-bg--${bgVariant}`} aria-hidden="true" />
 
       <p className="eyebrow attire-eyebrow">{dressCode.eyebrow}</p>
+
+      {/* Temporary background selector: 3 suggestions for the dress-code
+          background, all celebrating Mexican colour. Remove once a final
+          background is chosen. */}
+      <div className="attire-bg-switch" role="group" aria-label="Dress code background">
+        <span className="attire-bg-switch__label">Fondo</span>
+        {bgOptions.map((option) => (
+          <button
+            key={option.key}
+            type="button"
+            className={`attire-bg-switch__btn${bgVariant === option.key ? " is-active" : ""}`}
+            aria-pressed={bgVariant === option.key}
+            onClick={() => setBgVariant(option.key)}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
 
       {dressCode.title && (
         <div className="attire-dress-code reveal">
