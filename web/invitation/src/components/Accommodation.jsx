@@ -843,7 +843,23 @@ export function Accommodation() {
             </div>
           )}
         </div>
-        <h3>{hasNoCabin ? option.independentTitle : option.onSiteTitle}</h3>
+        <div className="accommodation-form-title">
+          <h3>{hasNoCabin ? option.independentTitle : option.onSiteTitle}</h3>
+          {groupMembers.length > 1 && (
+            <div className="accommodation-form-avatars" aria-hidden="true">
+              {groupMembers.map((member) => {
+                const memberPhoto = resolveGuestPhoto(member);
+                return (
+                  <span className="accommodation-form-avatar" key={member.id}>
+                    {memberPhoto
+                      ? <img src={memberPhoto} alt="" loading="lazy" />
+                      : getInitials(resolveGuestName(member).fullName)}
+                  </span>
+                );
+              })}
+            </div>
+          )}
+        </div>
 
         {hasNoCabin ? (
           <p className="accommodation-personal-note">

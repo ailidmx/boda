@@ -423,6 +423,51 @@
   line-height: 1;
 }
 
+/* Title row: the section heading with a cluster of the group members'
+   avatars on the right. The avatars overlap slightly (like a shared-group
+   facepile) and stay on one line with the heading. */
+.accommodation-form-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.accommodation-form-title h3 {
+  margin: 0;
+}
+
+.accommodation-form-avatars {
+  display: flex;
+  align-items: center;
+  padding-left: 0.75rem;
+}
+
+.accommodation-form-avatar {
+  display: grid;
+  flex: 0 0 2.6rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  margin-left: -0.75rem;
+  overflow: hidden;
+  place-items: center;
+  border: 2px solid var(--cream);
+  border-radius: 50%;
+  background: var(--terracotta, #b85c38);
+  color: var(--cream);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  box-shadow: 0 0.2rem 0.5rem rgb(36 33 25 / 18%);
+}
+
+.accommodation-form-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 .accommodation-form-wrap > p:not(.eyebrow) {
   margin-bottom: 2rem;
 }
@@ -1395,6 +1440,8 @@
     position: relative;
     display: block;
     width: min(100%, 28rem);
+    max-height: min(90vh, 40rem);
+    overflow: auto;
     padding: 2.25rem 1.5rem 1.75rem;
     border-top: 0.3rem solid var(--marigold);
     background: var(--cream);
