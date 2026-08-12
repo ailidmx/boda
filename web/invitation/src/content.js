@@ -52,6 +52,7 @@ export const content = {
       accommodation: "Alojamiento",
       travel: "VUELOS",
       tematica: "Temática",
+      attire: "Temática",
       dressCode: "Código de vestimenta",
 
 
@@ -1501,6 +1502,7 @@ export const content = {
       accommodation: "Hébergement",
       travel: "VOLS",
       tematica: "Thématique",
+      attire: "Thématique",
       dressCode: "Code vestimentaire",
 
 
@@ -2951,6 +2953,7 @@ export const content = {
       accommodation: "Accommodation",
       travel: "FLIGHTS",
       tematica: "Theme",
+      attire: "Theme",
       dressCode: "Dress code",
 
 
