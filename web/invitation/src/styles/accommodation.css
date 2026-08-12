@@ -1885,24 +1885,104 @@
     padding-inline: clamp(0.5rem, 2vw, 1rem);
   }
 
-  .accommodation-recap-row {
-    align-items: flex-start;
-    flex-direction: column;
+  /* The shared flip-step-card is reused here on the light accommodation
+     background. On mobile we strip its default card chrome (padding + top
+     margin) so the recap rows own the full width and the layout is rebuilt
+     from scratch to fit the narrow viewport. */
+  .accommodation-recap .flip-step-card {
+    padding: 0;
+    margin-top: 0;
   }
 
+  .accommodation-recap .flip-step-card-body {
+    gap: 0.75rem;
+  }
+
+  /* Each recap row becomes a compact stacked card: avatar + name on the
+     first line, the question text below, then the price, the covered banner
+     and the Yes/No toggle. Everything is full-width so nothing overflows. */
+  .accommodation-recap-row {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 0.85rem 0.9rem;
+  }
+
+  /* Person line: avatar + name on the left, per-person price on the right. */
+  .accommodation-recap-person {
+    width: 100%;
+  }
+
+  .accommodation-recap-person-text strong {
+    font-size: 1rem;
+  }
+
+  .accommodation-recap-person-text span {
+    font-size: 0.82rem;
+    line-height: 1.35;
+  }
+
+  /* The per-person price sits on its own line, left-aligned, so it never
+     competes with the name for horizontal space. */
+  .accommodation-recap-price {
+    width: 100%;
+    text-align: left;
+    padding-top: 0.35rem;
+    border-top: 1px dashed rgb(36 33 25 / 12%);
+  }
+
+  .accommodation-recap-price-value {
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+
+  /* The covered banner spans the full row width. */
+  .accommodation-recap-covered-banner {
+    margin-top: 0;
+  }
+
+  /* The Yes/No toggle is a full-width two-button row. */
   .accommodation-recap-toggle {
     width: 100%;
   }
 
   .accommodation-recap-toggle .rsvp-boolean-btn {
     flex: 1 1 0;
+    min-height: 2.9rem;
   }
 
-  /* Let the nowrap per-person price wrap on narrow screens so it can't push
-     past the container edge. */
-  .accommodation-recap-price-value,
+  /* Save row: stack the button and status text so they fit the width. */
+  .accommodation-recap-save {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .accommodation-recap-save small {
+    text-align: center;
+  }
+
+  /* Summary rows: stack person info, price and value so each line is
+     readable on a narrow screen. */
+  .accommodation-recap-summary {
+    padding: 1.1rem 1rem;
+  }
+
+  .accommodation-recap-summary-row {
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .accommodation-recap-summary-person {
+    flex: 1 1 100%;
+  }
+
   .accommodation-recap-summary-price {
     flex-wrap: wrap;
     white-space: normal;
+  }
+
+  .accommodation-recap-summary-value {
+    margin-left: auto;
   }
 }
