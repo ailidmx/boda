@@ -475,17 +475,26 @@
 }
 
 /* Each day is its own block on the parchment, with generous breathing room
-   between blocks so the long list reads comfortably. */
+   between blocks so the long list reads comfortably. Each block is a soft
+   rounded card: a translucent warm overlay with a hairline border and a
+   gentle shadow so the days read as distinct panels on the parchment. */
 .day-program-block {
   position: relative;
   z-index: 1;
-  padding: clamp(1.5rem, 3vw, 3rem) 0;
+  padding: clamp(1.5rem, 3vw, 3rem);
+  border: 1px solid rgb(169 77 49 / 22%);
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgb(255 253 248 / 62%), transparent 55%),
+    rgb(255 253 248 / 55%);
+  box-shadow: 0 0.75rem 2rem rgb(36 33 25 / 8%);
   scroll-margin-top: 1.5rem;
 }
 
 .day-program-block + .day-program-block {
-  border-top: 1px dashed rgb(169 77 49 / 30%);
+  margin-top: clamp(1.5rem, 3vw, 3rem);
 }
+
 
 /* Day heading row: eyebrow centred between the previous/next scroll arrows. */
 .day-program-block__head {
@@ -754,8 +763,9 @@
   }
 
   .day-program-block {
-    padding: 1.25rem 0;
+    padding: 1.25rem;
   }
+
 
   .day-program-block__head {
     grid-template-columns: 2rem minmax(0, 1fr) 2rem;
