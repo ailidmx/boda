@@ -313,11 +313,18 @@
    plain background while only the content (day-program-slideset) gets the
    warm tinted background, so the two parts are visually distinct. */
 .weekend-program {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 6vw, 6rem);
-  background: var(--white);
+  /* The parchment image is applied inline (MEDIA.parchment) so it spans the
+     whole section edge-to-edge for a full-immersion background. These rules
+     make it cover the section and give a warm fallback tint. */
+  background-color: #f6ecd6;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .weekend-program__header {
@@ -394,34 +401,20 @@
 
 /* The programme content is a single long parchment-style list: all three
    days are stacked vertically, like reading a long scroll. The parchment
-   gets a warm aged-paper feel with soft golden orbs, a subtle grain and a
-   hand-drawn border, evoking a prehispanic lake legend. */
+   background now lives on the section itself (full-width, full immersion);
+   this container is transparent so the parchment shows through edge-to-edge. */
 .weekend-program .day-program-scroll {
   position: relative;
   flex: 1 1 auto;
   width: 100%;
   padding: clamp(2.5rem, 6vw, 6rem) clamp(1.25rem, 4vw, 4rem);
-  background:
-    radial-gradient(90% 60% at 12% 8%, rgb(228 185 104 / 22%), transparent 55%),
-    radial-gradient(80% 55% at 88% 20%, rgb(169 77 49 / 14%), transparent 55%),
-    radial-gradient(70% 50% at 50% 100%, rgb(122 139 122 / 16%), transparent 60%),
-    linear-gradient(180deg, #f6ecd6, #efe0c0 45%, #f3e7cd);
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  border-radius: 1.5rem;
-  box-shadow:
-    inset 0 0 0 1px rgb(169 77 49 / 14%),
-    inset 0 0 3rem rgb(169 77 49 / 8%),
-    0 1.5rem 3.5rem rgb(36 33 25 / 14%);
 }
 
 
 /* A soft "light" glow drifting across the parchment, like candlelight. */
-.weekend-program .day-program-scroll::before {
+.weekend-program::before {
   position: absolute;
   inset: 0;
-  border-radius: inherit;
   background:
     radial-gradient(40% 30% at 30% 12%, rgb(255 244 214 / 55%), transparent 70%),
     radial-gradient(35% 28% at 72% 40%, rgb(255 236 200 / 40%), transparent 70%);
@@ -442,7 +435,7 @@
 }
 
 /* A subtle woven / prehispanic-inspired border motif along the top edge. */
-.weekend-program .day-program-scroll::after {
+.weekend-program::after {
   position: absolute;
   top: 0.9rem;
   right: 1.5rem;

@@ -405,6 +405,7 @@
     text-align: center;
     border-right: 1px solid rgb(36 33 25 / 18%);
     border-bottom: 1px solid rgb(36 33 25 / 18%);
+    padding: 0.6rem;
   }
 
 
@@ -417,31 +418,35 @@
   }
 
   .weather-fact strong {
-    font-size: clamp(1.4rem, 5.5vw, 2rem);
+    font-size: clamp(1.1rem, 4.5vw, 1.6rem);
+    line-height: 1.05;
   }
 
   .weather-fact span {
-    margin-top: 0.75rem;
-    font-size: clamp(0.85rem, 3vw, 1rem);
+    margin-top: 0.4rem;
+    font-size: clamp(0.72rem, 2.6vw, 0.88rem);
+    line-height: 1.2;
   }
 
   .weather-fact small {
-    font-size: clamp(0.75rem, 2.6vw, 0.9rem);
+    margin-top: 0.2rem;
+    font-size: clamp(0.62rem, 2.2vw, 0.78rem);
+    line-height: 1.2;
   }
 
   /* The first meteo card (the temperature) carries the longest value and
      label, so on mobile its title and content are reduced to keep the card
      compact and avoid overflow in the 2×2 grid. */
   .weather-fact:first-child strong {
-    font-size: clamp(1.15rem, 4.5vw, 1.6rem);
+    font-size: clamp(0.95rem, 3.8vw, 1.3rem);
   }
 
   .weather-fact:first-child span {
-    font-size: clamp(0.72rem, 2.6vw, 0.88rem);
+    font-size: clamp(0.62rem, 2.2vw, 0.78rem);
   }
 
   .weather-fact:first-child small {
-    font-size: clamp(0.65rem, 2.2vw, 0.78rem);
+    font-size: clamp(0.56rem, 1.9vw, 0.7rem);
   }
 
 
