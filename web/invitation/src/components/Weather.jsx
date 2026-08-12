@@ -7,12 +7,27 @@ export function Weather() {
   const [adviceOpen, setAdviceOpen] = useState(false);
   const [weatherActive, setWeatherActive] = useState(false);
   const [mobileSlide, setMobileSlide] = useState(0);
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(max-width: 899px)").matches,
+  );
   const sectionRef = useRef(null);
   const fabRef = useRef(null);
   const panelRef = useRef(null);
   const closeRef = useRef(null);
   const touchStartX = useRef(null);
   const slideCount = 2;
+
+  // Track the breakpoint so the weather-day reveal animation only plays when
+  // slide 2 (the moments) is active on mobile, while staying always-on for
+  // desktop where the slideset is not used.
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 899px)");
+    const onChange = (event) => setIsMobile(event.matches);
+    setIsMobile(mq.matches);
+    mq.addEventListener?.("change", onChange);
+    return () => mq.removeEventListener?.("change", onChange);
+  }, []);
+
 
   const goToSlide = (index) => {
     setMobileSlide(Math.max(0, Math.min(slideCount - 1, index)));
@@ -133,7 +148,7 @@ export function Weather() {
           <div
             className={`weather-slideset__slide weather-slideset__slide--moments${mobileSlide === 1 ? " is-active" : ""}`}
           >
-            <div className="weather-day reveal">
+            <div className={`weather-day${!isMobile || mobileSlide === 1 ? " reveal" : ""}`}>
               <div className="weather-moments">
                 {weather.moments.map((moment, index) => (
                   <article className="weather-moment reveal" key={index}>

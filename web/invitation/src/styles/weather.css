@@ -152,7 +152,7 @@
     justify-self: start;
     align-self: start;
     color: var(--deep-charcoal);
-    font-size: clamp(1.3rem, 2.4vw, 2rem);
+    font-size: clamp(1.1rem, 2vw, 1.7rem);
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -163,8 +163,9 @@
     justify-self: start;
     align-self: start;
     color: rgb(255 253 248 / 95%);
-    font-size: clamp(1.1rem, 2vw, 1.5rem);
+    font-size: clamp(0.95rem, 1.7vw, 1.3rem);
   }
+
 
   .weather-day .weather-moment small {
     grid-area: body;
@@ -207,8 +208,9 @@
 
   .weather-advice h3 {
     margin-bottom: 1.25rem;
-    font-size: clamp(1.3rem, 2.2vw, 1.7rem);
+    font-size: clamp(1.1rem, 1.9vw, 1.5rem);
   }
+
 
   .weather-advice ul {
     margin: 0;
@@ -558,11 +560,12 @@
   .weather-moment strong {
     color: var(--terracotta);
     font-family: var(--font-display);
-    font-size: 2rem;
+    font-size: 1.7rem;
     font-weight: 400;
     line-height: 1;
     overflow-wrap: anywhere;
   }
+
 
   .weather-moment:nth-child(2n) {
     border-right: 0;
@@ -589,19 +592,20 @@
      The inner content (time, title, body) is made smaller here so the four
      cards stay balanced and readable on the now-smaller square panels. */
   .weather-slideset__slide--moments .weather-moment strong {
-    font-size: 1.15rem;
+    font-size: 1rem;
   }
 
   .weather-slideset__slide--moments .weather-moment span {
     margin-top: 0.4rem;
-    font-size: clamp(0.72rem, 2.6vw, 0.9rem);
+    font-size: clamp(0.66rem, 2.3vw, 0.8rem);
   }
 
   .weather-slideset__slide--moments .weather-moment small {
     margin-top: 0.2rem;
-    font-size: clamp(0.6rem, 2.1vw, 0.72rem);
+    font-size: clamp(0.55rem, 1.9vw, 0.66rem);
     line-height: 1.25;
   }
+
 
 
 
