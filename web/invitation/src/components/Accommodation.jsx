@@ -909,7 +909,7 @@ export function Accommodation() {
             resolveMemberPaid={resolveMemberPaid}
             option={option}
             language={language}
-            showExtraCabinRow
+            showExtraCabinRow={false}
             extraCabin={extraCabin}
             extraRoom={extraRoom}
           />
