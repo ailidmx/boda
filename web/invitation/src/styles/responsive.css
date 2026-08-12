@@ -217,6 +217,18 @@
   }
 }
 
+/* ── THEMATIQUE citation on small screens ───────────────────────────────
+   Give the attire citation breathing room and a slightly larger, readable
+   size when the section collapses to a single column. */
+@media (max-width: 720px) {
+  .attire-citation {
+    margin-bottom: 1rem;
+    padding: 0.5rem 0 0 1rem;
+    font-size: clamp(1rem, 2.6vw, 2rem);
+    line-height: 1.35;
+  }
+}
+
 /* ── Extra-large screens: contain the whole page ────────────────────────
    On very wide displays (≥1440px) the invitation stretches edge-to-edge.
    Constrain the main content column (all sections) into a centered max-width
