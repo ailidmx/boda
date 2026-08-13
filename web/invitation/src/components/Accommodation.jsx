@@ -384,6 +384,7 @@ export function Accommodation() {
   const sectionRef = useRef(null);
   const noteFabRef = useRef(null);
   const noteCloseRef = useRef(null);
+  const recapRef = useRef(null);
 
 
   // ── Accommodation recap question ───────────────────────────────────────
@@ -502,6 +503,16 @@ export function Accommodation() {
     };
   }, [noteOpen]);
 
+  // When the user flips between the recap question and summary views
+  // ("Enregistrer ma confirmation" / "Modifier mes réponses"), the content
+  // height changes and the browser can jump the scroll position to the top of
+  // the section. Keep the recap in view so the user stays where they are.
+  useEffect(() => {
+    const recap = recapRef.current;
+    if (!recap) return undefined;
+    recap.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  }, [recapStep]);
+
   // The recap (per-person accommodation confirmation) is rendered in two
   // places: inside the form-wrap on desktop, and as the last element of the
   // whole accommodation section on mobile. The content is identical; only the
@@ -560,7 +571,8 @@ export function Accommodation() {
                             <>
                               <s>{formatPrice(memberPerPerson, language)} MXN</s>
                               <s>≈ {formatPrice(memberPerPerson / MXN_PER_EUR, language)} €</s>
-                              <strong>{recap.coveredLabel}</strong>
+                              <strong>0 MXN</strong>
+                              <small>≈ 0 €</small>
                             </>
                           ) : (
                             <>
@@ -657,7 +669,8 @@ export function Accommodation() {
                             <>
                               <s>{formatPrice(memberPerPerson, language)} MXN</s>
                               <s>≈ {formatPrice(memberPerPerson / MXN_PER_EUR, language)} €</s>
-                              <small>{recap.coveredLabel}</small>
+                              <strong>0 MXN</strong>
+                              <small className="is-eur">≈ 0 €</small>
                             </>
                           ) : (
                             <>
@@ -676,6 +689,12 @@ export function Accommodation() {
                       >
                         {current === BOOLEAN_YES ? recap.yesLabel : recap.noLabel}
                       </span>
+                      {memberCovered && (
+                        <span className="accommodation-recap-summary-covered-banner">
+                          <span aria-hidden="true">✓</span>
+                          {recap.coveredLabel}
+                        </span>
+                      )}
                     </li>
                   );
                 })}
@@ -1014,7 +1033,7 @@ export function Accommodation() {
           two-column grid (copy + form-wrap), so it always sits below the
           accommodation options on every breakpoint. */}
       {recap.title && groupMembers.length > 0 && (
-        <div className="accommodation-recap accommodation-recap--inline">
+        <div className="accommodation-recap accommodation-recap--inline" ref={recapRef}>
           {recapContent}
         </div>
       )}

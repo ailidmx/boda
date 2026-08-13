@@ -111,7 +111,6 @@ const GUEST_WRITABLE_FIELDS = [
 ];
 
 
-
 /**
  * Validate a payload intended for the `guests` collection.
  * Mirrors `hasValidGuestContactFields()` in the rules.
@@ -162,7 +161,6 @@ export function validateGuestContactPayload(payload) {
   return runChecks(payload, checks);
 }
 
-
 // ── Attendance responses validators ─────────────────────────────────────
 // Mirrors `hasValidAttendanceFields()` in firebase/firestore.rules.
 
@@ -204,7 +202,43 @@ export function validateAttendancePayload(payload) {
   return runChecks(payload, checks);
 }
 
+// ── Card votes validators ───────────────────────────────────────────────
+// Mirrors `hasValidCardVoteFields()` in firebase/firestore.rules.
+
+const CARD_VOTE_ALLOWED_FIELDS = [
+  "cardType", "cardKey", "guestId", "rating", "updatedBy", "updatedAt",
+];
+
+/**
+ * Validate a payload intended for the `card_votes` collection.
+ * Mirrors `hasValidCardVoteFields()` in the rules.
+ *
+ * @param {Object} payload  the payload to validate (before setDoc)
+ * @returns {{ valid: boolean, errors: string[] }}
+ */
+export function validateCardVotePayload(payload) {
+  if (!isObject(payload)) {
+    return { valid: false, errors: ["payload must be an object"] };
+  }
+
+  const checks = [
+    // Required fields
+    { check: hasAllKeys(payload, CARD_VOTE_ALLOWED_FIELDS), message: "missing required fields: cardType, cardKey, guestId, rating, updatedBy, updatedAt" },
+    // Allowed fields only
+    { check: hasOnlyKeys(payload, CARD_VOTE_ALLOWED_FIELDS), message: `payload contains fields not in the allowed schema: ${Object.keys(payload).filter((k) => !CARD_VOTE_ALLOWED_FIELDS.includes(k)).join(", ")}` },
+    // Field types and values
+    { check: isOneOf(payload.cardType, ["food", "music"]), message: "cardType must be one of: food, music" },
+    { check: isShortText(payload.cardKey, 100) && isNonEmptyString(payload.cardKey), message: "cardKey must be a non-empty string ≤ 100 chars" },
+    { check: isShortText(payload.guestId, 100) && isNonEmptyString(payload.guestId), message: "guestId must be a non-empty string ≤ 100 chars" },
+    { check: Number.isInteger(payload.rating) && payload.rating >= 1 && payload.rating <= 5, message: "rating must be an integer 1–5" },
+    { check: isShortText(payload.updatedBy, 100) && isNonEmptyString(payload.updatedBy), message: "updatedBy must be a non-empty string ≤ 100 chars" },
+  ];
+
+  return runChecks(payload, checks);
+}
+
 // ── RSVP submissions validators ─────────────────────────────────────────
+
 // Mirrors `hasValidRsvpFields()` in firebase/firestore.rules.
 
 const RSVP_REQUIRED_FIELDS = [

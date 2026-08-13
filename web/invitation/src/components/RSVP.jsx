@@ -203,27 +203,41 @@ export function RSVP() {
       <h2>{rsvp.title}</h2>
       <p>{rsvp.body}</p>
 
-        {/* Progress checklist: each mini-RSVP flow must be walked through to
-            its recap step ("resume"). The state is shared with the mini-flows
-            via RsvpContext. */}
+        {/* Progress checklist: each mini-RSVP flow is "done" once every group
+            member has answered all its questions (i.e. the flow's current step
+            has reached the recap). The state is shared with the mini-flows via
+            RsvpContext, so a flow also counts as done once it has been walked
+            through to its recap step or saved. */}
         <div className="rsvp-progress" aria-label={rsvp.progressLabel}>
           {[
-            { flow: RSVP_FLOWS.teAnimas, label: rsvp.progressTeAnimas },
-            { flow: RSVP_FLOWS.petanque, label: rsvp.progressPetanque },
-            { flow: RSVP_FLOWS.coast, label: rsvp.progressCoast },
-          ].map(({ flow, label }) => {
-            const done = progress[flow] === "resume";
+            {
+              flow: RSVP_FLOWS.teAnimas,
+              label: rsvp.progressTeAnimas,
+              done: scaleStep >= scaleQuestions.length,
+            },
+            {
+              flow: RSVP_FLOWS.petanque,
+              label: rsvp.progressPetanque,
+              done: petanqueStep >= visiblePetanqueQuestions.length,
+            },
+            {
+              flow: RSVP_FLOWS.coast,
+              label: rsvp.progressCoast,
+              done: extraStayStep >= extraStayQuestions.length,
+            },
+          ].map(({ flow, label, done }) => {
+            const isDone = done || progress[flow] === "resume";
             return (
               <div
                 key={flow}
-                className={`rsvp-progress-item${done ? " is-done" : ""}`}
+                className={`rsvp-progress-item${isDone ? " is-done" : ""}`}
               >
                 <span className="rsvp-progress-mark" aria-hidden="true">
-                  {done ? "✓" : "•"}
+                  {isDone ? "✓" : "•"}
                 </span>
                 <span className="rsvp-progress-label">{label}</span>
                 <span className="rsvp-progress-state">
-                  {done ? rsvp.progressResume : rsvp.progressPending}
+                  {isDone ? rsvp.progressResume : rsvp.progressPending}
                 </span>
               </div>
             );

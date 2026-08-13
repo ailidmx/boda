@@ -619,7 +619,7 @@
 
 .day-program-timeline p {
   margin: 0.25rem 0 0;
-  color: white;
+  color: var(--terracotta-complement);
   font-size: clamp(0.95rem, 1.3vw, 1.05rem);
   line-height: 1.25;
   font-weight: 600;

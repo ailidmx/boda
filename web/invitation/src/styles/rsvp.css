@@ -87,6 +87,18 @@
   max-width: 46rem;
   margin: 0 0 1.5rem;
   color: rgb(255 253 248 / 70%);
+  /* Ensure the note is a plain paragraph, never a citation: reset any
+     left border, padding, italic and quote mark that a generic `p` rule
+     (e.g. `.rsvp-section > p:not(.eyebrow)`) might apply. */
+  padding-left: 0;
+  border-left: 0;
+  font-style: normal;
+  font-family: inherit;
+  text-align: inherit;
+}
+.fieldset-note::before,
+.fieldset-note::after {
+  content: none;
 }
 
 /* Bottom "continue" nav inside the "¡Te animas!" RSVP section. Mirrors the

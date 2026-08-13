@@ -418,6 +418,16 @@ export const content = {
         "Queremos que cada comida sea sencilla, generosa y muy mexicana. Este es el menú que estamos imaginando; todavía puede crecer con tus ideas.",
       flavoursEyebrow: "Sabores de Jalisco y México",
       flavoursTitle: "¿Qué vamos a probar?",
+      vote: {
+        label: "Valora este plato",
+        star: "estrella",
+        vote: "voto",
+        votes: "votos",
+        empty: "Sé el primero en valorar",
+        yourRating: "Tu valoración",
+        error: "No se pudo guardar tu valoración",
+      },
+
       flavours: [
         {
           key: "carnitas",
@@ -545,6 +555,10 @@ export const content = {
       title: "Escuchar, bailar y también cantar",
       body:
         "La música acompañará cada cambio de energía del sábado, desde el final de la ceremonia hasta la pista de baile.",
+      background: {
+        label: "Ambiente",
+        themes: { wao: "WAO", arty: "ARTY", brutal: "BRUTAL" },
+      },
       acts: [
         {
           moment: "Después del aperitivo",
@@ -1220,6 +1234,7 @@ export const content = {
         ],
         recapTitle: "Resumen",
         recapProgress: "respondidos",
+        modifyButton: "Modificar mis respuestas",
         button: "Guardar mis respuestas",
         success: "¡Gracias! Guardamos tus respuestas.",
         error: "No pudimos guardar. Revisa tu conexión e inténtalo de nuevo.",
@@ -1271,7 +1286,10 @@ export const content = {
       extraStay: {
         eyebrow: "Tu estancia · domingo a martes",
         title: "Tu cabaña para la segunda estancia",
+        citation:
+          "Hemos previsto una cabaña para ti para la segunda parte de la estancia, del domingo al martes.",
       },
+
     },
 
 
@@ -1459,7 +1477,7 @@ export const content = {
         title: "¿Te apuntas?",
         intro: "El viernes por la tarde, Pierre organiza un torneo de petanca. ¿Te apuntas?",
         organizerLabel: "Contacta a Pierre para más información",
-        organizerWhatsapp: "https://wa.me/523332017504",
+        organizerWhatsapp: "https://wa.me/523310212012",
         fields: {
           participation: "¿Participas en el torneo?",
           ownBoules: "¿Necesitas que te prestemos unas boules?",
@@ -1857,7 +1875,17 @@ export const content = {
         "Nous voulons que chaque repas soit simple, généreux et profondément mexicain. Voici le menu que nous imaginons ; il peut encore évoluer grâce à tes idées.",
       flavoursEyebrow: "Saveurs du Jalisco et du Mexique",
       flavoursTitle: "Qu’allons-nous goûter ?",
+      vote: {
+        label: "Note ce plat",
+        star: "étoile",
+        vote: "vote",
+        votes: "votes",
+        empty: "Sois le premier à noter",
+        yourRating: "Ta note",
+        error: "Impossible d’enregistrer ta note",
+      },
       flavours: [
+
         {
           key: "carnitas",
           type: "food",
@@ -1985,6 +2013,10 @@ export const content = {
       title: "Écouter, danser et aussi chanter",
       body:
         "La musique accompagnera chaque changement d’énergie du samedi, de la fin de la cérémonie jusqu’à la piste de danse.",
+      background: {
+        label: "Ambiance",
+        themes: { wao: "WAO", arty: "ARTY", brutal: "BRUTAL" },
+      },
       acts: [
         {
           moment: "Après l’apéro",
@@ -2402,7 +2434,7 @@ export const content = {
       navNext: "Pétanque",
       recap: {
         eyebrow: "Confirmation de l’hébergement",
-        title: "Confirme-tu ton hébergement ?",
+        title: "Tu confirmes ton hébergement ?",
         intro:
           "Indique pour chaque personne si elle restera à Roca Azul afin que nous puissions organiser les gîtes.",
         hasCabinQuestion: "Reste-t-elle à Roca Azul ?",
@@ -2667,6 +2699,7 @@ export const content = {
         ],
         recapTitle: "Résumé",
         recapProgress: "répondu·e·s",
+        modifyButton: "Modifier mes réponses",
         button: "Enregistrer mes réponses",
         success: "Merci ! Nous avons enregistré tes réponses.",
         error: "Impossible d’enregistrer. Vérifie ta connexion et réessaie.",
@@ -2716,10 +2749,12 @@ export const content = {
           "Estimation indicative. Le prix final dépendra de l’hébergement choisi, de la saison et de la confirmation directe avec chaque hôtel ou Airbnb.",
       },
       extraStay: {
-        eyebrow: "Ton séjour · dimanche à mardi",
-        title: "Ton gîte du dimanche au mardi",
-
+        eyebrow: "Ton séjour du dimanche au mardi",
+        title: "Voici l'option que nous avons prévu pour toi, nous espérons qu'elle te plaira",
+        citation:
+          "Nous avons prévu une cabane pour toi pour la deuxième partie du séjour, du dimanche au mardi.",
       },
+
     },
 
 
@@ -2740,11 +2775,11 @@ export const content = {
         organizerLabel: "Organise : David",
         organizerWhatsapp: "https://wa.me/523332017504",
         fields: {
-          participation: "Participes-tu au tournoi ?",
+          participation: "Tu participes au tournoi ?",
           partySize: "Combien de personnes ?",
           names: "Noms des participants",
           namesPlaceholder: "Ex. David, Aydé, Dimitar…",
-          ownBoules: "As-tu besoin que nous te prêtions des boules ?",
+          ownBoules: "Tu as besoin de boules ?",
         },
 
         options: {
@@ -2909,11 +2944,11 @@ export const content = {
         title: "Tu t’inscris ?",
         intro: "Le vendredi après-midi, Pierre organise un tournoi de pétanque. Tu participes ?",
         organizerLabel: "Contacte Pierre pour plus d’infos",
-        organizerWhatsapp: "https://wa.me/523332017504",
+        organizerWhatsapp: "https://wa.me/523310212012",
 
         fields: {
-          participation: "Participes-tu au tournoi ?",
-          ownBoules: "Tu as besoin qu’on te prête des boules ?",
+          participation: "Tu participes au tournoi ?",
+          ownBoules: "Tu as besoin de boules ?",
           ownBoulesHint: "Si tu n’en as pas, pas de souci : nous t’en prêterons pour jouer.",
         },
         yesLabel: "Oui",
@@ -3431,6 +3466,10 @@ export const content = {
       title: "Listen, dance, and sing too",
       body:
         "Music will accompany every shift in energy on Saturday, from the end of the ceremony to the dance floor.",
+      background: {
+        label: "Vibe",
+        themes: { wao: "WAO", arty: "ARTY", brutal: "BRUTAL" },
+      },
       acts: [
         {
           moment: "After the aperitif",
@@ -4109,6 +4148,7 @@ export const content = {
         ],
         recapTitle: "Summary",
         recapProgress: "answered",
+        modifyButton: "Modify my answers",
         button: "Save my answers",
         success: "Thank you! We saved your answers.",
         error: "We could not save. Check your connection and try again.",
@@ -4145,7 +4185,10 @@ export const content = {
       extraStay: {
         eyebrow: "Your stay · Sunday to Tuesday",
         title: "Your guest house for the second stay",
+        citation:
+          "We have planned a guest house for you for the second part of your stay, from Sunday to Tuesday.",
       },
+
     },
 
     rsvp: {
@@ -4333,7 +4376,7 @@ export const content = {
         title: "Are you in?",
         intro: "On Friday afternoon, Pierre is organising a pétanque tournament. Would you like to join?",
         organizerLabel: "Contact Pierre for more info",
-        organizerWhatsapp: "https://wa.me/523332017504",
+        organizerWhatsapp: "https://wa.me/523310212012",
         fields: {
           participation: "Will you participate in the tournament?",
           ownBoules: "Do you need us to lend you some boules?",

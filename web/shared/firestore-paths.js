@@ -39,7 +39,10 @@ export const collections = {
   rsvpScale: "rsvp_scale",
   /** Per-guest RSVP answers (questionId → scale level). */
   rsvpResponses: "rsvp_responses",
+  /** Star ratings for experience cards (food flavours / music acts). */
+  cardVotes: "card_votes",
 };
+
 
 
 

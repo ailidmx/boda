@@ -17,8 +17,158 @@
 
 
 
+/* ── Music section background themes ────────────────────────────────────
+   The section exposes a set of CSS custom properties that drive the whole
+   palette (section background, act cards, playlist panel, playlist cards,
+   accent and ink). Three vibrant themes are available and the visitor can
+   switch between them with the selector: BRUTAL (the classic ink + gold),
+   WAO (electric night) and ARTY (sunset studio). */
 .music-section {
-  background: var(--ink);
+  /* BRUTAL — the classic ink + gold look */
+  --music-bg: var(--ink);
+  --music-act-bg:
+    radial-gradient(120% 90% at 100% 0%, rgb(255 244 214 / 55%), transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgb(198 139 43 / 45%), transparent 60%),
+    linear-gradient(160deg, #e4b968 0%, #c99a4a 48%, #a97c33 100%);
+  --music-act-bg-hover:
+    radial-gradient(120% 90% at 100% 0%, rgb(255 250 235 / 70%), transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgb(198 139 43 / 55%), transparent 60%),
+    linear-gradient(160deg, #f0c97e 0%, #d9ab58 48%, #b98a3c 100%);
+  --music-panel-bg: #182620;
+  --music-card-bg: var(--cream);
+  --music-card-number: rgb(169 77 49 / 14%);
+  --music-accent: var(--marigold);
+  --music-ink: var(--ink);
+  --music-on-accent: var(--ink);
+
+  background: var(--music-bg);
+  color: var(--white);
+}
+
+/* WAO — electric night: deep indigo with neon pink/purple act cards */
+.music-theme--wao {
+  --music-bg: linear-gradient(160deg, #2a0a4a 0%, #1a0b3a 50%, #0d1b3e 100%);
+  --music-act-bg:
+    radial-gradient(120% 90% at 100% 0%, rgb(255 120 200 / 45%), transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgb(90 60 220 / 55%), transparent 60%),
+    linear-gradient(160deg, #ff4d8d 0%, #b14bd4 48%, #6a3bd6 100%);
+  --music-act-bg-hover:
+    radial-gradient(120% 90% at 100% 0%, rgb(255 150 215 / 60%), transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgb(110 80 240 / 65%), transparent 60%),
+    linear-gradient(160deg, #ff6ba3 0%, #c45fe0 48%, #7d4be6 100%);
+  --music-panel-bg: #1c0f3a;
+  --music-card-bg: #f3e8ff;
+  --music-card-number: rgb(177 75 212 / 16%);
+  --music-accent: #ff4d8d;
+  --music-ink: #2a0a4a;
+  --music-on-accent: #fff;
+}
+
+/* ARTY — sunset studio: warm terracotta/coral with peach cards */
+.music-theme--arty {
+  --music-bg: linear-gradient(160deg, #3a1a10 0%, #2a1208 50%, #1a0a05 100%);
+  --music-act-bg:
+    radial-gradient(120% 90% at 100% 0%, rgb(255 200 150 / 45%), transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgb(194 58 42 / 50%), transparent 60%),
+    linear-gradient(160deg, #ff8a5c 0%, #e85d3a 48%, #c23a2a 100%);
+  --music-act-bg-hover:
+    radial-gradient(120% 90% at 100% 0%, rgb(255 215 175 / 60%), transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgb(214 78 58 / 60%), transparent 60%),
+    linear-gradient(160deg, #ffa07a 0%, #f06f4a 48%, #d04a36 100%);
+  --music-panel-bg: #2a1208;
+  --music-card-bg: #fff0e6;
+  --music-card-number: rgb(194 58 42 / 14%);
+  --music-accent: #ff8a5c;
+  --music-ink: #3a1a10;
+  --music-on-accent: #fff;
+}
+
+/* ── Theme selector ─────────────────────────────────────────────────────
+   A small pill row that lets the visitor switch between the three music
+   themes (BRUTAL / WAO / ARTY). Each button carries its own accent colour so
+   the choice is legible at a glance, and the active theme is highlighted. */
+.music-theme-selector {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 clamp(2.5rem, 5vw, 4rem);
+}
+
+.music-theme-selector__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 60%);
+}
+
+.music-theme-selector__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.music-theme-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid rgb(255 255 255 / 28%);
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  background: rgb(255 255 255 / 8%);
+  color: var(--white);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.music-theme-btn::before {
+  content: "";
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.music-theme-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgb(255 255 255 / 55%);
+}
+
+.music-theme-btn:focus-visible {
+  outline: 2px solid var(--music-accent);
+  outline-offset: 2px;
+}
+
+/* Each theme button previews its accent colour. */
+.music-theme-btn--brutal {
+  color: var(--marigold);
+}
+
+.music-theme-btn--wao {
+  color: #ff4d8d;
+}
+
+.music-theme-btn--arty {
+  color: #ff8a5c;
+}
+
+/* The active theme button fills with its accent. */
+.music-theme-btn.is-selected {
+  border-color: transparent;
+  background: currentColor;
+  color: var(--ink);
+}
+
+.music-theme-btn--wao.is-selected,
+.music-theme-btn--arty.is-selected {
   color: var(--white);
 }
 
@@ -30,7 +180,7 @@
   max-width: 40rem;
   margin: 0;
   padding-left: 1.5rem;
-  border-left: 2px solid var(--marigold);
+  border-left: 2px solid var(--music-accent);
   font-family: var(--font-display);
   font-size: clamp(1.15rem, 2.2vw, 1.7rem);
   font-style: italic;
@@ -47,7 +197,7 @@
   font-family: var(--font-display);
   font-size: 3.5em;
   line-height: 1;
-  color: var(--marigold);
+  color: var(--music-accent);
   opacity: 0.35;
 }
 
@@ -74,10 +224,7 @@
   overflow: hidden;
   border: 1px solid rgb(255 255 255 / 22%);
   border-right: 0;
-  background:
-    radial-gradient(120% 90% at 100% 0%, rgb(255 244 214 / 55%), transparent 55%),
-    radial-gradient(90% 80% at 0% 100%, rgb(198 139 43 / 45%), transparent 60%),
-    linear-gradient(160deg, #e4b968 0%, #c99a4a 48%, #a97c33 100%);
+  background: var(--music-act-bg);
   transition: background 320ms ease, border-color 320ms ease;
 }
 
@@ -88,10 +235,7 @@
 
 .music-act:hover {
   border-color: rgb(255 253 248 / 60%);
-  background:
-    radial-gradient(120% 90% at 100% 0%, rgb(255 250 235 / 70%), transparent 55%),
-    radial-gradient(90% 80% at 0% 100%, rgb(198 139 43 / 55%), transparent 60%),
-    linear-gradient(160deg, #f0c97e 0%, #d9ab58 48%, #b98a3c 100%);
+  background: var(--music-act-bg-hover);
 }
 
 
@@ -135,7 +279,7 @@
   font-size: clamp(5rem, 9vw, 8rem);
   font-weight: 400;
   line-height: 1;
-  color: rgb(228 185 104 / 16%);
+  color: color-mix(in srgb, var(--music-accent) 16%, transparent);
   letter-spacing: -0.02em;
   pointer-events: none;
   user-select: none;
@@ -169,7 +313,7 @@
   border: 1px solid rgb(36 33 25 / 22%);
   border-radius: 999px;
   background: rgb(255 253 248 / 42%);
-  color: #5a3d0e;
+  color: var(--music-ink);
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.14em;
@@ -206,7 +350,7 @@
 
 .music-act__inner h3 {
   margin: 0 0 0.5rem;
-  color: var(--ink);
+  color: var(--music-ink);
 }
 
 .music-act__inner small {
@@ -227,7 +371,7 @@
 
 
 .music-act__links .text-link {
-  color: #5a3d0e;
+  color: var(--music-ink);
 }
 
 
@@ -240,7 +384,7 @@
   margin-bottom: clamp(4rem, 8vw, 8rem);
   padding: clamp(2rem, 5vw, 5rem);
   border: 1px solid rgb(255 255 255 / 22%);
-  background: #182620;
+  background: var(--music-panel-bg);
 }
 
 .playlist-heading {
@@ -256,17 +400,17 @@
   line-height: 1;
 }
 
-/* The playlist eyebrow and its little rule are marigold in this section. */
+/* The playlist eyebrow and its little rule use the theme accent. */
 .playlist-heading .eyebrow {
-  color: var(--marigold);
+  color: var(--music-accent);
 }
 
 .playlist-heading .eyebrow::before {
-  background: var(--marigold);
+  background: var(--music-accent);
 }
 
 
-/* The "Trois playlists…" line is styled as a literary citation: a marigold
+/* The "Trois playlists…" line is styled as a literary citation: an accent
    left rule, display serif, italic, with a large opening quote mark. */
 .playlist-citation {
   position: relative;
@@ -274,7 +418,7 @@
   margin: 1.5rem 0 2.5rem;
   padding-left: 1.5rem;
 
-  border-left: 2px solid var(--marigold);
+  border-left: 2px solid var(--music-accent);
   font-family: var(--font-display);
   font-size: clamp(1.3rem, 2.4vw, 1.9rem);
   font-style: italic;
@@ -291,7 +435,7 @@
   font-family: var(--font-display);
   font-size: 3.5em;
   line-height: 1;
-  color: var(--marigold);
+  color: var(--music-accent);
   opacity: 0.35;
 }
 
@@ -308,9 +452,9 @@
   padding: 2rem;
   overflow: hidden;
   background:
-    radial-gradient(120% 90% at 100% 0%, rgb(198 139 43 / 12%), transparent 55%),
-    var(--cream);
-  color: var(--ink);
+    radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--music-accent) 12%, transparent), transparent 55%),
+    var(--music-card-bg);
+  color: var(--music-ink);
 }
 
 /* The playlist number is a large, stylised display numeral that sits behind
@@ -324,7 +468,7 @@
   font-size: clamp(5rem, 9vw, 8rem);
   font-weight: 400;
   line-height: 1;
-  color: rgb(169 77 49 / 14%);
+  color: var(--music-card-number);
   letter-spacing: -0.02em;
   pointer-events: none;
   user-select: none;
@@ -376,8 +520,8 @@
   grid-template-columns: 0.75fr 1.25fr;
   gap: clamp(2rem, 6vw, 6rem);
   padding: clamp(2rem, 5vw, 5rem);
-  background: var(--marigold);
-  color: var(--ink);
+  background: var(--music-accent);
+  color: var(--music-on-accent);
 }
 
 .open-stage h3 {

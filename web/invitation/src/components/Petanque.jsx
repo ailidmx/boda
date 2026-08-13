@@ -221,6 +221,7 @@ export function Petanque() {
               onDone={() => markResume(flow)}
               initialIndex={initialStep}
               hideBackOnLast
+              countSteps={visibleQuestions.length}
               steps={[
                 {
                   id: "participation",
