@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useApp } from "../context/AppContext.jsx";
 import { getRsvpScale, UNANSWERED_LEVEL } from "../rsvp-scale.js";
 import { resolveGuestName, resolveGuestPhoto } from "../guest-profiles.js";
+
 
 // Boolean answer levels (kept as integers 0–5 to stay compatible with the
 // shared `saveRsvpAnswers` Firestore schema).
@@ -292,20 +294,30 @@ export function RsvpQuestion({
             </div>
           </div>
 
-          <button
-            ref={legendFabRef}
-            className={`rsvp-legend-fab${
-              legendActive && !legendOpen ? " is-visible" : ""
-            }`}
-            type="button"
-            aria-label={SCALE_LEGEND_LABEL}
-            aria-haspopup="dialog"
-            onClick={() => setLegendOpen(true)}
-          >
-            <span aria-hidden="true">❓</span>
-          </button>
+          {/* The FAB is portaled to <body> so it escapes the flip card's
+              `perspective` ancestor. Without this, `position: fixed` would be
+              resolved against that transformed ancestor and the FAB would
+              stick to the section instead of floating over the viewport. */}
+          {createPortal(
+            <button
+              ref={legendFabRef}
+              className={`rsvp-legend-fab${
+                legendActive && !legendOpen ? " is-visible" : ""
+              }`}
+              type="button"
+              aria-label={SCALE_LEGEND_LABEL}
+              aria-haspopup="dialog"
+              onClick={() => setLegendOpen(true)}
+            >
+              <span className="rsvp-legend-fab-icon" aria-hidden="true">
+                ?
+              </span>
+            </button>,
+            document.body,
+          )}
         </>
       )}
     </div>
   );
 }
+

@@ -313,17 +313,47 @@
    plain background while only the content (day-program-slideset) gets the
    warm tinted background, so the two parts are visually distinct. */
 .weekend-program {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
   padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 6vw, 6rem);
-  background: var(--white);
+  /* The parchment image is applied inline (MEDIA.parchment) so it spans the
+     whole section edge-to-edge for a full-immersion background. These rules
+     make it cover the section and give a warm fallback tint. */
+  background-color: #f6ecd6;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .weekend-program__header {
+  position: relative;
   flex: 0 0 auto;
   width: 100%;
   margin-bottom: clamp(1.5rem, 3vw, 3rem);
+}
+
+/* Soft overlay behind the header text so the eyebrow, title and intro stay
+   legible over the parchment background. It sits above the section's
+   background image but below the header content. */
+.weekend-program__header::before {
+  content: "";
+  position: absolute;
+  inset: -1.5rem -1.25rem;
+  z-index: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(246 236 214 / 82%) 0%,
+    rgb(246 236 214 / 55%) 100%
+  );
+  filter: blur(0.5rem);
+  pointer-events: none;
+}
+
+.weekend-program__header > * {
+  position: relative;
+  z-index: 1;
 }
 
 
@@ -394,34 +424,20 @@
 
 /* The programme content is a single long parchment-style list: all three
    days are stacked vertically, like reading a long scroll. The parchment
-   gets a warm aged-paper feel with soft golden orbs, a subtle grain and a
-   hand-drawn border, evoking a prehispanic lake legend. */
+   background now lives on the section itself (full-width, full immersion);
+   this container is transparent so the parchment shows through edge-to-edge. */
 .weekend-program .day-program-scroll {
   position: relative;
   flex: 1 1 auto;
   width: 100%;
   padding: clamp(2.5rem, 6vw, 6rem) clamp(1.25rem, 4vw, 4rem);
-  background:
-    radial-gradient(90% 60% at 12% 8%, rgb(228 185 104 / 22%), transparent 55%),
-    radial-gradient(80% 55% at 88% 20%, rgb(169 77 49 / 14%), transparent 55%),
-    radial-gradient(70% 50% at 50% 100%, rgb(122 139 122 / 16%), transparent 60%),
-    linear-gradient(180deg, #f6ecd6, #efe0c0 45%, #f3e7cd);
-  background-position: center;
-  background-size: cover;
-  background-repeat: no-repeat;
-  border-radius: 1.5rem;
-  box-shadow:
-    inset 0 0 0 1px rgb(169 77 49 / 14%),
-    inset 0 0 3rem rgb(169 77 49 / 8%),
-    0 1.5rem 3.5rem rgb(36 33 25 / 14%);
 }
 
 
 /* A soft "light" glow drifting across the parchment, like candlelight. */
-.weekend-program .day-program-scroll::before {
+.weekend-program::before {
   position: absolute;
   inset: 0;
-  border-radius: inherit;
   background:
     radial-gradient(40% 30% at 30% 12%, rgb(255 244 214 / 55%), transparent 70%),
     radial-gradient(35% 28% at 72% 40%, rgb(255 236 200 / 40%), transparent 70%);
@@ -442,7 +458,7 @@
 }
 
 /* A subtle woven / prehispanic-inspired border motif along the top edge. */
-.weekend-program .day-program-scroll::after {
+.weekend-program::after {
   position: absolute;
   top: 0.9rem;
   right: 1.5rem;
@@ -459,17 +475,26 @@
 }
 
 /* Each day is its own block on the parchment, with generous breathing room
-   between blocks so the long list reads comfortably. */
+   between blocks so the long list reads comfortably. Each block is a soft
+   rounded card: a translucent warm overlay with a hairline border and a
+   gentle shadow so the days read as distinct panels on the parchment. */
 .day-program-block {
   position: relative;
   z-index: 1;
-  padding: clamp(1.5rem, 3vw, 3rem) 0;
+  padding: clamp(1.5rem, 3vw, 3rem);
+  border: 1px solid rgb(169 77 49 / 22%);
+  border-radius: 1.25rem;
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgb(255 253 248 / 62%), transparent 55%),
+    rgb(255 253 248 / 55%);
+  box-shadow: 0 0.75rem 2rem rgb(36 33 25 / 8%);
   scroll-margin-top: 1.5rem;
 }
 
 .day-program-block + .day-program-block {
-  border-top: 1px dashed rgb(169 77 49 / 30%);
+  margin-top: clamp(1.5rem, 3vw, 3rem);
 }
+
 
 /* Day heading row: eyebrow centred between the previous/next scroll arrows. */
 .day-program-block__head {
@@ -594,7 +619,7 @@
 
 .day-program-timeline p {
   margin: 0.25rem 0 0;
-  color: white;
+  color: var(--terracotta-complement);
   font-size: clamp(0.95rem, 1.3vw, 1.05rem);
   line-height: 1.25;
   font-weight: 600;
@@ -738,8 +763,9 @@
   }
 
   .day-program-block {
-    padding: 1.25rem 0;
+    padding: 1.25rem;
   }
+
 
   .day-program-block__head {
     grid-template-columns: 2rem minmax(0, 1fr) 2rem;
@@ -756,9 +782,23 @@
     font-size: clamp(1.5rem, 6vw, 2rem);
   }
 
+  /* On mobile the timeline rows give the time and the content the same
+     width (1fr 1fr) so the columns align cleanly. The time gets a min-width
+     so short times don't collapse and the two columns stay balanced. */
+  .day-program-timeline li {
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .day-program-timeline time {
+    min-width: 0;
+    justify-content: flex-start;
+  }
+
   .weekend-program .weekend-nav {
     flex: 0 0 auto;
   }
+
 
   .weekend-program .weekend-nav {
     margin-top: 0.75rem;

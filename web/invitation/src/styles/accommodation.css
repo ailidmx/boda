@@ -21,6 +21,7 @@
 
 .accommodation-copy {
   position: relative;
+  min-width: 0;
 }
 
 .accommodation-copy h2 {
@@ -312,6 +313,7 @@
 
 
 .accommodation-form-wrap {
+  min-width: 0;
   padding: clamp(2rem, 4vw, 4rem);
   border: 1px solid rgb(36 33 25 / 12%);
   background: rgb(255 253 248 / 72%);
@@ -419,6 +421,51 @@
   font-size: clamp(2rem, 4vw, 3.5rem);
   font-weight: 400;
   line-height: 1;
+}
+
+/* Title row: the section heading with a cluster of the group members'
+   avatars on the right. The avatars overlap slightly (like a shared-group
+   facepile) and stay on one line with the heading. */
+.accommodation-form-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.accommodation-form-title h3 {
+  margin: 0;
+}
+
+.accommodation-form-avatars {
+  display: flex;
+  align-items: center;
+  padding-left: 0.75rem;
+}
+
+.accommodation-form-avatar {
+  display: grid;
+  flex: 0 0 2.6rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  margin-left: -0.75rem;
+  overflow: hidden;
+  place-items: center;
+  border: 2px solid var(--cream);
+  border-radius: 50%;
+  background: var(--terracotta, #b85c38);
+  color: var(--cream);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  box-shadow: 0 0.2rem 0.5rem rgb(36 33 25 / 18%);
+}
+
+.accommodation-form-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .accommodation-form-wrap > p:not(.eyebrow) {
@@ -1171,17 +1218,18 @@
 }
 
 /* Desktop-only bottom nav linking to the next section (Food / "A TABLE").
-   The section is a 2-column grid, so the nav spans both columns and sits in
-   its own bottom row. Hidden on mobile, where the stacked panels already
-   provide their own sub-navigation. */
+   The section is a 2-column grid: row 1 holds the copy + form-wrap, row 2
+   holds the full-width recap, and row 3 holds the nav spanning both columns.
+   Hidden on mobile, where the stacked panels already provide their own
+   sub-navigation. */
 @media (min-width: 900px) {
   .accommodation-section {
-    grid-template-rows: 1fr auto;
+    grid-template-rows: 1fr auto auto;
   }
 
   .accommodation-section-nav {
     grid-column: 1 / -1;
-    grid-row: 2;
+    grid-row: 3;
     align-self: end;
     margin-top: 0;
   }
@@ -1392,6 +1440,8 @@
     position: relative;
     display: block;
     width: min(100%, 28rem);
+    max-height: min(90vh, 40rem);
+    overflow: auto;
     padding: 2.25rem 1.5rem 1.75rem;
     border-top: 0.3rem solid var(--marigold);
     background: var(--cream);
@@ -1484,14 +1534,51 @@
   border-top: 1px solid rgb(36 33 25 / 18%);
 }
 
+/* The recap is rendered once, in its own full-width space below the
+   two-column grid (copy + form-wrap), so it always sits below the
+   accommodation options on every breakpoint. `min-width: 0` lets the grid
+   item shrink within its track so long nowrap content (e.g. the per-person
+   price) can't push it past the container edge. */
+.accommodation-recap--inline {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin: 0;
+  padding: clamp(2.5rem, 8vw, 4rem) clamp(1.25rem, 6vw, 2rem);
+  border-top: 1px solid rgb(36 33 25 / 18%);
+}
+
+
 .accommodation-recap-head h3 {
   margin: 0.5rem 0 0.75rem;
 }
 
+/* Citation-style intro: left border + display italic, echoing the section's
+   pull-quote so the recap reads as a quiet, personal note. Scaled down from
+   the main citation since it sits inside the recap card. */
 .accommodation-recap-intro {
-  margin: 0 0 1.25rem;
-  color: rgb(36 33 25 / 78%);
-  line-height: 1.6;
+  position: relative;
+  max-width: 60rem;
+  margin: 0 0 1.5rem;
+  padding-left: 1.25rem;
+  border-left: 2px solid var(--marigold, #d9b36a);
+  color: rgb(36 33 25 / 82%);
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 2.6vw, 1.35rem);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.accommodation-recap-intro::before {
+  content: "“";
+  position: absolute;
+  top: -0.45em;
+  left: -0.1rem;
+  color: var(--marigold, #d9b36a);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.6em;
+  line-height: 1;
+  opacity: 0.35;
+  pointer-events: none;
 }
 
 .accommodation-recap-rows {
@@ -1501,6 +1588,7 @@
 
 .accommodation-recap-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 1rem;
@@ -1509,6 +1597,7 @@
   border-radius: 0.75rem;
   background: rgb(255 255 255 / 55%);
 }
+
 
 .accommodation-recap-person {
   display: flex;
@@ -1546,6 +1635,87 @@
   flex: 0 0 auto;
   gap: 0.5rem;
 }
+
+/* Per-person price shown in the recap question rows. */
+.accommodation-recap-price {
+  display: grid;
+  gap: 0.15rem;
+  flex: 0 0 auto;
+  text-align: right;
+  min-width: 0;
+}
+
+.accommodation-recap-price small {
+  color: rgb(36 33 25 / 62%);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.accommodation-recap-price-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.accommodation-recap-price-value strong {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.accommodation-recap-price-value s {
+  color: rgb(36 33 25 / 45%);
+  font-size: 0.85rem;
+}
+
+.accommodation-recap-price-value.is-covered strong {
+  color: var(--terracotta, #c96f4a);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.accommodation-recap-price-value small {
+  color: rgb(36 33 25 / 55%);
+  font-size: 0.8rem;
+}
+
+/* Full-width banner shown when a member's stay is covered by the couple.
+   The recap row wraps so this banner spans the whole row width. Uses the
+   green "success" style (sage) so it reads as a positive confirmation and
+   matches the summary-view covered banner. */
+.accommodation-recap-covered-banner {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--sage, #7a9b76) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sage, #7a9b76) 42%, transparent);
+  color: #2f4d2c;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.accommodation-recap-covered-banner span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  background: var(--sage, #7a9b76);
+  color: #fff;
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
+
 
 /* The recap sits on the light accommodation background, so the shared
    .rsvp-boolean-btn (designed for the dark RSVP section) needs a light-theme
@@ -1636,9 +1806,10 @@
 
 .accommodation-recap-summary-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 0.5rem 1rem;
   padding: 0.6rem 0;
   border-bottom: 1px dashed rgb(36 33 25 / 14%);
 }
@@ -1703,6 +1874,83 @@
   color: #8a3d24;
 }
 
+/* Per-person price shown in the recap summary rows. */
+.accommodation-recap-summary-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.accommodation-recap-summary-price strong {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.accommodation-recap-summary-price s {
+  color: rgb(36 33 25 / 45%);
+  font-size: 0.8rem;
+}
+
+.accommodation-recap-summary-price small {
+  color: var(--terracotta, #c96f4a);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+/* The EUR estimate in the non-covered summary price is muted, unlike the
+   terracotta "covered" label. */
+.accommodation-recap-summary-price small.is-eur {
+  color: rgb(36 33 25 / 55%);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+
+.accommodation-recap-summary-price.is-covered strong {
+  color: var(--terracotta, #c96f4a);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* Full-width banner shown in the summary rows when a member's stay is
+   covered by the couple. Mirrors the question-step covered banner so the
+   "Pris en charge" label has the same success style and sits on its own line
+   (the summary row wraps, so this spans the full row width). */
+.accommodation-recap-summary-covered-banner {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--sage, #7a9b76) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sage, #7a9b76) 42%, transparent);
+  color: #2f4d2c;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.accommodation-recap-summary-covered-banner span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  background: var(--sage, #7a9b76);
+  color: #fff;
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
+
 .accommodation-recap-confirmation {
   display: flex;
   align-items: center;
@@ -1737,16 +1985,95 @@
 
 @media (max-width: 899px) {
 
-  .accommodation-recap-row {
-    align-items: flex-start;
-    flex-direction: column;
+  /* On mobile the section already provides its own horizontal padding, so
+     trim the recap's side padding to give the child rows more width. */
+  .accommodation-recap--inline {
+    padding-inline: clamp(0.5rem, 2vw, 1rem);
   }
 
+  /* The shared flip-step-card is reused here on the light accommodation
+     background. On mobile we strip its default card chrome (padding + top
+     margin) so the recap rows own the full width and the layout is rebuilt
+     from scratch to fit the narrow viewport. */
+  .accommodation-recap .flip-step-card {
+    padding: 0;
+    margin-top: 0;
+  }
+
+  .accommodation-recap .flip-step-card-body {
+    gap: 0.75rem;
+  }
+
+  /* Each recap row keeps the desktop flex-wrap layout: avatar + name on the
+     left, per-person price on the right, the covered banner full-width on its
+     own line, and the Yes/No toggle on the right. */
+  .accommodation-recap-row {
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 0.9rem;
+  }
+
+  .accommodation-recap-person-text strong {
+    font-size: 1rem;
+  }
+
+  .accommodation-recap-person-text span {
+    font-size: 0.82rem;
+    line-height: 1.35;
+  }
+
+  .accommodation-recap-price-value {
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+
+  /* The covered banner spans the full row width. */
+  .accommodation-recap-covered-banner {
+    margin-top: 0;
+  }
+
+  /* The Yes/No toggle is a full-width two-button row. */
   .accommodation-recap-toggle {
     width: 100%;
   }
 
   .accommodation-recap-toggle .rsvp-boolean-btn {
     flex: 1 1 0;
+    min-height: 2.9rem;
+  }
+
+  /* Save row: stack the button and status text so they fit the width. */
+  .accommodation-recap-save {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .accommodation-recap-save small {
+    text-align: center;
+  }
+
+  /* Summary rows: stack person info, price and value so each line is
+     readable on a narrow screen. */
+  .accommodation-recap-summary {
+    padding: 1.1rem 1rem;
+  }
+
+  .accommodation-recap-summary-row {
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .accommodation-recap-summary-person {
+    flex: 1 1 100%;
+  }
+
+  .accommodation-recap-summary-price {
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+
+  .accommodation-recap-summary-value {
+    margin-left: auto;
   }
 }

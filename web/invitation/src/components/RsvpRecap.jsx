@@ -8,9 +8,14 @@ import { BOOLEAN_YES, BOOLEAN_NO } from "./RsvpQuestion.jsx";
 /**
  * Recapitulative summary of all RSVP scale answers.
  *
- * Shows, per question, each guest's chosen level (emoji + localized message),
+ * Shows, per GUEST, one card with a row for each question (e.g. Friday,
+ * Saturday, Sunday) and that guest's chosen level (emoji + localized message),
  * so the group can review everything before sending. Guests can jump back to a
  * question to change an answer — nothing is final until they submit.
+ *
+ * This is the SAME component used both in the mini RSVP flows (Te animas,
+ * Pétanque, Coast) and in the bottom RSVP form, so any change here is
+ * reproduced everywhere automatically.
  *
  * Props:
  *   questions  array  [{ id, title, subtitle }]
@@ -37,16 +42,30 @@ export function RsvpRecap({ questions = [], guests = [], answers = {} }) {
         </p>
       </div>
 
-      {questions.map((q) => {
-        const qAnswers = answers[q.id] || {};
+      {guests.map((guest) => {
+        const name = resolveGuestName(guest);
+        const photo = resolveGuestPhoto(guest);
         return (
-          <div className="rsvp-recap-question" key={q.id}>
-            <h4 className="rsvp-recap-question-title">{q.title}</h4>
+          <div className="rsvp-recap-guest" key={guest.id}>
+            <div className="rsvp-recap-guest-head">
+              {photo ? (
+                <img
+                  className="rsvp-recap-avatar"
+                  src={photo}
+                  alt=""
+                  loading="lazy"
+                />
+              ) : (
+                <span className="rsvp-recap-avatar rsvp-recap-avatar--fallback">
+                  {(name.fullName || "?").charAt(0).toUpperCase()}
+                </span>
+              )}
+              <span className="rsvp-recap-name">{name.fullName}</span>
+            </div>
+
             <ul className="rsvp-recap-list">
-              {guests.map((guest) => {
-                const name = resolveGuestName(guest);
-                const photo = resolveGuestPhoto(guest);
-                const level = Number(qAnswers[guest.id]) || UNANSWERED_LEVEL;
+              {questions.map((q) => {
+                const level = Number(answers[q.id]?.[guest.id]) || UNANSWERED_LEVEL;
                 const isBoolean = q.variant === "boolean";
                 const entry = isBoolean ? null : getRsvpScaleLevel(level);
                 const booleanLabel =
@@ -56,22 +75,8 @@ export function RsvpRecap({ questions = [], guests = [], answers = {} }) {
                       ? recap.no
                       : null;
                 return (
-                  <li className="rsvp-recap-row" key={guest.id}>
-                    <span className="rsvp-recap-identity">
-                      {photo ? (
-                        <img
-                          className="rsvp-recap-avatar"
-                          src={photo}
-                          alt=""
-                          loading="lazy"
-                        />
-                      ) : (
-                        <span className="rsvp-recap-avatar rsvp-recap-avatar--fallback">
-                          {(name.fullName || "?").charAt(0).toUpperCase()}
-                        </span>
-                      )}
-                      <span className="rsvp-recap-name">{name.fullName}</span>
-                    </span>
+                  <li className="rsvp-recap-row" key={q.id}>
+                    <span className="rsvp-recap-question-label">{q.title}</span>
                     {entry ? (
                       <span className="rsvp-recap-answer">
                         <span className="rsvp-recap-text">
@@ -93,7 +98,6 @@ export function RsvpRecap({ questions = [], guests = [], answers = {} }) {
                   </li>
                 );
               })}
-
             </ul>
           </div>
         );

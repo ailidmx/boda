@@ -8,7 +8,19 @@
     padding: clamp(2rem, 6vw, 3rem);
     outline-offset: -0.4rem;
   }
+
+  /* Compact the 0–5 scale buttons on mobile so the per-guest rows stay snug
+     and the selector doesn't overflow on narrow screens. */
+  .rsvp-question-guest .rsvp-scale-btn {
+    width: 2.0rem;
+    height: 2.0rem;
+    font-size: 0.9rem;
+  }
 }
+
+
+
+
 
 
 /* The RSVP section is a single container: the section itself is the dark
@@ -39,15 +51,54 @@
   background: #e4b968;
 }
 
+/* The RSVP intro is styled as an elegant citation (quote): italic display
+   type, a marigold quote mark and a left rule, echoing the venue and weather
+   citations. It sits on the dark green frame, so the text is light and the
+   accent is the golden marigold used across the RSVP section. */
 .rsvp-section > p:not(.eyebrow) {
+  position: relative;
   max-width: 34rem;
   margin: 0 auto 2rem;
+  padding-left: 1.5rem;
+  border-left: 2px solid #e4b968;
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-style: italic;
+  line-height: 1.5;
+  color: rgb(255 253 248 / 92%);
+  text-align: left;
 }
+
+.rsvp-section > p:not(.eyebrow)::before {
+  content: "“";
+  position: absolute;
+  top: -0.35em;
+  left: -0.15rem;
+  font-family: var(--font-display);
+  font-size: 3.5em;
+  line-height: 1;
+  color: #e4b968;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
 
 .fieldset-note {
   max-width: 46rem;
   margin: 0 0 1.5rem;
   color: rgb(255 253 248 / 70%);
+  /* Ensure the note is a plain paragraph, never a citation: reset any
+     left border, padding, italic and quote mark that a generic `p` rule
+     (e.g. `.rsvp-section > p:not(.eyebrow)`) might apply. */
+  padding-left: 0;
+  border-left: 0;
+  font-style: normal;
+  font-family: inherit;
+  text-align: inherit;
+}
+.fieldset-note::before,
+.fieldset-note::after {
+  content: none;
 }
 
 /* Bottom "continue" nav inside the "¡Te animas!" RSVP section. Mirrors the
@@ -221,7 +272,9 @@
   padding: 0.75rem 1rem;
   border: 1px solid rgb(255 255 255 / 14%);
   background: rgb(255 255 255 / 3%);
+  overflow: hidden;
 }
+
 
 .rsvp-guest-identity {
   display: flex;
@@ -250,7 +303,11 @@
 .rsvp-guest-name {
   font-weight: 600;
   color: var(--white);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
+
 
 /* 0–5 selector */
 .rsvp-scale-selector {
@@ -343,7 +400,18 @@
   text-align: left;
 }
 
+/* On mobile the recap sits directly on the dark green frame, so drop the
+   card border and padding to avoid a nested "box in a box" look. This rule
+   must come AFTER the base .rsvp-recap rule so it wins the cascade. */
+@media (max-width: 600px) {
+  .rsvp-recap {
+    border: 0;
+    padding: 0;
+  }
+}
+
 .rsvp-recap-head {
+
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -364,16 +432,36 @@
   font-size: 0.9rem;
 }
 
-.rsvp-recap-question {
+/* Each guest gets one card with a row per question (e.g. Friday, Saturday,
+   Sunday). The card is intentionally light/transparent so it reads as a
+   grouped list rather than a nested box. */
+.rsvp-recap-guest {
   display: grid;
-  gap: 0.75rem;
+  gap: 0.5rem;
+  padding: 0.9rem 0.25rem;
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
 }
 
-.rsvp-recap-question-title {
-  margin: 0;
-  color: var(--white);
-  font-size: 1.05rem;
+.rsvp-recap-guest:last-child {
+  border-bottom: 0;
 }
+
+.rsvp-recap-guest-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  margin-bottom: 0.25rem;
+}
+
+.rsvp-recap-question-label {
+  color: rgb(255 253 248 / 70%);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
 
 .rsvp-recap-list {
   list-style: none;
@@ -389,10 +477,14 @@
   justify-content: space-between;
   gap: 1rem;
   flex-wrap: wrap;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid rgb(255 255 255 / 12%);
-  background: rgb(255 255 255 / 3%);
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid rgb(255 255 255 / 8%);
 }
+
+.rsvp-recap-row:last-child {
+  border-bottom: 0;
+}
+
 
 .rsvp-recap-identity {
   display: flex;
@@ -524,6 +616,15 @@
   font-size: clamp(1.1rem, 2vw, 1.5rem);
 }
 
+/* On mobile the step label is redundant with the "Étape X / Y" counter, so
+   hide it to keep the step header compact. */
+@media (max-width: 600px) {
+  .flip-step-label {
+    display: none;
+  }
+}
+
+
 .flip-step-body {
   position: relative;
   perspective: 1200px;
@@ -588,6 +689,28 @@
 .rsvp-scale-save .button {
   width: 100%;
 }
+
+/* Secondary "Modify my answers" action on the recap step. It replaces the
+   generic "Back" button on the last step and jumps back to the first question
+   so the guest can review and change their answers. */
+.rsvp-scale-modify {
+  width: 100%;
+  padding: 0.6rem 1.25rem;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--white);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease;
+}
+
+.rsvp-scale-modify:hover {
+  transform: scale(1.02);
+  border-color: #e4b968;
+}
+
 
 
 /* ── Mobile scale legend modal + FAB ────────────────────────────────────
@@ -686,8 +809,9 @@
     cursor: pointer;
   }
 
-  /* Circular, marigold-bordered FAB fixed to the bottom-right. Appears only
-     while the question is in view. */
+  /* Circular, golden FAB fixed to the bottom-right. Appears only while the
+     question is in view. It is portaled to <body> so `position: fixed` is
+     resolved against the viewport (not a transformed ancestor). */
   .rsvp-legend-fab {
     position: fixed;
     z-index: 130;
@@ -700,10 +824,9 @@
     padding: 0;
     border: 3px solid var(--marigold);
     border-radius: 50%;
-    background: var(--terracotta);
-    color: var(--white);
+    background: var(--marigold);
+    color: var(--deep-green);
     box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
-    font-size: 1.9rem;
     line-height: 1;
 
     opacity: 0;
@@ -712,12 +835,20 @@
     transition: opacity 180ms ease, transform 180ms ease;
   }
 
+  .rsvp-legend-fab-icon {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
   .rsvp-legend-fab.is-visible {
     opacity: 1;
     pointer-events: auto;
     transform: translateY(0) scale(1);
   }
 }
+
 
 /* ── RSVP progress checklist ────────────────────────────────────────────
    A compact checklist that shows which mini-RSVP flows (Te animas, Pétanque,

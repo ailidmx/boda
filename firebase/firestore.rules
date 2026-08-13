@@ -441,7 +441,45 @@ service cloud.firestore {
 
 
 
+    // ── Card votes (star ratings on experience cards) ─────────────────────
+    // One document per (card, guest) pair. The document ID is
+    // `${cardType}_${cardKey}_${guestId}`, which is enforced below so a guest
+    // can only ever create/update their own single vote for a given card.
+    // Any authenticated guest may read all votes so the app can compute the
+    // average rating and vote count for each card.
+    function hasValidCardVoteFields() {
+      return request.resource.data.keys().hasAll([
+          "cardType", "cardKey", "guestId", "rating", "updatedBy", "updatedAt"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "cardType", "cardKey", "guestId", "rating", "updatedBy", "updatedAt"
+        ])
+        && request.resource.data.cardType in ["food", "music"]
+        && isShortText(request.resource.data.cardKey, 100)
+        && request.resource.data.cardKey.size() > 0
+        && isShortText(request.resource.data.guestId, 100)
+        && request.resource.data.guestId == request.auth.uid
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && isShortText(request.resource.data.updatedBy, 100)
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    match /card_votes/{voteId} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null
+        && hasValidCardVoteFields()
+        && voteId == request.resource.data.cardType + "_" + request.resource.data.cardKey + "_" + request.auth.uid;
+      allow delete: if false;
+    }
+
+
+
+
     match /guests/{guestId} {
+
 
       // READ SCOPE: Any authenticated guest may read all guests so the app can
       // compute correct prices and cabin occupancy across the whole guest list.

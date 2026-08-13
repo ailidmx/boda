@@ -7,12 +7,31 @@ export function Weather() {
   const [adviceOpen, setAdviceOpen] = useState(false);
   const [weatherActive, setWeatherActive] = useState(false);
   const [mobileSlide, setMobileSlide] = useState(0);
+  const [isMobile, setIsMobile] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(max-width: 899px)").matches,
+  );
   const sectionRef = useRef(null);
   const fabRef = useRef(null);
   const panelRef = useRef(null);
   const closeRef = useRef(null);
+  const touchStartX = useRef(null);
   const slideCount = 2;
 
+  // Track the breakpoint so the weather-day reveal animation only plays when
+  // slide 2 (the moments) is active on mobile, while staying always-on for
+  // desktop where the slideset is not used.
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 899px)");
+    const onChange = (event) => setIsMobile(event.matches);
+    setIsMobile(mq.matches);
+    mq.addEventListener?.("change", onChange);
+    return () => mq.removeEventListener?.("change", onChange);
+  }, []);
+
+
+  const goToSlide = (index) => {
+    setMobileSlide(Math.max(0, Math.min(slideCount - 1, index)));
+  };
 
   // Show the "Qué traer" FAB only while the weather section is in view.
   useEffect(() => {
@@ -61,6 +80,24 @@ export function Weather() {
     };
   }, [adviceOpen]);
 
+  // Swipe support: track a horizontal drag on the slideset track and change
+  // the active slide when the swipe crosses a threshold.
+  const handleTouchStart = (event) => {
+    touchStartX.current = event.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (event) => {
+    if (touchStartX.current === null) return;
+    const deltaX = event.changedTouches[0].clientX - touchStartX.current;
+    touchStartX.current = null;
+    if (Math.abs(deltaX) < 40) return; // ignore taps / small movements
+    if (deltaX < 0) {
+      goToSlide(mobileSlide + 1); // swipe left → next
+    } else {
+      goToSlide(mobileSlide - 1); // swipe right → previous
+    }
+  };
+
   return (
     <section className="weather-section section story-bg" ref={sectionRef}>
       <div className="weather-heading reveal">
@@ -75,9 +112,25 @@ export function Weather() {
       </div>
 
       {/* Mobile: the facts and the moments become a 2-slide slideset so the
-          section stays compact. On desktop both render in their usual layout. */}
+          section stays compact. On desktop both render in their usual layout.
+          Big arrows sit on the left/right edges, vertically centred, and the
+          slides are swipable. */}
       <div className="weather-slideset">
-        <div className="weather-slideset__track">
+        <button
+          className="weather-slideset__arrow weather-slideset__arrow--prev"
+          type="button"
+          aria-label="Previous"
+          disabled={mobileSlide === 0}
+          onClick={() => goToSlide(mobileSlide - 1)}
+        >
+          ←
+        </button>
+
+        <div
+          className="weather-slideset__track"
+          onTouchStart={handleTouchStart}
+          onTouchEnd={handleTouchEnd}
+        >
           <div
             className={`weather-slideset__slide weather-slideset__slide--facts${mobileSlide === 0 ? " is-active" : ""}`}
           >
@@ -95,7 +148,7 @@ export function Weather() {
           <div
             className={`weather-slideset__slide weather-slideset__slide--moments${mobileSlide === 1 ? " is-active" : ""}`}
           >
-            <div className="weather-day reveal">
+            <div className={`weather-day${!isMobile || mobileSlide === 1 ? " reveal" : ""}`}>
               <div className="weather-moments">
                 {weather.moments.map((moment, index) => (
                   <article className="weather-moment reveal" key={index}>
@@ -117,41 +170,15 @@ export function Weather() {
           </div>
         </div>
 
-        {/* Slideset navigation (mobile only) */}
-        <div className="weather-slideset__nav" aria-label="Weather slides">
-          <button
-            className="weather-slideset__arrow"
-            type="button"
-            aria-label="Previous"
-            disabled={mobileSlide === 0}
-            onClick={() => setMobileSlide((s) => Math.max(0, s - 1))}
-          >
-            ←
-          </button>
-          <div className="weather-slideset__dots">
-            {Array.from({ length: slideCount }).map((_, index) => (
-              <button
-                key={index}
-                className={`weather-slideset__dot${mobileSlide === index ? " is-active" : ""}`}
-                type="button"
-                aria-label={`Slide ${index + 1}`}
-                aria-current={mobileSlide === index ? "true" : undefined}
-                onClick={() => setMobileSlide(index)}
-              >
-                <span />
-              </button>
-            ))}
-          </div>
-          <button
-            className="weather-slideset__arrow"
-            type="button"
-            aria-label="Next"
-            disabled={mobileSlide === slideCount - 1}
-            onClick={() => setMobileSlide((s) => Math.min(slideCount - 1, s + 1))}
-          >
-            →
-          </button>
-        </div>
+        <button
+          className="weather-slideset__arrow weather-slideset__arrow--next"
+          type="button"
+          aria-label="Next"
+          disabled={mobileSlide === slideCount - 1}
+          onClick={() => goToSlide(mobileSlide + 1)}
+        >
+          →
+        </button>
       </div>
 
 

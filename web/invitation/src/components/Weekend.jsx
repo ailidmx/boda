@@ -135,7 +135,11 @@ function DayProgramSlideset({ programs }) {
   };
 
   return (
-    <section className="weekend-program section" ref={sectionRef}>
+    <section
+      className="weekend-program section"
+      ref={sectionRef}
+      style={{ backgroundImage: `url(${MEDIA.parchment})` }}
+    >
       <div className="weekend-program__header">
         <div className="section-heading reveal">
           <p className="eyebrow">{weekend.eyebrow}</p>
@@ -144,10 +148,7 @@ function DayProgramSlideset({ programs }) {
         </div>
       </div>
 
-      <div
-        className="day-program-scroll"
-        style={{ backgroundImage: `url(${MEDIA.parchment})` }}
-      >
+      <div className="day-program-scroll">
         {programs.map((program, index) => (
 
           <div
