@@ -153,15 +153,15 @@
   border-bottom-color: rgb(255 255 255 / 25%);
 }
 
-/* The coast eyebrow is marigold (matching the beach/sea palette) and its
-   little rule (the ::before bar) is marigold too, so it reads clearly over
+/* The coast eyebrow is gold sand (matching the beach/sea palette) and its
+   little rule (the ::before bar) is gold sand too, so it reads clearly over
    the dark translucent panel. */
 .coast-copy .section-heading .eyebrow {
-  color: var(--marigold);
+  color: #F2D49B;
 }
 
 .coast-copy .section-heading .eyebrow::before {
-  background: var(--marigold);
+  background: #F2D49B;
 }
 
 
@@ -215,7 +215,7 @@
 }
 
 .coast-ideas strong {
-  color: #e4b968;
+  color: #F2D49B;
   font-family: var(--font-display);
   font-size: 1.15rem;
   font-weight: 400;
@@ -368,13 +368,20 @@
 .coast-rsvp-save {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
   flex-wrap: wrap;
 }
 
 .coast-rsvp-save .button {
-  width: 100%;
+  flex: 1 1 12rem;
   margin: 0;
+}
+
+/* On small screens the two actions (Modify + Save) stack full-width. */
+@media (max-width: 480px) {
+  .coast-rsvp-save .button {
+    flex-basis: 100%;
+  }
 }
 
 
@@ -538,9 +545,33 @@
   line-height: 1.05;
 }
 
+/* The budget intro is a citation (blockquote): a large display quote with a
+   golden left rule and quotation marks, echoing the suggestions citation and
+   the travel citation. It sits on the dark translucent panel, so it uses a
+   light, clear cream-gold text for good contrast. */
 .coast-budget-intro {
+  position: relative;
+  margin: 0;
   max-width: 46rem;
-  color: rgb(255 255 255 / 82%);
+  padding: 0.25rem 0 0.25rem 1.75rem;
+  border-left: 3px solid var(--marigold);
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2.2vw, 1.6rem);
+  line-height: 1.5;
+  color: #f3e6c8;
+}
+
+.coast-budget-intro::before {
+  content: "“";
+  position: absolute;
+  top: -0.55em;
+  left: 0.35rem;
+  font-family: var(--font-display);
+  font-size: 2.6em;
+  line-height: 1;
+  color: var(--marigold);
+  opacity: 0.55;
+  pointer-events: none;
 }
 
 /* The three input figures: rate per night, number of nights, interested
@@ -668,6 +699,9 @@
 @media (max-width: 899px) {
   .coast-budget {
     grid-column: 1 / -1;
+    /* Give the budget block breathing room below it on mobile so it doesn't
+       crowd the next section (the mini RSVP card). */
+    margin-bottom: clamp(2rem, 6vw, 3.5rem);
   }
 
   .coast-budget-figures {
@@ -718,6 +752,14 @@
    default ink inherited from the shared accommodation price styles. */
 .coast-extra-stay .accommodation-plan-price strong {
   color: var(--terracotta, #b85c38);
+}
+
+/* The citation sits on the light cream panel, so it must use the dark ink
+   (like the heading) instead of the light coast text color it would
+   otherwise inherit from `.coast-section`. This keeps the whole extra-stay
+   block harmonious: dark heading, dark citation, terracotta eyebrow. */
+.coast-extra-stay .accommodation-citation {
+  color: var(--ink, #241f16);
 }
 
 @media (max-width: 899px) {

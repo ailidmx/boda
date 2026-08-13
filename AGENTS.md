@@ -178,6 +178,21 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   Cloudinary assets into `boda/cabin/<slug>/` (via `uploader.rename`) and store
   the relative IDs. See `scripts/update-casona-lavanda-photos.mjs` for a
   working example (it also shows how to split a batch of uploads by timestamp).
+- **Mini-RSVP recap step** — In the stepped mini-RSVP cards (Coast, Pétanque,
+  "¡Te animas!"), the recap step is the LAST step and holds BOTH the "Modify my
+  answers" button (jumps back to step 1 via `goToStart`) and the save button.
+  The save button must live on the recap step, never on an intermediate
+  question step. The recap step's `render` receives `{ goToStart }` from
+  `FlipStepCard`.
+- **`.fieldset-note` is a plain paragraph** — The RSVP section styles generic
+  `p` tags as elegant citations (left border, italic, quote mark). Any note
+  that must NOT look like a citation (e.g. `.fieldset-note`) needs an explicit
+  override resetting `padding-left`, `border-left`, `font-style`, and
+  `::before`/`::after` `content: none`.
+- **RSVP progress "done" state** — The final RSVP progress checklist derives
+  "done" from the actual answers via `computeInitialStepIndex` (a flow is done
+  when its current step reaches the recap), NOT from a separate saved flag.
+  This keeps "En attente" clearing as soon as answers are saved/reach recap.
 - **Guest data sourcing (Firestore-only)** — `web/invitation/src/guests.js` is
   the guest registry and sources ALL data from the LIVE Firestore `guests`
   cache (populated by `loadAllGuests()`/`loadGuestProfiles()` in

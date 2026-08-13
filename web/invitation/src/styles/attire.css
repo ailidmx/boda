@@ -74,6 +74,73 @@
     );
 }
 
+/* Variant C — confetti fiesta: a festive burst of scattered Mexican-colour
+   confetti dots over a deep warm base, evoking celebration and joy. */
+.attire-bg--confetti {
+  background:
+    /* Scattered confetti dots in Mexican colours */
+    radial-gradient(circle at 12% 18%, #e4007c 0 2.2%, transparent 2.4%),
+    radial-gradient(circle at 28% 8%, #f7c600 0 1.8%, transparent 2%),
+    radial-gradient(circle at 44% 22%, #00b5ad 0 2.4%, transparent 2.6%),
+    radial-gradient(circle at 62% 12%, #7b2d8b 0 1.9%, transparent 2.1%),
+    radial-gradient(circle at 78% 26%, #a8e000 0 2.2%, transparent 2.4%),
+    radial-gradient(circle at 90% 14%, #ff7f00 0 1.8%, transparent 2%),
+    radial-gradient(circle at 8% 42%, #1e90ff 0 2%, transparent 2.2%),
+    radial-gradient(circle at 22% 58%, #e4007c 0 2.4%, transparent 2.6%),
+    radial-gradient(circle at 38% 44%, #f7c600 0 1.8%, transparent 2%),
+    radial-gradient(circle at 55% 62%, #00b5ad 0 2.2%, transparent 2.4%),
+    radial-gradient(circle at 70% 46%, #7b2d8b 0 2%, transparent 2.2%),
+    radial-gradient(circle at 86% 60%, #a8e000 0 2.4%, transparent 2.6%),
+    radial-gradient(circle at 16% 78%, #ff7f00 0 1.9%, transparent 2.1%),
+    radial-gradient(circle at 34% 88%, #1e90ff 0 2.2%, transparent 2.4%),
+    radial-gradient(circle at 50% 76%, #e4007c 0 1.8%, transparent 2%),
+    radial-gradient(circle at 66% 90%, #f7c600 0 2.4%, transparent 2.6%),
+    radial-gradient(circle at 82% 78%, #00b5ad 0 2%, transparent 2.2%),
+    radial-gradient(circle at 94% 88%, #7b2d8b 0 1.9%, transparent 2.1%),
+    /* Warm festive base */
+    linear-gradient(160deg, #7a341c 0%, #a94d2a 45%, #8f3f22 100%);
+}
+
+/* Variant D — sunburst: radiating Mexican-colour rays from a warm centre,
+   like a festive sun or a piñata burst of colour. */
+.attire-bg--sunburst {
+  background:
+    /* Radiating colour rays from the centre */
+    repeating-conic-gradient(
+      from 0deg at 50% 50%,
+      #e4007c 0deg 12deg,
+      #f7c600 12deg 24deg,
+      #00b5ad 24deg 36deg,
+      #7b2d8b 36deg 48deg,
+      #a8e000 48deg 60deg,
+      #ff7f00 60deg 72deg,
+      #1e90ff 72deg 84deg,
+      #e4007c 84deg 96deg,
+      #f7c600 96deg 108deg,
+      #00b5ad 108deg 120deg,
+      #7b2d8b 120deg 132deg,
+      #a8e000 132deg 144deg,
+      #ff7f00 144deg 156deg,
+      #1e90ff 156deg 168deg,
+      #e4007c 168deg 180deg,
+      #f7c600 180deg 192deg,
+      #00b5ad 192deg 204deg,
+      #7b2d8b 204deg 216deg,
+      #a8e000 216deg 228deg,
+      #ff7f00 228deg 240deg,
+      #1e90ff 240deg 252deg,
+      #e4007c 252deg 264deg,
+      #f7c600 264deg 276deg,
+      #00b5ad 276deg 288deg,
+      #7b2d8b 288deg 300deg,
+      #a8e000 300deg 312deg,
+      #ff7f00 312deg 324deg,
+      #1e90ff 324deg 336deg,
+      #e4007c 336deg 348deg,
+      #f7c600 348deg 360deg
+    );
+}
+
 /* Soft light effects over the patchwork — a few warm glows and a subtle
    diagonal sheen — so the quilt feels festive and luminous rather than flat. */
 .attire-bg--patchwork::before {
@@ -218,22 +285,45 @@
   }
 }
 
+/* The tematica section is a single vertical stack on every screen size:
+   eyebrow → title → Oaxaca banner (row of 4) → citation → Huichol banner
+   (row of 4). This keeps the Oaxaca and Huichol photos as full-width rows of
+   four cards, matching the mobile treatment. */
 .attire-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: clamp(3rem, 8vw, 8rem);
-  align-items: center;
+  grid-template-columns: 1fr;
+  gap: clamp(2rem, 4vw, 3rem);
+  align-items: start;
 }
 
+/* Title sits at the top of the stack, centred. */
+.attire-title {
+  grid-column: 1;
+  grid-row: 1;
+  margin: 0 0 1rem;
+  text-align: center;
+}
+
+/* Oaxaca montage: a single full-width row of four cards (banner). */
 .oaxaca-grid {
+  grid-column: 1;
+  grid-row: 2;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(4, 1fr);
   gap: 0.5rem;
   padding: 0.5rem;
-  max-width: 28rem;
+  max-width: 60rem;
   margin-inline: auto;
   background: rgb(255 255 255 / 10%);
   border: 0.5rem solid rgb(255 255 255 / 10%);
+}
+
+/* Citation sits below the Oaxaca banner, centred. */
+.attire-copy {
+  grid-column: 1;
+  grid-row: 3;
+  max-width: 52rem;
+  margin-inline: auto;
 }
 
 .oaxaca-tile {
@@ -252,8 +342,7 @@
 }
 
 /* Wixárika (Huichol) photo montage — a full-width strip below the Oaxaca
-   montage, reusing the same tile treatment. Four tiles in a row on desktop,
-   collapsing to a 2×2 grid on mobile. */
+   montage, reusing the same tile treatment. Four tiles in a row. */
 .wixarica-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
@@ -263,11 +352,6 @@
   margin: clamp(2.5rem, 6vw, 4rem) auto 0;
   background: rgb(255 255 255 / 10%);
   border: 0.5rem solid rgb(255 255 255 / 10%);
-}
-
-
-.attire-copy h2 {
-  margin-bottom: 2rem;
 }
 
 /* Citation-style lead: large quote mark + left border, echoing the venue's
@@ -297,15 +381,18 @@
   pointer-events: none;
 }
 
-/* The dress-code block is a full-width (1/1) row below the photos + citation
+/* The dress-code block is a full-width row below the photos + citation
    grid. It holds the title and the text paragraphs; the pictograms live in a
-   modal opened by the section FAB. */
+   modal opened by the section FAB. A soft dark overlay sits behind the text
+   so it stays legible over the colourful patchwork background. */
 .attire-dress-code {
   position: relative;
   max-width: 52rem;
   margin: clamp(2.5rem, 6vw, 4rem) auto 0;
-  padding-top: clamp(1.5rem, 3vw, 2rem);
+  padding: clamp(1.5rem, 3vw, 2rem);
   border-top: 1px solid rgb(255 255 255 / 35%);
+  background: rgb(36 33 25 / 38%);
+  border-radius: 1rem;
 }
 
 .attire-dress-code__title {
@@ -548,17 +635,35 @@
     margin-bottom: 1rem;
   }
 
-  /* On mobile the images sit on the left (1/3) and the citation on the
-     right (2/3), so the section stays compact instead of stacking. */
+  /* On mobile the tematica section stacks vertically in this order:
+     eyebrow → title → Oaxaca banner → citation → Huichol banner. */
   .attire-grid {
-    grid-template-columns: 1fr 2fr;
-    gap: 1rem;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
     align-items: start;
   }
 
-  .attire-copy h2 {
-    margin-bottom: 1rem;
+  .attire-title {
+    grid-column: 1;
+    grid-row: 1;
+    margin-bottom: 0.5rem;
     font-size: clamp(1.35rem, 5.2vw, 1.65rem);
+  }
+
+  .oaxaca-grid {
+    grid-column: 1;
+    grid-row: 2;
+    /* A single full-width row of four cards (banner). */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.35rem;
+    padding: 0.4rem;
+    border-width: 0.4rem;
+    max-width: none;
+  }
+
+  .attire-copy {
+    grid-column: 1;
+    grid-row: 3;
   }
 
   .attire-citation {
@@ -624,24 +729,13 @@
     display: none;
   }
 
-
-  /* The images now live in a narrow 1/3 column, so the four tiles sit in a
-     2×2 grid to stay legible. */
-  .oaxaca-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.35rem;
-    padding: 0.4rem;
-    border-width: 0.4rem;
-  }
-
   /* The Wixárika montage is a full-width strip, so on mobile the four tiles
-     collapse to a 2×2 grid to stay legible. */
+     stay in a single row of four (banner). */
   .wixarica-grid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 0.35rem;
     padding: 0.4rem;
     border-width: 0.4rem;
     margin-top: 1.5rem;
   }
 }
-

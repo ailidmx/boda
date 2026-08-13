@@ -18,8 +18,27 @@ import React, { useEffect, useRef, useState } from "react";
  *                 answers are already saved opens directly on the current step
  *                 (or the recap when everything is answered). Once the user
  *                 navigates, the card stops following `initialIndex`.
+ *   hideBackOnLast  optional boolean. When true, the "Back" button is hidden
+ *                 on the last step (e.g. a read-only recap that only offers a
+ *                 "Modify my answers" action inside its own content).
+ *   hideNextOn    optional array of step indices where the "Next" button is
+ *                 hidden. Used when a step provides its own primary action to
+ *                 advance (e.g. a "Save" button on the last question step).
+ *   countSteps    optional number of steps to show in the "Étape X / Y"
+ *                 counter. Defaults to steps.length. When a step index is
+ *                 >= countSteps (e.g. a recap), the counter shows just the
+ *                 step label instead of a numbered step.
+ *   navRight      optional function (ctx) => ReactNode rendered on the right
+ *                 side of the nav. When it returns a truthy value it replaces
+ *                 the "Next" button for that step (e.g. a "Save" CTA on the
+ *                 last question step). Return null to fall back to "Next".
+ *   onNavigate    optional callback (nextIndex) => void fired on every step
+ *                 change (next/back/goToStart), used e.g. to scroll the flow
+ *                 back into view.
  */
-export function FlipStepCard({ steps = [], onDone, copy = {}, initialIndex = 0 }) {
+export function FlipStepCard({ steps = [], onDone, copy = {}, initialIndex = 0, hideBackOnLast = false, hideNextOn = [], countSteps, navRight, onNavigate }) {
+
+
   const [index, setIndex] = useState(initialIndex);
   const [flipping, setFlipping] = useState(false);
   const [flipDir, setFlipDir] = useState(1);
@@ -46,6 +65,7 @@ export function FlipStepCard({ steps = [], onDone, copy = {}, initialIndex = 0 }
     hasInteracted.current = true;
     setFlipDir(dir);
     setFlipping(true);
+    if (onNavigate) onNavigate(nextIndex);
     // Swap the step mid-flip so the new face appears as the card turns.
     window.setTimeout(() => {
       setIndex(nextIndex);
@@ -55,48 +75,66 @@ export function FlipStepCard({ steps = [], onDone, copy = {}, initialIndex = 0 }
   };
 
 
+
   const next = () => goTo(index + 1, 1);
   const back = () => goTo(index - 1, -1);
+  // Jump straight back to the first step (e.g. a "Modify my answers" action
+  // on a recap step). Uses a backward flip so it reads as going back.
+  const goToStart = () => goTo(0, -1);
 
   const step = steps[index];
+  const stepCount = countSteps ?? total;
+  const isRecap = index >= stepCount;
+  const rightAction = navRight ? navRight({ next, back, goToStart, isLast, index }) : null;
 
   return (
     <div className="flip-step-card">
       <div className="flip-step-head">
         <span className="flip-step-count">
-          {copy.step || "Step"} {index + 1} / {total}
+          {isRecap
+            ? step?.label
+            : `${copy.step || "Step"} ${index + 1} / ${stepCount}`}
         </span>
-        <span className="flip-step-label">{step?.label}</span>
+        {!isRecap && <span className="flip-step-label">{step?.label}</span>}
       </div>
 
       <div
         className={`flip-step-body${flipping ? ` is-flipping${flipDir > 0 ? " is-forward" : " is-back"}` : ""}`}
       >
         <div className="flip-step-face">
-          {step ? step.render({ next, back, isLast }) : null}
+          {step ? step.render({ next, back, goToStart, isLast }) : null}
         </div>
+
       </div>
 
       <div className="flip-step-nav">
-        <button
-          type="button"
-          className="flip-step-btn"
-          onClick={back}
-          disabled={index === 0 || flipping}
-        >
-          {copy.back || "← Back"}
-        </button>
-        {!isLast && (
+        {!(hideBackOnLast && isLast) && (
           <button
             type="button"
-            className="flip-step-btn flip-step-btn--primary"
-            onClick={next}
-            disabled={flipping}
+            className="flip-step-btn"
+            onClick={back}
+            disabled={index === 0 || flipping}
           >
-            {copy.next || "Next →"}
+            {copy.back || "← Back"}
           </button>
         )}
+        {rightAction ? (
+          rightAction
+        ) : (
+          !isLast && !hideNextOn.includes(index) && (
+            <button
+              type="button"
+              className="flip-step-btn flip-step-btn--primary"
+              onClick={next}
+              disabled={flipping}
+            >
+              {copy.next || "Next →"}
+            </button>
+          )
+        )}
+
       </div>
     </div>
   );
 }
+

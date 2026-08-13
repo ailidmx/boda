@@ -51,7 +51,10 @@ export const content = {
       venue: "El lugar",
       accommodation: "Alojamiento",
       travel: "VUELOS",
-      attire: "Vestuario",
+      tematica: "Temática",
+      attire: "Temática",
+      dressCode: "Código de vestimenta",
+
 
 
       weather: "Clima",
@@ -415,6 +418,16 @@ export const content = {
         "Queremos que cada comida sea sencilla, generosa y muy mexicana. Este es el menú que estamos imaginando; todavía puede crecer con tus ideas.",
       flavoursEyebrow: "Sabores de Jalisco y México",
       flavoursTitle: "¿Qué vamos a probar?",
+      vote: {
+        label: "Valora este plato",
+        star: "estrella",
+        vote: "voto",
+        votes: "votos",
+        empty: "Sé el primero en valorar",
+        yourRating: "Tu valoración",
+        error: "No se pudo guardar tu valoración",
+      },
+
       flavours: [
         {
           key: "carnitas",
@@ -542,6 +555,10 @@ export const content = {
       title: "Escuchar, bailar y también cantar",
       body:
         "La música acompañará cada cambio de energía del sábado, desde el final de la ceremonia hasta la pista de baile.",
+      background: {
+        label: "Ambiente",
+        themes: { wao: "WAO", arty: "ARTY", brutal: "BRUTAL" },
+      },
       acts: [
         {
           moment: "Después del aperitivo",
@@ -961,6 +978,8 @@ export const content = {
         hasCabinQuestion: "¿Se queda en Roca Azul?",
         hasCabinQuestionCabin: "¿Ok para {cabin}?",
         noCabinQuestion: "¿Me avisas si se libera un alojamiento?",
+        priceLabel: "Por persona",
+        coveredLabel: "Cubierto por los novios",
         yesLabel: "Sí",
 
         noLabel: "No",
@@ -970,7 +989,10 @@ export const content = {
         summaryTitle: "Resumen de tu confirmación",
         summaryIntro:
           "Esto es lo que indicaste para cada persona. Puedes modificarlo y volver a guardar cuando quieras.",
+        modifyButton: "Modificar mis respuestas",
       },
+
+
     },
     travel: {
 
@@ -1032,14 +1054,16 @@ export const content = {
     },
     attire: {
 
-      eyebrow: "Vestuario",
-      title: "Estética mexicana y código de vestimenta",
+      eyebrow: "Temática",
+      title: "Estética mexicana",
+
       body:
         "Hemos elegido una estética mexicana para nuestra boda como un homenaje a la cultura, la comida, la música y el lugar que nos reúne. Queremos que todo se sienta festivo, colorido y profundamente mexicano.",
       dressCode: {
-        title: "Vístete de color",
+        title: "¡Viva el color!",
+        eyebrow: "Código de vestimenta",
         paragraphs: [
-          "Nos hace muchísima ilusión compartir este día contigo, y queremos que, así como cada persona ha dejado una huella especial en nuestra vida, también cada uno aporte un poco de su esencia a esta celebración.",
+          "Así como cada persona ha dejado una huella especial en nuestra vida, queremos que cada uno aporte un poco de su esencia a esta celebración...",
           "Creemos que los colores transmiten energía, alegría y personalidad. Por eso, nos encantaría que nos acompañaras vistiendo tonos llenos de vida, procurando evitar el negro, el gris y el blanco.",
           "Nuestra boda tendrá una inspiración mexicana, con una decoración en tonos blancos y detalles artesanales. David llevará una guayabera de lino blanco con bordados dorados, y ambos vestiremos piezas bordadas por artesanas de una comunidad de Oaxaca, como un homenaje a la riqueza de nuestras tradiciones.",
           "La única regla es que te sientas tú mismo: elegante, cómodo y listo para celebrar, bailar y llenar este día de color, amor y buena energía.",
@@ -1210,6 +1234,7 @@ export const content = {
         ],
         recapTitle: "Resumen",
         recapProgress: "respondidos",
+        modifyButton: "Modificar mis respuestas",
         button: "Guardar mis respuestas",
         success: "¡Gracias! Guardamos tus respuestas.",
         error: "No pudimos guardar. Revisa tu conexión e inténtalo de nuevo.",
@@ -1261,7 +1286,10 @@ export const content = {
       extraStay: {
         eyebrow: "Tu estancia · domingo a martes",
         title: "Tu cabaña para la segunda estancia",
+        citation:
+          "Hemos previsto una cabaña para ti para la segunda parte de la estancia, del domingo al martes.",
       },
+
     },
 
 
@@ -1386,12 +1414,14 @@ export const content = {
         answered: "respondidos",
         yes: "Sí",
         no: "No",
+        modifyButton: "Modificar mis respuestas",
       },
 
       scale: {
         intro:
           "Cuéntanos, día por día, qué tan probable es que estés con nosotros. Puedes cambiar tu respuesta en cualquier momento.",
         saveButton: "Guardar mis respuestas",
+
         savedNote: "¡Gracias! Guardamos tus respuestas.",
         questions: [
           {
@@ -1432,7 +1462,7 @@ export const content = {
       intro:
         "La petanca nos ha unido con una comunidad maravillosa de amigos y compañeros de club en México y en el mundo.",
       body:
-        "El viernes por la tarde organizaremos un torneo de petanca para celebrar este juego que tanto queremos. No hace falta experiencia: solo ganas de jugar, reír y compartir.",
+        "El viernes por la tarde, Pierre organiza un torneo de petanca para celebrar este juego que tanto queremos. No hace falta experiencia: solo ganas de jugar, reír y compartir.",
       homage: "¡Te animas!",
       photosLabel: "Fotografías de petanca",
       photoAlts: [
@@ -1445,24 +1475,27 @@ export const content = {
       rsvpMini: {
         eyebrow: "Torneo de petanca",
         title: "¿Te apuntas?",
-        intro: "El viernes por la tarde organizaremos un torneo de petanca. ¿Te apuntas?",
-        organizerLabel: "Organiza: David",
-        organizerWhatsapp: "https://wa.me/523332017504",
+        intro: "El viernes por la tarde, Pierre organiza un torneo de petanca. ¿Te apuntas?",
+        organizerLabel: "Contacta a Pierre para más información",
+        organizerWhatsapp: "https://wa.me/523310212012",
         fields: {
           participation: "¿Participas en el torneo?",
           ownBoules: "¿Necesitas que te prestemos unas boules?",
           ownBoulesHint: "Si no tienes, no te preocupes: te prestamos unas para jugar.",
         },
+
         yesLabel: "Sí",
         noLabel: "No",
         success: "¡Gracias! Guardamos tus respuestas.",
         error: "No pudimos guardar. Revisa tu conexión e inténtalo de nuevo.",
         button: "Guardar mis respuestas",
         recapTitle: "Resumen",
+        modifyButton: "Modificar mis respuestas",
       },
     },
     footer: {
       line: "Con amor, desde México y Francia",
+
 
 
 
@@ -1486,7 +1519,10 @@ export const content = {
       venue: "Le lieu",
       accommodation: "Hébergement",
       travel: "VOLS",
-      attire: "Code vestimentaire",
+      tematica: "Thématique",
+      attire: "Thématique",
+      dressCode: "Code vestimentaire",
+
 
 
       weather: "Météo",
@@ -1839,7 +1875,17 @@ export const content = {
         "Nous voulons que chaque repas soit simple, généreux et profondément mexicain. Voici le menu que nous imaginons ; il peut encore évoluer grâce à tes idées.",
       flavoursEyebrow: "Saveurs du Jalisco et du Mexique",
       flavoursTitle: "Qu’allons-nous goûter ?",
+      vote: {
+        label: "Note ce plat",
+        star: "étoile",
+        vote: "vote",
+        votes: "votes",
+        empty: "Sois le premier à noter",
+        yourRating: "Ta note",
+        error: "Impossible d’enregistrer ta note",
+      },
       flavours: [
+
         {
           key: "carnitas",
           type: "food",
@@ -1967,6 +2013,10 @@ export const content = {
       title: "Écouter, danser et aussi chanter",
       body:
         "La musique accompagnera chaque changement d’énergie du samedi, de la fin de la cérémonie jusqu’à la piste de danse.",
+      background: {
+        label: "Ambiance",
+        themes: { wao: "WAO", arty: "ARTY", brutal: "BRUTAL" },
+      },
       acts: [
         {
           moment: "Après l’apéro",
@@ -2179,7 +2229,8 @@ export const content = {
         membersLabel: "Membres du groupe",
         linkLabel: "Voir l’option prévue pour toi",
         backLabel: "Retour à l’hébergement",
-        onSiteTitle: "Nous avons un place pour toi!",
+        onSiteTitle: "Nous avons une place pour toi!",
+
         onSiteBody:
           "Voici l’option que nous avons prévu pour toi, nous esperons qu’elle te plaira",
         onSiteCoveredBody:
@@ -2196,7 +2247,8 @@ export const content = {
         roomCapacityLabel: "Capacité de la chambre",
         cabinPriceLabel: "Prix du gîte",
         personPriceLabel: "Participation aux frais par personne",
-        groupPriceLabel: "Participation aux frais par le groupe",
+        groupPriceLabel: "Participation aux frais pour l'ensemble du groupe",
+
         coveredPriceLabel: "Pris en charge par les mariés",
 
         peopleLabel: "personnes",
@@ -2382,12 +2434,14 @@ export const content = {
       navNext: "Pétanque",
       recap: {
         eyebrow: "Confirmation de l’hébergement",
-        title: "Confirme-tu ton hébergement ?",
+        title: "Tu confirmes ton hébergement ?",
         intro:
           "Indique pour chaque personne si elle restera à Roca Azul afin que nous puissions organiser les gîtes.",
         hasCabinQuestion: "Reste-t-elle à Roca Azul ?",
         hasCabinQuestionCabin: "Ok pour {cabin} ?",
         noCabinQuestion: "Me prévenir si un logement se libère",
+        priceLabel: "Par personne",
+        coveredLabel: "Pris en charge par les mariés",
         yesLabel: "Oui",
 
         noLabel: "Non",
@@ -2397,7 +2451,10 @@ export const content = {
         summaryTitle: "Résumé de ta confirmation",
         summaryIntro:
           "Voici ce que tu as indiqué pour chaque personne. Tu peux le modifier et réenregistrer quand tu veux.",
+        modifyButton: "Modifier mes réponses",
       },
+
+
     },
     travel: {
 
@@ -2459,14 +2516,16 @@ export const content = {
     },
     attire: {
 
-      eyebrow: "Code vestimentaire",
+      eyebrow: "Thématique",
       title: "Esthétique mexicaine",
+
       body:
         "Nous avons choisi une esthétique mexicaine pour notre cérémonie en hommage à la culture, la cuisine, la musique et le lieu qui nous réunit. Nous voulons que tout soit festif, coloré et profondément mexicain.",
       dressCode: {
-        title: "Habille-toi en couleur",
+        title: "Vive la couleur !",
+        eyebrow: "Code vestimentaire",
         paragraphs: [
-          "Nous sommes immensément heureux de partager ce jour avec toi, et nous souhaitons que, tout comme chaque personne a laissé une empreinte spéciale dans notre vie, chacun apporte un peu de son essence à cette célébration.",
+          "Tout comme chaque personne a laissé une empreinte spéciale dans notre vie, nous souhaitons que chacun apporte un peu de son essence à cette célébration...",
           "Nous croyons que les couleurs transmettent de l’énergie, de la joie et de la personnalité. C’est pourquoi nous aimerions que tu nous accompagnes en portant des tons pleins de vie, en évitant le noir, le gris et le blanc.",
           "Notre mariage aura une inspiration mexicaine, avec une décoration aux tons blancs et des détails artisanaux. David portera une guayabera en lin blanc avec des broderies dorées, et nous porterons tous les deux des pièces brodées par des artisanes d’une communauté d’Oaxaca, en hommage à la richesse de nos traditions.",
           "La seule règle est que tu sois toi-même : élégant, à l’aise et prêt à célébrer, danser et remplir ce jour de couleur, d’amour et de bonne énergie.",
@@ -2640,6 +2699,7 @@ export const content = {
         ],
         recapTitle: "Résumé",
         recapProgress: "répondu·e·s",
+        modifyButton: "Modifier mes réponses",
         button: "Enregistrer mes réponses",
         success: "Merci ! Nous avons enregistré tes réponses.",
         error: "Impossible d’enregistrer. Vérifie ta connexion et réessaie.",
@@ -2689,10 +2749,12 @@ export const content = {
           "Estimation indicative. Le prix final dépendra de l’hébergement choisi, de la saison et de la confirmation directe avec chaque hôtel ou Airbnb.",
       },
       extraStay: {
-        eyebrow: "Ton séjour · dimanche à mardi",
-        title: "Ton gîte du dimanche au mardi",
-
+        eyebrow: "Ton séjour du dimanche au mardi",
+        title: "Voici l'option que nous avons prévu pour toi, nous espérons qu'elle te plaira",
+        citation:
+          "Nous avons prévu une cabane pour toi pour la deuxième partie du séjour, du dimanche au mardi.",
       },
+
     },
 
 
@@ -2713,11 +2775,11 @@ export const content = {
         organizerLabel: "Organise : David",
         organizerWhatsapp: "https://wa.me/523332017504",
         fields: {
-          participation: "Participes-tu au tournoi ?",
+          participation: "Tu participes au tournoi ?",
           partySize: "Combien de personnes ?",
           names: "Noms des participants",
           namesPlaceholder: "Ex. David, Aydé, Dimitar…",
-          ownBoules: "As-tu besoin que nous te prêtions des boules ?",
+          ownBoules: "Tu as besoin de boules ?",
         },
 
         options: {
@@ -2817,11 +2879,13 @@ export const content = {
         answered: "répondu·e·s",
         yes: "Oui",
         no: "Non",
+        modifyButton: "Modifier mes réponses",
       },
 
       scale: {
         intro:
           "Dis-nous, jour par jour, quelle est la probabilité que tu sois avec nous. Tu peux modifier ta réponse à tout moment.",
+
         saveButton: "Enregistrer mes réponses",
         savedNote: "Merci ! Nous avons enregistré tes réponses.",
         questions: [
@@ -2864,7 +2928,7 @@ export const content = {
       intro:
         "La pétanque nous a réunis autour d’une merveilleuse communauté d’amis et de coéquipiers de club, au Mexique et dans le monde.",
       body:
-        "Le vendredi après-midi, nous organiserons un tournoi de pétanque pour célébrer ce jeu que nous aimons tant. Aucune expérience n’est requise : juste l’envie de jouer, de rire et de partager.",
+        "Le vendredi après-midi, Pierre organise un tournoi de pétanque pour célébrer ce jeu que nous aimons tant. Aucune expérience n’est requise : juste l’envie de jouer, de rire et de partager.",
       homage: "Ça te tente !",
       photosLabel: "Photos de pétanque",
 
@@ -2878,12 +2942,13 @@ export const content = {
       rsvpMini: {
         eyebrow: "Tournoi de pétanque",
         title: "Tu t’inscris ?",
-        intro: "Le vendredi après-midi, nous organiserons un tournoi de pétanque. Tu participes ?",
-        organizerLabel: "Organise : David",
-        organizerWhatsapp: "https://wa.me/523332017504",
+        intro: "Le vendredi après-midi, Pierre organise un tournoi de pétanque. Tu participes ?",
+        organizerLabel: "Contacte Pierre pour plus d’infos",
+        organizerWhatsapp: "https://wa.me/523310212012",
+
         fields: {
-          participation: "Participes-tu au tournoi ?",
-          ownBoules: "As-tu besoin que nous te prêtions des boules ?",
+          participation: "Tu participes au tournoi ?",
+          ownBoules: "Tu as besoin de boules ?",
           ownBoulesHint: "Si tu n’en as pas, pas de souci : nous t’en prêterons pour jouer.",
         },
         yesLabel: "Oui",
@@ -2892,10 +2957,13 @@ export const content = {
         error: "Impossible d’enregistrer. Vérifie ta connexion et réessaie.",
         button: "Enregistrer mes réponses",
         recapTitle: "Résumé",
+        modifyButton: "Modifier mes réponses",
+
       },
     },
     footer: {
       line: "Avec amour, depuis le Mexique et la France",
+
 
 
 
@@ -2919,7 +2987,10 @@ export const content = {
       venue: "The venue",
       accommodation: "Accommodation",
       travel: "FLIGHTS",
-      attire: "Attire",
+      tematica: "Theme",
+      attire: "Theme",
+      dressCode: "Dress code",
+
 
 
       weather: "Weather",
@@ -3395,6 +3466,10 @@ export const content = {
       title: "Listen, dance, and sing too",
       body:
         "Music will accompany every shift in energy on Saturday, from the end of the ceremony to the dance floor.",
+      background: {
+        label: "Vibe",
+        themes: { wao: "WAO", arty: "ARTY", brutal: "BRUTAL" },
+      },
       acts: [
         {
           moment: "After the aperitif",
@@ -3814,6 +3889,8 @@ export const content = {
         hasCabinQuestion: "Will they stay at Roca Azul?",
         hasCabinQuestionCabin: "OK for {cabin}?",
         noCabinQuestion: "Notify me if a lodging becomes available",
+        priceLabel: "Per person",
+        coveredLabel: "Covered by the couple",
         yesLabel: "Yes",
 
         noLabel: "No",
@@ -3823,7 +3900,10 @@ export const content = {
         summaryTitle: "Summary of your confirmation",
         summaryIntro:
           "Here is what you indicated for each person. You can change it and save again whenever you like.",
+        modifyButton: "Modify my answers",
       },
+
+
     },
     travel: {
 
@@ -3886,14 +3966,16 @@ export const content = {
     },
     attire: {
 
-      eyebrow: "Attire",
-      title: "Mexican aesthetic and dress code",
+      eyebrow: "Theme",
+      title: "Mexican aesthetic",
+
       body:
         "We have chosen a Mexican aesthetic for our wedding as a tribute to the culture, the food, the music, and the place that brings us together. We want everything to feel festive, colorful, and deeply Mexican.",
       dressCode: {
-        title: "Dress in colour",
+        title: "Long live colour!",
+        eyebrow: "Dress code",
         paragraphs: [
-          "We are overjoyed to share this day with you, and just as each person has left a special mark on our lives, we want each of you to bring a little of your essence to this celebration.",
+          "Just as each person has left a special mark on our lives, we want each of you to bring a little of your essence to this celebration...",
           "We believe colours convey energy, joy, and personality. That is why we would love for you to join us wearing vibrant tones, trying to avoid black, grey, and white.",
           "Our wedding will have a Mexican inspiration, with white-toned décor and artisanal details. David will wear a white linen guayabera with golden embroidery, and we will both wear pieces embroidered by artisans from a community in Oaxaca, as a tribute to the richness of our traditions.",
           "The only rule is to be yourselves: elegant, comfortable, and ready to celebrate, dance, and fill this day with colour, love, and good energy.",
@@ -4066,6 +4148,7 @@ export const content = {
         ],
         recapTitle: "Summary",
         recapProgress: "answered",
+        modifyButton: "Modify my answers",
         button: "Save my answers",
         success: "Thank you! We saved your answers.",
         error: "We could not save. Check your connection and try again.",
@@ -4102,7 +4185,10 @@ export const content = {
       extraStay: {
         eyebrow: "Your stay · Sunday to Tuesday",
         title: "Your guest house for the second stay",
+        citation:
+          "We have planned a guest house for you for the second part of your stay, from Sunday to Tuesday.",
       },
+
     },
 
     rsvp: {
@@ -4226,11 +4312,13 @@ export const content = {
         answered: "answered",
         yes: "Yes",
         no: "No",
+        modifyButton: "Modify my answers",
       },
 
       scale: {
         intro:
           "Tell us, day by day, how likely you are to be with us. You can change your answer at any time.",
+
         saveButton: "Save my answers",
         savedNote: "Thank you! We saved your answers.",
         questions: [
@@ -4272,7 +4360,7 @@ export const content = {
       intro:
         "Pétanque has brought us together with a wonderful community of friends and club teammates in Mexico and around the world.",
       body:
-        "On Friday afternoon we will organise a pétanque tournament to celebrate this game we love so much. No experience needed: just the desire to play, laugh, and share.",
+        "On Friday afternoon, Pierre is organising a pétanque tournament to celebrate this game we love so much. No experience needed: just the desire to play, laugh, and share.",
       homage: "Are you in!",
       photosLabel: "Pétanque photos",
 
@@ -4286,24 +4374,27 @@ export const content = {
       rsvpMini: {
         eyebrow: "Pétanque tournament",
         title: "Are you in?",
-        intro: "On Friday afternoon we will organise a pétanque tournament. Would you like to join?",
-        organizerLabel: "Organised by: David",
-        organizerWhatsapp: "https://wa.me/523332017504",
+        intro: "On Friday afternoon, Pierre is organising a pétanque tournament. Would you like to join?",
+        organizerLabel: "Contact Pierre for more info",
+        organizerWhatsapp: "https://wa.me/523310212012",
         fields: {
           participation: "Will you participate in the tournament?",
-          ownBoules: "Do you need us to provide you with some boules?",
+          ownBoules: "Do you need us to lend you some boules?",
           ownBoulesHint: "If you don’t have any, no worries: we will lend you some to play.",
         },
+
         yesLabel: "Yes",
         noLabel: "No",
         success: "Thank you! We saved your answers.",
         error: "We could not save. Check your connection and try again.",
         button: "Save my answers",
         recapTitle: "Summary",
+        modifyButton: "Modify my answers",
       },
     },
     footer: {
       line: "With love, from Mexico and France",
+
 
 
 

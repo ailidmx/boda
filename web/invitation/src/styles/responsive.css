@@ -113,6 +113,33 @@
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+/* On mobile the accommodation fact cards are small, so the content elements
+   (value, euro conversion, label, note) get smaller fonts to fit without
+   overflowing. */
+@media (max-width: 899px) {
+  .accommodation-facts strong {
+    font-size: clamp(1.05rem, 4.6vw, 1.35rem);
+  }
+
+  .accommodation-facts article:nth-child(2) strong {
+    font-size: clamp(0.95rem, 4.2vw, 1.2rem);
+  }
+
+  .accommodation-facts .accommodation-fact-conversion {
+    font-size: 0.68rem;
+  }
+
+  .accommodation-facts span {
+    font-size: 0.6rem;
+    line-height: 1.2;
+  }
+
+  .accommodation-facts-note {
+    font-size: 0.78rem;
+    line-height: 1.45;
+  }
+}
+
 /* Tablet+: 2 columns. */
 @media (min-width: 640px) {
   .suggestion-form,
@@ -214,6 +241,18 @@
     background: transparent;
     box-shadow: none;
     transform: none;
+  }
+}
+
+/* ── THEMATIQUE citation on small screens ───────────────────────────────
+   Give the attire citation breathing room and a slightly larger, readable
+   size when the section collapses to a single column. */
+@media (max-width: 720px) {
+  .attire-citation {
+    margin-bottom: 1rem;
+    padding: 0.5rem 0 0 1rem;
+    font-size: clamp(1rem, 2.6vw, 2rem);
+    line-height: 1.35;
   }
 }
 

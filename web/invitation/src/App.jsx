@@ -54,6 +54,10 @@ const Travel = lazy(() =>
 const Attire = lazy(() =>
   import("./components/Attire.jsx").then((m) => ({ default: m.Attire })),
 );
+const DressCode = lazy(() =>
+  import("./components/Attire.jsx").then((m) => ({ default: m.DressCode })),
+);
+
 const Gift = lazy(() =>
   import("./components/Gift.jsx").then((m) => ({ default: m.Gift })),
 );
@@ -156,7 +160,13 @@ function Invitation() {
             <Attire />
           </Suspense>
         </LazySection>
+        <LazySection id="dress-code" className="lazy-section">
+          <Suspense fallback={null}>
+            <DressCode />
+          </Suspense>
+        </LazySection>
         <LazySection id="weather" className="lazy-section">
+
           <Suspense fallback={null}>
             <Weather />
           </Suspense>

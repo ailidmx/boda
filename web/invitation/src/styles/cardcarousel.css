@@ -11,6 +11,10 @@
 }
 
 @media (max-width: 899px) {
+  .swipe-card-carousel {
+    margin-bottom: 1.5rem;
+  }
+
   .swipe-card-carousel__viewport {
     overflow-x: auto;
     overflow-y: hidden;

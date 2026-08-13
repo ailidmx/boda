@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { MEDIA } from "../media.js";
 import { useApp } from "../context/AppContext.jsx";
 import { DressCodePictograms } from "./DressCodePictograms.jsx";
+
 
 /* Palette icon for the dress-code FAB. Kept inline so it inherits currentColor
    and stays crisp at any size. */
@@ -23,30 +25,107 @@ function PaletteIcon() {
   );
 }
 
+
+/* ── Section 1 · ESTHÉTIQUE MEXICAINE (TEMATICA) ─────────────────────────
+   The Mexican aesthetic intro: eyebrow, title, body, the Oaxaca + Wixárika
+   photo montages and the guest note. Uses the terracotta background. */
 export function Attire() {
   const { t } = useApp();
   const attire = t.attire || {};
-  const weekend = t.weekend || {};
+
+  return (
+    <section className="attire-section attire-section--tematica section story-bg">
+      {/* Full-bleed terracotta background behind the whole tematica section. */}
+      <div className="attire-bg attire-bg--terracotta" aria-hidden="true" />
+
+      <p className="eyebrow attire-eyebrow">{attire.eyebrow}</p>
+
+      {/* Vertical stack: title, Oaxaca montage, citation. On desktop the
+          title + citation share the right column while the Oaxaca montage
+          fills the left column; on mobile everything stacks. */}
+      <div className="attire-grid">
+        <h2 className="attire-title reveal">{attire.title}</h2>
+        <div className="oaxaca-grid" aria-label={attire.eyebrow}>
+          {MEDIA.oaxaca.map((src, i) => (
+            <img
+              className="oaxaca-tile"
+              src={src}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              style={{ "--tile-index": i }}
+              key={i}
+            />
+          ))}
+        </div>
+        <div className="attire-copy reveal">
+          <p className="attire-citation">{attire.body}</p>
+          <p className="note">{attire.guestNote}</p>
+        </div>
+      </div>
+
+      {/* Wixárika (Huichol) photo montage — same treatment as the Oaxaca
+          montage above, shown as an additional full-width strip. */}
+      <div className="wixarica-grid" aria-label="Wixárika">
+        {MEDIA.wixarica.map((src, i) => (
+          <img
+            className="oaxaca-tile"
+            src={src}
+            alt=""
+            loading="lazy"
+            decoding="async"
+            style={{ "--tile-index": i }}
+            key={i}
+          />
+        ))}
+      </div>
+
+      {/* Bottom nav → the dress code section */}
+      <nav className="attire-nav" aria-label="Attire navigation">
+        <a className="attire-nav-link" href="#dress-code">
+          <span>{t.nav.dressCode}</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </nav>
+    </section>
+  );
+}
+
+
+/* ── Section 2 · DRESS CODE ──────────────────────────────────────────────
+   The dress-code guidance: title, paragraphs and the pictogram modal opened
+   by the FAB. Uses the colour patchwork background. */
+export function DressCode() {
+  const { t } = useApp();
+  const attire = t.attire || {};
+  const dressCode = attire.dressCode || {};
 
   // Dress-code pictogram modal state.
   const [pictoOpen, setPictoOpen] = useState(false);
-  // TEMPORARY A/B test: which background variant to show. Remove this state,
-  // the selector UI and the variant classes once a final background is chosen.
+  // Whether the dress-code section is currently in view (drives the FAB).
+  const [dressCodeActive, setDressCodeActive] = useState(false);
+  // Selected background variant for the dress-code section (3 suggestions).
   const [bgVariant, setBgVariant] = useState("patchwork");
-  // Whether the attire section is currently in view (drives the FAB).
-  const [attireActive, setAttireActive] = useState(false);
+
+  // The 3 background suggestions for the dress-code section, all celebrating
+  // Mexican colour. Each maps to an `attire-bg--*` variant class.
+  const bgOptions = [
+    { key: "patchwork", label: "Patchwork" },
+    { key: "confetti", label: "Confetti" },
+    { key: "sunburst", label: "Sunburst" },
+  ];
 
   const sectionRef = useRef(null);
   const fabRef = useRef(null);
   const panelRef = useRef(null);
   const closeRef = useRef(null);
 
-  // Show the FAB only while the attire section is in view.
+  // Show the FAB only while the dress-code section is in view.
   useEffect(() => {
     const section = sectionRef.current;
     if (!section || typeof IntersectionObserver === "undefined") return undefined;
     let latestEntry = null;
-    const sync = () => setAttireActive(Boolean(latestEntry?.isIntersecting));
+    const sync = () => setDressCodeActive(Boolean(latestEntry?.isIntersecting));
     const observer = new IntersectionObserver(([entry]) => {
       latestEntry = entry;
       sync();
@@ -89,79 +168,35 @@ export function Attire() {
   }, [pictoOpen]);
 
   return (
-    <section className="attire-section section story-bg" ref={sectionRef}>
-      {/* Full-bleed background behind the whole dress-code section. The
-          variant class (patchwork / terracotta) is chosen by the temporary
-          A/B selector below. The photo montages stay in the foreground. */}
+    <section className="attire-section attire-section--dresscode section story-bg" ref={sectionRef}>
+      {/* Full-bleed colour background behind the dress-code section. The
+          variant is chosen by the temporary selector below. */}
       <div className={`attire-bg attire-bg--${bgVariant}`} aria-hidden="true" />
 
-      {/* TEMPORARY A/B test selector — remove once a final background is
-          chosen. Lets us switch between the background suggestions. */}
-      <div className="attire-bg-switch" role="group" aria-label="Background A/B test">
+      <p className="eyebrow attire-eyebrow">{dressCode.eyebrow}</p>
+
+      {/* Temporary background selector: 3 suggestions for the dress-code
+          background, all celebrating Mexican colour. Remove once a final
+          background is chosen. */}
+      <div className="attire-bg-switch" role="group" aria-label="Dress code background">
         <span className="attire-bg-switch__label">Fondo</span>
-        <button
-          type="button"
-          className={`attire-bg-switch__btn${bgVariant === "patchwork" ? " is-active" : ""}`}
-          onClick={() => setBgVariant("patchwork")}
-        >
-          Patchwork
-        </button>
-        <button
-          type="button"
-          className={`attire-bg-switch__btn${bgVariant === "terracotta" ? " is-active" : ""}`}
-          onClick={() => setBgVariant("terracotta")}
-        >
-          Terracota
-        </button>
-      </div>
-
-      <p className="eyebrow attire-eyebrow">{attire.eyebrow}</p>
-
-      {/* Row 1: photos (1/3) + citation (2/3) */}
-      <div className="attire-grid">
-        <div className="oaxaca-grid" aria-label={attire.eyebrow}>
-          {MEDIA.oaxaca.map((src, i) => (
-            <img
-              className="oaxaca-tile"
-              src={src}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              style={{ "--tile-index": i }}
-              key={i}
-            />
-          ))}
-        </div>
-        <div className="attire-copy reveal">
-          <h2>{attire.title}</h2>
-          <p className="attire-citation">{attire.body}</p>
-          <p className="note">{attire.guestNote}</p>
-        </div>
-      </div>
-
-      {/* Wixárika (Huichol) photo montage — same treatment as the Oaxaca
-          montage above, shown as an additional full-width strip. */}
-      <div className="wixarica-grid" aria-label="Wixárika">
-        {MEDIA.wixarica.map((src, i) => (
-          <img
-            className="oaxaca-tile"
-            src={src}
-            alt=""
-            loading="lazy"
-            decoding="async"
-            style={{ "--tile-index": i }}
-            key={i}
-          />
+        {bgOptions.map((option) => (
+          <button
+            key={option.key}
+            type="button"
+            className={`attire-bg-switch__btn${bgVariant === option.key ? " is-active" : ""}`}
+            aria-pressed={bgVariant === option.key}
+            onClick={() => setBgVariant(option.key)}
+          >
+            {option.label}
+          </button>
         ))}
       </div>
 
-      {/* Row 2: dress-code text, full width (1/1). The pictograms live in a
-          modal opened by the FAB so the text stays clean and readable. */}
-
-      {attire.dressCode && (
+      {dressCode.title && (
         <div className="attire-dress-code reveal">
-          <p className="attire-dress-code__title">{attire.dressCode.title}</p>
-          {attire.dressCode.paragraphs?.map((paragraph, i) => (
+          <p className="attire-dress-code__title">{dressCode.title}</p>
+          {dressCode.paragraphs?.map((paragraph, i) => (
             <p className="attire-dress-code__body" key={i}>
               {paragraph}
             </p>
@@ -169,27 +204,32 @@ export function Attire() {
         </div>
       )}
 
-      {/* Dress-code section FAB: a real floating action button, a direct child
-          of the section (like the other section FABs), fixed to the viewport
-          edge and contained within the 120rem column on wide screens. */}
-      <button
-        ref={fabRef}
-        className={`attire-picto-fab${attireActive && !pictoOpen ? " is-visible" : ""}`}
-        type="button"
-        aria-label={attire.dressCode.title}
-        aria-haspopup="dialog"
-        onClick={() => setPictoOpen(true)}
-      >
-        <PaletteIcon />
-      </button>
+      {/* Dress-code section FAB: a real floating action button, fixed to the
+          viewport edge and contained within the 120rem column on wide screens.
+          It is rendered through a portal to <body> so it escapes the section's
+          overflow:hidden and always floats over the viewport (a true FAB),
+          matching the other section FABs. */}
+      {createPortal(
+        <button
+          ref={fabRef}
+          className={`attire-picto-fab${dressCodeActive && !pictoOpen ? " is-visible" : ""}`}
+          type="button"
+          aria-label={dressCode.title}
+          aria-haspopup="dialog"
+          onClick={() => setPictoOpen(true)}
+        >
+          <PaletteIcon />
+        </button>,
+        document.body
+      )}
 
       {/* Dress-code pictogram modal */}
-      {attire.dressCode && (
+      {dressCode.title && (
         <div
           className={`attire-picto-shell${pictoOpen ? " is-open" : ""}`}
           role={pictoOpen ? "dialog" : undefined}
           aria-modal={pictoOpen ? "true" : undefined}
-          aria-label={pictoOpen ? attire.dressCode.title : undefined}
+          aria-label={pictoOpen ? dressCode.title : undefined}
           onMouseDown={(event) => {
             if (pictoOpen && event.target === event.currentTarget) setPictoOpen(false);
           }}
@@ -204,15 +244,15 @@ export function Attire() {
             >
               ×
             </button>
-            <p className="eyebrow attire-picto__eyebrow">{attire.eyebrow}</p>
-            <p className="attire-picto__title">{attire.dressCode.title}</p>
-            <DressCodePictograms labels={attire.dressCode.pictograms} />
-
+            <p className="eyebrow attire-picto__eyebrow">{dressCode.eyebrow}</p>
+            <p className="attire-picto__title">{dressCode.title}</p>
+            <DressCodePictograms labels={dressCode.pictograms} />
           </div>
         </div>
       )}
 
-      <nav className="attire-nav" aria-label="Attire navigation">
+      {/* Bottom nav → the weather section */}
+      <nav className="attire-nav" aria-label="Dress code navigation">
         <a className="attire-nav-link" href="#weather">
           <span>{t.nav.weather}</span>
           <span aria-hidden="true">↓</span>

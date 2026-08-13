@@ -297,10 +297,18 @@ export function StayPlanCard({
           <div>
             <dt>{option.extraCabinLabel}</dt>
             <dd>
-              {getCabin(extraCabin)?.name || extraCabin}
-              {extraRoom && getRoomDescription(getRoom(extraRoom), language)
-                ? ` · ${getRoomDescription(getRoom(extraRoom), language)}`
-                : ""}
+              {(() => {
+                const xtraCabin = getCabin(extraCabin);
+                const xtraName = xtraCabin?.name?.replace(/\s+/g, " ") || extraCabin;
+                const xtraCapacity = xtraCabin?.capacity
+                  ? ` - ${xtraCabin.capacity}p`
+                  : "";
+                const xtraRoomDesc =
+                  extraRoom && getRoomDescription(getRoom(extraRoom), language)
+                    ? ` · ${getRoomDescription(getRoom(extraRoom), language)}`
+                    : "";
+                return `${xtraName}${xtraCapacity}${xtraRoomDesc}`;
+              })()}
             </dd>
           </div>
         )}

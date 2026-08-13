@@ -86,18 +86,18 @@ export function buildGuestNamePayload({ guestId, firstName, middleName, lastName
  * @param {string} input.editorGuestId
  * @returns {Object} explicit payload for setDoc(..., { merge: true })
  */
-export function buildGuestPhotoPayload({ guestId, cloudinaryId, editorGuestId, timestamp }) {
+export function buildGuestPhotoPayload({ guestId, cloudinaryId, invitationGroup, editorGuestId, timestamp }) {
   return {
     guestId,
     identity: {
       cloudinaryId: String(cloudinaryId ?? "").trim(),
     },
     cloudinaryId: String(cloudinaryId ?? "").trim(),
+    invitationGroup: String(invitationGroup ?? "").trim(),
     updatedBy: String(editorGuestId ?? "").trim(),
     updatedAt: timestamp,
   };
 }
-
 
 
 /**
@@ -110,18 +110,18 @@ export function buildGuestPhotoPayload({ guestId, cloudinaryId, editorGuestId, t
  * @param {string} input.editorGuestId
  * @returns {Object} explicit payload for setDoc(..., { merge: true })
  */
-export function buildGuestContactPayload({ guestId, phone, editorGuestId, timestamp }) {
+export function buildGuestContactPayload({ guestId, phone, invitationGroup, editorGuestId, timestamp }) {
   const normalizedPhone = normalizeDbPhone(phone);
   return {
     guestId,
     identity: {
       phone: normalizedPhone,
     },
+    invitationGroup: String(invitationGroup ?? "").trim(),
     updatedBy: String(editorGuestId ?? "").trim(),
     updatedAt: timestamp,
   };
 }
-
 
 
 /**
@@ -134,15 +134,15 @@ export function buildGuestContactPayload({ guestId, phone, editorGuestId, timest
  * @param {string} input.editorGuestId
  * @returns {Object} explicit payload for setDoc(..., { merge: true })
  */
-export function buildGuestMessageAuthorPayload({ guestId, messageAuthor, editorGuestId, timestamp }) {
+export function buildGuestMessageAuthorPayload({ guestId, messageAuthor, invitationGroup, editorGuestId, timestamp }) {
   return {
     guestId,
     messageAuthor: String(messageAuthor ?? "").trim(),
+    invitationGroup: String(invitationGroup ?? "").trim(),
     updatedBy: String(editorGuestId ?? "").trim(),
     updatedAt: timestamp,
   };
 }
-
 
 
 /**
@@ -155,15 +155,15 @@ export function buildGuestMessageAuthorPayload({ guestId, messageAuthor, editorG
  * @param {string} input.editorGuestId
  * @returns {Object} explicit payload for setDoc(..., { merge: true })
  */
-export function buildIdentityCheckPayload({ guestId, passed, editorGuestId, timestamp }) {
+export function buildIdentityCheckPayload({ guestId, passed, invitationGroup, editorGuestId, timestamp }) {
   return {
     guestId,
     idCheckUser: passed === true,
+    invitationGroup: String(invitationGroup ?? "").trim(),
     updatedBy: String(editorGuestId ?? "").trim(),
     updatedAt: timestamp,
   };
 }
-
 
 
 /**
@@ -172,50 +172,46 @@ export function buildIdentityCheckPayload({ guestId, passed, editorGuestId, time
  * @param {string} guestId
  * @returns {Object} explicit payload for setDoc(..., { merge: true })
  */
-export function buildGuestDeletedPayload(guestId) {
-  return {
-    guestId,
-    _deleted: true,
-  };
-}
+ export function buildGuestDeletedPayload(guestId) {
+   return {
+     guestId,
+     _deleted: true,
+   };
+ }
 
+ /**
+  * Build a payload for saving a guest's RSVP answers.
+  *
+  * Answers are stored on the `guests` collection document, inside the nested
+  * `rsvp.answers` map (questionId → scale level, int 0–5). This keeps all live
+  * guest data in one place (the `guests` collection) instead of a separate
+  * `rsvp_responses` collection.
+  *
+  * @param {Object} input
+  * @param {string} input.guestId
+  * @param {Record<string, number>} input.answers  questionId → level (0–5)
+  * @param {string} input.editorGuestId
+  * @returns {Object} explicit payload for setDoc(..., { merge: true })
+  */
+ export function buildGuestRsvpPayload({ guestId, answers, editorGuestId, timestamp }) {
+   const normalized = {};
+   Object.entries(answers || {}).forEach(([questionId, level]) => {
+     const n = Number(level);
+     if (Number.isInteger(n) && n >= 0 && n <= 5) {
+       normalized[String(questionId)] = n;
+     }
+   });
+   return {
+     guestId,
+     rsvp: {
+       answers: normalized,
+     },
+     updatedBy: String(editorGuestId ?? "").trim(),
+     updatedAt: timestamp,
+   };
+ }
 
-/**
- * Build a payload for saving a guest's RSVP answers.
- *
- * Answers are stored on the `guests` collection document, inside the nested
- * `rsvp.answers` map (questionId → scale level, int 0–5). This keeps all live
- * guest data in one place (the `guests` collection) instead of a separate
- * `rsvp_responses` collection.
- *
- * @param {Object} input
- * @param {string} input.guestId
- * @param {Record<string, number>} input.answers  questionId → level (0–5)
- * @param {string} input.invitationGroup
- * @param {string} input.editorGuestId
- * @returns {Object} explicit payload for setDoc(..., { merge: true })
- */
-export function buildGuestRsvpPayload({ guestId, answers, editorGuestId, timestamp }) {
-  const normalized = {};
-  Object.entries(answers || {}).forEach(([questionId, level]) => {
-    const n = Number(level);
-    if (Number.isInteger(n) && n >= 0 && n <= 5) {
-      normalized[String(questionId)] = n;
-    }
-  });
-  return {
-    guestId,
-    rsvp: {
-      answers: normalized,
-    },
-    updatedBy: String(editorGuestId ?? "").trim(),
-    updatedAt: timestamp,
-  };
-}
-
-
-
-// ── Attendance responses collection ────────────────────────────────────
+ // ── Attendance responses collection ────────────────────────────────────
 
 /**
  * Build a payload for saving an attendance response.
@@ -244,7 +240,38 @@ export function buildAttendancePayload({ guestId, attendance, invitationGroup, e
 }
 
 
+// ── Card votes collection ──────────────────────────────────────────────
+
+/**
+ * Build a payload for saving a star rating on an experience card (a food
+ * flavour or a music act).
+ *
+ * One document per (card, guest) pair. The document ID is
+ * `${cardType}_${cardKey}_${guestId}`, which the Firestore rules enforce so a
+ * guest can only ever create/update their own single vote for a given card.
+ *
+ * @param {Object} input
+ * @param {string} input.cardType  "food" | "music"
+ * @param {string} input.cardKey   the flavour key (e.g. "carnitas") or act name
+ * @param {string} input.guestId   the voting guest's id (== auth uid)
+ * @param {number} input.rating    integer 1–5
+ * @param {*} input.timestamp      e.g. serverTimestamp()
+ * @returns {Object} explicit payload for setDoc(..., { merge: true })
+ */
+export function buildCardVotePayload({ cardType, cardKey, guestId, rating, timestamp }) {
+  return {
+    cardType: String(cardType ?? "").trim(),
+    cardKey: String(cardKey ?? "").trim(),
+    guestId: String(guestId ?? "").trim(),
+    rating: Number(rating),
+    updatedBy: String(guestId ?? "").trim(),
+    updatedAt: timestamp,
+  };
+}
+
+
 // ── Invitation groups collection ───────────────────────────────────────
+
 
 /**
  * Build a payload for creating a new invitation group.

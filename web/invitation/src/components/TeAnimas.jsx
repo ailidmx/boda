@@ -1,4 +1,5 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo, useRef, useState } from "react";
+
 import { useApp } from "../context/AppContext.jsx";
 import { useRsvp, RSVP_FLOWS } from "../context/RsvpContext.jsx";
 import { RsvpQuestion } from "./RsvpQuestion.jsx";
@@ -45,24 +46,37 @@ export function TeAnimas() {
   );
 
   const [saveStatus, setSaveStatus] = useState("idle");
+  const sectionRef = useRef(null);
 
   const handleAnswerChange = (questionId, guestId, level) => {
     setAnswer(questionId, guestId, level);
   };
 
+  // Persist the scale answers. Returns true on success so the caller can
+  // advance to the review step, false on failure (the error stays visible).
   const handleSaveAnswers = async () => {
-    if (saveStatus === "working") return;
+    if (saveStatus === "working") return false;
     const editorGuestId = profile?.guest?.id;
-    if (!editorGuestId) return;
+    if (!editorGuestId) return false;
     setSaveStatus("working");
     try {
       await saveFlow({ flow, questions, guests, editorGuestId });
       setSaveStatus("saved");
+      return true;
     } catch (error) {
       console.warn("[te-animas] scale save failed", error.code || error.message);
       setSaveStatus("error");
+      return false;
     }
   };
+
+  // Scroll the RSVP back into view on every step change (next/back/modify) so
+  // the guest always lands at the top of the flow instead of being left
+  // mid-page.
+  const handleNavigate = () => {
+    sectionRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
 
   const saveStatusText =
     saveStatus === "working"
@@ -73,45 +87,63 @@ export function TeAnimas() {
           ? interfaceText.submitError
           : "";
 
-  const steps = [
-    ...questions.map((q) => ({
-      id: q.id,
-      label: q.title,
-      render: () => (
-        <RsvpQuestion
-          questionId={q.id}
-          title={q.title}
-          subtitle={q.subtitle}
-          guests={guests}
-          answers={answers[q.id] || {}}
-          onChange={(guestId, level) => handleAnswerChange(q.id, guestId, level)}
-        />
-      ),
-    })),
-    {
-      id: "resumen",
-      label: rsvp.recap?.title || "Resumen",
-      render: () => (
-        <div className="rsvp-recap-step">
-          <RsvpRecap questions={questions} guests={guests} answers={answers} />
-          <div className="rsvp-scale-save">
-            <button
-              className="button button--gold"
-              type="button"
-              onClick={handleSaveAnswers}
-              disabled={saveStatus === "working"}
-            >
-              {scale.saveButton}
-            </button>
+  const lastQuestionIndex = questions.length - 1;
 
-            {saveStatusText ? (
+  const steps = [
+    ...questions.map((q, i) => {
+      const isLastQuestion = i === lastQuestionIndex;
+      return {
+        id: q.id,
+        label: q.title,
+        render: () => (
+          <div className="rsvp-recap-step">
+            <RsvpQuestion
+              questionId={q.id}
+              title={q.title}
+              subtitle={q.subtitle}
+              guests={guests}
+              answers={answers[q.id] || {}}
+              onChange={(guestId, level) => handleAnswerChange(q.id, guestId, level)}
+            />
+
+            {/* The success/error confirmation appears right here on the last
+                question step after "Enregistrer mes réponses" is pressed. */}
+            {isLastQuestion &&
+            (saveStatus === "saved" || saveStatus === "error") ? (
               <small data-form-status>{saveStatusText}</small>
             ) : null}
           </div>
+        ),
+      };
+    }),
+    {
+      id: "resumen",
+      label: rsvp.recap?.title || "Resumen",
+      render: ({ goToStart }) => (
+        <div className="rsvp-recap-step">
+          <RsvpRecap questions={questions} guests={guests} answers={answers} />
+
+          {saveStatus === "saved" || saveStatus === "error" ? (
+            <small data-form-status>{saveStatusText}</small>
+          ) : null}
+
+          <div className="rsvp-scale-save">
+            <button
+              className="rsvp-scale-modify"
+              type="button"
+              onClick={goToStart}
+            >
+              {rsvp.recap?.modifyButton || "Modifier mes réponses"}
+            </button>
+          </div>
         </div>
       ),
+
     },
   ];
+
+
+
 
   // Auto-detect the starting step: the first question that is not fully
   // answered by every group member, or the recap when everything is answered.
@@ -119,7 +151,7 @@ export function TeAnimas() {
 
 
   return (
-    <section className="rsvp-section section story-bg reveal">
+    <section ref={sectionRef} className="rsvp-section section story-bg reveal">
       <p className="eyebrow">{t.nav.teAnimas}</p>
       <p>{scale.intro}</p>
 
@@ -128,13 +160,42 @@ export function TeAnimas() {
           steps={steps}
           initialIndex={initialStep}
           onDone={() => markResume(flow)}
+          hideBackOnLast
+          hideNextOn={[lastQuestionIndex]}
+          countSteps={questions.length}
+          onNavigate={handleNavigate}
+          navRight={({ index, next }) => {
+            // On the last question step, replace the "Next" button with the
+            // gold "Enregistrer mes réponses" CTA, on the same line as Back.
+            if (index !== lastQuestionIndex) return null;
+            return (
+              <button
+                className="flip-step-btn flip-step-btn--primary"
+                type="button"
+                onClick={async () => {
+                  const ok = await handleSaveAnswers();
+                  if (ok) {
+                    // Let the success message show on this step before
+                    // advancing to the review.
+                    window.setTimeout(() => next(), 900);
+                  }
+                }}
+                disabled={saveStatus === "working"}
+              >
+                {scale.saveButton}
+              </button>
+            );
+          }}
           copy={{
             step: interfaceText.stepLabel || "Step",
             next: interfaceText.next || "Next",
             back: interfaceText.back || "Back",
           }}
         />
+
+
       )}
+
 
 
       <nav className="te-animas-nav" aria-label="Continue">

@@ -16,6 +16,26 @@
 export const FEATURES = {
   es: [
     {
+      icon: "⭐",
+      title: "Vota por tus favoritos",
+      body: "Califica con estrellas los platillos y los grupos musicales para ayudarnos a armar el menú y la fiesta perfectos.",
+    },
+    {
+      icon: "🎨",
+      title: "La música a tu estilo",
+      body: "Cambia el aspecto de la sección de música con tres temas visuales: clásico, noche eléctrica o atardecer.",
+    },
+    {
+      icon: "👥",
+      title: "Cada invitado, su detalle",
+      body: "En la sección de quedarse unos días más, cambia entre los miembros de tu grupo para ver el detalle de cada uno.",
+    },
+    {
+      icon: "✏️",
+      title: "Modifica tus respuestas",
+      body: "En los mini-RSVP puedes volver atrás y cambiar tus respuestas antes de guardarlas, sin empezar de cero.",
+    },
+    {
       icon: "📝",
       title: "Tu confirmación, todo en uno",
       body: "Responde todo desde un solo lugar: tu asistencia, si participas en la pétanque y tus planes para quedarte unos días más.",
@@ -78,6 +98,26 @@ export const FEATURES = {
   ],
   fr: [
     {
+      icon: "⭐",
+      title: "Vote pour tes favoris",
+      body: "Note avec des étoiles les plats et les groupes de musique pour nous aider à composer le menu et la fête parfaits.",
+    },
+    {
+      icon: "🎨",
+      title: "La musique à ton style",
+      body: "Change l'apparence de la section musique avec trois thèmes visuels : classique, nuit électrique ou coucher de soleil.",
+    },
+    {
+      icon: "👥",
+      title: "Chaque invité, son détail",
+      body: "Dans la section pour rester quelques jours de plus, bascule entre les membres de ton groupe pour voir le détail de chacun.",
+    },
+    {
+      icon: "✏️",
+      title: "Modifie tes réponses",
+      body: "Dans les mini-RSVP, tu peux revenir en arrière et changer tes réponses avant de les enregistrer, sans tout recommencer.",
+    },
+    {
       icon: "📝",
       title: "Ta confirmation, tout en un",
       body: "Réponds à tout depuis un seul endroit : ta présence, ta participation à la pétanque et tes envies de rester quelques jours de plus.",
@@ -139,6 +179,26 @@ export const FEATURES = {
     },
   ],
   en: [
+    {
+      icon: "⭐",
+      title: "Vote for your favorites",
+      body: "Rate the dishes and music acts with stars to help us craft the perfect menu and party.",
+    },
+    {
+      icon: "🎨",
+      title: "Music, your way",
+      body: "Switch the look of the music section with three visual themes: classic, electric night, or sunset.",
+    },
+    {
+      icon: "👥",
+      title: "Each guest, their detail",
+      body: "In the stay-a-few-more-days section, switch between your group members to see each person's detail.",
+    },
+    {
+      icon: "✏️",
+      title: "Edit your answers",
+      body: "In the mini-RSVPs you can go back and change your answers before saving, without starting over.",
+    },
     {
       icon: "📝",
       title: "Your RSVP, all in one",

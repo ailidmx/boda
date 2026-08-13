@@ -121,6 +121,16 @@ function formatPrice(amount, language) {
   return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(amount);
 }
 
+function getInitials(name) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toLocaleUpperCase();
+}
+
 export function Coast() {
 
   const { t, language, interfaceText, profile } = useApp();
@@ -132,6 +142,13 @@ export function Coast() {
 
 
   const barraRef = useRef(null);
+  // The mini RSVP card. Used to scroll the flow back into view on every step
+  // change (next/back/modify) so the guest always lands at the top of the
+  // card instead of being left mid-page.
+  const rsvpRef = useRef(null);
+  const handleNavigate = () => {
+    rsvpRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   // The group's guests (the signed-in guest + the other members of their
   // invitation group). These are the people the mini questions apply to.
@@ -169,7 +186,14 @@ export function Coast() {
     return source?.hosting?.isXtraCabinPaid ?? source?.isXtraCabinPaid;
   };
 
-  const liveActive = resolveLiveGuest(profile?.guest) || profile?.guest;
+  // The active member shown in the extra-stay card. Defaults to the signed-in
+  // guest; the guest selector (member tabs) lets the user switch between the
+  // members of their invitation group, mirroring the Accommodation section.
+  const [activeMemberId, setActiveMemberId] = useState(null);
+  const activeMember = activeMemberId
+    ? guests.find((m) => m.id === activeMemberId) || profile?.guest
+    : profile?.guest;
+  const liveActive = resolveLiveGuest(activeMember) || activeMember;
   const extraCabinId = getXtraCabinId(liveActive);
   const hasExtraCabin = Boolean(extraCabinId);
   const extraCabin = getCabin(extraCabinId);
@@ -437,8 +461,39 @@ export function Coast() {
       {hasExtraCabin && extraCabin && (
         <div className="coast-extra-stay reveal">
           <p className="eyebrow">{extraStay.eyebrow}</p>
-          <h3>{extraStay.title}</h3>
+          {guests.length > 1 && (
+            <div className="accommodation-member-tabs" role="tablist" aria-label={option.membersLabel || "Group members"}>
+              {guests.map((member) => {
+                const { firstName } = resolveGuestName(member);
+                const memberPhoto = resolveGuestPhoto(member);
+                const isActive = member.id === (activeMember?.id || profile?.guest?.id);
+                return (
+                  <button
+                    key={member.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={isActive}
+                    className={`accommodation-member-tab${isActive ? " is-active" : ""}`}
+                    onClick={() => setActiveMemberId(member.id)}
+                  >
+                    <span className="accommodation-member-tab-avatar" aria-hidden="true">
+                      {memberPhoto
+                        ? <img src={memberPhoto} alt="" loading="lazy" />
+                        : getInitials(resolveGuestName(member).fullName)}
+                    </span>
+                    <span className="accommodation-member-tab-name">{firstName}</span>
+                    {member.id === profile?.guest?.id && <small>{option.youLabel}</small>}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          <h3>{option.onSiteTitle}</h3>
+          {option.onSiteBody && (
+            <p className="accommodation-citation">{option.onSiteBody}</p>
+          )}
           <p className="accommodation-covered-note">
+
             <strong>{extraPaidByCouple ? option.onSiteCoveredBody : option.onSitePayBody}</strong>
           </p>
           {extraCabinName && (
@@ -646,7 +701,7 @@ export function Coast() {
           Step 1 = stay at Roca Azul, Step 2 = the beach plan, Step 3 = summary.
           Each guest rates how likely they are to join each "Et après ?" plan
           (0–5). Answers are saved per guest to Firestore via saveRsvpAnswers. */}
-      <div className="coast-rsvp-mini reveal">
+      <div className="coast-rsvp-mini reveal" ref={rsvpRef}>
 
         <div className="coast-rsvp-mini-head">
           <p className="eyebrow">{rsvpMini.eyebrow}</p>
@@ -679,7 +734,7 @@ export function Coast() {
             {
               id: "resumen",
               label: rsvpMini.recapTitle || "Summary",
-              render: () => (
+              render: ({ goToStart }) => (
                 <div className="rsvp-recap-step">
                   <RsvpRecap
                     questions={questions}
@@ -689,6 +744,13 @@ export function Coast() {
                     recapProgress={rsvpMini.recapProgress}
                   />
                   <div className="coast-rsvp-save">
+                    <button
+                      className="button button--ghost"
+                      type="button"
+                      onClick={goToStart}
+                    >
+                      {rsvpMini.modifyButton}
+                    </button>
                     <button
                       className="button button--gold"
                       type="button"
@@ -704,6 +766,9 @@ export function Coast() {
               ),
             },
           ]}
+          countSteps={questions.length}
+          onNavigate={handleNavigate}
+          hideBackOnLast
           copy={{
             step: interfaceText.stepLabel || "Step",
             next: interfaceText.next || "Next",

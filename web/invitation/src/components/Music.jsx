@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { EVENT } from "../content.js";
 import { MEDIA } from "../media.js";
 import { useApp } from "../context/AppContext.jsx";
@@ -8,6 +8,9 @@ import { SwipeCardCarousel } from "./SwipeCardCarousel.jsx";
 export function Music() {
   const { t } = useApp();
   const music = t.music || {};
+  const background = music.background || {};
+  const themes = background.themes || {};
+  const [theme, setTheme] = useState("wao");
   const playlists = [
     ["general", EVENT.playlists.general],
     ["karaoke", EVENT.playlists.karaoke],
@@ -15,13 +18,35 @@ export function Music() {
   ];
 
   return (
-    <section className="music-section section story-bg" id="music">
+    <section
+      className={`music-section section story-bg music-theme--${theme}`}
+      id="music"
+    >
 
       <div className="experience-heading reveal">
         <p className="eyebrow">{music.eyebrow}</p>
         <h2>{music.title}</h2>
         <p className="lead">{music.body}</p>
       </div>
+
+      {background.label && (
+        <div className="music-theme-selector reveal" role="group" aria-label={background.label}>
+          <span className="music-theme-selector__label">{background.label}</span>
+          <div className="music-theme-selector__options">
+            {Object.entries(themes).map(([key, name]) => (
+              <button
+                key={key}
+                type="button"
+                className={`music-theme-btn music-theme-btn--${key}${theme === key ? " is-selected" : ""}`}
+                aria-pressed={theme === key}
+                onClick={() => setTheme(key)}
+              >
+                {name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <SwipeCardCarousel className="music-lineup" label={music.title}>
         {music.acts.map((act, index) => {
