@@ -15,7 +15,10 @@ const firebaseConfig = {
 
 const firebaseApp = initializeApp(firebaseConfig);
 
-export const analytics = getAnalytics(firebaseApp);
+// Analytics requires a browser environment (uses `window`). Guard it so the
+// module can be imported in Node.js test environments without throwing.
+export const analytics =
+  typeof window !== "undefined" ? getAnalytics(firebaseApp) : null;
 export const auth = getAuth(firebaseApp);
 export const db = getFirestore(firebaseApp, "boda-us-central1");
 
