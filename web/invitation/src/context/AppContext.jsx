@@ -21,8 +21,10 @@ import {
   verifyBeforeUpdateEmail,
 } from "firebase/auth";
 
-import { auth } from "../firebase.js";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { auth, db } from "../firebase.js";
 import { content, SUPPORTED_LANGUAGES } from "../content.js";
+
 import {
   AUTH_EMAIL_DOMAIN,
   getActiveGuests,
@@ -277,7 +279,21 @@ export function AppProvider({ children }) {
         });
         setAuthState("signedIn");
 
+        // Log the sign-in so a Cloud Function can post a Telegram notification.
+        // This is a best-effort, fire-and-forget write: a failure here must
+        // never block the guest from entering the invitation.
+        try {
+          await addDoc(collection(db, "login_events"), {
+            guestId: user.uid,
+            username: username || resolvedGuest?.username || "",
+            createdAt: serverTimestamp(),
+          });
+        } catch (loginLogError) {
+          console.warn("[login] failed to log sign-in event", loginLogError);
+        }
+
         // After sign-in we use the guest's preferred language. If it differs
+
         // from the language the user was seeing (the login page, which is
         // Spanish by default), switch to the preferred language in the
         // background and offer a confirmation modal (only once per session).

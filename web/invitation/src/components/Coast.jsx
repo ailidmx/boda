@@ -330,8 +330,9 @@ export function Coast() {
   const budget = coast.budget || {};
 
   const handleAnswerChange = (questionId, guestId, level) => {
-    setAnswer(questionId, guestId, level);
+    setAnswer(questionId, guestId, level, RSVP_FLOWS.coast);
   };
+
 
 
   const handleSaveAnswers = async () => {
@@ -492,10 +493,11 @@ export function Coast() {
           {option.onSiteBody && (
             <p className="accommodation-citation">{option.onSiteBody}</p>
           )}
-          <p className="accommodation-covered-note">
-
-            <strong>{extraPaidByCouple ? option.onSiteCoveredBody : option.onSitePayBody}</strong>
-          </p>
+          {extraPaidByCouple && (
+            <p className="accommodation-covered-note">
+              <strong>{option.onSiteCoveredBody}</strong>
+            </p>
+          )}
           {extraCabinName && (
             <p className="accommodation-cabin-badge">{extraCabinName}</p>
           )}
@@ -641,6 +643,98 @@ export function Coast() {
         </div>
       )}
 
+      {/* Mini RSVP — a 3-step flipable card (like "¡Te animas!" and pétanque):
+          Step 1 = stay at Roca Azul, Step 2 = the beach plan, Step 3 = summary.
+          Each guest rates how likely they are to join each "Et après ?" plan
+          (0–5). Answers are saved per guest to Firestore via saveRsvpAnswers. */}
+      <div className="coast-rsvp-mini reveal" ref={rsvpRef}>
+
+
+        <div className="coast-rsvp-mini-head">
+          <p className="eyebrow">{rsvpMini.eyebrow}</p>
+          <h3>{rsvpMini.title}</h3>
+          <p className="coast-rsvp-mini-intro">{rsvpMini.intro}</p>
+        </div>
+
+        <FlipStepCard
+          onDone={() => markResume(flow)}
+          initialIndex={initialStep}
+          steps={[
+            ...questions.map((question) => ({
+
+              id: question.id,
+              label: question.title,
+              render: () => (
+                <RsvpQuestion
+                  questionId={question.id}
+                  title={question.title}
+                  subtitle={question.subtitle}
+                  variant="scale"
+                  guests={guests}
+                  answers={answers[question.id] || {}}
+                  onChange={(guestId, level) =>
+                    handleAnswerChange(question.id, guestId, level)
+                  }
+                />
+              ),
+            })),
+            {
+              id: "resumen",
+              label: rsvpMini.recapTitle || "Summary",
+              render: ({ goToStart }) => (
+                <div className="rsvp-recap-step">
+                  <RsvpRecap
+                    questions={questions}
+                    guests={guests}
+                    answers={answers}
+                    recapTitle={rsvpMini.recapTitle}
+                    recapProgress={rsvpMini.recapProgress}
+                  />
+                  <div className="coast-rsvp-save">
+                    <button
+                      className="button button--ghost"
+                      type="button"
+                      onClick={goToStart}
+                    >
+                      {rsvpMini.modifyButton}
+                    </button>
+                    {saveStatusText && <small>{saveStatusText}</small>}
+                  </div>
+                </div>
+              ),
+            },
+          ]}
+          countSteps={questions.length}
+          onNavigate={handleNavigate}
+          hideBackOnLast
+          hideNextOn={[questions.length - 1]}
+          navRight={({ index, next }) => {
+            // On the last question step, replace the "Next" button with the
+            // gold "Save my responses" CTA, on the same line as Back.
+            if (index !== questions.length - 1) return null;
+            return (
+              <button
+                className="flip-step-btn flip-step-btn--primary"
+                type="button"
+                onClick={async () => {
+                  await handleSaveAnswers();
+                  next();
+                }}
+                disabled={saveStatus === "working"}
+              >
+                {rsvpMini.button}
+              </button>
+            );
+          }}
+          copy={{
+            step: interfaceText.stepLabel || "Step",
+            next: interfaceText.next || "Next",
+            back: interfaceText.back || "Back",
+          }}
+        />
+
+      </div>
+
       {/* Barra de Navidad budget estimate — a "budget to plan" block that
           turns the per-night per-person rate (1,200–2,500 MXN) into a group
           total for the 4 beach nights, based on how many group members rated
@@ -697,95 +791,17 @@ export function Coast() {
         </div>
       )}
 
-      {/* Mini RSVP — a 3-step flipable card (like "¡Te animas!" and pétanque):
-          Step 1 = stay at Roca Azul, Step 2 = the beach plan, Step 3 = summary.
-          Each guest rates how likely they are to join each "Et après ?" plan
-          (0–5). Answers are saved per guest to Firestore via saveRsvpAnswers. */}
-      <div className="coast-rsvp-mini reveal" ref={rsvpRef}>
-
-        <div className="coast-rsvp-mini-head">
-          <p className="eyebrow">{rsvpMini.eyebrow}</p>
-          <h3>{rsvpMini.title}</h3>
-          <p className="coast-rsvp-mini-intro">{rsvpMini.intro}</p>
-        </div>
-
-        <FlipStepCard
-          onDone={() => markResume(flow)}
-          initialIndex={initialStep}
-          steps={[
-            ...questions.map((question) => ({
-
-              id: question.id,
-              label: question.title,
-              render: () => (
-                <RsvpQuestion
-                  questionId={question.id}
-                  title={question.title}
-                  subtitle={question.subtitle}
-                  variant="scale"
-                  guests={guests}
-                  answers={answers[question.id] || {}}
-                  onChange={(guestId, level) =>
-                    handleAnswerChange(question.id, guestId, level)
-                  }
-                />
-              ),
-            })),
-            {
-              id: "resumen",
-              label: rsvpMini.recapTitle || "Summary",
-              render: ({ goToStart }) => (
-                <div className="rsvp-recap-step">
-                  <RsvpRecap
-                    questions={questions}
-                    guests={guests}
-                    answers={answers}
-                    recapTitle={rsvpMini.recapTitle}
-                    recapProgress={rsvpMini.recapProgress}
-                  />
-                  <div className="coast-rsvp-save">
-                    <button
-                      className="button button--ghost"
-                      type="button"
-                      onClick={goToStart}
-                    >
-                      {rsvpMini.modifyButton}
-                    </button>
-                    <button
-                      className="button button--gold"
-                      type="button"
-                      onClick={handleSaveAnswers}
-
-                      disabled={saveStatus === "working"}
-                    >
-                      {rsvpMini.button}
-                    </button>
-                    {saveStatusText && <small>{saveStatusText}</small>}
-                  </div>
-                </div>
-              ),
-            },
-          ]}
-          countSteps={questions.length}
-          onNavigate={handleNavigate}
-          hideBackOnLast
-          copy={{
-            step: interfaceText.stepLabel || "Step",
-            next: interfaceText.next || "Next",
-            back: interfaceText.back || "Back",
-          }}
-        />
-      </div>
-
       {/* Desktop-only bottom nav: leads to the photos section. */}
+
       <nav className="section-nav coast-section-nav" aria-label="Continue">
 
 
-        <a className="section-nav-link" href="#photos">
-          <span>{t.nav.photos}</span>
+        <a className="section-nav-link" href="#rsvp">
+          <span>{t.nav.rsvp}</span>
           <span aria-hidden="true">↓</span>
         </a>
       </nav>
+
     </section>
   );
 }

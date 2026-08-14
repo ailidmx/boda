@@ -17,6 +17,12 @@
 // shown in the player.
 export const TRACKS = [
   {
+    src: "audio/Besame Mucho.mp3",
+    title: "Besame Mucho",
+    artist: "Lara Louise",
+    copyright: "Lara Louise",
+  },
+  {
     src: "audio/bbib1.mp3",
     title: "BISERI SRBIJE PART 1",
     artist: "BOBAN MARKOVIC ORKESTAR",
@@ -29,6 +35,7 @@ export const TRACKS = [
     copyright: "BOBAN MARKOVIC ORKESTAR",
   },
 ];
+
 
 // In-memory player + current track state.
 let audio = null;

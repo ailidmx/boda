@@ -1,0 +1,44 @@
+// ── Thanks manager (CRUD) ──────────────────────────────────────────────
+// Reuses the shared dashboard table, button, and modal styles. Only the
+// localized-text cells need a bit of extra room so long credits wrap nicely
+// instead of stretching the table.
+@use "tokens" as *;
+
+[data-thanks-manager] .dashboard-guest-table td {
+  max-width: 16rem;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+
+[data-thanks-manager] .dashboard-guest-table td:first-child {
+  min-width: 12rem;
+  white-space: nowrap;
+}
+
+// ── Sortable column headers ────────────────────────────────────────────
+// The header cells contain a button so the whole header is clickable. The
+// active column is highlighted and shows a ▲/▼ direction arrow.
+[data-thanks-manager] .dashboard-th-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.4rem;
+  margin: -0.25rem -0.4rem;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  border-radius: 0.3rem;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+[data-thanks-manager] .dashboard-th-sort:hover {
+  background: rgba(85, 69, 45, 0.08);
+}
+
+[data-thanks-manager] .dashboard-th-sort.is-active {
+  color: #a0352c;
+}
+

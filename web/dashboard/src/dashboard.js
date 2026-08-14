@@ -1,4 +1,5 @@
-import { collection, getDocs, doc, setDoc, deleteDoc, onSnapshot, limit, query } from "firebase/firestore";
+import { collection, getDocs, doc, setDoc, addDoc, deleteDoc, onSnapshot, limit, query, serverTimestamp } from "firebase/firestore";
+
 
 
 import { db } from "./firebase.js";
@@ -20,6 +21,7 @@ const COLLECTIONS = {
   suggestions: collections.experienceSuggestions,
   coast: collections.coastInterest,
   petanque: collections.petanqueParticipation,
+  thanks: collections.thanks,
 };
 
 
@@ -28,13 +30,18 @@ const state = {
   suggestions: [],
   coast: [],
   petanque: [],
+  thanks: [],
   invitationGroups: [], // from Firestore collection "invitation_groups"
   filterGroup: "",
   filterCabin: "",
   filterQuery: "",
   groupBy: "group",
   activeTab: "guests",
+  // Sort state for the thanks (agradecimientos) table. `key` is one of
+  // "guest" | "es" | "fr" | "en"; `dir` is "asc" | "desc".
+  thanksSort: { key: "guest", dir: "asc" },
 };
+
 
 // ── Sub-page routing ─────────────────────────────────────────────────────
 
@@ -50,6 +57,7 @@ const PATH_TO_TAB = {
   suggestions: "suggestions",
   coast: "coast",
   petanque: "petanque",
+  agradecimientos: "thanks",
 };
 
 /**
@@ -64,6 +72,7 @@ const TAB_TO_PATH = {
   suggestions: "suggestions",
   coast: "coast",
   petanque: "petanque",
+  thanks: "agradecimientos",
 };
 
 /**
@@ -194,6 +203,19 @@ function showMessage(message, stateName = "") {
   status.textContent = message;
   status.dataset.state = stateName;
 }
+
+// ── Firebase trace logging ─────────────────────────────────────────────
+// Lightweight console tracing for every Firestore read/write the dashboard
+// performs. Helps debug permission errors and data-loading issues. Toggle
+// `TRACE_FIREBASE` to false to silence the logs.
+const TRACE_FIREBASE = true;
+
+function traceFirebase(op, detail) {
+  if (!TRACE_FIREBASE) return;
+  const ts = new Date().toLocaleTimeString("es-MX");
+  console.log(`[firebase:${op}] ${ts}`, detail ?? "");
+}
+
 
 function guestIdentity(guest) {
   return guest?.identity || {};
@@ -1238,6 +1260,304 @@ function renderTableAssignments() {
   `;
 }
 
+// ── Thanks Manager (CRUD) ──────────────────────────────────────────────
+
+// The `thanks` collection is the source of truth for the "MERCI" credits roll
+// on the invitation. Each document carries a `guest` ID plus localized text
+// (`fr`, `es`, `en`). Firestore rules restrict writes to admins (isAdmin()).
+function thanksGuestName(record) {
+  const guest = getGuest(record.guest);
+  if (guest) return guestFullName(guest);
+  return record.guest || "—";
+}
+
+// Sortable column definitions for the thanks table. `key` maps to the record
+// field (or a computed value for the guest name); `label` is the header text.
+const THANKS_COLUMNS = [
+  { key: "guest", label: "Invitado" },
+  { key: "es", label: "ES" },
+  { key: "fr", label: "FR" },
+  { key: "en", label: "EN" },
+];
+
+// Resolve the sortable value for a thanks record given a column key.
+function thanksSortValue(record, key) {
+  if (key === "guest") return thanksGuestName(record).toLowerCase();
+  return (record[key] || "").toLowerCase();
+}
+
+function renderThanksManager() {
+  const container = document.querySelector("[data-thanks-manager]");
+  if (!container) return;
+
+  const { key, dir } = state.thanksSort;
+  const records = [...state.thanks].sort((a, b) => {
+    const aVal = thanksSortValue(a, key);
+    const bVal = thanksSortValue(b, key);
+    const cmp = aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+    return dir === "asc" ? cmp : -cmp;
+  });
+
+  // Build the sortable header cells. The active column shows ▲/▼.
+  const headerCells = THANKS_COLUMNS.map((col) => {
+    const active = col.key === key;
+    const arrow = active ? (dir === "asc" ? " ▲" : " ▼") : "";
+    return `<th><button type="button" class="dashboard-th-sort${active ? " is-active" : ""}" data-sort-thanks="${col.key}" title="Ordenar por ${col.label}">${col.label}${arrow}</button></th>`;
+  }).join("");
+
+  container.innerHTML = `
+    <div style="margin-bottom:1rem;">
+      <button class="dashboard-button" type="button" data-create-thanks>+ Nuevo agradecimiento</button>
+    </div>
+    ${records.length === 0
+      ? '<p class="dashboard-empty">No hay agradecimientos todavía. Crea uno para que aparezca en los créditos de la invitación.</p>'
+      : `<div class="dashboard-guest-table-wrap">
+          <table class="dashboard-guest-table">
+            <thead>
+              <tr>
+                ${headerCells}
+                <th>Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${records
+                .map(
+                  (record) => `
+                <tr>
+                  <td><strong>${thanksGuestName(record)}</strong><br /><code>${record.guest}</code></td>
+                  <td>${record.es || "—"}</td>
+                  <td>${record.fr || "—"}</td>
+                  <td>${record.en || "—"}</td>
+                  <td>
+                    <button class="dashboard-link-btn" data-edit-thanks="${record.id}" title="Editar">✏️</button>
+                    <button class="dashboard-link-btn" data-delete-thanks="${record.id}" title="Eliminar" style="color:#a0352c;">🗑️</button>
+                  </td>
+                </tr>`,
+                )
+                .join("")}
+            </tbody>
+          </table>
+        </div>`
+    }
+  `;
+
+  container.querySelector("[data-create-thanks]")?.addEventListener("click", () => {
+    openThanksEditor(null);
+  });
+
+  // ── Sortable column headers ──
+  container.querySelectorAll("[data-sort-thanks]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const colKey = btn.dataset.sortThanks;
+      if (state.thanksSort.key === colKey) {
+        // Toggle direction when re-clicking the active column.
+        state.thanksSort.dir = state.thanksSort.dir === "asc" ? "desc" : "asc";
+      } else {
+        state.thanksSort.key = colKey;
+        state.thanksSort.dir = "asc";
+      }
+      renderThanksManager();
+    });
+  });
+
+
+  container.querySelectorAll("[data-edit-thanks]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const record = state.thanks.find((r) => r.id === btn.dataset.editThanks);
+      if (record) openThanksEditor(record);
+    });
+  });
+
+  container.querySelectorAll("[data-delete-thanks]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const record = state.thanks.find((r) => r.id === btn.dataset.deleteThanks);
+      if (record) openThanksDelete(record);
+    });
+  });
+}
+
+function openThanksEditor(record) {
+  const isEdit = Boolean(record);
+  const overlay = document.createElement("div");
+  overlay.className = "dashboard-modal-overlay";
+  overlay.innerHTML = `
+    <div class="dashboard-modal">
+      <div class="dashboard-modal-heading">
+        <h3>${isEdit ? "Editar agradecimiento" : "Nuevo agradecimiento"}</h3>
+        <button class="dashboard-modal-close" data-modal-close type="button">✕</button>
+      </div>
+      <form class="dashboard-modal-form" data-thanks-form>
+        <div class="dashboard-modal-field">
+          <label for="thanks-guest">Invitado</label>
+          <select id="thanks-guest" name="guest" required>
+            <option value="">— Selecciona un invitado —</option>
+            ${getActiveGuests()
+              .map(
+                (g) =>
+                  `<option value="${g.id}" ${record && record.guest === g.id ? "selected" : ""}>${guestFullName(g)} (${g.id})</option>`,
+              )
+              .join("")}
+          </select>
+        </div>
+        <div class="dashboard-modal-field">
+          <label for="thanks-es">Texto en español</label>
+          <textarea id="thanks-es" name="es" rows="2" placeholder="Ej: Wedding planner">${record?.es || ""}</textarea>
+        </div>
+        <div class="dashboard-modal-field">
+          <label for="thanks-fr">Texto en francés</label>
+          <textarea id="thanks-fr" name="fr" rows="2" placeholder="Ej: Wedding planner">${record?.fr || ""}</textarea>
+        </div>
+        <div class="dashboard-modal-field">
+          <label for="thanks-en">Texto en inglés</label>
+          <textarea id="thanks-en" name="en" rows="2" placeholder="Ej: Wedding planner">${record?.en || ""}</textarea>
+        </div>
+        <small style="color:#8a7a5f;display:block;">
+          Puedes rellenar solo un idioma; el script de traducción completará los demás.
+        </small>
+        <div class="dashboard-modal-actions">
+          <button class="dashboard-button" type="submit">${isEdit ? "Guardar cambios" : "Crear"}</button>
+          <button class="dashboard-button dashboard-button-secondary" type="button" data-modal-close>Cancelar</button>
+        </div>
+        <small data-thanks-status></small>
+      </form>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  overlay.querySelectorAll("[data-modal-close]").forEach((btn) => {
+    btn.addEventListener("click", () => overlay.remove());
+  });
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+
+  const form = overlay.querySelector("[data-thanks-form]");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const data = new FormData(form);
+    const guest = data.get("guest")?.trim();
+    const es = data.get("es")?.trim();
+    const fr = data.get("fr")?.trim();
+    const en = data.get("en")?.trim();
+
+    // At least one language must be filled. The translation script fills the
+    // missing ones, so we don't require all three here.
+    if (!guest || (!es && !fr && !en)) return;
+
+    const status = overlay.querySelector("[data-thanks-status]");
+    status.textContent = "Guardando…";
+    status.dataset.state = "working";
+
+    // Only the agreed schema fields are written (guest, fr, es, en, createdAt).
+    // Empty languages are omitted so the translation script can fill them
+    // later. The Firestore rules (hasValidThanksFields) reject any extra keys.
+    const payload = { guest };
+    if (es) payload.es = es;
+    if (fr) payload.fr = fr;
+    if (en) payload.en = en;
+    // New records get a server timestamp so the dashboard can sort them by
+    // creation time (newest first) instead of falling back to document-ID
+    // (alphabetical) order. Existing records keep their original createdAt.
+    if (!isEdit) payload.createdAt = serverTimestamp();
+
+    traceFirebase(isEdit ? "thanks.update" : "thanks.create", {
+      guest,
+      hasEs: Boolean(es),
+      hasFr: Boolean(fr),
+      hasEn: Boolean(en),
+      hasCreatedAt: !isEdit,
+    });
+
+    try {
+      if (isEdit) {
+        await setDoc(doc(db, collections.thanks, record.id), payload, { merge: true });
+        traceFirebase("thanks.update.ok", { id: record.id });
+      } else {
+        await addDoc(collection(db, collections.thanks), payload);
+        traceFirebase("thanks.create.ok", { guest });
+      }
+
+      status.textContent = "✅ Guardado.";
+      status.dataset.state = "success";
+      setTimeout(() => overlay.remove(), 1200);
+      // Refresh the list so the new/edited entry shows up.
+      loadDashboardData().catch(showLoadError);
+    } catch (err) {
+      console.error("Failed to save thanks", err);
+      traceFirebase(isEdit ? "thanks.update.error" : "thanks.create.error", {
+        code: err?.code,
+        message: err?.message,
+      });
+      status.textContent = "❌ Error al guardar. Intenta de nuevo.";
+      status.dataset.state = "error";
+    }
+
+  });
+
+  setTimeout(() => overlay.querySelector("#thanks-guest")?.focus(), 100);
+}
+
+function openThanksDelete(record) {
+  const overlay = document.createElement("div");
+  overlay.className = "dashboard-modal-overlay";
+  overlay.innerHTML = `
+    <div class="dashboard-modal" style="max-width: 28rem;">
+      <div class="dashboard-modal-heading">
+        <h3>Eliminar agradecimiento</h3>
+        <button class="dashboard-modal-close" data-modal-close type="button">✕</button>
+      </div>
+      <div class="dashboard-modal-form">
+        <p style="line-height:1.6;color:#55452d;">
+          ¿Eliminar el agradecimiento de <strong>${thanksGuestName(record)}</strong>?
+        </p>
+        <p style="font-size:0.85rem;color:#a0352c;">
+          Esta acción quitará el crédito de la sección de agradecimientos de la invitación.
+        </p>
+        <div class="dashboard-modal-actions">
+          <button class="dashboard-button" style="background:#a0352c;" type="button" data-confirm-delete>
+            Eliminar
+          </button>
+          <button class="dashboard-button dashboard-button-secondary" type="button" data-modal-close>
+            Cancelar
+          </button>
+        </div>
+        <small data-thanks-status></small>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  overlay.querySelectorAll("[data-modal-close]").forEach((btn) => {
+    btn.addEventListener("click", () => overlay.remove());
+  });
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) overlay.remove();
+  });
+
+  overlay.querySelector("[data-confirm-delete]").addEventListener("click", async () => {
+    const status = overlay.querySelector("[data-thanks-status]");
+    status.textContent = "Eliminando…";
+    status.dataset.state = "working";
+    traceFirebase("thanks.delete", { id: record.id });
+    try {
+      await deleteDoc(doc(db, collections.thanks, record.id));
+      traceFirebase("thanks.delete.ok", { id: record.id });
+      status.textContent = "✅ Eliminado.";
+      status.dataset.state = "success";
+      setTimeout(() => overlay.remove(), 1200);
+      loadDashboardData().catch(showLoadError);
+    } catch (err) {
+      console.error("Failed to delete thanks", err);
+      traceFirebase("thanks.delete.error", { id: record.id, code: err?.code, message: err?.message });
+      status.textContent = "❌ Error al eliminar.";
+      status.dataset.state = "error";
+    }
+  });
+
+}
+
 // ── Summary cards ──────────────────────────────────────────────────────
 
 function summaryCard(label, value, detail) {
@@ -1413,6 +1733,7 @@ function updateDashboardData() {
   // Re-render guest manager if visible
   renderGuestManager();
   renderTableAssignments();
+  renderThanksManager();
 }
 
 // Bounded query limit for dashboard collections. Prevents unbounded reads
@@ -1422,6 +1743,7 @@ const DASHBOARD_QUERY_LIMIT = 1000;
 
 async function loadDashboardData() {
   showMessage("Actualizando respuestas…", "working");
+  traceFirebase("load.start", { collections: Object.keys(COLLECTIONS) });
   const entries = await Promise.all(
     Object.entries(COLLECTIONS).map(async ([key, collectionName]) => {
       const snapshot = await getDocs(
@@ -1436,6 +1758,7 @@ async function loadDashboardData() {
         const bTime = b.createdAt?.toMillis?.() || 0;
         return bTime - aTime;
       });
+      traceFirebase("load.collection", { collection: collectionName, count: records.length });
       return [key, records];
     }),
   );
@@ -1443,8 +1766,10 @@ async function loadDashboardData() {
     state[key] = records;
   });
   updateDashboardData();
+  traceFirebase("load.done", { counts: Object.fromEntries(entries.map(([k, r]) => [k, r.length])) });
   showMessage(`Actualizado a las ${new Date().toLocaleTimeString("es-MX")}`);
 }
+
 
 
 function showLoadError(error) {
@@ -1477,6 +1802,7 @@ function renderTabNavigation() {
     { id: "suggestions", label: "Sugerencias", icon: "🎵" },
     { id: "coast", label: "Costa", icon: "🏖️" },
     { id: "petanque", label: "Petanca", icon: "🎱" },
+    { id: "thanks", label: "Agradecimientos", icon: "🙏" },
   ];
 
   const nav = document.querySelector("[data-dashboard-tabs]");
@@ -1635,6 +1961,19 @@ function renderDashboard(app) {
           <div class="dashboard-records" data-records="petanque"></div>
         </div>
       </section>
+
+      <!-- ── Panel: Thanks ── -->
+      <section class="dashboard-panel" data-dashboard-panel="thanks">
+        <div class="dashboard-section">
+          <div class="dashboard-section-heading">
+            <div>
+              <p class="dashboard-eyebrow">Créditos de agradecimiento</p>
+              <h2>Agradecimientos</h2>
+            </div>
+          </div>
+          <div data-thanks-manager></div>
+        </div>
+      </section>
     </main>
   `;
 
@@ -1669,6 +2008,7 @@ function renderDashboard(app) {
   renderGuestManager();
   renderCabinAssignments();
   renderGroupsPanel();
+  renderThanksManager();
 
   // ── Load rooms from Firestore (source of truth) ──
   loadRooms().then(() => {

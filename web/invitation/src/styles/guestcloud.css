@@ -1,42 +1,14 @@
-/* The guest cloud is embedded inside the MERCI (thanks) section but keeps its
-   own full-width cream background, breaking out of the section's padding so
-   the warm radial gradients span edge to edge. */
 .guest-cloud-section {
-  width: 100vw;
-  margin-left: calc(50% - 50vw);
-  padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 6vw, 6rem);
   background:
     radial-gradient(circle at 12% 18%, rgb(198 139 43 / 14%), transparent 26rem),
     radial-gradient(circle at 88% 82%, rgb(169 77 49 / 14%), transparent 28rem),
     var(--cream);
 }
 
-
 .guest-cloud-frame {
   width: min(100%, 64rem);
   margin: 0 auto;
   text-align: center;
-}
-
-/* On desktop, let the cloud grow horizontally to fill the viewport (minus a
-   comfortable margin) so the tags can spread out across the full width. */
-@media (min-width: 1100px) {
-  .guest-cloud-frame {
-    width: calc(100vw - 8rem);
-    max-width: 96rem;
-  }
-}
-
-/* The guest cloud keeps its centered header but adopts the shared
-   section-heading separator (dark border on the light cream background). */
-.guest-cloud-heading {
-  align-items: center;
-  text-align: center;
-}
-
-.guest-cloud-heading .eyebrow {
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .guest-cloud-title {
@@ -48,35 +20,12 @@
   letter-spacing: -0.02em;
 }
 
-/* The "Chaque nom est une histoire partagée…" line is styled as a literary
-   citation: dark ink text, a marigold left rule, display serif, italic, with a
-   large opening quote mark — matching the citation style used in the Gift
-   section. */
 .guest-cloud-subtitle {
-  position: relative;
-  max-width: 34rem;
-  margin: 1.5rem auto 3rem;
-  padding-left: 1.5rem;
-  border-left: 2px solid var(--marigold);
-  font-family: var(--font-display);
-  font-size: clamp(1.25rem, 2.4vw, 1.8rem);
-  font-style: italic;
-  font-weight: 400;
-  line-height: 1.5;
-  color: var(--ink);
-  text-align: left;
-}
-
-.guest-cloud-subtitle::before {
-  content: "“";
-  position: absolute;
-  top: -0.35em;
-  left: -0.15rem;
-  font-family: var(--font-display);
-  font-size: 3.5em;
-  line-height: 1;
-  color: var(--marigold);
-  opacity: 0.35;
+  max-width: 42rem;
+  margin: 0 auto 3rem;
+  color: rgb(36 33 25 / 78%);
+  font-size: clamp(0.95rem, 1.6vw, 1.1rem);
+  line-height: 1.6;
 }
 
 .guest-cloud-mode {
@@ -177,36 +126,27 @@
 
 .guest-avatar-carousel__viewport {
   width: 100%;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  cursor: grab;
 }
 
-/* Pure CSS marquee: the track holds two identical halves and slides left by
-   exactly one half (-50%), so it loops seamlessly. */
+.guest-avatar-carousel__viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.guest-avatar-carousel__viewport:active {
+  cursor: grabbing;
+}
+
 .guest-avatar-carousel__track {
-  display: flex;
-  width: max-content;
-  animation: guest-avatar-marquee 45s linear infinite;
-  will-change: transform;
-}
-
-.guest-avatar-carousel:hover .guest-avatar-carousel__track {
-  animation-play-state: paused;
-}
-
-.guest-avatar-carousel__half {
   display: flex;
   align-items: flex-start;
   gap: 1.25rem;
-  padding-right: 1.25rem;
-}
-
-@keyframes guest-avatar-marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
+  width: max-content;
+  padding: 0 2rem;
 }
 
 .guest-avatar-card {
@@ -240,14 +180,94 @@
   max-width: 11ch;
 }
 
+/* ── Carousel controls (play/pause, speed, prev/next) ─────────────────── */
+.guest-avatar-carousel__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1.25rem;
+}
+
+.guest-avatar-carousel__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.4rem;
+  height: 2.4rem;
+  padding: 0 0.7rem;
+  border: 1px solid rgb(36 33 25 / 22%);
+  border-radius: 999px;
+  background: rgb(255 253 248 / 80%);
+  color: rgb(36 33 25 / 82%);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 180ms ease, background 180ms ease, color 180ms ease;
+}
+
+.guest-avatar-carousel__btn:hover {
+  border-color: rgb(36 33 25 / 42%);
+  color: var(--ink);
+}
+
+.guest-avatar-carousel__btn--play {
+  min-width: 3rem;
+  font-size: 0.9rem;
+}
+
+.guest-avatar-carousel__btn--nav {
+  font-size: 1.3rem;
+  padding: 0 0.9rem;
+}
+
+.guest-avatar-carousel__speed {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.35rem 0.7rem;
+  border: 1px solid rgb(36 33 25 / 18%);
+  border-radius: 999px;
+  background: rgb(255 253 248 / 55%);
+}
+
+.guest-avatar-carousel__speed-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(36 33 25 / 62%);
+  white-space: nowrap;
+}
+
+.guest-avatar-carousel__speed-slider {
+  width: clamp(6rem, 18vw, 10rem);
+  accent-color: var(--marigold);
+  cursor: pointer;
+}
+
+.guest-avatar-carousel__speed-value {
+  min-width: 2.4rem;
+  text-align: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+
 @media (max-width: 640px) {
+
   .guest-avatar-carousel {
     margin-top: 2rem;
   }
 
-  .guest-avatar-carousel__half {
+  .guest-avatar-carousel__track {
     gap: 0.95rem;
-    padding-right: 0.95rem;
+    padding: 0 1rem;
   }
 
   .guest-avatar-card {
@@ -260,14 +280,5 @@
     font-size: 0.86rem;
     max-width: 10ch;
   }
-}
-
-
-/* Bottom nav linking to the next section (Gift / "CADEAUX"). The guest cloud
-   is a full-width cream band, so the nav sits centered at the bottom of the
-   band, visible on all screen sizes. */
-.guest-cloud-section-nav {
-  width: min(100%, 64rem);
-  margin: 2.5rem auto 0;
 }
 

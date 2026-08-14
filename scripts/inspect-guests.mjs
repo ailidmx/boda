@@ -12,7 +12,7 @@ const serviceAccount = JSON.parse(
 );
 
 const app = initializeApp({ credential: cert(serviceAccount) });
-const db = getFirestore(app);
+const db = getFirestore(app, "boda-us-central1");
 
 const snap = await db.collection("guests").get();
 console.log(`Total documents in "guests": ${snap.size}\n`);

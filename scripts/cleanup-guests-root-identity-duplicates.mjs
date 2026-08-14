@@ -36,7 +36,7 @@ const app = initializeApp({
   projectId: serviceAccount.project_id,
 });
 
-const db = getFirestore(app);
+const db = getFirestore(app, "boda-us-central1");
 
 function hasLegacyRootFields(data) {
   if (!data || typeof data !== "object") return false;

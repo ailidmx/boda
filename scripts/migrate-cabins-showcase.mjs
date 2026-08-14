@@ -36,7 +36,7 @@ const { getFirestore } = await import(firestorePath);
 const SERVICE_ACCOUNT = join(__dirname, "..", "integraciones", "google_sheets", "service_account.json");
 const sa = JSON.parse(readFileSync(SERVICE_ACCOUNT, "utf8"));
 const app = initializeApp({ credential: cert(sa) });
-const db = getFirestore(app);
+const db = getFirestore(app, "boda-us-central1");
 
 // ── Cabin keys (invitation showcase keys) ─────────────────────────────────
 // These are the 13 cabins shown in the invitation's Cabins section.

@@ -57,6 +57,12 @@ export function RsvpProvider({ children }) {
   const [answers, setAnswers] = useState({});
   // progress: flow → "pending" | "resume"
   const [progress, setProgress] = useState(INITIAL_PROGRESS);
+  // editedFlows: flow → true once the user has edited an answer in that flow.
+  // Used to distinguish a flow that was completed but reloaded (still "done")
+  // from a flow the user has actively edited (should show "En attente" until
+  // they re-confirm by reaching the recap / saving).
+  const [editedFlows, setEditedFlows] = useState({});
+
   // Tracks whether the user has started editing answers. Once they have, we
   // stop re-hydrating from the live cache so an in-progress edit is never
   // overwritten by a background cache update.
@@ -109,7 +115,7 @@ export function RsvpProvider({ children }) {
     });
   }, [profile?.guest, hydrateAnswers]);
 
-  const setAnswer = useCallback((questionId, guestId, level) => {
+  const setAnswer = useCallback((questionId, guestId, level, flow) => {
     hasUserEdited.current = true;
     setAnswers((prev) => ({
       ...prev,
@@ -118,7 +124,23 @@ export function RsvpProvider({ children }) {
         [guestId]: level,
       },
     }));
+    // Editing an answer invalidates the flow's "done" state: reset it to
+    // "pending" so the RSVP progress checklist shows "En attente" until the
+    // guest re-confirms (reaches the recap / saves). The flow is optional so
+    // callers that don't know their flow can omit it.
+    if (flow) {
+      setProgress((prev) =>
+        prev[flow] === "pending" ? prev : { ...prev, [flow]: "pending" },
+      );
+      // Remember that the user actively edited this flow. This lets the RSVP
+      // progress checklist distinguish a flow that was completed but reloaded
+      // (still "done") from one the user has edited (shows "En attente" until
+      // they re-confirm).
+      setEditedFlows((prev) => (prev[flow] ? prev : { ...prev, [flow]: true }));
+    }
   }, []);
+
+
 
   const markResume = useCallback((flow) => {
     setProgress((prev) => (prev[flow] === "resume" ? prev : { ...prev, [flow]: "resume" }));
@@ -156,12 +178,14 @@ export function RsvpProvider({ children }) {
       answers,
       setAnswer,
       progress,
+      editedFlows,
       markResume,
       resetFlow,
       saveFlow,
     }),
-    [answers, setAnswer, progress, markResume, resetFlow, saveFlow],
+    [answers, setAnswer, progress, editedFlows, markResume, resetFlow, saveFlow],
   );
+
 
   return <RsvpContext.Provider value={value}>{children}</RsvpContext.Provider>;
 }

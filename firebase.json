@@ -161,10 +161,17 @@
   }
   ],
 
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs20"
+  },
   "firestore": {
+    "database": "boda-us-central1",
     "rules": "firebase/firestore.rules",
     "indexes": "firebase/firestore.indexes.json"
   },
+
+
   "auth": {
     "providers": {
       "emailPassword": true,

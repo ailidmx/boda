@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { getActiveGuests } from "../guests.js";
 import { resolveGuestName, resolveGuestPhoto } from "../guest-profiles.js";
 import { useApp } from "../context/AppContext.jsx";
@@ -36,6 +36,21 @@ const NAME_MODES = {
   last: "last",
 };
 
+// Base auto-scroll speed (px per ms). The faces drift gently but at a pace
+// that keeps the carousel feeling alive; the speed slider multiplies it.
+const BASE_SCROLL_SPEED = 0.12;
+
+
+// Speed slider range (multiplier applied to BASE_SCROLL_SPEED). The max is
+// deliberately high so the carousel can be cranked up to a fast, lively
+// marquee when the guest wants it.
+const SPEED_MIN = 1;
+const SPEED_MAX = 20;
+const SPEED_STEP = 1;
+const INTERACTION_IDLE_MS = 1400;
+
+
+
 function resolveCloudName(guest, mode) {
   const { firstName, middleName, lastName, maternalLastName, fullName } =
     resolveGuestName(guest);
@@ -53,8 +68,8 @@ function resolveCloudName(guest, mode) {
   }
 
   return (
-    String(fullName || "").trim()
-    || [first, middle, last, maternal].filter(Boolean).join(" ")
+    String(fullName || "").trim() ||
+    [first, middle, last, maternal].filter(Boolean).join(" ")
   );
 }
 
@@ -101,35 +116,111 @@ export function GuestCloud() {
       .filter(Boolean);
   }, []);
 
+  const viewportRef = useRef(null);
+  // True while the guest is actively dragging the carousel (pointer down).
+  const isDraggingRef = useRef(false);
+  // True briefly after a wheel/trackpad scroll so the auto-scroll doesn't
+  // fight the guest's own scrolling.
+  const wheelCooldownRef = useRef(false);
+  const wheelTimerRef = useRef(null);
+
+  // Play/pause + speed controls for the avatar carousel.
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [speed, setSpeed] = useState(1);
+  const speedRef = useRef(BASE_SCROLL_SPEED * 1);
+
+  // Keep the ref in sync with the chosen speed multiplier.
+  useEffect(() => {
+    speedRef.current = BASE_SCROLL_SPEED * speed;
+  }, [speed]);
+
+  const carouselItems = useMemo(() => {
+    if (avatars.length <= 1) return avatars;
+    return [...avatars, ...avatars];
+  }, [avatars]);
+
+  // User interaction is detected via pointer/wheel events only. We deliberately
+  // do NOT listen to `scroll`: the auto-scroll itself fires scroll events every
+  // frame, which would otherwise pause the marquee and make it stutter.
+  const handlePointerDown = () => {
+    isDraggingRef.current = true;
+  };
+  const handlePointerUp = () => {
+    isDraggingRef.current = false;
+  };
+  const handleWheel = () => {
+    wheelCooldownRef.current = true;
+    window.clearTimeout(wheelTimerRef.current);
+    wheelTimerRef.current = window.setTimeout(() => {
+      wheelCooldownRef.current = false;
+    }, INTERACTION_IDLE_MS);
+  };
+
+
+  // Scroll the marquee by roughly one card width (used by the prev/next nav).
+  const scrollByCard = (direction) => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const card = viewport.querySelector(".guest-avatar-card");
+    const step = card ? card.getBoundingClientRect().width + 20 : 200;
+    viewport.scrollLeft += direction * step;
+  };
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport || avatars.length <= 1) return undefined;
+
+    let rafId = 0;
+    let lastTs = 0;
+
+    const tick = (ts) => {
+      if (!viewport) return;
+      if (!lastTs) lastTs = ts;
+      const dt = ts - lastTs;
+      lastTs = ts;
+
+      const loopWidth = viewport.scrollWidth / 2;
+      if (
+        loopWidth > 0 &&
+        !isDraggingRef.current &&
+        !wheelCooldownRef.current &&
+        isPlaying
+      ) {
+        viewport.scrollLeft += dt * speedRef.current;
+        if (viewport.scrollLeft >= loopWidth) {
+          viewport.scrollLeft -= loopWidth;
+        }
+      }
+
+      rafId = window.requestAnimationFrame(tick);
+    };
+
+    rafId = window.requestAnimationFrame(tick);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.clearTimeout(wheelTimerRef.current);
+    };
+
+  }, [avatars.length, isPlaying]);
+
   const hasCarousel = avatars.length > 0;
 
-  // Render a single avatar card (used twice for the seamless marquee loop).
-  const renderAvatar = (av, key) => (
-    <figure className="guest-avatar-card" key={key}>
-      <img
-        className="guest-avatar-card__img"
-        src={av.photo}
-        alt={av.name}
-        loading="lazy"
-        decoding="async"
-      />
-      <figcaption className="guest-avatar-card__name">{av.name}</figcaption>
-    </figure>
-  );
 
   return (
-    <div className="guest-cloud-section story-bg">
+    <section className="guest-cloud-section section" id="guests">
       <div className="guest-cloud-frame">
+        <p className="eyebrow">{cloud.eyebrow}</p>
+        <h2 className="guest-cloud-title">{cloud.title}</h2>
+        {cloud.subtitle && (
+          <p className="guest-cloud-subtitle">{cloud.subtitle}</p>
+        )}
 
-        <div className="section-heading guest-cloud-heading">
-          <p className="eyebrow">{cloud.eyebrow}</p>
-          <h2 className="guest-cloud-title">{cloud.title}</h2>
-          {cloud.subtitle && (
-            <p className="guest-cloud-subtitle">{cloud.subtitle}</p>
-          )}
-        </div>
-
-        <div className="guest-cloud-mode" role="group" aria-label={cloud.modeGroupLabel || "Guest name mode"}>
+        <div
+          className="guest-cloud-mode"
+          role="group"
+          aria-label={cloud.modeGroupLabel || "Guest name mode"}
+        >
           <button
             type="button"
             className={`guest-cloud-mode__btn${nameMode === NAME_MODES.full ? " is-active" : ""}`}
@@ -176,25 +267,94 @@ export function GuestCloud() {
           className="guest-avatar-carousel"
           aria-label={cloud.avatarCarouselLabel || "Nuestros invitados"}
         >
-          <div className="guest-avatar-carousel__viewport">
+          <div
+            ref={viewportRef}
+            className="guest-avatar-carousel__viewport"
+            onPointerDown={handlePointerDown}
+            onPointerUp={handlePointerUp}
+            onPointerCancel={handlePointerUp}
+            onPointerLeave={handlePointerUp}
+            onWheel={handleWheel}
+          >
+
             <div className="guest-avatar-carousel__track">
-              <div className="guest-avatar-carousel__half">
-                {avatars.map((av) => renderAvatar(av, `${av.id}-a`))}
-              </div>
-              <div className="guest-avatar-carousel__half">
-                {avatars.map((av) => renderAvatar(av, `${av.id}-b`))}
-              </div>
+              {carouselItems.map((av, index) => (
+                <figure
+                  className="guest-avatar-card"
+                  key={`${av.id}-${index < avatars.length ? "a" : "b"}`}
+                >
+                  <img
+                    className="guest-avatar-card__img"
+                    src={av.photo}
+                    alt={av.name}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                  <figcaption className="guest-avatar-card__name">
+                    {av.name}
+                  </figcaption>
+                </figure>
+              ))}
             </div>
+          </div>
+
+          {/* Carousel controls: play/pause, speed, and prev/next nav. */}
+          <div className="guest-avatar-carousel__controls">
+            <button
+              type="button"
+              className="guest-avatar-carousel__btn guest-avatar-carousel__btn--nav"
+              aria-label={cloud.carouselPrevLabel || "Anterior"}
+              onClick={() => scrollByCard(-1)}
+            >
+              ‹
+            </button>
+
+            <button
+              type="button"
+              className="guest-avatar-carousel__btn guest-avatar-carousel__btn--play"
+              aria-pressed={isPlaying}
+              aria-label={isPlaying ? (cloud.carouselPauseLabel || "Pausar") : (cloud.carouselPlayLabel || "Reproducir")}
+              onClick={() => setIsPlaying((p) => !p)}
+            >
+              {isPlaying ? "❚❚" : "▶"}
+            </button>
+
+            <div
+              className="guest-avatar-carousel__speed"
+              role="group"
+              aria-label={cloud.carouselSpeedLabel || "Velocidad"}
+            >
+              <span className="guest-avatar-carousel__speed-label">
+                {cloud.carouselSpeedLabel || "Velocidad"}
+              </span>
+              <input
+                type="range"
+                className="guest-avatar-carousel__speed-slider"
+                min={SPEED_MIN}
+                max={SPEED_MAX}
+                step={SPEED_STEP}
+                value={speed}
+                onChange={(e) => setSpeed(Number(e.target.value))}
+                aria-label={cloud.carouselSpeedLabel || "Velocidad"}
+              />
+              <span className="guest-avatar-carousel__speed-value">
+                {speed}×
+              </span>
+            </div>
+
+
+            <button
+              type="button"
+              className="guest-avatar-carousel__btn guest-avatar-carousel__btn--nav"
+              aria-label={cloud.carouselNextLabel || "Siguiente"}
+              onClick={() => scrollByCard(1)}
+            >
+              ›
+            </button>
           </div>
         </div>
       )}
 
-      <nav className="section-nav guest-cloud-section-nav" aria-label="Continue">
-        <a className="section-nav-link" href="#gift">
-          <span>{cloud.navNext}</span>
-        </a>
-      </nav>
-    </div>
+    </section>
   );
 }
-

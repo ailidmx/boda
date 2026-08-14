@@ -14,4 +14,5 @@ const firebaseConfig = {
 const firebaseApp = initializeApp(firebaseConfig);
 
 export const auth = getAuth(firebaseApp);
-export const db = getFirestore(firebaseApp);
+export const db = getFirestore(firebaseApp, "boda-us-central1");
+

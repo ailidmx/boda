@@ -231,27 +231,33 @@ export function PaymentSummary({
             {paidByCouple && <em>{coveredLabel}</em>}
           </dd>
         </div>
-        <div className="rsvp-payment-row">
-          <dt>{payment.perGroup}</dt>
-          <dd className={`rsvp-payment-value${groupSale ? " is-sale" : ""}`}>
-            {groupLabels.length > 0 && (
-              <span className="rsvp-payment-cabinroom-list">
-                {groupLabels.map((label) => (
-                  <span key={label} className="rsvp-payment-cabinroom">
-                    {label}
-                  </span>
-                ))}
-              </span>
-            )}
-            <PriceLines
-              original={groupTotal}
-              toPay={groupToPay}
-              language={language}
-              showSale={groupSale}
-            />
-            {anyCovered && <em>{coveredLabel}</em>}
-          </dd>
-        </div>
+        {/* The per-group row only makes sense when the group has more than one
+            person; with a single guest it would just duplicate the per-person
+            amount. */}
+        {groupMembers.length > 1 && (
+          <div className="rsvp-payment-row">
+            <dt>{payment.perGroup}</dt>
+            <dd className={`rsvp-payment-value${groupSale ? " is-sale" : ""}`}>
+              {groupLabels.length > 0 && (
+                <span className="rsvp-payment-cabinroom-list">
+                  {groupLabels.map((label) => (
+                    <span key={label} className="rsvp-payment-cabinroom">
+                      {label}
+                    </span>
+                  ))}
+                </span>
+              )}
+              <PriceLines
+                original={groupTotal}
+                toPay={groupToPay}
+                language={language}
+                showSale={groupSale}
+              />
+              {anyCovered && <em>{coveredLabel}</em>}
+            </dd>
+          </div>
+        )}
+
       </dl>
     </div>
   );

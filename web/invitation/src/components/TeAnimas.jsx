@@ -49,8 +49,9 @@ export function TeAnimas() {
   const sectionRef = useRef(null);
 
   const handleAnswerChange = (questionId, guestId, level) => {
-    setAnswer(questionId, guestId, level);
+    setAnswer(questionId, guestId, level, RSVP_FLOWS.teAnimas);
   };
+
 
   // Persist the scale answers. Returns true on success so the caller can
   // advance to the review step, false on failure (the error stays visible).

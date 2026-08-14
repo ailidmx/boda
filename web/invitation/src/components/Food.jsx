@@ -2,6 +2,8 @@ import React, { useEffect, useRef, useState } from "react";
 import { MEDIA } from "../media.js";
 import { useApp } from "../context/AppContext.jsx";
 import { SwipeCardCarousel } from "./SwipeCardCarousel.jsx";
+import { StarVote } from "./StarVote.jsx";
+
 
 // Decorative icon for the drinks policy panel (a raised glass / toast).
 function DrinksIcon() {
@@ -97,7 +99,9 @@ export function Food() {
               <h3>{flavour.title}</h3>
               <p>{flavour.body}</p>
             </div>
+            <StarVote cardType="food" cardKey={flavour.key} />
           </article>
+
         ))}
       </SwipeCardCarousel>
 

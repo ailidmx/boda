@@ -30,7 +30,7 @@ const { initializeApp, cert } = await import(appPath);
 const { getFirestore } = await import(firestorePath);
 
 const app = initializeApp({ credential: cert(serviceAccount), projectId: serviceAccount.project_id });
-const db = getFirestore(app);
+const db = getFirestore(app, "boda-us-central1");
 
 // ── Room inventory (mirrors web/dashboard/src/rooms.js) ────────────────────
 const ROOMS = [

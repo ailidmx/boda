@@ -1,6 +1,6 @@
 # Google Sheet to Firestore Sync Report
 
-- Generated at: 2026-08-11T14:17:42.868Z
+- Generated at: 2026-08-14T03:41:08.835Z
 - Mode: execute
 - CI mode: no
 - Fail on drift: no
@@ -9,20 +9,20 @@
 
 ## Auth Health
 
-- Auth users total: 208
-- Guests total (Firestore): 259
-- Auth users mapped to guest by UID: 208
+- Auth users total: 211
+- Guests total (Firestore): 262
+- Auth users mapped to guest by UID: 211
 - Auth users without guest: 0
 - Auth users without matching sheet row: 0
 - Sheet guests requiring auth: 211
 - Sheet guests not requiring auth: 51
 - Auth records present where firebase.auth is false: 0
 - Guests requiring auth but missing it: 0
-- Sheet guests requiring auth but missing it (selected scope): 3
-- Auth email update candidates (sheet -> auth): 1
+- Sheet guests requiring auth but missing it (selected scope): 0
+- Auth email update candidates (sheet -> auth): 4
 - Auth email updates blocked (invalid email): 0
 - Auth email updates blocked (email in use): 0
-- Auth create candidates (email present): 3
+- Auth create candidates (email present): 0
 - Auth create blocked (missing sheet email): 0
 - Auth create blocked (invalid email): 0
 - Auth create blocked (email in use): 0
@@ -32,173 +32,266 @@
 
 | UID | Invitation Group | Sheet Email | Auth Email | Disabled |
 |---|---|---|---|---|
-| antoine |  | antoine@boda-david-y-ayde.web.app | antoine_faure@boda-david-y-ayde.web.app | false |
-
-### Auth Create Candidates
-
-| UID | Invitation Group | Sheet Email | Password In Sheet |
-|---|---|---|---|
-| maria.cristina |  | maria.cristina@boda-david-y-ayde.web.app | yes |
-| lourdes |  | lourdes@boda-david-y-ayde.web.app | yes |
-| claudia.torrez |  | claudia.torrez@boda-david-y-ayde.web.app | yes |
+| paablo | Pablo y Brianda | pablo.galaup@gmail.com | paablo@boda-david-y-ayde.web.app | false |
+| brianda | Pablo y Brianda | jannyn.vs@hotmail.com | brianda@boda-david-y-ayde.web.app | false |
+| max |  | leblond.maxime6@gmail.com | max@boda-david-y-ayde.web.app | false |
+| jean-daniel |  | leroy.jd.bci@gmail.com | jean-daniel@boda-david-y-ayde.web.app | false |
 
 ## Auth Sync Actions
 
 - Planned auth deletes (missing sheet row or firebase.auth=false): 0
-- Planned email updates: 1
-- Planned auth creates: 3
+- Planned email updates: 4
+- Planned auth creates: 0
 - Planned blocked creates (missing email): 0
 - Planned blocked email updates (invalid): 0
 - Planned blocked email updates (in use): 0
 - Planned blocked auth creates (invalid email): 0
 - Planned blocked auth creates (email in use): 0
 - Applied auth deletes: 0
-- Applied email updates: 1
-- Applied auth creates: 3
+- Applied email updates: 4
+- Applied auth creates: 0
 - Auth action failures: 0
 
 ## Summary
 
 - Invalid rows skipped (missing UID): 0
-- Added candidates: 3
-- Changed candidates: 17
-- Unchanged: 242
+- Added candidates: 0
+- Changed candidates: 35
+- Unchanged: 227
 - Stale candidates: 0
 - Auth metadata rows: 262
-- Writes: 20
-
-## Missing In Firestore
-
-- maria.cristina
-- lourdes
-- claudia.torrez
+- Writes: 35
 
 ## Field Mismatches
+
+### david_aïli
+
+- idCheckUser: sheet=false firestore=true
 
 ### aydé_juárez_guadalupe
 
 - idCheckUser: sheet=false firestore=true
 
-### manu
+### mika_rako
 
-- identity.firstName: sheet=Manuel firestore=Manu
-- identity.lastName: sheet=Hurtado firestore=
-- identity.maternalLastName: sheet=Pedroza firestore=
+- hosting.cabin: sheet=VILLA MARGARITA firestore=VILLA DON RAFA
+- hosting.room: sheet=VILLA MARGARITA-1 firestore=VILLA DON RAFA-1
 
-### esposa_de_mauricio_vargas
+### corine_rako
 
-- identity.firstName: sheet=Paola firestore=Esposa
-- identity.middleName: sheet= firestore=De
-- identity.lastName: sheet=Alcaraz firestore=Mauricio
-- identity.maternalLastName: sheet=González firestore=Vargas
+- hosting.cabin: sheet=VILLA MARGARITA firestore=VILLA DON RAFA
+- hosting.room: sheet=VILLA MARGARITA-1 firestore=VILLA DON RAFA-1
 
-### jimena
+### livier_rako
 
-- identity.firstName: sheet= firestore=Jimena
+- hosting.cabin: sheet=VILLA MARGARITA firestore=VILLA DON RAFA
+- hosting.room: sheet=VILLA MARGARITA-1 firestore=VILLA DON RAFA-2
 
-### rene.linares
+### cathy_rako
 
-- identity.firstName: sheet=René firestore=
-- identity.lastName: sheet=Linares firestore=
+- hosting.cabin: sheet=VILLA MARGARITA firestore=VILLA DON RAFA
+- hosting.room: sheet=VILLA MARGARITA-1 firestore=VILLA DON RAFA-2
 
-### esposa_de_rené
+### morgane
 
-- identity.firstName: sheet=Esposa firestore=
-- identity.lastName: sheet=René firestore=
+- hosting.cabin: sheet=VILLA MARGARITA firestore=VILLA DON RAFA
+- hosting.room: sheet=VILLA MARGARITA-3 firestore=VILLA DON RAFA-2
 
-### spomenka.petrovic
+### pareja_de_morgane_rako
 
-- hosting.xtraCabin: sheet=CABAÑA 1 firestore=VILLA MARGARITA
-- hosting.xtraRoom: sheet=CABAÑA 1-1 firestore=VILLA MARGARITA-3
+- hosting.cabin: sheet=VILLA MARGARITA firestore=VILLA DON RAFA
+- hosting.room: sheet=VILLA MARGARITA-3 firestore=VILLA DON RAFA-2
 
-### guilhem.laubie
+### paablo
 
-- hosting.xtraCabin: sheet=CABAÑA 1 firestore=VILLA MARGARITA
-- hosting.xtraRoom: sheet=CABAÑA 1-1 firestore=VILLA MARGARITA-3
+- identity.lastName: sheet=Galaup firestore=Galaud
 
-### fred_38t
+### brianda
 
-- hosting.xtraCabin: sheet=VILLA AZALEA firestore=VILLA MARGARITA
-- hosting.xtraRoom: sheet=VILLA AZALEA-2 firestore=VILLA MARGARITA-1
+- identity.middleName: sheet=Jannyn firestore=
+- identity.lastName: sheet=Valenzuela firestore=
+- identity.maternalLastName: sheet=Suárez firestore=
+
+### max
+
+- invitationGroup: sheet= firestore=Max y JD
+
+### jean-daniel
+
+- identity.phone: sheet=524421683004 firestore=
+- invitationGroup: sheet= firestore=Max y JD
+
+### thierry_aïli
+
+- idCheckUser: sheet=false firestore=true
+
+### diego_aïli_vázquez
+
+- idCheckUser: sheet=false firestore=true
+
+### oscar
+
+- idCheckUser: sheet=false firestore=true
+
+### erik
+
+- hosting.room: sheet=CASONA-5 firestore=CASONA-4
+
+### olaf
+
+- hosting.room: sheet=CASONA-6 firestore=CASONA-5
+
+### adriana
+
+- hosting.cabin: sheet=VILLA DON RAFA firestore=VILLA MARGARITA
+- hosting.room: sheet=VILLA DON RAFA-1 firestore=VILLA MARGARITA-1
+
+### fernanda
+
+- hosting.cabin: sheet=VILLA DON RAFA firestore=VILLA MARGARITA
+- hosting.room: sheet=VILLA DON RAFA-1 firestore=VILLA MARGARITA-1
+
+### adriana_agris
+
+- hosting.cabin: sheet=VILLA DON RAFA firestore=VILLA MARGARITA
+- hosting.room: sheet=VILLA DON RAFA-1 firestore=VILLA MARGARITA-1
+
+### susana.diaz
+
+- hosting.cabin: sheet=VILLA DON RAFA firestore=VILLA MARGARITA
+- hosting.room: sheet=VILLA DON RAFA-2 firestore=VILLA MARGARITA-1
+
+### gabriela
+
+- hosting.cabin: sheet=VILLA DON RAFA firestore=VILLA MARGARITA
+- hosting.room: sheet=VILLA DON RAFA-2 firestore=VILLA MARGARITA-3
+
+### tania
+
+- hosting.cabin: sheet=VILLA DON RAFA firestore=
+- hosting.room: sheet=VILLA DON RAFA-2 firestore=
+
+### aili
+
+- identity.firstName: sheet=Imelda firestore=Aili
+- identity.middleName: sheet=Aili firestore=
+- identity.lastName: sheet=Torres firestore=
+- identity.maternalLastName: sheet=Gastelum firestore=
+
+### juan
+
+- identity.middleName: sheet=Carlos firestore=
+- identity.lastName: sheet=Rodríguez firestore=
+- identity.maternalLastName: sheet=Hernández firestore=
+
+### natalia
+
+- hosting.cabin: sheet=VILLA DON RAFA firestore=VILLA MARGARITA
+- hosting.room: sheet=VILLA DON RAFA-2 firestore=VILLA MARGARITA-3
+
+### renata
+
+- identity.lastName: sheet=Cappi firestore=Capítulo
+- identity.maternalLastName: sheet=Reynoso firestore=
+
+### victor
+
+- identity.middleName: sheet=Martín firestore=
+- identity.maternalLastName: sheet=Regalado firestore=
+
+### esposa_de_victor_segoviano
+
+- identity.firstName: sheet=Rosalía firestore=Esposa
+- identity.middleName: sheet=Del Carmen firestore=De
+- identity.lastName: sheet=Ortega firestore=Victor
+- identity.maternalLastName: sheet=González firestore=Segoviano
 
 ### lolo_38t
 
-- hosting.xtraCabin: sheet=VILLA AZALEA firestore=VILLA MARGARITA
-- hosting.xtraRoom: sheet=VILLA AZALEA-2 firestore=VILLA MARGARITA-1
+- hosting.room: sheet=VILLA MARGARITA-2 firestore=VILLA MARGARITA-3
 
 ### isa_38t
 
-- hosting.xtraCabin: sheet=VILLA AZALEA firestore=VILLA MARGARITA
-- hosting.xtraRoom: sheet=VILLA AZALEA-2 firestore=VILLA MARGARITA-2
-
-### bobo_28t
-
-- hosting.xtraCabin: sheet=VILLA AZALEA firestore=VILLA MARGARITA
-- hosting.xtraRoom: sheet=VILLA AZALEA-2 firestore=VILLA MARGARITA-1
-
-### alexis
-
-- hosting.xtraCabin: sheet=VILLA AZALEA firestore=VILLA MARGARITA
-- hosting.xtraRoom: sheet=VILLA AZALEA-3 firestore=VILLA MARGARITA-2
+- hosting.room: sheet=VILLA MARGARITA-2 firestore=VILLA MARGARITA-3
 
 ### marion_38t
 
-- hosting.xtraCabin: sheet=VILLA AZALEA firestore=VILLA MARGARITA
-- hosting.xtraRoom: sheet=VILLA AZALEA-3 firestore=VILLA MARGARITA-2
-
-### benoit_38t
-
-- hosting.xtraCabin: sheet=VILLA AZALEA firestore=VILLA MARGARITA
-- hosting.xtraRoom: sheet=VILLA AZALEA-3 firestore=VILLA MARGARITA-2
+- hosting.room: sheet=VILLA MARGARITA-2 firestore=VILLA MARGARITA-3
 
 ### dimitar
 
-- hosting.xtraCabin: sheet=VILLA AZALEA firestore=VILLA MARGARITA
-- hosting.xtraRoom: sheet=VILLA AZALEA-1 firestore=VILLA MARGARITA-3
+- hosting.room: sheet=VILLA MARGARITA-2 firestore=VILLA MARGARITA-3
 
 ### acompagnante_de_dimitar
 
-- hosting.xtraCabin: sheet=VILLA AZALEA firestore=VILLA MARGARITA
-- hosting.xtraRoom: sheet=VILLA AZALEA-1 firestore=VILLA MARGARITA-3
+- hosting.room: sheet=VILLA MARGARITA-2 firestore=VILLA MARGARITA-3
+
+### jose.valdes
+
+- identity.cloudinaryId: sheet=CPR52_-_José_Alberto_Ricardo_Valdés_Villarreal_Miranda_pelu52 firestore=
 
 ## Cabin & Extra Cabin Assignments
 
 | Guest | Cabaña | Cuarto | Xtra Cabaña | Xtra Cuarto |
 |---|---|---|---|---|
-| spomenka.petrovic |  |  | CABAÑA 1 | CABAÑA 1-1 |
-| guilhem.laubie |  |  | CABAÑA 1 | CABAÑA 1-1 |
-| fred_38t |  |  | VILLA AZALEA | VILLA AZALEA-2 |
-| lolo_38t |  |  | VILLA AZALEA | VILLA AZALEA-2 |
-| isa_38t |  |  | VILLA AZALEA | VILLA AZALEA-2 |
-| bobo_28t |  |  | VILLA AZALEA | VILLA AZALEA-2 |
-| alexis |  |  | VILLA AZALEA | VILLA AZALEA-3 |
-| marion_38t |  |  | VILLA AZALEA | VILLA AZALEA-3 |
-| benoit_38t |  |  | VILLA AZALEA | VILLA AZALEA-3 |
-| dimitar |  |  | VILLA AZALEA | VILLA AZALEA-1 |
-| acompagnante_de_dimitar |  |  | VILLA AZALEA | VILLA AZALEA-1 |
+| mika_rako | VILLA MARGARITA | VILLA MARGARITA-1 |  |  |
+| corine_rako | VILLA MARGARITA | VILLA MARGARITA-1 |  |  |
+| livier_rako | VILLA MARGARITA | VILLA MARGARITA-1 |  |  |
+| cathy_rako | VILLA MARGARITA | VILLA MARGARITA-1 |  |  |
+| morgane | VILLA MARGARITA | VILLA MARGARITA-3 |  |  |
+| pareja_de_morgane_rako | VILLA MARGARITA | VILLA MARGARITA-3 |  |  |
+| erik |  | CASONA-5 |  |  |
+| olaf |  | CASONA-6 |  |  |
+| adriana | VILLA DON RAFA | VILLA DON RAFA-1 |  |  |
+| fernanda | VILLA DON RAFA | VILLA DON RAFA-1 |  |  |
+| adriana_agris | VILLA DON RAFA | VILLA DON RAFA-1 |  |  |
+| susana.diaz | VILLA DON RAFA | VILLA DON RAFA-2 |  |  |
+| gabriela | VILLA DON RAFA | VILLA DON RAFA-2 |  |  |
+| tania | VILLA DON RAFA | VILLA DON RAFA-2 |  |  |
+| natalia | VILLA DON RAFA | VILLA DON RAFA-2 |  |  |
+| lolo_38t |  | VILLA MARGARITA-2 |  |  |
+| isa_38t |  | VILLA MARGARITA-2 |  |  |
+| marion_38t |  | VILLA MARGARITA-2 |  |  |
+| dimitar |  | VILLA MARGARITA-2 |  |  |
+| acompagnante_de_dimitar |  | VILLA MARGARITA-2 |  |  |
 
 ## Field-By-Field Record Audit
 
 | ID | Status | Compared Fields | Differences |
 |---|---|---:|---:|
+| david_aïli | changed | 37 | 1 |
 | aydé_juárez_guadalupe | changed | 37 | 1 |
-| manu | changed | 37 | 3 |
-| esposa_de_mauricio_vargas | changed | 37 | 4 |
-| jimena | changed | 37 | 1 |
-| rene.linares | changed | 37 | 2 |
-| esposa_de_rené | changed | 37 | 2 |
-| spomenka.petrovic | changed | 37 | 2 |
-| guilhem.laubie | changed | 37 | 2 |
-| fred_38t | changed | 37 | 2 |
-| lolo_38t | changed | 37 | 2 |
-| isa_38t | changed | 37 | 2 |
-| bobo_28t | changed | 37 | 2 |
-| alexis | changed | 37 | 2 |
-| marion_38t | changed | 37 | 2 |
-| benoit_38t | changed | 37 | 2 |
-| dimitar | changed | 37 | 2 |
-| acompagnante_de_dimitar | changed | 37 | 2 |
-| maria.cristina | candidate-add | 37 | 37 |
-| lourdes | candidate-add | 37 | 37 |
-| claudia.torrez | candidate-add | 37 | 37 |
+| mika_rako | changed | 37 | 2 |
+| corine_rako | changed | 37 | 2 |
+| livier_rako | changed | 37 | 2 |
+| cathy_rako | changed | 37 | 2 |
+| morgane | changed | 37 | 2 |
+| pareja_de_morgane_rako | changed | 37 | 2 |
+| paablo | changed | 37 | 1 |
+| brianda | changed | 37 | 3 |
+| max | changed | 37 | 1 |
+| jean-daniel | changed | 37 | 2 |
+| thierry_aïli | changed | 37 | 1 |
+| diego_aïli_vázquez | changed | 37 | 1 |
+| oscar | changed | 37 | 1 |
+| erik | changed | 37 | 1 |
+| olaf | changed | 37 | 1 |
+| adriana | changed | 37 | 2 |
+| fernanda | changed | 37 | 2 |
+| adriana_agris | changed | 37 | 2 |
+| susana.diaz | changed | 37 | 2 |
+| gabriela | changed | 37 | 2 |
+| tania | changed | 37 | 2 |
+| aili | changed | 37 | 4 |
+| juan | changed | 37 | 3 |
+| natalia | changed | 37 | 2 |
+| renata | changed | 37 | 2 |
+| victor | changed | 37 | 2 |
+| esposa_de_victor_segoviano | changed | 37 | 4 |
+| lolo_38t | changed | 37 | 1 |
+| isa_38t | changed | 37 | 1 |
+| marion_38t | changed | 37 | 1 |
+| dimitar | changed | 37 | 1 |
+| acompagnante_de_dimitar | changed | 37 | 1 |
+| jose.valdes | changed | 37 | 1 |
 

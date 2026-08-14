@@ -29,7 +29,7 @@ const app = initializeApp({
   credential: cert(serviceAccount),
   projectId: serviceAccount.project_id,
 });
-const db = getFirestore(app);
+const db = getFirestore(app, "boda-us-central1");
 
 async function main() {
   console.log(`cleanup-cabins-derived-occupancy :: ${execute ? "EXECUTE" : "DRY-RUN"}`);

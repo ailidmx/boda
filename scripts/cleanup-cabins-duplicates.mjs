@@ -33,7 +33,7 @@ const { getFirestore } = await import(firestorePath);
 const SERVICE_ACCOUNT = join(__dirname, "..", "integraciones", "google_sheets", "service_account.json");
 const sa = JSON.parse(readFileSync(SERVICE_ACCOUNT, "utf8"));
 const app = initializeApp({ credential: cert(sa) });
-const db = getFirestore(app);
+const db = getFirestore(app, "boda-us-central1");
 
 // ── Mapping: showcase key → existing uppercase document ID ────────────────
 const KEY_TO_DOC_ID = {
