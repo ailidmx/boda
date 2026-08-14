@@ -1,4 +1,5 @@
 import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
@@ -9,9 +10,13 @@ const firebaseConfig = {
   storageBucket: "boda-500805.firebasestorage.app",
   messagingSenderId: "924780234130",
   appId: "1:924780234130:web:a5ebb44e155e064391ad4b",
+  measurementId: "G-ZDQX91613Z",
 };
 
 const firebaseApp = initializeApp(firebaseConfig);
 
+export const analytics = getAnalytics(firebaseApp);
 export const auth = getAuth(firebaseApp);
-export const db = getFirestore(firebaseApp);
+export const db = getFirestore(firebaseApp, "boda-us-central1");
+
+

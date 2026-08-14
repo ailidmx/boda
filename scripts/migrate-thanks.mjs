@@ -31,7 +31,7 @@ const { initializeApp, cert } = await import(appPath);
 const { getFirestore } = await import(firestorePath);
 
 const app = initializeApp({ credential: cert(serviceAccount), projectId: serviceAccount.project_id });
-const db = getFirestore(app);
+const db = getFirestore(app, "boda-us-central1");
 
 // ── Mock FE credits → real guest mapping ──────────────────────────────────
 // Each record: guestId + the thanks text in fr/es/en (derived from the mock

@@ -90,7 +90,9 @@ export const MEDIA = {
     aguas: cloudinaryImage("aguas_kpoxib", { width: 600, height: 450, crop: "fill" }),
 
     esquites: cloudinaryImage("esquites_rzhsv6", { width: 600, height: 450, crop: "fill" }),
+    tostilocos: cloudinaryImage("tostilocos_vrkadw", { width: 600, height: 450, crop: "fill" }),
     guacamole: cloudinaryImage("guacamole_inzf4m", { width: 600, height: 450, crop: "fill" }),
+
     nopales: cloudinaryImage("nopales_kyhrzh", { width: 600, height: 450, crop: "fill" }),
     pizza: cloudinaryImage("pizza_cxhngb", { width: 600, height: 450, crop: "fill" }),
     taquiza: cloudinaryImage("taquiza_zkqygq", { width: 600, height: 450, crop: "fill" }),
@@ -112,11 +114,14 @@ export const MEDIA = {
   // they are built directly with cloudinaryImage instead of the `img` helper.
   music: {
     marimba: cloudinaryImage("marimba_jclxjy", { width: 900 }),
-    mariachi: cloudinaryImage("mariachis_f0foi2", { width: 900 }),
+    mariachi: cloudinaryImage("MARIACHIS_ivljyc", { width: 900 }),
     norteno: cloudinaryImage("norteños_izxes3", { width: 900 }),
+
     frenchBand: cloudinaryImage("38t_photo_yhx9m3", { width: 900 }),
     // 38 tonnes logo, overlaid in the top-right corner of the card.
     frenchBandLogo: cloudinaryImage("logo38t_aptkvz", { width: 200 }),
+    // Marimba Vientos del Sur logo, overlaid in the top-right corner of the card.
+    marimbaLogo: cloudinaryImage("marimbavientos_rfjmuw", { width: 200 }),
   },
 
 

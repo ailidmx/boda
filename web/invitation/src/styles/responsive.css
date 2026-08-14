@@ -138,6 +138,14 @@
     font-size: 0.78rem;
     line-height: 1.45;
   }
+
+  /* The member tabs (guest avatar chips) and the cabin badge are both
+     prominent pills. On mobile give the tabs breathing room so they don't
+     sit right on top of the cabin badge below — applies to both the
+     Hébergement section and the Coast extra-stay section. */
+  .accommodation-member-tabs {
+    margin-bottom: 1rem;
+  }
 }
 
 /* Tablet+: 2 columns. */

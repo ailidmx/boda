@@ -49,7 +49,7 @@ const { getFirestore, FieldValue } = await import(firestorePath);
 const { getAuth } = await import(authPath);
 
 const app = initializeApp({ credential: cert(serviceAccount), projectId: serviceAccount.project_id });
-const db = getFirestore(app);
+const db = getFirestore(app, "boda-us-central1");
 const auth = getAuth(app);
 
 const SHEETS_ENV_PATH = join(__dirname, "../integraciones/google_sheets/.env");

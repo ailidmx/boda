@@ -385,6 +385,12 @@ export function Accommodation() {
   const noteFabRef = useRef(null);
   const noteCloseRef = useRef(null);
   const recapRef = useRef(null);
+  // Tracks whether the recap has mounted yet. The scroll-into-view effect below
+  // must NOT run on the initial mount (it would yank a first-time visitor to
+  // the recap as soon as the section lazy-loads); it should only keep the recap
+  // in view when the user actually flips between the question and summary views.
+  const recapMounted = useRef(false);
+
 
 
   // ── Accommodation recap question ───────────────────────────────────────
@@ -507,11 +513,21 @@ export function Accommodation() {
   // ("Enregistrer ma confirmation" / "Modifier mes réponses"), the content
   // height changes and the browser can jump the scroll position to the top of
   // the section. Keep the recap in view so the user stays where they are.
+  //
+  // IMPORTANT: this must NOT run on the initial mount. The section is
+  // lazy-loaded when it scrolls into view, and running scrollIntoView here on
+  // first render would yank a first-time visitor straight to the recap (a
+  // confusing auto-scroll). We only scroll once the user actually flips views.
   useEffect(() => {
+    if (!recapMounted.current) {
+      recapMounted.current = true;
+      return undefined;
+    }
     const recap = recapRef.current;
     if (!recap) return undefined;
     recap.scrollIntoView({ block: "nearest", behavior: "smooth" });
   }, [recapStep]);
+
 
   // The recap (per-person accommodation confirmation) is rendered in two
   // places: inside the form-wrap on desktop, and as the last element of the
@@ -887,9 +903,11 @@ export function Accommodation() {
         ) : (
           <>
             <p className="accommodation-citation">{option.onSiteBody}</p>
-            <p className="accommodation-covered-note">
-              <strong>{paidByCouple ? option.onSiteCoveredBody : option.onSitePayBody}</strong>
-            </p>
+            {paidByCouple && (
+              <p className="accommodation-covered-note">
+                <strong>{option.onSiteCoveredBody}</strong>
+              </p>
+            )}
             {cabinName && (
               <p className="accommodation-cabin-badge">{cabinName}</p>
             )}

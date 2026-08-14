@@ -71,16 +71,8 @@ export function Hero() {
       profile?.guest?.message ||
       "",
   ).trim();
-  const customMessageAuthor = String(
-    profile?.custom?.messageAuth ||
-      profile?.custom?.messageAuthor ||
-      profile?.guest?.customContent?.messageAuth ||
-      profile?.guest?.customContent?.messageAuthor ||
-      profile?.guest?.messageAuth ||
-      profile?.guest?.messageAuthor ||
-      "",
-  ).trim();
   const hasCustomHeroMessage = Boolean(customMessage);
+
 
   return (
     <section className="hero" id="top">
@@ -148,13 +140,12 @@ export function Hero() {
       </div>
 
       <div className="hero-content">
-        {guest && <p className="hero-guest-name">{fullName}</p>}
-        <p className="hero-eyebrow">{eyebrow}</p>
-        {showGroupBadge && <p className="hero-group-name">{groupName}</p>}
-
         <h1>
           <CoupleNames variant="identity-swap--hero" delay="-1.2s" />
         </h1>
+        <p className="hero-eyebrow">{eyebrow}</p>
+        {showGroupBadge && <p className="hero-group-name">{groupName}</p>}
+
         <p className="hero-date">
           <HeroDate />
         </p>
@@ -163,20 +154,17 @@ export function Hero() {
           <br />
           {EVENT.place}
         </p>
+        {guest && <p className="hero-guest-name">{fullName}</p>}
         {hasCustomHeroMessage ? (
           <p className="hero-invitation hero-invitation--custom">
             <span className="hero-invitation__message">{customMessage}</span>
-            {customMessageAuthor && (
-              <span className="hero-invitation__author">
-                {customMessageAuthor}
-              </span>
-            )}
           </p>
         ) : (
           <p className="hero-invitation">{t.hero.invitation}</p>
         )}
-        <div className="hero-date-label">{EVENT.dateShort}</div>
+
       </div>
+
 
       <nav
         className="section-nav section-nav--light hero-section-nav"

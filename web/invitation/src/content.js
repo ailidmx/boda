@@ -143,8 +143,9 @@ export const content = {
 
 
     hero: {
-      eyebrow: "Estás invitado a celebrar nuestra unión",
-      eyebrowF: "Estás invitada a celebrar nuestra unión",
+      eyebrow: "Te invitan a ser parte de esta celebración del amor",
+      eyebrowF: "Te invitan a ser parte de esta celebración del amor",
+
 
       invitation: "Queremos celebrar este momento contigo",
 
@@ -501,7 +502,15 @@ export const content = {
           title: "Esquites",
           body: "Maíz tierno cocido con epazote, chile, limón y queso: un clásico callejero mexicano.",
         },
+        {
+          key: "tostilocos",
+          type: "food",
+          title: "Tostilocos",
+          body: "Tostadas crujientes con cueritos, jícama, cacahuate, chile y limón: el antojito perfecto para picar.",
+        },
       ],
+
+
 
       flavourType: {
         food: "Comida",
@@ -562,17 +571,22 @@ export const content = {
       acts: [
         {
           moment: "Después del aperitivo",
-          name: "Marimba",
-          note: "La marimba es un idiófono de teclado de madera: barras de hormiguillo que se percuten con baquetas y resuenan en tubos. Su timbre cálido y melódico, herencia del sureste mexicano y de Guatemala, acompaña el primer brindis antes de las carnitas.",
+          name: "Marimba Vientos del Sur",
+          note: "La marimba Vientos del Sur es un idiófono de teclado de madera: barras de hormiguillo que se percuten con baquetas y resuenan en tubos. Su timbre cálido y melódico, herencia del sureste mexicano y de Guatemala, acompaña el primer brindis antes de las carnitas.",
           image: "marimba",
+          logo: "marimbaLogo",
+          website: "https://www.facebook.com/marimbavientosdelsur",
+          link: "https://www.youtube.com/watch?v=w5j8rGwby00",
         },
 
         {
           moment: "Después de la ceremonia en el faro",
-          name: "Mariachi",
-          note: "El mariachi es la orquesta tradicional mexicana por excelencia: violines, trompetas, vihuela y guitarrón. Sus sones y rancheras, con su característico grito, abren la cena con una entrada festiva.",
+          name: "Mariachi Latidos de Jalisco",
+          note: "Con más de 25 años de experiencia, Latidos de Jalisco es un mariachi profesional de Guadalajara que ha pisado escenarios como el Teatro Degollado. Sus sones y rancheras, con su característico grito, abren la cena con una entrada festiva.",
           image: "mariachi",
+          website: "https://mariachilatidosdejalisco.shop/",
         },
+
         {
           moment: "Después de la cena",
           name: "Norteño",
@@ -1463,7 +1477,7 @@ export const content = {
         "La petanca nos ha unido con una comunidad maravillosa de amigos y compañeros de club en México y en el mundo.",
       body:
         "El viernes por la tarde, Pierre organiza un torneo de petanca para celebrar este juego que tanto queremos. No hace falta experiencia: solo ganas de jugar, reír y compartir.",
-      homage: "¡Te animas!",
+      homage: "¿Te animas?",
       photosLabel: "Fotografías de petanca",
       photoAlts: [
         "Jugadores de petanca en el club",
@@ -1610,8 +1624,10 @@ export const content = {
 
 
     hero: {
-      eyebrow: "Tu es invité à notre mariage",
-      eyebrowF: "Tu es invitée à notre mariage",
+      eyebrow: "T'invitent à faire partie de cette célébration de l'amour",
+      eyebrowF: "T'invitent à faire partie de cette célébration de l'amour",
+
+
       invitation: "Nous voulons vivre ce moment avec toi",
 
 
@@ -1958,10 +1974,17 @@ export const content = {
           title: "Esquites",
           body: "Du maïs tendre cuit avec de l’épazote, du piment, du citron vert et du fromage : un classique de la rue mexicaine.",
         },
+        {
+          key: "tostilocos",
+          type: "food",
+          title: "Tostilocos",
+          body: "Des tostadas croustillantes garnies de cueritos, de jícama, de cacahuètes, de piment et de citron vert : l’en-cas parfait à grignoter.",
+        },
       ],
 
       flavourType: {
         food: "Plat",
+
         drink: "Boisson",
         dessert: "Dessert",
       },
@@ -2020,17 +2043,22 @@ export const content = {
       acts: [
         {
           moment: "Après l’apéro",
-          name: "Marimba",
-          note: "La marimba est un idiophone à clavier de bois : des lames de bois dur frappées avec des mailloches qui résonnent dans des tubes. Son timbre chaleureux et mélodique, héritage du sud-est du Mexique et du Guatemala, accompagne le premier verre avant les carnitas.",
+          name: "Marimba Vientos del Sur",
+          note: "La marimba Vientos del Sur est un idiophone à clavier de bois : des lames de bois dur frappées avec des mailloches qui résonnent dans des tubes. Son timbre chaleureux et mélodique, héritage du sud-est du Mexique et du Guatemala, accompagne le premier verre avant les carnitas.",
           image: "marimba",
+          logo: "marimbaLogo",
+          website: "https://www.facebook.com/marimbavientosdelsur",
+          link: "https://www.youtube.com/watch?v=w5j8rGwby00",
         },
 
         {
           moment: "Après la cérémonie au phare",
-          name: "Mariachi",
-          note: "Le mariachi est l’orchestre traditionnel mexicain par excellence : violons, trompettes, vihuela et guitarrón. Ses sones et rancheras, avec son cri caractéristique, ouvrent le dîner d’une entrée festive.",
+          name: "Mariachi Latidos de Jalisco",
+          note: "Avec plus de 25 ans d’expérience, Latidos de Jalisco est un mariachi professionnel de Guadalajara qui s’est produit sur des scènes comme le Teatro Degollado. Ses sones et rancheras, avec son cri caractéristique, ouvrent le dîner d’une entrée festive.",
           image: "mariachi",
+          website: "https://mariachilatidosdejalisco.shop/",
         },
+
         {
           moment: "Après le dîner",
           name: "Norteño",
@@ -2929,7 +2957,7 @@ export const content = {
         "La pétanque nous a réunis autour d’une merveilleuse communauté d’amis et de coéquipiers de club, au Mexique et dans le monde.",
       body:
         "Le vendredi après-midi, Pierre organise un tournoi de pétanque pour célébrer ce jeu que nous aimons tant. Aucune expérience n’est requise : juste l’envie de jouer, de rire et de partager.",
-      homage: "Ça te tente !",
+      homage: "Ça te tente ?",
       photosLabel: "Photos de pétanque",
 
       photoAlts: [
@@ -3077,8 +3105,10 @@ export const content = {
 
 
     hero: {
-      eyebrow: "You are invited to our wedding",
+      eyebrow: "Invite you to be part of this celebration of love",
       invitation: "We want to celebrate this moment with you",
+
+
 
 
       scroll: "Let's begin",
@@ -3412,10 +3442,17 @@ export const content = {
           title: "Esquites",
           body: "Tender corn cooked with epazote, chili, lime, and cheese: a Mexican street-food classic.",
         },
+        {
+          key: "tostilocos",
+          type: "food",
+          title: "Tostilocos",
+          body: "Crispy tostadas topped with cueritos, jícama, peanuts, chili, and lime: the perfect snack to nibble on.",
+        },
       ],
 
       flavourType: {
         food: "Food",
+
         drink: "Drink",
         dessert: "Dessert",
       },
@@ -3473,17 +3510,22 @@ export const content = {
       acts: [
         {
           moment: "After the aperitif",
-          name: "Marimba",
-          note: "The marimba is a wooden keyboard idiophone: bars of hormiguillo struck with mallets that resonate through tubes. Its warm, melodic timbre, a legacy of southeastern Mexico and Guatemala, accompanies the first toast before the carnitas.",
+          name: "Marimba Vientos del Sur",
+          note: "Marimba Vientos del Sur is a wooden keyboard idiophone: bars of hormiguillo struck with mallets that resonate through tubes. Its warm, melodic timbre, a legacy of southeastern Mexico and Guatemala, accompanies the first toast before the carnitas.",
           image: "marimba",
+          logo: "marimbaLogo",
+          website: "https://www.facebook.com/marimbavientosdelsur",
+          link: "https://www.youtube.com/watch?v=w5j8rGwby00",
         },
 
         {
           moment: "After the lighthouse ceremony",
-          name: "Mariachi",
-          note: "The mariachi is the quintessential traditional Mexican ensemble: violins, trumpets, vihuela, and guitarrón. Its sones and rancheras, with their signature grito, open dinner with a festive entrance.",
+          name: "Mariachi Latidos de Jalisco",
+          note: "With over 25 years of experience, Latidos de Jalisco is a professional mariachi from Guadalajara that has performed on stages such as the Teatro Degollado. Its sones and rancheras, with their signature grito, open dinner with a festive entrance.",
           image: "mariachi",
+          website: "https://mariachilatidosdejalisco.shop/",
         },
+
         {
           moment: "After dinner",
           name: "Norteño",
@@ -4361,7 +4403,7 @@ export const content = {
         "Pétanque has brought us together with a wonderful community of friends and club teammates in Mexico and around the world.",
       body:
         "On Friday afternoon, Pierre is organising a pétanque tournament to celebrate this game we love so much. No experience needed: just the desire to play, laugh, and share.",
-      homage: "Are you in!",
+      homage: "Are you in?",
       photosLabel: "Pétanque photos",
 
       photoAlts: [

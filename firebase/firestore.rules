@@ -438,6 +438,31 @@ service cloud.firestore {
       allow delete: if false;
     }
 
+    // ── Login events ────────────────────────────────────────────────────────
+    // A lightweight, append-only log of guest sign-ins. The client writes one
+    // document per successful sign-in; a Cloud Function watches this collection
+    // and posts a Telegram notification. Guests may only create (never update
+    // or delete) their own login events.
+    function hasValidLoginEventFields() {
+      return request.resource.data.keys().hasAll([
+          "guestId", "username", "createdAt"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "guestId", "username", "createdAt"
+        ])
+        && isShortText(request.resource.data.guestId, 100)
+        && request.resource.data.guestId == request.auth.uid
+        && isShortText(request.resource.data.username, 200)
+        && request.resource.data.createdAt == request.time;
+    }
+
+    match /login_events/{eventId} {
+      allow create: if request.auth != null && hasValidLoginEventFields();
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+
+
 
 
 
@@ -650,18 +675,21 @@ service cloud.firestore {
     // field creation or oversized content.
     function hasValidThanksFields() {
       return request.resource.data.keys().hasOnly([
-          "guest", "fr", "es", "en", "_source", "_migratedAt"
+          "guest", "fr", "es", "en", "createdAt", "_source", "_migratedAt"
         ])
         && isShortText(request.resource.data.guest, 100)
         && request.resource.data.guest.size() > 0
         && isShortText(request.resource.data.fr, 2000)
         && isShortText(request.resource.data.es, 2000)
         && isShortText(request.resource.data.en, 2000)
+        && (!request.resource.data.keys().hasAny(["createdAt"])
+          || request.resource.data.createdAt is timestamp)
         && (!request.resource.data.keys().hasAny(["_source"])
           || isShortText(request.resource.data._source, 100))
         && (!request.resource.data.keys().hasAny(["_migratedAt"])
           || isShortText(request.resource.data._migratedAt, 100));
     }
+
 
     match /thanks/{creditId} {
       allow read: if true;

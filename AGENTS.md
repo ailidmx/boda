@@ -184,6 +184,13 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   The save button must live on the recap step, never on an intermediate
   question step. The recap step's `render` receives `{ goToStart }` from
   `FlipStepCard`.
+- **Per-group price row is hidden for single-guest groups** — In the RSVP
+  "À payer" summary (`PaymentSummary.jsx`) and the Total block (`RSVP.jsx`),
+  the "par le groupe" (per group) row is only rendered when the group has more
+  than one member (`groupMembers.length > 1` / `guests.length > 1`). With a
+  single guest it would just duplicate the per-person amount, so it is hidden.
+  When adding new price rows, keep this rule in mind.
+
 - **`.fieldset-note` is a plain paragraph** — The RSVP section styles generic
   `p` tags as elegant citations (left border, italic, quote mark). Any note
   that must NOT look like a citation (e.g. `.fieldset-note`) needs an explicit
@@ -206,6 +213,18 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   through `getActiveGuests()` + `resolveGuestName`/`resolveGuestPhoto` so it
   reflects live Firestore data. (The separate admin dashboard still reads the
   static `web/shared/guests.js` snapshot; it is not part of the invitation app.)
+- **Telegram bot must be a member of the target chat** — The notification
+  Cloud Functions (`functions/index.js` + `telegram.js`) post to a Telegram
+  group via the `@boda_dya_bot` bot. If the bot is NOT a member of the group,
+  `sendMessage` returns `Bad Request: chat not found` and the notification is
+  silently dropped (the guest's Firestore write still succeeds). To fix, add
+  the bot as a member of the group in Telegram. The bot can post to a group it
+  belongs to without being an admin (channels require admin). The secrets
+  (`TELEGRAM_TOKEN`, `TELEGRAM_CHAT_ID`) are wired via Secret Manager and must
+  be listed in each function's `secrets: [...]` dependency array — otherwise
+  the function logs `No value found for secret parameter ...` and skips the
+  notification. Verify with `firebase functions:list` (secrets shown) and
+  `gcloud logging read 'resource.labels.service_name="onlogin"'`.
 - *(Add new lessons here as you discover them.)*
 
 

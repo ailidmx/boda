@@ -26,7 +26,7 @@ const { initializeApp, cert } = await import(appPath);
 const { getFirestore, FieldValue } = await import(firestorePath);
 
 initializeApp({ credential: cert(serviceAccount), projectId: serviceAccount.project_id });
-const db = getFirestore();
+const db = getFirestore("boda-us-central1");
 
 const IDENTITY_FIELDS = ["age", "cloudinaryId", "firstName", "gender", "middleName", "lastName", "maternalLastName", "lang", "phone"];
 const HOSTING_FIELDS = [

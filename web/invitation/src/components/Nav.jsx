@@ -30,12 +30,14 @@ const NAV_LINKS = [
   ["food", "#food"],
   ["music", "#music"],
   ["coast", "#after"],
-  ["photos", "#photos"],
-  ["guests", "#guests"],
   ["rsvp", "#rsvp"],
   ["gift", "#gift"],
+  ["photos", "#photos"],
+  ["guests", "#guests"],
   ["thanks", "#thanks"],
+
 ];
+
 
 
 // Resolve the effective nav links for the signed-in guest. The FLIGHTS

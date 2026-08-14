@@ -555,6 +555,18 @@
   background: rgb(255 255 255 / 3%);
 }
 
+/* On mobile the flip card sits directly on the section's own frame/panel, so
+   drop the card padding and translucent background to avoid a nested "box in
+   a box" look. This rule must come AFTER the base .flip-step-card rule so it
+   wins the cascade. */
+@media (max-width: 600px) {
+  .flip-step-card {
+    padding: 0;
+    background: transparent;
+  }
+}
+
+
 /* Stepped RSVP mini used by the accommodation recap: a card with a header
    (title + flip toggle) and a body that swaps between the question step and
    the resumen (summary) step. */

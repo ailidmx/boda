@@ -558,7 +558,7 @@
   font-family: var(--font-display);
   font-size: clamp(1.15rem, 2.2vw, 1.6rem);
   line-height: 1.5;
-  color: #f3e6c8;
+  color: var(--white);
 }
 
 .coast-budget-intro::before {
@@ -586,6 +586,8 @@
 .coast-budget-figure {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: 0.25rem;
   padding: 1rem 1.25rem;
   border: 1px solid rgb(255 255 255 / 18%);
@@ -601,9 +603,10 @@
 }
 
 .coast-budget-figure small {
-  color: rgb(255 255 255 / 72%);
+  color: rgb(255 255 255 / 82%);
   font-size: 0.9rem;
 }
+
 
 /* The min / max totals for the whole group. */
 .coast-budget-totals {
@@ -634,9 +637,10 @@
 }
 
 .coast-budget-total small {
-  color: rgb(255 255 255 / 68%);
+  color: rgb(255 255 255 / 80%);
   font-size: 0.9rem;
 }
+
 
 .coast-budget-total--min {
   border: 1px solid rgb(255 255 255 / 18%);
@@ -653,8 +657,9 @@
 }
 
 .coast-budget-total--max strong {
-  color: var(--marigold, #e4b968);
+  color: #e4b968;
 }
+
 
 /* The big headline total for the whole group. */
 .coast-budget-big {
@@ -681,11 +686,11 @@
   font-size: clamp(2rem, 4.5vw, 3.4rem);
   font-weight: 400;
   line-height: 1;
-  color: var(--marigold, #e4b968);
+  color: #e4b968;
 }
 
 .coast-budget-big small {
-  color: rgb(255 255 255 / 68%);
+  color: rgb(255 255 255 / 80%);
   font-size: 0.95rem;
 }
 
@@ -693,8 +698,9 @@
   margin: 1.25rem 0 0;
   max-width: 46rem;
   font-size: 0.9rem;
-  color: rgb(255 255 255 / 62%);
+  color: rgb(255 255 255 / 78%);
 }
+
 
 @media (max-width: 899px) {
   .coast-budget {
@@ -788,6 +794,11 @@
 
   .coast-suggestions {
     grid-column: 1 / -1;
+    /* On mobile the section gap is 0, so spacing between blocks comes from
+       each block's own margins. Remove any bottom margin on the suggestions
+       panel so it doesn't crowd the mini RSVP card below. */
+    margin-bottom: 0;
   }
 }
+
 
