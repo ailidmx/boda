@@ -17,7 +17,9 @@ import "./styles/petanque.css";
 import "./styles/weather.css";
 import "./styles/food.css";
 import "./styles/music.css";
+import "./styles/star-vote.css";
 import "./styles/cardcarousel.css";
+
 import "./styles/venue.css";
 import "./styles/lightbox.css";
 import "./styles/accommodation.css";
@@ -37,15 +39,12 @@ import "./styles/identity.css";
 import "./styles/identitymodal.css";
 import "./styles/winamp.css";
 
-
-
-
 import "./styles/responsive.css";
 
 import { App } from "./App.jsx";
 
-
 // Register the service worker for offline support + PWA installability.
+
 // Only in production: in dev the Vite server handles HMR and we don't want a
 // service worker caching stale modules during development.
 if (import.meta.env.PROD && "serviceWorker" in navigator) {

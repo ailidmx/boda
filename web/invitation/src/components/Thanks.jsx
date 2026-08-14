@@ -87,46 +87,68 @@ export function Thanks() {
           <p className="thanks-subtitle">{thanks.subtitle}</p>
         </blockquote>
 
-        <ul className="thanks-credits">
-          {credits.map((credit, index) => {
-            const resolved = resolveCredit(credit);
-            return (
+        {/* Cinematic vertical credits roll: a fixed-height stage with a fade
+            mask, inside which two identical lists scroll up and loop
+            seamlessly (the -50% translate). */}
+        <div className="thanks-credits-stage">
+          <div className="thanks-credits-roll">
+            {[0, 1].map((setIndex) => (
+              <ul
+                className="thanks-credits"
+                key={setIndex}
+                aria-hidden={setIndex === 1}
+              >
+                {credits.map((credit, index) => {
+                  const resolved = resolveCredit(credit);
+                  return (
+                    <li className="thanks-credit" key={index}>
+                      {resolved.photo ? (
+                        <span
+                          className="thanks-avatar thanks-avatar--photo"
+                          aria-hidden="true"
+                        >
+                          <img
+                            src={resolved.photo}
+                            alt=""
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        </span>
+                      ) : (
+                        <span className="thanks-avatar" aria-hidden="true">
+                          {initialsOf(resolved.name)}
+                        </span>
+                      )}
+                      <span className="thanks-credit-text">
+                        <strong className="thanks-name">{resolved.name}</strong>
+                        <span className="thanks-role">{credit.role}</span>
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            ))}
+          </div>
+        </div>
 
-              <li className="thanks-credit" key={index}>
-                {resolved.photo ? (
-                  <span
-                    className="thanks-avatar thanks-avatar--photo"
-                    aria-hidden="true"
-                  >
-                    <img
-                      src={resolved.photo}
-                      alt=""
-                      loading="lazy"
-                      decoding="async"
-                    />
-                  </span>
-                ) : (
-                  <span className="thanks-avatar" aria-hidden="true">
-                    {initialsOf(resolved.name)}
-                  </span>
-                )}
-                <span className="thanks-credit-text">
-                  <strong className="thanks-name">{resolved.name}</strong>
-                  <span className="thanks-role">{credit.role}</span>
-                </span>
-              </li>
-            );
-          })}
-        </ul>
 
 
         <div className="thanks-humor">
-          {humor.map((line, index) => (
-            <blockquote className="thanks-humor-line" key={index}>
-              <p>{line}</p>
-            </blockquote>
-          ))}
+          {/* Two identical sets so the -50% translate loops seamlessly. */}
+          <div className="thanks-humor-track">
+            {[0, 1].map((setIndex) => (
+              <div className="thanks-humor-set" key={setIndex} aria-hidden={setIndex === 1}>
+                {humor.map((line, index) => (
+                  <blockquote className="thanks-humor-line" key={index}>
+                    <p>{line}</p>
+                  </blockquote>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
+
+
 
         <div className="thanks-contacts">
           <span>{thanks.cta}</span>

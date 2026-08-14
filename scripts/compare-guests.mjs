@@ -17,7 +17,7 @@ const serviceAccount = JSON.parse(
 );
 
 const app = initializeApp({ credential: cert(serviceAccount) });
-const db = getFirestore(app);
+const db = getFirestore(app, "boda-us-central1");
 
 // Normalize a name for fuzzy matching: lowercase, strip accents, collapse spaces
 function norm(s) {

@@ -37,7 +37,7 @@ const app = initializeApp({
   projectId: serviceAccount.project_id,
 });
 
-const db = getFirestore(app);
+const db = getFirestore(app, "boda-us-central1");
 const guestsRef = db.collection("guests");
 
 async function main() {

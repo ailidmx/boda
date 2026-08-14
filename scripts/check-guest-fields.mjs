@@ -21,7 +21,7 @@ const { initializeApp, cert } = await import(appPath);
 const { getFirestore } = await import(firestorePath);
 
 const app = initializeApp({ credential: cert(serviceAccount), projectId: serviceAccount.project_id });
-const db = getFirestore(app);
+const db = getFirestore(app, "boda-us-central1");
 
 const snap = await db.collection("guests").get();
 const allFields = new Set();

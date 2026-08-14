@@ -17,7 +17,8 @@ import {
 
 export function RSVP() {
   const { t, profile, language, interfaceText } = useApp();
-  const { answers, setAnswer, progress, saveFlow } = useRsvp();
+  const { answers, setAnswer, progress, editedFlows, saveFlow } = useRsvp();
+
   const rsvp = t.rsvp || {};
   const scale = rsvp.scale || {};
   const petanque = rsvp.petanque || {};
@@ -110,14 +111,15 @@ export function RSVP() {
 
   const [saveStatus, setSaveStatus] = useState("idle"); // idle | working | saved | error
 
-  const handleAnswerChange = (questionId, guestId, level) => {
-    setAnswer(questionId, guestId, level);
+  const handleAnswerChange = (questionId, guestId, level, flow) => {
+    setAnswer(questionId, guestId, level, flow);
     // If participation is no longer "yes", clear the boules answer for that
     // guest so it doesn't linger as a stale "yes"/"no".
     if (questionId === "petanqueParticipation" && level !== BOOLEAN_YES) {
-      setAnswer("petanqueOwnBoules", guestId, 0);
+      setAnswer("petanqueOwnBoules", guestId, 0, flow);
     }
   };
+
 
   // Persist every flow's answers (attendance scale, petanque, extra stay) for
   // every guest in the group, then surface a success/error message.
@@ -226,8 +228,16 @@ export function RSVP() {
               done: extraStayStep >= extraStayQuestions.length,
             },
           ].map(({ flow, label, done }) => {
-            const isDone = done || progress[flow] === "resume";
+            // A flow counts as done when all its questions are answered AND
+            // the user has not actively edited it since (editedFlows), OR when
+            // the user has walked it through to the recap / saved it (resume).
+            // This way, editing an answer flips the flow back to "En attente"
+            // until the guest re-confirms, while a completed-but-reloaded flow
+            // still shows "Terminé".
+            const isDone =
+              (done && !editedFlows[flow]) || progress[flow] === "resume";
             return (
+
               <div
                 key={flow}
                 className={`rsvp-progress-item${isDone ? " is-done" : ""}`}
@@ -265,9 +275,10 @@ export function RSVP() {
                       guests={guests}
                       answers={answers[q.id] || {}}
                       onChange={(guestId, level) =>
-                        handleAnswerChange(q.id, guestId, level)
+                        handleAnswerChange(q.id, guestId, level, RSVP_FLOWS.teAnimas)
                       }
                     />
+
                   );
                 })()}
               </div>
@@ -305,9 +316,10 @@ export function RSVP() {
                       guests={q.id === "petanqueOwnBoules" ? boulesGuests : guests}
                       answers={answers[q.id] || {}}
                       onChange={(guestId, level) =>
-                        handleAnswerChange(q.id, guestId, level)
+                        handleAnswerChange(q.id, guestId, level, RSVP_FLOWS.petanque)
                       }
                     />
+
                   );
                 })()}
               </div>
@@ -344,9 +356,10 @@ export function RSVP() {
                       guests={guests}
                       answers={answers[q.id] || {}}
                       onChange={(guestId, level) =>
-                        handleAnswerChange(q.id, guestId, level)
+                        handleAnswerChange(q.id, guestId, level, RSVP_FLOWS.coast)
                       }
                     />
+
                   );
                 })()}
               </div>
@@ -453,29 +466,35 @@ export function RSVP() {
                         </span>
                       </dd>
                     </div>
-                    <div className="rsvp-payment-row">
-                      <dt>{payment.perGroup}</dt>
-                      <dd
-                        className={`rsvp-payment-value${groupSale ? " is-sale" : ""}`}
-                      >
-                        <span className="rsvp-payment-line">
-                          {groupSale && (
-                            <span className="rsvp-payment-original">
-                              {formatPrice(groupOriginal, language)} MXN
-                            </span>
-                          )}
-                          <strong>{formatPrice(groupTotal, language)} MXN</strong>
-                        </span>
-                        <span className="rsvp-payment-line">
-                          {groupSale && (
-                            <span className="rsvp-payment-original">
-                              ≈ {formatPrice(groupOriginal / 20, language)} €
-                            </span>
-                          )}
-                          <small>≈ {formatPrice(groupTotal / 20, language)} €</small>
-                        </span>
-                      </dd>
-                    </div>
+                    {/* The per-group row only makes sense when the group has
+                        more than one person; with a single guest it would just
+                        duplicate the per-person amount. */}
+                    {guests.length > 1 && (
+                      <div className="rsvp-payment-row">
+                        <dt>{payment.perGroup}</dt>
+                        <dd
+                          className={`rsvp-payment-value${groupSale ? " is-sale" : ""}`}
+                        >
+                          <span className="rsvp-payment-line">
+                            {groupSale && (
+                              <span className="rsvp-payment-original">
+                                {formatPrice(groupOriginal, language)} MXN
+                              </span>
+                            )}
+                            <strong>{formatPrice(groupTotal, language)} MXN</strong>
+                          </span>
+                          <span className="rsvp-payment-line">
+                            {groupSale && (
+                              <span className="rsvp-payment-original">
+                                ≈ {formatPrice(groupOriginal / 20, language)} €
+                              </span>
+                            )}
+                            <small>≈ {formatPrice(groupTotal / 20, language)} €</small>
+                          </span>
+                        </dd>
+                      </div>
+                    )}
+
                   </dl>
                 </div>
               );
@@ -518,13 +537,15 @@ export function RSVP() {
           )}
         </div>
 
-        {/* Desktop-only bottom nav: leads to the thanks section. */}
+        {/* Desktop-only bottom nav: leads to the INVITES section. */}
         <nav className="section-nav section-nav--light rsvp-section-nav" aria-label="Continue">
-          <a className="section-nav-link" href="#thanks">
-            <span>{t.nav.thanks}</span>
+          <a className="section-nav-link" href="#gift">
+            <span>{t.nav.gift}</span>
+
             <span aria-hidden="true">↓</span>
           </a>
         </nav>
+
     </section>
   );
 }

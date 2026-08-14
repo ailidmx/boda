@@ -31,7 +31,7 @@ const { getFirestore } = await import(firestorePath);
 const SERVICE_ACCOUNT = join(__dirname, "..", "integraciones", "google_sheets", "service_account.json");
 const sa = JSON.parse(readFileSync(SERVICE_ACCOUNT, "utf8"));
 const app = initializeApp({ credential: cert(sa) });
-const db = getFirestore(app);
+const db = getFirestore(app, "boda-us-central1");
 
 // ── Cloudinary photo IDs (from src/generated-media.js) ────────────────────
 // These are the public IDs (without the "boda/" prefix) for each cabin type.

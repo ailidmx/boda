@@ -38,7 +38,7 @@ const { initializeApp, cert } = await import(appPath);
 const { getFirestore, FieldValue } = await import(firestorePath);
 
 initializeApp({ credential: cert(serviceAccount), projectId: serviceAccount.project_id });
-const db = getFirestore();
+const db = getFirestore("boda-us-central1");
 
 // The impacted boolean fields and their target questionId in rsvp.answers.
 const BOOLEAN_TO_QUESTION = {

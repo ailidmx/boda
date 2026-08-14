@@ -110,13 +110,14 @@ export function Petanque() {
 
   const handleAnswerChange = (questionId, guestId, level) => {
 
-    setAnswer(questionId, guestId, level);
+    setAnswer(questionId, guestId, level, RSVP_FLOWS.petanque);
     // If participation is no longer "yes", clear the boules answer for that
     // guest so it doesn't linger as a stale "yes"/"no".
     if (questionId === "petanqueParticipation" && level !== BOOLEAN_YES) {
-      setAnswer("petanqueOwnBoules", guestId, 0);
+      setAnswer("petanqueOwnBoules", guestId, 0, RSVP_FLOWS.petanque);
     }
   };
+
 
   const handleSaveAnswers = async () => {
     if (saveStatus === "working") return;
@@ -221,42 +222,45 @@ export function Petanque() {
               onDone={() => markResume(flow)}
               initialIndex={initialStep}
               hideBackOnLast
+              hideNextOn={[visibleQuestions.length - 1]}
               countSteps={visibleQuestions.length}
+              navRight={({ index, next }) => {
+                // On the last question step, replace the "Next" button with the
+                // gold "Save my responses" CTA, on the same line as Back.
+                if (index !== visibleQuestions.length - 1) return null;
+                return (
+                  <button
+                    className="flip-step-btn flip-step-btn--primary"
+                    type="button"
+                    onClick={async () => {
+                      await handleSaveAnswers();
+                      next();
+                    }}
+                    disabled={saveStatus === "working"}
+                  >
+                    {rsvpMini.button}
+                  </button>
+                );
+              }}
               steps={[
+
                 {
                   id: "participation",
                   label: rsvpMini.fields?.participation,
                   render: () => (
-                    <>
-                      <RsvpQuestion
-                        questionId="petanqueParticipation"
-                        title={rsvpMini.fields?.participation}
-                        subtitle={rsvpMini.intro}
-                        variant="boolean"
-                        yesLabel={rsvpMini.yesLabel}
-                        noLabel={rsvpMini.noLabel}
-                        guests={guests}
-                        answers={answers.petanqueParticipation || {}}
-                        onChange={(guestId, level) =>
-                          handleAnswerChange("petanqueParticipation", guestId, level)
-                        }
-                      />
-                      {boulesGuests.length === 0 && (
-                        <div className="petanque-rsvp-save">
-                          <button
-                            className="button button--gold"
-                            type="button"
-                            onClick={handleSaveAnswers}
-                            disabled={saveStatus === "working"}
-                          >
-                            {rsvpMini.button}
-                          </button>
-                          {saveStatus === "working" ? (
-                            <small data-form-status>{interfaceText.submitWorking}</small>
-                          ) : null}
-                        </div>
-                      )}
-                    </>
+                    <RsvpQuestion
+                      questionId="petanqueParticipation"
+                      title={rsvpMini.fields?.participation}
+                      subtitle={rsvpMini.intro}
+                      variant="boolean"
+                      yesLabel={rsvpMini.yesLabel}
+                      noLabel={rsvpMini.noLabel}
+                      guests={guests}
+                      answers={answers.petanqueParticipation || {}}
+                      onChange={(guestId, level) =>
+                        handleAnswerChange("petanqueParticipation", guestId, level)
+                      }
+                    />
                   ),
                 },
                 ...(boulesGuests.length > 0
@@ -265,38 +269,24 @@ export function Petanque() {
                         id: "boules",
                         label: rsvpMini.fields?.ownBoules,
                         render: () => (
-                          <>
-                            <RsvpQuestion
-                              questionId="petanqueOwnBoules"
-                              title={rsvpMini.fields?.ownBoules}
-                              subtitle={rsvpMini.fields?.ownBoulesHint}
-                              variant="boolean"
-                              yesLabel={rsvpMini.yesLabel}
-                              noLabel={rsvpMini.noLabel}
-                              guests={boulesGuests}
-                              answers={answers.petanqueOwnBoules || {}}
-                              onChange={(guestId, level) =>
-                                handleAnswerChange("petanqueOwnBoules", guestId, level)
-                              }
-                            />
-                            <div className="petanque-rsvp-save">
-                              <button
-                                className="button button--gold"
-                                type="button"
-                                onClick={handleSaveAnswers}
-                                disabled={saveStatus === "working"}
-                              >
-                                {rsvpMini.button}
-                              </button>
-                              {saveStatus === "working" ? (
-                                <small data-form-status>{interfaceText.submitWorking}</small>
-                              ) : null}
-                            </div>
-                          </>
+                          <RsvpQuestion
+                            questionId="petanqueOwnBoules"
+                            title={rsvpMini.fields?.ownBoules}
+                            subtitle={rsvpMini.fields?.ownBoulesHint}
+                            variant="boolean"
+                            yesLabel={rsvpMini.yesLabel}
+                            noLabel={rsvpMini.noLabel}
+                            guests={boulesGuests}
+                            answers={answers.petanqueOwnBoules || {}}
+                            onChange={(guestId, level) =>
+                              handleAnswerChange("petanqueOwnBoules", guestId, level)
+                            }
+                          />
                         ),
                       },
                     ]
                   : []),
+
                 {
                   id: "resumen",
                   label: rsvpMini.recapTitle || "Resumen",

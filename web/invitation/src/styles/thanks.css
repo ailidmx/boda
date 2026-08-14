@@ -379,15 +379,16 @@
 .thanks-credit {
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 1rem;
   margin-bottom: 0.9rem;
   padding: 0.85rem 1.25rem;
   border: 1px solid rgb(255 255 255 / 14%);
   border-radius: 0.75rem;
   background: rgb(255 255 255 / 5%);
-  text-align: center;
+  text-align: left;
 }
+
 
 .thanks-credit--featured {
   border-color: rgb(255 183 77 / 45%);

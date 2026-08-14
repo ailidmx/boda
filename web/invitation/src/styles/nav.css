@@ -889,6 +889,7 @@
 .about-modal__card {
   display: flex;
   flex-direction: column;
+  width: min(52rem, 100%);
   max-height: min(86vh, 42rem);
   min-width: 0;
   overflow: hidden;
