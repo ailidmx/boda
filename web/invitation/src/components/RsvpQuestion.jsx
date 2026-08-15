@@ -202,6 +202,7 @@ export function RsvpQuestion({
                 >
                   <button
                     type="button"
+                    data-analytics={`rsvp.answer.${questionId}.yes`}
                     className={`rsvp-boolean-btn ${
                       current === BOOLEAN_YES ? "is-selected" : ""
                     }`}
@@ -212,6 +213,7 @@ export function RsvpQuestion({
                   </button>
                   <button
                     type="button"
+                    data-analytics={`rsvp.answer.${questionId}.no`}
                     className={`rsvp-boolean-btn ${
                       current === BOOLEAN_NO ? "is-selected" : ""
                     }`}
@@ -220,6 +222,7 @@ export function RsvpQuestion({
                   >
                     {noLabel}
                   </button>
+
                 </div>
               ) : (
                 <div
@@ -230,6 +233,7 @@ export function RsvpQuestion({
                   {/* 0 = unanswered */}
                   <button
                     type="button"
+                    data-analytics={`rsvp.answer.${questionId}.0`}
                     className={`rsvp-scale-btn rsvp-scale-btn--zero ${
                       current === UNANSWERED_LEVEL ? "is-selected" : ""
                     }`}
@@ -243,6 +247,7 @@ export function RsvpQuestion({
                     <button
                       type="button"
                       key={entry.level}
+                      data-analytics={`rsvp.answer.${questionId}.${entry.level}`}
                       className={`rsvp-scale-btn ${
                         current === entry.level ? "is-selected" : ""
                       }`}
@@ -256,6 +261,7 @@ export function RsvpQuestion({
                       {entry.emoji}
                     </button>
                   ))}
+
                 </div>
               )}
             </li>
@@ -307,8 +313,10 @@ export function RsvpQuestion({
               type="button"
               aria-label={SCALE_LEGEND_LABEL}
               aria-haspopup="dialog"
+              data-analytics="fab.rsvp.legend"
               onClick={() => setLegendOpen(true)}
             >
+
               <span className="rsvp-legend-fab-icon" aria-hidden="true">
                 ?
               </span>

@@ -227,8 +227,10 @@ export function Weather() {
         type="button"
         aria-label={weather.adviceTitle}
         aria-haspopup="dialog"
+        data-analytics="fab.weather.advice"
         onClick={() => setAdviceOpen(true)}
       >
+
         <span aria-hidden="true">☀</span>
       </button>
     </section>

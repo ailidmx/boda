@@ -12,6 +12,21 @@ import {
   resolveGuestPhoto,
   guestTravelsByPlane,
 } from "../guest-profiles.js";
+import { trackAction, ACTION_TYPES } from "../analytics.js";
+import { dispatchNavigate } from "../hooks/usePageViewTracking.js";
+
+// Dispatch a navigation event (so the page-view tracker attributes the cause)
+// and log a categorized navigation action. `sectionId` is the target section
+// id; `navigationType` is how the guest navigated (nav / side_drawer /
+// mobile_menu / fab).
+function trackNav(sectionId, navigationType = "nav") {
+  dispatchNavigate({ sectionId, navigationType });
+  trackAction(ACTION_TYPES.NAVIGATION, `nav.${sectionId}`, {
+    section_id: sectionId,
+    navigation_type: navigationType,
+  });
+}
+
 
 
 
@@ -246,8 +261,10 @@ function UserMenu() {
         type="button"
         aria-haspopup="true"
         aria-expanded={open}
+        data-analytics="menu.open"
         onClick={() => setOpen((v) => !v)}
       >
+
         <span className="user-menu__avatar">
           {photo ? (
             <img className="user-menu__avatar-img" src={photo} alt="" />
@@ -279,16 +296,19 @@ function UserMenu() {
                     className={`user-menu__lang-option${lang === language ? " is-active" : ""}`}
                     type="button"
                     aria-pressed={lang === language}
+                    data-analytics={`menu.lang.${lang}`}
                     onClick={() => setLanguage(lang)}
                   >
                     {LANGUAGE_FLAGS[lang]}
                   </button>
                 ))}
+
               </div>
             </div>
             <button
               className="user-menu__item"
               type="button"
+              data-analytics="menu.identity"
               onClick={() => {
                 setOpen(false);
                 openIdentityPrompt();
@@ -300,6 +320,7 @@ function UserMenu() {
             <button
               className="user-menu__item"
               type="button"
+              data-analytics="menu.photo"
               onClick={() => {
                 setOpen(false);
                 openIdentityPrompt();
@@ -313,6 +334,7 @@ function UserMenu() {
               <a
                 className="user-menu__item user-menu__item--admin"
                 href="/dashboard"
+                data-analytics="menu.dashboard"
                 onClick={() => setOpen(false)}
               >
                 <span className="user-menu__item-icon">📊</span>
@@ -322,6 +344,7 @@ function UserMenu() {
             <button
               className="user-menu__item"
               type="button"
+              data-analytics="menu.email"
               onClick={() => openAccountModal("email")}
             >
               <span className="user-menu__item-icon">✉</span>
@@ -331,6 +354,7 @@ function UserMenu() {
             <button
               className="user-menu__item"
               type="button"
+              data-analytics="menu.password"
               onClick={() => openAccountModal("password")}
             >
               <span className="user-menu__item-icon">🔑</span>
@@ -342,6 +366,7 @@ function UserMenu() {
               type="button"
               role="switch"
               aria-checked={musicEnabled}
+              data-analytics="menu.music"
               onClick={() => setMusicEnabled(!musicEnabled)}
             >
               <span className="user-menu__item-icon">🎵</span>
@@ -357,6 +382,7 @@ function UserMenu() {
             <button
               className="user-menu__item"
               type="button"
+              data-analytics="menu.about"
               onClick={() => {
                 setOpen(false);
                 setAboutOpen(true);
@@ -369,11 +395,13 @@ function UserMenu() {
             <button
               className="user-menu__item user-menu__item--danger"
               type="button"
+              data-analytics="menu.logout"
               onClick={handleLogout}
             >
               <span className="user-menu__item-icon">↪</span>
               {nav.logout}
             </button>
+
 
 
             {menuStatus && (
@@ -599,13 +627,18 @@ function MobileNav({ activeKey }) {
             <a
               key={key}
               href={href}
+              data-analytics={`nav.${key}`}
               className={`mobile-nav__link${key === activeKey ? " is-active" : ""}`}
               aria-current={key === activeKey ? "true" : undefined}
-              onClick={() => setOpenMenu(null)}
+              onClick={() => {
+                setOpenMenu(null);
+                trackNav(key, "mobile_menu");
+              }}
             >
               {t.nav[key]}
             </a>
           ))}
+
         </div>
       )}
     </div>
@@ -690,13 +723,18 @@ function SideDrawer({ links, activeKey }) {
                   <a
                     key={key}
                     href={href}
+                    data-analytics={`nav.${key}`}
                     className={`side-drawer__link${key === activeKey ? " is-active" : ""}`}
                     aria-current={key === activeKey ? "true" : undefined}
-                    onClick={() => setOpen(false)}
+                    onClick={() => {
+                      setOpen(false);
+                      trackNav(key, "side_drawer");
+                    }}
                   >
                     {t.nav[key]}
                   </a>
                 ))}
+
               </nav>
             </div>
           </div>,
@@ -905,8 +943,10 @@ export function Nav() {
             <a
               key={key}
               href={href}
+              data-analytics={`nav.${key}`}
               className={key === activeKey ? "is-active" : undefined}
               aria-current={key === activeKey ? "true" : undefined}
+              onClick={() => trackNav(key, "nav")}
               onMouseEnter={() => {
                 setHoverKey(key);
                 positionUnderline(key);
@@ -919,6 +959,7 @@ export function Nav() {
               {t.nav[key]}
             </a>
           ))}
+
         </nav>
 
         <button
@@ -934,15 +975,26 @@ export function Nav() {
       <MobileNav activeKey={activeKey} />
 
       <div className="site-header__actions">
-        <a className="mobile-nav__cta" href="#rsvp">
+        <a
+          className="mobile-nav__cta"
+          href="#rsvp"
+          data-analytics="nav.rsvp"
+          onClick={() => trackNav("rsvp", "nav")}
+        >
           <span className="mobile-nav__cta-icon" aria-hidden="true">✓</span>
           <span className="mobile-nav__cta-label">{t.nav.rsvp}</span>
         </a>
         <UserMenu />
-        <a className="header-rsvp" href="#rsvp">
+        <a
+          className="header-rsvp"
+          href="#rsvp"
+          data-analytics="nav.rsvp"
+          onClick={() => trackNav("rsvp", "nav")}
+        >
           {t.nav.rsvp}
         </a>
       </div>
+
 
     </header>
   );

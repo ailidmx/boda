@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { buildStayCartItems } from "../src/analytics.js";
+import {
+  buildStayCartItems,
+  trackPageView,
+  trackAction,
+  ACTION_TYPES,
+} from "../src/analytics.js";
 import { resolveClickId } from "../src/hooks/useClickTracking.js";
+
 
 // ── buildStayCartItems ──────────────────────────────────────────────────
 
@@ -121,3 +127,35 @@ test("handles missing element", () => {
   assert.equal(resolveClickId(null), "unknown");
   assert.equal(resolveClickId(undefined), "unknown");
 });
+
+// ── trackPageView / trackAction (no-op safety) ─────────────────────────
+// In a Node test environment `analytics` is unavailable, so these helpers are
+// no-ops. We assert they never throw and that the ACTION_TYPES catalog is
+// stable (used by reports to filter events).
+
+test("trackPageView is a safe no-op without analytics", () => {
+  assert.doesNotThrow(() =>
+    trackPageView({ pageTitle: "story", pagePath: "/#story", navigationType: "nav" }),
+  );
+  assert.doesNotThrow(() => trackPageView());
+});
+
+test("trackAction is a safe no-op without analytics", () => {
+  assert.doesNotThrow(() =>
+    trackAction(ACTION_TYPES.FAB, "music.fab", { section_id: "music" }),
+  );
+  assert.doesNotThrow(() => trackAction(ACTION_TYPES.RSVP_ANSWER, "rsvp.answer.4"));
+});
+
+test("ACTION_TYPES exposes the canonical categories", () => {
+  assert.deepEqual(ACTION_TYPES, {
+    NAVIGATION: "navigation",
+    FAB: "fab",
+    RSVP_ANSWER: "rsvp_answer",
+    FORM_SUBMIT: "form_submit",
+    MENU: "menu",
+    TOGGLE: "toggle",
+    MODAL: "modal",
+  });
+});
+

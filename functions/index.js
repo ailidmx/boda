@@ -15,6 +15,8 @@
  *   - attendance_responses    (save-the-date attendance saved)
  *   - card_votes              (star rating on an experience card)
  *   - guiso_rankings          (guest orders their guisos)
+ *   - song_requests           (guest requests a song)
+ *   - genre_ratings           (guest rates a music genre 1–5 stars)
  *   - guests                  (identity check, name/photo/phone, RSVP answers,
  *                              flight details, travel mode, messages, hosting)
  *                             Notifications include the guest's avatar photo.
@@ -359,6 +361,80 @@ export const onGuisoRanking = onDocumentWritten(
       kv("Invitado", name || guestId),
       kv("Platillos en menú", selected.length ? selected.join(", ") : "—"),
       kv("Orden completo", ranking.length ? ranking.join(" → ") : "—"),
+      kv("Hora", time),
+    ];
+    await notify(lines.filter(Boolean).join("\n"));
+
+  },
+);
+
+// ── Song requests (guest asks for a song) ──────────────────────────────────
+
+/**
+ * Fires when a guest submits a song request ("Pide tu canción"). The client
+ * writes a document to the `song_requests` collection via `addDoc` (one doc
+ * per request). We notify on create so the couple sees each new request.
+ */
+export const onSongRequest = onDocumentCreated(
+  { document: "song_requests/{requestId}", database: DB_ID, secrets: [TELEGRAM_TOKEN, TELEGRAM_CHAT_ID] },
+
+  async (event) => {
+
+    const data = event.data?.data() || {};
+    const guestId = data.guestId || "";
+    const name = (await resolveGuestName(guestId)) || guestId;
+    const time = formatTime(data.createdAt || data.timestamp);
+
+    const intentLabels = {
+      hear: "Escuchar",
+      sing: "Cantar",
+      karaoke: "Karaoke",
+      band: "Con banda",
+    };
+    const intent = intentLabels[data.intent] || data.intent || "";
+
+    const songMeta = data.songMeta || {};
+    const title = songMeta.title || data.song || "";
+    const artist = songMeta.artist || "";
+
+    const lines = [
+      "🎵 *Nueva petición de canción*",
+      kv("Invitado", name),
+      kv("Canción", title),
+      kv("Artista", artist),
+      kv("Intención", intent),
+      kv("Banda", data.bandType || ""),
+      kv("Hora", time),
+    ];
+    await notify(lines.filter(Boolean).join("\n"));
+
+  },
+);
+
+// ── Genre ratings (guest rates a music genre) ──────────────────────────────
+
+/**
+ * Fires when a guest saves or updates a 1–5 star rating for a music genre in
+ * the "Califica la música" survey. The document lives at
+ * `genre_ratings/{genreId}_{guestId}` — one doc per (genre, guest). We notify
+ * on create and on update so the couple sees each new/updated rating.
+ */
+export const onGenreRating = onDocumentWritten(
+  { document: "genre_ratings/{ratingId}", database: DB_ID, secrets: [TELEGRAM_TOKEN, TELEGRAM_CHAT_ID] },
+
+  async (event) => {
+
+    const data = event.data?.after?.data() || {};
+    const guestId = data.guestId || "";
+    const name = (await resolveGuestName(guestId)) || guestId;
+    const time = formatTime(data.updatedAt || data.timestamp);
+    const stars = "⭐".repeat(Math.max(0, Math.min(5, Number(data.rating) || 0)));
+
+    const lines = [
+      "🎧 *Nueva calificación de género*",
+      kv("Invitado", name),
+      kv("Género", data.genreName || data.genreId || ""),
+      kv("Calificación", `${data.rating || ""} ${stars}`),
       kv("Hora", time),
     ];
     await notify(lines.filter(Boolean).join("\n"));

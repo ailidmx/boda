@@ -301,10 +301,12 @@ export function Petanque() {
                         <button
                           className="button button--gold"
                           type="button"
+                          data-analytics="rsvp.modify.petanque"
                           onClick={back}
                         >
                           {rsvpMini.modifyButton || rsvpMini.button}
                         </button>
+
                         {saveStatus === "saved" ? (
                           <p className="rsvp-confirmation" role="status">
                             <span aria-hidden="true">✓</span>

@@ -251,8 +251,10 @@ function DayProgramSlideset({ programs }) {
           type="button"
           aria-label={traffic.title}
           aria-haspopup="dialog"
+          data-analytics="fab.weekend.warning"
           onClick={() => setWarningOpen(true)}
         >
+
           <WarningIcon />
         </button>
       )}

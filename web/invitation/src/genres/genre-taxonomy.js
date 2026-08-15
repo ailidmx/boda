@@ -372,7 +372,32 @@ export const GENRES = [
     ],
   },
 
+  // ── French / Francophone ───────────────────────────────────────────────
+  {
+    id: "french",
+    name: "Francesa / Francófona",
+    aliases: ["French", "Francophone", "Música francesa", "Musique française", "French music"],
+    region: "France",
+    curated: true,
+    tier: "PRIMARY",
+    children: [
+      { id: "fr-chanson", name: "Chanson française", aliases: ["Chanson", "Chanson française"], region: "France", curated: true, tier: "PRIMARY" },
+      { id: "fr-variete", name: "Variété française", aliases: ["Variété", "Variété française"], region: "France", curated: true, tier: "PRIMARY" },
+      { id: "fr-yeye", name: "Yé-yé", aliases: ["Yeye", "Yé-yé français"], region: "France", curated: true, tier: "SECONDARY" },
+      { id: "fr-pop", name: "French pop", aliases: ["Pop française", "French pop"], region: "France", curated: true, tier: "PRIMARY" },
+      { id: "fr-rap", name: "French rap / Hip-hop", aliases: ["Rap français", "French hip-hop", "Hip-hop français"], region: "France", curated: true, tier: "PRIMARY" },
+      { id: "fr-electro", name: "French electro", aliases: ["French touch", "Electro française"], region: "France", curated: true, tier: "SECONDARY" },
+      { id: "fr-house", name: "French house", aliases: ["French touch", "House française"], region: "France", curated: true, tier: "SECONDARY" },
+      { id: "fr-rock", name: "French rock", aliases: ["Rock français"], region: "France", curated: true, tier: "SECONDARY" },
+      { id: "fr-folk", name: "French folk", aliases: ["Folk français"], region: "France", curated: true, tier: "SECONDARY" },
+      { id: "fr-jazz", name: "French jazz", aliases: ["Jazz français"], region: "France", curated: true, tier: "SECONDARY" },
+      { id: "fr-musette", name: "Musette", aliases: ["Bal musette", "Accordéon musette"], region: "France", curated: true, tier: "SECONDARY" },
+      { id: "fr-afro-francophone", name: "Afro-francophone", aliases: ["Afro français", "Afrobeat français"], region: "France", curated: true, tier: "SECONDARY" },
+    ],
+  },
+
   // ── Decades / Party ────────────────────────────────────────────────────
+
   {
     id: "party",
     name: "Décadas / Fiesta",

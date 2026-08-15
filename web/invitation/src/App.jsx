@@ -11,6 +11,7 @@ import { IdentityModal } from "./components/IdentityModal.jsx";
 import { WinampPlayer } from "./components/WinampPlayer.jsx";
 import { useVersionCheck } from "./hooks/useVersionCheck.js";
 import { useClickTracking } from "./hooks/useClickTracking.js";
+import { usePageViewTracking } from "./hooks/usePageViewTracking.js";
 import { guestTravelsByPlane } from "./guest-profiles.js";
 
 // Full-load architecture: every section is imported eagerly and mounted up
@@ -59,6 +60,11 @@ function Invitation() {
   // Log every click to Analytics (delegated listener). Runs for all auth
   // states so we also capture clicks on the sign-in gate.
   useClickTracking();
+
+  // Treat every section view as a page view (Analytics `page_view` + a
+  // Firestore `page_views` record per guest). Only meaningful once signed in,
+  // when the sections are rendered.
+  usePageViewTracking({ guestId: profile?.guest?.id });
 
   // On first load (direct visit, refresh, or a shared link with a hash like
   // `#thanks`), clear any hash from the URL. The sections are gated behind
