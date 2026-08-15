@@ -15,13 +15,13 @@
  *    `sendSelectedRow()` (single row) from the Apps Script editor or a button.
  *
  * ── Source of truth: Firestore ─────────────────────────────────────────────
- * The guest's LANGUAGE (`identity.lang`), CABIN (`hosting.cabin`), and PROFILE
- * CODE (`perfil`) are read from the LIVE Firestore `guests` collection (the
- * authoritative source), falling back to the sheet columns when Firestore is
- * unreachable. This keeps the email correct even when the sheet is out of sync
- * (e.g. the sheet `lang` column says "es" but Firestore `identity.lang` is
- * "fr"). The script authenticates to Firestore with the project's service
- * account (see SERVICE_ACCOUNT_* below).
+ * The guest's LANGUAGE (`identity.lang`) is read from the LIVE Firestore
+ * `guests` collection (the authoritative source), falling back to the sheet
+ * `lang` column when Firestore is unreachable. This keeps the email correct
+ * even when the sheet is out of sync (e.g. the sheet `lang` column says "es"
+ * but Firestore `identity.lang` is "fr"). The script authenticates to
+ * Firestore with the project's service account (see SERVICE_ACCOUNT_* below).
+
  *
  * ── Email content ──────────────────────────────────────────────────────────
  * The email is a hand-built HTML template (inline CSS, UTF-8) with:
@@ -38,12 +38,9 @@
  *   - `guest`        the guest's login email (pre-fills the username field)
  *   - `password`     the shared login password (pre-fills the password field)
  *   - `inviteType`   "email" (how the guest was invited)
- *   - `invitationCode` the guest's profile code (base64url) — OPTIONAL, only
- *                      added when a real code is known (from the sheet `perfil`
- *                      column). It is NOT required for login; it only shows the
- *                      guest their cabin info. We never invent a code.
  *   - `utm_source`/`utm_medium`/`utm_campaign` = email / email / invitacion
  *   - `sent_at`      epoch ms when the email is sent (for time-to-answer)
+
 
  *
  * ── Setup (one time) ───────────────────────────────────────────────────────
@@ -111,12 +108,8 @@ var COL_MSG_FR = "_msgInvitFR";
 var COL_MSG_ES = "_msgInvitES";
 var COL_MSG_EN = "_msgInvitEN";
 
-// Profile code column (optional). Only used when it holds a REAL code; we
-// never invent a code from cabin/payment data.
-var COL_PROFILE_CODE = "perfil";
-
-
 // ── Trilingual subjects ───────────────────────────────────────────────────
+
 
 var SUBJECTS = {
   es: "Invitación a la boda de David & Aydé 💍",
@@ -231,28 +224,20 @@ function firestoreValueToJs(v) {
 }
 
 /**
- * Resolve the guest's authoritative data (language + optional profile code)
- * from Firestore, falling back to the sheet row.
- *
- * The profile code is OPTIONAL and is only used when a REAL code is known
- * (from the sheet `perfil` column or Firestore `perfil`). We NEVER invent a
- * code from cabin/payment data — the invitation link works fine without one
- * (login is email/password).
- *
- * Returns { lang, profileCode }.
+ * Resolve the guest's authoritative language from Firestore, falling back to
+ * the sheet row. Returns { lang }.
  */
 function resolveGuestData(row, guestId) {
   var fs = readGuestFromFirestore(guestId);
   var lang = normaliseLang(row[COL_LANG]);
-  var profileCode = String(row[COL_PROFILE_CODE] || "").trim();
 
-  if (fs) {
-    if (fs.identity && fs.identity.lang) lang = normaliseLang(fs.identity.lang);
-    if (fs.perfil) profileCode = String(fs.perfil).trim();
+  if (fs && fs.identity && fs.identity.lang) {
+    lang = normaliseLang(fs.identity.lang);
   }
 
-  return { lang: lang, profileCode: profileCode };
+  return { lang: lang };
 }
+
 
 
 // ── Email HTML template ───────────────────────────────────────────────────
@@ -361,7 +346,7 @@ function buildHtmlEmail(lang, name, link, email, password) {
  * Build the personalised invitation link, including the analytics + login
  * pre-fill params the invitation app reads.
  */
-function buildInvitationLink(profileCode, email, sentAt) {
+function buildInvitationLink(email, sentAt) {
   var params = [
     "guest=" + encodeURIComponent(email || ""),
     "password=" + encodeURIComponent(SHARED_PASSWORD),
@@ -371,11 +356,9 @@ function buildInvitationLink(profileCode, email, sentAt) {
     "utm_campaign=invitacion",
     "sent_at=" + (sentAt || Date.now()),
   ];
-  if (profileCode) {
-    params.unshift("invitationCode=" + base64UrlEncode(profileCode));
-  }
   return INVITATION_BASE_URL + "?" + params.join("&");
 }
+
 
 /** Read the email content template for a guest row, in their language. */
 function readMessageTemplate(row, lang) {
@@ -417,16 +400,13 @@ function sendOne(row, rowIndex, force) {
   // NOTE: We ALWAYS resend — the `_enviado` checkbox is intentionally ignored
   // so invitations can be re-sent freely (the couple's requirement).
 
-  // Authoritative data from Firestore (language + optional profile code).
-  // The profile code is OPTIONAL — when absent we simply omit `invitationCode`
-  // from the link (login is email/password, so the link still works).
-
+  // Authoritative language from Firestore (falls back to the sheet `lang`).
   var data = resolveGuestData(row, guestId);
   var lang = data.lang;
-  var profileCode = data.profileCode;
-  console.log("[sendOne] resolved lang=%s code=%s", lang, profileCode || "(none)");
+  console.log("[sendOne] resolved lang=%s", lang);
 
-  var link = buildInvitationLink(profileCode, email, Date.now());
+  var link = buildInvitationLink(email, Date.now());
+
 
   var subject = SUBJECTS[lang];
 
@@ -442,10 +422,10 @@ function sendOne(row, rowIndex, force) {
   }
 
   if (DRY_RUN) {
-    Logger.log("[DRY RUN] To: %s | Lang: %s | Code: %s | Subject: %s", email, lang, profileCode, subject);
+    Logger.log("[DRY RUN] To: %s | Lang: %s | Subject: %s", email, lang, subject);
     Logger.log(htmlBody);
-    console.log("[sendOne] [DRY RUN] would send to %s [code %s]", email, profileCode);
-    return "row " + rowIndex + " (" + guestId + "): [DRY RUN] would send to " + email + " [code " + profileCode + "]";
+    console.log("[sendOne] [DRY RUN] would send to %s", email);
+    return "row " + rowIndex + " (" + guestId + "): [DRY RUN] would send to " + email;
   }
 
   try {
@@ -454,9 +434,10 @@ function sendOne(row, rowIndex, force) {
       cc: CC_RECIPIENTS.join(","),
       name: SENDER_NAME,
     });
-    var ok = "row " + rowIndex + " (" + guestId + "): sent to " + email + " [" + lang + "] [code " + profileCode + "]";
+    var ok = "row " + rowIndex + " (" + guestId + "): sent to " + email + " [" + lang + "]";
     console.log("[sendOne] EMAIL SENT: " + ok);
     return ok;
+
   } catch (err) {
     var fail = "row " + rowIndex + " (" + guestId + "): SEND FAILED: " + err;
     console.error("[sendOne] " + fail);
