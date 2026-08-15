@@ -572,6 +572,78 @@ function sendSelectedRow() {
   SpreadsheetApp.getUi().alert(status);
 }
 
+/**
+ * Force-resend the invitation email for the currently selected row, even if
+ * the `_enviado` checkbox is already TRUE. Useful for testing, or for
+ * re-sending after editing a guest's details (language, cabin, email, etc.).
+ * Attach this to a "Resend" button or run it from the Apps Script editor.
+ */
+function resendSelectedRow() {
+  var sheet = SpreadsheetApp.getActiveSheet();
+  var rowIndex = sheet.getActiveRange().getRow();
+  if (rowIndex < 2) {
+    SpreadsheetApp.getUi().alert("Select a guest row first.");
+    return;
+  }
+  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var values = sheet.getRange(rowIndex, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var row = {};
+  headers.forEach(function (h, i) { row[String(h).trim()] = values[i]; });
+  var status = sendOne(row, rowIndex, true); // force = true → bypasses _enviado
+  Logger.log(status);
+  SpreadsheetApp.getUi().alert(status);
+}
+
+/**
+ * Force-resend invitation emails to ALL guests, ignoring the `_enviado`
+ * checkbox. Asks for confirmation first. Use with care — this sends to
+ * everyone, including those already sent.
+ */
+function resendAll() {
+  var ui = SpreadsheetApp.getUi();
+  var resp = ui.alert(
+    "Resend all invitations?",
+    "This will re-send an invitation email to EVERY guest, ignoring the " +
+      "'_enviado' checkbox. Continue?",
+    ui.ButtonSet.YES_NO
+  );
+  if (resp !== ui.Button.YES) return;
+
+  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  if (!sheet) throw new Error("Worksheet '" + SHEET_NAME + "' not found.");
+
+  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var colIndex = {};
+  headers.forEach(function (h, i) { colIndex[String(h).trim()] = i; });
+
+  var lastRow = sheet.getLastRow();
+  if (lastRow < 2) {
+    Logger.log("No guest rows found.");
+    return;
+  }
+
+  var values = sheet.getRange(2, 1, lastRow - 1, sheet.getLastColumn()).getValues();
+  var sentCount = 0;
+  var results = [];
+
+  for (var r = 0; r < values.length; r++) {
+    if (LIMIT > 0 && sentCount >= LIMIT) {
+      results.push("Limit of " + LIMIT + " reached, stopping.");
+      break;
+    }
+    var row = {};
+    headers.forEach(function (h, i) { row[String(h).trim()] = values[r][i]; });
+    var status = sendOne(row, r + 2, true); // force = true → bypasses _enviado
+    results.push(status);
+    if (status.indexOf("sent to") !== -1) sentCount++;
+  }
+
+  Logger.log("=== Resend all: %d sent, %d total rows ===", sentCount, values.length);
+  results.forEach(function (s) { Logger.log(s); });
+  ui.alert("Invitaciones reenviadas: " + sentCount + ".\n\n" + results.join("\n"));
+}
+
+
 // ── Auto-send on checkbox (installable onEdit trigger) ────────────────────
 
 /**
