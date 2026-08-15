@@ -53,11 +53,13 @@
  * 6. (Optional) Attach `sendInvitationEmails` to a button.
  *
  * ── Safety ─────────────────────────────────────────────────────────────────
- * - Guests whose `_enviado` column is already TRUE are SKIPPED (no duplicates).
+ * - Emails are ALWAYS re-sent, even if the `_enviado` column is already TRUE
+ *   (the couple wants to be able to resend invitations freely).
  * - Guests without an email are skipped and reported.
  * - Set `DRY_RUN = true` to preview without sending.
  * - Set `LIMIT` to cap how many emails are sent per run (0 = no limit).
  */
+
 
 // ── Configuration ─────────────────────────────────────────────────────────
 
@@ -443,13 +445,11 @@ function sendOne(row, rowIndex, force) {
     console.log("[sendOne] " + m2);
     return m2;
   }
-  if (!force && String(row[COL_SENT] || "").trim().toUpperCase() === "TRUE") {
-    var m3 = "row " + rowIndex + " (" + guestId + "): already sent, skipped";
-    console.log("[sendOne] " + m3);
-    return m3;
-  }
+  // NOTE: We ALWAYS resend — the `_enviado` checkbox is intentionally ignored
+  // so invitations can be re-sent freely (the couple's requirement).
 
   // Authoritative data from Firestore (language, cabin, profile code).
+
   var data = resolveGuestData(row, guestId);
   var lang = data.lang;
   var profileCode = data.profileCode;
@@ -501,9 +501,11 @@ function sendOne(row, rowIndex, force) {
 
 /**
  * Send invitation emails to all guests in the INVITADOS tab.
- * Skips guests already marked as sent. Marks the `_enviado` column after sending.
+ * ALWAYS re-sends (the `_enviado` checkbox is ignored). Marks the `_enviado`
+ * column after sending.
  */
 function sendInvitationEmails() {
+
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
   if (!sheet) throw new Error("Worksheet '" + SHEET_NAME + "' not found.");
 
