@@ -49,6 +49,13 @@ import { loadAttendanceResponses } from "../guest-attendance.js";
 import { loadRooms } from "../rooms.js";
 import { loadCabins } from "../cabins.js";
 import { useActivityTracker } from "../hooks/useActivityTracker.js";
+import { trackInvitationVisit } from "../analytics.js";
+import {
+  computeTimeToAnswer,
+  getInvitationLinkParams,
+  normalizeSource,
+} from "../invitation-link.js";
+
 
 
 const LANGUAGE_STORAGE_KEY = "boda-language";
@@ -415,15 +422,39 @@ export function AppProvider({ children }) {
       // NOT on every page refresh — the `onAuthStateChanged` handler restores
       // the session on refresh and must not re-notify. Best-effort, fire-and-
       // forget: a failure here must never block the guest from entering.
+      //
+      // When the guest arrived via an invitation link, we also capture the
+      // channel (utm_source) and how long it took them to answer (sent_at →
+      // now) so the couple can see which channel drives logins and how quickly
+      // guests respond.
+      const link = getInvitationLinkParams();
+      const source = normalizeSource(link.source);
+      const timeToAnswer = computeTimeToAnswer(link.sentAt);
       try {
         await addDoc(collection(db, "login_events"), {
           guestId: auth.currentUser?.uid || "",
           username,
+          source,
+          medium: link.medium,
+          campaign: link.campaign,
+          sentAt: link.sentAt,
+          timeToAnswer,
           createdAt: serverTimestamp(),
         });
       } catch (loginLogError) {
         console.warn("[login] failed to log sign-in event", loginLogError);
       }
+
+      // Analytics: log the invitation-link visit (channel + time-to-answer).
+      // Safe no-op when Analytics is unavailable.
+      trackInvitationVisit({
+        guest: link.guest,
+        source,
+        medium: link.medium,
+        campaign: link.campaign,
+        timeToAnswer,
+      });
+
 
       // onAuthStateChanged will fire and set authState to signedIn.
     } catch (error) {

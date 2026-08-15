@@ -515,13 +515,29 @@ service cloud.firestore {
           "guestId", "username", "createdAt"
         ])
         && request.resource.data.keys().hasOnly([
-          "guestId", "username", "createdAt"
+          "guestId", "username", "createdAt",
+          "source", "medium", "campaign", "sentAt", "timeToAnswer"
         ])
         && isShortText(request.resource.data.guestId, 100)
         && request.resource.data.guestId == request.auth.uid
         && isShortText(request.resource.data.username, 200)
-        && request.resource.data.createdAt == request.time;
+        && request.resource.data.createdAt == request.time
+        // Optional invitation-link analytics fields (written only when the
+        // guest arrived via a link). `source` is a normalised channel slug
+        // ("email" | "whatsapp" | "other"); `medium`/`campaign` are raw UTM
+        // values; `sentAt` is epoch ms; `timeToAnswer` is seconds. All are
+        // optional, so a plain login (no link) still passes.
+        && (request.resource.data.keys().hasAny(["source", "medium", "campaign", "sentAt", "timeToAnswer"])
+            ? (
+                (!request.resource.data.keys().hasAny(["source"]) || isShortText(request.resource.data.source, 20))
+                && (!request.resource.data.keys().hasAny(["medium"]) || isShortText(request.resource.data.medium, 50))
+                && (!request.resource.data.keys().hasAny(["campaign"]) || isShortText(request.resource.data.campaign, 100))
+                && (!request.resource.data.keys().hasAny(["sentAt"]) || request.resource.data.sentAt is number)
+                && (!request.resource.data.keys().hasAny(["timeToAnswer"]) || request.resource.data.timeToAnswer is number)
+              )
+            : true);
     }
+
 
     match /login_events/{eventId} {
       allow create: if request.auth != null && hasValidLoginEventFields();

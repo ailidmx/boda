@@ -5,29 +5,45 @@
  *
  * Sends a personalised invitation email to each guest, in their preferred
  * language (es / fr / en), from the script owner's Gmail account, with the
- * couple in CC. It reads the guest's email + language from the INVITADOS tab
- * and builds the invitation link from the guest's PROFILE CODE (Base64URL-
- * encoded), which is what the invitation app accepts.
+ * couple in CC.
  *
- * ── IMPORTANT: profile code, not guest UID ────────────────────────────────
+ * ── Two ways to send ───────────────────────────────────────────────────────
+ * 1. AUTO (recommended): an installable onEdit trigger fires whenever the
+ *    `_enviado` checkbox is set to TRUE on a guest row, and sends that guest's
+ *    invitation immediately. See `setupTrigger()` below.
+ * 2. MANUAL: run `sendInvitationEmails()` (bulk, skips already-sent) or
+ *    `sendSelectedRow()` (single row) from the Apps Script editor or a button.
+ *
+ * ── Email content ──────────────────────────────────────────────────────────
+ * The email BODY is read from the guest's row, from the column matching their
+ * language:
+ *   - `_msgInvitFR`  (French)
+ *   - `_msgInvitES`  (Spanish)
+ *   - `_msgInvitEN`  (English)
+ * The language is taken from the `lang` column (es / fr / en). The body may
+ * contain the placeholders {name} and {link}, which are replaced with the
+ * guest's name and their personalised invitation link.
+ *
+ * ── Invitation link ────────────────────────────────────────────────────────
  * The invitation app's `decodeInvitationCode()` only accepts PROFILE codes
  * (e.g. `azalea_compartida_porpagar`, `sin_cabaña`), NOT per-guest IDs. So the
  * email link MUST use the guest's profile code. The script reads it from the
  * `perfil` column; if that column is missing it derives the code from the
  * cabin + payment columns (see `deriveProfileCode`).
  *
- * ── Setup ─────────────────────────────────────────────────────────────────
+ * ── Setup (one time) ───────────────────────────────────────────────────────
  * 1. Open the Google Sheet → Extensions → Apps Script.
  * 2. Paste the contents of this file into the editor and save.
  * 3. The script runs as the account that owns the spreadsheet. To send FROM
  *    `bodadavidyayde@gmail.com`, that account must own (or be the active
  *    account of) the spreadsheet, and Gmail must be enabled for it.
- * 4. Run `sendInvitationEmails()` once to authorise Gmail + Sheets access.
+ * 4. Run `setupTrigger()` once from the editor to install the onEdit trigger
+ *    (this also authorises Gmail + Sheets access).
  * 5. (Optional) Attach `sendInvitationEmails` to a button:
  *    Insert → Drawing → draw a button → ⋮ → Assign script → `sendInvitationEmails`.
  *
- * ── Safety ────────────────────────────────────────────────────────────────
- * - Guests whose `sent` column is already "TRUE" are SKIPPED (no duplicates).
+ * ── Safety ─────────────────────────────────────────────────────────────────
+ * - Guests whose `_enviado` column is already TRUE are SKIPPED (no duplicates).
  * - Guests without an email are skipped and reported.
  * - Set `DRY_RUN = true` to preview without sending.
  * - Set `LIMIT` to cap how many emails are sent per run (0 = no limit).
@@ -56,10 +72,16 @@ var SHEET_NAME = "Invitados";
 // ── Column names (must match the INVITADOS header row) ────────────────────
 
 var COL_ID = "UID";
-var COL_EMAIL = "email";
-var COL_LANG = "lang";
-var COL_SENT = "sent";
-var COL_NAME = "Nombre"; // used only for the log / fallback greeting
+var COL_EMAIL = "firebase.Identifier"; // primary; falls back to firebase_email / _email / email
+var COL_LANG = "lang";                 // es / fr / en
+var COL_SENT = "_enviado";             // checkbox; also accepts "sent"
+var COL_NAME = "Nombre";               // used only for the log / fallback greeting
+
+// Email content template columns (per language). The script picks the one that
+// matches the guest's `lang` value.
+var COL_MSG_FR = "_msgInvitFR";
+var COL_MSG_ES = "_msgInvitES";
+var COL_MSG_EN = "_msgInvitEN";
 
 // Profile code column. If present, it is used directly for the invitation
 // link. If absent, the script derives the code from the cabin columns below.
@@ -70,71 +92,12 @@ var COL_CABIN = "Cabaña";            // e.g. "AZALEA - 12p", "CABAÑA_5 - 6p", 
 var COL_IS_PRIVATE = "isPrivate";    // "TRUE"/"FALSE" — cabin privacy
 var COL_IS_PAID = "isCabinPaidByNovios"; // "TRUE"/"FALSE" — cabin paid by the couple
 
-// ── Trilingual copy ───────────────────────────────────────────────────────
+// ── Trilingual subjects (the body comes from the sheet) ───────────────────
 
 var SUBJECTS = {
   es: "Invitación a la boda de David & Aydé 💍",
   fr: "Invitation au mariage de David & Aydé 💍",
   en: "Invitation to David & Aydé's wedding 💍",
-};
-
-var BODIES = {
-  es: function (name, link) {
-    return [
-      "Hola " + name + ",",
-      "",
-      "¡Nos casamos! 💍 Y nos encantaría que nos acompañaras en este día tan especial.",
-      "",
-      "Hemos preparado una invitación personalizada para ti con todos los detalles:",
-      "fechas, alojamiento, comida, música y mucho más.",
-      "",
-      "👉 Abre tu invitación aquí: " + link,
-      "",
-      "Por favor confirma tu asistencia y responde las preguntas que encontrarás",
-      "dentro de la invitación. ¡Tu respuesta es muy importante para nosotros!",
-      "",
-      "Con todo el cariño,",
-      "David & Aydé",
-    ].join("\n");
-  },
-  fr: function (name, link) {
-    return [
-      "Bonjour " + name + ",",
-      "",
-      "Nous nous marions ! 💍 Et nous serions ravis que tu nous accompagnes",
-      "pour ce jour si spécial.",
-      "",
-      "Nous avons préparé une invitation personnalisée pour toi avec tous les",
-      "détails : dates, hébergement, repas, musique et bien plus encore.",
-      "",
-      "👉 Ouvre ton invitation ici : " + link,
-      "",
-      "Merci de confirmer ta présence et de répondre aux questions que tu",
-      "trouveras dans l'invitation. Ta réponse est très importante pour nous !",
-      "",
-      "Avec toute notre affection,",
-      "David & Aydé",
-    ].join("\n");
-  },
-  en: function (name, link) {
-    return [
-      "Hello " + name + ",",
-      "",
-      "We're getting married! 💍 And we'd love for you to join us on this very",
-      "special day.",
-      "",
-      "We've prepared a personalised invitation for you with all the details:",
-      "dates, accommodation, food, music and much more.",
-      "",
-      "👉 Open your invitation here: " + link,
-      "",
-      "Please confirm your attendance and answer the questions you'll find",
-      "inside the invitation. Your reply means the world to us!",
-      "",
-      "With all our love,",
-      "David & Aydé",
-    ].join("\n");
-  },
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────
@@ -208,9 +171,47 @@ function resolveProfileCode(row) {
   return deriveProfileCode(row);
 }
 
-/** Build the personalised invitation link for a profile code. */
-function buildInvitationLink(profileCode) {
-  return INVITATION_BASE_URL + "?invitationCode=" + base64UrlEncode(profileCode);
+/**
+ * Build the personalised invitation link for a profile code, including the
+ * analytics query-string params the invitation app reads to pre-fill the login
+ * field and to measure which channel drove the visit + how quickly the guest
+ * answered.
+ *
+ * Params appended:
+ *   - `guest`      the guest's login email (pre-fills the login field)
+ *   - `utm_source` "email" (these are invitation emails)
+ *   - `utm_medium` "email"
+ *   - `utm_campaign` "invitacion"
+ *   - `sent_at`    epoch ms when the email is sent (for time-to-answer)
+ */
+function buildInvitationLink(profileCode, email, sentAt) {
+  var params = [
+    "invitationCode=" + base64UrlEncode(profileCode),
+    "guest=" + encodeURIComponent(email || ""),
+    "utm_source=email",
+    "utm_medium=email",
+    "utm_campaign=invitacion",
+    "sent_at=" + (sentAt || Date.now()),
+  ];
+  return INVITATION_BASE_URL + "?" + params.join("&");
+}
+
+
+/**
+ * Read the email content template for a guest row, in their language.
+ * Returns the raw template text (may contain {name} and {link} placeholders),
+ * or "" if the column is missing/empty.
+ */
+function readMessageTemplate(row, lang) {
+  var col = lang === "fr" ? COL_MSG_FR : (lang === "en" ? COL_MSG_EN : COL_MSG_ES);
+  return String(row[col] || "").trim();
+}
+
+/** Replace {name} and {link} placeholders in a template. */
+function fillTemplate(template, name, link) {
+  return String(template || "")
+    .replace(/\{name\}/g, name)
+    .replace(/\{link\}/g, link);
 }
 
 // ── Sending ───────────────────────────────────────────────────────────────
@@ -221,7 +222,7 @@ function buildInvitationLink(profileCode) {
  */
 function sendOne(row, rowIndex) {
   var guestId = String(row[COL_ID] || "").trim();
-  var email = String(row[COL_EMAIL] || "").trim();
+  var email = String(row[COL_EMAIL] || row.firebase_email || row._email || row.email || "").trim();
   var lang = normaliseLang(row[COL_LANG]);
   var name = String(row[COL_NAME] || guestId || "amigo").trim();
 
@@ -236,9 +237,15 @@ function sendOne(row, rowIndex) {
     return "row " + rowIndex + " (" + guestId + "): could not determine profile code, skipped";
   }
 
-  var link = buildInvitationLink(profileCode);
+  var link = buildInvitationLink(profileCode, email, Date.now());
   var subject = SUBJECTS[lang];
-  var body = BODIES[lang](name, link);
+
+
+  // Body comes from the sheet template column for the guest's language.
+  var template = readMessageTemplate(row, lang);
+  var body = template
+    ? fillTemplate(template, name, link)
+    : "Hola " + name + ",\n\nAbre tu invitación aquí: " + link + "\n\nDavid & Aydé";
 
   if (DRY_RUN) {
     Logger.log("[DRY RUN] To: %s | Lang: %s | Code: %s | Subject: %s", email, lang, profileCode, subject);
@@ -256,7 +263,7 @@ function sendOne(row, rowIndex) {
 
 /**
  * Send invitation emails to all guests in the INVITADOS tab.
- * Skips guests already marked as sent. Marks the `sent` column after sending.
+ * Skips guests already marked as sent. Marks the `_enviado` column after sending.
  */
 function sendInvitationEmails() {
   var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
@@ -326,4 +333,67 @@ function sendSelectedRow() {
   var status = sendOne(row, rowIndex);
   Logger.log(status);
   SpreadsheetApp.getUi().alert(status);
+}
+
+// ── Auto-send on checkbox (installable onEdit trigger) ────────────────────
+
+/**
+ * Install the onEdit trigger that auto-sends an invitation when the `_enviado`
+ * checkbox is set to TRUE. Run this once from the Apps Script editor.
+ * It runs as the script owner (the couple's Gmail account), so GmailApp works.
+ */
+function setupTrigger() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  // Remove any existing onEditSendInvitation triggers to avoid duplicates.
+  ScriptApp.getProjectTriggers().forEach(function (t) {
+    if (t.getHandlerFunction() === "onEditSendInvitation") {
+      ScriptApp.deleteTrigger(t);
+    }
+  });
+  ScriptApp.newTrigger("onEditSendInvitation")
+    .forSpreadsheet(ss)
+    .onEdit()
+    .create();
+  Logger.log("onEditSendInvitation trigger installed for spreadsheet: " + ss.getName());
+  SpreadsheetApp.getUi().alert("Trigger instalado. Ahora, al marcar _enviado = TRUE se enviará el correo.");
+}
+
+/**
+ * Installable onEdit trigger handler.
+ * Detects when the `_enviado` (or `sent`) checkbox on a guest row is set to
+ * TRUE and sends that guest's invitation email.
+ *
+ * NOTE: This must be installed as an INSTALLABLE trigger (see setupTrigger),
+ * not a simple onEdit, because it uses GmailApp which requires authorisation.
+ */
+function onEditSendInvitation(e) {
+  if (!e || !e.range) return;
+
+  var sheet = e.range.getSheet();
+  if (sheet.getName() !== SHEET_NAME) return;
+
+  var rowIndex = e.range.getRow();
+  if (rowIndex < 2) return; // header row
+
+  var col = e.range.getColumn();
+  var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var headerName = String(headers[col - 1] || "").trim();
+
+  // Only react to the sent checkbox column (accept _enviado or sent).
+  var isSentCol = headerName === COL_SENT || headerName === "sent";
+  if (!isSentCol) return;
+
+  // Only react when the checkbox is turned ON (value TRUE).
+  var newValue = String(e.value || "").trim().toUpperCase();
+  var oldValue = String(e.oldValue || "").trim().toUpperCase();
+  if (newValue !== "TRUE") return;
+  if (oldValue === "TRUE") return; // already true before — no change
+
+  // Read the full row.
+  var values = sheet.getRange(rowIndex, 1, 1, sheet.getLastColumn()).getValues()[0];
+  var row = {};
+  headers.forEach(function (h, i) { row[String(h).trim()] = values[i]; });
+
+  var status = sendOne(row, rowIndex);
+  Logger.log(status);
 }

@@ -3,12 +3,18 @@ import { EVENT } from "../content.js";
 import { useApp } from "../context/AppContext.jsx";
 import { CoupleNames, LanguageSwitcher } from "./ui.jsx";
 import { Countdown } from "./Countdown.jsx";
+import { getInvitationLinkParams } from "../invitation-link.js";
 
 
 export function AuthGate() {
   const { interfaceText: t, gateError, signIn } = useApp();
-  const [username, setUsername] = useState("");
+  // Pre-fill the username field from the invitation link's `guest` param (the
+  // guest's login email) so they don't have to retype it. Falls back to "".
+  const [username, setUsername] = useState(
+    () => getInvitationLinkParams().guest || "",
+  );
   const [password, setPassword] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   // The disclosure checkbox is checked by default so guests can sign in with
   // one less click; they can still uncheck it if they don't agree.
