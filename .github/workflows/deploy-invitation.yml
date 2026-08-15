@@ -29,6 +29,11 @@ on:
         options:
           - development
           - production
+      description:
+        description: Optional PR description (markdown) to include in the Telegram notification
+        required: false
+        type: string
+
 
 permissions:
   contents: read
@@ -176,22 +181,10 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_BODY: ${{ github.event.pull_request.body }}
           COMMIT_MSG: ${{ github.event.head_commit.message }}
+          DESCRIPTION: ${{ github.event.inputs.description }}
         run: |
           # Escape Telegram MarkdownV2 special characters in dynamic content.
           esc() { printf '%s' "$1" | sed 's/[\\_*[\]()~`>#+\-=|{}.!]/\\&/g'; }
-
-          # Build a French deploy notification. For PR-triggered deploys we
-          # include the PR title + description; for direct pushes we fall back
-          # to the commit message.
-          if [ -n "$PR_TITLE" ]; then
-            DESC="$(esc "$PR_TITLE")"
-            if [ -n "$PR_BODY" ]; then
-              DESC="$DESC
-              $(esc "$PR_BODY")"
-            fi
-          else
-            DESC="$(esc "${COMMIT_MSG:-Déploiement direct}")"
-          fi
 
           STATUS_ICON="✅"
           STATUS_TEXT="réussi"
@@ -200,12 +193,30 @@ jobs:
             STATUS_TEXT="échoué"
           fi
 
+          # Build the description block. For PR-triggered deploys (or a manual
+          # workflow_dispatch with a "description" input) we include the full
+          # markdown description as CLEAR TEXT inside a preformatted block, so
+          # the markdown reads as-is instead of being mangled by MarkdownV2
+          # escaping. For direct pushes we fall back to the commit message.
+          if [ -n "$DESCRIPTION" ]; then
+            DESC="$DESCRIPTION"
+          elif [ -n "$PR_BODY" ]; then
+            DESC="$PR_BODY"
+          else
+            DESC="${COMMIT_MSG:-Déploiement direct}"
+          fi
+
+          # Guard against a description that itself contains a closing fence.
+          DESC="$(printf '%s' "$DESC" | sed 's/```/` ` `/g')"
+
           MESSAGE="🚀 *Déploiement production ${STATUS_TEXT}* ${STATUS_ICON}
           *Branche :* $(esc "$REF")
           *Commit :* $(esc "$SHA")
           *Par :* $(esc "$ACTOR")
-          *Détails :*
+          *Description :*
+          \`\`\`markdown
           ${DESC}
+          \`\`\`
           [Voir le run]($(esc "$RUN_URL"))"
 
           curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
@@ -214,3 +225,4 @@ jobs:
             -d parse_mode="MarkdownV2" \
             -d disable_web_page_preview="true" \
             > /dev/null
+
