@@ -126,6 +126,53 @@ function base64UrlEncode(str) {
   return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
 }
 
+/**
+ * RFC 2047-encode a subject line so non-ASCII characters (emoji, accents)
+ * display correctly in the recipient's mail client.
+ *
+ * GmailApp.sendEmail does NOT encode the subject itself — it passes it through
+ * as-is, which mangles emoji (e.g. 💍 → ) because the subject header is
+ * not UTF-8 encoded. Encoding it as an RFC 2047 "encoded-word"
+ * ( =?UTF-8?B?...?= ) makes Gmail display the emoji correctly.
+ */
+function encodeSubject(subject) {
+  // Repair any mojibake first so the encoded subject is the real text.
+  var clean = repairMojibake(String(subject));
+  var bytes = Utilities.newBlob(clean).getBytes();
+  var b64 = Utilities.base64Encode(bytes);
+  return "=?UTF-8?B?" + b64 + "?=";
+}
+
+/**
+ * Best-effort repair of common mojibake in text read from the sheet.
+ *
+ * If a cell's emoji were double-encoded (UTF-8 bytes interpreted as Latin-1
+ * and then re-encoded as UTF-8), they come back as mojibake like "Ã°Å¸ÅŽâ€°".
+ * This detects the typical markers and, when present, re-encodes the string
+ * as Latin-1 and decodes it as UTF-8 to restore the original characters.
+ * Returns the input unchanged if it doesn't look like mojibake or the repair
+ * doesn't help.
+ */
+function repairMojibake(s) {
+  if (!s) return s;
+  try {
+    var str = String(s);
+    // Typical mojibake markers for double-encoded UTF-8, written as Unicode
+    // escapes so they survive any file encoding round-trip:
+    //   \u00C3 = Ã, \u00E2\u20AC = â€, \u00C2 = Â, \u00F0\u0178 = ðŸ
+    var MOJIBAKE = /[\uFFFD]|\u00C3|\u00E2\u20AC|\u00C2|\u00F0\u0178/;
+    if (!MOJIBAKE.test(str)) return str;
+    var latin1 = Utilities.newBlob(str, "iso-8859-1").getBytes();
+    var repaired = Utilities.newBlob(latin1, "utf-8").getDataAsString();
+    if (repaired !== str && !MOJIBAKE.test(repaired)) {
+      return repaired;
+    }
+    return str;
+  } catch (e) {
+    return s;
+  }
+}
+
 /** Normalise a language value to es / fr / en (default es). */
 function normaliseLang(raw) {
   var v = String(raw || "").trim().toLowerCase();
@@ -408,10 +455,13 @@ function sendOne(row, rowIndex, force) {
   var link = buildInvitationLink(email, Date.now());
 
 
-  var subject = SUBJECTS[lang];
+  // RFC 2047-encode the subject so emoji/accents display correctly (GmailApp
+  // does not encode the subject itself, which mangles emoji).
+  var subject = encodeSubject(SUBJECTS[lang]);
 
   // Body: use the sheet template if present, else the beautiful HTML template.
-  var template = readMessageTemplate(row, lang);
+  // Repair any mojibake in the sheet template so emoji come through intact.
+  var template = repairMojibake(readMessageTemplate(row, lang));
   var htmlBody;
   if (template) {
     var plain = fillTemplate(template, name, link);
