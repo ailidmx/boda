@@ -480,7 +480,7 @@ const RSVP_REQUIRED_FIELDS = [
 
 const RSVP_ALLOWED_FIELDS = [
   ...RSVP_REQUIRED_FIELDS,
-  "independentArrival", "sundayMorning", "invitationCode",
+  "independentArrival", "sundayMorning",
 ];
 
 /**
@@ -542,7 +542,7 @@ export function validateRsvpPayload(payload) {
 
 const PETANQUE_ALLOWED_FIELDS = [
   "petanqueParticipation", "petanquePartySize", "petanqueNames",
-  "petanqueOwnBoules", "invitationCode", "language",
+  "petanqueOwnBoules", "language",
   "schemaVersion", "createdAt",
 ];
 
@@ -578,7 +578,7 @@ export function validatePetanquePayload(payload) {
 
 const COAST_ALLOWED_FIELDS = [
   "name", "interest", "partySize", "nights", "destination", "style",
-  "note", "invitationCode", "language", "schemaVersion", "createdAt",
+  "note", "language", "schemaVersion", "createdAt",
 ];
 
 /**
@@ -609,36 +609,4 @@ export function validateCoastPayload(payload) {
   ];
 
   return runChecks(payload, checks);
-}
-
-// ── Invitation code validation ──────────────────────────────────────────
-// Mirrors `hasValidInvitationCode()` in firebase/firestore.rules.
-
-const VALID_INVITATION_CODES = [
-  "hortencia_privada_pagada",
-  "cabaña_33_privada_porpagar",
-  "azalea_compartida_porpagar",
-  "sin_cabaña",
-  "cabaña_5_privada_porpagar",
-  "cabaña_34_privada_pagada",
-  "cabaña_4_compartida_pagada",
-  "lavanda_compartida_porpagar",
-  "casona_compartida_pagada",
-  "margarita_compartida_porpagar",
-  "cabaña_6_privada_porpagar",
-  "dalia_compartida_porpagar",
-  "cabaña_31_privada_porpagar",
-  "cabaña_32_privada_porpagar",
-];
-
-/**
- * Validate an invitation code against the known list.
- * Mirrors `hasValidInvitationCode()` in the rules.
- *
- * @param {string|undefined} code  the invitation code (optional)
- * @returns {boolean} true if the code is absent or valid
- */
-export function isValidInvitationCode(code) {
-  if (code === undefined || code === null || code === "") return true;
-  return VALID_INVITATION_CODES.includes(code);
 }

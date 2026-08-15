@@ -7,6 +7,7 @@ on:
       - develop
     paths:
       - "web/invitation/**"
+      - "integraciones/google_sheets/**"
       - "firebase.json"
       - ".firebaserc"
       - ".github/workflows/deploy-invitation.yml"
@@ -16,6 +17,7 @@ on:
       - develop
     paths:
       - "web/invitation/**"
+      - "integraciones/google_sheets/**"
       - "firebase.json"
       - ".firebaserc"
       - ".github/workflows/deploy-invitation.yml"
@@ -167,6 +169,60 @@ jobs:
           projectId: boda-500805
           target: invitation-named
           channelId: live
+
+      # Deploy the invitation-emails Google Apps Script to the live project.
+      # clasp authenticates via the CLASPRC_JSON secret (the contents of the
+      # local ~/.clasprc.json produced by `clasp login`). We push the code and
+      # create a new versioned deployment so the live onEdit trigger runs the
+      # latest email logic.
+      #
+      # The .gs file keeps SERVICE_ACCOUNT_PRIVATE_KEY as a "REPLACE_ME"
+      # placeholder (so the secret is never committed). Before pushing, we
+      # inject the real service-account private key from the
+      # SERVICE_ACCOUNT_BODA_SHEETS secret (the contents of
+      # integraciones/google_sheets/service_account.json) so the deployed
+      # script can authenticate to Firestore and read the authoritative guest
+      # language. The placeholder is restored afterwards.
+      - name: Deploy invitation-emails Apps Script (clasp)
+        working-directory: integraciones/google_sheets
+        env:
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
+          SERVICE_ACCOUNT_BODA_SHEETS: ${{ secrets.SERVICE_ACCOUNT_BODA_SHEETS }}
+        run: |
+          set -euo pipefail
+          # Restore clasp credentials from the secret.
+          if [ -z "$CLASPRC_JSON" ]; then
+            echo "::error::Missing CLASPRC_JSON secret. Run 'clasp login' locally and store the contents of ~/.clasprc.json as the CLASPRC_JSON repository secret."
+            exit 1
+          fi
+          printf '%s' "$CLASPRC_JSON" > "$HOME/.clasprc.json"
+          chmod 600 "$HOME/.clasprc.json"
+
+          # Inject the real service-account key + client email into the .gs
+          # file so the deployed script can read Firestore. The key from the
+          # JSON secret has real newlines; escape them back into a JS string
+          # literal (\n) so the .gs file stays valid.
+          if [ -z "$SERVICE_ACCOUNT_BODA_SHEETS" ]; then
+            echo "::error::Missing SERVICE_ACCOUNT_BODA_SHEETS secret (contents of integraciones/google_sheets/service_account.json)."
+            exit 1
+          fi
+          printf '%s' "$SERVICE_ACCOUNT_BODA_SHEETS" > service_account.json
+          node -e '
+            const fs = require("fs");
+            const sa = JSON.parse(fs.readFileSync("service_account.json", "utf8"));
+            let gs = fs.readFileSync("invitation_emails.gs", "utf8");
+            gs = gs.replace(/var SERVICE_ACCOUNT_CLIENT_EMAIL = "[^"]*";/, `var SERVICE_ACCOUNT_CLIENT_EMAIL = "${sa.client_email}";`);
+            const key = sa.private_key.replace(/\\/g, "\\\\").replace(/"/g, "\\\"").replace(/\n/g, "\\n");
+            gs = gs.replace("REPLACE_ME", key);
+            fs.writeFileSync("invitation_emails.gs", gs, "utf8");
+          '
+          rm -f service_account.json
+
+          # Install clasp (pinned) and deploy.
+          npm install --no-save @google/clasp@3.2.0 >/dev/null 2>&1
+          npx clasp push --force
+          npx clasp deploy --description "Deploy from GitHub Actions (${{ github.sha }})"
+
 
       - name: Notify Telegram on production deploy
         if: always()
