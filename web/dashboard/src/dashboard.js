@@ -5,7 +5,6 @@ import { collection, getDocs, doc, setDoc, addDoc, deleteDoc, onSnapshot, limit,
 import { db } from "./firebase.js";
 import { getActiveGuests, getGuestsByUnit, getGuest, getGuestByEmail } from "./guests.js";
 import { loadRooms } from "./rooms.js";
-import { buildInvitationUrl } from "./invitation-profile.js";
 import { collections } from "../../shared/firestore-paths.js";
 import {
   buildDashboardGuestEditPayload,
@@ -324,14 +323,14 @@ function getFilteredGuests() {
   return filtered;
 }
 
-function getInviteUrl(guestId) {
+function getInviteUrl() {
   // In dev, the dashboard runs on port 5174 while the invitation runs on
-  // port 5173. Build invitation links against the invitation's origin.
-  const origin =
-    window.location.port === "5174"
-      ? "http://localhost:5173"
-      : window.location.origin;
-  return buildInvitationUrl(origin, guestId);
+  // port 5173. Link to the invitation's origin. Per-guest invitation links
+  // were removed (login is now email/password), so this is just the plain
+  // invitation URL with no code parameter.
+  return window.location.port === "5174"
+    ? "http://localhost:5173/"
+    : "/";
 }
 
 
@@ -1130,8 +1129,7 @@ function renderGuestManager() {
   // ── Copy link ──
   container.querySelectorAll("[data-copy-link]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const guestId = btn.dataset.copyLink;
-      const url = getInviteUrl(guestId);
+      const url = getInviteUrl();
       navigator.clipboard.writeText(url).then(() => {
         btn.textContent = "✅";
         setTimeout(() => (btn.textContent = "🔗"), 1500);
@@ -1142,8 +1140,7 @@ function renderGuestManager() {
   // ── Preview link ──
   container.querySelectorAll("[data-preview-link]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const guestId = btn.dataset.previewLink;
-      const url = getInviteUrl(guestId);
+      const url = getInviteUrl();
       window.open(url, "_blank");
     });
   });
@@ -1204,8 +1201,7 @@ function renderCabinAssignments() {
 
   container.querySelectorAll("[data-copy-guest]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const guestId = btn.dataset.copyGuest;
-      const url = getInviteUrl(guestId);
+      const url = getInviteUrl();
       navigator.clipboard.writeText(url).then(() => {
         btn.textContent = "✅";
         setTimeout(() => (btn.textContent = "🔗"), 1500);

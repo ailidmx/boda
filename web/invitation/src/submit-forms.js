@@ -6,10 +6,9 @@
  * Each payload is built field-by-field so that only the fields allowed by the
  * Firestore Security Rules (see firebase/firestore.rules) are ever written.
  *
- * The `invitationCode` field is intentionally omitted: the Rules treat it as
- * optional (`hasValidInvitationCode()` allows its absence), and computing the
- * correct base64-encoded code would require duplicating the dashboard's
- * encoding logic. It can be added later if the couple needs it for grouping.
+ * The `invitationCode` field is intentionally omitted: it is no longer part of
+ * the guest-facing schema (per-guest invitation links were removed in favor of
+ * profile codes). It can be added later if the couple needs it for grouping.
  */
 
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";

@@ -37,26 +37,6 @@ service cloud.firestore {
       return field is string && field.size() <= maximum;
     }
 
-    function hasValidInvitationCode() {
-      return !request.resource.data.keys().hasAny(["invitationCode"])
-        || request.resource.data.invitationCode in [
-          "hortencia_privada_pagada",
-          "cabaña_33_privada_porpagar",
-          "azalea_compartida_porpagar",
-          "sin_cabaña",
-          "cabaña_5_privada_porpagar",
-          "cabaña_34_privada_pagada",
-          "cabaña_4_compartida_pagada",
-          "lavanda_compartida_porpagar",
-          "casona_compartida_pagada",
-          "margarita_compartida_porpagar",
-          "cabaña_6_privada_porpagar",
-          "dalia_compartida_porpagar",
-          "cabaña_31_privada_porpagar",
-          "cabaña_32_privada_porpagar"
-        ];
-    }
-
     function hasValidRsvpFields() {
       return request.resource.data.keys().hasAll([
           "firstName", "lastName", "email", "whatsapp", "attendance",
@@ -75,7 +55,7 @@ service cloud.firestore {
           "arrivalTime", "arrivalAirline", "arrivalFlight", "departureFrom",
           "departureTo", "departureDate", "departureTime",
           "departureAirline", "departureFlight", "route", "notes",
-          "invitationCode", "language", "schemaVersion", "createdAt"
+          "language", "schemaVersion", "createdAt"
         ])
         && isShortText(request.resource.data.firstName, 100)
         && request.resource.data.firstName.size() > 0
@@ -117,7 +97,6 @@ service cloud.firestore {
     match /rsvp_submissions/{submissionId} {
       allow create: if isInvitedGuest()
         && hasSubmissionMetadata(3)
-        && hasValidInvitationCode()
         && hasValidRsvpFields();
       // Any authenticated guest may read submissions so the app can compute
       // correct prices and cabin occupancy across the whole guest list.
@@ -132,10 +111,9 @@ service cloud.firestore {
         && hasSubmissionMetadata(1)
         && request.resource.data.keys().hasOnly([
           "name", "dessert", "foodSuggestion", "songTitle", "songArtist",
-          "singInterest", "extra", "invitationCode", "language",
+          "singInterest", "extra", "language",
           "schemaVersion", "createdAt"
         ])
-        && hasValidInvitationCode()
         && isShortText(request.resource.data.name, 150)
         && request.resource.data.name.size() > 0
         && isShortText(request.resource.data.dessert, 50)
@@ -156,9 +134,8 @@ service cloud.firestore {
         && hasSubmissionMetadata(1)
         && request.resource.data.keys().hasOnly([
           "name", "interest", "partySize", "nights", "destination", "style",
-          "note", "invitationCode", "language", "schemaVersion", "createdAt"
+          "note", "language", "schemaVersion", "createdAt"
         ])
-        && hasValidInvitationCode()
         && isShortText(request.resource.data.name, 150)
         && request.resource.data.name.size() > 0
         && isShortText(request.resource.data.interest, 50)
@@ -178,10 +155,9 @@ service cloud.firestore {
       allow create: if isInvitedGuest()
         && request.resource.data.keys().hasOnly([
           "petanqueParticipation", "petanquePartySize", "petanqueNames",
-          "petanqueOwnBoules", "invitationCode", "language",
+          "petanqueOwnBoules", "language",
           "schemaVersion", "createdAt"
         ])
-        && hasValidInvitationCode()
         && isShortText(request.resource.data.petanqueParticipation, 30)
         && isShortText(request.resource.data.petanquePartySize, 2)
         && isShortText(request.resource.data.petanqueNames, 500)

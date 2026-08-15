@@ -6,7 +6,6 @@ import {
   validateRsvpPayload,
   validatePetanquePayload,
   validateCoastPayload,
-  isValidInvitationCode,
 } from "../../shared/validation.js";
 
 // ── Guest contact payload ──────────────────────────────────────────────
@@ -438,7 +437,6 @@ test("RSVP with optional fields passes", () => {
     ...makeValidRsvpPayload(),
     independentArrival: "yes",
     sundayMorning: "no",
-    invitationCode: "azalea_compartida_porpagar",
   };
   const result = validateRsvpPayload(payload);
   assert.equal(result.valid, true, result.errors.join("; "));
@@ -593,23 +591,4 @@ test("coast with unknown field fails", () => {
   const result = validateCoastPayload(payload);
   assert.equal(result.valid, false);
   assert.ok(result.errors.some((e) => e.includes("not in the allowed schema")));
-});
-
-// ── Invitation code ────────────────────────────────────────────────────
-
-test("valid invitation codes pass", () => {
-  assert.equal(isValidInvitationCode("azalea_compartida_porpagar"), true);
-  assert.equal(isValidInvitationCode("cabaña_33_privada_porpagar"), true);
-  assert.equal(isValidInvitationCode("sin_cabaña"), true);
-});
-
-test("absent invitation code passes (optional)", () => {
-  assert.equal(isValidInvitationCode(undefined), true);
-  assert.equal(isValidInvitationCode(null), true);
-  assert.equal(isValidInvitationCode(""), true);
-});
-
-test("unknown invitation code fails", () => {
-  assert.equal(isValidInvitationCode("not_a_real_code"), false);
-  assert.equal(isValidInvitationCode("palacio_admin_pagado"), false);
 });

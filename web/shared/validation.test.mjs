@@ -15,7 +15,6 @@ import {
   validateRsvpPayload,
   validatePetanquePayload,
   validateCoastPayload,
-  isValidInvitationCode,
 } from "./validation.js";
 
 // ── validateGuestContactPayload ─────────────────────────────────────────
@@ -232,7 +231,6 @@ const validRsvp = {
   departureFlight: "AM36",
   route: "Málaga — Madrid — Guadalajara",
   notes: "",
-  invitationCode: "azalea_compartida_porpagar",
   language: "fr",
   schemaVersion: 3,
   createdAt: "2026-08-04T00:00:00Z",
@@ -283,7 +281,6 @@ test("validatePetanquePayload: accepts a valid petanque submission", () => {
     petanquePartySize: "2",
     petanqueNames: "Camille, David",
     petanqueOwnBoules: "no",
-    invitationCode: "azalea_compartida_porpagar",
     language: "fr",
     schemaVersion: 1,
     createdAt: "2026-08-04T00:00:00Z",
@@ -298,7 +295,6 @@ test("validatePetanquePayload: rejects unknown fields", () => {
     petanquePartySize: "2",
     petanqueNames: "Camille, David",
     petanqueOwnBoules: "no",
-    invitationCode: "azalea_compartida_porpagar",
     language: "fr",
     schemaVersion: 1,
     createdAt: "2026-08-04T00:00:00Z",
@@ -314,7 +310,6 @@ test("validatePetanquePayload: rejects wrong schemaVersion", () => {
     petanquePartySize: "2",
     petanqueNames: "Camille, David",
     petanqueOwnBoules: "no",
-    invitationCode: "azalea_compartida_porpagar",
     language: "fr",
     schemaVersion: 2,
     createdAt: "2026-08-04T00:00:00Z",
@@ -334,7 +329,6 @@ test("validateCoastPayload: accepts a valid coast submission", () => {
     destination: "barra",
     style: "hotel",
     note: "",
-    invitationCode: "azalea_compartida_porpagar",
     language: "fr",
     schemaVersion: 1,
     createdAt: "2026-08-04T00:00:00Z",
@@ -352,7 +346,6 @@ test("validateCoastPayload: rejects empty name", () => {
     destination: "barra",
     style: "hotel",
     note: "",
-    invitationCode: "azalea_compartida_porpagar",
     language: "fr",
     schemaVersion: 1,
     createdAt: "2026-08-04T00:00:00Z",
@@ -370,7 +363,6 @@ test("validateCoastPayload: rejects unknown fields", () => {
     destination: "barra",
     style: "hotel",
     note: "",
-    invitationCode: "azalea_compartida_porpagar",
     language: "fr",
     schemaVersion: 1,
     createdAt: "2026-08-04T00:00:00Z",
@@ -378,23 +370,4 @@ test("validateCoastPayload: rejects unknown fields", () => {
   });
   assert.equal(result.valid, false);
   assert.ok(result.errors.some((e) => e.includes("not in the allowed schema")));
-});
-
-// ── isValidInvitationCode ───────────────────────────────────────────────
-
-test("isValidInvitationCode: accepts known codes", () => {
-  assert.equal(isValidInvitationCode("azalea_compartida_porpagar"), true);
-  assert.equal(isValidInvitationCode("cabaña_34_privada_pagada"), true);
-  assert.equal(isValidInvitationCode("sin_cabaña"), true);
-});
-
-test("isValidInvitationCode: rejects unknown codes", () => {
-  assert.equal(isValidInvitationCode("palacio_admin_pagado"), false);
-  assert.equal(isValidInvitationCode("hacked_code"), false);
-});
-
-test("isValidInvitationCode: accepts absent/empty codes", () => {
-  assert.equal(isValidInvitationCode(undefined), true);
-  assert.equal(isValidInvitationCode(null), true);
-  assert.equal(isValidInvitationCode(""), true);
 });
