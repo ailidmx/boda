@@ -3,15 +3,19 @@
  * invitation emails / WhatsApp messages append to the base site URL.
  *
  * Link format:
- *   https://boda-david-y-ayde.web.app/?guest=<email>&utm_source=<source>&utm_medium=<medium>&utm_campaign=<campaign>&sent_at=<epoch_ms>
+ *   https://boda-david-y-ayde.web.app/?guest=<email>&password=<pw>&inviteType=<type>&invitationCode=<code>&utm_source=<source>&utm_medium=<medium>&utm_campaign=<campaign>&sent_at=<epoch_ms>
  *
- * - `guest`     — the guest's login identifier (email). Used to pre-fill the
- *                 login field. (The guest record does NOT store the auth email,
- *                 so the link carries it directly.)
+ * - `guest`        — the guest's login identifier (email). Used to pre-fill the
+ *                    login field. (The guest record does NOT store the auth
+ *                    email, so the link carries it directly.)
+ * - `password`     — the shared login password. Used to pre-fill the password
+ *                    field so the guest only has to tap "Enter".
+ * - `inviteType`   — how the guest was invited ("email", "whatsapp", ...).
+ * - `invitationCode` — the guest's profile code (base64url), when known.
  * - `utm_source`/`utm_medium`/`utm_campaign` — standard UTM params so we know
- *                 whether the guest came from an email, WhatsApp, or other.
- * - `sent_at`   — epoch milliseconds when the invitation was sent, so we can
- *                 compute "time to answer" at the analytics level.
+ *                    whether the guest came from an email, WhatsApp, or other.
+ * - `sent_at`      — epoch milliseconds when the invitation was sent, so we can
+ *                    compute "time to answer" at the analytics level.
  *
  * All helpers are pure and safe to call in any environment (they default to
  * `window.location.href` only when a URL is not supplied).
@@ -20,7 +24,7 @@
 /**
  * Parse the invitation-link analytics params from a URL.
  * @param {string} [url]  Defaults to `window.location.href`.
- * @returns {{ guest: string, source: string, medium: string, campaign: string, sentAt: number|null }}
+ * @returns {{ guest: string, password: string, inviteType: string, invitationCode: string, source: string, medium: string, campaign: string, sentAt: number|null }}
  */
 export function getInvitationLinkParams(url = window.location.href) {
   let parsed;
@@ -32,6 +36,9 @@ export function getInvitationLinkParams(url = window.location.href) {
   const sp = parsed.searchParams;
   return {
     guest: (sp.get("guest") || "").trim(),
+    password: (sp.get("password") || "").trim(),
+    inviteType: (sp.get("inviteType") || "").trim(),
+    invitationCode: (sp.get("invitationCode") || "").trim(),
     source: (sp.get("utm_source") || "").trim(),
     medium: (sp.get("utm_medium") || "").trim(),
     campaign: (sp.get("utm_campaign") || "").trim(),

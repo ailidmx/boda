@@ -13,7 +13,11 @@ export function AuthGate() {
   const [username, setUsername] = useState(
     () => getInvitationLinkParams().guest || "",
   );
-  const [password, setPassword] = useState("");
+  // Pre-fill the password field from the invitation link's `password` param
+  // (the shared login password) so the guest only has to tap "Enter".
+  const [password, setPassword] = useState(
+    () => getInvitationLinkParams().password || "",
+  );
 
   const [showPassword, setShowPassword] = useState(false);
   // The disclosure checkbox is checked by default so guests can sign in with

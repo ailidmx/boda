@@ -3,9 +3,9 @@
  *
  * Google Apps Script bound to the wedding Google Sheet.
  *
- * Sends a personalised invitation email to each guest, in their preferred
- * language (es / fr / en), from the script owner's Gmail account, with the
- * couple in CC.
+ * Sends a personalised, BEAUTIFUL HTML invitation email to each guest, in their
+ * preferred language (es / fr / en), from the script owner's Gmail account,
+ * with the couple in CC.
  *
  * ── Two ways to send ───────────────────────────────────────────────────────
  * 1. AUTO (recommended): an installable onEdit trigger fires whenever the
@@ -14,33 +14,43 @@
  * 2. MANUAL: run `sendInvitationEmails()` (bulk, skips already-sent) or
  *    `sendSelectedRow()` (single row) from the Apps Script editor or a button.
  *
+ * ── Source of truth: Firestore ─────────────────────────────────────────────
+ * The guest's LANGUAGE (`identity.lang`), CABIN (`hosting.cabin`), and PROFILE
+ * CODE (`perfil`) are read from the LIVE Firestore `guests` collection (the
+ * authoritative source), falling back to the sheet columns when Firestore is
+ * unreachable. This keeps the email correct even when the sheet is out of sync
+ * (e.g. the sheet `lang` column says "es" but Firestore `identity.lang` is
+ * "fr"). The script authenticates to Firestore with the project's service
+ * account (see SERVICE_ACCOUNT_* below).
+ *
  * ── Email content ──────────────────────────────────────────────────────────
- * The email BODY is read from the guest's row, from the column matching their
- * language:
- *   - `_msgInvitFR`  (French)
- *   - `_msgInvitES`  (Spanish)
- *   - `_msgInvitEN`  (English)
- * The language is taken from the `lang` column (es / fr / en). The body may
- * contain the placeholders {name} and {link}, which are replaced with the
- * guest's name and their personalised invitation link.
+ * The email is a hand-built HTML template (inline CSS, UTF-8) with:
+ *   - the couple's names + a warm greeting in the guest's language
+ *   - a big "Open your invitation" button (the personalised link)
+ *   - the guest's login email + password (so they can auto-fill the login form)
+ *   - the invite type ("email")
+ * The body may also be overridden per-language via the sheet columns
+ * `_msgInvitFR` / `_msgInvitES` / `_msgInvitEN` (placeholders {name} and {link}).
  *
  * ── Invitation link ────────────────────────────────────────────────────────
- * The invitation app's `decodeInvitationCode()` only accepts PROFILE codes
- * (e.g. `azalea_compartida_porpagar`, `sin_cabaña`), NOT per-guest IDs. So the
- * email link MUST use the guest's profile code. The script reads it from the
- * `perfil` column; if that column is missing it derives the code from the
- * cabin + payment columns (see `deriveProfileCode`).
+ * The link carries the analytics + login pre-fill params the invitation app
+ * reads:
+ *   - `guest`        the guest's login email (pre-fills the username field)
+ *   - `password`     the shared login password (pre-fills the password field)
+ *   - `inviteType`   "email" (how the guest was invited)
+ *   - `invitationCode` the guest's profile code (base64url), when known
+ *   - `utm_source`/`utm_medium`/`utm_campaign` = email / email / invitacion
+ *   - `sent_at`      epoch ms when the email is sent (for time-to-answer)
  *
  * ── Setup (one time) ───────────────────────────────────────────────────────
  * 1. Open the Google Sheet → Extensions → Apps Script.
  * 2. Paste the contents of this file into the editor and save.
- * 3. The script runs as the account that owns the spreadsheet. To send FROM
- *    `bodadavidyayde@gmail.com`, that account must own (or be the active
- *    account of) the spreadsheet, and Gmail must be enabled for it.
- * 4. Run `setupTrigger()` once from the editor to install the onEdit trigger
- *    (this also authorises Gmail + Sheets access).
- * 5. (Optional) Attach `sendInvitationEmails` to a button:
- *    Insert → Drawing → draw a button → ⋮ → Assign script → `sendInvitationEmails`.
+ * 3. Set the SERVICE_ACCOUNT_* constants below to the project's service
+ *    account (client_email + private_key). These are used to read Firestore.
+ * 4. The script runs as the account that owns the spreadsheet. To send FROM
+ *    `bodadavidyayde@gmail.com`, that account must own the spreadsheet.
+ * 5. Run `setupTrigger()` once from the editor to install the onEdit trigger.
+ * 6. (Optional) Attach `sendInvitationEmails` to a button.
  *
  * ── Safety ─────────────────────────────────────────────────────────────────
  * - Guests whose `_enviado` column is already TRUE are SKIPPED (no duplicates).
@@ -69,30 +79,42 @@ var INVITATION_BASE_URL = "https://boda-david-y-ayde.web.app/";
 /** Name of the INVITADOS worksheet. */
 var SHEET_NAME = "Invitados";
 
+/** Shared login password for all guests (Firebase Auth). */
+var SHARED_PASSWORD = "vivamexico";
+
+/** How the guest was invited — shown in the email + link. */
+var INVITE_TYPE = "email";
+
+// ── Firestore service account (used to read the authoritative guest data) ──
+// Fill these in from integraciones/google_sheets/service_account.json.
+var SERVICE_ACCOUNT_CLIENT_EMAIL = "firebase-adminsdk@boda-500805.iam.gserviceaccount.com";
+var SERVICE_ACCOUNT_PRIVATE_KEY = "-----BEGIN PRIVATE KEY-----\nREPLACE_ME\n-----END PRIVATE KEY-----\n";
+var FIRESTORE_PROJECT_ID = "boda-500805";
+
 // ── Column names (must match the INVITADOS header row) ────────────────────
 
 var COL_ID = "UID";
 var COL_EMAIL = "firebase.Identifier"; // primary; falls back to firebase_email / _email / email
-var COL_LANG = "lang";                 // es / fr / en
+var COL_LANG = "lang";                 // es / fr / en (fallback when Firestore unreachable)
 var COL_SENT = "_enviado";             // checkbox; also accepts "sent"
 var COL_NAME = "Nombre";               // used only for the log / fallback greeting
 
 // Email content template columns (per language). The script picks the one that
-// matches the guest's `lang` value.
+// matches the guest's language.
 var COL_MSG_FR = "_msgInvitFR";
 var COL_MSG_ES = "_msgInvitES";
 var COL_MSG_EN = "_msgInvitEN";
 
-// Profile code column. If present, it is used directly for the invitation
-// link. If absent, the script derives the code from the cabin columns below.
+// Profile code column (fallback when Firestore has no `perfil`).
 var COL_PROFILE_CODE = "perfil";
 
-// Columns used to DERIVE the profile code when COL_PROFILE_CODE is absent.
-var COL_CABIN = "Cabaña";            // e.g. "AZALEA - 12p", "CABAÑA_5 - 6p", "sin_cabaña"
-var COL_IS_PRIVATE = "isPrivate";    // "TRUE"/"FALSE" — cabin privacy
-var COL_IS_PAID = "isCabinPaidByNovios"; // "TRUE"/"FALSE" — cabin paid by the couple
+// Columns used to DERIVE the profile code when neither Firestore nor the
+// `perfil` column provides one.
+var COL_CABIN = "Cabaña";
+var COL_IS_PRIVATE = "isPrivate";
+var COL_IS_PAID = "isCabinPaidByNovios";
 
-// ── Trilingual subjects (the body comes from the sheet) ───────────────────
+// ── Trilingual subjects ───────────────────────────────────────────────────
 
 var SUBJECTS = {
   es: "Invitación a la boda de David & Aydé 💍",
@@ -102,10 +124,7 @@ var SUBJECTS = {
 
 // ── Helpers ───────────────────────────────────────────────────────────────
 
-/**
- * Base64URL-encode a string (RFC 4648 §5) — matches the invitation app's
- * `encodeInvitationCode()` (UTF-8 bytes → base64 → URL-safe, no padding).
- */
+/** Base64URL-encode a string (RFC 4648 §5) — matches the app's encoder. */
 function base64UrlEncode(str) {
   var bytes = Utilities.newBlob(str).getBytes();
   var b64 = Utilities.base64Encode(bytes);
@@ -126,10 +145,7 @@ function toBool(v) {
   return s === "TRUE" || s === "1" || s === "YES" || s === "SI";
 }
 
-/**
- * Map a cabin display name to the unit slug used in profile codes.
- * Add/rename entries as needed to match the sheet's cabin names.
- */
+/** Map a cabin display name to the unit slug used in profile codes. */
 function cabinUnitSlug(cabin) {
   var c = String(cabin || "").trim().toLowerCase();
   if (!c || c.indexOf("sin") === 0) return "";
@@ -139,69 +155,258 @@ function cabinUnitSlug(cabin) {
   if (c.indexOf("casona") !== -1) return "casona";
   if (c.indexOf("margarita") !== -1 || c.indexOf("marguerite") !== -1) return "margarita";
   if (c.indexOf("dalia") !== -1) return "dalia";
-  // Generic "CABAÑA_N" / "CABANA_N" / "CABAÑA N" → "cabaña_N"
   var m = c.match(/caba[ñn]a[_\s-]*(\d+)/i);
   if (m) return "cabaña_" + m[1];
   return "";
 }
 
-/**
- * Derive the profile code from the cabin + payment columns.
- * Returns "" when it cannot be derived (caller should skip / warn).
- */
-function deriveProfileCode(row) {
-  var cabin = String(row[COL_CABIN] || "").trim();
-  if (!cabin || cabin.toLowerCase().indexOf("sin") === 0) return "sin_cabaña";
-
-  var unit = cabinUnitSlug(cabin);
+/** Derive the profile code from cabin + payment info. */
+function deriveProfileCode(cabin, isPrivate, isPaid) {
+  var c = String(cabin || "").trim();
+  if (!c || c.toLowerCase().indexOf("sin") === 0) return "sin_cabaña";
+  var unit = cabinUnitSlug(c);
   if (!unit) return "";
-
-  var occupancy = toBool(row[COL_IS_PRIVATE]) ? "privada" : "compartida";
-  var payment = toBool(row[COL_IS_PAID]) ? "pagada" : "porpagar";
+  var occupancy = toBool(isPrivate) ? "privada" : "compartida";
+  var payment = toBool(isPaid) ? "pagada" : "porpagar";
   return unit + "_" + occupancy + "_" + payment;
 }
 
+// ── Firestore access (authoritative guest data) ───────────────────────────
+
 /**
- * Resolve the profile code for a guest row: prefer the `perfil` column,
- * otherwise derive it from the cabin columns.
+ * Build a signed JWT (RS256) for the service account and exchange it for a
+ * Google OAuth2 access token scoped to Firestore.
  */
-function resolveProfileCode(row) {
-  var direct = String(row[COL_PROFILE_CODE] || "").trim();
-  if (direct) return direct;
-  return deriveProfileCode(row);
+function getFirestoreAccessToken() {
+  var now = Math.floor(Date.now() / 1000);
+  var header = base64UrlEncode(JSON.stringify({ alg: "RS256", typ: "JWT" }));
+  var payload = base64UrlEncode(JSON.stringify({
+    iss: SERVICE_ACCOUNT_CLIENT_EMAIL,
+    scope: "https://www.googleapis.com/auth/datastore",
+    aud: "https://oauth2.googleapis.com/token",
+    iat: now,
+    exp: now + 3600,
+  }));
+  var signingInput = header + "." + payload;
+  var signature = Utilities.computeRsaSha256Signature(
+    signingInput,
+    SERVICE_ACCOUNT_PRIVATE_KEY
+  );
+  var jwt = signingInput + "." + Utilities.base64Encode(signature)
+    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+
+  var tokenRes = UrlFetchApp.fetch("https://oauth2.googleapis.com/token", {
+    method: "post",
+    contentType: "application/x-www-form-urlencoded",
+    payload: "grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=" +
+      encodeURIComponent(jwt),
+    muteHttpExceptions: true,
+  });
+  var tokenJson = JSON.parse(tokenRes.getContentText());
+  if (!tokenJson.access_token) {
+    throw new Error("Firestore token exchange failed: " + tokenRes.getContentText());
+  }
+  return tokenJson.access_token;
 }
 
 /**
- * Build the personalised invitation link for a profile code, including the
- * analytics query-string params the invitation app reads to pre-fill the login
- * field and to measure which channel drove the visit + how quickly the guest
- * answered.
- *
- * Params appended:
- *   - `guest`      the guest's login email (pre-fills the login field)
- *   - `utm_source` "email" (these are invitation emails)
- *   - `utm_medium` "email"
- *   - `utm_campaign` "invitacion"
- *   - `sent_at`    epoch ms when the email is sent (for time-to-answer)
+ * Read a guest document from Firestore by id.
+ * Returns the document data object, or null if not found / on error.
+ */
+function readGuestFromFirestore(guestId) {
+  if (!guestId) return null;
+  try {
+    var token = getFirestoreAccessToken();
+    var url = "https://firestore.googleapis.com/v1/projects/" +
+      FIRESTORE_PROJECT_ID + "/databases/(default)/documents/guests/" +
+      encodeURIComponent(guestId);
+    var res = UrlFetchApp.fetch(url, {
+      headers: { Authorization: "Bearer " + token },
+      muteHttpExceptions: true,
+    });
+    if (res.getResponseCode() !== 200) {
+      console.warn("[firestore] read %s failed (%s): %s",
+        guestId, res.getResponseCode(), res.getContentText());
+      return null;
+    }
+    var doc = JSON.parse(res.getContentText());
+    return doc.fields ? firestoreFieldsToObject(doc.fields) : null;
+  } catch (err) {
+    console.warn("[firestore] read %s error: %s", guestId, err);
+    return null;
+  }
+}
+
+/** Convert Firestore REST `fields` map into a plain JS object. */
+function firestoreFieldsToObject(fields) {
+  var out = {};
+  Object.keys(fields || {}).forEach(function (key) {
+    out[key] = firestoreValueToJs(fields[key]);
+  });
+  return out;
+}
+
+/** Convert a single Firestore REST value into a JS value. */
+function firestoreValueToJs(v) {
+  if (!v) return null;
+  if (v.stringValue !== undefined) return v.stringValue;
+  if (v.booleanValue !== undefined) return v.booleanValue;
+  if (v.integerValue !== undefined) return parseInt(v.integerValue, 10);
+  if (v.doubleValue !== undefined) return parseFloat(v.doubleValue);
+  if (v.mapValue) return firestoreFieldsToObject(v.mapValue.fields);
+  if (v.arrayValue) return (v.arrayValue.values || []).map(firestoreValueToJs);
+  if (v.nullValue !== undefined) return null;
+  return null;
+}
+
+/**
+ * Resolve the guest's authoritative data (language, cabin, profile code) from
+ * Firestore, falling back to the sheet row.
+ * Returns { lang, cabin, isPrivate, isPaid, profileCode }.
+ */
+function resolveGuestData(row, guestId) {
+  var fs = readGuestFromFirestore(guestId);
+  var lang = normaliseLang(row[COL_LANG]);
+  var cabin = String(row[COL_CABIN] || "").trim();
+  var isPrivate = row[COL_IS_PRIVATE];
+  var isPaid = row[COL_IS_PAID];
+  var profileCode = String(row[COL_PROFILE_CODE] || "").trim();
+
+  if (fs) {
+    if (fs.identity && fs.identity.lang) lang = normaliseLang(fs.identity.lang);
+    if (fs.hosting && fs.hosting.cabin) cabin = String(fs.hosting.cabin).trim();
+    if (fs.hosting && fs.hosting.isPrivate !== undefined) isPrivate = fs.hosting.isPrivate;
+    if (fs.hosting && fs.hosting.isCabinPaidByNovios !== undefined) isPaid = fs.hosting.isCabinPaidByNovios;
+    if (fs.perfil) profileCode = String(fs.perfil).trim();
+  }
+
+  if (!profileCode) profileCode = deriveProfileCode(cabin, isPrivate, isPaid);
+  return { lang: lang, cabin: cabin, profileCode: profileCode };
+}
+
+// ── Email HTML template ───────────────────────────────────────────────────
+
+/** Escape HTML special chars in user-provided strings. */
+function esc(s) {
+  return String(s == null ? "" : s)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+}
+
+/** Trilingual greeting + body copy for the HTML email. */
+function emailCopy(lang, name) {
+  var n = esc(name);
+  if (lang === "fr") {
+    return {
+      greeting: "Nous nous marions !",
+      body: "Nous serions ravis de vous avoir à nos côtés pour partager ce jour, et même tout ce week-end si spécial.",
+      cta: "Ouvrir mon invitation",
+      loginLabel: "Votre identifiant",
+      passwordLabel: "Votre mot de passe",
+      inviteLabel: "Invitation envoyée par",
+      footer: "Avec tout notre amour, David & Aydé",
+    };
+  }
+  if (lang === "en") {
+    return {
+      greeting: "We're getting married!",
+      body: "We would be so happy to have you by our side to share this day with us — and even this whole special weekend.",
+      cta: "Open my invitation",
+      loginLabel: "Your username",
+      passwordLabel: "Your password",
+      inviteLabel: "Invitation sent by",
+      footer: "With all our love, David & Aydé",
+    };
+  }
+  return {
+    greeting: "¡Nos casamos!",
+    body: "Estaríamos muy felices de tenerlos a nuestro lado para compartir con nosotros este día, e incluso todo este fin de semana tan especial.",
+    cta: "Abrir mi invitación",
+    loginLabel: "Tu usuario",
+    passwordLabel: "Tu contraseña",
+    inviteLabel: "Invitación enviada por",
+    footer: "Con todo nuestro amor, David & Aydé",
+  };
+}
+
+/**
+ * Build the beautiful HTML email body.
+ * @param {string} lang  es / fr / en
+ * @param {string} name  guest display name
+ * @param {string} link  personalised invitation link
+ * @param {string} email guest login email
+ * @param {string} password shared login password
+ */
+function buildHtmlEmail(lang, name, link, email, password) {
+  var c = emailCopy(lang, name);
+  var login = esc(email);
+  var pass = esc(password);
+  var href = esc(link);
+  return [
+    '<!DOCTYPE html><html lang="' + lang + '"><head><meta charset="utf-8">',
+    '<meta name="viewport" content="width=device-width, initial-scale=1">',
+    '<title>' + SUBJECTS[lang] + '</title></head>',
+    '<body style="margin:0;padding:0;background-color:#f6f1e7;font-family:Georgia,serif;color:#3a2e22;">',
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f6f1e7;padding:24px 12px;">',
+    '<tr><td align="center">',
+    '<table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:16px;overflow:hidden;box-shadow:0 8px 30px rgba(58,46,34,0.12);">',
+    // Header band
+    '<tr><td style="background:linear-gradient(135deg,#8a6d4f,#b08d5f);padding:36px 32px;text-align:center;">',
+    '<div style="font-size:13px;letter-spacing:3px;text-transform:uppercase;color:#f3e9d8;">David & Aydé</div>',
+    '<div style="font-size:30px;color:#ffffff;margin-top:10px;font-family:Georgia,serif;">' + c.greeting + '</div>',
+    '<div style="font-size:14px;color:#f3e9d8;margin-top:6px;">' + SUBJECTS[lang] + '</div>',
+    '</td></tr>',
+    // Body
+    '<tr><td style="padding:36px 40px;">',
+    '<p style="font-size:17px;line-height:1.7;margin:0 0 18px;">' + c.body + '</p>',
+    // CTA button
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:26px 0;"><tr><td align="center">',
+    '<a href="' + href + '" style="display:inline-block;background-color:#8a6d4f;color:#ffffff;text-decoration:none;font-size:16px;font-family:Georgia,serif;padding:15px 34px;border-radius:40px;">' + c.cta + '</a>',
+    '</td></tr></table>',
+    // Login credentials card
+    '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#faf6ee;border:1px solid #e6dcc8;border-radius:12px;padding:20px 24px;margin:22px 0;">',
+    '<tr><td style="font-size:13px;color:#8a6d4f;letter-spacing:1px;text-transform:uppercase;padding-bottom:10px;">' + c.loginLabel + '</td></tr>',
+    '<tr><td style="font-size:16px;font-family:Menlo,monospace;color:#3a2e22;padding-bottom:14px;">' + login + '</td></tr>',
+    '<tr><td style="font-size:13px;color:#8a6d4f;letter-spacing:1px;text-transform:uppercase;padding-bottom:10px;">' + c.passwordLabel + '</td></tr>',
+    '<tr><td style="font-size:16px;font-family:Menlo,monospace;color:#3a2e22;padding-bottom:14px;">' + pass + '</td></tr>',
+    '<tr><td style="font-size:13px;color:#8a6d4f;letter-spacing:1px;text-transform:uppercase;padding-bottom:6px;">' + c.inviteLabel + '</td></tr>',
+    '<tr><td style="font-size:15px;color:#3a2e22;">' + esc(INVITE_TYPE) + '</td></tr>',
+    '</table>',
+    '<p style="font-size:14px;color:#8a6d4f;line-height:1.6;margin:0;">' + c.footer + '</p>',
+    '</td></tr>',
+    // Footer band
+    '<tr><td style="background-color:#f3ece0;padding:18px 32px;text-align:center;font-size:12px;color:#a08a6a;">',
+    'boda-david-y-ayde.web.app',
+    '</td></tr>',
+    '</table>',
+    '</td></tr></table>',
+    '</body></html>',
+  ].join("");
+}
+
+// ── Invitation link ───────────────────────────────────────────────────────
+
+/**
+ * Build the personalised invitation link, including the analytics + login
+ * pre-fill params the invitation app reads.
  */
 function buildInvitationLink(profileCode, email, sentAt) {
   var params = [
-    "invitationCode=" + base64UrlEncode(profileCode),
     "guest=" + encodeURIComponent(email || ""),
+    "password=" + encodeURIComponent(SHARED_PASSWORD),
+    "inviteType=" + encodeURIComponent(INVITE_TYPE),
     "utm_source=email",
     "utm_medium=email",
     "utm_campaign=invitacion",
     "sent_at=" + (sentAt || Date.now()),
   ];
+  if (profileCode) {
+    params.unshift("invitationCode=" + base64UrlEncode(profileCode));
+  }
   return INVITATION_BASE_URL + "?" + params.join("&");
 }
 
-
-/**
- * Read the email content template for a guest row, in their language.
- * Returns the raw template text (may contain {name} and {link} placeholders),
- * or "" if the column is missing/empty.
- */
+/** Read the email content template for a guest row, in their language. */
 function readMessageTemplate(row, lang) {
   var col = lang === "fr" ? COL_MSG_FR : (lang === "en" ? COL_MSG_EN : COL_MSG_ES);
   return String(row[col] || "").trim();
@@ -219,21 +424,14 @@ function fillTemplate(template, name, link) {
 /**
  * Send one invitation email to a single guest row.
  * Returns a status string for logging.
- *
- * @param {Object} row     The guest row (keyed by header name).
- * @param {number} rowIndex 1-based row number (for logging).
- * @param {boolean} force  When true, send even if `_enviado` is already TRUE.
- *                         Used by the onEdit trigger, where the user explicitly
- *                         toggled the checkbox to TRUE (an explicit re-send).
  */
 function sendOne(row, rowIndex, force) {
   var guestId = String(row[COL_ID] || "").trim();
   var email = String(row[COL_EMAIL] || row.firebase_email || row._email || row.email || "").trim();
-  var lang = normaliseLang(row[COL_LANG]);
   var name = String(row[COL_NAME] || guestId || "amigo").trim();
 
-  console.log("[sendOne] row=%s guest=%s email=%s lang=%s force=%s",
-    rowIndex, guestId, email, lang, force ? "true" : "false");
+  console.log("[sendOne] row=%s guest=%s email=%s force=%s",
+    rowIndex, guestId, email, force ? "true" : "false");
 
   if (!guestId) {
     var m = "row " + rowIndex + ": no UID, skipped";
@@ -251,7 +449,13 @@ function sendOne(row, rowIndex, force) {
     return m3;
   }
 
-  var profileCode = resolveProfileCode(row);
+  // Authoritative data from Firestore (language, cabin, profile code).
+  var data = resolveGuestData(row, guestId);
+  var lang = data.lang;
+  var profileCode = data.profileCode;
+  console.log("[sendOne] resolved lang=%s cabin=%s code=%s",
+    lang, data.cabin, profileCode);
+
   if (!profileCode) {
     var m4 = "row " + rowIndex + " (" + guestId + "): could not determine profile code, skipped";
     console.log("[sendOne] " + m4);
@@ -261,21 +465,27 @@ function sendOne(row, rowIndex, force) {
   var link = buildInvitationLink(profileCode, email, Date.now());
   var subject = SUBJECTS[lang];
 
-  // Body comes from the sheet template column for the guest's language.
+  // Body: use the sheet template if present, else the beautiful HTML template.
   var template = readMessageTemplate(row, lang);
-  var body = template
-    ? fillTemplate(template, name, link)
-    : "Hola " + name + ",\n\nAbre tu invitación aquí: " + link + "\n\nDavid & Aydé";
+  var htmlBody;
+  if (template) {
+    var plain = fillTemplate(template, name, link);
+    htmlBody = "<div style=\"font-family:Georgia,serif;color:#3a2e22;line-height:1.7;\">" +
+      plain.replace(/\n/g, "<br>") + "</div>";
+  } else {
+    htmlBody = buildHtmlEmail(lang, name, link, email, SHARED_PASSWORD);
+  }
 
   if (DRY_RUN) {
     Logger.log("[DRY RUN] To: %s | Lang: %s | Code: %s | Subject: %s", email, lang, profileCode, subject);
-    Logger.log(body);
+    Logger.log(htmlBody);
     console.log("[sendOne] [DRY RUN] would send to %s [code %s]", email, profileCode);
     return "row " + rowIndex + " (" + guestId + "): [DRY RUN] would send to " + email + " [code " + profileCode + "]";
   }
 
   try {
-    GmailApp.sendEmail(email, subject, body, {
+    GmailApp.sendEmail(email, subject, "", {
+      htmlBody: htmlBody,
       cc: CC_RECIPIENTS.join(","),
       name: SENDER_NAME,
     });
@@ -288,7 +498,6 @@ function sendOne(row, rowIndex, force) {
     return fail;
   }
 }
-
 
 /**
  * Send invitation emails to all guests in the INVITADOS tab.
@@ -331,7 +540,6 @@ function sendInvitationEmails() {
     if (status.indexOf("sent to") !== -1) {
       sentCount++;
       if (!DRY_RUN) {
-        // Mark the sent column (colIndex[COL_SENT] + 1 is the 1-based column).
         sheet.getRange(r + 2, colIndex[COL_SENT] + 1).setValue("TRUE");
       }
     }
@@ -369,11 +577,9 @@ function sendSelectedRow() {
 /**
  * Install the onEdit trigger that auto-sends an invitation when the `_enviado`
  * checkbox is set to TRUE. Run this once from the Apps Script editor.
- * It runs as the script owner (the couple's Gmail account), so GmailApp works.
  */
 function setupTrigger() {
   var ss = SpreadsheetApp.getActiveSpreadsheet();
-  // Remove any existing onEditSendInvitation triggers to avoid duplicates.
   ScriptApp.getProjectTriggers().forEach(function (t) {
     if (t.getHandlerFunction() === "onEditSendInvitation") {
       ScriptApp.deleteTrigger(t);
@@ -381,78 +587,38 @@ function setupTrigger() {
   });
   ScriptApp.newTrigger("onEditSendInvitation")
     .forSpreadsheet(ss)
-    .onEdit()
+    .onChange()
     .create();
-  Logger.log("onEditSendInvitation trigger installed for spreadsheet: " + ss.getName());
-  SpreadsheetApp.getUi().alert("Trigger instalado. Ahora, al marcar _enviado = TRUE se enviará el correo.");
+  Logger.log("onEditSendInvitation trigger installed.");
 }
 
 /**
- * Installable onEdit trigger handler.
- * Detects when the `_enviado` (or `sent`) checkbox on a guest row is set to
- * TRUE and sends that guest's invitation email.
- *
- * NOTE: This must be installed as an INSTALLABLE trigger (see setupTrigger),
- * not a simple onEdit, because it uses GmailApp which requires authorisation.
+ * Installable onEdit trigger handler. When the `_enviado` checkbox on a guest
+ * row is set to TRUE, sends that guest's invitation immediately.
  */
 function onEditSendInvitation(e) {
-  console.log("[onEdit] trigger fired");
-  if (!e || !e.range) {
-    console.log("[onEdit] no event/range, returning");
-    return;
-  }
-
-  var sheet = e.range.getSheet();
-  console.log("[onEdit] sheet=%s", sheet.getName());
-  if (sheet.getName() !== SHEET_NAME) {
-    console.log("[onEdit] not the %s sheet, returning", SHEET_NAME);
-    return;
-  }
-
-  var rowIndex = e.range.getRow();
-  var col = e.range.getColumn();
-  console.log("[onEdit] row=%s col=%s", rowIndex, col);
-  if (rowIndex < 2) {
-    console.log("[onEdit] header row, returning");
-    return; // header row
-  }
+  var range = e.range;
+  var sheet = range.getSheet();
+  if (sheet.getName() !== SHEET_NAME) return;
 
   var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
-  var headerName = String(headers[col - 1] || "").trim();
-  console.log("[onEdit] edited column header=%s", headerName);
+  var colIndex = {};
+  headers.forEach(function (h, i) { colIndex[String(h).trim()] = i; });
 
-  // Only react to the sent checkbox column (accept _enviado or sent).
-  var isSentCol = headerName === COL_SENT || headerName === "sent";
-  if (!isSentCol) {
-    console.log("[onEdit] not the sent column, returning");
-    return;
-  }
+  var sentCol = colIndex[COL_SENT];
+  if (sentCol === undefined) return;
+  if (range.getColumn() !== sentCol + 1) return;
 
-  // Only react when the checkbox is turned ON (value TRUE).
-  var newValue = String(e.value || "").trim().toUpperCase();
-  var oldValue = String(e.oldValue || "").trim().toUpperCase();
-  console.log("[onEdit] newValue=%s oldValue=%s", newValue, oldValue);
-  if (newValue !== "TRUE") {
-    console.log("[onEdit] not turned ON, returning");
-    return;
-  }
-  if (oldValue === "TRUE") {
-    console.log("[onEdit] was already TRUE, no change, returning");
-    return; // already true before — no change
-  }
+  var rowIndex = range.getRow();
+  if (rowIndex < 2) return;
 
-  // Read the full row.
+  var value = sheet.getRange(rowIndex, sentCol + 1).getValue();
+  if (String(value).trim().toUpperCase() !== "TRUE") return;
+
   var values = sheet.getRange(rowIndex, 1, 1, sheet.getLastColumn()).getValues()[0];
   var row = {};
   headers.forEach(function (h, i) { row[String(h).trim()] = values[i]; });
 
-  // The user explicitly toggled the checkbox to TRUE (from a non-TRUE state),
-  // which is an explicit request to (re)send — so force the send even if the
-  // `_enviado` column already reads TRUE.
-  console.log("[onEdit] toggled to TRUE, sending...");
-  var status = sendOne(row, rowIndex, true);
+  var status = sendOne(row, rowIndex);
   Logger.log(status);
-  console.log("[onEdit] result: " + status);
 }
-
-
