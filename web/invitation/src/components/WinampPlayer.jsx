@@ -33,7 +33,8 @@ import {
  * error UI).
  */
 export function WinampPlayer() {
-  const { authState, musicEnabled } = useApp();
+  const { authState, musicEnabled, setMusicPlaying } = useApp();
+
   // idle | connecting | ready | error
   const [status, setStatus] = useState("idle");
   const [playing, setPlaying] = useState(false);
@@ -108,11 +109,19 @@ export function WinampPlayer() {
   useEffect(() => {
     if (!musicEnabled) {
       stopPlayback();
+      setMusicPlaying(false);
     }
-  }, [musicEnabled]);
+  }, [musicEnabled, setMusicPlaying]);
+
+  // Keep the shared "music is playing" flag in sync so the Music section's FAB
+  // can clearly show whether the stream is playing or muted.
+  useEffect(() => {
+    setMusicPlaying(playing);
+  }, [playing, setMusicPlaying]);
 
   // Hidden unless the guest explicitly enabled it from the user menu.
   if (authState !== "signedIn" || !musicEnabled) return null;
+
 
 
   const handleToggle = async () => {

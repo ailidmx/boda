@@ -70,6 +70,7 @@ function DayProgramSlideset({ programs }) {
   const nav = t.nav || {};
   const [warningOpen, setWarningOpen] = useState(false);
   const [programActive, setProgramActive] = useState(false);
+  const [theme, setTheme] = useState("picado");
   const sectionRef = useRef(null);
   const fabRef = useRef(null);
   const panelRef = useRef(null);
@@ -78,6 +79,20 @@ function DayProgramSlideset({ programs }) {
   // The FAB warning modal always shows the same traffic disclaimer (the
   // Saturday note about the Guadalajara access).
   const traffic = weekend.saturday || {};
+
+  // The programme background is selectable by the guest: the colourful papel
+  // picado bunting or the parchment / prehispanic motif. Each theme maps to
+  // its own background image and CSS variant class.
+  const themeImages = {
+    prehispanico: MEDIA.parchment,
+    picado: MEDIA.picado,
+  };
+  const themeImage = themeImages[theme] || MEDIA.picado;
+  const themes = weekend.themes || {};
+  const themeOptions = themes.options || [];
+
+
+
 
   // Show the warning FAB only while the programme section is in view.
   useEffect(() => {
@@ -136,9 +151,9 @@ function DayProgramSlideset({ programs }) {
 
   return (
     <section
-      className="weekend-program section"
+      className={`weekend-program section weekend-program--${theme}`}
       ref={sectionRef}
-      style={{ backgroundImage: `url(${MEDIA.parchment})` }}
+      style={{ backgroundImage: `url(${themeImage})` }}
     >
       <div className="weekend-program__header">
         <div className="section-heading reveal">
@@ -146,7 +161,37 @@ function DayProgramSlideset({ programs }) {
           <h2>{weekend.title}</h2>
           {weekend.intro && <p className="programme-citation">{weekend.intro}</p>}
         </div>
+
+        {themeOptions.length > 0 && (
+          <div className="programme-theme-selector" role="group" aria-label={themes.label}>
+            <span className="programme-theme-selector__label">{themes.label}</span>
+            <div className="programme-theme-selector__options">
+              {themeOptions.map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  className={`programme-theme-selector__option${
+                    theme === option.id ? " is-active" : ""
+                  }`}
+                  aria-pressed={theme === option.id}
+                  onClick={() => setTheme(option.id)}
+                >
+                  <span className="programme-theme-selector__option-label">
+                    {option.label}
+                  </span>
+                  {option.hint && (
+                    <span className="programme-theme-selector__option-hint">
+                      {option.hint}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
+
+
 
       <div className="day-program-scroll">
         {programs.map((program, index) => (

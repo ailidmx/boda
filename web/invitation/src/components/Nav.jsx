@@ -5,7 +5,12 @@ import { LANGUAGE_FLAGS, LANGUAGE_FLAGS_ONLY } from "./ui.jsx";
 import { AboutModal } from "./AboutModal.jsx";
 
 import { SUPPORTED_LANGUAGES } from "../content.js";
-import { resolveGuestName, resolveGuestPhoto } from "../guest-profiles.js";
+import {
+  resolveGuestName,
+  resolveGuestPhoto,
+  guestTravelsByPlane,
+} from "../guest-profiles.js";
+
 
 
 // The full ordered list of nav links. The FLIGHTS ("travel") entry is only
@@ -28,6 +33,7 @@ const NAV_LINKS = [
   ["accommodation", "#accommodation"],
   ["petanque", "#petanque"],
   ["food", "#food"],
+  ["guisos", "#guisos"],
   ["music", "#music"],
   ["coast", "#after"],
   ["rsvp", "#rsvp"],
@@ -558,11 +564,10 @@ function MobileNav({ activeKey }) {
     return () => document.removeEventListener("mousedown", onDocClick);
   }, [openMenu]);
 
-  const travelsByPlane = ["booked", "planning"].includes(
-    profile?.guest?.travelStatus,
-  );
+  const travelsByPlane = guestTravelsByPlane(profile?.guest);
   const links = getNavLinks(travelsByPlane);
   const part1EndIndex = links.findIndex(([key]) => key === PART_I_END);
+
 
   const part1 = links.slice(0, part1EndIndex + 1);
   const part2 = links.slice(part1EndIndex + 1);
@@ -626,10 +631,9 @@ export function Nav() {
 
   // The effective nav links for this guest (FLIGHTS hidden when not travelling
   // by plane). Used by the desktop nav, the underline, and the scroll-spy.
-  const travelsByPlane = ["booked", "planning"].includes(
-    profile?.guest?.travelStatus,
-  );
+  const travelsByPlane = guestTravelsByPlane(profile?.guest);
   const links = getNavLinks(travelsByPlane);
+
 
 
 

@@ -162,3 +162,55 @@ jobs:
           projectId: boda-500805
           target: invitation-named
           channelId: live
+
+      - name: Notify Telegram on production deploy
+        if: always()
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          DEPLOY_STATUS: ${{ job.status }}
+          ACTOR: ${{ github.actor }}
+          REF: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+        run: |
+          # Escape Telegram MarkdownV2 special characters in dynamic content.
+          esc() { printf '%s' "$1" | sed 's/[\\_*[\]()~`>#+\-=|{}.!]/\\&/g'; }
+
+          # Build a French deploy notification. For PR-triggered deploys we
+          # include the PR title + description; for direct pushes we fall back
+          # to the commit message.
+          if [ -n "$PR_TITLE" ]; then
+            DESC="$(esc "$PR_TITLE")"
+            if [ -n "$PR_BODY" ]; then
+              DESC="$DESC
+              $(esc "$PR_BODY")"
+            fi
+          else
+            DESC="$(esc "${COMMIT_MSG:-Déploiement direct}")"
+          fi
+
+          STATUS_ICON="✅"
+          STATUS_TEXT="réussi"
+          if [ "$DEPLOY_STATUS" != "success" ]; then
+            STATUS_ICON="❌"
+            STATUS_TEXT="échoué"
+          fi
+
+          MESSAGE="🚀 *Déploiement production ${STATUS_TEXT}* ${STATUS_ICON}
+          *Branche :* $(esc "$REF")
+          *Commit :* $(esc "$SHA")
+          *Par :* $(esc "$ACTOR")
+          *Détails :*
+          ${DESC}
+          [Voir le run]($(esc "$RUN_URL"))"
+
+          curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            -d chat_id="${TELEGRAM_CHAT_ID}" \
+            --data-urlencode "text=${MESSAGE}" \
+            -d parse_mode="MarkdownV2" \
+            -d disable_web_page_preview="true" \
+            > /dev/null

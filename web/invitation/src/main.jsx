@@ -16,14 +16,19 @@ import "./styles/weekend.css";
 import "./styles/petanque.css";
 import "./styles/weather.css";
 import "./styles/food.css";
+import "./styles/guisos.css";
+import "./styles/song-request.css";
 import "./styles/music.css";
+
 import "./styles/star-vote.css";
 import "./styles/cardcarousel.css";
 
 import "./styles/venue.css";
 import "./styles/lightbox.css";
 import "./styles/accommodation.css";
+import "./styles/story-bg.css";
 import "./styles/travel.css";
+
 
 import "./styles/mapcarousel.css";
 import "./styles/attire.css";

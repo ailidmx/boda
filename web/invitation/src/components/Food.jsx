@@ -90,6 +90,17 @@ export function Food() {
                 <span>{food.flavourPlaceholder}</span>
               </div>
             )}
+            {flavour.key === "taquiza" && MEDIA.food.donaCarmen && (
+              <img
+                className="flavour-card__badge"
+                src={MEDIA.food.donaCarmen}
+                alt=""
+                aria-hidden="true"
+                loading="lazy"
+                decoding="async"
+              />
+            )}
+
             <div>
               {flavour.type && food.flavourType?.[flavour.type] ? (
                 <span className={`flavour-card__type flavour-card__type--${flavour.type}`}>

@@ -206,6 +206,12 @@ export function AppProvider({ children }) {
     () => window.localStorage.getItem(MUSIC_ENABLED_KEY) === "1",
   );
 
+  // Whether the music stream is actually playing right now. This is kept in
+  // sync by the WinampPlayer (via setMusicPlaying) so the Music section's FAB
+  // can clearly show "music is playing" vs "music is muted".
+  const [musicPlaying, setMusicPlaying] = useState(false);
+
+
   // Avoid re-prompting on every auth state change within the same session.
   const langPromptShown = useRef(false);
   // Avoid re-opening the identity modal on every auth state change within the
@@ -536,6 +542,8 @@ export function AppProvider({ children }) {
       openIdentityPrompt,
       musicEnabled,
       setMusicEnabled,
+      musicPlaying,
+      setMusicPlaying,
       signIn,
       signOut,
       changePassword,
@@ -551,8 +559,10 @@ export function AppProvider({ children }) {
       identityPrompt,
       revertLangPrompt,
       musicEnabled,
+      musicPlaying,
     ],
   );
+
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }

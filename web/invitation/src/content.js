@@ -102,6 +102,7 @@ export const content = {
 
       petanque: "Petanca",
       food: "Comida",
+      guisos: "Guisos",
       coast: "¿Y después?",
 
       menu1: "Menú",
@@ -324,8 +325,24 @@ export const content = {
       navSchedule: "Ver los tres días",
       navProgram: "Programa detallado",
 
+      themes: {
+        label: "Elige el fondo del programa",
+        options: [
+          {
+            id: "prehispanico",
+            label: "Prehispánico",
+            hint: "Pergamino y motivos ancestrales",
+          },
+          {
+            id: "picado",
+            label: "Papel picado",
+            hint: "Banderines festivos de colores",
+          },
+        ],
+      },
 
       items: [
+
         {
           day: "Viernes 19 · desde mediodía",
           title: "Llegada y bienvenida",
@@ -559,15 +576,156 @@ export const content = {
           "Si quieres asegurarte de que tu noche quede especialmente bien regada, puedes traer tus propias municiones para compartir y disfrutar responsablemente.",
       },
     },
+    guisos: {
+      eyebrow: "¿Qué guisos?",
+      title: "Ayúdanos a elegir el menú",
+      body:
+        "Queremos que el banquete sepa a casa. Vota por los guisos que más te gusten y los más votados se servirán el día de la boda. Doña Carmen y su equipo le darán un sabor casero a todos nuestros platillos. Lo más difícil: elegir solo 9 guisos entre los 20 que proponemos aquí. ¡Qué rompecabezas, nos los llevaríamos todos! ¿Nos ayudas?",
+
+      flavoursTitle: "¿Qué guisos vamos a probar?",
+      flavourPlaceholder: "Guiso",
+      voteLabel: "Tu voto",
+      note:
+        "Puedes votar por todos los que quieras. Los más votados se sumarán al menú.",
+      spiceNote:
+        "🌶️ Sobre el picante: muchos guisos llevan chile, pero casi siempre es para dar sabor, no ardor. La mayoría no pican nada. Y si quieres el toque picante, siempre habrá salsas en la mesa para añadirlo a tu gusto.",
+      spiceButton: "Sobre el picante",
+      spiceClose: "Cerrar",
+
+
+      reorderTitle: "Ordena tus favoritos",
+      reorderBody:
+        "Ordena los guisos del 1 al 20 según tus preferencias. Los 9 primeros entrarán al menú; el resto se quedará fuera. Arrastra cada platillo o usa las flechas para moverlo.",
+      reorderDrag: "Arrastra para reordenar",
+
+      reorderButton: "Ordenar mis favoritos",
+      reorderCancel: "Cancelar",
+      reorderSave: "Guardar mi orden",
+      reorderSaved: "¡Orden guardado!",
+      reorderInMenu: "En el menú",
+      reorderNotInMenu: "Fuera del menú",
+      reorderUp: "Subir",
+      reorderDown: "Bajar",
+      reorderRank: "Lugar",
+      reorderHint: "Los 9 primeros (verde) entran al menú. Los demás (rojo) se quedan fuera.",
+
+
+      dishes: [
+        {
+          name: "Papas con longaniza",
+          note: "Papas doradas guisadas con longaniza, una salchicha fresca mexicana con un toque de chile.",
+          cloudinaryId: "quisos/1._Papas_con_longaniza_cy5av6",
+        },
+        {
+          name: "Bistec a la mexicana",
+          note: "Bistec en salsa de jitomate (tomate rojo) con cebolla, chile y cilantro.",
+          cloudinaryId: "quisos/2._Bistec_a_la_MX_k0nt4r",
+        },
+        {
+          name: "Bistec con nopales",
+          note: "Bistec guisado con nopales, las pencas tiernas del cactus, con cebolla y jitomate.",
+          cloudinaryId: "quisos/3._Bistec_con_nopales_ngiynu",
+        },
+        {
+          name: "Alambre",
+          note: "Carne con tocino, pimientos, cebolla y queso fundido, como una brocheta sin palito.",
+          cloudinaryId: "quisos/4._Alambre_d2upyi",
+        },
+        {
+          name: "Barbacoa",
+          note: "Carne suave cocida a fuego lento en un hoyo bajo tierra, con su consomé caliente.",
+          cloudinaryId: "quisos/5._Barbacoa_pupyj7",
+        },
+        {
+          name: "Chicharrón en salsa roja",
+          note: "Chicharrón, piel de cerdo frita y crujiente, bañado en salsa roja de jitomate y chile.",
+          cloudinaryId: "quisos/6._Chicharrón_en_salsa_roja_nlbqzb",
+        },
+        {
+          name: "Chicharrón en salsa verde",
+          note: "Chicharrón crujiente bañado en salsa verde de tomatillo, un tomate pequeño y ácido.",
+          cloudinaryId: "quisos/6._Chicharrón_en_salsa_verde_t4hiiz",
+        },
+        {
+          name: "Costilla en tomatada",
+          note: "Costilla de res guisada en salsa de tomatillo verde.",
+          cloudinaryId: "quisos/7._Costilla_en_tomatada_rrawks",
+        },
+        {
+          name: "Mole",
+          note: "El clásico de fiesta: pollo bañado en mole, una salsa espesa de chiles y especias con ajonjolí.",
+          cloudinaryId: "quisos/8._Mole_nohguw",
+        },
+        {
+          name: "Pollo al chipotle",
+          note: "Pollo en cremosa salsa de chipotle, un chile seco ahumado que da sabor más que ardor.",
+          cloudinaryId: "quisos/9._Pollo_al_chipotle_txkyvi",
+        },
+        {
+          name: "Pipián",
+          note: "Pollo en salsa de semillas de calabaza tostadas y chiles, con un sabor a nuez.",
+          cloudinaryId: "quisos/10._Pipian_u1w5mv",
+        },
+        {
+          name: "Rajas con elote",
+          note: "Tiras de chile poblano asado (suave) con elote, crema y queso.",
+          cloudinaryId: "quisos/11._Rajas_con_elote_rma3rq",
+        },
+        {
+          name: "Pollo con champiñones",
+          note: "Pollo guisado con champiñones en salsa de jitomate.",
+          cloudinaryId: "quisos/12._Pollo_con_champiñones_xc6745",
+        },
+        {
+          name: "Costilla en salsa roja",
+          note: "Costilla de res en salsa roja de jitomate y chile.",
+          cloudinaryId: "quisos/13._Costilla_en_salsa_roja_s3vlby",
+        },
+        {
+          name: "Lengua en salsa verde",
+          note: "Lengua de res, muy suave y tierna, en salsa verde de tomatillo.",
+          cloudinaryId: "quisos/15_-_Lengua_en_salsa_verde_fmjvit",
+        },
+        {
+          name: "Carne al pastor",
+          note: "El sabor de la calle: carne adobada con piña, cilantro y cebolla, como en los tacos.",
+          cloudinaryId: "quisos/15._Carne_al_pastor_neyycc",
+        },
+        {
+          name: "Cochinita",
+          note: "Cerdo deshebrado en salsa de achiote, una especia roja, estilo yucateco.",
+          cloudinaryId: "quisos/16._Cochinita_Pibil_fghtug",
+        },
+        {
+          name: "Bistec con papas",
+          note: "Bistec guisado con papas en salsa de jitomate.",
+          cloudinaryId: "quisos/18_-_Bistec_con_papa_s_htmnar",
+        },
+        {
+          name: "Calabazas guisadas",
+          note: "Calabacitas (zucchini) guisadas con elote, crema y queso.",
+          cloudinaryId: "quisos/19_-_Calabazas_guisadas_ijenzm",
+        },
+        {
+          name: "Arroz rojo",
+          note: "Arroz rojo con jitomate, cebolla y un toque de chile.",
+          cloudinaryId: "quisos/20_-_ARROZ_ROJO_g7z0dj",
+        },
+      ],
+
+    },
     music: {
       eyebrow: "Música en vivo",
       title: "Escuchar, bailar y también cantar",
       body:
-        "La música acompañará cada cambio de energía del sábado, desde el final de la ceremonia hasta la pista de baile.",
+        "La música acompañará cada cambio de energía el sábado, del final de la ceremonia a la pista de baile.",
       background: {
         label: "Ambiente",
         themes: { wao: "WAO", arty: "ARTY", brutal: "BRUTAL" },
       },
+      fabPlayingLabel: "En directo",
+      fabMutedLabel: "Silenciado",
+
       acts: [
         {
           moment: "Después del aperitivo",
@@ -634,7 +792,41 @@ export const content = {
         button: "Abrir en Spotify",
       },
     },
+    songRequest: {
+      eyebrow: "Pide tu canción",
+      title: "¿Qué canción no puede faltar?",
+      body:
+        "Dinos qué canción quieres escuchar, cantar o bailar. Si quieres subir al escenario, elige la opción de karaoke o de banda en vivo y quizá podamos acompañarte.",
+      songLabel: "Canción (título y artista)",
+      songPlaceholder: "Ej. La Bikina · Luis Miguel",
+      searchHint: "Escribe al menos 2 letras para buscar.",
+      searching: "Buscando…",
+      noResults: "No encontramos canciones. Escribe el título y artista.",
+      searchError: "No pudimos buscar. Inténtalo de nuevo.",
+      selectSong: "Selecciona una canción",
+      intentLabel: "¿Qué quieres hacer con ella?",
+      intents: {
+        hear: "Quiero escucharla",
+        sing: "Quiero cantarla en el escenario",
+        karaoke: "Quiero cantarla en el karaoke",
+        band: "Quiero que la toque la banda en vivo",
+      },
+      bandTypeLabel: "¿Qué banda quieres que la toque?",
+      bandTypes: {
+        marimba: "Marimba",
+        mariachi: "Mariachi",
+        norteno: "Norteño",
+        frenchBand: "Fanfare francesa",
+      },
+
+      submit: "Enviar mi canción",
+      success: "¡Gracias! Tu canción está en la lista.",
+      error: "No pudimos guardar tu canción. Inténtalo de nuevo.",
+      required: "Escribe el título de la canción.",
+    },
+
     suggestions: {
+
       fields: {
         name: "Tu nombre",
         dessert: "¿Qué postre prefieres?",
@@ -1014,14 +1206,15 @@ export const content = {
       eyebrow: "Vengo de lejos",
       title: "Tu viaje también forma parte de la celebración",
       body:
-        "Acompañaremos personalmente a quienes vienen desde Europa y otros lugares: elección de vuelos, llegada a Guadalajara, alojamiento y traslados.",
+        "Acompañaremos personalmente a quienes lo deseen y vengan desde Europa y otros lugares: elección de vuelos, llegada a Guadalajara, alojamiento y traslados.",
       points: [
-        "Madrid–Guadalajara es la ruta directa prioritaria desde Europa.",
-        "Coordinaremos las recogidas cuando tengamos tus números de vuelo.",
-        "Cada viajero tendrá un itinerario de llegada, estancia y regreso.",
+        "Madrid–Guadalajara, operado por Aeromexico, es la conexión directa prioritaria desde Europa.",
+        "Estaremos encantados de ayudarte a organizar tu estancia y tus traslados.",
+        "No dudes en contactarnos directamente si necesitas consejos para organizar tu viaje y tu estancia en México. ¡Nos encanta compartir nuestros consejos de este país de mil facetas!",
       ],
       routes: {
         eyebrow: "Mapa de trayectos",
+
         title: "Llegar a Roca Azul y seguir hacia la costa",
         note:
           "Las duraciones indicadas son orientativas y pueden variar enormemente. Sé previsor y, mejor aún, está en el lugar con anticipación reservando un alojamiento si puedes.",
@@ -1110,7 +1303,7 @@ export const content = {
 
       title: "Lo más importante es tu presencia",
       body:
-        "Tu compañía es el mejor regalo que podemos recibir. Si además deseas hacernos un detalle, agradecemos cualquier contribución para nuestra luna de miel o nuestros proyectos de pareja.",
+        "Tu compañía es el mejor regalo que podemos recibir. Si además deseas hacernos un detalle, agradecemos cualquier contribución para nuestra luna de miel.",
       note:
         "No hay ninguna obligación ni expectativa — lo que realmente nos hace felices es compartir este fin de semana contigo.",
       accounts: {
@@ -1310,9 +1503,10 @@ export const content = {
     rsvp: {
 
       eyebrow: "RSVP",
-      title: "¿Nos acompañas?",
+      title: "¿Entonces, nos acompañas?",
       body:
-        "Una sola respuesta nos permitirá organizar tu asistencia, alojamiento y viaje. Si todavía no tienes tus vuelos, podrás enviarlos más adelante.",
+        "Tus respuestas nos permitirán organizar tu asistencia, alojamiento y viaje. ¡Gracias por tu paciencia! Idealmente, nos gustaría tener tu respuesta antes de finales de octubre.",
+
       groups: {
         attendance: "Asistencia y alojamiento",
         travel: "Vengo desde lejos",
@@ -1584,6 +1778,7 @@ export const content = {
 
       petanque: "Pétanque",
       food: "Cuisine",
+      guisos: "Plats mijotés",
       coast: "Et après ?",
 
       menu1: "Menu",
@@ -1796,10 +1991,26 @@ export const content = {
       navSchedule: "Voir les trois jours",
       navProgram: "Programme détaillé",
 
+      themes: {
+        label: "Choisis le fond du programme",
+        options: [
+          {
+            id: "prehispanico",
+            label: "Préhispanique",
+            hint: "Parchemin et motifs ancestraux",
+          },
+          {
+            id: "picado",
+            label: "Papel picado",
+            hint: "Banderoles festives colorées",
+          },
+        ],
+      },
 
       items: [
         {
           day: "Vendredi 19 · dès midi",
+
           title: "Arrivée et bienvenue",
           body: "Check-in, pétanque, pizzas et premières retrouvailles.",
         },
@@ -2031,6 +2242,145 @@ export const content = {
           "Si tu veux être certain que la soirée soit particulièrement bien arrosée, tu peux apporter tes propres munitions, à partager et à savourer avec modération.",
       },
     },
+    guisos: {
+      eyebrow: "Quels plats mijotés ?",
+      title: "Aide-nous à choisir le menu",
+      body:
+        "Nous voulons que le banquet ait un goût de maison. Vote pour les plats mijotés que tu préfères, et les plus plébiscités seront servis le jour du mariage. Doña Cármen et son équipe donneront une saveur maison à tous nos plats. Le plus difficile : choisir seulement 9 plats mijotés parmi les 20 proposés ici. Quel casse-tête, on voudrait les prendre tous ! Tu nous aides ?",
+
+      flavoursTitle: "Quels plats mijotés allons-nous goûter ?",
+      flavourPlaceholder: "Plat mijoté",
+      voteLabel: "Ton vote",
+
+      note:
+        "Tu peux voter pour autant de plats que tu veux. Les plus votés rejoindront le menu.",
+      spiceNote:
+        "🌶️ À propos du piquant : beaucoup de plats mijotés contiennent du piment, mais presque toujours pour donner du goût, pas de l’ardeur. La plupart ne piquent pas du tout. Et si tu veux la touche épicée, il y aura toujours des sauces sur la table pour l’ajouter à ton goût.",
+      spiceButton: "À propos du piquant",
+      spiceClose: "Fermer",
+
+
+      reorderTitle: "Classe tes favoris",
+      reorderBody:
+        "Classe les plats mijotés de 1 à 20 selon tes préférences. Les 9 premiers entreront au menu ; les autres resteront dehors. Fais glisser chaque plat ou utilise les flèches pour le déplacer.",
+      reorderDrag: "Fais glisser pour réordonner",
+      reorderButton: "Classer mes favoris",
+
+      reorderCancel: "Annuler",
+      reorderSave: "Enregistrer mon classement",
+      reorderSaved: "Classement enregistré !",
+      reorderInMenu: "Au menu",
+      reorderNotInMenu: "Hors menu",
+      reorderUp: "Monter",
+      reorderDown: "Descendre",
+      reorderRank: "Place",
+      reorderHint: "Les 9 premiers (vert) entrent au menu. Les autres (rouge) restent dehors.",
+
+
+      dishes: [
+        {
+          name: "Papas con longaniza",
+          note: "Pommes de terre dorées mijotées avec de la longaniza, une saucisse fraîche mexicaine, et une touche de piment.",
+          cloudinaryId: "quisos/1._Papas_con_longaniza_cy5av6",
+        },
+        {
+          name: "Bistec a la mexicana",
+          note: "Bœuf en sauce de jitomate (tomate rouge) avec oignon, piment et coriandre.",
+          cloudinaryId: "quisos/2._Bistec_a_la_MX_k0nt4r",
+        },
+        {
+          name: "Bistec con nopales",
+          note: "Bœuf mijoté avec des nopales, les jeunes raquettes du cactus, oignon et tomate.",
+          cloudinaryId: "quisos/3._Bistec_con_nopales_ngiynu",
+        },
+        {
+          name: "Alambre",
+          note: "Viande avec bacon, poivrons, oignon et fromage fondu, comme une brochette sans pique.",
+          cloudinaryId: "quisos/4._Alambre_d2upyi",
+        },
+        {
+          name: "Barbacoa",
+          note: "Viande tendre cuite lentement dans un trou sous terre, avec son consommé chaud.",
+          cloudinaryId: "quisos/5._Barbacoa_pupyj7",
+        },
+        {
+          name: "Chicharrón en salsa roja",
+          note: "Chicharrón, peau de porc frite et croustillante, nappé de sauce rouge de tomate et de piment.",
+          cloudinaryId: "quisos/6._Chicharrón_en_salsa_roja_nlbqzb",
+        },
+        {
+          name: "Chicharrón en salsa verde",
+          note: "Chicharrón croustillant nappé de sauce verte de tomatille, une petite tomate acide.",
+          cloudinaryId: "quisos/6._Chicharrón_en_salsa_verde_t4hiiz",
+        },
+        {
+          name: "Costilla en tomatada",
+          note: "Côtes de bœuf mijotées en sauce de tomatille verte.",
+          cloudinaryId: "quisos/7._Costilla_en_tomatada_rrawks",
+        },
+        {
+          name: "Mole",
+          note: "Le grand classique de fête : poulet nappé de mole, une sauce épaisse de piments et d’épices au sésame.",
+          cloudinaryId: "quisos/8._Mole_nohguw",
+        },
+        {
+          name: "Pollo al chipotle",
+          note: "Poulet en sauce crémeuse au chipotle, un piment séché fumé qui donne du goût plus que de l’ardeur.",
+          cloudinaryId: "quisos/9._Pollo_al_chipotle_txkyvi",
+        },
+        {
+          name: "Pipián",
+          note: "Poulet en sauce de graines de courge grillées et de piments, au goût de noisette.",
+          cloudinaryId: "quisos/10._Pipian_u1w5mv",
+        },
+        {
+          name: "Rajas con elote",
+          note: "Lanières de piment poblano grillé (doux) avec maïs, crème et fromage.",
+          cloudinaryId: "quisos/11._Rajas_con_elote_rma3rq",
+        },
+        {
+          name: "Pollo con champiñones",
+          note: "Poulet mijoté avec des champignons en sauce tomate.",
+          cloudinaryId: "quisos/12._Pollo_con_champiñones_xc6745",
+        },
+        {
+          name: "Costilla en salsa roja",
+          note: "Côtes de bœuf en sauce rouge de tomate et de piment.",
+          cloudinaryId: "quisos/13._Costilla_en_salsa_roja_s3vlby",
+        },
+        {
+          name: "Lengua en salsa verde",
+          note: "Langue de bœuf, très tendre, en sauce verte de tomatille.",
+          cloudinaryId: "quisos/15_-_Lengua_en_salsa_verde_fmjvit",
+        },
+        {
+          name: "Carne al pastor",
+          note: "Le goût de la rue : viande marinée avec ananas, coriandre et oignon, comme dans les tacos.",
+          cloudinaryId: "quisos/15._Carne_al_pastor_neyycc",
+        },
+        {
+          name: "Cochinita",
+          note: "Porc effiloché en sauce achiote, une épice rouge, style yucatèque.",
+          cloudinaryId: "quisos/16._Cochinita_Pibil_fghtug",
+        },
+        {
+          name: "Bistec con papas",
+          note: "Bœuf mijoté avec des pommes de terre en sauce tomate.",
+          cloudinaryId: "quisos/18_-_Bistec_con_papa_s_htmnar",
+        },
+        {
+          name: "Calabazas guisadas",
+          note: "Courgettes mijotées avec maïs, crème et fromage.",
+          cloudinaryId: "quisos/19_-_Calabazas_guisadas_ijenzm",
+        },
+        {
+          name: "Arroz rojo",
+          note: "Riz rouge à la tomate, oignon et une touche de piment.",
+          cloudinaryId: "quisos/20_-_ARROZ_ROJO_g7z0dj",
+        },
+      ],
+
+    },
     music: {
       eyebrow: "Musique live",
       title: "Écouter, danser et aussi chanter",
@@ -2040,7 +2390,10 @@ export const content = {
         label: "Ambiance",
         themes: { wao: "WAO", arty: "ARTY", brutal: "BRUTAL" },
       },
+      fabPlayingLabel: "En direct",
+      fabMutedLabel: "Coupé",
       acts: [
+
         {
           moment: "Après l’apéro",
           name: "Marimba Vientos del Sur",
@@ -2106,9 +2459,43 @@ export const content = {
         button: "Ouvrir dans Spotify",
       },
     },
+    songRequest: {
+      eyebrow: "Demande ta chanson",
+      title: "Quelle chanson ne peut pas manquer ?",
+      body:
+        "Dis-nous quelle chanson tu veux écouter, chanter ou danser. Si tu veux monter sur scène, choisis l’option karaoké ou fanfare live et nous pourrons peut-être t’accompagner.",
+      songLabel: "Chanson (titre et artiste)",
+      songPlaceholder: "Ex. La Bikina · Luis Miguel",
+      searchHint: "Écris au moins 2 lettres pour rechercher.",
+      searching: "Recherche…",
+      noResults: "Aucune chanson trouvée. Écris le titre et l’artiste.",
+      searchError: "Impossible de rechercher. Réessaie.",
+      selectSong: "Sélectionne une chanson",
+      intentLabel: "Qu’aimerais-tu en faire ?",
+      intents: {
+        hear: "Je veux l’écouter",
+        sing: "Je veux la chanter sur scène",
+        karaoke: "Je veux la chanter au karaoké",
+        band: "Je veux que la fanfare la joue en live",
+      },
+      bandTypeLabel: "Quelle fanfare veux-tu qu’elle la joue ?",
+      bandTypes: {
+        marimba: "Marimba",
+        mariachi: "Mariachi",
+        norteno: "Norteño",
+        frenchBand: "Fanfare française",
+      },
+      submit: "Envoyer ma chanson",
+
+      success: "Merci ! Ta chanson est sur la liste.",
+      error: "Impossible d’enregistrer ta chanson. Réessaie.",
+      required: "Écris le titre de la chanson.",
+    },
+
     suggestions: {
       fields: {
         name: "Ton nom",
+
         dessert: "Quel dessert préfères-tu ?",
         food: "Que manque-t-il ou qu’aimerais-tu ajouter ?",
         song: "Chanson proposée",
@@ -2490,14 +2877,15 @@ export const content = {
       eyebrow: "Je viens de loin",
       title: "Ton voyage fait aussi partie de la fête",
       body:
-        "Nous accompagnerons personnellement celles et ceux qui viennent d’Europe et d’ailleurs : choix des vols, arrivée à Guadalajara, hébergement et transferts.",
+        "Nous accompagnerons personnellement celles et ceux qui le souhaitent et qui viennent d’Europe et d’ailleurs : choix des vols, arrivée à Guadalajara, hébergement et transferts.",
       points: [
-        "Madrid–Guadalajara est la liaison directe prioritaire depuis l’Europe.",
-        "Nous coordonnerons les accueils dès réception de tes numéros de vol.",
-        "Chaque voyageur aura un itinéraire d’arrivée, de séjour et de retour.",
+        "Madrid–Guadalajara, opéré par Aeromexico, est la liaison directe prioritaire depuis l’Europe.",
+        "Nous serons ravis de t’aider à organiser ton séjour et tes transferts.",
+        "N’hésite pas à nous contacter directement si tu as besoin de conseils pour organiser ton voyage et ton séjour au Mexique ! Nous adorons partager nos conseils de ce pays aux mille facettes !",
       ],
       routes: {
         eyebrow: "Schéma des trajets",
+
         title: "Rejoindre Roca Azul, puis continuer vers la côte",
         note:
           "Les durées indiquées sont indicatives et peuvent varier énormément. Sois prévoyant et, encore mieux, sois sur place en avance en réservant un logement si tu peux.",
@@ -2587,7 +2975,7 @@ export const content = {
       title: "Le plus beau cadeau, c'est ta présence",
 
       body:
-        "Ta présence est le plus beau cadeau que nous puissions recevoir. Si tu souhaites tout de même nous faire un geste, nous serons touchés par toute contribution pour notre lune de miel ou nos projets de couple.",
+        "Ta présence est le plus beau cadeau que nous puissions recevoir. Si tu souhaites tout de même nous faire un geste, nous serons touchés par toute contribution pour notre lune de miel.",
       note:
         "Il n'y a aucune obligation ni attente — ce qui nous rend vraiment heureux, c'est de partager ce week-end avec toi.",
       accounts: {
@@ -2789,9 +3177,10 @@ export const content = {
     rsvp: {
 
       eyebrow: "RSVP",
-      title: "Seras-tu avec nous ?",
+      title: "Alors, tu seras avec nous ?",
       body:
-        "Une seule réponse nous permettra d’organiser ta présence, ton hébergement et ton voyage. Si tes vols ne sont pas encore réservés, tu pourras nous les transmettre plus tard.",
+        "Tes réponses nous permettront d’organiser ta présence, ton hébergement et ton voyage. Merci pour ta patience ! Idéalement, nous aimerions avoir ta réponse avant fin octobre.",
+
       groups: {
         attendance: "Présence et hébergement",
         travel: "Je viens de loin",
@@ -3065,6 +3454,7 @@ export const content = {
       teAnimas: "Are you in?",
       petanque: "Pétanque",
       food: "Food",
+      guisos: "Stews",
       coast: "And afterwards?",
 
       menu1: "Menu",
@@ -3274,7 +3664,24 @@ export const content = {
       navSchedule: "See the three days",
       navProgram: "Detailed programme",
 
+      themes: {
+        label: "Choose the programme background",
+        options: [
+          {
+            id: "prehispanico",
+            label: "Pre-Hispanic",
+            hint: "Parchment and ancestral motifs",
+          },
+          {
+            id: "picado",
+            label: "Papel picado",
+            hint: "Festive colourful bunting",
+          },
+        ],
+      },
+
       items: [
+
 
         {
           day: "Friday 19 · from midday",
@@ -3369,7 +3776,17 @@ export const content = {
         "We want every meal to feel simple, generous, and unmistakably Mexican. This is the menu we are imagining, and it can still grow with your ideas.",
       flavoursEyebrow: "Flavours of Jalisco and Mexico",
       flavoursTitle: "What will we be tasting?",
+      vote: {
+        label: "Rate this dish",
+        star: "star",
+        vote: "vote",
+        votes: "votes",
+        empty: "Be the first to rate",
+        yourRating: "Your rating",
+        error: "Could not save your rating",
+      },
       flavours: [
+
         {
           key: "carnitas",
           type: "food",
@@ -3498,6 +3915,145 @@ export const content = {
           "If you want to make absolutely sure your evening is especially well supplied, you are welcome to bring your own ammunition to share and enjoy responsibly.",
       },
     },
+    guisos: {
+      eyebrow: "Which stews?",
+      title: "Help us choose the menu",
+      body:
+        "We want the banquet to taste like home. Vote for the stews you love most, and the most popular ones will be served on the wedding day. Doña Carmen and her team will give all our dishes a home-cooked flavour. The hardest part: choosing just 9 stews out of the 20 on offer here. What a puzzle — we'd take them all! Will you help us?",
+
+      flavoursTitle: "Which stews will we be tasting?",
+      flavourPlaceholder: "Stew",
+      voteLabel: "Your vote",
+
+      note:
+        "You can vote for as many as you like. The most voted will join the menu.",
+      spiceNote:
+        "🌶️ About the spice: many stews contain chilli, but almost always to add flavour, not heat. Most are not spicy at all. And if you want the spicy touch, there will always be salsas on the table to add to your taste.",
+      spiceButton: "About the spice",
+      spiceClose: "Close",
+
+
+      reorderTitle: "Rank your favourites",
+      reorderBody:
+        "Rank the stews from 1 to 20 by preference. The top 9 make it into the menu; the rest stay out. Drag each dish or use the arrows to move it.",
+      reorderDrag: "Drag to reorder",
+      reorderButton: "Rank my favourites",
+
+      reorderCancel: "Cancel",
+      reorderSave: "Save my ranking",
+      reorderSaved: "Ranking saved!",
+      reorderInMenu: "In the menu",
+      reorderNotInMenu: "Out of the menu",
+      reorderUp: "Move up",
+      reorderDown: "Move down",
+      reorderRank: "Place",
+      reorderHint: "The top 9 (green) make it into the menu. The rest (red) stay out.",
+
+
+      dishes: [
+        {
+          name: "Papas con longaniza",
+          note: "Golden potatoes stewed with longaniza, a fresh Mexican sausage, and a touch of chilli.",
+          cloudinaryId: "quisos/1._Papas_con_longaniza_cy5av6",
+        },
+        {
+          name: "Bistec a la mexicana",
+          note: "Beef in a jitomate (red tomato) sauce with onion, chilli, and coriander.",
+          cloudinaryId: "quisos/2._Bistec_a_la_MX_k0nt4r",
+        },
+        {
+          name: "Bistec con nopales",
+          note: "Beef stewed with nopales, the tender pads of the cactus, onion, and tomato.",
+          cloudinaryId: "quisos/3._Bistec_con_nopales_ngiynu",
+        },
+        {
+          name: "Alambre",
+          note: "Meat with bacon, peppers, onion, and melted cheese, like a kebab without the skewer.",
+          cloudinaryId: "quisos/4._Alambre_d2upyi",
+        },
+        {
+          name: "Barbacoa",
+          note: "Tender meat slow-cooked in a pit underground, with its hot consommé.",
+          cloudinaryId: "quisos/5._Barbacoa_pupyj7",
+        },
+        {
+          name: "Chicharrón en salsa roja",
+          note: "Chicharrón, crispy fried pork skin, in a red tomato and chilli salsa.",
+          cloudinaryId: "quisos/6._Chicharrón_en_salsa_roja_nlbqzb",
+        },
+        {
+          name: "Chicharrón en salsa verde",
+          note: "Crispy chicharrón in a green tomatillo salsa, a small tangy tomato.",
+          cloudinaryId: "quisos/6._Chicharrón_en_salsa_verde_t4hiiz",
+        },
+        {
+          name: "Costilla en tomatada",
+          note: "Beef ribs stewed in green tomatillo sauce.",
+          cloudinaryId: "quisos/7._Costilla_en_tomatada_rrawks",
+        },
+        {
+          name: "Mole",
+          note: "The classic celebration dish: chicken in mole, a thick sauce of chillies and spices with sesame.",
+          cloudinaryId: "quisos/8._Mole_nohguw",
+        },
+        {
+          name: "Pollo al chipotle",
+          note: "Chicken in a creamy chipotle sauce, a smoked dried chilli that adds flavour more than heat.",
+          cloudinaryId: "quisos/9._Pollo_al_chipotle_txkyvi",
+        },
+        {
+          name: "Pipián",
+          note: "Chicken in a sauce of toasted pumpkin seeds and chillies, with a nutty flavour.",
+          cloudinaryId: "quisos/10._Pipian_u1w5mv",
+        },
+        {
+          name: "Rajas con elote",
+          note: "Strips of roasted poblano chilli (mild) with corn, cream, and cheese.",
+          cloudinaryId: "quisos/11._Rajas_con_elote_rma3rq",
+        },
+        {
+          name: "Pollo con champiñones",
+          note: "Chicken stewed with mushrooms in tomato sauce.",
+          cloudinaryId: "quisos/12._Pollo_con_champiñones_xc6745",
+        },
+        {
+          name: "Costilla en salsa roja",
+          note: "Beef ribs in a red tomato and chilli sauce.",
+          cloudinaryId: "quisos/13._Costilla_en_salsa_roja_s3vlby",
+        },
+        {
+          name: "Lengua en salsa verde",
+          note: "Beef tongue, very tender, in green tomatillo sauce.",
+          cloudinaryId: "quisos/15_-_Lengua_en_salsa_verde_fmjvit",
+        },
+        {
+          name: "Carne al pastor",
+          note: "The taste of the street: marinated meat with pineapple, coriander, and onion, like in tacos.",
+          cloudinaryId: "quisos/15._Carne_al_pastor_neyycc",
+        },
+        {
+          name: "Cochinita",
+          note: "Shredded pork in achiote sauce, a red spice, Yucatán style.",
+          cloudinaryId: "quisos/16._Cochinita_Pibil_fghtug",
+        },
+        {
+          name: "Bistec con papas",
+          note: "Beef stewed with potatoes in tomato sauce.",
+          cloudinaryId: "quisos/18_-_Bistec_con_papa_s_htmnar",
+        },
+        {
+          name: "Calabazas guisadas",
+          note: "Zucchini stewed with corn, cream, and cheese.",
+          cloudinaryId: "quisos/19_-_Calabazas_guisadas_ijenzm",
+        },
+        {
+          name: "Arroz rojo",
+          note: "Red rice with tomato, onion, and a touch of chilli.",
+          cloudinaryId: "quisos/20_-_ARROZ_ROJO_g7z0dj",
+        },
+      ],
+
+    },
     music: {
       eyebrow: "Live music",
       title: "Listen, dance, and sing too",
@@ -3507,7 +4063,10 @@ export const content = {
         label: "Vibe",
         themes: { wao: "WAO", arty: "ARTY", brutal: "BRUTAL" },
       },
+      fabPlayingLabel: "Live",
+      fabMutedLabel: "Muted",
       acts: [
+
         {
           moment: "After the aperitif",
           name: "Marimba Vientos del Sur",
@@ -3574,9 +4133,43 @@ export const content = {
         button: "Open in Spotify",
       },
     },
+    songRequest: {
+      eyebrow: "Request your song",
+      title: "Which song can’t be missing?",
+      body:
+        "Tell us which song you want to hear, sing, or dance to. If you want to take the stage, choose the karaoke or live band option and we may be able to accompany you.",
+      songLabel: "Song (title and artist)",
+      songPlaceholder: "E.g. La Bikina · Luis Miguel",
+      searchHint: "Type at least 2 letters to search.",
+      searching: "Searching…",
+      noResults: "No songs found. Enter the title and artist.",
+      searchError: "We could not search. Please try again.",
+      selectSong: "Select a song",
+      intentLabel: "What would you like to do with it?",
+      intents: {
+        hear: "I want to hear it",
+        sing: "I want to sing it on stage",
+        karaoke: "I want to sing it at karaoke",
+        band: "I want the live band to play it",
+      },
+      bandTypeLabel: "Which band would you like to play it?",
+      bandTypes: {
+        marimba: "Marimba",
+        mariachi: "Mariachi",
+        norteno: "Norteño",
+        frenchBand: "French band",
+      },
+      submit: "Send my song",
+
+      success: "Thank you! Your song is on the list.",
+      error: "We could not save your song. Please try again.",
+      required: "Enter the song title.",
+    },
+
     suggestions: {
       fields: {
         name: "Your name",
+
         dessert: "Which dessert would you prefer?",
         food: "What is missing or what would you add?",
         song: "Song suggestion",
@@ -3953,14 +4546,15 @@ export const content = {
       eyebrow: "Coming from afar",
       title: "Your journey is part of the celebration too",
       body:
-        "We will personally support everyone travelling from Europe and beyond with flights, arrival in Guadalajara, accommodation, and transfers.",
+        "We will personally support everyone who wishes, travelling from Europe and beyond, with flights, arrival in Guadalajara, accommodation, and transfers.",
       points: [
-        "Madrid–Guadalajara is the priority nonstop route from Europe.",
-        "We will coordinate airport pickups once we have your flight numbers.",
-        "Every traveller will have an arrival, stay, and return itinerary.",
+        "Madrid–Guadalajara, operated by Aeromexico, is the priority direct connection from Europe.",
+        "We will be delighted to help you organise your stay and your transfers.",
+        "Don’t hesitate to contact us directly if you need advice on planning your trip and your stay in Mexico. We love sharing our tips about this country of a thousand facets!",
       ],
       routes: {
         eyebrow: "Journey map",
+
         title: "Getting to Roca Azul, then travelling on to the coast",
         note:
           "The times shown are indicative and can vary enormously. Please plan ahead and, even better, arrive early by booking accommodation if you can.",
@@ -4050,7 +4644,7 @@ export const content = {
 
       title: "Your presence is the greatest gift",
       body:
-        "Your company is the best present we could receive. If you would also like to give a token of affection, we would be grateful for any contribution towards our honeymoon or our shared projects as a couple.",
+        "Your company is the best present we could receive. If you would also like to give a token of affection, we would be grateful for any contribution towards our honeymoon.",
       note:
         "There is absolutely no obligation or expectation — what truly makes us happy is sharing this weekend with you.",
       accounts: {
@@ -4236,9 +4830,10 @@ export const content = {
     rsvp: {
 
       eyebrow: "RSVP",
-      title: "Will you join us?",
+      title: "So, will you join us?",
       body:
-        "One response will help us organise your attendance, accommodation, and journey. If your flights are not booked yet, you can share them later.",
+        "Your responses will help us organise your attendance, accommodation, and journey. Thank you for your patience! Ideally, we would like to have your response before the end of October.",
+
       groups: {
         attendance: "Attendance and accommodation",
         travel: "Coming from afar",

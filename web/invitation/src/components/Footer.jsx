@@ -3,12 +3,29 @@ import { EVENT } from "../content.js";
 import { useApp } from "../context/AppContext.jsx";
 import { CoupleNames, InitialsSwap } from "./ui.jsx";
 
+// The build number is injected at build time by vite.config.js as a UTC
+// timestamp (e.g. "20260815-0231"). We surface it in the footer so it's easy
+// to tell which build is deployed. In dev it's undefined, so we hide it.
+const BUILD = typeof __BUILD_NUMBER__ !== "undefined" ? __BUILD_NUMBER__ : null;
+
+// Format the UTC build timestamp into a short, human-readable label.
+function formatBuild(build) {
+  if (!build) return null;
+  // build looks like "YYYYMMDD-HHMM" (UTC).
+  const m = /^(\d{4})(\d{2})(\d{2})-(\d{2})(\d{2})$/.exec(build);
+  if (!m) return build;
+  const [, y, mo, d, h, mi] = m;
+  return `${y}-${mo}-${d} ${h}:${mi} UTC`;
+}
+
 export function Footer() {
   const { t } = useApp();
   const footer = t.footer || {};
   const identity = t.identity || {};
+  const versionLabel = formatBuild(BUILD);
 
   return (
+
     <footer className="site-footer">
       {identity.whatsappUrl && (
         <div className="site-footer-whatsapp">
@@ -36,12 +53,23 @@ export function Footer() {
         <p className="footer-names">
           <CoupleNames variant="identity-swap--footer" delay="0.2s" />
         </p>
-        <p className="footer-line">{footer.line}</p>
-        <p className="footer-date">
-          {EVENT.dateShort} · {EVENT.venue}
+        <p className="footer-meta">
+          <span className="footer-meta__item">{footer.line}</span>
+          <span className="footer-meta__sep" aria-hidden="true">·</span>
+          <span className="footer-meta__item">
+            {EVENT.dateShort} · {EVENT.venue}
+          </span>
+          <span className="footer-meta__sep" aria-hidden="true">·</span>
+          <span className="footer-meta__item">{footer.privacy}</span>
         </p>
-        <p className="footer-privacy">{footer.privacy}</p>
+        {versionLabel && (
+          <p className="footer-version" title="Build number">
+            v{versionLabel}
+          </p>
+        )}
       </div>
+
+
     </footer>
   );
 }

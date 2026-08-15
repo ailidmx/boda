@@ -3,6 +3,11 @@ import { useApp } from "../context/AppContext.jsx";
 import { cloudinaryImage } from "../cloudinary.js";
 import { LightboxCarousel } from "./LightboxCarousel.jsx";
 
+// The final chosen background mood for the Travel section is "ciel"
+// (Vol de nuit / Ciel étoilé). The temporary background selector was removed;
+// the section always uses the NIGHT FLIGHT variant.
+const BACKGROUND = "ciel";
+
 export function Travel() {
   const { t } = useApp();
   const travel = t.travel || {};
@@ -21,7 +26,9 @@ export function Travel() {
     : null;
 
   return (
-    <section className="travel-section section story-bg">
+    <section
+      className={`travel-section section story-bg travel-bg--${BACKGROUND}`}
+    >
       <div className="travel-heading reveal">
         <p className="eyebrow">{travel.eyebrow}</p>
         <h2>{travel.title}</h2>
@@ -73,3 +80,4 @@ export function Travel() {
     </section>
   );
 }
+
