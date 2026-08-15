@@ -284,6 +284,15 @@ npm run test:rules  # Firestore rules tests (uses emulators)
    `https://res.cloudinary.com/k2ajcgxv/image/upload/w_256,h_256,c_fill,g_auto/boda/<id>`
    (see `resolveGuestPhotoUrl`). When adding a new guest field that should notify,
    add a change-detection block in `onGuestUpdated` and a human-readable line.
+- **Guisos-order Telegram notification** — `onGuisoRanking` in
+  `functions/index.js` watches the `guiso_rankings/{guestId}` collection (one doc
+  per guest, written via `saveGuisoRanking` with `setDoc` + `merge: true`) and
+  notifies the couple whenever a guest saves or updates their guisos order. It
+  uses `onDocumentWritten` (fires on both create and update) and reads the
+  `after` snapshot. The message lists the guest, the dishes marked "in the menu"
+  (`selected`), and the full ranked order (`ranking`). When adding a new
+  guest-facing collection that should notify, add an `onDocumentWritten` trigger
+  here with the `secrets: [TELEGRAM_TOKEN, TELEGRAM_CHAT_ID]` dependency array.
 - **Genre survey is a curated catalog + isolated search service** — the "Califica
   la música" survey (`GenreSurvey.jsx` + `GenreVote.jsx`) rates music genres with
   1–5 stars. The source of truth is the app's OWN curated catalog
@@ -299,7 +308,38 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   never touch the UI or persistence layer to add a search source. When adding a
   genre, add it to `genre-taxonomy.js` (with aliases + tier); the UI, rules, and
   persistence need no changes.
+- **Desktop hamburger side drawer is desktop-only** — the desktop nav bar
+  always shows a hamburger button on its LEFT (`.side-drawer__toggle` inside
+  `.desktop-nav-wrap`). It opens a transparent side drawer
+  (`SideDrawer` in `Nav.jsx`, `.side-drawer__*` in `nav.css`) listing the full
+  nav in CSS columns (`column-width: 12rem`), so links flow into more columns
+  when they exceed the viewport height. Because the button lives inside
+  `.desktop-nav-wrap` (hidden below 900px), it never appears on mobile — mobile
+  keeps its existing split dropdowns. When adding a new nav link, it appears in
+  the drawer automatically (it renders the same `links` array as the desktop
+  nav). Reuse `.side-drawer__*` classes rather than building a new drawer.
+- **Login event is written ONLY in `signIn()`, never in `onAuthStateChanged`** —
+  The `login_events` write (which triggers the "NUEVO INICIO DE SESIÓN"
+  Telegram notification) lives in the `signIn()` function in `AppContext.jsx`,
+  which runs only when the guest truly types their credentials. It must NOT be
+  added to the `onAuthStateChanged` handler: that handler fires on EVERY page
+  load/refresh (the session is restored from `browserLocalPersistence`), so
+  writing there would spam the couple with a login notification on every
+  refresh even though the guest did not actually log in.
+- **Inactivity tracking is isolated in `useActivityTracker`** — the
+  `web/invitation/src/hooks/useActivityTracker.js` hook listens to user-activity
+  events (mouse, keyboard, scroll, touch, pointer) and, after the idle threshold
+  (default 5 min), logs a Firebase Analytics `user_inactive` event and writes a
+  doc to the `activity_events` collection (schema enforced in `firestore.rules`;
+  a Cloud Function `onActivityEvent` notifies the couple). It exposes `isActive`
+  (false once idle) which `AppContext` puts on the context value. `useSectionTime`
+  (via `LazySection`) reads `isActive` and pauses section-time accumulation while
+  the guest is idle or the tab is hidden — idle/hidden time is NOT counted as
+  "time spent" on a section. When adding a new activity signal, extend the
+  `ACTIVITY_EVENTS` list and the `type` enum in the rules.
 - *(Add new lessons here as you discover them.)*
+
+
 
 
 

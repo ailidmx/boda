@@ -48,6 +48,8 @@ import {
 import { loadAttendanceResponses } from "../guest-attendance.js";
 import { loadRooms } from "../rooms.js";
 import { loadCabins } from "../cabins.js";
+import { useActivityTracker } from "../hooks/useActivityTracker.js";
+
 
 const LANGUAGE_STORAGE_KEY = "boda-language";
 const USERNAME_STORAGE_KEY = "boda-username";
@@ -211,9 +213,23 @@ export function AppProvider({ children }) {
   // can clearly show "music is playing" vs "music is muted".
   const [musicPlaying, setMusicPlaying] = useState(false);
 
+  // Whether the Music section is currently in view. The Music section's FAB
+  // and the Winamp banner are only shown while the guest is actually in the
+  // Music section; the audio keeps playing (or stays muted) based on
+  // `musicEnabled` regardless of which section is on screen.
+  const [musicSectionVisible, setMusicSectionVisibleState] = useState(false);
+
+  // Detect when the signed-in guest stops interacting (inactivity). Exposes
+  // `isActive` so section-time tracking can pause while the guest is idle, and
+  // logs an `user_inactive` analytics event + Firestore doc after the idle
+  // threshold. Only meaningful once signed in (guestId is the auth uid).
+  const { isActive } = useActivityTracker({
+    guestId: authState === "signedIn" ? auth.currentUser?.uid : undefined,
+  });
 
   // Avoid re-prompting on every auth state change within the same session.
   const langPromptShown = useRef(false);
+
   // Avoid re-opening the identity modal on every auth state change within the
   // same session (it is still reopenable manually from the user menu).
   const identityPromptShown = useRef(false);
@@ -285,20 +301,16 @@ export function AppProvider({ children }) {
         });
         setAuthState("signedIn");
 
-        // Log the sign-in so a Cloud Function can post a Telegram notification.
-        // This is a best-effort, fire-and-forget write: a failure here must
-        // never block the guest from entering the invitation.
-        try {
-          await addDoc(collection(db, "login_events"), {
-            guestId: user.uid,
-            username: username || resolvedGuest?.username || "",
-            createdAt: serverTimestamp(),
-          });
-        } catch (loginLogError) {
-          console.warn("[login] failed to log sign-in event", loginLogError);
-        }
+        // NOTE: The `login_events` write is intentionally NOT here. This
+        // `onAuthStateChanged` handler fires on EVERY page load/refresh (the
+        // session is restored from browserLocalPersistence), so writing here
+        // would spam the couple with a "NUEVO INICIO DE SESIÓN" notification
+        // on every refresh even though the guest did not actually log in. The
+        // login event is written only in `signIn()`, which runs when the guest
+        // truly types their credentials.
 
         // After sign-in we use the guest's preferred language. If it differs
+
 
         // from the language the user was seeing (the login page, which is
         // Spanish by default), switch to the preferred language in the
@@ -397,6 +409,22 @@ export function AppProvider({ children }) {
         timeout,
       ]);
       window.localStorage.setItem(USERNAME_STORAGE_KEY, username);
+
+      // Log the sign-in so a Cloud Function can post a Telegram notification.
+      // This runs ONLY on a real sign-in (the guest typed their credentials),
+      // NOT on every page refresh — the `onAuthStateChanged` handler restores
+      // the session on refresh and must not re-notify. Best-effort, fire-and-
+      // forget: a failure here must never block the guest from entering.
+      try {
+        await addDoc(collection(db, "login_events"), {
+          guestId: auth.currentUser?.uid || "",
+          username,
+          createdAt: serverTimestamp(),
+        });
+      } catch (loginLogError) {
+        console.warn("[login] failed to log sign-in event", loginLogError);
+      }
+
       // onAuthStateChanged will fire and set authState to signedIn.
     } catch (error) {
       console.warn("Invitation access rejected", error.code || error.message, {
@@ -405,6 +433,7 @@ export function AppProvider({ children }) {
       setGateError("gateError");
     }
   };
+
 
   const signOut = async () => {
     try {
@@ -523,6 +552,11 @@ export function AppProvider({ children }) {
     window.localStorage.setItem(MUSIC_ENABLED_KEY, enabled ? "1" : "0");
   };
 
+  // Toggle whether the Music section is currently in view. Drives the FAB and
+  // Winamp banner visibility (see musicSectionVisible above).
+  const setMusicSectionVisible = (visible) =>
+    setMusicSectionVisibleState(visible);
+
   const value = useMemo(
     () => ({
       language,
@@ -544,6 +578,9 @@ export function AppProvider({ children }) {
       setMusicEnabled,
       musicPlaying,
       setMusicPlaying,
+      musicSectionVisible,
+      setMusicSectionVisible,
+      isActive,
       signIn,
       signOut,
       changePassword,
@@ -560,8 +597,11 @@ export function AppProvider({ children }) {
       revertLangPrompt,
       musicEnabled,
       musicPlaying,
+      musicSectionVisible,
+      isActive,
     ],
   );
+
 
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

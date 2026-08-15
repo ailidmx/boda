@@ -8,14 +8,17 @@
  *
  * Collections watched:
  *   - login_events            (guest signs in)
+ *   - activity_events         (guest goes inactive)
  *   - rsvp_submissions        (RSVP form submitted)
  *   - petanque_participation  (petanque form submitted)
  *   - coast_interest          (coast form submitted)
  *   - attendance_responses    (save-the-date attendance saved)
  *   - card_votes              (star rating on an experience card)
+ *   - guiso_rankings          (guest orders their guisos)
  *   - guests                  (identity check, name/photo/phone, RSVP answers,
  *                              flight details, travel mode, messages, hosting)
  *                             Notifications include the guest's avatar photo.
+
 
  *
  * Configuration (set once, secrets stay server-side):
@@ -24,7 +27,7 @@
 
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
-import { onDocumentCreated, onDocumentUpdated } from "firebase-functions/v2/firestore";
+import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from "firebase-functions/v2/firestore";
 import { defineSecret } from "firebase-functions/params";
 import { setGlobalOptions } from "firebase-functions/v2";
 
@@ -154,7 +157,38 @@ export const onLogin = onDocumentCreated(
   },
 );
 
+// ── Activity events (inactivity) ───────────────────────────────────────────
+
+/**
+ * Fires when a guest goes inactive (stops interacting for the idle threshold).
+ * The client writes a lightweight document to the `activity_events` collection
+ * on each inactivity episode. This lets the couple see who stopped browsing
+ * and for how long they were idle.
+ */
+export const onActivityEvent = onDocumentCreated(
+  { document: "activity_events/{eventId}", database: DB_ID, secrets: [TELEGRAM_TOKEN, TELEGRAM_CHAT_ID] },
+  async (event) => {
+
+    const data = event.data?.data() || {};
+    const guestId = data.guestId || event.params.eventId || "";
+    const name = (await resolveGuestName(guestId)) || guestId;
+    const time = formatTime(data.createdAt);
+    const idleSeconds = Number(data.idleSeconds) || 0;
+    const idleMinutes = Math.max(1, Math.round(idleSeconds / 60));
+
+    const lines = [
+      "💤 *Invitado inactivo*",
+      kv("Invitado", name),
+      kv("Inactivo", `${idleMinutes} min`),
+      kv("Hora", time),
+    ];
+    await notify(lines.filter(Boolean).join("\n"));
+
+  },
+);
+
 // ── RSVP form ──────────────────────────────────────────────────────────────
+
 
 /** Fires when a guest submits the main RSVP form. */
 export const onRsvpSubmission = onDocumentCreated(
@@ -293,6 +327,38 @@ export const onCardVote = onDocumentCreated(
       kv("Tipo", data.cardType || ""),
       kv("Tarjeta", data.cardKey || ""),
       kv("Calificación", `${data.rating || ""} ${stars}`),
+      kv("Hora", time),
+    ];
+    await notify(lines.filter(Boolean).join("\n"));
+
+  },
+);
+
+// ── Guisos ranking (guest orders their guisos) ─────────────────────────────
+
+/**
+ * Fires when a guest saves or updates their guisos ranking (their "order").
+ * The document lives at `guiso_rankings/{guestId}` — one doc per guest. We
+ * notify on create and on update so the couple knows a guest has ordered.
+ */
+export const onGuisoRanking = onDocumentWritten(
+  { document: "guiso_rankings/{guestId}", database: DB_ID, secrets: [TELEGRAM_TOKEN, TELEGRAM_CHAT_ID] },
+
+  async (event) => {
+
+    const data = event.data?.after?.data() || {};
+    const guestId = event.params.guestId || data.guestId || "";
+    const name = await resolveGuestName(guestId);
+    const time = formatTime(data.updatedAt);
+
+    const ranking = Array.isArray(data.ranking) ? data.ranking : [];
+    const selected = Array.isArray(data.selected) ? data.selected : [];
+
+    const lines = [
+      "🍲 *Nuevo pedido de guisos*",
+      kv("Invitado", name || guestId),
+      kv("Platillos en menú", selected.length ? selected.join(", ") : "—"),
+      kv("Orden completo", ranking.length ? ranking.join(" → ") : "—"),
       kv("Hora", time),
     ];
     await notify(lines.filter(Boolean).join("\n"));

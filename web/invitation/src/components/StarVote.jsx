@@ -50,6 +50,21 @@ export function StarVote({ cardType, cardKey, onVote }) {
     return { average: sum / votes.length, count: votes.length };
   }, [votes]);
 
+  // Render a 5-star row for a numeric score (0–5). Fractional averages are
+  // rounded to the nearest half star so the general score reads clearly.
+  const renderStars = (value) => {
+    const rounded = Math.round((Number(value) || 0) * 2) / 2;
+    const full = Math.floor(rounded);
+    const half = rounded - full >= 0.5;
+    const stars = [];
+    for (let i = 0; i < 5; i += 1) {
+      if (i < full) stars.push("★");
+      else if (i === full && half) stars.push("⯨");
+      else stars.push("☆");
+    }
+    return stars.join("");
+  };
+
   const handleRate = useCallback(
     async (rating) => {
       if (!guestId) return;
@@ -108,7 +123,9 @@ export function StarVote({ cardType, cardKey, onVote }) {
       <div className="star-vote__meta">
         {count > 0 ? (
           <span className="star-vote__average">
-            {average.toFixed(1)} <span aria-hidden="true">★</span>
+            <span className="star-vote__stars-row" aria-hidden="true">
+              {renderStars(average)}
+            </span>
             <span className="star-vote__count">
               ({count} {count === 1 ? voteLabel.vote : voteLabel.votes})
             </span>

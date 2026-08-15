@@ -609,6 +609,9 @@ export const content = {
       reorderDown: "Bajar",
       reorderRank: "Lugar",
       reorderHint: "Los 9 primeros (verde) entran al menú. Los demás (rojo) se quedan fuera.",
+      reorderMyScore: "Tu voto",
+      reorderGeneralScore: "Puntuación general",
+
 
 
       dishes: [
@@ -2346,6 +2349,9 @@ export const content = {
       reorderDown: "Descendre",
       reorderRank: "Place",
       reorderHint: "Les 9 premiers (vert) entrent au menu. Les autres (rouge) restent dehors.",
+      reorderMyScore: "Ton vote",
+      reorderGeneralScore: "Score général",
+
 
 
       dishes: [
@@ -4089,9 +4095,12 @@ export const content = {
       reorderDown: "Move down",
       reorderRank: "Place",
       reorderHint: "The top 9 (green) make it into the menu. The rest (red) stay out.",
+      reorderMyScore: "Your vote",
+      reorderGeneralScore: "General score",
 
 
       dishes: [
+
         {
           name: "Papas con longaniza",
           note: "Golden potatoes stewed with longaniza, a fresh Mexican sausage, and a touch of chilli.",

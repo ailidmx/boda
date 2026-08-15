@@ -219,9 +219,13 @@ columns in the "Invitados" tab (matched by `UID`). Column mapping:
       in `tests/song-search.test.mjs` (14 pass).
 - [x] **Piquant note as a FAB-activated modal** — the "À propos du piquant" note
       in Guisos opens in a modal via a floating action button (🌶️ + label).
-- [x] **Programme détaillée background theme selector** — the detailed programme
-      section lets guests choose between **papel picado** bunting and the
-      **prehispanic** parchment motif (pill group under the heading, trilingual).
+- [x] **Programme détaillée background fixed to papel picado (selector removed)** —
+      the detailed programme section now ALWAYS uses the colourful **papel
+      picado** bunting background. The guest-facing background theme selector
+      (papel picado vs. prehispanic parchment) was removed from `Weekend.jsx`;
+      the theme is hardcoded to `"picado"` (`MEDIA.picado`). The parchment /
+      prehispanic motif is no longer offered.
+
 - [x] **"À propos" (About) modal — center + enlarge on desktop** — opens centered
       and wide (`width: min(64rem, 100%)`); feature text wraps cleanly.
 - [x] **Force food card logos to be squared** — the Doña Carmen badge is now a
@@ -252,13 +256,37 @@ columns in the "Invitados" tab (matched by `UID`). Column mapping:
       `cloud.firestore/boda-us-central1` on 2026-08-15). Guiso rankings can now
       be saved and reordered correctly.
 
-- [ ] **Deduplicate existing `card_votes`** — a single guest's star vote on a
+- [x] **Desktop hamburger side drawer (multi-column)** — the desktop nav bar
+      now always shows a hamburger button on its LEFT (the horizontal menu bar
+      is kept as-is). Clicking it opens an elegant, transparent side drawer
+      that slides in from the left with the full nav list laid out in CSS
+      columns (`column-width: 12rem`): if the links exceed the viewport height
+      they flow into additional columns instead of scrolling. Desktop only —
+      the button lives inside `.desktop-nav-wrap`, which is hidden below the
+      tablet breakpoint (mobile keeps its existing split dropdowns). Closes on
+      link click, Escape, the ✕ button, or clicking the backdrop; body scroll
+      is locked while open. Implemented in `Nav.jsx` (`SideDrawer` component)
+      + `nav.css` (`.side-drawer__*`). Production build passes.
+
+- [x] **Deduplicate existing `card_votes`** — a single guest's star vote on a
       card can show as 2 votes. The code + rules are correct (deterministic doc
       ID `${cardType}_${cardKey}_${guestId}` + `voteId == ...auth.uid` means one
       guest can only ever have one vote doc per card), so the duplicate is
       almost certainly stale data created before the doc-ID enforcement was
       added. Write a cleanup script to find and merge/remove duplicate
       `card_votes` docs for the same (cardType, cardKey, guestId).
+  - **Done:** added `scripts/cleanup-card-votes-duplicates.mjs` (dry-run by
+    default, `--execute` to apply). It groups all `card_votes` docs by
+    (cardType, cardKey, guestId), reports any group with >1 doc, and in
+    `--execute` mode deletes the extra docs (keeping the deterministic-ID doc,
+    falling back to the most recently updated). **Verified on production: the
+    live `card_votes` collection has 52 docs, all unique by
+    (cardType, cardKey, guestId), and every doc ID matches the deterministic
+    pattern — 0 duplicates.** The read/aggregation logic in `StarVote.jsx` and
+    `Guisos.jsx` counts docs directly, so with clean data the "2 votes" display
+    cannot occur. The script remains as a safety net if duplicates ever
+    reappear.
+
 
 
 

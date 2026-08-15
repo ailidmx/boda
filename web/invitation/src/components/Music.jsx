@@ -10,7 +10,14 @@ import { GenreSurvey } from "./GenreSurvey.jsx";
 
 
 export function Music() {
-  const { t, musicEnabled, setMusicEnabled, musicPlaying } = useApp();
+  const {
+    t,
+    musicEnabled,
+    setMusicEnabled,
+    musicPlaying,
+    musicSectionVisible,
+    setMusicSectionVisible,
+  } = useApp();
   const music = t.music || {};
   // The final chosen background theme is "arty". The temporary theme selector
   // was removed; the section always uses the ARTY variant.
@@ -22,14 +29,19 @@ export function Music() {
   ];
 
   // The section's root element, observed so we can auto-start the music stream
-  // the first time the guest scrolls into the Music section.
+  // the first time the guest scrolls into the Music section, and so we can
+  // show/hide the FAB (and the Winamp banner) only while the section is in
+  // view.
   const sectionRef = useRef(null);
   const autoStartedRef = useRef(false);
 
   // Auto-play the music stream the first time the Music section scrolls into
   // view. Scrolling is a user gesture, so the browser generally allows the
   // audio to start. We only do this once per session; afterwards the guest is
-  // in full control via the FAB.
+  // in full control via the FAB. The same observer also drives the FAB and
+  // Winamp banner visibility: they are only shown while the Music section is
+  // actually on screen, while the audio keeps playing (or stays muted) based
+  // on `musicEnabled` regardless of which section is in view.
   useEffect(() => {
     const section = sectionRef.current;
     if (!section) return undefined;
@@ -37,10 +49,10 @@ export function Music() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
+          setMusicSectionVisible(entry.isIntersecting);
           if (entry.isIntersecting && !autoStartedRef.current) {
             autoStartedRef.current = true;
             setMusicEnabled(true);
-            observer.disconnect();
           }
         });
       },
@@ -48,8 +60,11 @@ export function Music() {
     );
 
     observer.observe(section);
-    return () => observer.disconnect();
-  }, [setMusicEnabled]);
+    return () => {
+      observer.disconnect();
+      setMusicSectionVisible(false);
+    };
+  }, [setMusicEnabled, setMusicSectionVisible]);
 
   // Toggle the music stream on/off from the FAB. When turned off, the player
   // closes and the button shows a crossed-out note; turning it back on resumes
@@ -67,38 +82,36 @@ export function Music() {
 
       {/* Floating action button: clearly shows whether the music stream is
           playing (animated equalizer) or muted (crossed-out note). Clicking it
-          toggles the stream on/off. */}
-      <button
-        type="button"
-        className={`music-fab${musicPlaying ? " is-playing" : " is-muted"}`}
-        onClick={handleToggleMusic}
-        aria-pressed={musicPlaying}
-        aria-label={
-          musicPlaying
-            ? (music.fabPlayingLabel || "Música en reproducción")
-            : (music.fabMutedLabel || "Música silenciada")
-        }
-        title={
-          musicPlaying
-            ? (music.fabPlayingLabel || "Música en reproducción")
-            : (music.fabMutedLabel || "Música silenciada")
-        }
-      >
-        <span className="music-fab__icon" aria-hidden="true">
-          <span className="music-fab__note">♪</span>
-          <span className="music-fab__bars">
-            <i />
-            <i />
-            <i />
-            <i />
+          toggles the stream on/off. It is only rendered while the Music
+          section is in view, and it is icon-only (no text label). */}
+      {musicSectionVisible && (
+        <button
+          type="button"
+          className={`music-fab${musicPlaying ? " is-playing" : " is-muted"}`}
+          onClick={handleToggleMusic}
+          aria-pressed={musicPlaying}
+          aria-label={
+            musicPlaying
+              ? (music.fabPlayingLabel || "Música en reproducción")
+              : (music.fabMutedLabel || "Música silenciada")
+          }
+          title={
+            musicPlaying
+              ? (music.fabPlayingLabel || "Música en reproducción")
+              : (music.fabMutedLabel || "Música silenciada")
+          }
+        >
+          <span className="music-fab__icon" aria-hidden="true">
+            <span className="music-fab__note">♪</span>
+            <span className="music-fab__bars">
+              <i />
+              <i />
+              <i />
+              <i />
+            </span>
           </span>
-        </span>
-        <span className="music-fab__label">
-          {musicPlaying
-            ? (music.fabPlayingLabel || "En directo")
-            : (music.fabMutedLabel || "Silenciado")}
-        </span>
-      </button>
+        </button>
+      )}
 
       <div className="experience-heading reveal">
 

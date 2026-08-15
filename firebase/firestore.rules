@@ -351,41 +351,15 @@ service cloud.firestore {
         // save their answers; the structure is validated client-side.
         && (!request.resource.data.keys().hasAny(["rsvp"])
           || request.resource.data.rsvp is map)
-        && hasValidFlightInfo();
+        // `flightInfo` is allowed in hasOnly() and in the affectedKeys() lists
+        // so guests can save their flight details. Its structure is validated
+        // client-side (see validation.js); we intentionally do NOT deep-validate
+        // it here because the combined expression count of this base function
+        // plus the flightInfo checks exceeds Firestore's 1000-expression limit.
+        && (!request.resource.data.keys().hasAny(["flightInfo"])
+          || request.resource.data.flightInfo is map);
     }
 
-    // `flightInfo` holds the guest's flight details for the Travel section
-    // (origin, connections, destination, legs, arrival date/time, final flight
-    // number, and the return-trip `departure` details). It is client-writable
-    // and validated structurally here so guests can only store well-formed
-    // airport/leg objects.
-    function hasValidFlightInfo() {
-      return (!request.resource.data.keys().hasAny(["flightInfo"])
-        || (request.resource.data.flightInfo is map
-          && request.resource.data.flightInfo.keys().hasOnly([
-            "origin", "connections", "destination", "legs",
-            "arrivalDate", "arrivalTime", "finalFlightNumber", "departure"
-          ])
-          && (!request.resource.data.flightInfo.keys().hasAny(["origin"])
-            || isValidAirport(request.resource.data.flightInfo.origin))
-          && (!request.resource.data.flightInfo.keys().hasAny(["destination"])
-            || isValidAirport(request.resource.data.flightInfo.destination))
-          && (!request.resource.data.flightInfo.keys().hasAny(["connections"])
-            || (request.resource.data.flightInfo.connections is list
-              && request.resource.data.flightInfo.connections.size() <= 3))
-          && (!request.resource.data.flightInfo.keys().hasAny(["legs"])
-            || (request.resource.data.flightInfo.legs is list
-              && request.resource.data.flightInfo.legs.size() <= 4))
-
-          && (!request.resource.data.flightInfo.keys().hasAny(["arrivalDate"])
-            || request.resource.data.flightInfo.arrivalDate.matches('^\\d{4}-\\d{2}-\\d{2}$'))
-          && (!request.resource.data.flightInfo.keys().hasAny(["arrivalTime"])
-            || request.resource.data.flightInfo.arrivalTime.matches('^\\d{2}:\\d{2}$'))
-          && (!request.resource.data.flightInfo.keys().hasAny(["finalFlightNumber"])
-            || isShortText(request.resource.data.flightInfo.finalFlightNumber, 30))
-          && (!request.resource.data.flightInfo.keys().hasAny(["departure"])
-            || hasValidDeparture(request.resource.data.flightInfo.departure))));
-    }
 
     // The return-trip (departure) details inside `flightInfo`. Mirrors the
     // arrival fields but grouped under a `departure` map so the two trips stay
@@ -554,6 +528,35 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow update, delete: if false;
     }
+
+    // ── Activity events (inactivity detection) ─────────────────────────────
+    // A lightweight, append-only log of guest activity signals (currently
+    // "inactive": the guest stopped interacting for the idle threshold). The
+    // client writes one document per inactivity episode; a Cloud Function can
+    // watch this collection and notify the couple. Guests may only create
+    // (never update or delete) their own activity events.
+    function hasValidActivityEventFields() {
+      return request.resource.data.keys().hasAll([
+          "guestId", "type", "idleSeconds", "createdAt"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "guestId", "type", "idleSeconds", "createdAt"
+        ])
+        && isShortText(request.resource.data.guestId, 100)
+        && request.resource.data.guestId == request.auth.uid
+        && request.resource.data.type in ["inactive"]
+        && request.resource.data.idleSeconds is int
+        && request.resource.data.idleSeconds >= 0
+        && request.resource.data.idleSeconds <= 86400
+        && request.resource.data.createdAt == request.time;
+    }
+
+    match /activity_events/{eventId} {
+      allow create: if request.auth != null && hasValidActivityEventFields();
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+
 
 
 
