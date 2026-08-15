@@ -557,6 +557,36 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // ── Page views (section navigation analytics) ──────────────────────────
+    // A lightweight, append-only log of which invitation sections a guest
+    // views and how they navigated there (nav / side_drawer / mobile_menu /
+    // fab / scroll). The client writes one document per section view; a Cloud
+    // Function or report script can aggregate these into a funnel. Guests may
+    // only create (never update or delete) their own page views.
+    function hasValidPageViewFields() {
+      return request.resource.data.keys().hasAll([
+          "guestId", "sectionId", "navigationType", "createdAt"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "guestId", "sectionId", "navigationType", "createdAt"
+        ])
+        && isShortText(request.resource.data.guestId, 100)
+        && request.resource.data.guestId == request.auth.uid
+        && isShortText(request.resource.data.sectionId, 100)
+        && request.resource.data.sectionId.size() > 0
+        && isShortText(request.resource.data.navigationType, 50)
+        && request.resource.data.navigationType in ["nav", "side_drawer", "mobile_menu", "fab", "scroll", "initial"]
+
+        && request.resource.data.createdAt == request.time;
+    }
+
+    match /page_views/{viewId} {
+      allow create: if request.auth != null && hasValidPageViewFields();
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+
+
 
 
 

@@ -82,11 +82,60 @@ export function trackSectionTime(sectionId, seconds) {
 /**
  * Log a generic click with an identifier.
  * @param {string} elementId  e.g. "nav.gift", "rsvp.submit".
- * @param {object} [params]
+ * @param {object} [params]  May include `action_type` (see trackAction) so
+ *   clicks can be filtered by category (navigation, fab, rsvp_answer, ...).
  */
 export function trackClick(elementId, params = {}) {
   trackEvent("click", { element_id: elementId, ...params });
 }
+
+/**
+ * Log a categorized action. `actionType` is a stable, filterable category so
+ * every interactive element can be grouped in reports regardless of its
+ * element id. The `element_id` is the specific control (e.g. "nav.gift",
+ * "music.fab", "rsvp.answer.4").
+ *
+ * @param {string} actionType  One of the ACTION_TYPES below.
+ * @param {string} elementId   Stable id of the control.
+ * @param {object} [params]    Extra params (e.g. { section_id }).
+ */
+export function trackAction(actionType, elementId, params = {}) {
+  trackEvent("action", { action_type: actionType, element_id: elementId, ...params });
+}
+
+/**
+ * The canonical set of action categories used across the invitation. Keeping
+ * them in one place makes reports and filters consistent.
+ */
+export const ACTION_TYPES = {
+  NAVIGATION: "navigation", // nav links, side drawer, mobile menu, CTA
+  FAB: "fab", // floating action buttons (music, weather, story, venue, ...)
+  RSVP_ANSWER: "rsvp_answer", // selecting an RSVP / mini-RSVP answer
+  FORM_SUBMIT: "form_submit", // submitting a form (RSVP save, song request, ...)
+  MENU: "menu", // user-menu dropdown items
+  TOGGLE: "toggle", // on/off switches (music, language, ...)
+  MODAL: "modal", // opening/closing a modal or lightbox
+};
+
+/**
+ * Log a page view. In this single-page invitation each section is treated as
+ * a "page", so a page view fires whenever the visible section changes.
+ *
+ * @param {object} opts
+ * @param {string} opts.pageTitle   Section id, e.g. "story".
+ * @param {string} [opts.pagePath]  e.g. "/#story".
+ * @param {string} [opts.navigationType]  "initial" | "scroll" | "nav" |
+ *   "side_drawer" | "mobile_menu" | "fab".
+ */
+export function trackPageView({ pageTitle, pagePath, navigationType = "scroll" } = {}) {
+  trackEvent("page_view", {
+    page_title: pageTitle,
+    page_path: pagePath || `/#${pageTitle}`,
+    page_location: typeof window !== "undefined" ? window.location.href : "",
+    navigation_type: navigationType,
+  });
+}
+
 
 /**
  * Build the "cart items" for the RSVP funnel from the primary and extra stay
