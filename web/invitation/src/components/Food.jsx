@@ -162,8 +162,10 @@ export function Food() {
         className={`drinks-policy-fab${drinksActive ? " is-visible" : ""}`}
         ref={drinksFabRef}
         aria-label={food.drinks.title}
+        data-analytics="fab.food.drinks"
         onClick={() => setDrinksOpen(true)}
       >
+
         <span>🍸</span>
       </button>
 

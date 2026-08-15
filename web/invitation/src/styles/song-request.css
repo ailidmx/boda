@@ -20,19 +20,11 @@
   z-index: 1;
 }
 
-/* The intro body is a plain paragraph (not a citation), so it must not pick
-   up the generic `p` citation styling. */
-.song-request-section .experience-note {
-  font-style: normal;
-  padding-left: 0;
-  border-left: 0;
-}
-.song-request-section .experience-note::before,
-.song-request-section .experience-note::after {
-  content: none;
-}
+/* The intro body is an elegant citation (italic, muted, right-aligned) via
+   the shared `.experience-note` style, so no override is needed here. */
 
 /* ── Form ──────────────────────────────────────────────────────────────── */
+
 .song-request-form {
   max-width: 40rem;
   margin: 2rem auto 0;

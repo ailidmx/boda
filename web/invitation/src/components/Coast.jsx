@@ -694,12 +694,14 @@ export function Coast() {
                     <button
                       className="button button--ghost"
                       type="button"
+                      data-analytics="rsvp.modify.coast"
                       onClick={goToStart}
                     >
                       {rsvpMini.modifyButton}
                     </button>
                     {saveStatusText && <small>{saveStatusText}</small>}
                   </div>
+
                 </div>
               ),
             },

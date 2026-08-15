@@ -284,15 +284,34 @@ npm run test:rules  # Firestore rules tests (uses emulators)
    `https://res.cloudinary.com/k2ajcgxv/image/upload/w_256,h_256,c_fill,g_auto/boda/<id>`
    (see `resolveGuestPhotoUrl`). When adding a new guest field that should notify,
    add a change-detection block in `onGuestUpdated` and a human-readable line.
-- **Guisos-order Telegram notification** — `onGuisoRanking` in
-  `functions/index.js` watches the `guiso_rankings/{guestId}` collection (one doc
-  per guest, written via `saveGuisoRanking` with `setDoc` + `merge: true`) and
-  notifies the couple whenever a guest saves or updates their guisos order. It
-  uses `onDocumentWritten` (fires on both create and update) and reads the
-  `after` snapshot. The message lists the guest, the dishes marked "in the menu"
-  (`selected`), and the full ranked order (`ranking`). When adding a new
-  guest-facing collection that should notify, add an `onDocumentWritten` trigger
-  here with the `secrets: [TELEGRAM_TOKEN, TELEGRAM_CHAT_ID]` dependency array.
+ - **Guisos-order Telegram notification** — `onGuisoRanking` in
+   `functions/index.js` watches the `guiso_rankings/{guestId}` collection (one doc
+   per guest, written via `saveGuisoRanking` with `setDoc` + `merge: true`) and
+   notifies the couple whenever a guest saves or updates their guisos order. It
+   uses `onDocumentWritten` (fires on both create and update) and reads the
+   `after` snapshot. The message lists the guest, the dishes marked "in the menu"
+   (`selected`), and the full ranked order (`ranking`). When adding a new
+   guest-facing collection that should notify, add an `onDocumentWritten` trigger
+   here with the `secrets: [TELEGRAM_TOKEN, TELEGRAM_CHAT_ID]` dependency array.
+ - **Song-request + genre-rating Telegram notifications** — `onSongRequest` and
+   `onGenreRating` in `functions/index.js` notify the couple when a guest submits
+   a song request (`song_requests/{requestId}`, written via `addDoc` in
+   `song-requests.js`) or rates a music genre (`genre_ratings/{genreId}_{guestId}`,
+   written via `setDoc` + `merge: true` in `genre-ratings.js`). `onSongRequest`
+   uses `onDocumentCreated` (each request is a new doc); `onGenreRating` uses
+   `onDocumentWritten` (a rating can be created or updated). Both read the guest
+   name via `resolveGuestName` and include the `secrets: [TELEGRAM_TOKEN,
+   TELEGRAM_CHAT_ID]` dependency array. When adding a new guest-facing collection
+   that should notify, add a trigger here.
+ - **Dead notification collections (no app writes)** — `rsvp_submissions`,
+   `petanque_participation`, and `coast_interest` still have deployed triggers
+   (`onRsvpSubmission`, `onPetanqueSubmission`, `onCoastSubmission`) but the app
+   NO LONGER writes to them: the current RSVP/petanque/coast mini-RSVP flows save
+   answers directly to the `guests` collection via `saveRsvpAnswers` →
+   `rsvp.answers`, which `onGuestUpdated` already detects. The old
+   `submit-forms.js` helpers (`submitRsvp`, `submitPetanque`, `submitCoast`) have
+   no callers. These triggers are harmless but dead; they can be removed if the
+   couple wants to reduce deployed functions.
 - **Genre survey is a curated catalog + isolated search service** — the "Califica
   la música" survey (`GenreSurvey.jsx` + `GenreVote.jsx`) rates music genres with
   1–5 stars. The source of truth is the app's OWN curated catalog
@@ -307,7 +326,19 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   MusicBrainz provider (`musicbrainz-genre-provider.js`) for obscure genres —
   never touch the UI or persistence layer to add a search source. When adding a
   genre, add it to `genre-taxonomy.js` (with aliases + tier); the UI, rules, and
-  persistence need no changes.
+  persistence need no changes. There is also a dedicated **French/Francophone
+  category** (`id: "french"`, "Francesa / Francófona") with 12 subgenres
+  (Chanson française, Variété française, Yé-yé, French pop, French rap,
+  French electro, French house, French rock, French folk, French jazz, Musette,
+  Afro-francophone). Note that "Chanson française" and "French pop" also exist
+  under the Jazz/Blues/World category (`jw-chanson`, `jw-french-pop`) — search
+  returns both, which is intentional.
+- **Song-request intro is a citation** — the "Pide tu canción" intro body
+  (`songRequest.body` in `content.js`) renders with the shared `.experience-note`
+  citation style (italic, muted, right-aligned). Do NOT add a `.song-request-section
+  .experience-note` override to strip it (that was removed); the section relies on
+  the generic `.experience-note` styling from `food.css`.
+
 - **Desktop hamburger side drawer is desktop-only** — the desktop nav bar
   always shows a hamburger button on its LEFT (`.side-drawer__toggle` inside
   `.desktop-nav-wrap`). It opens a transparent side drawer

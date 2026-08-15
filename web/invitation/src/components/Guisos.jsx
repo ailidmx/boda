@@ -298,7 +298,9 @@ export function Guisos() {
           className="guisos-spice-fab"
           onClick={() => setSpiceOpen(true)}
           aria-haspopup="dialog"
+          data-analytics="fab.guisos.spice"
         >
+
           <span className="guisos-spice-fab__icon" aria-hidden="true">🌶️</span>
           <span className="guisos-spice-fab__label">{guisos.spiceButton}</span>
         </button>
