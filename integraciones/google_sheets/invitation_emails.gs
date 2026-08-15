@@ -343,9 +343,18 @@ function sendOne(row, rowIndex, force) {
   // so invitations can be re-sent freely (the couple's requirement).
 
   // Language from the sheet `lang` column (es / fr / en).
+  // Diagnostic: log the raw cell value so we can see exactly what the sheet
+  // holds (JSON.stringify reveals whitespace / type) and whether the `lang`
+  // key is present in the row object at all.
+  var rawLang = row[COL_LANG];
+  console.log("[sendOne] lang key present=%s raw=%s (typeof=%s)",
+    Object.prototype.hasOwnProperty.call(row, COL_LANG),
+    JSON.stringify(rawLang),
+    typeof rawLang);
   var data = resolveGuestData(row);
   var lang = data.lang;
   console.log("[sendOne] resolved lang=%s", lang);
+
 
 
   var link = buildInvitationLink(email, Date.now());
