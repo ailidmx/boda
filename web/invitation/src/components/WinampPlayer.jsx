@@ -28,12 +28,17 @@ import {
  *   to begin.
  * - A very thin, pixelated banner scrolls the artist + song name horizontally.
  *
+ * The banner is only rendered while the Music section is in view. The component
+ * stays mounted while the player is enabled so the audio keeps playing (or
+ * stays muted) even when the guest scrolls to another section.
+ *
  * SILENT FAILURE: Any failure is logged to the console and swallowed — the
  * invitation keeps working and the player simply stays quiet (no blocking
  * error UI).
  */
 export function WinampPlayer() {
-  const { authState, musicEnabled, setMusicPlaying } = useApp();
+  const { authState, musicEnabled, setMusicPlaying, musicSectionVisible } =
+    useApp();
 
   // idle | connecting | ready | error
   const [status, setStatus] = useState("idle");
@@ -119,7 +124,10 @@ export function WinampPlayer() {
     setMusicPlaying(playing);
   }, [playing, setMusicPlaying]);
 
-  // Hidden unless the guest explicitly enabled it from the user menu.
+  // Hidden unless the guest explicitly enabled it from the user menu. The
+  // component stays mounted while enabled so the audio keeps playing even when
+  // the banner is hidden (i.e. when the guest leaves the Music section); only
+  // the banner itself is conditionally rendered below.
   if (authState !== "signedIn" || !musicEnabled) return null;
 
 
@@ -184,91 +192,95 @@ export function WinampPlayer() {
 
   return (
     <>
-      {/* Thin pixelated scrolling banner + controls */}
-      <div
-        className={`winamp-banner${bannerOpen ? " is-open" : ""}`}
-        onClick={() => setBannerOpen((o) => !o)}
-        role="button"
-        tabIndex={0}
-        aria-label="Mostrar u ocultar la canción actual"
-      >
-        <div className="winamp-banner-track">
-          <span className="winamp-banner-text">{bannerText}</span>
-          <span className="winamp-banner-text" aria-hidden="true">{bannerText}</span>
-        </div>
-
-        {/* Winamp-style transport controls */}
-        <div className="winamp-controls" onClick={(e) => e.stopPropagation()}>
-          <button
-            type="button"
-            className="winamp-btn"
-            onClick={handlePrev}
-            disabled={status !== "ready"}
-            aria-label="Canción anterior"
-            title="Anterior"
-          >
-            <span aria-hidden="true">⏮</span>
-          </button>
-          <button
-            type="button"
-            className="winamp-btn"
-            onClick={handleToggle}
-            disabled={status !== "ready"}
-            aria-label={playing ? "Pausar" : "Reproducir"}
-            title={playing ? "Pausar" : "Reproducir"}
-          >
-            <span aria-hidden="true">{playing ? "⏸" : "▶"}</span>
-          </button>
-          <button
-            type="button"
-            className="winamp-btn"
-            onClick={handleNext}
-            disabled={status !== "ready"}
-            aria-label="Siguiente canción"
-            title="Siguiente"
-          >
-            <span aria-hidden="true">⏭</span>
-          </button>
-          <button
-            type="button"
-            className={`winamp-btn winamp-loop${loop ? " is-on" : ""}`}
-            onClick={handleLoopToggle}
-            disabled={status !== "ready"}
-            aria-label={loop ? "Desactivar repetición" : "Activar repetición"}
-            aria-pressed={loop}
-            title={loop ? "Repetición activada" : "Repetición desactivada"}
-          >
-            <span aria-hidden="true">🔁</span>
-          </button>
-        </div>
-
-        {/* Time display: current / remaining */}
-        <div className="winamp-time">
-          <span className="winamp-time-current">{fmt(positionMs)}</span>
-          <span className="winamp-time-sep">/</span>
-          <span className="winamp-time-remaining">-{fmt(remainingMs)}</span>
-        </div>
-
-        {/* Copyright attribution */}
-        {track.copyright && (
-          <div className="winamp-copyright">© {track.copyright}</div>
-        )}
-
-
-        {/* Thin pixelated progress bar (click to seek) */}
+      {/* Thin pixelated scrolling banner + controls. Only rendered while the
+          Music section is in view; the audio keeps playing (or stays muted)
+          based on `musicEnabled` regardless of which section is on screen. */}
+      {musicSectionVisible && (
         <div
-          className="winamp-progress"
-          onClick={handleSeek}
-          role="slider"
-          aria-label="Progreso de la canción"
-          aria-valuemin={0}
-          aria-valuemax={durationMs || 0}
-          aria-valuenow={positionMs}
+          className={`winamp-banner${bannerOpen ? " is-open" : ""}`}
+          onClick={() => setBannerOpen((o) => !o)}
+          role="button"
           tabIndex={0}
+          aria-label="Mostrar u ocultar la canción actual"
         >
-          <div className="winamp-progress-fill" style={{ width: `${progressPct}%` }} />
+          <div className="winamp-banner-track">
+            <span className="winamp-banner-text">{bannerText}</span>
+            <span className="winamp-banner-text" aria-hidden="true">{bannerText}</span>
+          </div>
+
+          {/* Winamp-style transport controls */}
+          <div className="winamp-controls" onClick={(e) => e.stopPropagation()}>
+            <button
+              type="button"
+              className="winamp-btn"
+              onClick={handlePrev}
+              disabled={status !== "ready"}
+              aria-label="Canción anterior"
+              title="Anterior"
+            >
+              <span aria-hidden="true">⏮</span>
+            </button>
+            <button
+              type="button"
+              className="winamp-btn"
+              onClick={handleToggle}
+              disabled={status !== "ready"}
+              aria-label={playing ? "Pausar" : "Reproducir"}
+              title={playing ? "Pausar" : "Reproducir"}
+            >
+              <span aria-hidden="true">{playing ? "⏸" : "▶"}</span>
+            </button>
+            <button
+              type="button"
+              className="winamp-btn"
+              onClick={handleNext}
+              disabled={status !== "ready"}
+              aria-label="Siguiente canción"
+              title="Siguiente"
+            >
+              <span aria-hidden="true">⏭</span>
+            </button>
+            <button
+              type="button"
+              className={`winamp-btn winamp-loop${loop ? " is-on" : ""}`}
+              onClick={handleLoopToggle}
+              disabled={status !== "ready"}
+              aria-label={loop ? "Desactivar repetición" : "Activar repetición"}
+              aria-pressed={loop}
+              title={loop ? "Repetición activada" : "Repetición desactivada"}
+            >
+              <span aria-hidden="true">🔁</span>
+            </button>
+          </div>
+
+          {/* Time display: current / remaining */}
+          <div className="winamp-time">
+            <span className="winamp-time-current">{fmt(positionMs)}</span>
+            <span className="winamp-time-sep">/</span>
+            <span className="winamp-time-remaining">-{fmt(remainingMs)}</span>
+          </div>
+
+          {/* Copyright attribution */}
+          {track.copyright && (
+            <div className="winamp-copyright">© {track.copyright}</div>
+          )}
+
+
+          {/* Thin pixelated progress bar (click to seek) */}
+          <div
+            className="winamp-progress"
+            onClick={handleSeek}
+            role="slider"
+            aria-label="Progreso de la canción"
+            aria-valuemin={0}
+            aria-valuemax={durationMs || 0}
+            aria-valuenow={positionMs}
+            tabIndex={0}
+          >
+            <div className="winamp-progress-fill" style={{ width: `${progressPct}%` }} />
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

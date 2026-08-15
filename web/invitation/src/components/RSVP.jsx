@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useApp } from "../context/AppContext.jsx";
 import { useRsvp, RSVP_FLOWS } from "../context/RsvpContext.jsx";
 import { RsvpQuestion, BOOLEAN_YES } from "./RsvpQuestion.jsx";
@@ -14,6 +14,12 @@ import {
   computeStayAmounts,
   formatPrice,
 } from "./PaymentSummary.jsx";
+import {
+  buildStayCartItems,
+  trackCartItem,
+  trackFunnelStep,
+  trackPurchase,
+} from "../analytics.js";
 
 export function RSVP() {
   const { t, profile, language, interfaceText } = useApp();
@@ -139,6 +145,10 @@ export function RSVP() {
         await saveFlow({ flow, questions, guests, editorGuestId });
       }
       setSaveStatus("saved");
+      // The guest confirmed their answers — log the "sale done" funnel event
+      // with the total they commit to paying (sum of the cart items).
+      const total = cartItems.reduce((sum, item) => sum + (item.price || 0), 0);
+      trackPurchase({ value: total, items: cartItems, step: "confirm" });
     } catch (error) {
       console.warn("[rsvp] final save failed", error.code || error.message);
       setSaveStatus("error");
@@ -198,6 +208,43 @@ export function RSVP() {
       source?.isXtraCabinPaidByNovios
     );
   };
+
+  // ── Funnel analytics ───────────────────────────────────────────────────
+  // The "À payer" block is the guest's cart: the primary cabin stay and, when
+  // present, the extra cabin stay. We log a `view_cart` funnel step plus an
+  // `add_to_cart` event per priced item the first time the block renders, and
+  // a `purchase` event when the guest confirms (final submit succeeds).
+  const cartItems = useMemo(() => {
+    if (!payment.title) return [];
+    const primary = computeStayAmounts({
+      activeMember: profile?.guest,
+      groupMembers: guests,
+      getAssignedCabinId,
+      resolveMemberCovered,
+    });
+    const extra = getXtraCabinId(profile?.guest)
+      ? computeStayAmounts({
+          activeMember: profile?.guest,
+          groupMembers: guests,
+          getAssignedCabinId: getXtraCabinId,
+          resolveMemberCovered: resolveXtraCovered,
+        })
+      : null;
+
+    return buildStayCartItems({ primary, extra });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [payment.title, profile?.guest, guests]);
+
+  // Log the cart once per distinct set of items (avoid re-firing on re-render).
+  const loggedCartRef = useRef(null);
+  useEffect(() => {
+    if (cartItems.length === 0) return;
+    const key = cartItems.map((i) => i.item_id).join("|");
+    if (loggedCartRef.current === key) return;
+    loggedCartRef.current = key;
+    trackFunnelStep("view_cart", { items: cartItems });
+    cartItems.forEach((item) => trackCartItem(item));
+  }, [cartItems]);
 
   return (
     <section className="rsvp-section section story-bg reveal">

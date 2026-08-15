@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { useApp } from "../context/AppContext.jsx";
 import { cloudinaryImage } from "../cloudinary.js";
 import { LightboxCarousel } from "./LightboxCarousel.jsx";
+import { FlightInfo } from "./FlightInfo.jsx";
+
 
 // The final chosen background mood for the Travel section is "ciel"
 // (Vol de nuit / Ciel étoilé). The temporary background selector was removed;
@@ -70,7 +72,11 @@ export function Travel() {
         label={travel.vuelosLabel}
       />
 
+      {/* Guest flight details form (only meaningful for guests who fly in). */}
+      <FlightInfo />
+
       {/* Desktop-only bottom nav: leads to the accommodation section. */}
+
       <nav className="section-nav travel-section-nav" aria-label="Continue">
         <a className="section-nav-link" href="#accommodation">
           <span>{t.nav.accommodation}</span>

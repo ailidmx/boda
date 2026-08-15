@@ -170,6 +170,124 @@ test("non-object payload fails", () => {
   assert.equal(validateGuestContactPayload(42).valid, false);
 });
 
+// ── flightInfo payload (Travel section) ────────────────────────────────
+
+function makeValidFlightInfoPayload() {
+  return {
+    guestId: "guest-1",
+    flightInfo: {
+      origin: {
+        iata: "MAD",
+        icao: "LEMD",
+        name: "Adolfo Suárez Madrid–Barajas Airport",
+        city: "Madrid",
+        country: "Spain",
+        countryCode: "ES",
+        latitude: 40.4719,
+        longitude: -3.5626,
+      },
+      destination: {
+        iata: "GDL",
+        icao: "MMGL",
+        name: "Guadalajara International Airport",
+        city: "Guadalajara",
+        country: "Mexico",
+        countryCode: "MX",
+        latitude: 20.5218,
+        longitude: -103.3112,
+      },
+      connections: [
+        {
+          iata: "CDG",
+          icao: "LFPG",
+          name: "Charles de Gaulle Airport",
+          city: "Paris",
+          country: "France",
+          countryCode: "FR",
+        },
+      ],
+      legs: [
+        { from: "MAD", to: "CDG", flightNumber: "AF 1001" },
+        { from: "CDG", to: "GDL", flightNumber: "AF 58" },
+      ],
+      arrivalDate: "2027-02-19",
+      arrivalTime: "14:30",
+      finalFlightNumber: "AF 58",
+    },
+    updatedBy: "guest-1",
+    updatedAt: { seconds: 123, nanoseconds: 0 },
+  };
+}
+
+test("valid flightInfo payload passes", () => {
+  const result = validateGuestContactPayload(makeValidFlightInfoPayload());
+  assert.equal(result.valid, true, result.errors.join("; "));
+});
+
+test("flightInfo with only origin and destination passes", () => {
+  const payload = makeValidFlightInfoPayload();
+  delete payload.flightInfo.connections;
+  delete payload.flightInfo.legs;
+  delete payload.flightInfo.arrivalDate;
+  delete payload.flightInfo.arrivalTime;
+  delete payload.flightInfo.finalFlightNumber;
+  const result = validateGuestContactPayload(payload);
+  assert.equal(result.valid, true, result.errors.join("; "));
+});
+
+test("flightInfo with unsupported field fails", () => {
+  const payload = makeValidFlightInfoPayload();
+  payload.flightInfo.airline = "Aeroméxico"; // not in the allowed schema
+  const result = validateGuestContactPayload(payload);
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((e) => e.includes("flightInfo contains unsupported fields")));
+});
+
+test("flightInfo with invalid airport (missing iata) fails", () => {
+  const payload = makeValidFlightInfoPayload();
+  delete payload.flightInfo.origin.iata;
+  const result = validateGuestContactPayload(payload);
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((e) => e.includes("flightInfo.origin")));
+});
+
+test("flightInfo with too many connections fails", () => {
+  const payload = makeValidFlightInfoPayload();
+  payload.flightInfo.connections = [
+    { iata: "CDG", name: "Paris", countryCode: "FR" },
+    { iata: "AMS", name: "Amsterdam", countryCode: "NL" },
+    { iata: "FRA", name: "Frankfurt", countryCode: "DE" },
+    { iata: "LHR", name: "London", countryCode: "GB" }, // 4th → over the 3 limit
+  ];
+  const result = validateGuestContactPayload(payload);
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((e) => e.includes("flightInfo.connections")));
+});
+
+test("flightInfo with invalid arrival date fails", () => {
+  const payload = makeValidFlightInfoPayload();
+  payload.flightInfo.arrivalDate = "19/02/2027"; // not YYYY-MM-DD
+  const result = validateGuestContactPayload(payload);
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((e) => e.includes("flightInfo.arrivalDate")));
+});
+
+test("flightInfo with invalid arrival time fails", () => {
+  const payload = makeValidFlightInfoPayload();
+  payload.flightInfo.arrivalTime = "2:30 PM"; // not HH:MM
+  const result = validateGuestContactPayload(payload);
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((e) => e.includes("flightInfo.arrivalTime")));
+});
+
+test("flightInfo with invalid leg fails", () => {
+  const payload = makeValidFlightInfoPayload();
+  payload.flightInfo.legs = [{ from: "MAD" }]; // missing `to`
+  const result = validateGuestContactPayload(payload);
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((e) => e.includes("flightInfo.legs")));
+});
+
 // ── Attendance payload ─────────────────────────────────────────────────
 
 test("valid attendance payload passes", () => {

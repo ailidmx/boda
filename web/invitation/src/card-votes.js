@@ -93,6 +93,58 @@ export async function loadCardVotes(cardType, cardKey) {
 }
 
 /**
+ * Load ALL votes for a given card type in a single query.
+ *
+ * Useful for computing the aggregate ("general") score per card across all
+ * guests (e.g. the average star rating shown next to each dish in the guisos
+ * reorder panel).
+ *
+ * @param {string} cardType  "food" | "music" | "guiso"
+ * @returns {Promise<Object[]>} array of all vote documents of this card type
+ */
+export async function loadAllCardVotes(cardType) {
+  try {
+    if (!cardType) {
+      console.warn("[card-votes] Missing cardType; skipping load");
+      return [];
+    }
+    logDb("read:start", {
+      collection: collections.cardVotes,
+      op: "getDocs",
+      where: { cardType },
+    });
+    const q = query(
+      collection(db, collections.cardVotes),
+      where("cardType", "==", cardType),
+    );
+
+    const snapshot = await getDocs(q);
+    const votes = [];
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      voteCache.set(docSnap.id, data);
+      votes.push(data);
+    });
+    logDb("read:success", {
+      collection: collections.cardVotes,
+      op: "getDocs",
+      where: { cardType },
+      size: snapshot.size,
+    });
+    return votes;
+  } catch (error) {
+    logDb("read:error", {
+      collection: collections.cardVotes,
+      op: "getDocs",
+      where: { cardType },
+      error: error.message,
+    });
+    console.warn("[card-votes] Could not load card votes", error.message);
+    return [];
+  }
+}
+
+/**
  * Load all of a single guest's votes for a given card type.
  *
  * Useful for building a "pre-order" from the guest's own star ratings (e.g.
@@ -103,6 +155,7 @@ export async function loadCardVotes(cardType, cardKey) {
  * @returns {Promise<Object[]>} array of vote documents for this guest
  */
 export async function loadGuestCardVotes(cardType, guestId) {
+
   try {
     if (!cardType || !guestId) {
       console.warn("[card-votes] Missing cardType/guestId; skipping load");

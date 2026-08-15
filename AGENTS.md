@@ -257,14 +257,90 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   (~600ms) and aborting stale requests via `AbortController`. When adding a new
   search source, add a provider and inject it — don't touch the UI or the
   persistence layer. Unit tests live in `tests/song-search.test.mjs`.
-- **Song-request persistence uses a `songMeta` field** — the guest's chosen
-  song identity (title, artist, year, MusicBrainz id, isrc) is stored in the
-  `songMeta` field of the `song_requests` doc, separate from the free-text
-  `song` and the `intent`. `buildSongRequestPayload` (payload-builders) and
-  `validateSongRequestPayload` (validation) both accept `songMeta`; the
-  Firestore rules allow it. If the search finds nothing, the guest can still
-  type a free-text title (no `songMeta`).
+ - **Song-request persistence uses a `songMeta` field** — the guest's chosen
+   song identity (title, artist, year, MusicBrainz id, isrc) is stored in the
+   `songMeta` field of the `song_requests` doc, separate from the free-text
+   `song` and the `intent`. `buildSongRequestPayload` (payload-builders) and
+   `validateSongRequestPayload` (validation) both accept `songMeta`; the
+   Firestore rules allow it. If the search finds nothing, the guest can still
+   type a free-text title (no `songMeta`).
+ - **Song-request band-type selector shows for BOTH `band` and `sing` intents** —
+   In `SongRequest.jsx`, the "which musicians" selector (`bandType`) is rendered
+   when `intent === "band" || intent === "sing"`, because "sing on stage with the
+   musicians" also needs to know which band accompanies the guest. The `bandType`
+   is saved via `saveSongRequest` for both intents. When adding a new intent that
+   needs a band choice, include it in that condition.
+ - **Guest-change Telegram notifications are context-aware + include the avatar** —
+   `onGuestUpdated` in `functions/index.js` watches the `guests` collection and
+   notifies on ANY meaningful change, formatted by what changed: identity check,
+   name correction, phone, photo, RSVP answers, flight details (`flightInfo`),
+   travel mode (`travelsByPlane`), a written message (`messageAuthor`), and cabin
+   assignment (`hosting`). Metadata-only touches (`updatedBy`/`updatedAt`) are
+   skipped. When the guest has an avatar, the notification is sent via
+   `sendTelegramPhoto` (in `functions/telegram.js`) with the avatar as the photo
+   and the message as its caption; otherwise it falls back to `sendTelegramMessage`.
+   The avatar URL is built from `identity.cloudinaryId` (stored relative to the
+   `boda/` prefix) as
+   `https://res.cloudinary.com/k2ajcgxv/image/upload/w_256,h_256,c_fill,g_auto/boda/<id>`
+   (see `resolveGuestPhotoUrl`). When adding a new guest field that should notify,
+   add a change-detection block in `onGuestUpdated` and a human-readable line.
+- **Guisos-order Telegram notification** — `onGuisoRanking` in
+  `functions/index.js` watches the `guiso_rankings/{guestId}` collection (one doc
+  per guest, written via `saveGuisoRanking` with `setDoc` + `merge: true`) and
+  notifies the couple whenever a guest saves or updates their guisos order. It
+  uses `onDocumentWritten` (fires on both create and update) and reads the
+  `after` snapshot. The message lists the guest, the dishes marked "in the menu"
+  (`selected`), and the full ranked order (`ranking`). When adding a new
+  guest-facing collection that should notify, add an `onDocumentWritten` trigger
+  here with the `secrets: [TELEGRAM_TOKEN, TELEGRAM_CHAT_ID]` dependency array.
+- **Genre survey is a curated catalog + isolated search service** — the "Califica
+  la música" survey (`GenreSurvey.jsx` + `GenreVote.jsx`) rates music genres with
+  1–5 stars. The source of truth is the app's OWN curated catalog
+  (`web/invitation/src/genres/genre-taxonomy.js`), deliberately rich in Mexican
+  Regional and Serbian/Balkan music (the two cultural pillars). Genres are
+  hierarchical (parent category → subgenres), tiered (PRIMARY shown / SECONDARY
+  collapsed / SEARCH_ONLY), alias-aware, and use stable ids independent of
+  MusicBrainz. Ratings persist to `genre_ratings/{genreId}_{guestId}` (one doc
+  per genre+guest; the rules enforce the doc id). Search is isolated behind
+  `createGenreSearchService()` (`genre-search/genre-search-service.js`), which
+  searches the curated catalog first and only falls back to the injectable
+  MusicBrainz provider (`musicbrainz-genre-provider.js`) for obscure genres —
+  never touch the UI or persistence layer to add a search source. When adding a
+  genre, add it to `genre-taxonomy.js` (with aliases + tier); the UI, rules, and
+  persistence need no changes.
+- **Desktop hamburger side drawer is desktop-only** — the desktop nav bar
+  always shows a hamburger button on its LEFT (`.side-drawer__toggle` inside
+  `.desktop-nav-wrap`). It opens a transparent side drawer
+  (`SideDrawer` in `Nav.jsx`, `.side-drawer__*` in `nav.css`) listing the full
+  nav in CSS columns (`column-width: 12rem`), so links flow into more columns
+  when they exceed the viewport height. Because the button lives inside
+  `.desktop-nav-wrap` (hidden below 900px), it never appears on mobile — mobile
+  keeps its existing split dropdowns. When adding a new nav link, it appears in
+  the drawer automatically (it renders the same `links` array as the desktop
+  nav). Reuse `.side-drawer__*` classes rather than building a new drawer.
+- **Login event is written ONLY in `signIn()`, never in `onAuthStateChanged`** —
+  The `login_events` write (which triggers the "NUEVO INICIO DE SESIÓN"
+  Telegram notification) lives in the `signIn()` function in `AppContext.jsx`,
+  which runs only when the guest truly types their credentials. It must NOT be
+  added to the `onAuthStateChanged` handler: that handler fires on EVERY page
+  load/refresh (the session is restored from `browserLocalPersistence`), so
+  writing there would spam the couple with a login notification on every
+  refresh even though the guest did not actually log in.
+- **Inactivity tracking is isolated in `useActivityTracker`** — the
+  `web/invitation/src/hooks/useActivityTracker.js` hook listens to user-activity
+  events (mouse, keyboard, scroll, touch, pointer) and, after the idle threshold
+  (default 5 min), logs a Firebase Analytics `user_inactive` event and writes a
+  doc to the `activity_events` collection (schema enforced in `firestore.rules`;
+  a Cloud Function `onActivityEvent` notifies the couple). It exposes `isActive`
+  (false once idle) which `AppContext` puts on the context value. `useSectionTime`
+  (via `LazySection`) reads `isActive` and pauses section-time accumulation while
+  the guest is idle or the tab is hidden — idle/hidden time is NOT counted as
+  "time spent" on a section. When adding a new activity signal, extend the
+  `ACTIVITY_EVENTS` list and the `type` enum in the rules.
 - *(Add new lessons here as you discover them.)*
+
+
+
 
 
 
