@@ -307,7 +307,19 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   MusicBrainz provider (`musicbrainz-genre-provider.js`) for obscure genres —
   never touch the UI or persistence layer to add a search source. When adding a
   genre, add it to `genre-taxonomy.js` (with aliases + tier); the UI, rules, and
-  persistence need no changes.
+  persistence need no changes. There is also a dedicated **French/Francophone
+  category** (`id: "french"`, "Francesa / Francófona") with 12 subgenres
+  (Chanson française, Variété française, Yé-yé, French pop, French rap,
+  French electro, French house, French rock, French folk, French jazz, Musette,
+  Afro-francophone). Note that "Chanson française" and "French pop" also exist
+  under the Jazz/Blues/World category (`jw-chanson`, `jw-french-pop`) — search
+  returns both, which is intentional.
+- **Song-request intro is a citation** — the "Pide tu canción" intro body
+  (`songRequest.body` in `content.js`) renders with the shared `.experience-note`
+  citation style (italic, muted, right-aligned). Do NOT add a `.song-request-section
+  .experience-note` override to strip it (that was removed); the section relies on
+  the generic `.experience-note` styling from `food.css`.
+
 - **Desktop hamburger side drawer is desktop-only** — the desktop nav bar
   always shows a hamburger button on its LEFT (`.side-drawer__toggle` inside
   `.desktop-nav-wrap`). It opens a transparent side drawer
