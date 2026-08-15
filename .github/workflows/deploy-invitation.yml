@@ -200,8 +200,11 @@ jobs:
 
           # Inject the real service-account key + client email into the .gs
           # file so the deployed script can read Firestore. The key from the
-          # JSON secret has real newlines; escape them back into a JS string
-          # literal (\n) so the .gs file stays valid.
+          # JSON secret is PKCS#8 ("BEGIN PRIVATE KEY"), but Apps Script's
+          # Utilities.computeRsaSha256Signature only accepts PKCS#1 ("BEGIN
+          # RSA PRIVATE KEY"), so we convert it with OpenSSL first. The key
+          # has real newlines; escape them back into a JS string literal (\n)
+          # so the .gs file stays valid.
           if [ -z "$SERVICE_ACCOUNT_BODA_SHEETS" ]; then
             echo "::error::Missing SERVICE_ACCOUNT_BODA_SHEETS secret (contents of integraciones/google_sheets/service_account.json)."
             exit 1
@@ -209,14 +212,21 @@ jobs:
           printf '%s' "$SERVICE_ACCOUNT_BODA_SHEETS" > service_account.json
           node -e '
             const fs = require("fs");
+            const { execSync } = require("child_process");
             const sa = JSON.parse(fs.readFileSync("service_account.json", "utf8"));
+            fs.writeFileSync("sa_key_pkcs8.pem", sa.private_key, "utf8");
+            execSync("openssl rsa -in sa_key_pkcs8.pem -traditional -out sa_key_pkcs1.pem 2>/dev/null");
+            const pkcs1 = fs.readFileSync("sa_key_pkcs1.pem", "utf8");
+            fs.unlinkSync("sa_key_pkcs8.pem");
+            fs.unlinkSync("sa_key_pkcs1.pem");
             let gs = fs.readFileSync("invitation_emails.gs", "utf8");
             gs = gs.replace(/var SERVICE_ACCOUNT_CLIENT_EMAIL = "[^"]*";/, `var SERVICE_ACCOUNT_CLIENT_EMAIL = "${sa.client_email}";`);
-            const key = sa.private_key.replace(/\\/g, "\\\\").replace(/"/g, "\\\"").replace(/\n/g, "\\n");
+            const key = pkcs1.replace(/\\/g, "\\\\").replace(/"/g, "\\\"").replace(/\n/g, "\\n");
             gs = gs.replace("REPLACE_ME", key);
             fs.writeFileSync("invitation_emails.gs", gs, "utf8");
           '
           rm -f service_account.json
+
 
           # Install clasp (pinned) and deploy.
           npm install --no-save @google/clasp@3.2.0 >/dev/null 2>&1

@@ -69,18 +69,39 @@ gs = gs.replace(
   `var SERVICE_ACCOUNT_CLIENT_EMAIL = "${sa.client_email}";`
 );
 
-// 4. Inject the real private key. The key from JSON is a PEM with real
-//    newlines (JSON.parse turns the \n escapes into actual line breaks). The
-//    .gs file stores it inside a JS string literal, so we must escape the key
-//    back into a valid JS string: real newlines -> \n, and escape backslashes
-//    and double quotes.
+// 4. Convert the key to PKCS#1 and inject it.
+//
+//    Google service-account keys are PKCS#8 ("-----BEGIN PRIVATE KEY-----").
+//    Apps Script's Utilities.computeRsaSha256Signature only accepts PKCS#1
+//    ("-----BEGIN RSA PRIVATE KEY-----"); passing a PKCS#8 key throws
+//    "Unexpected error while getting the method or property
+//    computeRsaSha256Signature on object Utilities". So we convert the key
+//    with OpenSSL before injecting it.
+function toPkcs1(pem) {
+  const tmpIn = join(ROOT, ".sa-key-pkcs8.pem");
+  const tmpOut = join(ROOT, ".sa-key-pkcs1.pem");
+  writeFileSync(tmpIn, pem, "utf8");
+  try {
+    execSync(`openssl rsa -in "${tmpIn}" -traditional -out "${tmpOut}" 2>/dev/null`, { stdio: "pipe" });
+    return readFileSync(tmpOut, "utf8");
+  } finally {
+    try { execSync(`rm -f "${tmpIn}" "${tmpOut}"`, { stdio: "pipe" }); } catch {}
+  }
+}
+
+// The key from JSON is a PEM with real newlines (JSON.parse turns the \n
+// escapes into actual line breaks). The .gs file stores it inside a JS string
+// literal, so we must escape the key back into a valid JS string: real
+// newlines -> \n, and escape backslashes and double quotes.
 function toJsStringLiteral(value) {
   return value
     .replace(/\\/g, "\\\\")
     .replace(/"/g, '\\"')
     .replace(/\n/g, "\\n");
 }
-const injected = gs.replace(PLACEHOLDER, toJsStringLiteral(sa.private_key));
+const pkcs1Key = toPkcs1(sa.private_key);
+const injected = gs.replace(PLACEHOLDER, toJsStringLiteral(pkcs1Key));
+
 
 
 // 5. Write the injected file, push, then restore the placeholder.
