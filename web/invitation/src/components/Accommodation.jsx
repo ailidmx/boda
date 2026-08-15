@@ -609,6 +609,7 @@ export function Accommodation() {
 
                       <button
                         type="button"
+                        data-analytics="rsvp.answer.accommodationConfirm.yes"
                         className={`rsvp-boolean-btn${current === BOOLEAN_YES ? ' is-selected' : ''}`}
                         aria-pressed={current === BOOLEAN_YES}
                         onClick={() => handleRecapChange(member.id, BOOLEAN_YES)}
@@ -617,6 +618,7 @@ export function Accommodation() {
                       </button>
                       <button
                         type="button"
+                        data-analytics="rsvp.answer.accommodationConfirm.no"
                         className={`rsvp-boolean-btn${current === BOOLEAN_NO ? ' is-selected' : ''}`}
                         aria-pressed={current === BOOLEAN_NO}
                         onClick={() => handleRecapChange(member.id, BOOLEAN_NO)}
@@ -624,6 +626,7 @@ export function Accommodation() {
                         {recap.noLabel}
                       </button>
                     </div>
+
                   </div>
                 );
               })}
@@ -732,11 +735,13 @@ export function Accommodation() {
                 <button
                   className="button button--gold"
                   type="button"
+                  data-analytics="rsvp.modify.accommodation"
                   onClick={() => setRecapStep("question")}
                 >
                   {recap.modifyButton}
                 </button>
               </div>
+
             </div>
           </div>
         )}

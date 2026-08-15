@@ -132,11 +132,13 @@ export function TeAnimas() {
             <button
               className="rsvp-scale-modify"
               type="button"
+              data-analytics="rsvp.modify.teAnimas"
               onClick={goToStart}
             >
               {rsvp.recap?.modifyButton || "Modifier mes réponses"}
             </button>
           </div>
+
         </div>
       ),
 

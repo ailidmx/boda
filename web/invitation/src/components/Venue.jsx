@@ -592,8 +592,10 @@ export function Venue() {
         type="button"
         aria-label={facilities.privacyTitle}
         aria-haspopup="dialog"
+        data-analytics="fab.venue.privacy"
         onClick={() => setPrivacyOpen(true)}
       >
+
         <PrivacyLockIcon />
       </button>
 
