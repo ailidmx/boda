@@ -89,10 +89,14 @@ var SHARED_PASSWORD = "vivamexico";
 var INVITE_TYPE = "email";
 
 // ── Firestore service account (used to read the authoritative guest data) ──
-// Fill these in from integraciones/google_sheets/service_account.json.
-var SERVICE_ACCOUNT_CLIENT_EMAIL = "firebase-adminsdk@boda-500805.iam.gserviceaccount.com";
+// The client email matches integraciones/google_sheets/service_account.json.
+// The private key is a placeholder: the deploy step (scripts/deploy-invitation-emails.mjs
+// or the CI workflow) injects the real key from service_account.json before `clasp push`,
+// then restores this placeholder so the secret is never committed.
+var SERVICE_ACCOUNT_CLIENT_EMAIL = "boda-sheets-mcp@boda-500805.iam.gserviceaccount.com";
 var SERVICE_ACCOUNT_PRIVATE_KEY = "-----BEGIN PRIVATE KEY-----\nREPLACE_ME\n-----END PRIVATE KEY-----\n";
 var FIRESTORE_PROJECT_ID = "boda-500805";
+
 
 // ── Column names (must match the INVITADOS header row) ────────────────────
 
