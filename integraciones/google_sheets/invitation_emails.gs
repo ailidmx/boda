@@ -219,8 +219,14 @@ function fillTemplate(template, name, link) {
 /**
  * Send one invitation email to a single guest row.
  * Returns a status string for logging.
+ *
+ * @param {Object} row     The guest row (keyed by header name).
+ * @param {number} rowIndex 1-based row number (for logging).
+ * @param {boolean} force  When true, send even if `_enviado` is already TRUE.
+ *                         Used by the onEdit trigger, where the user explicitly
+ *                         toggled the checkbox to TRUE (an explicit re-send).
  */
-function sendOne(row, rowIndex) {
+function sendOne(row, rowIndex, force) {
   var guestId = String(row[COL_ID] || "").trim();
   var email = String(row[COL_EMAIL] || row.firebase_email || row._email || row.email || "").trim();
   var lang = normaliseLang(row[COL_LANG]);
@@ -228,9 +234,10 @@ function sendOne(row, rowIndex) {
 
   if (!guestId) return "row " + rowIndex + ": no UID, skipped";
   if (!email) return "row " + rowIndex + " (" + guestId + "): no email, skipped";
-  if (String(row[COL_SENT] || "").trim().toUpperCase() === "TRUE") {
+  if (!force && String(row[COL_SENT] || "").trim().toUpperCase() === "TRUE") {
     return "row " + rowIndex + " (" + guestId + "): already sent, skipped";
   }
+
 
   var profileCode = resolveProfileCode(row);
   if (!profileCode) {
@@ -394,6 +401,10 @@ function onEditSendInvitation(e) {
   var row = {};
   headers.forEach(function (h, i) { row[String(h).trim()] = values[i]; });
 
-  var status = sendOne(row, rowIndex);
+  // The user explicitly toggled the checkbox to TRUE (from a non-TRUE state),
+  // which is an explicit request to (re)send — so force the send even if the
+  // `_enviado` column already reads TRUE.
+  var status = sendOne(row, rowIndex, true);
   Logger.log(status);
 }
+

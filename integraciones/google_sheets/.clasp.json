@@ -1,5 +1,7 @@
 {
   "scriptId": "1yqKROmXJJUqG4QJzEv37EboX0PjyF8-N1Uo90YnUVNSrhlluaaqELQO2",
   "rootDir": ".",
+  "projectId": "boda-500805",
   "filePushOrder": ["invitation_emails.gs"]
 }
+
