@@ -564,11 +564,16 @@ function setupTrigger() {
       ScriptApp.deleteTrigger(t);
     }
   });
+  // IMPORTANT: use .onEdit(), NOT .onChange(). A change trigger fires on
+  // structural changes (insert/delete rows) and does NOT pass an e.range
+  // event object — so e.range would be undefined and the handler crashes.
+  // An onEdit trigger passes e.range with the edited cell.
   ScriptApp.newTrigger("onEditSendInvitation")
     .forSpreadsheet(ss)
-    .onChange()
+    .onEdit()
     .create();
   Logger.log("onEditSendInvitation trigger installed.");
+
 }
 
 /**
@@ -592,9 +597,13 @@ function listTriggers() {
  * row is set to TRUE, sends that guest's invitation immediately.
  */
 function onEditSendInvitation(e) {
+  // Guard: if run manually (no event) or the event lacks a range, do nothing
+  // instead of crashing. The installable onEdit trigger always passes e.range.
+  if (!e || !e.range) return;
   var range = e.range;
   var sheet = range.getSheet();
   if (sheet.getName() !== SHEET_NAME) return;
+
 
   var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   var colIndex = {};
