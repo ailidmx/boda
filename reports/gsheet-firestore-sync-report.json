@@ -2,13 +2,13 @@
   "mode": "execute",
   "ciMode": false,
   "failOnDrift": false,
-  "generatedAt": "2026-08-15T15:56:05.789Z",
+  "generatedAt": "2026-08-15T19:24:51.137Z",
   "source": "gsheet",
   "sourceRef": "spreadsheetId=1tvUs2WPksMWVbV10hdVoZ2NLNwTx6Q2R8Bs0sEbkqMg;sheet=Invitados",
   "authHealth": {
-    "authUsersTotal": 211,
-    "guestsTotal": 262,
-    "authUsersMappedToGuest": 211,
+    "authUsersTotal": 212,
+    "guestsTotal": 263,
+    "authUsersMappedToGuest": 212,
     "authUsersWithoutGuestCount": 0,
     "authUsersWithoutSheetCount": 0,
     "authDisabledBySheetCount": 0,
@@ -16,11 +16,11 @@
     "sheetAuthExpectedCount": 212,
     "sheetAuthDisabledCount": 51,
     "guestsWithoutAuthCount": 0,
-    "sheetGuestsWithoutAuthCount": 1,
-    "authEmailUpdateCandidatesCount": 12,
+    "sheetGuestsWithoutAuthCount": 0,
+    "authEmailUpdateCandidatesCount": 0,
     "authEmailUpdateBlockedInvalidCount": 0,
     "authEmailUpdateBlockedInUseCount": 0,
-    "authCreateCandidatesCount": 1,
+    "authCreateCandidatesCount": 0,
     "authCreateBlockedMissingEmailCount": 0,
     "authCreateBlockedInvalidEmailCount": 0,
     "authCreateBlockedEmailInUseCount": 0,
@@ -30,136 +30,244 @@
     "authDisabledBySheet": [],
     "authDeleteCandidates": [],
     "guestsWithoutAuth": [],
-    "sheetGuestsWithoutAuth": [
-      {
-        "uid": "william",
-        "invitationGroup": "Marion et William",
-        "sheetEmail": "william@boda-david-y-ayde.web.app",
-        "passwordPresent": true
-      }
-    ],
-    "authEmailUpdateCandidates": [
-      {
-        "uid": "spomenka.petrovic",
-        "invitationGroup": "Spomeka y Guihem",
-        "sheetEmail": "spomenka.petrovic.laubie@gmail.com",
-        "authEmail": "spomenka.petrovic@boda-david-y-ayde.web.app",
-        "authDisabled": false
-      },
-      {
-        "uid": "pierre.berthelon",
-        "invitationGroup": "Pierre et Titis",
-        "sheetEmail": "pbertholon@gmail.com",
-        "authEmail": "pierre.berthelon@boda-david-y-ayde.web.app",
-        "authDisabled": false
-      },
-      {
-        "uid": "geraldine.toussaint",
-        "invitationGroup": "Géraldine et Jean-Christophe",
-        "sheetEmail": "toussaint.geraldine@yahoo.fr",
-        "authEmail": "geraldine.toussaint@boda-david-y-ayde.web.app",
-        "authDisabled": false
-      },
-      {
-        "uid": "gaetane",
-        "invitationGroup": "Gaëtane et Stéphane",
-        "sheetEmail": "contact@gaetanelefranc.com",
-        "authEmail": "gaetane@boda-david-y-ayde.web.app",
-        "authDisabled": false
-      },
-      {
-        "uid": "gregory.nussbaumer",
-        "invitationGroup": "",
-        "sheetEmail": "gregory.nussbaumer@gmail.com",
-        "authEmail": "gregory.nussbaumer@boda-david-y-ayde.web.app",
-        "authDisabled": false
-      },
-      {
-        "uid": "victor.sirisakd",
-        "invitationGroup": "",
-        "sheetEmail": "victor.sirisakd@free.fr",
-        "authEmail": "victor.sirisakd@boda-david-y-ayde.web.app",
-        "authDisabled": false
-      },
-      {
-        "uid": "aurelien.neyrand",
-        "invitationGroup": "",
-        "sheetEmail": "aurelien.neyrand@gmail.com",
-        "authEmail": "aurelien.neyrand@boda-david-y-ayde.web.app",
-        "authDisabled": false
-      },
-      {
-        "uid": "damien.gilles",
-        "invitationGroup": "",
-        "sheetEmail": "lemaildedamien@gmail.com",
-        "authEmail": "damien.gilles@boda-david-y-ayde.web.app",
-        "authDisabled": false
-      },
-      {
-        "uid": "ilija.stankovic",
-        "invitationGroup": "",
-        "sheetEmail": "ilijastankovic@yahoo.co.uk",
-        "authEmail": "ilija.stankovic@boda-david-y-ayde.web.app",
-        "authDisabled": false
-      },
-      {
-        "uid": "jeanne.sergent",
-        "invitationGroup": "",
-        "sheetEmail": "jeanou.s@icloud.com",
-        "authEmail": "jeanne.sergent@boda-david-y-ayde.web.app",
-        "authDisabled": false
-      },
-      {
-        "uid": "moussa.boutemine",
-        "invitationGroup": "",
-        "sheetEmail": "moussa.boutemine@gmail.com",
-        "authEmail": "moussa.boutemine@boda-david-y-ayde.web.app",
-        "authDisabled": false
-      },
-      {
-        "uid": "sofiane.benalia",
-        "invitationGroup": "",
-        "sheetEmail": "benalia.sofiane@free.fr",
-        "authEmail": "sofiane.benalia@boda-david-y-ayde.web.app",
-        "authDisabled": false
-      }
-    ],
+    "sheetGuestsWithoutAuth": [],
+    "authEmailUpdateCandidates": [],
     "authEmailUpdateBlockedInvalid": [],
     "authEmailUpdateBlockedInUse": [],
-    "authCreateCandidates": [
-      {
-        "uid": "william",
-        "invitationGroup": "Marion et William",
-        "sheetEmail": "william@boda-david-y-ayde.web.app",
-        "passwordPresent": true
-      }
-    ],
+    "authCreateCandidates": [],
     "authCreateBlockedMissingEmail": [],
     "authCreateBlockedInvalidEmail": [],
     "authCreateBlockedEmailInUse": []
   },
   "invalidRows": [],
-  "added": [
+  "added": [],
+  "changed": [
     {
-      "id": "william",
-      "auth": {
-        "uid": "william",
-        "enabled": true,
-        "identifier": "william@boda-david-y-ayde.web.app",
-        "password": "vivamexico"
-      },
+      "id": "sebastian_cecillon_arevalo",
+      "mismatches": [
+        {
+          "path": "message",
+          "sheetValue": "Cada quien recorre su propio camino, pero hay pasos que están hechos para compartirse.",
+          "firestoreValue": ""
+        }
+      ],
       "payload": {
-        "id": "william",
+        "id": "sebastian_cecillon_arevalo",
         "identity": {
-          "firstName": "William",
+          "firstName": "Sebastian",
           "middleName": "",
-          "lastName": "",
+          "lastName": "Cecillon",
+          "maternalLastName": "Arevalo",
+          "lang": "es",
+          "age": "Adulto",
+          "gender": "H",
+          "phone": "533310989859",
+          "cloudinaryId": "Captura_de_pantalla_2026-08-02_a_la_s_5.01.26_p.m._vuj7dt"
+        },
+        "hosting": {
+          "cabin": "CABAÑA 3",
+          "room": "CABAÑA 3-1",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "PetanclubGDL",
+        "invitationGroup": "Familia Cecillon Quezada",
+        "message": "Cada quien recorre su propio camino, pero hay pasos que están hechos para compartirse.",
+        "messageAuthor": "",
+        "table": "Petanclub #1",
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "maternalLastName": "Arevalo"
+      },
+      "existing": {
+        "id": "sebastian_cecillon_arevalo",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "tagGroup": "PetanclubGDL",
+        "table": "Petanclub #1",
+        "sent": false,
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:34.451Z",
+        "hosting": {
+          "cabin": "CABAÑA 3",
+          "room": "CABAÑA 3-1",
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "maternalLastName": "Arevalo",
+        "invitationGroup": "Familia Cecillon Quezada",
+        "identity": {
+          "age": "Adulto",
+          "firstName": "Sebastian",
+          "lang": "es",
+          "cloudinaryId": "Captura_de_pantalla_2026-08-02_a_la_s_5.01.26_p.m._vuj7dt",
+          "gender": "H",
+          "lastName": "Cecillon",
+          "middleName": "",
+          "maternalLastName": "Arevalo",
+          "phone": "533310989859"
+        },
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "friday": 0,
+            "saturday": 0,
+            "sunday": 0,
+            "xtra": 0,
+            "playa": 0
+          }
+        }
+      }
+    },
+    {
+      "id": "cathy_rako",
+      "mismatches": [
+        {
+          "path": "identity.lastName",
+          "sheetValue": "Le Gales",
+          "firestoreValue": "Rakotonoera"
+        },
+        {
+          "path": "identity.phone",
+          "sheetValue": "523222731351",
+          "firestoreValue": ""
+        },
+        {
+          "path": "identity.cloudinaryId",
+          "sheetValue": "BOS09_-_Le_gales_qv1u47",
+          "firestoreValue": ""
+        }
+      ],
+      "payload": {
+        "id": "cathy_rako",
+        "identity": {
+          "firstName": "Cathy",
+          "middleName": "",
+          "lastName": "Le Gales",
           "maternalLastName": "",
           "lang": "fr",
           "age": "Adulto",
-          "gender": "H",
+          "gender": "M",
+          "phone": "523222731351",
+          "cloudinaryId": "BOS09_-_Le_gales_qv1u47"
+        },
+        "hosting": {
+          "cabin": "VILLA MARGARITA",
+          "room": "VILLA MARGARITA-1",
+          "isCabinPaidByNovios": false,
+          "isCabinPaid": false,
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false
+        },
+        "rsvp": {},
+        "sent": false,
+        "tagGroup": "Rako",
+        "invitationGroup": "Corine et Cathy",
+        "message": "",
+        "messageAuthor": "",
+        "table": "Mika",
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "maternalLastName": ""
+      },
+      "existing": {
+        "id": "cathy_rako",
+        "idCheckUser": false,
+        "message": "",
+        "messageAuthor": "",
+        "tagGroup": "Rako",
+        "table": "Mika",
+        "sent": false,
+        "modifiedAt": "",
+        "travelsByPlane": false,
+        "isAdmin": false,
+        "_source": "google_sheet",
+        "_migratedAt": "2026-08-03T15:31:34.976Z",
+        "maternalLastName": "",
+        "identity": {
+          "age": "Adulto",
+          "firstName": "Cathy",
+          "lang": "fr",
           "phone": "",
-          "cloudinaryId": ""
+          "cloudinaryId": "",
+          "gender": "M",
+          "maternalLastName": "",
+          "lastName": "Rakotonoera",
+          "middleName": ""
+        },
+        "invitationGroup": "Corine et Cathy",
+        "updatedBy": "sync_script",
+        "rsvp": {
+          "confirmCabin": false,
+          "cabinWaitingList": false,
+          "petanca": false,
+          "needBalls": false,
+          "answers": {
+            "friday": 0,
+            "saturday": 0,
+            "sunday": 0,
+            "xtra": 0,
+            "playa": 0
+          }
+        },
+        "hosting": {
+          "xtraCabin": "",
+          "xtraRoom": "",
+          "isCabinPaid": false,
+          "isCabinPaidByNovios": false,
+          "isXtraCabinPaidByNovios": false,
+          "isXtraCabinPaid": false,
+          "cabin": "VILLA MARGARITA",
+          "room": "VILLA MARGARITA-1"
+        },
+        "updatedAt": {
+          "_seconds": 1786678869,
+          "_nanoseconds": 180000000
+        }
+      }
+    },
+    {
+      "id": "isa_38t",
+      "mismatches": [
+        {
+          "path": "identity.cloudinaryId",
+          "sheetValue": "zaza_v6no9u",
+          "firestoreValue": ""
+        }
+      ],
+      "payload": {
+        "id": "isa_38t",
+        "identity": {
+          "firstName": "Isabelle",
+          "middleName": "",
+          "lastName": "Panzica",
+          "maternalLastName": "",
+          "lang": "fr",
+          "age": "Adulto",
+          "gender": "M",
+          "phone": "33652053202",
+          "cloudinaryId": "zaza_v6no9u"
         },
         "hosting": {
           "cabin": "VILLA MARGARITA",
@@ -167,519 +275,48 @@
           "isCabinPaidByNovios": false,
           "isCabinPaid": false,
           "xtraCabin": "VILLA AZALEA",
-          "xtraRoom": "VILLA AZALEA-3",
+          "xtraRoom": "VILLA AZALEA-2",
           "isXtraCabinPaidByNovios": false,
           "isXtraCabinPaid": false
         },
         "rsvp": {},
         "sent": false,
         "tagGroup": "38 Tonnes",
-        "invitationGroup": "Marion et William",
-        "idCheckUser": false,
+        "invitationGroup": "",
         "message": "",
         "messageAuthor": "",
-        "table": "38 tonnes #2",
+        "table": "38 tonnes #1",
         "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      }
-    }
-  ],
-  "changed": [
-    {
-      "id": "david_aïli",
-      "mismatches": [
-        {
-          "path": "idCheckUser",
-          "sheetValue": false,
-          "firestoreValue": true
-        }
-      ],
-      "payload": {
-        "id": "david_aïli",
-        "identity": {
-          "firstName": "David",
-          "middleName": "",
-          "lastName": "Aïli",
-          "maternalLastName": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "gender": "H",
-          "phone": "523332017504",
-          "cloudinaryId": "20260726_120055_wxzxpv"
-        },
-        "hosting": {
-          "cabin": "VILLA HORTENCIA",
-          "room": "VILLA HORTENCIA-1",
-          "isCabinPaidByNovios": true,
-          "isCabinPaid": false,
-          "xtraCabin": "CASONA",
-          "xtraRoom": "CASONA-2",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Novios",
-        "invitationGroup": "David y Aydé",
-        "idCheckUser": false,
-        "message": "La vida es un carnaval",
-        "messageAuthor": "Alguien",
-        "table": "Novios",
-        "modifiedAt": "dom 25 ene 26",
         "travelsByPlane": false,
-        "isAdmin": true,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "id": "david_aïli",
-        "invitationGroup": "David y Aydé",
-        "tagGroup": "Novios",
-        "table": "Novios",
-        "sent": false,
-        "travelsByPlane": false,
-        "isAdmin": true,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:34.273Z",
-        "modifiedAt": "dom 25 ene 26",
-        "guestId": "david_aïli",
-        "identity": {
-          "age": "Adulto",
-          "firstName": "David",
-          "lastName": "Aïli",
-          "lang": "fr",
-          "cloudinaryId": "20260726_120055_wxzxpv",
-          "gender": "H",
-          "maternalLastName": "",
-          "middleName": "",
-          "phone": "523332017504"
-        },
-        "maternalLastName": "",
-        "messageAuthor": "Alguien",
-        "message": "La vida es un carnaval",
-        "hosting": {
-          "isXtraCabinPaid": false,
-          "room": "VILLA HORTENCIA-1",
-          "xtraCabin": "CASONA",
-          "isCabinPaidByNovios": true,
-          "xtraRoom": "CASONA-2",
-          "cabin": "VILLA HORTENCIA",
-          "isXtraCabinPaidByNovios": false,
-          "isCabinPaid": false
-        },
-        "rsvp": {
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "petanca": false,
-          "needBalls": false,
-          "answers": {
-            "petanqueOwnBoules": 1,
-            "petanqueParticipation": 1,
-            "sunday": 5,
-            "saturday": 5,
-            "friday": 5,
-            "accommodationConfirm": 1,
-            "playa": 5,
-            "rocaAzul": 5
-          }
-        },
-        "updatedBy": "david_aïli",
-        "idCheckUser": true,
-        "updatedAt": {
-          "_seconds": 1786771167,
-          "_nanoseconds": 253000000
-        }
-      }
-    },
-    {
-      "id": "aydé_juárez_guadalupe",
-      "mismatches": [
-        {
-          "path": "idCheckUser",
-          "sheetValue": false,
-          "firestoreValue": true
-        }
-      ],
-      "payload": {
-        "id": "aydé_juárez_guadalupe",
-        "identity": {
-          "firstName": "Aydé",
-          "middleName": "",
-          "lastName": "Juárez",
-          "maternalLastName": "Guadalupe",
-          "lang": "es",
-          "age": "Adulto",
-          "gender": "M",
-          "phone": "523336616738",
-          "cloudinaryId": "v1785544747/IMG_3496_qzt2un.heic"
-        },
-        "hosting": {
-          "cabin": "VILLA HORTENCIA",
-          "room": "VILLA HORTENCIA-1",
-          "isCabinPaidByNovios": true,
-          "isCabinPaid": false,
-          "xtraCabin": "CASONA",
-          "xtraRoom": "CASONA-2",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Novios",
-        "invitationGroup": "David y Aydé",
-        "idCheckUser": false,
-        "message": "No te pedí, solo me llegaste, mi regalo de Dios",
-        "messageAuthor": "",
-        "table": "Novios",
-        "modifiedAt": "dom 25 ene 26",
-        "travelsByPlane": false,
-        "isAdmin": true,
-        "maternalLastName": "Guadalupe"
-      },
-      "existing": {
-        "id": "aydé_juárez_guadalupe",
-        "message": "No te pedí, solo me llegaste, mi regalo de Dios",
-        "messageAuthor": "",
-        "invitationGroup": "David y Aydé",
-        "tagGroup": "Novios",
-        "table": "Novios",
-        "sent": false,
-        "travelsByPlane": false,
-        "isAdmin": true,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:34.372Z",
-        "modifiedAt": "dom 25 ene 26",
-        "maternalLastName": "Guadalupe",
-        "identity": {
-          "age": "Adulto",
-          "lang": "es",
-          "phone": "523336616738",
-          "cloudinaryId": "v1785544747/IMG_3496_qzt2un.heic",
-          "gender": "M",
-          "middleName": "",
-          "maternalLastName": "Guadalupe",
-          "firstName": "Aydé",
-          "lastName": "Juárez"
-        },
-        "guestId": "aydé_juárez_guadalupe",
-        "hosting": {
-          "xtraRoom": "CASONA-2",
-          "xtraCabin": "CASONA",
-          "isXtraCabinPaidByNovios": false,
-          "room": "VILLA HORTENCIA-1",
-          "cabin": "VILLA HORTENCIA",
-          "isXtraCabinPaid": false,
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": true
-        },
-        "rsvp": {
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "petanca": false,
-          "needBalls": false,
-          "answers": {
-            "petanqueOwnBoules": 1,
-            "petanqueParticipation": 1,
-            "sunday": 5,
-            "saturday": 5,
-            "friday": 5,
-            "accommodationConfirm": 1,
-            "playa": 5,
-            "rocaAzul": 5
-          }
-        },
-        "updatedBy": "david_aïli",
-        "idCheckUser": true,
-        "updatedAt": {
-          "_seconds": 1786771167,
-          "_nanoseconds": 326000000
-        }
-      }
-    },
-    {
-      "id": "diego_aïli_vázquez",
-      "mismatches": [
-        {
-          "path": "idCheckUser",
-          "sheetValue": false,
-          "firestoreValue": true
-        }
-      ],
-      "payload": {
-        "id": "diego_aïli_vázquez",
-        "identity": {
-          "firstName": "Diego",
-          "middleName": "",
-          "lastName": "Aïli",
-          "maternalLastName": "Vázquez",
-          "lang": "es",
-          "age": "Niño",
-          "gender": "H",
-          "phone": "523326919351",
-          "cloudinaryId": "diego_k1hjw6"
-        },
-        "hosting": {
-          "cabin": "SUITE DON CARLOS",
-          "room": "SUITE DON CARLOS-3",
-          "isCabinPaidByNovios": true,
-          "isCabinPaid": false,
-          "xtraCabin": "CASONA",
-          "xtraRoom": "CASONA-6",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Familia de David",
-        "invitationGroup": "David y Aydé",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Niños #1",
-        "modifiedAt": "dom 25 ene 26",
-        "travelsByPlane": false,
-        "isAdmin": false,
-        "maternalLastName": "Vázquez"
-      },
-      "existing": {
-        "id": "diego_aïli_vázquez",
-        "message": "",
-        "messageAuthor": "",
-        "tagGroup": "Familia de David",
-        "table": "Niños #1",
-        "sent": false,
-        "travelsByPlane": false,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:36.346Z",
-        "modifiedAt": "dom 25 ene 26",
-        "invitationGroup": "David y Aydé",
-        "maternalLastName": "Vázquez",
-        "identity": {
-          "age": "Niño",
-          "firstName": "Diego",
-          "lang": "es",
-          "gender": "H",
-          "middleName": "",
-          "phone": "523326919351",
-          "cloudinaryId": "diego_k1hjw6",
-          "maternalLastName": "Vázquez",
-          "lastName": "Aïli"
-        },
-        "guestId": "diego_aïli_vázquez",
-        "hosting": {
-          "cabin": "SUITE DON CARLOS",
-          "room": "SUITE DON CARLOS-3",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": true,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false,
-          "xtraRoom": "CASONA-6",
-          "xtraCabin": "CASONA"
-        },
-        "rsvp": {
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "petanca": false,
-          "needBalls": false,
-          "answers": {
-            "petanqueOwnBoules": 0,
-            "petanqueParticipation": 2,
-            "sunday": 5,
-            "saturday": 5,
-            "friday": 5,
-            "accommodationConfirm": 1,
-            "playa": 5,
-            "rocaAzul": 5
-          }
-        },
-        "updatedBy": "david_aïli",
-        "idCheckUser": true,
-        "updatedAt": {
-          "_seconds": 1786771167,
-          "_nanoseconds": 354000000
-        }
-      }
-    },
-    {
-      "id": "oscar",
-      "mismatches": [
-        {
-          "path": "idCheckUser",
-          "sheetValue": false,
-          "firestoreValue": true
-        }
-      ],
-      "payload": {
-        "id": "oscar",
-        "identity": {
-          "firstName": "Oscar",
-          "middleName": "",
-          "lastName": "Aïli",
-          "maternalLastName": "Vázquez",
-          "lang": "es",
-          "age": "Niño",
-          "gender": "H",
-          "phone": "",
-          "cloudinaryId": "oscar_pud6lm"
-        },
-        "hosting": {
-          "cabin": "SUITE DON CARLOS",
-          "room": "SUITE DON CARLOS-3",
-          "isCabinPaidByNovios": true,
-          "isCabinPaid": false,
-          "xtraCabin": "CASONA",
-          "xtraRoom": "CASONA-6",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Familia de David",
-        "invitationGroup": "David y Aydé",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Niños #1",
-        "modifiedAt": "dom 25 ene 26",
-        "travelsByPlane": false,
-        "isAdmin": false,
-        "maternalLastName": "Vázquez"
-      },
-      "existing": {
-        "id": "oscar",
-        "message": "",
-        "messageAuthor": "",
-        "tagGroup": "Familia de David",
-        "table": "Niños #1",
-        "sent": false,
-        "travelsByPlane": false,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:36.377Z",
-        "modifiedAt": "dom 25 ene 26",
-        "invitationGroup": "David y Aydé",
-        "maternalLastName": "Vázquez",
-        "identity": {
-          "age": "Niño",
-          "firstName": "Oscar",
-          "lang": "es",
-          "phone": "",
-          "gender": "H",
-          "middleName": "",
-          "cloudinaryId": "oscar_pud6lm",
-          "maternalLastName": "Vázquez",
-          "lastName": "Aïli"
-        },
-        "guestId": "oscar",
-        "hosting": {
-          "cabin": "SUITE DON CARLOS",
-          "room": "SUITE DON CARLOS-3",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": true,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false,
-          "xtraRoom": "CASONA-6",
-          "xtraCabin": "CASONA"
-        },
-        "rsvp": {
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "petanca": false,
-          "needBalls": false,
-          "answers": {
-            "petanqueOwnBoules": 0,
-            "petanqueParticipation": 2,
-            "sunday": 5,
-            "saturday": 5,
-            "friday": 5,
-            "accommodationConfirm": 1,
-            "playa": 5,
-            "rocaAzul": 5
-          }
-        },
-        "updatedBy": "david_aïli",
-        "idCheckUser": true,
-        "updatedAt": {
-          "_seconds": 1786771167,
-          "_nanoseconds": 398000000
-        }
-      }
-    },
-    {
-      "id": "spomenka.petrovic",
-      "mismatches": [
-        {
-          "path": "identity.cloudinaryId",
-          "sheetValue": "spo_nl89t6",
-          "firestoreValue": "spomenka_b03vcf"
-        }
-      ],
-      "payload": {
-        "id": "spomenka.petrovic",
-        "identity": {
-          "firstName": "Spomenka",
-          "middleName": "",
-          "lastName": "Petrovic",
-          "maternalLastName": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "gender": "M",
-          "phone": "33667340474",
-          "cloudinaryId": "spo_nl89t6"
-        },
-        "hosting": {
-          "cabin": "CABAÑA 1",
-          "room": "CABAÑA 1-1",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "CABAÑA 1",
-          "xtraRoom": "CABAÑA 1-1",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Amigos de HP - David",
-        "invitationGroup": "Spomeka y Guihem",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Amigos David #1",
-        "modifiedAt": "dom 25 ene 26",
-        "travelsByPlane": true,
         "isAdmin": false,
         "maternalLastName": ""
       },
       "existing": {
-        "id": "spomenka.petrovic",
+        "id": "isa_38t",
+        "idCheckUser": false,
         "message": "",
         "messageAuthor": "",
-        "invitationGroup": "Spomeka y Guihem",
-        "table": "Amigos David #1",
+        "invitationGroup": "",
+        "tagGroup": "38 Tonnes",
+        "table": "38 tonnes #1",
         "sent": false,
-        "travelsByPlane": true,
+        "modifiedAt": "",
+        "travelsByPlane": false,
         "isAdmin": false,
         "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:38.723Z",
-        "modifiedAt": "dom 25 ene 26",
-        "tagGroup": "Amigos de HP - David",
+        "_migratedAt": "2026-08-03T15:31:39.001Z",
         "maternalLastName": "",
         "identity": {
           "age": "Adulto",
-          "firstName": "Spomenka",
-          "lastName": "Petrovic",
+          "firstName": "Isabelle",
+          "lastName": "Panzica",
           "lang": "fr",
+          "cloudinaryId": "",
           "gender": "M",
           "maternalLastName": "",
-          "phone": "33667340474",
-          "middleName": "",
-          "cloudinaryId": "spomenka_b03vcf"
+          "phone": "33652053202",
+          "middleName": ""
         },
-        "guestId": "spomenka.petrovic",
-        "updatedBy": "sync_script",
-        "idCheckUser": false,
         "rsvp": {
           "confirmCabin": false,
           "cabinWaitingList": false,
@@ -693,121 +330,21 @@
             "playa": 0
           }
         },
-        "hosting": {
-          "cabin": "CABAÑA 1",
-          "room": "CABAÑA 1-1",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": false,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false,
-          "xtraRoom": "CABAÑA 1-1",
-          "xtraCabin": "CABAÑA 1"
-        },
-        "updatedAt": {
-          "_seconds": 1786457863,
-          "_nanoseconds": 505000000
-        }
-      }
-    },
-    {
-      "id": "guilhem.laubie",
-      "mismatches": [
-        {
-          "path": "identity.cloudinaryId",
-          "sheetValue": "guilhem_sbvz9h",
-          "firestoreValue": "guilhem_dy6ag9"
-        }
-      ],
-      "payload": {
-        "id": "guilhem.laubie",
-        "identity": {
-          "firstName": "Guilhem",
-          "middleName": "",
-          "lastName": "Laubie",
-          "maternalLastName": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "gender": "H",
-          "phone": "33674332050",
-          "cloudinaryId": "guilhem_sbvz9h"
-        },
-        "hosting": {
-          "cabin": "CABAÑA 1",
-          "room": "CABAÑA 1-1",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "CABAÑA 1",
-          "xtraRoom": "CABAÑA 1-1",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Amigos de HP - David",
-        "invitationGroup": "Spomeka y Guihem",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Amigos David #1",
-        "modifiedAt": "dom 25 ene 26",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "id": "guilhem.laubie",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "invitationGroup": "Spomeka y Guihem",
-        "table": "Amigos David #1",
-        "sent": false,
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:38.754Z",
-        "modifiedAt": "dom 25 ene 26",
-        "tagGroup": "Amigos de HP - David",
-        "maternalLastName": "",
-        "identity": {
-          "age": "Adulto",
-          "firstName": "Guilhem",
-          "lang": "fr",
-          "gender": "H",
-          "maternalLastName": "",
-          "lastName": "Laubie",
-          "phone": "33674332050",
-          "middleName": "",
-          "cloudinaryId": "guilhem_dy6ag9"
-        },
+        "guestId": "isa_38t",
         "updatedBy": "sync_script",
-        "rsvp": {
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "petanca": false,
-          "needBalls": false,
-          "answers": {
-            "friday": 0,
-            "saturday": 0,
-            "sunday": 0,
-            "xtra": 0,
-            "playa": 0
-          }
-        },
-        "guestId": "guilhem.laubie",
         "hosting": {
-          "cabin": "CABAÑA 1",
-          "room": "CABAÑA 1-1",
+          "cabin": "VILLA MARGARITA",
           "isCabinPaid": false,
           "isCabinPaidByNovios": false,
           "isXtraCabinPaidByNovios": false,
           "isXtraCabinPaid": false,
-          "xtraRoom": "CABAÑA 1-1",
-          "xtraCabin": "CABAÑA 1"
+          "xtraRoom": "VILLA AZALEA-2",
+          "xtraCabin": "VILLA AZALEA",
+          "room": "VILLA MARGARITA-2"
         },
         "updatedAt": {
-          "_seconds": 1786457863,
-          "_nanoseconds": 540000000
+          "_seconds": 1786678870,
+          "_nanoseconds": 111000000
         }
       }
     },
@@ -815,14 +352,14 @@
       "id": "marion_38t",
       "mismatches": [
         {
-          "path": "invitationGroup",
-          "sheetValue": "Marion et William",
-          "firestoreValue": ""
+          "path": "hosting.cabin",
+          "sheetValue": "CABAÑA 2",
+          "firestoreValue": "VILLA MARGARITA"
         },
         {
-          "path": "travelsByPlane",
-          "sheetValue": true,
-          "firestoreValue": false
+          "path": "hosting.room",
+          "sheetValue": "CABAÑA 2-1",
+          "firestoreValue": "VILLA MARGARITA-2"
         }
       ],
       "payload": {
@@ -839,8 +376,8 @@
           "cloudinaryId": "marion_ujo5dw"
         },
         "hosting": {
-          "cabin": "VILLA MARGARITA",
-          "room": "VILLA MARGARITA-2",
+          "cabin": "CABAÑA 2",
+          "room": "CABAÑA 2-1",
           "isCabinPaidByNovios": false,
           "isCabinPaid": false,
           "xtraCabin": "VILLA AZALEA",
@@ -852,7 +389,6 @@
         "sent": false,
         "tagGroup": "38 Tonnes",
         "invitationGroup": "Marion et William",
-        "idCheckUser": false,
         "message": "",
         "messageAuthor": "",
         "table": "38 tonnes #2",
@@ -866,12 +402,10 @@
         "idCheckUser": false,
         "message": "",
         "messageAuthor": "",
-        "invitationGroup": "",
         "tagGroup": "38 Tonnes",
         "table": "38 tonnes #2",
         "sent": false,
         "modifiedAt": "",
-        "travelsByPlane": false,
         "isAdmin": false,
         "_source": "google_sheet",
         "_migratedAt": "2026-08-03T15:31:39.306Z",
@@ -912,1663 +446,77 @@
           "xtraCabin": "VILLA AZALEA",
           "room": "VILLA MARGARITA-2"
         },
+        "invitationGroup": "Marion et William",
+        "travelsByPlane": true,
         "updatedAt": {
-          "_seconds": 1786678870,
-          "_nanoseconds": 152000000
+          "_seconds": 1786809367,
+          "_nanoseconds": 198000000
         }
       }
     },
     {
-      "id": "dimitar",
+      "id": "william",
       "mismatches": [
         {
-          "path": "identity.cloudinaryId",
-          "sheetValue": "dimi_cyzpb7",
-          "firestoreValue": ""
+          "path": "hosting.cabin",
+          "sheetValue": "CABAÑA 2",
+          "firestoreValue": "VILLA MARGARITA"
+        },
+        {
+          "path": "hosting.room",
+          "sheetValue": "CABAÑA 2-1",
+          "firestoreValue": "VILLA MARGARITA-2"
         }
       ],
       "payload": {
-        "id": "dimitar",
+        "id": "william",
         "identity": {
-          "firstName": "Dimitar",
+          "firstName": "William",
           "middleName": "",
-          "lastName": "Miriyski",
-          "maternalLastName": "",
-          "lang": "en",
-          "age": "Adulto",
-          "gender": "H",
-          "phone": "34600374224",
-          "cloudinaryId": "dimi_cyzpb7"
-        },
-        "hosting": {
-          "cabin": "VILLA MARGARITA",
-          "room": "VILLA MARGARITA-2",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "VILLA AZALEA",
-          "xtraRoom": "VILLA AZALEA-1",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Amigos de HP - David",
-        "invitationGroup": "Dimitar",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Amigos David #2",
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "id": "dimitar",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "invitationGroup": "Dimitar",
-        "table": "Amigos David #2",
-        "sent": false,
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:39.511Z",
-        "tagGroup": "Amigos de HP - David",
-        "maternalLastName": "",
-        "identity": {
-          "age": "Adulto",
-          "firstName": "Dimitar",
-          "lang": "en",
-          "cloudinaryId": "",
-          "gender": "H",
-          "maternalLastName": "",
-          "lastName": "Miriyski",
-          "phone": "34600374224",
-          "middleName": ""
-        },
-        "updatedBy": "sync_script",
-        "rsvp": {
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "petanca": false,
-          "needBalls": false,
-          "answers": {
-            "friday": 0,
-            "saturday": 0,
-            "sunday": 0,
-            "xtra": 0,
-            "playa": 0
-          }
-        },
-        "hosting": {
-          "cabin": "VILLA MARGARITA",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": false,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false,
-          "xtraRoom": "VILLA AZALEA-1",
-          "xtraCabin": "VILLA AZALEA",
-          "room": "VILLA MARGARITA-2"
-        },
-        "updatedAt": {
-          "_seconds": 1786678870,
-          "_nanoseconds": 187000000
-        }
-      }
-    },
-    {
-      "id": "geraldine.toussaint",
-      "mismatches": [
-        {
-          "path": "identity.cloudinaryId",
-          "sheetValue": "gg_u1wclq",
-          "firestoreValue": "Captura_de_pantalla_2026-08-03_a_la_s_4.16.02_p.m._sme5nv"
-        },
-        {
-          "path": "invitationGroup",
-          "sheetValue": "Géraldine et Jean-Christophe",
-          "firestoreValue": "Géraldine et ..."
-        }
-      ],
-      "payload": {
-        "id": "geraldine.toussaint",
-        "identity": {
-          "firstName": "Géraldine",
-          "middleName": "",
-          "lastName": "Toussaint",
-          "maternalLastName": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "gender": "M",
-          "phone": "33608259301",
-          "cloudinaryId": "gg_u1wclq"
-        },
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Familia de David",
-        "invitationGroup": "Géraldine et Jean-Christophe",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Mesa #4",
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "id": "geraldine.toussaint",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "invitationGroup": "Géraldine et ...",
-        "tagGroup": "Familia de David",
-        "table": "Mesa #4",
-        "sent": false,
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:40.419Z",
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": false,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "maternalLastName": "",
-        "identity": {
-          "age": "Adulto",
-          "lastName": "Toussaint",
-          "lang": "fr",
-          "gender": "M",
-          "maternalLastName": "",
-          "phone": "33608259301",
-          "middleName": "",
-          "cloudinaryId": "Captura_de_pantalla_2026-08-03_a_la_s_4.16.02_p.m._sme5nv",
-          "firstName": "Géraldine"
-        },
-        "rsvp": {
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "petanca": false,
-          "needBalls": false,
-          "answers": {
-            "friday": 0,
-            "saturday": 0,
-            "sunday": 0,
-            "xtra": 0,
-            "playa": 0
-          }
-        },
-        "guestId": "geraldine.toussaint"
-      }
-    },
-    {
-      "id": "pareja_de_géraldine",
-      "mismatches": [
-        {
-          "path": "identity.firstName",
-          "sheetValue": "Jean-Christophe",
-          "firestoreValue": "Pareja"
-        },
-        {
-          "path": "identity.middleName",
-          "sheetValue": "",
-          "firestoreValue": "De"
-        },
-        {
-          "path": "identity.lastName",
-          "sheetValue": "Nervo",
-          "firestoreValue": "Géraldine"
-        },
-        {
-          "path": "identity.cloudinaryId",
-          "sheetValue": "jc_nxmclx",
-          "firestoreValue": ""
-        },
-        {
-          "path": "invitationGroup",
-          "sheetValue": "Géraldine et Jean-Christophe",
-          "firestoreValue": "Géraldine et ..."
-        }
-      ],
-      "payload": {
-        "id": "pareja_de_géraldine",
-        "identity": {
-          "firstName": "Jean-Christophe",
-          "middleName": "",
-          "lastName": "Nervo",
+          "lastName": "",
           "maternalLastName": "",
           "lang": "fr",
           "age": "Adulto",
           "gender": "H",
           "phone": "",
-          "cloudinaryId": "jc_nxmclx"
-        },
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Familia de David",
-        "invitationGroup": "Géraldine et Jean-Christophe",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Mesa #4",
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "id": "pareja_de_géraldine",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "invitationGroup": "Géraldine et ...",
-        "tagGroup": "Familia de David",
-        "table": "Mesa #4",
-        "sent": false,
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:40.445Z",
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": false,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "maternalLastName": "",
-        "updatedBy": "sync_script",
-        "identity": {
-          "age": "Adulto",
-          "lang": "fr",
-          "cloudinaryId": "",
-          "gender": "H",
-          "firstName": "Pareja",
-          "middleName": "De",
-          "maternalLastName": "",
-          "lastName": "Géraldine",
-          "phone": ""
-        },
-        "updatedAt": {
-          "_seconds": 1785887967,
-          "_nanoseconds": 760000000
-        },
-        "rsvp": {
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "petanca": false,
-          "needBalls": false,
-          "answers": {
-            "friday": 0,
-            "saturday": 0,
-            "sunday": 0,
-            "xtra": 0,
-            "playa": 0
-          }
-        }
-      }
-    },
-    {
-      "id": "gaetane",
-      "mismatches": [
-        {
-          "path": "identity.cloudinaryId",
-          "sheetValue": "glf_n9syy0",
-          "firestoreValue": ""
-        }
-      ],
-      "payload": {
-        "id": "gaetane",
-        "identity": {
-          "firstName": "Gaëtane",
-          "middleName": "",
-          "lastName": "Lefranc",
-          "maternalLastName": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "gender": "M",
-          "phone": "014385226909",
-          "cloudinaryId": "glf_n9syy0"
-        },
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Familia de David",
-        "invitationGroup": "Gaëtane et Stéphane",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Mesa #4",
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "id": "gaetane",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "invitationGroup": "Gaëtane et Stéphane",
-        "tagGroup": "Familia de David",
-        "table": "Mesa #4",
-        "sent": false,
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:40.482Z",
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": false,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "maternalLastName": "",
-        "identity": {
-          "age": "Adulto",
-          "lastName": "Lefranc",
-          "lang": "fr",
-          "cloudinaryId": "",
-          "gender": "M",
-          "maternalLastName": "",
-          "phone": "014385226909",
-          "middleName": "",
-          "firstName": "Gaëtane"
-        },
-        "rsvp": {
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "petanca": false,
-          "needBalls": false,
-          "answers": {
-            "friday": 0,
-            "saturday": 0,
-            "sunday": 0,
-            "xtra": 0,
-            "playa": 0
-          }
-        },
-        "guestId": "gaetane"
-      }
-    },
-    {
-      "id": "stéphane_bon",
-      "mismatches": [
-        {
-          "path": "identity.cloudinaryId",
-          "sheetValue": "sbon_bpkms5",
-          "firestoreValue": ""
-        }
-      ],
-      "payload": {
-        "id": "stéphane_bon",
-        "identity": {
-          "firstName": "Stéphane",
-          "middleName": "",
-          "lastName": "Bon",
-          "maternalLastName": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "gender": "H",
-          "phone": "",
-          "cloudinaryId": "sbon_bpkms5"
-        },
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Familia de David",
-        "invitationGroup": "Gaëtane et Stéphane",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Mesa #4",
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "id": "stéphane_bon",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "invitationGroup": "Gaëtane et Stéphane",
-        "tagGroup": "Familia de David",
-        "table": "Mesa #4",
-        "sent": false,
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:40.509Z",
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": false,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "maternalLastName": "",
-        "updatedBy": "sync_script",
-        "identity": {
-          "age": "Adulto",
-          "lastName": "Bon",
-          "lang": "fr",
-          "cloudinaryId": "",
-          "gender": "H",
-          "maternalLastName": "",
-          "middleName": "",
-          "firstName": "Stéphane",
-          "phone": ""
-        },
-        "updatedAt": {
-          "_seconds": 1785887967,
-          "_nanoseconds": 794000000
-        },
-        "rsvp": {
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "petanca": false,
-          "needBalls": false,
-          "answers": {
-            "friday": 0,
-            "saturday": 0,
-            "sunday": 0,
-            "xtra": 0,
-            "playa": 0
-          }
-        }
-      }
-    },
-    {
-      "id": "ange_bon",
-      "mismatches": [
-        {
-          "path": "identity.cloudinaryId",
-          "sheetValue": "abon_cqloe8",
-          "firestoreValue": "ange_wfyq1x"
-        }
-      ],
-      "payload": {
-        "id": "ange_bon",
-        "identity": {
-          "firstName": "Ange",
-          "middleName": "",
-          "lastName": "Bon",
-          "maternalLastName": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "gender": "M",
-          "phone": "",
-          "cloudinaryId": "abon_cqloe8"
-        },
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Familia de David",
-        "invitationGroup": "Gaëtane et Stéphane",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Mesa #5",
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "id": "ange_bon",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "tagGroup": "Familia de David",
-        "table": "Mesa #5",
-        "sent": false,
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:40.534Z",
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": false,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "maternalLastName": "",
-        "updatedBy": "sync_script",
-        "identity": {
-          "age": "Adulto",
-          "firstName": "Ange",
-          "lastName": "Bon",
-          "lang": "fr",
-          "gender": "M",
-          "maternalLastName": "",
-          "middleName": "",
-          "cloudinaryId": "ange_wfyq1x",
-          "phone": ""
-        },
-        "rsvp": {
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "petanca": false,
-          "needBalls": false,
-          "answers": {
-            "friday": 0,
-            "saturday": 0,
-            "sunday": 0,
-            "xtra": 0,
-            "playa": 0
-          }
-        },
-        "invitationGroup": "Gaëtane et Stéphane",
-        "updatedAt": {
-          "_seconds": 1786416491,
-          "_nanoseconds": 18000000
-        }
-      }
-    },
-    {
-      "id": "gregory.nussbaumer",
-      "mismatches": [
-        {
-          "path": "identity.cloudinaryId",
-          "sheetValue": "greg_sz5pma",
-          "firestoreValue": ""
-        }
-      ],
-      "payload": {
-        "id": "gregory.nussbaumer",
-        "identity": {
-          "firstName": "Gregory",
-          "middleName": "",
-          "lastName": "Nussbaumer",
-          "maternalLastName": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "gender": "H",
-          "phone": "33626693367",
-          "cloudinaryId": "greg_sz5pma"
-        },
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Amigos de HP - David",
-        "invitationGroup": "",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Mesa #5",
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "id": "gregory.nussbaumer",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "invitationGroup": "",
-        "table": "Mesa #5",
-        "sent": false,
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:40.737Z",
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": false,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "tagGroup": "Amigos de HP - David",
-        "maternalLastName": "",
-        "identity": {
-          "age": "Adulto",
-          "firstName": "Gregory",
-          "lastName": "Nussbaumer",
-          "lang": "fr",
-          "cloudinaryId": "",
-          "gender": "H",
-          "maternalLastName": "",
-          "phone": "33626693367",
-          "middleName": ""
-        },
-        "rsvp": {
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "petanca": false,
-          "needBalls": false,
-          "answers": {
-            "friday": 0,
-            "saturday": 0,
-            "sunday": 0,
-            "xtra": 0,
-            "playa": 0
-          }
-        },
-        "guestId": "gregory.nussbaumer"
-      }
-    },
-    {
-      "id": "paul-henry.picard",
-      "mismatches": [
-        {
-          "path": "identity.cloudinaryId",
-          "sheetValue": "polo_mellvf",
-          "firestoreValue": "polo_kalmuw"
-        }
-      ],
-      "payload": {
-        "id": "paul-henry.picard",
-        "identity": {
-          "firstName": "Paul-Henry",
-          "middleName": "",
-          "lastName": "Picard",
-          "maternalLastName": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "gender": "H",
-          "phone": "33682436166",
-          "cloudinaryId": "polo_mellvf"
-        },
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Amigos de HP - David",
-        "invitationGroup": "",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Mesa #5",
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "id": "paul-henry.picard",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "invitationGroup": "",
-        "table": "Mesa #5",
-        "sent": false,
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:40.762Z",
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": false,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "tagGroup": "Amigos de HP - David",
-        "maternalLastName": "",
-        "identity": {
-          "age": "Adulto",
-          "firstName": "Paul-Henry",
-          "lastName": "Picard",
-          "lang": "fr",
-          "gender": "H",
-          "maternalLastName": "",
-          "phone": "33682436166",
-          "middleName": "",
-          "cloudinaryId": "polo_kalmuw"
-        },
-        "rsvp": {
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "petanca": false,
-          "needBalls": false,
-          "answers": {
-            "friday": 0,
-            "saturday": 0,
-            "sunday": 0,
-            "xtra": 0,
-            "playa": 0
-          }
-        },
-        "guestId": "paul-henry.picard"
-      }
-    },
-    {
-      "id": "victor.sirisakd",
-      "mismatches": [
-        {
-          "path": "identity.cloudinaryId",
-          "sheetValue": "vik_mmaw3h",
-          "firestoreValue": ""
-        }
-      ],
-      "payload": {
-        "id": "victor.sirisakd",
-        "identity": {
-          "firstName": "Victor",
-          "middleName": "",
-          "lastName": "Sirisakd",
-          "maternalLastName": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "gender": "H",
-          "phone": "33620663207",
-          "cloudinaryId": "vik_mmaw3h"
-        },
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Amigos de HP - David",
-        "invitationGroup": "",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Mesa #5",
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "id": "victor.sirisakd",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "invitationGroup": "",
-        "table": "Mesa #5",
-        "sent": false,
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "_source": "google_sheet",
-        "_migratedAt": "2026-08-03T15:31:40.791Z",
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isCabinPaid": false,
-          "isCabinPaidByNovios": false,
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "tagGroup": "Amigos de HP - David",
-        "maternalLastName": "",
-        "identity": {
-          "age": "Adulto",
-          "firstName": "Victor",
-          "lastName": "Sirisakd",
-          "lang": "fr",
-          "cloudinaryId": "",
-          "gender": "H",
-          "maternalLastName": "",
-          "phone": "33620663207",
-          "middleName": ""
-        },
-        "rsvp": {
-          "confirmCabin": false,
-          "cabinWaitingList": false,
-          "petanca": false,
-          "needBalls": false,
-          "answers": {
-            "friday": 0,
-            "saturday": 0,
-            "sunday": 0,
-            "xtra": 0,
-            "playa": 0
-          }
-        },
-        "guestId": "victor.sirisakd"
-      }
-    },
-    {
-      "id": "aurelien.neyrand",
-      "mismatches": [
-        {
-          "path": "identity.cloudinaryId",
-          "sheetValue": "aneyrand_obhmrr",
-          "firestoreValue": ""
-        }
-      ],
-      "payload": {
-        "id": "aurelien.neyrand",
-        "identity": {
-          "firstName": "Aurélien",
-          "middleName": "",
-          "lastName": "Neyrand",
-          "maternalLastName": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "gender": "H",
-          "phone": "",
-          "cloudinaryId": "aneyrand_obhmrr"
-        },
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Amigos de HP - David",
-        "invitationGroup": "",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Mesa #6",
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "invitationGroup": "",
-        "tagGroup": "Amigos de HP - David",
-        "modifiedAt": "",
-        "hosting": {
-          "xtraRoom": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "isXtraCabinPaid": false,
-          "isXtraCabinPaidByNovios": false,
-          "xtraCabin": "",
-          "cabin": "",
-          "room": ""
-        },
-        "idCheckUser": false,
-        "isAdmin": false,
-        "message": "",
-        "sent": false,
-        "travelsByPlane": true,
-        "maternalLastName": "",
-        "messageAuthor": "",
-        "id": "aurelien.neyrand",
-        "table": "Mesa #6",
-        "identity": {
-          "maternalLastName": "",
-          "lastName": "Neyrand",
-          "gender": "H",
-          "phone": "",
-          "middleName": "",
-          "cloudinaryId": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "firstName": "Aurélien"
-        },
-        "rsvp": {
-          "confirmCabin": false,
-          "needBalls": false,
-          "petanca": false,
-          "cabinWaitingList": false,
-          "answers": {
-            "friday": 0,
-            "saturday": 0,
-            "sunday": 0,
-            "xtra": 0,
-            "playa": 0
-          }
-        },
-        "guestId": "aurelien.neyrand"
-      }
-    },
-    {
-      "id": "damien.gilles",
-      "mismatches": [
-        {
-          "path": "identity.cloudinaryId",
-          "sheetValue": "dgilles_lrm8pw",
-          "firestoreValue": ""
-        }
-      ],
-      "payload": {
-        "id": "damien.gilles",
-        "identity": {
-          "firstName": "Damien",
-          "middleName": "",
-          "lastName": "Gilles",
-          "maternalLastName": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "gender": "H",
-          "phone": "33645206380",
-          "cloudinaryId": "dgilles_lrm8pw"
-        },
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Amigos de HP - David",
-        "invitationGroup": "",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Mesa #6",
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "invitationGroup": "",
-        "tagGroup": "Amigos de HP - David",
-        "modifiedAt": "",
-        "hosting": {
-          "xtraRoom": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "isXtraCabinPaid": false,
-          "isXtraCabinPaidByNovios": false,
-          "xtraCabin": "",
-          "cabin": "",
-          "room": ""
-        },
-        "idCheckUser": false,
-        "isAdmin": false,
-        "message": "",
-        "sent": false,
-        "travelsByPlane": true,
-        "maternalLastName": "",
-        "identity": {
-          "maternalLastName": "",
-          "firstName": "Damien",
-          "lastName": "Gilles",
-          "gender": "H",
-          "phone": "33645206380",
-          "middleName": "",
-          "cloudinaryId": "",
-          "lang": "fr",
-          "age": "Adulto"
-        },
-        "messageAuthor": "",
-        "id": "damien.gilles",
-        "table": "Mesa #6",
-        "rsvp": {
-          "confirmCabin": false,
-          "needBalls": false,
-          "petanca": false,
-          "cabinWaitingList": false,
-          "answers": {
-            "friday": 0,
-            "saturday": 0,
-            "sunday": 0,
-            "xtra": 0,
-            "playa": 0
-          }
-        },
-        "guestId": "damien.gilles"
-      }
-    },
-    {
-      "id": "desislava",
-      "mismatches": [
-        {
-          "path": "identity.cloudinaryId",
-          "sheetValue": "desi_dirzx4",
-          "firestoreValue": "desi_xr2o4d"
-        }
-      ],
-      "payload": {
-        "id": "desislava",
-        "identity": {
-          "firstName": "Desislava",
-          "middleName": "",
-          "lastName": "Ivanova",
-          "maternalLastName": "",
-          "lang": "en",
-          "age": "Adulto",
-          "gender": "M",
-          "phone": "33783629527",
-          "cloudinaryId": "desi_dirzx4"
-        },
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Amigos de David",
-        "invitationGroup": "Desi et Michaël",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Mesa #6",
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "invitationGroup": "Desi et Michaël",
-        "tagGroup": "Amigos de David",
-        "modifiedAt": "",
-        "hosting": {
-          "xtraRoom": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "isXtraCabinPaid": false,
-          "isXtraCabinPaidByNovios": false,
-          "xtraCabin": "",
-          "cabin": "",
-          "room": ""
-        },
-        "idCheckUser": false,
-        "isAdmin": false,
-        "message": "",
-        "sent": false,
-        "travelsByPlane": true,
-        "maternalLastName": "",
-        "identity": {
-          "maternalLastName": "",
-          "firstName": "Desislava",
-          "lastName": "Ivanova",
-          "gender": "M",
-          "phone": "33783629527",
-          "middleName": "",
-          "cloudinaryId": "desi_xr2o4d",
-          "lang": "en",
-          "age": "Adulto"
-        },
-        "messageAuthor": "",
-        "id": "desislava",
-        "table": "Mesa #6",
-        "rsvp": {
-          "confirmCabin": false,
-          "needBalls": false,
-          "petanca": false,
-          "cabinWaitingList": false,
-          "answers": {
-            "friday": 0,
-            "saturday": 0,
-            "sunday": 0,
-            "xtra": 0,
-            "playa": 0
-          }
-        }
-      }
-    },
-    {
-      "id": "michael.delarche",
-      "mismatches": [
-        {
-          "path": "identity.cloudinaryId",
-          "sheetValue": "delarche_fobe8e",
-          "firestoreValue": ""
-        }
-      ],
-      "payload": {
-        "id": "michael.delarche",
-        "identity": {
-          "firstName": "Michaël",
-          "middleName": "",
-          "lastName": "Delarche",
-          "maternalLastName": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "gender": "H",
-          "phone": "33618400853",
-          "cloudinaryId": "delarche_fobe8e"
-        },
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Amigos de David",
-        "invitationGroup": "",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Mesa #6",
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "invitationGroup": "",
-        "tagGroup": "Amigos de David",
-        "modifiedAt": "",
-        "hosting": {
-          "xtraRoom": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "isXtraCabinPaid": false,
-          "isXtraCabinPaidByNovios": false,
-          "xtraCabin": "",
-          "cabin": "",
-          "room": ""
-        },
-        "idCheckUser": false,
-        "isAdmin": false,
-        "message": "",
-        "sent": false,
-        "travelsByPlane": true,
-        "maternalLastName": "",
-        "messageAuthor": "",
-        "id": "michael.delarche",
-        "table": "Mesa #6",
-        "identity": {
-          "maternalLastName": "",
-          "lastName": "Delarche",
-          "gender": "H",
-          "phone": "33618400853",
-          "middleName": "",
-          "cloudinaryId": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "firstName": "Michaël"
-        },
-        "rsvp": {
-          "confirmCabin": false,
-          "needBalls": false,
-          "petanca": false,
-          "cabinWaitingList": false,
-          "answers": {
-            "friday": 0,
-            "saturday": 0,
-            "sunday": 0,
-            "xtra": 0,
-            "playa": 0
-          }
-        },
-        "guestId": "michael.delarche"
-      }
-    },
-    {
-      "id": "robin.haider",
-      "mismatches": [
-        {
-          "path": "identity.cloudinaryId",
-          "sheetValue": "rh_dxidkb",
-          "firestoreValue": ""
-        }
-      ],
-      "payload": {
-        "id": "robin.haider",
-        "identity": {
-          "firstName": "Robin",
-          "middleName": "",
-          "lastName": "Haider",
-          "maternalLastName": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "gender": "H",
-          "phone": "33629882962",
-          "cloudinaryId": "rh_dxidkb"
-        },
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Amigos de David",
-        "invitationGroup": "",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Mesa #6",
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "invitationGroup": "",
-        "tagGroup": "Amigos de David",
-        "modifiedAt": "",
-        "hosting": {
-          "xtraRoom": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "isXtraCabinPaid": false,
-          "isXtraCabinPaidByNovios": false,
-          "xtraCabin": "",
-          "cabin": "",
-          "room": ""
-        },
-        "idCheckUser": false,
-        "isAdmin": false,
-        "message": "",
-        "sent": false,
-        "travelsByPlane": true,
-        "maternalLastName": "",
-        "identity": {
-          "maternalLastName": "",
-          "firstName": "Robin",
-          "lastName": "Haider",
-          "gender": "H",
-          "phone": "33629882962",
-          "middleName": "",
-          "cloudinaryId": "",
-          "lang": "fr",
-          "age": "Adulto"
-        },
-        "messageAuthor": "",
-        "id": "robin.haider",
-        "table": "Mesa #6",
-        "rsvp": {
-          "confirmCabin": false,
-          "needBalls": false,
-          "petanca": false,
-          "cabinWaitingList": false,
-          "answers": {
-            "friday": 0,
-            "saturday": 0,
-            "sunday": 0,
-            "xtra": 0,
-            "playa": 0
-          }
-        },
-        "guestId": "robin.haider"
-      }
-    },
-    {
-      "id": "ilija.stankovic",
-      "mismatches": [
-        {
-          "path": "identity.phone",
-          "sheetValue": "381641950011",
-          "firestoreValue": ""
-        },
-        {
-          "path": "identity.cloudinaryId",
-          "sheetValue": "ilija_rcohes",
-          "firestoreValue": ""
-        }
-      ],
-      "payload": {
-        "id": "ilija.stankovic",
-        "identity": {
-          "firstName": "Ilija",
-          "middleName": "",
-          "lastName": "Stankovic",
-          "maternalLastName": "",
-          "lang": "en",
-          "age": "Adulto",
-          "gender": "H",
-          "phone": "381641950011",
-          "cloudinaryId": "ilija_rcohes"
-        },
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "38 Tonnes",
-        "invitationGroup": "",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Mesa #7",
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "invitationGroup": "",
-        "tagGroup": "38 Tonnes",
-        "modifiedAt": "",
-        "hosting": {
-          "xtraRoom": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "isXtraCabinPaid": false,
-          "isXtraCabinPaidByNovios": false,
-          "xtraCabin": "",
-          "cabin": "",
-          "room": ""
-        },
-        "idCheckUser": false,
-        "isAdmin": false,
-        "message": "",
-        "sent": false,
-        "travelsByPlane": true,
-        "maternalLastName": "",
-        "identity": {
-          "maternalLastName": "",
-          "firstName": "Ilija",
-          "lastName": "Stankovic",
-          "gender": "H",
-          "phone": "",
-          "middleName": "",
-          "cloudinaryId": "",
-          "lang": "en",
-          "age": "Adulto"
-        },
-        "messageAuthor": "",
-        "id": "ilija.stankovic",
-        "table": "Mesa #7",
-        "rsvp": {
-          "confirmCabin": false,
-          "needBalls": false,
-          "petanca": false,
-          "cabinWaitingList": false,
-          "answers": {
-            "friday": 0,
-            "saturday": 0,
-            "sunday": 0,
-            "xtra": 0,
-            "playa": 0
-          }
-        },
-        "guestId": "ilija.stankovic"
-      }
-    },
-    {
-      "id": "jeanne.sergent",
-      "mismatches": [
-        {
-          "path": "identity.phone",
-          "sheetValue": "33601334212",
-          "firestoreValue": ""
-        },
-        {
-          "path": "identity.cloudinaryId",
-          "sheetValue": "JEanne_v94dyf",
-          "firestoreValue": ""
-        }
-      ],
-      "payload": {
-        "id": "jeanne.sergent",
-        "identity": {
-          "firstName": "Jeanne",
-          "middleName": "",
-          "lastName": "Sergent",
-          "maternalLastName": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "gender": "H",
-          "phone": "33601334212",
-          "cloudinaryId": "JEanne_v94dyf"
-        },
-        "hosting": {
-          "cabin": "",
-          "room": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "xtraCabin": "",
-          "xtraRoom": "",
-          "isXtraCabinPaidByNovios": false,
-          "isXtraCabinPaid": false
-        },
-        "rsvp": {},
-        "sent": false,
-        "tagGroup": "Amigos de David",
-        "invitationGroup": "",
-        "idCheckUser": false,
-        "message": "",
-        "messageAuthor": "",
-        "table": "Mesa #7",
-        "modifiedAt": "",
-        "travelsByPlane": true,
-        "isAdmin": false,
-        "maternalLastName": ""
-      },
-      "existing": {
-        "invitationGroup": "",
-        "tagGroup": "Amigos de David",
-        "modifiedAt": "",
-        "hosting": {
-          "xtraRoom": "",
-          "isCabinPaidByNovios": false,
-          "isCabinPaid": false,
-          "isXtraCabinPaid": false,
-          "isXtraCabinPaidByNovios": false,
-          "xtraCabin": "",
-          "cabin": "",
-          "room": ""
-        },
-        "idCheckUser": false,
-        "isAdmin": false,
-        "message": "",
-        "sent": false,
-        "travelsByPlane": true,
-        "maternalLastName": "",
-        "identity": {
-          "maternalLastName": "",
-          "firstName": "Jeanne",
-          "lastName": "Sergent",
-          "gender": "H",
-          "phone": "",
-          "middleName": "",
-          "cloudinaryId": "",
-          "lang": "fr",
-          "age": "Adulto"
-        },
-        "messageAuthor": "",
-        "id": "jeanne.sergent",
-        "table": "Mesa #7",
-        "rsvp": {
-          "confirmCabin": false,
-          "needBalls": false,
-          "petanca": false,
-          "cabinWaitingList": false,
-          "answers": {
-            "friday": 0,
-            "saturday": 0,
-            "sunday": 0,
-            "xtra": 0,
-            "playa": 0
-          }
-        },
-        "guestId": "jeanne.sergent"
-      }
-    },
-    {
-      "id": "mireille.guillermet",
-      "mismatches": [
-        {
-          "path": "identity.lastName",
-          "sheetValue": "Guilhermet",
-          "firestoreValue": "Guillermet"
-        },
-        {
-          "path": "identity.phone",
-          "sheetValue": "33624842081",
-          "firestoreValue": ""
-        }
-      ],
-      "payload": {
-        "id": "mireille.guillermet",
-        "identity": {
-          "firstName": "Mireille",
-          "middleName": "",
-          "lastName": "Guilhermet",
-          "maternalLastName": "",
-          "lang": "fr",
-          "age": "Adulto",
-          "gender": "M",
-          "phone": "33624842081",
           "cloudinaryId": ""
         },
         "hosting": {
-          "cabin": "",
-          "room": "",
+          "cabin": "CABAÑA 2",
+          "room": "CABAÑA 2-1",
           "isCabinPaidByNovios": false,
           "isCabinPaid": false,
-          "xtraCabin": "",
-          "xtraRoom": "",
+          "xtraCabin": "VILLA AZALEA",
+          "xtraRoom": "VILLA AZALEA-3",
           "isXtraCabinPaidByNovios": false,
           "isXtraCabinPaid": false
         },
         "rsvp": {},
         "sent": false,
-        "tagGroup": "Amigos de HP - David",
-        "invitationGroup": "",
-        "idCheckUser": false,
+        "tagGroup": "38 Tonnes",
+        "invitationGroup": "Marion et William",
         "message": "",
         "messageAuthor": "",
-        "table": "Mesa #7",
+        "table": "38 tonnes #2",
         "modifiedAt": "",
         "travelsByPlane": true,
         "isAdmin": false,
         "maternalLastName": ""
       },
       "existing": {
-        "invitationGroup": "",
-        "tagGroup": "Amigos de HP - David",
+        "invitationGroup": "Marion et William",
+        "tagGroup": "38 Tonnes",
+        "updatedBy": "sync_script",
         "modifiedAt": "",
         "hosting": {
-          "xtraRoom": "",
+          "xtraRoom": "VILLA AZALEA-3",
           "isCabinPaidByNovios": false,
           "isCabinPaid": false,
           "isXtraCabinPaid": false,
           "isXtraCabinPaidByNovios": false,
-          "xtraCabin": "",
-          "cabin": "",
-          "room": ""
+          "xtraCabin": "VILLA AZALEA",
+          "cabin": "VILLA MARGARITA",
+          "room": "VILLA MARGARITA-2"
         },
         "idCheckUser": false,
         "isAdmin": false,
@@ -2578,9 +526,9 @@
         "maternalLastName": "",
         "identity": {
           "maternalLastName": "",
-          "firstName": "Mireille",
-          "lastName": "Guillermet",
-          "gender": "M",
+          "firstName": "William",
+          "lastName": "",
+          "gender": "H",
           "phone": "",
           "middleName": "",
           "cloudinaryId": "",
@@ -2588,22 +536,12 @@
           "age": "Adulto"
         },
         "messageAuthor": "",
-        "id": "mireille.guillermet",
-        "table": "Mesa #7",
-        "rsvp": {
-          "confirmCabin": false,
-          "needBalls": false,
-          "petanca": false,
-          "cabinWaitingList": false,
-          "answers": {
-            "friday": 0,
-            "saturday": 0,
-            "sunday": 0,
-            "xtra": 0,
-            "playa": 0
-          }
-        },
-        "guestId": "mireille.guillermet"
+        "id": "william",
+        "table": "38 tonnes #2",
+        "updatedAt": {
+          "_seconds": 1786809366,
+          "_nanoseconds": 44000000
+        }
       }
     }
   ],
@@ -2740,7 +678,7 @@
       "id": "cathy_rako",
       "uid": "cathy_rako",
       "enabled": false,
-      "identifier": "cathy_rako@boda-david-y-ayde.web.app",
+      "identifier": "bzhcathy@gmail.com",
       "passwordPresent": true
     },
     {
@@ -4455,37 +2393,19 @@
   "alerts": [],
   "comparisonAudit": [
     {
-      "id": "david_aïli",
+      "id": "sebastian_cecillon_arevalo",
       "status": "changed",
       "comparedFields": 37,
       "diffCount": 1
     },
     {
-      "id": "aydé_juárez_guadalupe",
+      "id": "cathy_rako",
       "status": "changed",
       "comparedFields": 37,
-      "diffCount": 1
+      "diffCount": 3
     },
     {
-      "id": "diego_aïli_vázquez",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 1
-    },
-    {
-      "id": "oscar",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 1
-    },
-    {
-      "id": "spomenka.petrovic",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 1
-    },
-    {
-      "id": "guilhem.laubie",
+      "id": "isa_38t",
       "status": "changed",
       "comparedFields": 37,
       "diffCount": 1
@@ -4498,117 +2418,15 @@
     },
     {
       "id": "william",
-      "status": "candidate-add",
-      "comparedFields": 37,
-      "diffCount": 37
-    },
-    {
-      "id": "dimitar",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 1
-    },
-    {
-      "id": "geraldine.toussaint",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 2
-    },
-    {
-      "id": "pareja_de_géraldine",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 5
-    },
-    {
-      "id": "gaetane",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 1
-    },
-    {
-      "id": "stéphane_bon",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 1
-    },
-    {
-      "id": "ange_bon",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 1
-    },
-    {
-      "id": "gregory.nussbaumer",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 1
-    },
-    {
-      "id": "paul-henry.picard",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 1
-    },
-    {
-      "id": "victor.sirisakd",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 1
-    },
-    {
-      "id": "aurelien.neyrand",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 1
-    },
-    {
-      "id": "damien.gilles",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 1
-    },
-    {
-      "id": "desislava",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 1
-    },
-    {
-      "id": "michael.delarche",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 1
-    },
-    {
-      "id": "robin.haider",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 1
-    },
-    {
-      "id": "ilija.stankovic",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 2
-    },
-    {
-      "id": "jeanne.sergent",
-      "status": "changed",
-      "comparedFields": 37,
-      "diffCount": 2
-    },
-    {
-      "id": "mireille.guillermet",
       "status": "changed",
       "comparedFields": 37,
       "diffCount": 2
     }
   ],
-  "writes": 25,
+  "writes": 5,
   "authPlan": {
-    "emailUpdates": 12,
-    "authCreates": 1,
+    "emailUpdates": 0,
+    "authCreates": 0,
     "authDeletes": 0,
     "blockedCreatesMissingEmail": 0,
     "blockedEmailUpdatesInvalid": 0,
@@ -4618,9 +2436,9 @@
   },
   "authResults": {
     "authDeletesApplied": 0,
-    "emailUpdatesApplied": 12,
-    "authCreatesApplied": 1,
+    "emailUpdatesApplied": 0,
+    "authCreatesApplied": 0,
     "failures": []
   },
-  "unchangedOmitted": 238
+  "unchangedOmitted": 258
 }
