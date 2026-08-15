@@ -38,9 +38,13 @@
  *   - `guest`        the guest's login email (pre-fills the username field)
  *   - `password`     the shared login password (pre-fills the password field)
  *   - `inviteType`   "email" (how the guest was invited)
- *   - `invitationCode` the guest's profile code (base64url), when known
+ *   - `invitationCode` the guest's profile code (base64url) — OPTIONAL, only
+ *                      added when a real code is known (from the sheet `perfil`
+ *                      column). It is NOT required for login; it only shows the
+ *                      guest their cabin info. We never invent a code.
  *   - `utm_source`/`utm_medium`/`utm_campaign` = email / email / invitacion
  *   - `sent_at`      epoch ms when the email is sent (for time-to-answer)
+
  *
  * ── Setup (one time) ───────────────────────────────────────────────────────
  * 1. Open the Google Sheet → Extensions → Apps Script.
@@ -107,14 +111,10 @@ var COL_MSG_FR = "_msgInvitFR";
 var COL_MSG_ES = "_msgInvitES";
 var COL_MSG_EN = "_msgInvitEN";
 
-// Profile code column (fallback when Firestore has no `perfil`).
+// Profile code column (optional). Only used when it holds a REAL code; we
+// never invent a code from cabin/payment data.
 var COL_PROFILE_CODE = "perfil";
 
-// Columns used to DERIVE the profile code when neither Firestore nor the
-// `perfil` column provides one.
-var COL_CABIN = "Cabaña";
-var COL_IS_PRIVATE = "isPrivate";
-var COL_IS_PAID = "isCabinPaidByNovios";
 
 // ── Trilingual subjects ───────────────────────────────────────────────────
 
@@ -141,39 +141,8 @@ function normaliseLang(raw) {
   return "es";
 }
 
-/** Normalise a boolean-ish cell value to true/false. */
-function toBool(v) {
-  var s = String(v || "").trim().toUpperCase();
-  return s === "TRUE" || s === "1" || s === "YES" || s === "SI";
-}
-
-/** Map a cabin display name to the unit slug used in profile codes. */
-function cabinUnitSlug(cabin) {
-  var c = String(cabin || "").trim().toLowerCase();
-  if (!c || c.indexOf("sin") === 0) return "";
-  if (c.indexOf("azalea") !== -1) return "azalea";
-  if (c.indexOf("hortencia") !== -1) return "hortencia";
-  if (c.indexOf("lavanda") !== -1 || c.indexOf("lavande") !== -1) return "lavanda";
-  if (c.indexOf("casona") !== -1) return "casona";
-  if (c.indexOf("margarita") !== -1 || c.indexOf("marguerite") !== -1) return "margarita";
-  if (c.indexOf("dalia") !== -1) return "dalia";
-  var m = c.match(/caba[ñn]a[_\s-]*(\d+)/i);
-  if (m) return "cabaña_" + m[1];
-  return "";
-}
-
-/** Derive the profile code from cabin + payment info. */
-function deriveProfileCode(cabin, isPrivate, isPaid) {
-  var c = String(cabin || "").trim();
-  if (!c || c.toLowerCase().indexOf("sin") === 0) return "sin_cabaña";
-  var unit = cabinUnitSlug(c);
-  if (!unit) return "";
-  var occupancy = toBool(isPrivate) ? "privada" : "compartida";
-  var payment = toBool(isPaid) ? "pagada" : "porpagar";
-  return unit + "_" + occupancy + "_" + payment;
-}
-
 // ── Firestore access (authoritative guest data) ───────────────────────────
+
 
 /**
  * Build a signed JWT (RS256) for the service account and exchange it for a
@@ -262,29 +231,29 @@ function firestoreValueToJs(v) {
 }
 
 /**
- * Resolve the guest's authoritative data (language, cabin, profile code) from
- * Firestore, falling back to the sheet row.
- * Returns { lang, cabin, isPrivate, isPaid, profileCode }.
+ * Resolve the guest's authoritative data (language + optional profile code)
+ * from Firestore, falling back to the sheet row.
+ *
+ * The profile code is OPTIONAL and is only used when a REAL code is known
+ * (from the sheet `perfil` column or Firestore `perfil`). We NEVER invent a
+ * code from cabin/payment data — the invitation link works fine without one
+ * (login is email/password).
+ *
+ * Returns { lang, profileCode }.
  */
 function resolveGuestData(row, guestId) {
   var fs = readGuestFromFirestore(guestId);
   var lang = normaliseLang(row[COL_LANG]);
-  var cabin = String(row[COL_CABIN] || "").trim();
-  var isPrivate = row[COL_IS_PRIVATE];
-  var isPaid = row[COL_IS_PAID];
   var profileCode = String(row[COL_PROFILE_CODE] || "").trim();
 
   if (fs) {
     if (fs.identity && fs.identity.lang) lang = normaliseLang(fs.identity.lang);
-    if (fs.hosting && fs.hosting.cabin) cabin = String(fs.hosting.cabin).trim();
-    if (fs.hosting && fs.hosting.isPrivate !== undefined) isPrivate = fs.hosting.isPrivate;
-    if (fs.hosting && fs.hosting.isCabinPaidByNovios !== undefined) isPaid = fs.hosting.isCabinPaidByNovios;
     if (fs.perfil) profileCode = String(fs.perfil).trim();
   }
 
-  if (!profileCode) profileCode = deriveProfileCode(cabin, isPrivate, isPaid);
-  return { lang: lang, cabin: cabin, profileCode: profileCode };
+  return { lang: lang, profileCode: profileCode };
 }
+
 
 // ── Email HTML template ───────────────────────────────────────────────────
 
@@ -448,21 +417,17 @@ function sendOne(row, rowIndex, force) {
   // NOTE: We ALWAYS resend — the `_enviado` checkbox is intentionally ignored
   // so invitations can be re-sent freely (the couple's requirement).
 
-  // Authoritative data from Firestore (language, cabin, profile code).
+  // Authoritative data from Firestore (language + optional profile code).
+  // The profile code is OPTIONAL — when absent we simply omit `invitationCode`
+  // from the link (login is email/password, so the link still works).
 
   var data = resolveGuestData(row, guestId);
   var lang = data.lang;
   var profileCode = data.profileCode;
-  console.log("[sendOne] resolved lang=%s cabin=%s code=%s",
-    lang, data.cabin, profileCode);
-
-  if (!profileCode) {
-    var m4 = "row " + rowIndex + " (" + guestId + "): could not determine profile code, skipped";
-    console.log("[sendOne] " + m4);
-    return m4;
-  }
+  console.log("[sendOne] resolved lang=%s code=%s", lang, profileCode || "(none)");
 
   var link = buildInvitationLink(profileCode, email, Date.now());
+
   var subject = SUBJECTS[lang];
 
   // Body: use the sheet template if present, else the beautiful HTML template.
@@ -665,6 +630,22 @@ function setupTrigger() {
     .create();
   Logger.log("onEditSendInvitation trigger installed.");
 }
+
+/**
+ * List the currently installed triggers. Run this to confirm the onEdit
+ * trigger is installed (the checkbox auto-send only works when it is).
+ */
+function listTriggers() {
+  var triggers = ScriptApp.getProjectTriggers();
+  Logger.log("Installed triggers: " + triggers.length);
+  triggers.forEach(function (t) {
+    Logger.log(" - " + t.getHandlerFunction() + " (" + t.getEventType() + ")");
+  });
+  return triggers.map(function (t) {
+    return t.getHandlerFunction() + " (" + t.getEventType() + ")";
+  });
+}
+
 
 /**
  * Installable onEdit trigger handler. When the `_enviado` checkbox on a guest
