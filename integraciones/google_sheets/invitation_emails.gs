@@ -232,21 +232,34 @@ function sendOne(row, rowIndex, force) {
   var lang = normaliseLang(row[COL_LANG]);
   var name = String(row[COL_NAME] || guestId || "amigo").trim();
 
-  if (!guestId) return "row " + rowIndex + ": no UID, skipped";
-  if (!email) return "row " + rowIndex + " (" + guestId + "): no email, skipped";
-  if (!force && String(row[COL_SENT] || "").trim().toUpperCase() === "TRUE") {
-    return "row " + rowIndex + " (" + guestId + "): already sent, skipped";
-  }
+  console.log("[sendOne] row=%s guest=%s email=%s lang=%s force=%s",
+    rowIndex, guestId, email, lang, force ? "true" : "false");
 
+  if (!guestId) {
+    var m = "row " + rowIndex + ": no UID, skipped";
+    console.log("[sendOne] " + m);
+    return m;
+  }
+  if (!email) {
+    var m2 = "row " + rowIndex + " (" + guestId + "): no email, skipped";
+    console.log("[sendOne] " + m2);
+    return m2;
+  }
+  if (!force && String(row[COL_SENT] || "").trim().toUpperCase() === "TRUE") {
+    var m3 = "row " + rowIndex + " (" + guestId + "): already sent, skipped";
+    console.log("[sendOne] " + m3);
+    return m3;
+  }
 
   var profileCode = resolveProfileCode(row);
   if (!profileCode) {
-    return "row " + rowIndex + " (" + guestId + "): could not determine profile code, skipped";
+    var m4 = "row " + rowIndex + " (" + guestId + "): could not determine profile code, skipped";
+    console.log("[sendOne] " + m4);
+    return m4;
   }
 
   var link = buildInvitationLink(profileCode, email, Date.now());
   var subject = SUBJECTS[lang];
-
 
   // Body comes from the sheet template column for the guest's language.
   var template = readMessageTemplate(row, lang);
@@ -257,16 +270,25 @@ function sendOne(row, rowIndex, force) {
   if (DRY_RUN) {
     Logger.log("[DRY RUN] To: %s | Lang: %s | Code: %s | Subject: %s", email, lang, profileCode, subject);
     Logger.log(body);
+    console.log("[sendOne] [DRY RUN] would send to %s [code %s]", email, profileCode);
     return "row " + rowIndex + " (" + guestId + "): [DRY RUN] would send to " + email + " [code " + profileCode + "]";
   }
 
-  GmailApp.sendEmail(email, subject, body, {
-    cc: CC_RECIPIENTS.join(","),
-    name: SENDER_NAME,
-  });
-
-  return "row " + rowIndex + " (" + guestId + "): sent to " + email + " [" + lang + "] [code " + profileCode + "]";
+  try {
+    GmailApp.sendEmail(email, subject, body, {
+      cc: CC_RECIPIENTS.join(","),
+      name: SENDER_NAME,
+    });
+    var ok = "row " + rowIndex + " (" + guestId + "): sent to " + email + " [" + lang + "] [code " + profileCode + "]";
+    console.log("[sendOne] EMAIL SENT: " + ok);
+    return ok;
+  } catch (err) {
+    var fail = "row " + rowIndex + " (" + guestId + "): SEND FAILED: " + err;
+    console.error("[sendOne] " + fail);
+    return fail;
+  }
 }
+
 
 /**
  * Send invitation emails to all guests in the INVITADOS tab.
@@ -374,27 +396,50 @@ function setupTrigger() {
  * not a simple onEdit, because it uses GmailApp which requires authorisation.
  */
 function onEditSendInvitation(e) {
-  if (!e || !e.range) return;
+  console.log("[onEdit] trigger fired");
+  if (!e || !e.range) {
+    console.log("[onEdit] no event/range, returning");
+    return;
+  }
 
   var sheet = e.range.getSheet();
-  if (sheet.getName() !== SHEET_NAME) return;
+  console.log("[onEdit] sheet=%s", sheet.getName());
+  if (sheet.getName() !== SHEET_NAME) {
+    console.log("[onEdit] not the %s sheet, returning", SHEET_NAME);
+    return;
+  }
 
   var rowIndex = e.range.getRow();
-  if (rowIndex < 2) return; // header row
-
   var col = e.range.getColumn();
+  console.log("[onEdit] row=%s col=%s", rowIndex, col);
+  if (rowIndex < 2) {
+    console.log("[onEdit] header row, returning");
+    return; // header row
+  }
+
   var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
   var headerName = String(headers[col - 1] || "").trim();
+  console.log("[onEdit] edited column header=%s", headerName);
 
   // Only react to the sent checkbox column (accept _enviado or sent).
   var isSentCol = headerName === COL_SENT || headerName === "sent";
-  if (!isSentCol) return;
+  if (!isSentCol) {
+    console.log("[onEdit] not the sent column, returning");
+    return;
+  }
 
   // Only react when the checkbox is turned ON (value TRUE).
   var newValue = String(e.value || "").trim().toUpperCase();
   var oldValue = String(e.oldValue || "").trim().toUpperCase();
-  if (newValue !== "TRUE") return;
-  if (oldValue === "TRUE") return; // already true before — no change
+  console.log("[onEdit] newValue=%s oldValue=%s", newValue, oldValue);
+  if (newValue !== "TRUE") {
+    console.log("[onEdit] not turned ON, returning");
+    return;
+  }
+  if (oldValue === "TRUE") {
+    console.log("[onEdit] was already TRUE, no change, returning");
+    return; // already true before — no change
+  }
 
   // Read the full row.
   var values = sheet.getRange(rowIndex, 1, 1, sheet.getLastColumn()).getValues()[0];
@@ -404,7 +449,10 @@ function onEditSendInvitation(e) {
   // The user explicitly toggled the checkbox to TRUE (from a non-TRUE state),
   // which is an explicit request to (re)send — so force the send even if the
   // `_enviado` column already reads TRUE.
+  console.log("[onEdit] toggled to TRUE, sending...");
   var status = sendOne(row, rowIndex, true);
   Logger.log(status);
+  console.log("[onEdit] result: " + status);
 }
+
 
