@@ -67,7 +67,13 @@
   color: rgb(36 33 25 / 78%);
 }
 
-.star-vote__average > span[aria-hidden="true"] {
+/* The general score rendered as a row of star glyphs (filled + empty).
+   Filled stars are gold; empty stars stay muted. */
+.star-vote__stars-row {
+  letter-spacing: 0.08em;
+  color: rgb(36 33 25 / 22%);
+}
+.star-vote__stars-row::first-letter {
   color: var(--marigold);
 }
 
@@ -109,6 +115,13 @@
 
 .music-act .star-vote__average {
   color: rgb(255 253 248 / 88%);
+}
+
+.music-act .star-vote__stars-row {
+  color: rgb(255 255 255 / 26%);
+}
+.music-act .star-vote__stars-row::first-letter {
+  color: var(--marigold);
 }
 
 .music-act .star-vote__count,

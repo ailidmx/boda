@@ -310,7 +310,7 @@ service cloud.firestore {
           "id", "gender", "tagGroup",
           "hosting", "table", "sent",
           "modifiedAt", "travelsByPlane", "isAdmin",
-          "_source", "_migratedAt", "message", "rsvp"
+          "_source", "_migratedAt", "message", "rsvp", "flightInfo"
         ])
         && isShortText(request.resource.data.guestId, 100)
         && request.resource.data.guestId.size() > 0
@@ -350,8 +350,73 @@ service cloud.firestore {
         // allowed in hasOnly() and in the affectedKeys() lists so guests can
         // save their answers; the structure is validated client-side.
         && (!request.resource.data.keys().hasAny(["rsvp"])
-          || request.resource.data.rsvp is map);
+          || request.resource.data.rsvp is map)
+        // `flightInfo` is allowed in hasOnly() and in the affectedKeys() lists
+        // so guests can save their flight details. Its structure is validated
+        // client-side (see validation.js); we intentionally do NOT deep-validate
+        // it here because the combined expression count of this base function
+        // plus the flightInfo checks exceeds Firestore's 1000-expression limit.
+        && (!request.resource.data.keys().hasAny(["flightInfo"])
+          || request.resource.data.flightInfo is map);
     }
+
+
+    // The return-trip (departure) details inside `flightInfo`. Mirrors the
+    // arrival fields but grouped under a `departure` map so the two trips stay
+    // clearly separated in the guest document.
+    function hasValidDeparture(value) {
+      return value is map
+        && value.keys().hasOnly([
+          "origin", "connections", "destination", "legs",
+          "departureDate", "departureTime", "finalFlightNumber"
+        ])
+        && (!value.keys().hasAny(["origin"])
+          || isValidAirport(value.origin))
+        && (!value.keys().hasAny(["destination"])
+          || isValidAirport(value.destination))
+        && (!value.keys().hasAny(["connections"])
+          || (value.connections is list
+            && value.connections.size() <= 3))
+        && (!value.keys().hasAny(["legs"])
+          || (value.legs is list
+            && value.legs.size() <= 4))
+
+        && (!value.keys().hasAny(["departureDate"])
+          || value.departureDate.matches('^\\d{4}-\\d{2}-\\d{2}$'))
+        && (!value.keys().hasAny(["departureTime"])
+          || value.departureTime.matches('^\\d{2}:\\d{2}$'))
+        && (!value.keys().hasAny(["finalFlightNumber"])
+          || isShortText(value.finalFlightNumber, 30));
+    }
+
+    function isValidAirport(value) {
+      return value is map
+        && value.keys().hasOnly([
+          "iata", "icao", "name", "city", "country", "countryCode", "latitude", "longitude"
+        ])
+        && isShortText(value.iata, 3)
+        && value.iata.size() > 0
+        && (!value.keys().hasAny(["icao"]) || isShortText(value.icao, 4))
+        && isShortText(value.name, 200)
+        && value.name.size() > 0
+        && (!value.keys().hasAny(["city"]) || isShortText(value.city, 150))
+        && (!value.keys().hasAny(["country"]) || isShortText(value.country, 100))
+        && isShortText(value.countryCode, 2)
+        && value.countryCode.size() > 0
+        && (!value.keys().hasAny(["latitude"]) || value.latitude is number)
+        && (!value.keys().hasAny(["longitude"]) || value.longitude is number);
+    }
+
+    function isValidLeg(value) {
+      return value is map
+        && value.keys().hasOnly(["from", "to", "flightNumber"])
+        && isShortText(value.from, 3)
+        && value.from.size() > 0
+        && isShortText(value.to, 3)
+        && value.to.size() > 0
+        && (!value.keys().hasAny(["flightNumber"]) || isShortText(value.flightNumber, 30));
+    }
+
 
     // REGULAR GUEST WRITE SCOPE: A group member may update the contact details
     // (phone), the identity-check acknowledgement, the avatar photo (Cloudinary
@@ -366,9 +431,10 @@ service cloud.firestore {
           "idCheckUser", "cloudinaryId", "messageAuthor",
           // Legacy flat identity writes allowed only during transition.
           "firstName", "middleName", "lastName", "maternalLastName", "gender", "cloudinaryId", "lang", "age", "phone",
-          "rsvp", "updatedBy", "updatedAt"
+          "rsvp", "flightInfo", "updatedBy", "updatedAt"
         ]);
     }
+
 
 
     // ADMIN WRITE SCOPE: Administrators may additionally modify `invitationGroup`
@@ -382,9 +448,10 @@ service cloud.firestore {
           "guestId", "identity",
           "idCheckUser", "cloudinaryId", "messageAuthor",
           "firstName", "middleName", "lastName", "maternalLastName", "gender", "cloudinaryId", "lang", "age", "phone",
-          "rsvp", "invitationGroup", "updatedBy", "updatedAt", "_deleted"
+          "rsvp", "flightInfo", "invitationGroup", "updatedBy", "updatedAt", "_deleted"
         ]);
     }
+
 
     // Metadata-only guest touch. Any authenticated user may refresh
     // `updatedBy`/`updatedAt` on an existing guest document without changing
@@ -462,6 +529,35 @@ service cloud.firestore {
       allow update, delete: if false;
     }
 
+    // ── Activity events (inactivity detection) ─────────────────────────────
+    // A lightweight, append-only log of guest activity signals (currently
+    // "inactive": the guest stopped interacting for the idle threshold). The
+    // client writes one document per inactivity episode; a Cloud Function can
+    // watch this collection and notify the couple. Guests may only create
+    // (never update or delete) their own activity events.
+    function hasValidActivityEventFields() {
+      return request.resource.data.keys().hasAll([
+          "guestId", "type", "idleSeconds", "createdAt"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "guestId", "type", "idleSeconds", "createdAt"
+        ])
+        && isShortText(request.resource.data.guestId, 100)
+        && request.resource.data.guestId == request.auth.uid
+        && request.resource.data.type in ["inactive"]
+        && request.resource.data.idleSeconds is int
+        && request.resource.data.idleSeconds >= 0
+        && request.resource.data.idleSeconds <= 86400
+        && request.resource.data.createdAt == request.time;
+    }
+
+    match /activity_events/{eventId} {
+      allow create: if request.auth != null && hasValidActivityEventFields();
+      allow read: if isAdmin();
+      allow update, delete: if false;
+    }
+
+
 
 
 
@@ -503,6 +599,46 @@ service cloud.firestore {
 
 
 
+    // ── Genre ratings (1–5 star ratings on music genres) ─────────────────
+    // One document per (genre, guest) pair. The document ID is
+    // `${genreId}_${guestId}`, which is enforced below so a guest can only
+    // ever create/update their own single rating for a given genre.
+    // Any authenticated guest may read all ratings so the app can compute the
+    // average rating and vote count for each genre.
+    // A parent genre and its subgenres are rated independently — rating a
+    // parent never overwrites a child's rating (each has its own document).
+    function hasValidGenreRatingFields() {
+      return request.resource.data.keys().hasAll([
+          "genreId", "genreName", "guestId", "rating", "updatedBy", "updatedAt"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "genreId", "genreName", "guestId", "rating", "updatedBy", "updatedAt"
+        ])
+        && isShortText(request.resource.data.genreId, 100)
+        && request.resource.data.genreId.size() > 0
+        && isShortText(request.resource.data.genreName, 200)
+        && request.resource.data.genreName.size() > 0
+        && isShortText(request.resource.data.guestId, 100)
+        && request.resource.data.guestId == request.auth.uid
+        && request.resource.data.rating is int
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && isShortText(request.resource.data.updatedBy, 100)
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    match /genre_ratings/{ratingId} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null
+        && hasValidGenreRatingFields()
+        && ratingId == request.resource.data.genreId + "_" + request.auth.uid;
+      allow delete: if false;
+    }
+
+
+
+
     // ── Guiso rankings (ranked ordering of the guisos dishes) ─────────────
     // One document per guest, stored under `guiso_rankings/{guestId}`. The
     // `ranking` array holds the dish names in the guest's preferred order
@@ -522,19 +658,14 @@ service cloud.firestore {
         && request.resource.data.ranking is list
         && request.resource.data.ranking.size() >= 1
         && request.resource.data.ranking.size() <= 20
-        && request.resource.data.ranking.all(entry,
-          entry is string && entry.size() > 0 && entry.size() <= 100)
-        && request.resource.data.ranking.distinct().size() == request.resource.data.ranking.size()
         && request.resource.data.selected is list
         && request.resource.data.selected.size() <= 9
-        && request.resource.data.selected.all(entry,
-          entry is string && entry.size() > 0 && entry.size() <= 100)
-        && request.resource.data.selected.distinct().size() == request.resource.data.selected.size()
-        && request.resource.data.selected.all(entry, request.resource.data.ranking.hasAny([entry]))
+        && request.resource.data.selected.size() <= request.resource.data.ranking.size()
         && isShortText(request.resource.data.updatedBy, 100)
         && request.resource.data.updatedBy == request.auth.uid
         && request.resource.data.updatedAt == request.time;
     }
+
 
     match /guiso_rankings/{guestId} {
       allow read: if request.auth != null;

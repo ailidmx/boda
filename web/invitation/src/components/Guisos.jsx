@@ -4,7 +4,8 @@ import { StarVote } from "./StarVote.jsx";
 import { SwipeCardCarousel } from "./SwipeCardCarousel.jsx";
 import { cloudinaryImage } from "../cloudinary.js";
 import { loadGuisoRanking, saveGuisoRanking } from "../guiso-rankings.js";
-import { loadGuestCardVotes } from "../card-votes.js";
+import { loadGuestCardVotes, loadAllCardVotes } from "../card-votes.js";
+
 
 /**
  * "¿Qué guisos?" — help the couple choose the wedding menu.
@@ -92,6 +93,39 @@ export function Guisos() {
     };
   }, [guestId]);
 
+  // Load the general (aggregate) score for every dish across all guests so the
+  // reorder panel can show each dish's average star rating and vote count.
+  const [generalScores, setGeneralScores] = useState({});
+  useEffect(() => {
+    let cancelled = false;
+    loadAllCardVotes("guiso").then((votes) => {
+      if (cancelled) return;
+      const scores = {};
+      votes.forEach((v) => {
+        if (!v || !v.cardKey) return;
+        const rating = Number(v.rating) || 0;
+        if (!rating) return;
+        const entry = scores[v.cardKey] || { total: 0, count: 0 };
+        entry.total += rating;
+        entry.count += 1;
+        scores[v.cardKey] = entry;
+      });
+      const computed = {};
+      Object.keys(scores).forEach((key) => {
+        const { total, count } = scores[key];
+        computed[key] = {
+          average: count ? total / count : 0,
+          count,
+        };
+      });
+      setGeneralScores(computed);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+
   // Build a pre-sorted order from the guest's star ratings: higher rating
   // first, alphabetical within the same rating, unrated dishes last.
   const preSortedOrder = useMemo(() => {
@@ -178,6 +212,22 @@ export function Guisos() {
   );
 
   const selected = useMemo(() => order.slice(0, 9), [order]);
+
+  // Render a 5-star row for a numeric score (0–5). Fractional averages are
+  // rounded to the nearest half star so the general score reads clearly.
+  const renderStars = (value) => {
+    const rounded = Math.round((Number(value) || 0) * 2) / 2;
+    const full = Math.floor(rounded);
+    const half = rounded - full >= 0.5;
+    const stars = [];
+    for (let i = 0; i < 5; i += 1) {
+      if (i < full) stars.push("★");
+      else if (i === full && half) stars.push("⯨");
+      else stars.push("☆");
+    }
+    return stars.join("");
+  };
+
 
   const handleSave = useCallback(async () => {
     if (!guestId) return;
@@ -338,10 +388,34 @@ export function Guisos() {
                       </span>
                       <span className="guisos-reorder__rank">{index + 1}</span>
                       <span className="guisos-reorder__name">{name}</span>
+                      <span className="guisos-reorder__scores">
+                        <span className="guisos-reorder__score guisos-reorder__score--mine">
+                          <span className="guisos-reorder__score-label">
+                            {guisos.reorderMyScore}
+                          </span>
+                          <span className="guisos-reorder__stars" aria-hidden="true">
+                            {renderStars(myRatings[name] || 0)}
+                          </span>
+                        </span>
+                        <span className="guisos-reorder__score guisos-reorder__score--general">
+                          <span className="guisos-reorder__score-label">
+                            {guisos.reorderGeneralScore}
+                          </span>
+                          <span className="guisos-reorder__stars" aria-hidden="true">
+                            {renderStars(generalScores[name]?.average || 0)}
+                          </span>
+                          <span className="guisos-reorder__count">
+                            {generalScores[name]?.count
+                              ? `(${generalScores[name].count})`
+                              : ""}
+                          </span>
+                        </span>
+                      </span>
                       <span className="guisos-reorder__status">
                         {inMenu ? guisos.reorderInMenu : guisos.reorderNotInMenu}
                       </span>
                       <span className="guisos-reorder__controls">
+
                         <button
                           type="button"
                           aria-label={`${guisos.reorderUp}: ${name}`}

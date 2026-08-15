@@ -3,6 +3,8 @@ import { createRoot } from "react-dom/client";
 import "./styles/tokens.css";
 import "./styles/base.css";
 
+import "./styles/matrix-loader.css";
+
 import "./styles/countdown.css";
 import "./styles/nav.css";
 import "./styles/hero.css";
@@ -28,6 +30,7 @@ import "./styles/lightbox.css";
 import "./styles/accommodation.css";
 import "./styles/story-bg.css";
 import "./styles/travel.css";
+import "./styles/flight-info.css";
 
 
 import "./styles/mapcarousel.css";

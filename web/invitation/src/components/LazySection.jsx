@@ -1,4 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useSectionTime } from "../hooks/useSectionTime.js";
+import { useApp } from "../context/AppContext.jsx";
+
 
 /**
  * LazySection renders its children only once the element scrolls into view.
@@ -20,6 +23,14 @@ export function LazySection({
 }) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
+
+  // Whether the guest is currently active (from the inactivity tracker). When
+  // false, section-time accumulation pauses so idle time is not counted.
+  const { isActive } = useApp();
+
+  // Track how long this section stays in view (Analytics `section_time`).
+  useSectionTime(id, ref, isActive);
+
 
   useEffect(() => {
     const node = ref.current;

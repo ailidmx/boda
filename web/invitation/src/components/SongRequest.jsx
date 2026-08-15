@@ -262,7 +262,7 @@ export function SongRequest() {
           </div>
         </fieldset>
 
-        {intent === "band" && (
+        {(intent === "band" || intent === "sing") && (
           <fieldset className="song-request-bandtypes">
             <legend className="song-request-bandtypes__label">
               {sr.bandTypeLabel}

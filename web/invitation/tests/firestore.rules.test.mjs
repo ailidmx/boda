@@ -848,3 +848,72 @@ test("a guest cannot write to cabins or rooms (admin-only)", async () => {
   );
 });
 
+// ── Activity events (inactivity detection) ────────────────────────────────
+// The `activity_events` collection is an append-only log of guest inactivity
+// episodes. A guest may only CREATE their own activity events (never update or
+// delete them), and the `guestId` must match their own auth uid.
+
+test("a guest can create their own activity event", async () => {
+  await seedGuestAuth();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "activity_events", "event-1"), {
+      guestId: editorUid,
+      type: "inactive",
+      idleSeconds: 300,
+      createdAt: serverTimestamp(),
+    }),
+  );
+});
+
+test("a guest cannot create an activity event for another guest", async () => {
+  await seedGuestAuth();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertFails(
+    setDoc(doc(db, "activity_events", "event-2"), {
+      guestId: "someone-else",
+      type: "inactive",
+      idleSeconds: 300,
+      createdAt: serverTimestamp(),
+    }),
+  );
+});
+
+test("a guest cannot create an activity event with an invalid type", async () => {
+  await seedGuestAuth();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertFails(
+    setDoc(doc(db, "activity_events", "event-3"), {
+      guestId: editorUid,
+      type: "click",
+      idleSeconds: 300,
+      createdAt: serverTimestamp(),
+    }),
+  );
+});
+
+test("a guest cannot update or delete an activity event", async () => {
+  await seedGuestAuth();
+  await environment.withSecurityRulesDisabled(async (admin) => {
+    await setDoc(doc(admin.firestore(), "activity_events", "event-4"), {
+      guestId: editorUid,
+      type: "inactive",
+      idleSeconds: 300,
+      createdAt: serverTimestamp(),
+    });
+  });
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertFails(
+    updateDoc(doc(db, "activity_events", "event-4"), { idleSeconds: 600 }),
+  );
+  await assertFails(
+    setDoc(doc(db, "activity_events", "event-4"), {
+      guestId: editorUid,
+      type: "inactive",
+      idleSeconds: 600,
+      createdAt: serverTimestamp(),
+    }),
+  );
+});
+
+
