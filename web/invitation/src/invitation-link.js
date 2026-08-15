@@ -20,15 +20,56 @@
  * `window.location.href` only when a URL is not supplied).
  */
 
+// Cache of the invitation-link params captured on first load. We capture them
+// eagerly (before the URL is cleaned) so that even after the query params are
+// hidden from the address bar, `signIn()` and `AuthGate` can still read the
+// guest/password/UTM/sent_at values for pre-fill and analytics.
+let capturedParams = null;
+
+/**
+ * Capture the invitation-link params from the current URL exactly once and
+ * cache them. Subsequent calls return the cached value (the first call wins).
+ * Call this before cleaning the URL so the data survives the cleanup.
+ * @returns {{ guest: string, password: string, inviteType: string, source: string, medium: string, campaign: string, sentAt: number|null }}
+ */
+export function captureInvitationLinkParams() {
+  if (!capturedParams) {
+    capturedParams = getInvitationLinkParams();
+  }
+  return capturedParams;
+}
+
+/**
+ * Remove the invitation-link query params from the address bar (keeping the
+ * path and any hash) so the shared password is not left visible in the URL and
+ * navigation stays clean. Uses `history.replaceState`, so it does not add a
+ * history entry and the back button is unaffected. Safe no-op when there are
+ * no query params or when `history` is unavailable.
+ */
+export function cleanInvitationLinkUrl() {
+  try {
+    const url = new URL(window.location.href);
+    if ([...url.searchParams.keys()].length === 0) return;
+    window.history.replaceState(null, "", url.pathname + url.hash);
+  } catch {
+    // Ignore — cleaning the URL is best-effort and must never break the app.
+  }
+}
+
 /**
  * Parse the invitation-link analytics params from a URL.
  * @param {string} [url]  Defaults to `window.location.href`.
  * @returns {{ guest: string, password: string, inviteType: string, source: string, medium: string, campaign: string, sentAt: number|null }}
  */
-export function getInvitationLinkParams(url = window.location.href) {
+export function getInvitationLinkParams(url) {
+  // When the params were captured on first load and no explicit URL is given,
+  // return the captured values so they survive the URL cleanup. Callers that
+  // pass an explicit URL (e.g. tests) still get a fresh parse.
+  if (capturedParams && url === undefined) return capturedParams;
+  const target = url ?? window.location.href;
   let parsed;
   try {
-    parsed = new URL(url);
+    parsed = new URL(target);
   } catch {
     parsed = new URL("https://localhost/");
   }
@@ -44,16 +85,32 @@ export function getInvitationLinkParams(url = window.location.href) {
   };
 }
 
+
 /**
- * Parse a `sent_at` value (epoch ms) into a number, or null when invalid.
+ * Parse a `sent_at` value into epoch milliseconds, or null when invalid.
+ *
+ * The link may carry `sent_at` in any of three formats, and we normalise them
+ * all to epoch ms so the "time to answer" metric is always correct:
+ *   - epoch ms (13 digits, ~1.7e12 for 2026)  → used as-is
+ *   - epoch seconds (10 digits, ~1.7e9)       → ×1000
+ *   - Google Sheets serial date (days since 1899-12-30, ~46000 for 2026,
+ *     e.g. what the sheet's NOW() formula produces) → (n - 25569) × 86400000
  * @param {string|null} raw
  * @returns {number|null}
  */
 function parseSentAt(raw) {
   if (!raw) return null;
   const n = Number(raw);
-  return Number.isFinite(n) && n > 0 ? n : null;
+  if (!Number.isFinite(n) || n <= 0) return null;
+  // Epoch milliseconds (13 digits, ~1.7e12 for 2026).
+  if (n >= 1e11) return n;
+  // Epoch seconds (10 digits, ~1.7e9 for 2026).
+  if (n >= 1e8) return Math.round(n * 1000);
+  // Google Sheets serial date (days since 1899-12-30, ~46000 for 2026).
+  // 25569 = days between 1899-12-30 and 1970-01-01.
+  return Math.round((n - 25569) * 86400000);
 }
+
 
 /**
  * Compute the "time to answer" in seconds from when the invitation was sent

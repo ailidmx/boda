@@ -95,6 +95,12 @@ var COL_EMAIL = "firebase.Identifier"; // primary; falls back to firebase_email 
 var COL_LANG = "identity.lang";
 var COL_SENT = "_enviado";             // checkbox; also accepts "sent"
 var COL_NAME = "Nombre";               // used only for the log / fallback greeting
+// Optional column holding when the invitation was sent. If present, its value
+// (a Google Sheets serial date, e.g. what NOW() produces) is used for the
+// link's `sent_at` param so we can compute "time to answer". Falls back to
+// Date.now() when the column is missing or empty.
+var COL_SENT_AT = "sent_at";
+
 
 
 
@@ -289,10 +295,35 @@ function buildHtmlEmail(lang, name, link, email, password) {
 // ── Invitation link ───────────────────────────────────────────────────────
 
 /**
+ * Convert a Google Sheets serial date (days since 1899-12-30, e.g. what the
+ * sheet's NOW() formula produces, like 46249.73) to epoch milliseconds. The
+ * invitation app expects `sent_at` in epoch ms, so we normalise here.
+ * @param {number} serial
+ * @returns {number}
+ */
+function serialToEpochMs(serial) {
+  // 25569 = days between 1899-12-30 and 1970-01-01.
+  return Math.round((Number(serial) - 25569) * 86400000);
+}
+
+/**
  * Build the personalised invitation link, including the analytics + login
  * pre-fill params the invitation app reads.
+ *
+ * `sentAt` may be a Google Sheets serial date (e.g. from a NOW() cell) or an
+ * epoch-ms number; it is normalised to epoch ms before being put in the link.
+ * Falls back to Date.now() when missing/invalid.
  */
 function buildInvitationLink(email, sentAt) {
+  var sentMs;
+  var raw = Number(sentAt);
+  if (Number.isFinite(raw) && raw > 0) {
+    // Epoch ms (13 digits, ~1.7e12) → use as-is; otherwise treat as a Sheets
+    // serial date (~46000 for 2026) and convert.
+    sentMs = raw >= 1e11 ? Math.round(raw) : serialToEpochMs(raw);
+  } else {
+    sentMs = Date.now();
+  }
   var params = [
     "guest=" + encodeURIComponent(email || ""),
     "password=" + encodeURIComponent(SHARED_PASSWORD),
@@ -300,10 +331,11 @@ function buildInvitationLink(email, sentAt) {
     "utm_source=email",
     "utm_medium=email",
     "utm_campaign=invitacion",
-    "sent_at=" + (sentAt || Date.now()),
+    "sent_at=" + sentMs,
   ];
   return INVITATION_BASE_URL + "?" + params.join("&");
 }
+
 
 
 /** Read the email content template for a guest row, in their language. */
@@ -312,12 +344,42 @@ function readMessageTemplate(row, lang) {
   return String(row[col] || "").trim();
 }
 
-/** Replace {name} and {link} placeholders in a template. */
+/**
+ * Replace {name} and {link} placeholders in a template.
+ *
+ * `{link}` is rendered as a clickable, styled "Click here" anchor (not the raw
+ * URL) so the email looks beautiful and the guest doesn't see the long query
+ * string. The anchor opens the personalised invitation in a new tab.
+ */
 function fillTemplate(template, name, link) {
+  var href = esc(link);
+  var anchor =
+    '<a href="' + href + '" target="_blank" ' +
+    'style="color:#8a6d4f;font-weight:bold;text-decoration:underline;">' +
+    'Click here</a>';
   return String(template || "")
     .replace(/\{name\}/g, name)
-    .replace(/\{link\}/g, link);
+    .replace(/\{link\}/g, anchor);
 }
+
+/**
+ * Replace any bare http(s):// URL in the text with a clickable "Click here"
+ * anchor. This catches invitation links that are typed DIRECTLY into the sheet
+ * template (e.g. "Lien: https://boda-david-y-ayde.web.app?guest=...") rather
+ * than using the {link} placeholder, so the guest never sees the long query
+ * string. Non-URL text (email, password, prose) is left untouched.
+ */
+function linkifyUrls(text) {
+  var urlRe = /(https?:\/\/[^\s<]+)/g;
+  return String(text || "").replace(urlRe, function (match) {
+    var href = esc(match);
+    return '<a href="' + href + '" target="_blank" ' +
+      'style="color:#8a6d4f;font-weight:bold;text-decoration:underline;">' +
+      'Click here</a>';
+  });
+}
+
+
 
 // ── Sending ───────────────────────────────────────────────────────────────
 
@@ -359,9 +421,14 @@ function sendOne(row, rowIndex, force) {
   var lang = data.lang;
   console.log("[sendOne] resolved lang=%s", lang);
 
+  // `sent_at` for the link: prefer the sheet's `sent_at` column (a Google
+  // Sheets serial date, e.g. from NOW()); fall back to Date.now() when the
+  // column is missing or empty. buildInvitationLink normalises it to epoch ms.
+  var sentAt = row[COL_SENT_AT];
+  console.log("[sendOne] sent_at raw=%s (typeof=%s)",
+    JSON.stringify(sentAt), typeof sentAt);
+  var link = buildInvitationLink(email, sentAt);
 
-
-  var link = buildInvitationLink(email, Date.now());
 
 
   // RFC 2047-encode the subject so emoji/accents display correctly (GmailApp
@@ -373,12 +440,16 @@ function sendOne(row, rowIndex, force) {
   var template = repairMojibake(readMessageTemplate(row, lang));
   var htmlBody;
   if (template) {
-    var plain = fillTemplate(template, name, link);
+    // Fill {name}/{link} placeholders, then turn any bare URL typed directly
+    // in the template (e.g. "Lien: https://...") into a clickable "Click here"
+    // anchor so the guest never sees the long query string.
+    var plain = linkifyUrls(fillTemplate(template, name, link));
     htmlBody = "<div style=\"font-family:Georgia,serif;color:#3a2e22;line-height:1.7;\">" +
       plain.replace(/\n/g, "<br>") + "</div>";
   } else {
     htmlBody = buildHtmlEmail(lang, name, link, email, SHARED_PASSWORD);
   }
+
 
   if (DRY_RUN) {
     Logger.log("[DRY RUN] To: %s | Lang: %s | Subject: %s", email, lang, subject);
