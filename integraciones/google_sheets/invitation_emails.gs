@@ -89,9 +89,13 @@ var INVITE_TYPE = "email";
 
 var COL_ID = "UID";
 var COL_EMAIL = "firebase.Identifier"; // primary; falls back to firebase_email / _email / email
-var COL_LANG = "lang";                 // es / fr / en — the source of truth for the email language
+// The INVITADOS sheet header for the language column is literally
+// "identity.lang" (it mirrors the Firestore field path), NOT "lang". The
+// value is es / fr / en — the source of truth for the email language.
+var COL_LANG = "identity.lang";
 var COL_SENT = "_enviado";             // checkbox; also accepts "sent"
 var COL_NAME = "Nombre";               // used only for the log / fallback greeting
+
 
 
 // Email content template columns (per language). The script picks the one that
