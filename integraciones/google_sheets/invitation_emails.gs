@@ -223,15 +223,40 @@ function getFirestoreAccessToken() {
 /**
  * Read a guest document from Firestore by id.
  * Returns the document data object, or null if not found / on error.
+ *
+ * Uses the `runQuery` API with a `__name__` filter instead of the direct
+ * `documents/{document_path}` endpoint. Guest IDs can contain non-ASCII
+ * characters (e.g. "david_aïli", "aydé_juárez_guadalupe"); the direct
+ * document-path endpoint rejects those with "Invalid argument: key" because
+ * the percent-encoded characters in the path are not decoded properly.
+ * `runQuery` matches on the document reference value in the JSON body, which
+ * handles special characters correctly.
  */
 function readGuestFromFirestore(guestId) {
   if (!guestId) return null;
   try {
     var token = getFirestoreAccessToken();
     var url = "https://firestore.googleapis.com/v1/projects/" +
-      FIRESTORE_PROJECT_ID + "/databases/(default)/documents/guests/" +
-      encodeURIComponent(guestId);
+      FIRESTORE_PROJECT_ID + "/databases/(default)/documents:runQuery";
+    var reference = "projects/" + FIRESTORE_PROJECT_ID +
+      "/databases/(default)/documents/guests/" + guestId;
+    var body = {
+      structuredQuery: {
+        from: [{ collectionId: "guests" }],
+        where: {
+          fieldFilter: {
+            field: { fieldPath: "__name__" },
+            op: "EQUAL",
+            value: { referenceValue: reference },
+          },
+        },
+        limit: 1,
+      },
+    };
     var res = UrlFetchApp.fetch(url, {
+      method: "post",
+      contentType: "application/json",
+      payload: JSON.stringify(body),
       headers: { Authorization: "Bearer " + token },
       muteHttpExceptions: true,
     });
@@ -240,8 +265,9 @@ function readGuestFromFirestore(guestId) {
         guestId, res.getResponseCode(), res.getContentText());
       return null;
     }
-    var doc = JSON.parse(res.getContentText());
-    return doc.fields ? firestoreFieldsToObject(doc.fields) : null;
+    var results = JSON.parse(res.getContentText());
+    if (!results || results.length === 0 || !results[0].document) return null;
+    return firestoreFieldsToObject(results[0].document.fields);
   } catch (err) {
     console.warn("[firestore] read %s error: %s", guestId, err);
     return null;
