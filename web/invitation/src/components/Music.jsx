@@ -90,6 +90,7 @@ export function Music() {
           className={`music-fab${musicPlaying ? " is-playing" : " is-muted"}`}
           onClick={handleToggleMusic}
           aria-pressed={musicPlaying}
+          data-analytics="fab.music.toggle"
           aria-label={
             musicPlaying
               ? (music.fabPlayingLabel || "Música en reproducción")
@@ -101,6 +102,7 @@ export function Music() {
               : (music.fabMutedLabel || "Música silenciada")
           }
         >
+
           <span className="music-fab__icon" aria-hidden="true">
             <span className="music-fab__note">♪</span>
             <span className="music-fab__bars">

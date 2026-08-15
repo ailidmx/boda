@@ -178,7 +178,34 @@ async function main() {
   }
   md.push("");
 
+  // ── Page views per section ────────────────────────────────────────────
+  // The invitation logs a `page_view` event whenever the dominant visible
+  // section changes (see usePageViewTracking.js). `page_title` is the section
+  // id (e.g. "story") and `page_path` is "/#story". This shows which sections
+  // guests actually reach — a section-level funnel.
+  md.push("## Page views per section");
+  md.push("");
+  md.push("| Section | Page views |");
+  md.push("|---------|------------|");
+  const pageViewRows = await runReport(
+    ["pageTitle"],
+    ["eventCount"],
+    {
+      dimensionFilter: {
+        filter: {
+          fieldName: "eventName",
+          inListFilter: { values: ["page_view"] },
+        },
+      },
+    },
+  );
+  for (const row of pageViewRows) {
+    md.push(`| ${row.dims[0] || "(unknown)"} | ${row.metrics[0]} |`);
+  }
+  md.push("");
+
   await writeFile(OUT, md.join("\n"), "utf8");
+
   console.log(`Wrote ${OUT}`);
 }
 
