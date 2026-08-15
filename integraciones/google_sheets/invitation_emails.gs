@@ -14,16 +14,14 @@
  * 2. MANUAL: run `sendInvitationEmails()` (bulk, skips already-sent) or
  *    `sendSelectedRow()` (single row) from the Apps Script editor or a button.
  *
- * ── Source of truth: Firestore ─────────────────────────────────────────────
- * The guest's LANGUAGE (`identity.lang`) is read from the LIVE Firestore
- * `guests` collection (the authoritative source), falling back to the sheet
- * `lang` column when Firestore is unreachable. This keeps the email correct
- * even when the sheet is out of sync (e.g. the sheet `lang` column says "es"
- * but Firestore `identity.lang` is "fr"). The script authenticates to
- * Firestore with the project's service account (see SERVICE_ACCOUNT_* below).
+ * ── Source of truth: the sheet ─────────────────────────────────────────────
+ * The guest's LANGUAGE is read from the sheet `lang` column (es / fr / en).
+ * Keep that column correct for each guest — the email is sent in whatever
+ * language the row says.
 
  *
  * ── Email content ──────────────────────────────────────────────────────────
+
  * The email is a hand-built HTML template (inline CSS, UTF-8) with:
  *   - the couple's names + a warm greeting in the guest's language
  *   - a big "Open your invitation" button (the personalised link)
@@ -46,12 +44,11 @@
  * ── Setup (one time) ───────────────────────────────────────────────────────
  * 1. Open the Google Sheet → Extensions → Apps Script.
  * 2. Paste the contents of this file into the editor and save.
- * 3. Set the SERVICE_ACCOUNT_* constants below to the project's service
- *    account (client_email + private_key). These are used to read Firestore.
- * 4. The script runs as the account that owns the spreadsheet. To send FROM
+ * 3. The script runs as the account that owns the spreadsheet. To send FROM
  *    `bodadavidyayde@gmail.com`, that account must own the spreadsheet.
- * 5. Run `setupTrigger()` once from the editor to install the onEdit trigger.
- * 6. (Optional) Attach `sendInvitationEmails` to a button.
+ * 4. Run `setupTrigger()` once from the editor to install the onEdit trigger.
+ * 5. (Optional) Attach `sendInvitationEmails` to a button.
+
  *
  * ── Safety ─────────────────────────────────────────────────────────────────
  * - Emails are ALWAYS re-sent, even if the `_enviado` column is already TRUE
@@ -88,23 +85,14 @@ var SHARED_PASSWORD = "vivamexico";
 /** How the guest was invited — shown in the email + link. */
 var INVITE_TYPE = "email";
 
-// ── Firestore service account (used to read the authoritative guest data) ──
-// The client email matches integraciones/google_sheets/service_account.json.
-// The private key is a placeholder: the deploy step (scripts/deploy-invitation-emails.mjs
-// or the CI workflow) injects the real key from service_account.json before `clasp push`,
-// then restores this placeholder so the secret is never committed.
-var SERVICE_ACCOUNT_CLIENT_EMAIL = "boda-sheets-mcp@boda-500805.iam.gserviceaccount.com";
-var SERVICE_ACCOUNT_PRIVATE_KEY = "-----BEGIN PRIVATE KEY-----\nREPLACE_ME\n-----END PRIVATE KEY-----\n";
-var FIRESTORE_PROJECT_ID = "boda-500805";
-
-
 // ── Column names (must match the INVITADOS header row) ────────────────────
 
 var COL_ID = "UID";
 var COL_EMAIL = "firebase.Identifier"; // primary; falls back to firebase_email / _email / email
-var COL_LANG = "lang";                 // es / fr / en (fallback when Firestore unreachable)
+var COL_LANG = "lang";                 // es / fr / en — the source of truth for the email language
 var COL_SENT = "_enviado";             // checkbox; also accepts "sent"
 var COL_NAME = "Nombre";               // used only for the log / fallback greeting
+
 
 // Email content template columns (per language). The script picks the one that
 // matches the guest's language.
@@ -185,145 +173,16 @@ function normaliseLang(raw) {
   return "es";
 }
 
-// ── Firestore access (authoritative guest data) ───────────────────────────
-
-
 /**
- * Build a signed JWT (RS256) for the service account and exchange it for a
- * Google OAuth2 access token scoped to Firestore.
+ * Resolve the guest's email language from the sheet `lang` column.
+ * Returns { lang }.
  */
-function getFirestoreAccessToken() {
-  var now = Math.floor(Date.now() / 1000);
-  var header = base64UrlEncode(JSON.stringify({ alg: "RS256", typ: "JWT" }));
-  var payload = base64UrlEncode(JSON.stringify({
-    iss: SERVICE_ACCOUNT_CLIENT_EMAIL,
-    scope: "https://www.googleapis.com/auth/datastore",
-    aud: "https://oauth2.googleapis.com/token",
-    iat: now,
-    exp: now + 3600,
-  }));
-  var signingInput = header + "." + payload;
-  var signature = Utilities.computeRsaSha256Signature(
-    signingInput,
-    SERVICE_ACCOUNT_PRIVATE_KEY
-  );
-  var jwt = signingInput + "." + Utilities.base64Encode(signature)
-    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-
-  var tokenRes = UrlFetchApp.fetch("https://oauth2.googleapis.com/token", {
-    method: "post",
-    contentType: "application/x-www-form-urlencoded",
-    payload: "grant_type=urn:ietf:params:oauth:grant-type:jwt-bearer&assertion=" +
-      encodeURIComponent(jwt),
-    muteHttpExceptions: true,
-  });
-  var tokenJson = JSON.parse(tokenRes.getContentText());
-  if (!tokenJson.access_token) {
-    throw new Error("Firestore token exchange failed: " + tokenRes.getContentText());
-  }
-  return tokenJson.access_token;
+function resolveGuestData(row) {
+  return { lang: normaliseLang(row[COL_LANG]) };
 }
-
-/**
- * Read a guest document from Firestore by id.
- * Returns the document data object, or null if not found / on error.
- *
- * Uses the `runQuery` API with a `__name__` filter instead of the direct
- * `documents/{document_path}` endpoint. Guest IDs can contain non-ASCII
- * characters (e.g. "david_aïli", "aydé_juárez_guadalupe"); the direct
- * document-path endpoint rejects those with "Invalid argument: key" because
- * the percent-encoded characters in the path are not decoded properly.
- * `runQuery` matches on the document reference value in the JSON body, which
- * handles special characters correctly.
- *
- * The document ID is percent-encoded in the reference value (Firestore
- * resource names require URL-encoded path segments). This also keeps raw
- * non-ASCII bytes out of the JSON payload, which Apps Script's
- * `UrlFetchApp.fetch` otherwise rejects with "Invalid argument: key".
- */
-function readGuestFromFirestore(guestId) {
-  if (!guestId) return null;
-  try {
-    var token = getFirestoreAccessToken();
-    var url = "https://firestore.googleapis.com/v1/projects/" +
-      FIRESTORE_PROJECT_ID + "/databases/(default)/documents:runQuery";
-    var reference = "projects/" + FIRESTORE_PROJECT_ID +
-      "/databases/(default)/documents/guests/" + encodeURIComponent(guestId);
-
-    var body = {
-      structuredQuery: {
-        from: [{ collectionId: "guests" }],
-        where: {
-          fieldFilter: {
-            field: { fieldPath: "__name__" },
-            op: "EQUAL",
-            value: { referenceValue: reference },
-          },
-        },
-        limit: 1,
-      },
-    };
-    var res = UrlFetchApp.fetch(url, {
-      method: "post",
-      contentType: "application/json",
-      payload: JSON.stringify(body),
-      headers: { Authorization: "Bearer " + token },
-      muteHttpExceptions: true,
-    });
-    if (res.getResponseCode() !== 200) {
-      console.warn("[firestore] read %s failed (%s): %s",
-        guestId, res.getResponseCode(), res.getContentText());
-      return null;
-    }
-    var results = JSON.parse(res.getContentText());
-    if (!results || results.length === 0 || !results[0].document) return null;
-    return firestoreFieldsToObject(results[0].document.fields);
-  } catch (err) {
-    console.warn("[firestore] read %s error: %s", guestId, err);
-    return null;
-  }
-}
-
-/** Convert Firestore REST `fields` map into a plain JS object. */
-function firestoreFieldsToObject(fields) {
-  var out = {};
-  Object.keys(fields || {}).forEach(function (key) {
-    out[key] = firestoreValueToJs(fields[key]);
-  });
-  return out;
-}
-
-/** Convert a single Firestore REST value into a JS value. */
-function firestoreValueToJs(v) {
-  if (!v) return null;
-  if (v.stringValue !== undefined) return v.stringValue;
-  if (v.booleanValue !== undefined) return v.booleanValue;
-  if (v.integerValue !== undefined) return parseInt(v.integerValue, 10);
-  if (v.doubleValue !== undefined) return parseFloat(v.doubleValue);
-  if (v.mapValue) return firestoreFieldsToObject(v.mapValue.fields);
-  if (v.arrayValue) return (v.arrayValue.values || []).map(firestoreValueToJs);
-  if (v.nullValue !== undefined) return null;
-  return null;
-}
-
-/**
- * Resolve the guest's authoritative language from Firestore, falling back to
- * the sheet row. Returns { lang }.
- */
-function resolveGuestData(row, guestId) {
-  var fs = readGuestFromFirestore(guestId);
-  var lang = normaliseLang(row[COL_LANG]);
-
-  if (fs && fs.identity && fs.identity.lang) {
-    lang = normaliseLang(fs.identity.lang);
-  }
-
-  return { lang: lang };
-}
-
-
 
 // ── Email HTML template ───────────────────────────────────────────────────
+
 
 /** Escape HTML special chars in user-provided strings. */
 function esc(s) {
@@ -483,10 +342,11 @@ function sendOne(row, rowIndex, force) {
   // NOTE: We ALWAYS resend — the `_enviado` checkbox is intentionally ignored
   // so invitations can be re-sent freely (the couple's requirement).
 
-  // Authoritative language from Firestore (falls back to the sheet `lang`).
-  var data = resolveGuestData(row, guestId);
+  // Language from the sheet `lang` column (es / fr / en).
+  var data = resolveGuestData(row);
   var lang = data.lang;
   console.log("[sendOne] resolved lang=%s", lang);
+
 
   var link = buildInvitationLink(email, Date.now());
 

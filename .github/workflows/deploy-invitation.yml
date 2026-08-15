@@ -176,18 +176,13 @@ jobs:
       # create a new versioned deployment so the live onEdit trigger runs the
       # latest email logic.
       #
-      # The .gs file keeps SERVICE_ACCOUNT_PRIVATE_KEY as a "REPLACE_ME"
-      # placeholder (so the secret is never committed). Before pushing, we
-      # inject the real service-account private key from the
-      # SERVICE_ACCOUNT_BODA_SHEETS secret (the contents of
-      # integraciones/google_sheets/service_account.json) so the deployed
-      # script can authenticate to Firestore and read the authoritative guest
-      # language. The placeholder is restored afterwards.
+      # The script reads the guest's email language from the sheet `lang`
+      # column only — it no longer talks to Firestore, so there is no
+      # service-account key to inject.
       - name: Deploy invitation-emails Apps Script (clasp)
         working-directory: integraciones/google_sheets
         env:
           CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
-          SERVICE_ACCOUNT_BODA_SHEETS: ${{ secrets.SERVICE_ACCOUNT_BODA_SHEETS }}
         run: |
           set -euo pipefail
           # Restore clasp credentials from the secret.
@@ -198,40 +193,11 @@ jobs:
           printf '%s' "$CLASPRC_JSON" > "$HOME/.clasprc.json"
           chmod 600 "$HOME/.clasprc.json"
 
-          # Inject the real service-account key + client email into the .gs
-          # file so the deployed script can read Firestore. The key from the
-          # JSON secret is PKCS#8 ("BEGIN PRIVATE KEY"), but Apps Script's
-          # Utilities.computeRsaSha256Signature only accepts PKCS#1 ("BEGIN
-          # RSA PRIVATE KEY"), so we convert it with OpenSSL first. The key
-          # has real newlines; escape them back into a JS string literal (\n)
-          # so the .gs file stays valid.
-          if [ -z "$SERVICE_ACCOUNT_BODA_SHEETS" ]; then
-            echo "::error::Missing SERVICE_ACCOUNT_BODA_SHEETS secret (contents of integraciones/google_sheets/service_account.json)."
-            exit 1
-          fi
-          printf '%s' "$SERVICE_ACCOUNT_BODA_SHEETS" > service_account.json
-          node -e '
-            const fs = require("fs");
-            const { execSync } = require("child_process");
-            const sa = JSON.parse(fs.readFileSync("service_account.json", "utf8"));
-            fs.writeFileSync("sa_key_pkcs8.pem", sa.private_key, "utf8");
-            execSync("openssl rsa -in sa_key_pkcs8.pem -traditional -out sa_key_pkcs1.pem 2>/dev/null");
-            const pkcs1 = fs.readFileSync("sa_key_pkcs1.pem", "utf8");
-            fs.unlinkSync("sa_key_pkcs8.pem");
-            fs.unlinkSync("sa_key_pkcs1.pem");
-            let gs = fs.readFileSync("invitation_emails.gs", "utf8");
-            gs = gs.replace(/var SERVICE_ACCOUNT_CLIENT_EMAIL = "[^"]*";/, `var SERVICE_ACCOUNT_CLIENT_EMAIL = "${sa.client_email}";`);
-            const key = pkcs1.replace(/\\/g, "\\\\").replace(/"/g, "\\\"").replace(/\n/g, "\\n");
-            gs = gs.replace("REPLACE_ME", key);
-            fs.writeFileSync("invitation_emails.gs", gs, "utf8");
-          '
-          rm -f service_account.json
-
-
           # Install clasp (pinned) and deploy.
           npm install --no-save @google/clasp@3.2.0 >/dev/null 2>&1
           npx clasp push --force
           npx clasp deploy --description "Deploy from GitHub Actions (${{ github.sha }})"
+
 
 
       - name: Notify Telegram on production deploy

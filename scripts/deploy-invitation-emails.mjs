@@ -3,15 +3,11 @@
  * deploy-invitation-emails.mjs
  *
  * Deploys the invitation-emails Google Apps Script to the live project via
- * `clasp push`, injecting the REAL service-account private key into the .gs
- * file first (so the deployed script can authenticate to Firestore), then
- * restoring the placeholder so the secret is never committed.
+ * `clasp push`.
  *
- * The repo keeps `SERVICE_ACCOUNT_PRIVATE_KEY = "...REPLACE_ME..."` as a
- * placeholder. This script reads the real key from
- * `integraciones/google_sheets/service_account.json` (gitignored), substitutes
- * it into `invitation_emails.gs`, runs `clasp push`, and restores the
- * placeholder on success/failure.
+ * The script reads the guest's email language from the sheet `lang` column
+ * only — it no longer talks to Firestore, so there is no service-account key
+ * to inject. This deploy step is a plain `clasp push`.
  *
  * Usage:
  *   node scripts/deploy-invitation-emails.mjs
@@ -19,94 +15,20 @@
  * Requires:
  *   - `clasp` available on PATH (or `npx @google/clasp`).
  *   - `~/.clasprc.json` present (from `clasp login`).
- *   - `integraciones/google_sheets/service_account.json` present (gitignored).
  */
 
 import { execSync } from "node:child_process";
-import { readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dirname, "..");
 const SHEETS_DIR = join(ROOT, "integraciones", "google_sheets");
-const GS_FILE = join(SHEETS_DIR, "invitation_emails.gs");
-const SA_FILE = join(SHEETS_DIR, "service_account.json");
-
-const PLACEHOLDER = "REPLACE_ME";
 
 function fail(msg) {
   console.error(`[deploy-invitation-emails] ERROR: ${msg}`);
   process.exit(1);
 }
-
-// 1. Read the real service account.
-let sa;
-try {
-  sa = JSON.parse(readFileSync(SA_FILE, "utf8"));
-} catch (e) {
-  fail(`could not read ${SA_FILE}: ${e.message}`);
-}
-if (!sa.private_key || !sa.client_email) {
-  fail(`${SA_FILE} is missing private_key / client_email`);
-}
-
-// 2. Read the .gs file.
-let gs;
-try {
-  gs = readFileSync(GS_FILE, "utf8");
-} catch (e) {
-  fail(`could not read ${GS_FILE}: ${e.message}`);
-}
-if (!gs.includes(PLACEHOLDER)) {
-  fail(`placeholder "${PLACEHOLDER}" not found in ${GS_FILE} — nothing to inject`);
-}
-
-// 3. Align the client email with the service account (defensive; the .gs file
-//    should already match, but this guarantees the JWT issuer matches the key).
-gs = gs.replace(
-  /var SERVICE_ACCOUNT_CLIENT_EMAIL = "[^"]*";/,
-  `var SERVICE_ACCOUNT_CLIENT_EMAIL = "${sa.client_email}";`
-);
-
-// 4. Convert the key to PKCS#1 and inject it.
-//
-//    Google service-account keys are PKCS#8 ("-----BEGIN PRIVATE KEY-----").
-//    Apps Script's Utilities.computeRsaSha256Signature only accepts PKCS#1
-//    ("-----BEGIN RSA PRIVATE KEY-----"); passing a PKCS#8 key throws
-//    "Unexpected error while getting the method or property
-//    computeRsaSha256Signature on object Utilities". So we convert the key
-//    with OpenSSL before injecting it.
-function toPkcs1(pem) {
-  const tmpIn = join(ROOT, ".sa-key-pkcs8.pem");
-  const tmpOut = join(ROOT, ".sa-key-pkcs1.pem");
-  writeFileSync(tmpIn, pem, "utf8");
-  try {
-    execSync(`openssl rsa -in "${tmpIn}" -traditional -out "${tmpOut}" 2>/dev/null`, { stdio: "pipe" });
-    return readFileSync(tmpOut, "utf8");
-  } finally {
-    try { execSync(`rm -f "${tmpIn}" "${tmpOut}"`, { stdio: "pipe" }); } catch {}
-  }
-}
-
-// The key from JSON is a PEM with real newlines (JSON.parse turns the \n
-// escapes into actual line breaks). The .gs file stores it inside a JS string
-// literal, so we must escape the key back into a valid JS string: real
-// newlines -> \n, and escape backslashes and double quotes.
-function toJsStringLiteral(value) {
-  return value
-    .replace(/\\/g, "\\\\")
-    .replace(/"/g, '\\"')
-    .replace(/\n/g, "\\n");
-}
-const pkcs1Key = toPkcs1(sa.private_key);
-const injected = gs.replace(PLACEHOLDER, toJsStringLiteral(pkcs1Key));
-
-
-
-// 5. Write the injected file, push, then restore the placeholder.
-writeFileSync(GS_FILE, injected, "utf8");
-console.log("[deploy-invitation-emails] injected service-account key, pushing…");
 
 try {
   execSync("clasp push --force", {
@@ -115,11 +37,5 @@ try {
   });
   console.log("[deploy-invitation-emails] clasp push succeeded.");
 } catch (e) {
-  // Restore the placeholder before rethrowing.
-  writeFileSync(GS_FILE, gs, "utf8");
   fail(`clasp push failed: ${e.message}`);
 }
-
-// 6. Restore the placeholder so the secret is never committed.
-writeFileSync(GS_FILE, gs, "utf8");
-console.log("[deploy-invitation-emails] restored placeholder (secret not committed).");
