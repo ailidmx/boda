@@ -386,7 +386,7 @@ export const GENRES = [
       { id: "fr-yeye", name: "Yé-yé", aliases: ["Yeye", "Yé-yé français"], region: "France", curated: true, tier: "SECONDARY" },
       { id: "fr-pop", name: "French pop", aliases: ["Pop française", "French pop"], region: "France", curated: true, tier: "PRIMARY" },
       { id: "fr-rap", name: "French rap / Hip-hop", aliases: ["Rap français", "French hip-hop", "Hip-hop français"], region: "France", curated: true, tier: "PRIMARY" },
-      { id: "fr-electro", name: "French electro", aliases: ["French touch", "Electro française", "French house"], region: "France", curated: true, tier: "SECONDARY" },
+      { id: "fr-electro", name: "French electro", aliases: ["French touch", "Electro française"], region: "France", curated: true, tier: "SECONDARY" },
       { id: "fr-house", name: "French house", aliases: ["French touch", "House française"], region: "France", curated: true, tier: "SECONDARY" },
       { id: "fr-rock", name: "French rock", aliases: ["Rock français"], region: "France", curated: true, tier: "SECONDARY" },
       { id: "fr-folk", name: "French folk", aliases: ["Folk français"], region: "France", curated: true, tier: "SECONDARY" },
