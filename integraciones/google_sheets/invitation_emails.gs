@@ -231,6 +231,11 @@ function getFirestoreAccessToken() {
  * the percent-encoded characters in the path are not decoded properly.
  * `runQuery` matches on the document reference value in the JSON body, which
  * handles special characters correctly.
+ *
+ * The document ID is percent-encoded in the reference value (Firestore
+ * resource names require URL-encoded path segments). This also keeps raw
+ * non-ASCII bytes out of the JSON payload, which Apps Script's
+ * `UrlFetchApp.fetch` otherwise rejects with "Invalid argument: key".
  */
 function readGuestFromFirestore(guestId) {
   if (!guestId) return null;
@@ -239,7 +244,8 @@ function readGuestFromFirestore(guestId) {
     var url = "https://firestore.googleapis.com/v1/projects/" +
       FIRESTORE_PROJECT_ID + "/databases/(default)/documents:runQuery";
     var reference = "projects/" + FIRESTORE_PROJECT_ID +
-      "/databases/(default)/documents/guests/" + guestId;
+      "/databases/(default)/documents/guests/" + encodeURIComponent(guestId);
+
     var body = {
       structuredQuery: {
         from: [{ collectionId: "guests" }],
