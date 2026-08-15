@@ -5,7 +5,8 @@ import { useRsvp, RSVP_FLOWS } from "../context/RsvpContext.jsx";
 import { RsvpQuestion } from "./RsvpQuestion.jsx";
 import { RsvpRecap } from "./RsvpRecap.jsx";
 import { FlipStepCard } from "./FlipStepCard.jsx";
-import { getGroupMembers } from "../guest-profiles.js";
+import { getGroupMembers, guestTravelsByPlane } from "../guest-profiles.js";
+
 import { getActiveGuests } from "../guests.js";
 import { computeInitialStepIndex } from "../rsvp-responses.js";
 
@@ -30,11 +31,10 @@ export function TeAnimas() {
   // The section that follows "¡Te animas!" depends on whether the guest
   // travels by plane: guests who fly continue to the FLIGHTS section, everyone
   // else skips straight to the accommodation section. The guest's travel
-  // status is stored as `travelStatus` ("booked" | "planning" | "local");
-  // anyone who is not local travels by plane.
-  const travelsByPlane = ["booked", "planning"].includes(
-    profile?.guest?.travelStatus,
-  );
+  // status is stored as the boolean `travelsByPlane` (true = flies in). See
+  // guestTravelsByPlane().
+  const travelsByPlane = guestTravelsByPlane(profile?.guest);
+
   const nextHref = travelsByPlane ? "#travel" : "#accommodation";
   const nextLabel = travelsByPlane ? t.nav.travel : t.nav.accommodation;
 

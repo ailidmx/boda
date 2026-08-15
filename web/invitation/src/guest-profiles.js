@@ -371,6 +371,29 @@ export function resolveGuestName(guest) {
 
 
 /**
+ * Whether a guest travels by plane. The FLIGHTS ("Je viens de loin") section
+ * is only shown to guests who fly in, so this drives section visibility, the
+ * nav link, and the "next section" bottom links.
+ *
+ * The source of truth is the boolean `travelsByPlane` on the guest's Firestore
+ * record (true = flies in). For backward compatibility we also accept the
+ * older `travelStatus` string ("booked" | "planning" = flies in, "local" = no).
+ *
+ * @param {Object} guest  the signed-in guest profile (profile.guest)
+ * @returns {boolean}
+ */
+export function guestTravelsByPlane(guest) {
+  if (!guest) return false;
+  // Boolean flag (current schema) takes precedence.
+  if (typeof guest.travelsByPlane === "boolean") return guest.travelsByPlane;
+  // Legacy string fallback.
+  if (typeof guest.travelStatus === "string") {
+    return ["booked", "planning"].includes(guest.travelStatus);
+  }
+  return false;
+}
+
+/**
  * Resolve the effective avatar photo URL for a guest from their Cloudinary
  * public id (`cloudinaryId`). The id comes from the sheet (via the static
  * registry or the `guests` Firestore record). Returns null when absent.
@@ -378,6 +401,7 @@ export function resolveGuestName(guest) {
  * @returns {string|null}
  */
 export function resolveGuestPhoto(guest) {
+
   if (!guest) return null;
   const record = guestsCache.get(guest.id);
   const publicId = record?.identity?.cloudinaryId || record?.cloudinaryId || guest.identity?.cloudinaryId || guest.cloudinaryId;

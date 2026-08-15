@@ -10,8 +10,8 @@
 
 /* Full-bleed background behind the whole dress-code section. The base class
    only handles positioning; the actual artwork lives in the variant classes
-   (--patchwork / --terracotta) chosen by the temporary A/B selector. The
-   foreground content (montages + text) stays above it. */
+   (--confetti for the dress-code section, --terracotta for the tematica
+   section). The foreground content (montages + text) stays above it. */
 .attire-bg {
   position: absolute;
   z-index: 0;
@@ -19,31 +19,10 @@
   overflow: hidden;
 }
 
-/* Variant A — Mexican colour patchwork: a 4×3 quilt of classical Mexican
-   colours (rosa mexicano, verde limón, violeta, amarillo, naranja, turquesa,
-   azul). Each layer paints one block. */
-.attire-bg--patchwork {
-  background:
-    /* Row 1 */
-    linear-gradient(135deg, #e4007c 0 100%) 0 0 / 25% 33.333% no-repeat,
-    linear-gradient(135deg, #f7c600 0 100%) 25% 0 / 25% 33.333% no-repeat,
-    linear-gradient(135deg, #00b5ad 0 100%) 50% 0 / 25% 33.333% no-repeat,
-    linear-gradient(135deg, #7b2d8b 0 100%) 75% 0 / 25% 33.333% no-repeat,
-    /* Row 2 */
-    linear-gradient(135deg, #a8e000 0 100%) 0 33.333% / 25% 33.333% no-repeat,
-    linear-gradient(135deg, #ff7f00 0 100%) 25% 33.333% / 25% 33.333% no-repeat,
-    linear-gradient(135deg, #e4007c 0 100%) 50% 33.333% / 25% 33.333% no-repeat,
-    linear-gradient(135deg, #1e90ff 0 100%) 75% 33.333% / 25% 33.333% no-repeat,
-    /* Row 3 */
-    linear-gradient(135deg, #f7c600 0 100%) 0 66.666% / 25% 33.333% no-repeat,
-    linear-gradient(135deg, #7b2d8b 0 100%) 25% 66.666% / 25% 33.333% no-repeat,
-    linear-gradient(135deg, #00b5ad 0 100%) 50% 66.666% / 25% 33.333% no-repeat,
-    linear-gradient(135deg, #a8e000 0 100%) 75% 66.666% / 25% 33.333% no-repeat;
-}
-
-/* Variant B — terracotta earth with a sun and moon, radiating light and
-   subtle Mesoamerican geometric motifs. */
+/* Terracotta earth with a sun and moon, radiating light and subtle
+   Mesoamerican geometric motifs. Used by the tematica section. */
 .attire-bg--terracotta {
+
   background:
     /* Radiating sun rays (top-right) */
     repeating-conic-gradient(
@@ -101,67 +80,8 @@
     linear-gradient(160deg, #7a341c 0%, #a94d2a 45%, #8f3f22 100%);
 }
 
-/* Variant D — sunburst: radiating Mexican-colour rays from a warm centre,
-   like a festive sun or a piñata burst of colour. */
-.attire-bg--sunburst {
-  background:
-    /* Radiating colour rays from the centre */
-    repeating-conic-gradient(
-      from 0deg at 50% 50%,
-      #e4007c 0deg 12deg,
-      #f7c600 12deg 24deg,
-      #00b5ad 24deg 36deg,
-      #7b2d8b 36deg 48deg,
-      #a8e000 48deg 60deg,
-      #ff7f00 60deg 72deg,
-      #1e90ff 72deg 84deg,
-      #e4007c 84deg 96deg,
-      #f7c600 96deg 108deg,
-      #00b5ad 108deg 120deg,
-      #7b2d8b 120deg 132deg,
-      #a8e000 132deg 144deg,
-      #ff7f00 144deg 156deg,
-      #1e90ff 156deg 168deg,
-      #e4007c 168deg 180deg,
-      #f7c600 180deg 192deg,
-      #00b5ad 192deg 204deg,
-      #7b2d8b 204deg 216deg,
-      #a8e000 216deg 228deg,
-      #ff7f00 228deg 240deg,
-      #1e90ff 240deg 252deg,
-      #e4007c 252deg 264deg,
-      #f7c600 264deg 276deg,
-      #00b5ad 276deg 288deg,
-      #7b2d8b 288deg 300deg,
-      #a8e000 300deg 312deg,
-      #ff7f00 312deg 324deg,
-      #1e90ff 324deg 336deg,
-      #e4007c 336deg 348deg,
-      #f7c600 348deg 360deg
-    );
-}
-
-/* Soft light effects over the patchwork — a few warm glows and a subtle
-   diagonal sheen — so the quilt feels festive and luminous rather than flat. */
-.attire-bg--patchwork::before {
-  position: absolute;
-  inset: 0;
-  content: "";
-  background:
-    /* Diagonal sheen across the whole quilt */
-    linear-gradient(
-      115deg,
-      rgb(255 253 248 / 0.14) 0%,
-      rgb(255 253 248 / 0.02) 30%,
-      transparent 55%
-    ),
-    /* Floating warm orbs (light effects) */
-    radial-gradient(circle at 22% 78%, rgb(255 253 248 / 0.22) 0%, transparent 30%),
-    radial-gradient(circle at 88% 22%, rgb(255 253 248 / 0.18) 0%, transparent 28%),
-    radial-gradient(circle at 60% 55%, rgb(255 253 248 / 0.12) 0%, transparent 24%);
-}
-
 /* Moon orb (top-left), a subtle sun-calendar ring motif, and floating warm
+
    orbs — the "light effects" that give the terracotta earth a cosmic feel. */
 .attire-bg--terracotta::before {
   position: absolute;
@@ -206,58 +126,8 @@
   content: "";
 }
 
-/* ── TEMPORARY A/B test selector ────────────────────────────────────────
-   A small pill bar at the top of the attire section to switch between the
-   background variants. Remove this block (and the JSX + state) once a final
-   background is chosen. */
-.attire-bg-switch {
-  position: relative;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  margin: 0 auto clamp(1.5rem, 4vw, 2.5rem);
-  padding: 0.3rem;
-  border: 1px solid rgb(255 253 248 / 30%);
-  border-radius: 999px;
-  background: rgb(36 33 25 / 35%);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-}
-
-.attire-bg-switch__label {
-  padding: 0 0.5rem;
-  font-size: 0.62rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgb(255 253 248 / 70%);
-}
-
-.attire-bg-switch__btn {
-  padding: 0.45rem 0.9rem;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: rgb(255 253 248 / 85%);
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.04em;
-  cursor: pointer;
-  transition: background 180ms ease, color 180ms ease;
-}
-
-.attire-bg-switch__btn:hover,
-.attire-bg-switch__btn:focus-visible {
-  background: rgb(255 253 248 / 14%);
-}
-
-.attire-bg-switch__btn.is-active {
-  background: var(--marigold, #d9b36a);
-  color: var(--ink, #242119);
-}
-
 /* Keep all foreground content (eyebrow, montages, dress-code text, nav)
+
    above the full-bleed background layer. */
 .attire-section > :not(.attire-bg) {
   position: relative;
@@ -382,10 +252,10 @@
 }
 
 /* The dress-code block is a full-width row below the photos + citation
-   grid. It holds the title and the text paragraphs; the pictograms live in a
-   modal opened by the section FAB. A soft dark overlay sits behind the text
-   so it stays legible over the colourful patchwork background. */
+   grid. It holds the title and the text paragraphs. A soft dark overlay sits
+   behind the text so it stays legible over the confetti background. */
 .attire-dress-code {
+
   position: relative;
   max-width: 52rem;
   margin: clamp(2.5rem, 6vw, 4rem) auto 0;
@@ -415,180 +285,8 @@
   margin-bottom: 0;
 }
 
-/* ── Dress-code pictogram gallery ───────────────────────────────────────
-   A playful grid of SVG pictograms that illustrate the dress code at a
-   glance. Each card is a light tile with an icon and a short label. */
-.dp-gallery {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.75rem;
-  margin-top: 1.25rem;
-}
-
-.dp-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  margin: 0;
-  padding: 0.9rem 0.5rem 0.75rem;
-  background: rgb(255 255 255 / 12%);
-  border: 1px solid rgb(255 255 255 / 22%);
-  border-radius: 0.9rem;
-  text-align: center;
-}
-
-.dp-icon {
-  width: 3.4rem;
-  height: 3.4rem;
-  display: block;
-}
-
-.dp-label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  line-height: 1.2;
-  color: rgb(255 253 248 / 92%);
-}
-
-/* ── Dress-code pictogram modal ─────────────────────────────────────────
-   The pictograms open in a light modal (opened by the section FAB) so the
-   dress-code text stays clean and readable. */
-.attire-picto-shell {
-  display: none;
-}
-
-.attire-picto-shell.is-open {
-  position: fixed;
-  z-index: 240;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding:
-    max(1rem, env(safe-area-inset-top))
-    1rem
-    max(1rem, env(safe-area-inset-bottom));
-  background: rgb(18 27 24 / 72%);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
-.attire-picto-panel {
-  position: relative;
-  width: min(100%, 40rem);
-  max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
-  padding: 1.5rem;
-  overflow-y: auto;
-  border-radius: 1.5rem;
-  background: var(--cream);
-  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 38%);
-  overscroll-behavior: contain;
-}
-
-.attire-picto__close {
-  position: absolute;
-  z-index: 2;
-  top: 0.65rem;
-  right: 0.75rem;
-  display: grid;
-  width: 2.25rem;
-  height: 2.25rem;
-  place-items: center;
-  padding: 0;
-  border: 1px solid rgb(36 33 25 / 20%);
-  border-radius: 50%;
-  background: rgb(255 253 248 / 88%);
-  color: var(--ink);
-  font-size: 1.5rem;
-  line-height: 1;
-  cursor: pointer;
-}
-
-.attire-picto__eyebrow {
-  display: block;
-  margin-bottom: 0.65rem;
-}
-
-.attire-picto__title {
-  margin: 0 0 1rem;
-  padding-right: 2.5rem;
-  font-family: var(--font-display);
-  font-size: clamp(1.4rem, 3vw, 2rem);
-  font-weight: 400;
-  color: var(--ink);
-}
-
-
-/* The pictogram cards are restyled for the light modal background. */
-.attire-picto-panel .dp-card {
-  background: rgb(36 33 25 / 6%);
-  border-color: rgb(36 33 25 / 14%);
-}
-
-.attire-picto-panel .dp-label {
-  color: var(--ink);
-}
-
-/* ── Dress-code section FAB ─────────────────────────────────────────────
-   A floating action button that appears while the attire section is in view
-   and opens the pictogram modal. It is a real FAB on every screen size
-   (fixed to the viewport edge), matching the other section FABs. */
-.attire-picto-fab {
-  position: fixed;
-  z-index: 130;
-  right: max(1rem, env(safe-area-inset-right));
-  bottom: max(1rem, env(safe-area-inset-bottom));
-  width: 4.25rem;
-  height: 4.25rem;
-  display: grid;
-  place-items: center;
-  padding: 0;
-  border: 3px solid var(--marigold);
-  border-radius: 50%;
-  background: var(--terracotta);
-  box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
-  color: var(--white);
-
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(1rem) scale(0.9);
-  transition: opacity 180ms ease, transform 180ms ease;
-}
-
-.attire-picto-fab.is-visible {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0) scale(1);
-}
-
-.attire-picto-fab svg {
-  width: 2.4rem;
-  height: 2.4rem;
-}
-
-/* ── Extra-large screens: contain the FAB within the 120rem main column ──
-   On very wide displays (≥1440px) the main content is constrained to a
-   centered 120rem container. The dress-code FAB is position:fixed, so it
-   would otherwise float at the far viewport edge, outside the container.
-   Anchor it to the container's right edge instead (50% + 60rem = right edge
-   of the centered 120rem column), keeping a 1rem breathing margin. */
-@media (min-width: 1440px) {
-  .attire-picto-fab {
-    left: 50%;
-    right: auto;
-    transform: translateX(calc(60rem - 100% - 1rem)) translateY(1rem) scale(0.9);
-  }
-
-  .attire-picto-fab.is-visible {
-    transform: translateX(calc(60rem - 100% - 1rem)) translateY(0) scale(1);
-  }
-}
-
-
-
 .attire-copy .note {
+
   margin-top: 1.25rem;
   padding-top: 1rem;
   border-top: 1px solid rgb(255 255 255 / 35%);
@@ -700,30 +398,8 @@
     line-height: 1.55;
   }
 
-
-  /* The pictogram gallery lives inside the modal on mobile, so it drops to
-     3 columns with smaller tiles to stay compact. */
-  .dp-gallery {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.5rem;
-    margin-top: 1rem;
-  }
-
-  .dp-card {
-    padding: 0.6rem 0.3rem 0.5rem;
-    gap: 0.35rem;
-  }
-
-  .dp-icon {
-    width: 2.4rem;
-    height: 2.4rem;
-  }
-
-  .dp-label {
-    font-size: 0.6rem;
-  }
-
   /* The guest note ("Merci de faire partie de notre histoire !") is hidden on
+
      mobile to keep the attire section compact. */
   .attire-copy .note {
     display: none;

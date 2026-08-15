@@ -41,7 +41,12 @@ export const collections = {
   rsvpResponses: "rsvp_responses",
   /** Star ratings for experience cards (food flavours / music acts). */
   cardVotes: "card_votes",
+  /** Per-guest ranked ordering of the guisos dishes (1–20) + top-9 selection. */
+  guisoRankings: "guiso_rankings",
+  /** Guest song requests (title/artist + intent) for the music section. */
+  songRequests: "song_requests",
 };
+
 
 
 

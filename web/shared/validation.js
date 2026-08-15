@@ -227,7 +227,7 @@ export function validateCardVotePayload(payload) {
     // Allowed fields only
     { check: hasOnlyKeys(payload, CARD_VOTE_ALLOWED_FIELDS), message: `payload contains fields not in the allowed schema: ${Object.keys(payload).filter((k) => !CARD_VOTE_ALLOWED_FIELDS.includes(k)).join(", ")}` },
     // Field types and values
-    { check: isOneOf(payload.cardType, ["food", "music"]), message: "cardType must be one of: food, music" },
+    { check: isOneOf(payload.cardType, ["food", "music", "guiso"]), message: "cardType must be one of: food, music, guiso" },
     { check: isShortText(payload.cardKey, 100) && isNonEmptyString(payload.cardKey), message: "cardKey must be a non-empty string ≤ 100 chars" },
     { check: isShortText(payload.guestId, 100) && isNonEmptyString(payload.guestId), message: "guestId must be a non-empty string ≤ 100 chars" },
     { check: Number.isInteger(payload.rating) && payload.rating >= 1 && payload.rating <= 5, message: "rating must be an integer 1–5" },
@@ -236,6 +236,111 @@ export function validateCardVotePayload(payload) {
 
   return runChecks(payload, checks);
 }
+
+// ── Guiso rankings validators ───────────────────────────────────────────
+// Mirrors `hasValidGuisoRankingFields()` in firebase/firestore.rules.
+
+const GUISO_RANKING_ALLOWED_FIELDS = [
+  "guestId", "ranking", "selected", "updatedBy", "updatedAt",
+];
+
+/**
+ * Validate a payload intended for the `guiso_rankings` collection.
+ * Mirrors `hasValidGuisoRankingFields()` in the rules.
+ *
+ * @param {Object} payload  the payload to validate (before setDoc)
+ * @returns {{ valid: boolean, errors: string[] }}
+ */
+export function validateGuisoRankingPayload(payload) {
+  if (!isObject(payload)) {
+    return { valid: false, errors: ["payload must be an object"] };
+  }
+
+  const ranking = Array.isArray(payload.ranking) ? payload.ranking : [];
+  const selected = Array.isArray(payload.selected) ? payload.selected : [];
+  const rankingUnique = new Set(ranking).size === ranking.length;
+  const selectedUnique = new Set(selected).size === selected.length;
+  const selectedInRanking = selected.every((d) => ranking.includes(d));
+
+  const checks = [
+    // Required fields
+    { check: hasAllKeys(payload, GUISO_RANKING_ALLOWED_FIELDS), message: "missing required fields: guestId, ranking, selected, updatedBy, updatedAt" },
+    // Allowed fields only
+    { check: hasOnlyKeys(payload, GUISO_RANKING_ALLOWED_FIELDS), message: `payload contains fields not in the allowed schema: ${Object.keys(payload).filter((k) => !GUISO_RANKING_ALLOWED_FIELDS.includes(k)).join(", ")}` },
+    // Field types and values
+    { check: isShortText(payload.guestId, 100) && isNonEmptyString(payload.guestId), message: "guestId must be a non-empty string ≤ 100 chars" },
+    { check: Array.isArray(payload.ranking), message: "ranking must be an array" },
+    { check: ranking.length >= 1 && ranking.length <= 20, message: "ranking must contain between 1 and 20 dishes" },
+    { check: ranking.every((d) => isShortText(d, 100) && isNonEmptyString(d)), message: "ranking entries must be non-empty strings ≤ 100 chars" },
+    { check: rankingUnique, message: "ranking must not contain duplicate dishes" },
+    { check: Array.isArray(payload.selected), message: "selected must be an array" },
+    { check: selected.length <= 9, message: "selected must contain at most 9 dishes" },
+    { check: selected.every((d) => isShortText(d, 100) && isNonEmptyString(d)), message: "selected entries must be non-empty strings ≤ 100 chars" },
+    { check: selectedUnique, message: "selected must not contain duplicate dishes" },
+    { check: selectedInRanking, message: "selected dishes must be present in ranking" },
+    { check: isShortText(payload.updatedBy, 100) && isNonEmptyString(payload.updatedBy), message: "updatedBy must be a non-empty string ≤ 100 chars" },
+  ];
+
+  return runChecks(payload, checks);
+}
+
+// ── Song requests validators ────────────────────────────────────────────
+// Mirrors `hasValidSongRequestFields()` in firebase/firestore.rules.
+
+const SONG_REQUEST_ALLOWED_FIELDS = [
+  "guestId", "song", "intent", "bandType", "songMeta", "updatedBy", "updatedAt",
+];
+const SONG_REQUEST_INTENTS = ["hear", "sing", "karaoke", "band"];
+
+// Allowed live-band types, only meaningful when intent == "band".
+const SONG_REQUEST_BAND_TYPES = ["marimba", "mariachi", "norteno", "frenchBand"];
+
+// Allowed keys inside the optional `songMeta` map (normalized song identity).
+
+const SONG_META_ALLOWED_FIELDS = [
+  "title", "artist", "year", "externalId", "source", "isrc",
+];
+
+/**
+ * Validate a payload intended for the `song_requests` collection.
+ * Mirrors `hasValidSongRequestFields()` in the rules.
+ *
+ * @param {Object} payload  the payload to validate (before addDoc)
+ * @returns {{ valid: boolean, errors: string[] }}
+ */
+export function validateSongRequestPayload(payload) {
+  if (!isObject(payload)) {
+    return { valid: false, errors: ["payload must be an object"] };
+  }
+
+  const checks = [
+    // Required fields
+    { check: hasAllKeys(payload, SONG_REQUEST_ALLOWED_FIELDS), message: "missing required fields: guestId, song, intent, updatedBy, updatedAt" },
+    // Allowed fields only
+    { check: hasOnlyKeys(payload, SONG_REQUEST_ALLOWED_FIELDS), message: `payload contains fields not in the allowed schema: ${Object.keys(payload).filter((k) => !SONG_REQUEST_ALLOWED_FIELDS.includes(k)).join(", ")}` },
+    // Field types and values
+    { check: isShortText(payload.guestId, 100) && isNonEmptyString(payload.guestId), message: "guestId must be a non-empty string ≤ 100 chars" },
+    { check: isShortText(payload.song, 200) && isNonEmptyString(payload.song), message: "song must be a non-empty string ≤ 200 chars" },
+    { check: isOneOf(payload.intent, SONG_REQUEST_INTENTS), message: "intent must be one of: hear, sing, karaoke, band" },
+    // Optional bandType, only meaningful when intent == "band"
+    { check: !hasAnyKey(payload, ["bandType"]) || isOneOf(payload.bandType, SONG_REQUEST_BAND_TYPES), message: "bandType must be one of: marimba, mariachi, norteno, frenchBand" },
+    { check: isShortText(payload.updatedBy, 100) && isNonEmptyString(payload.updatedBy), message: "updatedBy must be a non-empty string ≤ 100 chars" },
+    // Optional songMeta map (normalized song identity)
+
+    { check: !hasAnyKey(payload, ["songMeta"]) || isObject(payload.songMeta), message: "songMeta must be an object" },
+    { check: !hasAnyKey(payload, ["songMeta"]) || hasOnlyKeys(payload.songMeta, SONG_META_ALLOWED_FIELDS), message: `songMeta contains unsupported fields: ${Object.keys(payload.songMeta || {}).filter((k) => !SONG_META_ALLOWED_FIELDS.includes(k)).join(", ")}` },
+    { check: !hasAnyKey(payload, ["songMeta"]) || !hasAnyKey(payload.songMeta, ["title"]) || isShortText(payload.songMeta.title, 200), message: "songMeta.title must be a string ≤ 200 chars" },
+    { check: !hasAnyKey(payload, ["songMeta"]) || !hasAnyKey(payload.songMeta, ["artist"]) || isShortText(payload.songMeta.artist, 200), message: "songMeta.artist must be a string ≤ 200 chars" },
+    { check: !hasAnyKey(payload, ["songMeta"]) || !hasAnyKey(payload.songMeta, ["year"]) || (Number.isInteger(payload.songMeta.year) && payload.songMeta.year >= 1000 && payload.songMeta.year <= 2100), message: "songMeta.year must be an integer year" },
+    { check: !hasAnyKey(payload, ["songMeta"]) || !hasAnyKey(payload.songMeta, ["externalId"]) || isShortText(payload.songMeta.externalId, 100), message: "songMeta.externalId must be a string ≤ 100 chars" },
+    { check: !hasAnyKey(payload, ["songMeta"]) || !hasAnyKey(payload.songMeta, ["source"]) || isShortText(payload.songMeta.source, 50), message: "songMeta.source must be a string ≤ 50 chars" },
+    { check: !hasAnyKey(payload, ["songMeta"]) || !hasAnyKey(payload.songMeta, ["isrc"]) || isShortText(payload.songMeta.isrc, 50), message: "songMeta.isrc must be a string ≤ 50 chars" },
+  ];
+
+  return runChecks(payload, checks);
+}
+
+
 
 // ── RSVP submissions validators ─────────────────────────────────────────
 

@@ -562,3 +562,26 @@
 
 
 
+
+
+/* Doña Carmen badge — a small rounded-square portrait of the cook, overlaid
+   on the taquiza card. Overrides the generic .flavour-card img sizing (4:3
+   cover) so it renders as a framed, rounded-square avatar in the top-right
+   corner. */
+.flavour-card__badge {
+  position: absolute;
+  z-index: 3;
+  top: 0.9rem;
+  right: 0.9rem;
+  width: clamp(3.2rem, 6vw, 4.4rem);
+  height: clamp(3.2rem, 6vw, 4.4rem);
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 0.75rem;
+  border: 2px solid rgb(255 253 248 / 95%);
+  box-shadow: 0 0.4rem 1rem rgb(36 33 25 / 30%);
+  transition: transform 320ms ease;
+}
+.flavour-card:hover .flavour-card__badge {
+  transform: scale(1.06);
+}

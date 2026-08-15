@@ -734,7 +734,15 @@ export function IdentityModal() {
     setSaving(true);
     setFooterMessage(null);
     try {
-      await saveIdentityCheckPassed(guest, true, guest.id);
+      // Confirming the identity check acknowledges it for the WHOLE invitation
+      // group, so the modal won't pop up again for any member. The signed-in
+      // guest is allowed to write `idCheckUser` for every member of their own
+      // group (enforced by the Firestore rules).
+      await Promise.all(
+        members.map((member) =>
+          saveIdentityCheckPassed(member, true, guest.id),
+        ),
+      );
       confirmIdentityPrompt();
     } catch (error) {
       console.error("saveIdentityCheckPassed failed", error);
@@ -744,6 +752,7 @@ export function IdentityModal() {
       setSaving(false);
     }
   };
+
 
   return (
     <div

@@ -479,7 +479,7 @@ service cloud.firestore {
         && request.resource.data.keys().hasOnly([
           "cardType", "cardKey", "guestId", "rating", "updatedBy", "updatedAt"
         ])
-        && request.resource.data.cardType in ["food", "music"]
+        && request.resource.data.cardType in ["food", "music", "guiso"]
         && isShortText(request.resource.data.cardKey, 100)
         && request.resource.data.cardKey.size() > 0
         && isShortText(request.resource.data.guestId, 100)
@@ -498,6 +498,111 @@ service cloud.firestore {
         && hasValidCardVoteFields()
         && voteId == request.resource.data.cardType + "_" + request.resource.data.cardKey + "_" + request.auth.uid;
       allow delete: if false;
+    }
+
+
+
+
+    // ── Guiso rankings (ranked ordering of the guisos dishes) ─────────────
+    // One document per guest, stored under `guiso_rankings/{guestId}`. The
+    // `ranking` array holds the dish names in the guest's preferred order
+    // (1st element = favourite). The `selected` array holds the dish names the
+    // guest marked as "in the menu" (the top 9). A guest may only create/update
+    // their own ranking document. Any authenticated guest may read all rankings
+    // so the couple can aggregate the results.
+    function hasValidGuisoRankingFields() {
+      return request.resource.data.keys().hasAll([
+          "guestId", "ranking", "selected", "updatedBy", "updatedAt"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "guestId", "ranking", "selected", "updatedBy", "updatedAt"
+        ])
+        && isShortText(request.resource.data.guestId, 100)
+        && request.resource.data.guestId == request.auth.uid
+        && request.resource.data.ranking is list
+        && request.resource.data.ranking.size() >= 1
+        && request.resource.data.ranking.size() <= 20
+        && request.resource.data.ranking.all(entry,
+          entry is string && entry.size() > 0 && entry.size() <= 100)
+        && request.resource.data.ranking.distinct().size() == request.resource.data.ranking.size()
+        && request.resource.data.selected is list
+        && request.resource.data.selected.size() <= 9
+        && request.resource.data.selected.all(entry,
+          entry is string && entry.size() > 0 && entry.size() <= 100)
+        && request.resource.data.selected.distinct().size() == request.resource.data.selected.size()
+        && request.resource.data.selected.all(entry, request.resource.data.ranking.hasAny([entry]))
+        && isShortText(request.resource.data.updatedBy, 100)
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time;
+    }
+
+    match /guiso_rankings/{guestId} {
+      allow read: if request.auth != null;
+      allow create, update: if request.auth != null
+        && hasValidGuisoRankingFields()
+        && guestId == request.auth.uid;
+      allow delete: if false;
+    }
+
+
+
+    // ── Song requests (guest song suggestions for the music section) ───────
+    // One document per request, stored under `song_requests/{requestId}` (an
+    // auto-generated id). A guest may only create their own requests. Any
+    // authenticated guest may read all requests so the couple can aggregate
+    // the results.
+    function hasValidSongRequestFields() {
+      return request.resource.data.keys().hasAll([
+          "guestId", "song", "intent", "updatedBy", "updatedAt"
+        ])
+        && request.resource.data.keys().hasOnly([
+          "guestId", "song", "intent", "bandType", "songMeta", "updatedBy", "updatedAt"
+        ])
+        && isShortText(request.resource.data.guestId, 100)
+        && request.resource.data.guestId == request.auth.uid
+        && isShortText(request.resource.data.song, 200)
+        && request.resource.data.song.size() > 0
+        && request.resource.data.intent in ["hear", "sing", "karaoke", "band"]
+        // Optional live-band type, only meaningful when intent == "band".
+        && (!request.resource.data.keys().hasAny(["bandType"])
+            || request.resource.data.bandType in ["marimba", "mariachi", "norteno", "frenchBand"])
+        && isShortText(request.resource.data.updatedBy, 100)
+        && request.resource.data.updatedBy == request.auth.uid
+        && request.resource.data.updatedAt == request.time
+        // Optional normalized song identity (from the autocomplete). Kept
+        // separate from the event request (`intent`) so future event-specific
+        // metadata can be added as sibling fields without touching song identity.
+        && (!request.resource.data.keys().hasAny(["songMeta"])
+            || hasValidSongMetaFields());
+    }
+
+
+    function hasValidSongMetaFields() {
+      return request.resource.data.songMeta.keys().hasOnly([
+          "title", "artist", "year", "externalId", "source", "isrc"
+        ])
+        && (!request.resource.data.songMeta.keys().hasAny(["title"])
+            || isShortText(request.resource.data.songMeta.title, 200))
+        && (!request.resource.data.songMeta.keys().hasAny(["artist"])
+            || isShortText(request.resource.data.songMeta.artist, 200))
+        && (!request.resource.data.songMeta.keys().hasAny(["year"])
+            || (request.resource.data.songMeta.year is int
+                && request.resource.data.songMeta.year >= 1000
+                && request.resource.data.songMeta.year <= 2100))
+        && (!request.resource.data.songMeta.keys().hasAny(["externalId"])
+            || isShortText(request.resource.data.songMeta.externalId, 100))
+        && (!request.resource.data.songMeta.keys().hasAny(["source"])
+            || isShortText(request.resource.data.songMeta.source, 50))
+        && (!request.resource.data.songMeta.keys().hasAny(["isrc"])
+            || isShortText(request.resource.data.songMeta.isrc, 50));
+    }
+
+
+    match /song_requests/{requestId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null
+        && hasValidSongRequestFields();
+      allow update, delete: if false;
     }
 
 
