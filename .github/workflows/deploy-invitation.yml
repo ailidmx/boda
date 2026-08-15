@@ -7,6 +7,7 @@ on:
       - develop
     paths:
       - "web/invitation/**"
+      - "integraciones/google_sheets/**"
       - "firebase.json"
       - ".firebaserc"
       - ".github/workflows/deploy-invitation.yml"
@@ -16,6 +17,7 @@ on:
       - develop
     paths:
       - "web/invitation/**"
+      - "integraciones/google_sheets/**"
       - "firebase.json"
       - ".firebaserc"
       - ".github/workflows/deploy-invitation.yml"
@@ -167,6 +169,30 @@ jobs:
           projectId: boda-500805
           target: invitation-named
           channelId: live
+
+      # Deploy the invitation-emails Google Apps Script to the live project.
+      # clasp authenticates via the CLASPRC_JSON secret (the contents of the
+      # local ~/.clasprc.json produced by `clasp login`). We push the code and
+      # create a new versioned deployment so the live onEdit trigger runs the
+      # latest email logic.
+      - name: Deploy invitation-emails Apps Script (clasp)
+        working-directory: integraciones/google_sheets
+        env:
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
+        run: |
+          set -euo pipefail
+          # Restore clasp credentials from the secret.
+          if [ -z "$CLASPRC_JSON" ]; then
+            echo "::error::Missing CLASPRC_JSON secret. Run 'clasp login' locally and store the contents of ~/.clasprc.json as the CLASPRC_JSON repository secret."
+            exit 1
+          fi
+          printf '%s' "$CLASPRC_JSON" > "$HOME/.clasprc.json"
+          chmod 600 "$HOME/.clasprc.json"
+
+          # Install clasp (pinned) and deploy.
+          npm install --no-save @google/clasp@3.2.0 >/dev/null 2>&1
+          npx clasp push --force
+          npx clasp deploy --description "Deploy from GitHub Actions (${{ github.sha }})"
 
       - name: Notify Telegram on production deploy
         if: always()
