@@ -201,17 +201,158 @@ export function buildIdentityCheckPayload({ guestId, passed, invitationGroup, ed
        normalized[String(questionId)] = n;
      }
    });
+  return {
+    guestId,
+    rsvp: {
+      answers: normalized,
+    },
+    updatedBy: String(editorGuestId ?? "").trim(),
+    updatedAt: timestamp,
+  };
+ }
+
+ /**
+  * Build a payload for saving a guest's flight information (Travel section).
+  *
+  * Flight details are stored on the `guests` collection document, inside the
+  * nested `flightInfo` map. This keeps all live guest data in one place (the
+  * `guests` collection) instead of a separate collection.
+  *
+  * The payload is explicit and allowlisted: only the fields the guest can
+  * actually edit are included, and each is normalized (trimmed, bounded) so it
+  * passes the runtime validator and the Firestore rules.
+  *
+  * @param {Object} input
+  * @param {string} input.guestId
+  * @param {Object|null} input.origin        departure airport (normalized)
+  * @param {Object|null} input.destination   arrival airport (normalized)
+  * @param {Array<Object>} [input.connections]  connecting airports (0–3)
+  * @param {Array<Object>} [input.legs]      flight legs (0–4)
+  * @param {string} [input.arrivalDate]      YYYY-MM-DD
+  * @param {string} [input.arrivalTime]      HH:MM
+  * @param {string} [input.finalFlightNumber]
+  * @param {Object|null} [input.departure]   return-trip details (normalized)
+  * @param {string} input.editorGuestId
+  * @returns {Object} explicit payload for setDoc(..., { merge: true })
+  */
+ export function buildGuestFlightInfoPayload({
+   guestId,
+   origin,
+   destination,
+   connections = [],
+   legs = [],
+   arrivalDate,
+   arrivalTime,
+   finalFlightNumber,
+   departure,
+   editorGuestId,
+   timestamp,
+ }) {
+   const flightInfo = {};
+
+   if (origin) flightInfo.origin = normalizeAirport(origin);
+   if (destination) flightInfo.destination = normalizeAirport(destination);
+
+   const normalizedConnections = (connections || [])
+     .map(normalizeAirport)
+     .filter(Boolean)
+     .slice(0, 3);
+   if (normalizedConnections.length > 0) flightInfo.connections = normalizedConnections;
+
+   const normalizedLegs = (legs || [])
+     .map(normalizeLeg)
+     .filter(Boolean)
+     .slice(0, 4);
+   if (normalizedLegs.length > 0) flightInfo.legs = normalizedLegs;
+
+   if (arrivalDate) flightInfo.arrivalDate = String(arrivalDate).trim();
+   if (arrivalTime) flightInfo.arrivalTime = String(arrivalTime).trim();
+   if (finalFlightNumber) flightInfo.finalFlightNumber = String(finalFlightNumber).trim().slice(0, 30);
+
+   // Return-trip details (the "Dis-nous comment tu repars" section). Mirrors
+   // the arrival fields but grouped under a `departure` map so the two trips
+   // stay clearly separated in the guest document.
+   const normalizedDeparture = normalizeDeparture(departure);
+   if (normalizedDeparture) flightInfo.departure = normalizedDeparture;
+
    return {
      guestId,
-     rsvp: {
-       answers: normalized,
-     },
+     flightInfo,
      updatedBy: String(editorGuestId ?? "").trim(),
      updatedAt: timestamp,
    };
  }
 
+ /**
+  * Normalize the return-trip (departure) details to the compact persisted shape.
+  * @param {Object} departure
+  * @returns {Object|null}
+  */
+ function normalizeDeparture(departure) {
+   if (!departure || typeof departure !== "object") return null;
+   const out = {};
+
+   if (departure.origin) out.origin = normalizeAirport(departure.origin);
+   if (departure.destination) out.destination = normalizeAirport(departure.destination);
+
+   const normalizedConnections = (departure.connections || [])
+     .map(normalizeAirport)
+     .filter(Boolean)
+     .slice(0, 3);
+   if (normalizedConnections.length > 0) out.connections = normalizedConnections;
+
+   const normalizedLegs = (departure.legs || [])
+     .map(normalizeLeg)
+     .filter(Boolean)
+     .slice(0, 4);
+   if (normalizedLegs.length > 0) out.legs = normalizedLegs;
+
+   if (departure.departureDate) out.departureDate = String(departure.departureDate).trim();
+   if (departure.departureTime) out.departureTime = String(departure.departureTime).trim();
+   if (departure.finalFlightNumber) out.finalFlightNumber = String(departure.finalFlightNumber).trim().slice(0, 30);
+
+   return Object.keys(out).length > 0 ? out : null;
+ }
+
+ /**
+  * Normalize an airport object to the compact persisted shape.
+  * @param {Object} airport
+  * @returns {Object|null}
+  */
+ function normalizeAirport(airport) {
+   if (!airport || typeof airport !== "object") return null;
+   const iata = String(airport.iata || "").trim().toUpperCase();
+   if (!iata) return null;
+   const out = {
+     iata,
+     name: String(airport.name || "").trim().slice(0, 200),
+     countryCode: String(airport.countryCode || "").trim().slice(0, 2),
+   };
+   if (airport.icao) out.icao = String(airport.icao).trim().toUpperCase().slice(0, 4);
+   if (airport.city) out.city = String(airport.city).trim().slice(0, 150);
+   if (airport.country) out.country = String(airport.country).trim().slice(0, 100);
+   if (Number.isFinite(airport.latitude)) out.latitude = airport.latitude;
+   if (Number.isFinite(airport.longitude)) out.longitude = airport.longitude;
+   return out;
+ }
+
+ /**
+  * Normalize a flight leg to the compact persisted shape.
+  * @param {Object} leg
+  * @returns {Object|null}
+  */
+ function normalizeLeg(leg) {
+   if (!leg || typeof leg !== "object") return null;
+   const from = String(leg.from || "").trim().toUpperCase();
+   const to = String(leg.to || "").trim().toUpperCase();
+   if (!from || !to) return null;
+   const out = { from, to };
+   if (leg.flightNumber) out.flightNumber = String(leg.flightNumber).trim().slice(0, 30);
+   return out;
+ }
+
  // ── Attendance responses collection ────────────────────────────────────
+
 
 /**
  * Build a payload for saving an attendance response.
@@ -262,6 +403,39 @@ export function buildCardVotePayload({ cardType, cardKey, guestId, rating, times
   return {
     cardType: String(cardType ?? "").trim(),
     cardKey: String(cardKey ?? "").trim(),
+    guestId: String(guestId ?? "").trim(),
+    rating: Number(rating),
+    updatedBy: String(guestId ?? "").trim(),
+    updatedAt: timestamp,
+  };
+}
+
+
+// ── Genre ratings collection ───────────────────────────────────────────
+
+/**
+ * Build a payload for saving a guest's 1–5 star rating for a music genre
+ * (the genre survey).
+ *
+ * One document per (genre, guest) pair. The document ID is
+ * `${genreId}_${guestId}`, which the Firestore rules enforce so a guest can
+ * only ever create/update their own single rating for a given genre.
+ *
+ * A parent genre and its subgenres are rated independently — rating a parent
+ * never overwrites a child's rating (each has its own document).
+ *
+ * @param {Object} input
+ * @param {string} input.genreId  the stable curated genre id (e.g. "mx-norteno")
+ * @param {string} input.genreName the human-readable genre name (for display)
+ * @param {string} input.guestId  the rating guest's id (== auth uid)
+ * @param {number} input.rating   integer 1–5
+ * @param {*} input.timestamp     e.g. serverTimestamp()
+ * @returns {Object} explicit payload for setDoc(..., { merge: true })
+ */
+export function buildGenreRatingPayload({ genreId, genreName, guestId, rating, timestamp }) {
+  return {
+    genreId: String(genreId ?? "").trim(),
+    genreName: String(genreName ?? "").trim(),
     guestId: String(guestId ?? "").trim(),
     rating: Number(rating),
     updatedBy: String(guestId ?? "").trim(),

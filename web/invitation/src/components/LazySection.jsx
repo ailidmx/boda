@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useSectionTime } from "../hooks/useSectionTime.js";
 
 /**
  * LazySection renders its children only once the element scrolls into view.
@@ -20,6 +21,9 @@ export function LazySection({
 }) {
   const ref = useRef(null);
   const [visible, setVisible] = useState(false);
+
+  // Track how long this section stays in view (Analytics `section_time`).
+  useSectionTime(id, ref);
 
   useEffect(() => {
     const node = ref.current;

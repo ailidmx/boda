@@ -4,6 +4,8 @@ import { MEDIA } from "../media.js";
 import { useApp } from "../context/AppContext.jsx";
 import { SwipeCardCarousel } from "./SwipeCardCarousel.jsx";
 import { StarVote } from "./StarVote.jsx";
+import { GenreSurvey } from "./GenreSurvey.jsx";
+
 
 
 
@@ -197,10 +199,16 @@ export function Music() {
         </SwipeCardCarousel>
       </div>
 
+      {/* Music genre survey: guests rate the genres they love (Mexican
+          Regional, Serbia/Balkans, Latina/Caribe, etc.) with 1–5 stars and can
+          search for obscure genres via MusicBrainz. */}
+      <GenreSurvey />
+
       {/* Desktop-only bottom nav: leads to the "Et après ?" (coast) section.
           The music section sits on a dark ink background, so the nav uses the
           light variant to keep the link visible. */}
       <nav
+
         className="section-nav section-nav--light music-section-nav"
         aria-label="Continue"
       >

@@ -55,6 +55,54 @@ export async function sendTelegramMessage(text, options = {}) {
 }
 
 /**
+ * Send a photo (e.g. a guest's avatar) to a Telegram chat with an optional
+ * caption. Uses the `sendPhoto` Bot API method so the image appears inline
+ * with the notification text.
+ *
+ * @param {string} photoUrl  a public URL to the image (e.g. a Cloudinary URL)
+ * @param {object} [options]
+ * @param {string} [options.token]  the bot token
+ * @param {string} [options.chatId]  the target chat id
+ * @param {string} [options.caption]  optional caption (MarkdownV2 if parseMode set)
+ * @param {"MarkdownV2"|"HTML"} [options.parseMode]  optional parse mode
+ * @returns {Promise<boolean>}  true when the API call succeeded
+ */
+export async function sendTelegramPhoto(photoUrl, options = {}) {
+  const token = options.token || "";
+  const chatId = options.chatId || "";
+  if (!token || !chatId || !photoUrl) {
+    console.warn("[telegram] Missing token, chatId or photoUrl; skipping photo.");
+    return false;
+  }
+
+  const body = {
+    chat_id: chatId,
+    photo: photoUrl,
+    disable_web_page_preview: true,
+  };
+  if (options.caption) body.caption = options.caption;
+  if (options.parseMode) body.parse_mode = options.parseMode;
+
+  try {
+    const response = await fetch(`${TELEGRAM_API}/bot${token}/sendPhoto`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const data = await response.json();
+    if (!data.ok) {
+      console.warn("[telegram] sendPhoto failed:", data.description);
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.warn("[telegram] sendPhoto error:", error.message);
+    return false;
+  }
+}
+
+
+/**
  * Escape a string for Telegram MarkdownV2 so user-provided text (names,
  * messages, notes) never breaks the message formatting.
  * @param {string} value

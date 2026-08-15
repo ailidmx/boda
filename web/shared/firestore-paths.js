@@ -45,6 +45,8 @@ export const collections = {
   guisoRankings: "guiso_rankings",
   /** Guest song requests (title/artist + intent) for the music section. */
   songRequests: "song_requests",
+  /** Per-guest 1–5 star ratings for music genres (genre survey). */
+  genreRatings: "genre_ratings",
 };
 
 

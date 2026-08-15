@@ -257,14 +257,50 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   (~600ms) and aborting stale requests via `AbortController`. When adding a new
   search source, add a provider and inject it — don't touch the UI or the
   persistence layer. Unit tests live in `tests/song-search.test.mjs`.
-- **Song-request persistence uses a `songMeta` field** — the guest's chosen
-  song identity (title, artist, year, MusicBrainz id, isrc) is stored in the
-  `songMeta` field of the `song_requests` doc, separate from the free-text
-  `song` and the `intent`. `buildSongRequestPayload` (payload-builders) and
-  `validateSongRequestPayload` (validation) both accept `songMeta`; the
-  Firestore rules allow it. If the search finds nothing, the guest can still
-  type a free-text title (no `songMeta`).
+ - **Song-request persistence uses a `songMeta` field** — the guest's chosen
+   song identity (title, artist, year, MusicBrainz id, isrc) is stored in the
+   `songMeta` field of the `song_requests` doc, separate from the free-text
+   `song` and the `intent`. `buildSongRequestPayload` (payload-builders) and
+   `validateSongRequestPayload` (validation) both accept `songMeta`; the
+   Firestore rules allow it. If the search finds nothing, the guest can still
+   type a free-text title (no `songMeta`).
+ - **Song-request band-type selector shows for BOTH `band` and `sing` intents** —
+   In `SongRequest.jsx`, the "which musicians" selector (`bandType`) is rendered
+   when `intent === "band" || intent === "sing"`, because "sing on stage with the
+   musicians" also needs to know which band accompanies the guest. The `bandType`
+   is saved via `saveSongRequest` for both intents. When adding a new intent that
+   needs a band choice, include it in that condition.
+ - **Guest-change Telegram notifications are context-aware + include the avatar** —
+   `onGuestUpdated` in `functions/index.js` watches the `guests` collection and
+   notifies on ANY meaningful change, formatted by what changed: identity check,
+   name correction, phone, photo, RSVP answers, flight details (`flightInfo`),
+   travel mode (`travelsByPlane`), a written message (`messageAuthor`), and cabin
+   assignment (`hosting`). Metadata-only touches (`updatedBy`/`updatedAt`) are
+   skipped. When the guest has an avatar, the notification is sent via
+   `sendTelegramPhoto` (in `functions/telegram.js`) with the avatar as the photo
+   and the message as its caption; otherwise it falls back to `sendTelegramMessage`.
+   The avatar URL is built from `identity.cloudinaryId` (stored relative to the
+   `boda/` prefix) as
+   `https://res.cloudinary.com/k2ajcgxv/image/upload/w_256,h_256,c_fill,g_auto/boda/<id>`
+   (see `resolveGuestPhotoUrl`). When adding a new guest field that should notify,
+   add a change-detection block in `onGuestUpdated` and a human-readable line.
+- **Genre survey is a curated catalog + isolated search service** — the "Califica
+  la música" survey (`GenreSurvey.jsx` + `GenreVote.jsx`) rates music genres with
+  1–5 stars. The source of truth is the app's OWN curated catalog
+  (`web/invitation/src/genres/genre-taxonomy.js`), deliberately rich in Mexican
+  Regional and Serbian/Balkan music (the two cultural pillars). Genres are
+  hierarchical (parent category → subgenres), tiered (PRIMARY shown / SECONDARY
+  collapsed / SEARCH_ONLY), alias-aware, and use stable ids independent of
+  MusicBrainz. Ratings persist to `genre_ratings/{genreId}_{guestId}` (one doc
+  per genre+guest; the rules enforce the doc id). Search is isolated behind
+  `createGenreSearchService()` (`genre-search/genre-search-service.js`), which
+  searches the curated catalog first and only falls back to the injectable
+  MusicBrainz provider (`musicbrainz-genre-provider.js`) for obscure genres —
+  never touch the UI or persistence layer to add a search source. When adding a
+  genre, add it to `genre-taxonomy.js` (with aliases + tier); the UI, rules, and
+  persistence need no changes.
 - *(Add new lessons here as you discover them.)*
+
 
 
 

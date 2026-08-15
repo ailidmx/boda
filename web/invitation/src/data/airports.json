@@ -1,0 +1,254 @@
+[
+  {
+    "iata": "AMS",
+    "icao": "EHAM",
+    "name": "Amsterdam Airport Schiphol",
+    "city": "Amsterdam",
+    "countryCode": "NL",
+    "latitude": 52.308601,
+    "longitude": 4.76389
+  },
+  {
+    "iata": "BCN",
+    "icao": "LEBL",
+    "name": "Josep Tarradellas Barcelona-El Prat Airport",
+    "city": "Barcelona",
+    "countryCode": "ES",
+    "latitude": 41.2971,
+    "longitude": 2.07846
+  },
+  {
+    "iata": "BER",
+    "icao": "EDDB",
+    "name": "Berlin Brandenburg Airport",
+    "city": "Berlin",
+    "countryCode": "DE",
+    "latitude": 52.3667,
+    "longitude": 13.5033
+  },
+  {
+    "iata": "BOG",
+    "icao": "SKBO",
+    "name": "El Dorado International Airport",
+    "city": "Bogota",
+    "countryCode": "CO",
+    "latitude": 4.70159,
+    "longitude": -74.1469
+  },
+  {
+    "iata": "BRU",
+    "icao": "EBBR",
+    "name": "Brussels Airport",
+    "city": "Brussels",
+    "countryCode": "BE",
+    "latitude": 50.9014,
+    "longitude": 4.48444
+  },
+  {
+    "iata": "CDG",
+    "icao": "LFPG",
+    "name": "Charles de Gaulle International Airport",
+    "city": "Paris",
+    "countryCode": "FR",
+    "latitude": 49.012779,
+    "longitude": 2.55
+  },
+  {
+    "iata": "CUN",
+    "icao": "MMUN",
+    "name": "Cancun International Airport",
+    "city": "Cancun",
+    "countryCode": "MX",
+    "latitude": 21.0365,
+    "longitude": -86.8771
+  },
+  {
+    "iata": "DFW",
+    "icao": "KDFW",
+    "name": "Dallas Fort Worth International Airport",
+    "city": "Dallas-Fort Worth",
+    "countryCode": "US",
+    "latitude": 32.8968,
+    "longitude": -97.038
+  },
+  {
+    "iata": "DUB",
+    "icao": "EIDW",
+    "name": "Dublin Airport",
+    "city": "Dublin",
+    "countryCode": "IE",
+    "latitude": 53.4213,
+    "longitude": -6.27007
+  },
+  {
+    "iata": "FRA",
+    "icao": "EDDF",
+    "name": "Frankfurt am Main Airport",
+    "city": "Frankfurt",
+    "countryCode": "DE",
+    "latitude": 50.0333,
+    "longitude": 8.57056
+  },
+  {
+    "iata": "GDL",
+    "icao": "MMGL",
+    "name": "Guadalajara International Airport",
+    "city": "Guadalajara",
+    "countryCode": "MX",
+    "latitude": 20.5218,
+    "longitude": -103.311
+  },
+  {
+    "iata": "GVA",
+    "icao": "LSGG",
+    "name": "Geneva Cointrin International Airport",
+    "city": "Geneva",
+    "countryCode": "CH",
+    "latitude": 46.2381,
+    "longitude": 6.10895
+  },
+  {
+    "iata": "JFK",
+    "icao": "KJFK",
+    "name": "John F Kennedy International Airport",
+    "city": "New York",
+    "countryCode": "US",
+    "latitude": 40.6398,
+    "longitude": -73.7789
+  },
+  {
+    "iata": "LAX",
+    "icao": "KLAX",
+    "name": "Los Angeles International Airport",
+    "city": "Los Angeles",
+    "countryCode": "US",
+    "latitude": 33.9425,
+    "longitude": -118.408
+  },
+  {
+    "iata": "LHR",
+    "icao": "EGLL",
+    "name": "London Heathrow Airport",
+    "city": "London",
+    "countryCode": "GB",
+    "latitude": 51.4706,
+    "longitude": -0.461941
+  },
+  {
+    "iata": "LIS",
+    "icao": "LPPT",
+    "name": "Humberto Delgado Airport",
+    "city": "Lisbon",
+    "countryCode": "PT",
+    "latitude": 38.7813,
+    "longitude": -9.13592
+  },
+  {
+    "iata": "LYS",
+    "icao": "LFLL",
+    "name": "Lyon Saint-Exupery Airport",
+    "city": "Lyon",
+    "countryCode": "FR",
+    "latitude": 45.7256,
+    "longitude": 5.08111
+  },
+  {
+    "iata": "MAD",
+    "icao": "LEMD",
+    "name": "Adolfo Suarez Madrid-Barajas Airport",
+    "city": "Madrid",
+    "countryCode": "ES",
+    "latitude": 40.4719,
+    "longitude": -3.56264
+  },
+  {
+    "iata": "MEX",
+    "icao": "MMMX",
+    "name": "Benito Juarez International Airport",
+    "city": "Mexico City",
+    "countryCode": "MX",
+    "latitude": 19.4363,
+    "longitude": -99.0721
+  },
+  {
+    "iata": "MIA",
+    "icao": "KMIA",
+    "name": "Miami International Airport",
+    "city": "Miami",
+    "countryCode": "US",
+    "latitude": 25.7932,
+    "longitude": -80.2906
+  },
+  {
+    "iata": "MUC",
+    "icao": "EDDM",
+    "name": "Munich Airport",
+    "city": "Munich",
+    "countryCode": "DE",
+    "latitude": 48.3538,
+    "longitude": 11.7861
+  },
+  {
+    "iata": "NCE",
+    "icao": "LFMN",
+    "name": "Nice-Cote d'Azur Airport",
+    "city": "Nice",
+    "countryCode": "FR",
+    "latitude": 43.6584,
+    "longitude": 7.21587
+  },
+  {
+    "iata": "ORY",
+    "icao": "LFPO",
+    "name": "Paris-Orly Airport",
+    "city": "Paris",
+    "countryCode": "FR",
+    "latitude": 48.7233,
+    "longitude": 2.37944
+  },
+  {
+    "iata": "PVR",
+    "icao": "MMPR",
+    "name": "Licenciado Gustavo Diaz Ordaz International Airport",
+    "city": "Puerto Vallarta",
+    "countryCode": "MX",
+    "latitude": 20.6801,
+    "longitude": -105.254
+  },
+  {
+    "iata": "SFO",
+    "icao": "KSFO",
+    "name": "San Francisco International Airport",
+    "city": "San Francisco",
+    "countryCode": "US",
+    "latitude": 37.619,
+    "longitude": -122.375
+  },
+  {
+    "iata": "TLS",
+    "icao": "LFBO",
+    "name": "Toulouse-Blagnac Airport",
+    "city": "Toulouse",
+    "countryCode": "FR",
+    "latitude": 43.6291,
+    "longitude": 1.36382
+  },
+  {
+    "iata": "YYZ",
+    "icao": "CYYZ",
+    "name": "Lester B. Pearson International Airport",
+    "city": "Toronto",
+    "countryCode": "CA",
+    "latitude": 43.6772,
+    "longitude": -79.6306
+  },
+  {
+    "iata": "ZRH",
+    "icao": "LSZH",
+    "name": "Zurich Airport",
+    "city": "Zurich",
+    "countryCode": "CH",
+    "latitude": 47.4647,
+    "longitude": 8.54917
+  }
+]

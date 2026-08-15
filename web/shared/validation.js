@@ -97,7 +97,7 @@ function runChecks(payload, checks) {
 // sheet-synced read-only). Mirrors the `hasOnly()` list in the rules.
 const GUEST_ALLOWED_FIELDS = [
   "guestId", "identity", "hosting", "idCheckUser", "cloudinaryId", "messageAuthor",
-  "invitationGroup", "updatedBy", "updatedAt", "_deleted", "rsvp",
+  "invitationGroup", "updatedBy", "updatedAt", "_deleted", "rsvp", "flightInfo",
 ];
 
 const GUEST_IDENTITY_FIELDS = [
@@ -107,8 +107,82 @@ const GUEST_IDENTITY_FIELDS = [
 // Fields that clients may MODIFY (mirrors the `affectedKeys().hasOnly()` list).
 const GUEST_WRITABLE_FIELDS = [
   "guestId", "identity", "idCheckUser", "cloudinaryId", "messageAuthor",
-  "invitationGroup", "updatedBy", "updatedAt", "_deleted", "rsvp",
+  "invitationGroup", "updatedBy", "updatedAt", "_deleted", "rsvp", "flightInfo",
 ];
+
+// ── flightInfo (guest flight details for the Travel section) ────────────
+// Mirrors `hasValidFlightInfo()` in firebase/firestore.rules.
+
+const FLIGHT_INFO_FIELDS = [
+  "origin", "connections", "destination", "legs", "arrivalDate", "arrivalTime", "finalFlightNumber",
+  "departure",
+];
+
+const DEPARTURE_FIELDS = [
+  "origin", "connections", "destination", "legs", "departureDate", "departureTime", "finalFlightNumber",
+];
+
+const AIRPORT_FIELDS = [
+  "iata", "icao", "name", "city", "country", "countryCode", "latitude", "longitude",
+];
+
+const LEG_FIELDS = ["from", "to", "flightNumber"];
+
+/** @param {*} value @returns {boolean} */
+function isValidAirport(value) {
+  if (!isObject(value)) return false;
+  if (!hasOnlyKeys(value, AIRPORT_FIELDS)) return false;
+  if (!isShortText(value.iata, 3) || !isNonEmptyString(value.iata)) return false;
+  if (value.icao !== undefined && !isShortText(value.icao, 4)) return false;
+  if (!isShortText(value.name, 200) || !isNonEmptyString(value.name)) return false;
+  if (value.city !== undefined && !isShortText(value.city, 150)) return false;
+  if (value.country !== undefined && !isShortText(value.country, 100)) return false;
+  if (!isShortText(value.countryCode, 2) || !isNonEmptyString(value.countryCode)) return false;
+  if (value.latitude !== undefined && !Number.isFinite(value.latitude)) return false;
+  if (value.longitude !== undefined && !Number.isFinite(value.longitude)) return false;
+  return true;
+}
+
+/** @param {*} value @returns {boolean} */
+function isValidLeg(value) {
+  if (!isObject(value)) return false;
+  if (!hasOnlyKeys(value, LEG_FIELDS)) return false;
+  if (!isShortText(value.from, 3) || !isNonEmptyString(value.from)) return false;
+  if (!isShortText(value.to, 3) || !isNonEmptyString(value.to)) return false;
+  if (value.flightNumber !== undefined && !isShortText(value.flightNumber, 30)) return false;
+  return true;
+}
+
+/** @param {*} value @returns {boolean} */
+function isDateString(value) {
+  return isString(value) && /^\d{4}-\d{2}-\d{2}$/.test(value);
+}
+
+/** @param {*} value @returns {boolean} */
+function isTimeString(value) {
+  return isString(value) && /^\d{2}:\d{2}$/.test(value);
+}
+
+/**
+ * Validate the return-trip (departure) details inside `flightInfo`.
+ * Mirrors `hasValidDeparture()` in firebase/firestore.rules.
+ *
+ * @param {*} value
+ * @returns {boolean}
+ */
+function isValidDeparture(value) {
+  if (!isObject(value)) return false;
+  if (!hasOnlyKeys(value, DEPARTURE_FIELDS)) return false;
+  if (value.origin !== undefined && !isValidAirport(value.origin)) return false;
+  if (value.destination !== undefined && !isValidAirport(value.destination)) return false;
+  if (value.connections !== undefined && !(Array.isArray(value.connections) && value.connections.length <= 3 && value.connections.every(isValidAirport))) return false;
+  if (value.legs !== undefined && !(Array.isArray(value.legs) && value.legs.length <= 4 && value.legs.every(isValidLeg))) return false;
+  if (value.departureDate !== undefined && !isDateString(value.departureDate)) return false;
+  if (value.departureTime !== undefined && !isTimeString(value.departureTime)) return false;
+  if (value.finalFlightNumber !== undefined && !isShortText(value.finalFlightNumber, 30)) return false;
+  return true;
+}
+
 
 
 /**
@@ -156,10 +230,23 @@ export function validateGuestContactPayload(payload) {
     { check: !hasAnyKey(payload, ["rsvp"]) || !hasAnyKey(payload.rsvp, ["answers"]) || isObject(payload.rsvp.answers), message: "rsvp.answers must be an object" },
     { check: !hasAnyKey(payload, ["rsvp"]) || !hasAnyKey(payload.rsvp, ["answers"]) || Object.keys(payload.rsvp.answers).length <= 100, message: "rsvp.answers must have ≤ 100 entries" },
     { check: !hasAnyKey(payload, ["rsvp"]) || !hasAnyKey(payload.rsvp, ["answers"]) || Object.values(payload.rsvp.answers).every((v) => Number.isInteger(v) && v >= 0 && v <= 5), message: "rsvp.answers values must be integers 0–5" },
+    // flightInfo (guest flight details for the Travel section)
+    { check: !hasAnyKey(payload, ["flightInfo"]) || isObject(payload.flightInfo), message: "flightInfo must be an object" },
+    { check: !hasAnyKey(payload, ["flightInfo"]) || hasOnlyKeys(payload.flightInfo, FLIGHT_INFO_FIELDS), message: `flightInfo contains unsupported fields: ${Object.keys(payload.flightInfo || {}).filter((k) => !FLIGHT_INFO_FIELDS.includes(k)).join(", ")}` },
+    { check: !hasAnyKey(payload, ["flightInfo"]) || !hasAnyKey(payload.flightInfo, ["origin"]) || isValidAirport(payload.flightInfo.origin), message: "flightInfo.origin must be a valid airport object" },
+    { check: !hasAnyKey(payload, ["flightInfo"]) || !hasAnyKey(payload.flightInfo, ["destination"]) || isValidAirport(payload.flightInfo.destination), message: "flightInfo.destination must be a valid airport object" },
+    { check: !hasAnyKey(payload, ["flightInfo"]) || !hasAnyKey(payload.flightInfo, ["connections"]) || (Array.isArray(payload.flightInfo.connections) && payload.flightInfo.connections.length <= 3 && payload.flightInfo.connections.every(isValidAirport)), message: "flightInfo.connections must be an array of ≤ 3 valid airports" },
+    { check: !hasAnyKey(payload, ["flightInfo"]) || !hasAnyKey(payload.flightInfo, ["legs"]) || (Array.isArray(payload.flightInfo.legs) && payload.flightInfo.legs.length <= 4 && payload.flightInfo.legs.every(isValidLeg)), message: "flightInfo.legs must be an array of ≤ 4 valid legs" },
+    { check: !hasAnyKey(payload, ["flightInfo"]) || !hasAnyKey(payload.flightInfo, ["arrivalDate"]) || isDateString(payload.flightInfo.arrivalDate), message: "flightInfo.arrivalDate must be a YYYY-MM-DD date" },
+    { check: !hasAnyKey(payload, ["flightInfo"]) || !hasAnyKey(payload.flightInfo, ["arrivalTime"]) || isTimeString(payload.flightInfo.arrivalTime), message: "flightInfo.arrivalTime must be a HH:MM time" },
+    { check: !hasAnyKey(payload, ["flightInfo"]) || !hasAnyKey(payload.flightInfo, ["finalFlightNumber"]) || isShortText(payload.flightInfo.finalFlightNumber, 30), message: "flightInfo.finalFlightNumber must be a string ≤ 30 chars" },
+    // flightInfo.departure (return-trip details for the Travel section)
+    { check: !hasAnyKey(payload, ["flightInfo"]) || !hasAnyKey(payload.flightInfo, ["departure"]) || isValidDeparture(payload.flightInfo.departure), message: "flightInfo.departure must be a valid departure object" },
   ];
 
   return runChecks(payload, checks);
 }
+
 
 // ── Attendance responses validators ─────────────────────────────────────
 // Mirrors `hasValidAttendanceFields()` in firebase/firestore.rules.
@@ -229,6 +316,41 @@ export function validateCardVotePayload(payload) {
     // Field types and values
     { check: isOneOf(payload.cardType, ["food", "music", "guiso"]), message: "cardType must be one of: food, music, guiso" },
     { check: isShortText(payload.cardKey, 100) && isNonEmptyString(payload.cardKey), message: "cardKey must be a non-empty string ≤ 100 chars" },
+    { check: isShortText(payload.guestId, 100) && isNonEmptyString(payload.guestId), message: "guestId must be a non-empty string ≤ 100 chars" },
+    { check: Number.isInteger(payload.rating) && payload.rating >= 1 && payload.rating <= 5, message: "rating must be an integer 1–5" },
+    { check: isShortText(payload.updatedBy, 100) && isNonEmptyString(payload.updatedBy), message: "updatedBy must be a non-empty string ≤ 100 chars" },
+  ];
+
+  return runChecks(payload, checks);
+}
+
+// ── Genre ratings validators ────────────────────────────────────────────
+// Mirrors `hasValidGenreRatingFields()` in firebase/firestore.rules.
+
+const GENRE_RATING_ALLOWED_FIELDS = [
+  "genreId", "genreName", "guestId", "rating", "updatedBy", "updatedAt",
+];
+
+/**
+ * Validate a payload intended for the `genre_ratings` collection.
+ * Mirrors `hasValidGenreRatingFields()` in the rules.
+ *
+ * @param {Object} payload  the payload to validate (before setDoc)
+ * @returns {{ valid: boolean, errors: string[] }}
+ */
+export function validateGenreRatingPayload(payload) {
+  if (!isObject(payload)) {
+    return { valid: false, errors: ["payload must be an object"] };
+  }
+
+  const checks = [
+    // Required fields
+    { check: hasAllKeys(payload, GENRE_RATING_ALLOWED_FIELDS), message: "missing required fields: genreId, genreName, guestId, rating, updatedBy, updatedAt" },
+    // Allowed fields only
+    { check: hasOnlyKeys(payload, GENRE_RATING_ALLOWED_FIELDS), message: `payload contains fields not in the allowed schema: ${Object.keys(payload).filter((k) => !GENRE_RATING_ALLOWED_FIELDS.includes(k)).join(", ")}` },
+    // Field types and values
+    { check: isShortText(payload.genreId, 100) && isNonEmptyString(payload.genreId), message: "genreId must be a non-empty string ≤ 100 chars" },
+    { check: isShortText(payload.genreName, 200) && isNonEmptyString(payload.genreName), message: "genreName must be a non-empty string ≤ 200 chars" },
     { check: isShortText(payload.guestId, 100) && isNonEmptyString(payload.guestId), message: "guestId must be a non-empty string ≤ 100 chars" },
     { check: Number.isInteger(payload.rating) && payload.rating >= 1 && payload.rating <= 5, message: "rating must be an integer 1–5" },
     { check: isShortText(payload.updatedBy, 100) && isNonEmptyString(payload.updatedBy), message: "updatedBy must be a non-empty string ≤ 100 chars" },

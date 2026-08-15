@@ -13,7 +13,10 @@
  *   - coast_interest          (coast form submitted)
  *   - attendance_responses    (save-the-date attendance saved)
  *   - card_votes              (star rating on an experience card)
- *   - guests                  (identity check, name/photo/phone, RSVP answers)
+ *   - guests                  (identity check, name/photo/phone, RSVP answers,
+ *                              flight details, travel mode, messages, hosting)
+ *                             Notifications include the guest's avatar photo.
+
  *
  * Configuration (set once, secrets stay server-side):
  *   firebase functions:config:set telegram.token="<BOT_TOKEN>" telegram.chat_id="<CHAT_ID>"
@@ -25,7 +28,8 @@ import { onDocumentCreated, onDocumentUpdated } from "firebase-functions/v2/fire
 import { defineSecret } from "firebase-functions/params";
 import { setGlobalOptions } from "firebase-functions/v2";
 
-import { sendTelegramMessage, escapeMarkdown } from "./telegram.js";
+import { sendTelegramMessage, sendTelegramPhoto, escapeMarkdown } from "./telegram.js";
+
 
 initializeApp();
 
@@ -104,6 +108,24 @@ async function resolveGuestName(guestId) {
 function kv(key, value) {
   return `${escapeMarkdown(key)}: ${escapeMarkdown(value)}`;
 }
+
+// Cloudinary cloud name is public (embedded in every delivery URL), so it is
+// safe to hard-code here. Guest avatars are stored under the `boda/` folder.
+const CLOUD_NAME = "k2ajcgxv";
+
+/**
+ * Build a small square Cloudinary delivery URL for a guest's avatar photo.
+ * The guest's `cloudinaryId` is stored relative to the `boda/` prefix, so the
+ * full public id is `boda/<cloudinaryId>`. Returns null when absent.
+ * @param {object} guest  a guest document (or the identity sub-object)
+ * @returns {string|null}
+ */
+function resolveGuestPhotoUrl(guest) {
+  const publicId = guest?.identity?.cloudinaryId || guest?.cloudinaryId;
+  if (!publicId) return null;
+  return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/w_256,h_256,c_fill,g_auto/boda/${publicId}`;
+}
+
 
 // ── Login events ───────────────────────────────────────────────────────────
 
@@ -349,6 +371,34 @@ export const onGuestUpdated = onDocumentUpdated(
       changes.push("📝 *Actualizó sus respuestas RSVP*");
     }
 
+    // Flight details added/changed (arrival and/or return trip).
+    const beforeFlight = JSON.stringify(before.flightInfo || {});
+    const afterFlight = JSON.stringify(after.flightInfo || {});
+    if (beforeFlight !== afterFlight && Object.keys(after.flightInfo || {}).length > 0) {
+      changes.push("✈️ *Actualizó sus datos de vuelo*");
+    }
+
+    // Travel mode changed (flies in vs. local).
+    const beforePlane = before.travelsByPlane === true;
+    const afterPlane = after.travelsByPlane === true;
+    if (beforePlane !== afterPlane) {
+      changes.push(afterPlane ? "✈️ *Indicó que viaja en avión*" : "🚗 *Indicó que no viaja en avión*");
+    }
+
+    // Guest wrote a message to the couple.
+    const beforeMsg = before.messageAuthor || "";
+    const afterMsg = after.messageAuthor || "";
+    if (beforeMsg !== afterMsg && afterMsg) {
+      changes.push("💬 *Escribió un mensaje*");
+    }
+
+    // Cabin / hosting assignment changed.
+    const beforeHosting = JSON.stringify(before.hosting || {});
+    const afterHosting = JSON.stringify(after.hosting || {});
+    if (beforeHosting !== afterHosting && Object.keys(after.hosting || {}).length > 0) {
+      changes.push("🏠 *Actualizó su alojamiento*");
+    }
+
     if (changes.length === 0) return;
 
     const lines = [
@@ -357,7 +407,22 @@ export const onGuestUpdated = onDocumentUpdated(
       ...changes,
       kv("Hora", formatTime(after.updatedAt)),
     ];
-    await notify(lines.filter(Boolean).join("\n"));
+    const text = lines.filter(Boolean).join("\n");
+
+    // Send the guest's avatar photo with the notification as its caption when
+    // available; otherwise fall back to a plain text message.
+    const photoUrl = resolveGuestPhotoUrl(after);
+    if (photoUrl) {
+      await sendTelegramPhoto(photoUrl, {
+        token: TELEGRAM_TOKEN.value(),
+        chatId: TELEGRAM_CHAT_ID.value(),
+        caption: text,
+        parseMode: "MarkdownV2",
+      });
+    } else {
+      await notify(text);
+    }
 
   },
 );
+

@@ -738,4 +738,274 @@
   transform-origin: center;
 }
 
+/* ── Music genre survey ─────────────────────────────────────────────────
+   The "Rate the music you love" survey lets guests rate curated genres
+   (Mexican Regional, Serbia/Balkans, Latina/Caribe, etc.) with 1–5 stars and
+   search for obscure genres via MusicBrainz. It sits on the dark music
+   background, so it uses light text and the theme accent. */
+.genre-survey {
+  margin: clamp(3rem, 6vw, 6rem) 0;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: 1.25rem;
+  background: var(--music-panel-bg);
+  color: var(--white);
+}
+
+.genre-survey__intro {
+  max-width: 42rem;
+  margin: 0 0 2rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2.4vw, 1.8rem);
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--white);
+}
+
+/* Search box */
+.genre-survey__search {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.genre-survey__search-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 60%);
+}
+
+.genre-survey__search-input {
+  width: 100%;
+  max-width: 30rem;
+  border: 1px solid rgb(255 255 255 / 28%);
+  border-radius: 0.75rem;
+  padding: 0.8rem 1rem;
+  background: rgb(255 255 255 / 8%);
+  color: var(--white);
+  font-size: 1rem;
+}
+
+.genre-survey__search-input::placeholder {
+  color: rgb(255 255 255 / 45%);
+}
+
+.genre-survey__search-input:focus-visible {
+  outline: 2px solid var(--music-accent);
+  outline-offset: 2px;
+}
+
+.genre-survey__searching {
+  font-size: 0.85rem;
+  color: rgb(255 255 255 / 60%);
+}
+
+.genre-survey__search-error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #ffb4a2;
+}
+
+/* Search results */
+.genre-survey__results {
+  margin-bottom: 2rem;
+}
+
+.genre-survey__results-title {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  font-weight: 400;
+}
+
+.genre-survey__results-list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Catalog */
+.genre-survey__catalog {
+  display: grid;
+  gap: 1rem;
+}
+
+.genre-survey__category {
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 1rem;
+  overflow: hidden;
+  background: rgb(255 255 255 / 4%);
+}
+
+.genre-survey__category-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.1rem;
+}
+
+.genre-survey__category-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  border: 0;
+  background: none;
+  color: var(--white);
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.genre-survey__category-toggle:focus-visible {
+  outline: 2px solid var(--music-accent);
+  outline-offset: 2px;
+  border-radius: 0.4rem;
+}
+
+.genre-survey__chevron {
+  color: var(--music-accent);
+  font-size: 0.8rem;
+  transition: transform 160ms ease;
+}
+
+.genre-survey__subgenres {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0 1.1rem 1rem;
+  list-style: none;
+}
+
+.genre-survey__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 0.2rem;
+  border-top: 1px solid rgb(255 255 255 / 10%);
+}
+
+.genre-survey__row-name {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.genre-survey__name {
+  font-weight: 600;
+}
+
+.genre-survey__region {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 50%);
+}
+
+/* ── Genre vote (1–5 stars) ───────────────────────────────────────────── */
+.genre-vote {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.genre-vote__stars {
+  display: inline-flex;
+  gap: 0.15rem;
+}
+
+.genre-vote__star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: rgb(255 255 255 / 30%);
+  cursor: pointer;
+  transition: color 120ms ease, transform 120ms ease;
+}
+
+.genre-vote__star svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: currentColor;
+}
+
+.genre-vote__star:hover {
+  transform: scale(1.15);
+}
+
+.genre-vote__star.is-filled {
+  color: var(--music-accent);
+}
+
+.genre-vote__star:focus-visible {
+  outline: 2px solid var(--music-accent);
+  outline-offset: 2px;
+  border-radius: 0.3rem;
+}
+
+.genre-vote__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  color: rgb(255 255 255 / 70%);
+}
+
+.genre-vote__average {
+  font-weight: 700;
+  color: var(--music-accent);
+}
+
+.genre-vote__count {
+  font-weight: 400;
+  color: rgb(255 255 255 / 55%);
+}
+
+.genre-vote__empty {
+  font-style: italic;
+  color: rgb(255 255 255 / 45%);
+}
+
+.genre-vote__mine {
+  font-size: 0.75rem;
+  color: rgb(255 255 255 / 60%);
+}
+
+.genre-vote__error {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #ffb4a2;
+}
+
+@media (max-width: 899px) {
+  .genre-survey {
+    padding: 1.25rem;
+  }
+
+  .genre-survey__category-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .genre-survey__row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+
 
