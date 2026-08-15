@@ -93,6 +93,59 @@ export async function loadCardVotes(cardType, cardKey) {
 }
 
 /**
+ * Load all of a single guest's votes for a given card type.
+ *
+ * Useful for building a "pre-order" from the guest's own star ratings (e.g.
+ * rank the guisos by their 5-star dishes first, then 4-star, etc.).
+ *
+ * @param {string} cardType  "food" | "music" | "guiso"
+ * @param {string} guestId   the voting guest's id (== auth uid)
+ * @returns {Promise<Object[]>} array of vote documents for this guest
+ */
+export async function loadGuestCardVotes(cardType, guestId) {
+  try {
+    if (!cardType || !guestId) {
+      console.warn("[card-votes] Missing cardType/guestId; skipping load");
+      return [];
+    }
+    logDb("read:start", {
+      collection: collections.cardVotes,
+      op: "getDocs",
+      where: { cardType, guestId },
+    });
+    const q = query(
+      collection(db, collections.cardVotes),
+      where("cardType", "==", cardType),
+      where("guestId", "==", guestId),
+    );
+
+    const snapshot = await getDocs(q);
+    const votes = [];
+    snapshot.forEach((docSnap) => {
+      const data = docSnap.data();
+      voteCache.set(docSnap.id, data);
+      votes.push(data);
+    });
+    logDb("read:success", {
+      collection: collections.cardVotes,
+      op: "getDocs",
+      where: { cardType, guestId },
+      size: snapshot.size,
+    });
+    return votes;
+  } catch (error) {
+    logDb("read:error", {
+      collection: collections.cardVotes,
+      op: "getDocs",
+      where: { cardType, guestId },
+      error: error.message,
+    });
+    console.warn("[card-votes] Could not load guest card votes", error.message);
+    return [];
+  }
+}
+
+/**
  * Save (create or update) a guest's star rating for a card.
  *
  * @param {Object} input
@@ -103,6 +156,7 @@ export async function loadCardVotes(cardType, cardKey) {
  * @returns {Promise<void>}
  */
 export async function saveCardVote({ cardType, cardKey, guestId, rating }) {
+
   if (!cardType || !cardKey || !guestId) {
     throw new Error("Missing cardType, cardKey or guestId");
   }

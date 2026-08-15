@@ -270,6 +270,95 @@ export function buildCardVotePayload({ cardType, cardKey, guestId, rating, times
 }
 
 
+// ── Guiso rankings collection ──────────────────────────────────────────
+
+/**
+ * Build a payload for saving a guest's ranked ordering of the guisos dishes.
+ *
+ * One document per guest, stored under `guiso_rankings/{guestId}`. The
+ * `ranking` array holds the dish names in the guest's preferred order (1st
+ * element = favourite, last = least favourite). The `selected` array holds the
+ * dish names the guest marked as "in the menu" (the top 9). Both arrays are
+ * validated to contain only known dish names and to have no duplicates.
+ *
+ * @param {Object} input
+ * @param {string} input.guestId   the ranking guest's id (== auth uid)
+ * @param {string[]} input.ranking  dish names in order 1..N (all 20 dishes)
+ * @param {string[]} input.selected dish names marked as in the menu (top 9)
+ * @param {*} input.timestamp       e.g. serverTimestamp()
+ * @returns {Object} explicit payload for setDoc(..., { merge: true })
+ */
+export function buildGuisoRankingPayload({ guestId, ranking, selected, timestamp }) {
+  return {
+    guestId: String(guestId ?? "").trim(),
+    ranking: Array.isArray(ranking) ? ranking.map((d) => String(d).trim()) : [],
+    selected: Array.isArray(selected) ? selected.map((d) => String(d).trim()) : [],
+    updatedBy: String(guestId ?? "").trim(),
+    updatedAt: timestamp,
+  };
+}
+
+
+// ── Song requests collection ────────────────────────────────────────────
+
+/**
+ * Build a payload for saving a guest's song request.
+ *
+ * One document per request, stored under `song_requests/{requestId}` (an
+ * auto-generated id). The `song` field holds the requested title (and artist
+ * if provided), and `intent` is one of the allowed intents (e.g. "hear",
+ * "sing", "karaoke", "band"). The guest may only create their own requests.
+ *
+ * When the guest picks a song from the autocomplete, `songMeta` carries the
+ * normalized song identity (title, artist, year, external id, source, isrc)
+ * so the external source can be referenced later. Song identity is kept
+ * separate from the event request (`intent`), so future event-specific
+ * metadata (singer, key, notes…) can be added as sibling fields without
+ * touching the song identity.
+ *
+ * @param {Object} input
+ * @param {string} input.guestId   the requesting guest's id (== auth uid)
+ * @param {string} input.song      the requested song title (and artist)
+ * @param {string} input.intent    one of the allowed intents
+ * @param {string} [input.bandType] which live band should play it, only when
+ *                                  intent == "band" (marimba | mariachi |
+ *                                  norteno | frenchBand). Optional.
+ * @param {Object} [input.songMeta] normalized song identity (optional)
+ * @param {*} input.timestamp      e.g. serverTimestamp()
+ * @returns {Object} explicit payload for addDoc(...)
+ */
+export function buildSongRequestPayload({ guestId, song, intent, bandType, songMeta, timestamp }) {
+  const payload = {
+    guestId: String(guestId ?? "").trim(),
+    song: String(song ?? "").trim(),
+    intent: String(intent ?? "").trim(),
+    updatedBy: String(guestId ?? "").trim(),
+    updatedAt: timestamp,
+  };
+
+  // Optional band type, only meaningful when the guest wants a live band.
+  if (bandType) {
+    payload.bandType = String(bandType).trim();
+  }
+
+
+  if (songMeta && typeof songMeta === "object") {
+    const meta = {};
+    if (songMeta.title) meta.title = String(songMeta.title).trim();
+    if (songMeta.artist) meta.artist = String(songMeta.artist).trim();
+    if (songMeta.year) meta.year = Number(songMeta.year);
+    if (songMeta.externalId) meta.externalId = String(songMeta.externalId).trim();
+    if (songMeta.source) meta.source = String(songMeta.source).trim();
+    if (songMeta.isrc) meta.isrc = String(songMeta.isrc).trim();
+    if (Object.keys(meta).length > 0) payload.songMeta = meta;
+  }
+
+  return payload;
+}
+
+
+
+
 // ── Invitation groups collection ───────────────────────────────────────
 
 
@@ -382,4 +471,3 @@ export function buildDashboardGuestInlinePayload(guestId, field, value, invitati
     ...payload,
   };
 }
-

@@ -10,8 +10,11 @@ import { loadCardVotes, saveCardVote } from "../card-votes.js";
  * Props:
  *   cardType  "food" | "music"
  *   cardKey   the flavour key (e.g. "carnitas") or act name
+ *   onVote    optional callback fired after a successful save, with
+ *             { cardKey, rating } so a parent can react to the new rating.
  */
-export function StarVote({ cardType, cardKey }) {
+export function StarVote({ cardType, cardKey, onVote }) {
+
   const { t, profile } = useApp();
   const guestId = profile?.guest?.id;
 
@@ -21,7 +24,8 @@ export function StarVote({ cardType, cardKey }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
-  const voteLabel = t?.vote || {};
+  const voteLabel = t?.food?.vote || {};
+
 
   // Load existing votes for this card once the guest is known.
   useEffect(() => {
@@ -58,6 +62,8 @@ export function StarVote({ cardType, cardKey }) {
         // Refresh the aggregate from Firestore so the average/count update.
         const loaded = await loadCardVotes(cardType, cardKey);
         setVotes(loaded);
+        // Let a parent (e.g. the guisos reorder panel) react to the new rating.
+        onVote?.({ cardKey, rating });
       } catch (err) {
         console.warn("[StarVote] save failed", err);
         setError(voteLabel.error || "Could not save your rating");
@@ -65,8 +71,9 @@ export function StarVote({ cardType, cardKey }) {
         setSaving(false);
       }
     },
-    [cardType, cardKey, guestId, saving, voteLabel.error],
+    [cardType, cardKey, guestId, saving, voteLabel.error, onVote],
   );
+
 
   if (!guestId) return null;
 

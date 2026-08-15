@@ -11,7 +11,7 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 0;
-  margin-bottom: clamp(4rem, 8vw, 8rem);
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
 }
 
 .travel-heading .eyebrow {
@@ -47,6 +47,21 @@
   color: var(--marigold);
   opacity: 0.55;
   pointer-events: none;
+}
+
+/* ── Background mood ────────────────────────────────────────────────────
+   The Travel section always uses the "ciel" (Vol de nuit / Ciel étoilé)
+   mood. It overrides the story-bg orb/sparkle/bloom/vignette palette with a
+   deep indigo sky, cool blues and a golden starfield. */
+.travel-bg--ciel {
+  --orb-a: rgb(64 84 138 / 55%);
+  --orb-b: rgb(41 59 104 / 55%);
+  --orb-c: rgb(122 139 122 / 30%);
+  --orb-d: rgb(198 139 43 / 30%);
+  --orb-e: rgb(255 183 77 / 16%);
+  --sparkle: rgb(255 255 255 / 95%);
+  --bloom: rgb(255 183 77 / 14%);
+  --vignette: rgb(10 14 28 / 62%);
 }
 
 .travel-layout {
@@ -112,3 +127,4 @@
 .travel-vuelos:hover img {
   transform: scale(1.02);
 }
+

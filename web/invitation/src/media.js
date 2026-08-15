@@ -96,6 +96,10 @@ export const MEDIA = {
     nopales: cloudinaryImage("nopales_kyhrzh", { width: 600, height: 450, crop: "fill" }),
     pizza: cloudinaryImage("pizza_cxhngb", { width: 600, height: 450, crop: "fill" }),
     taquiza: cloudinaryImage("taquiza_zkqygq", { width: 600, height: 450, crop: "fill" }),
+    // Doña Carmen — the cook behind the guisos. Used as a small circular badge
+    // on the taquiza card and as a soft background motif in the guisos section.
+    donaCarmen: cloudinaryImage("doña_carmen_cjsnz7", { width: 200, height: 200, crop: "fill" }),
+
     tejuino: cloudinaryImage("tejuino_davqad", { width: 600, height: 450, crop: "fill" }),
     tequila: cloudinaryImage("tequila_k7ewqm", { width: 600, height: 450, crop: "fill" }),
     // Dessert cards (previously missing photos).
@@ -150,6 +154,13 @@ export const MEDIA = {
   // timeline items (the "PROGRAMME DÉTAILLÉ" list). Lives at the account root
   // (not under `boda/`), so it is built directly with cloudinaryImage.
   parchment: cloudinaryImage("parch_m0kxlx", { width: 1200 }),
+
+  // Papel picado (colourful cut-paper bunting) used as an alternative
+  // background for the detailed programme, selectable by the guest. Lives at
+  // the account root (not under `boda/`), so it is built directly with
+  // cloudinaryImage.
+  picado: cloudinaryImage("picado_irksg5", { width: 1200 }),
+
 
 
   // Pétanque club logo (GDL), used as a large, blurred, far-away background

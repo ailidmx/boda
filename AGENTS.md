@@ -225,6 +225,48 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   the function logs `No value found for secret parameter ...` and skips the
   notification. Verify with `firebase functions:list` (secrets shown) and
   `gcloud logging read 'resource.labels.service_name="onlogin"'`.
+- **Travel-by-plane flag is `travelsByPlane` (boolean), NOT `travelStatus`** —
+  The FLIGHTS ("Je viens de loin") section visibility, the nav link, and the
+  "next section" bottom links all depend on whether the guest flies in. The
+  source of truth on the guest's Firestore record is the boolean
+  `travelsByPlane` (true = flies in). There is NO `travelStatus` field in the
+  data (0 of 262 guests have it). Always read it via the
+  `guestTravelsByPlane(profile?.guest)` helper in `guest-profiles.js` (which
+  also accepts the legacy `travelStatus` string for backward compatibility) —
+  never read `profile?.guest?.travelStatus` directly, or the section will be
+  hidden for everyone.
+- **`story-bg.css` MUST be imported in `main.jsx`** — The `.story-bg` class
+  (used on most sections: Food, Travel, RSVP, Accommodation, Photos, Story,
+  Attire, Venue, Petanque, Music, Guisos, Weather, Gift, Weekend) renders the
+  animated orbs/sparkles/bloom/vignette via `::before`/`::after`. If
+  `web/invitation/src/styles/story-bg.css` is not imported in `main.jsx`, the
+  class has NO styles and every section silently loses its background effects.
+  It must be imported BEFORE `travel.css` so the Travel mood overrides
+  (`.travel-bg--<id>`) come after the base `.travel-section` palette in the
+  cascade and win. If you add a new section that uses `story-bg`, verify the
+  import is present and ordered correctly.
+- **Song-request search is isolated behind a service + provider** — the
+  "Pide tu canción" section (`SongRequest.jsx`) never talks to MusicBrainz
+  directly. It uses `createSongSearchService()` from
+  `web/invitation/src/song-search/song-search-service.js`, which enforces a
+  minimum query length (`MIN_QUERY_LENGTH = 2`), caches results per query, and
+  delegates to an injectable provider (`musicbrainz-provider.js`). The provider
+  normalizes raw recordings into the internal `SongSearchResult` shape
+  (`title`, `artist`, `year`, `externalId`, `source`, `isrc`) and dedupes by
+  (title+artist) preferring ISRC then earliest year. The UI owns debouncing
+  (~600ms) and aborting stale requests via `AbortController`. When adding a new
+  search source, add a provider and inject it — don't touch the UI or the
+  persistence layer. Unit tests live in `tests/song-search.test.mjs`.
+- **Song-request persistence uses a `songMeta` field** — the guest's chosen
+  song identity (title, artist, year, MusicBrainz id, isrc) is stored in the
+  `songMeta` field of the `song_requests` doc, separate from the free-text
+  `song` and the `intent`. `buildSongRequestPayload` (payload-builders) and
+  `validateSongRequestPayload` (validation) both accept `songMeta`; the
+  Firestore rules allow it. If the search finds nothing, the guest can still
+  type a free-text title (no `songMeta`).
 - *(Add new lessons here as you discover them.)*
+
+
+
 
 

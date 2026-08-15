@@ -10,6 +10,8 @@ import { LanguageModal } from "./components/LanguageModal.jsx";
 import { IdentityModal } from "./components/IdentityModal.jsx";
 import { WinampPlayer } from "./components/WinampPlayer.jsx";
 import { useVersionCheck } from "./hooks/useVersionCheck.js";
+import { guestTravelsByPlane } from "./guest-profiles.js";
+
 
 
 // Below-the-fold sections are code-split and only mounted (and their JS chunk
@@ -45,10 +47,17 @@ const Weather = lazy(() =>
 const Food = lazy(() =>
   import("./components/Food.jsx").then((m) => ({ default: m.Food })),
 );
+const Guisos = lazy(() =>
+  import("./components/Guisos.jsx").then((m) => ({ default: m.Guisos })),
+);
 const Music = lazy(() =>
   import("./components/Music.jsx").then((m) => ({ default: m.Music })),
 );
+const SongRequest = lazy(() =>
+  import("./components/SongRequest.jsx").then((m) => ({ default: m.SongRequest })),
+);
 const Travel = lazy(() =>
+
   import("./components/Travel.jsx").then((m) => ({ default: m.Travel })),
 );
 const Attire = lazy(() =>
@@ -93,12 +102,10 @@ function Invitation() {
   // section is hidden entirely: it is removed from the DOM, from the nav menu,
   // and from the "next section" bottom links.
   //
-  // The guest's travel status is stored on the guest doc as `travelStatus`
-  // ("booked" | "planning" | "local"). Guests who travel by plane are those
-  // who are NOT local.
-  const travelsByPlane = ["booked", "planning"].includes(
-    profile?.guest?.travelStatus,
-  );
+  // The guest's travel status is stored on the guest doc as the boolean
+  // `travelsByPlane` (true = flies in). See guestTravelsByPlane().
+  const travelsByPlane = guestTravelsByPlane(profile?.guest);
+
 
 
   // Force guests onto the latest deployed version: periodically compare the
@@ -208,12 +215,26 @@ function Invitation() {
             <Food />
           </Suspense>
         </LazySection>
+        {/* "¿Qué guisos?" — menu vote, placed right after the food section. */}
+        <LazySection id="guisos" className="lazy-section">
+          <Suspense fallback={null}>
+            <Guisos />
+          </Suspense>
+        </LazySection>
         <LazySection id="music" className="lazy-section">
           <Suspense fallback={null}>
             <Music />
           </Suspense>
         </LazySection>
+        {/* "Pide tu canción" — interactive song-request section, placed right
+            after the music section. */}
+        <LazySection id="song-request" className="lazy-section">
+          <Suspense fallback={null}>
+            <SongRequest />
+          </Suspense>
+        </LazySection>
         <LazySection id="coast" className="lazy-section">
+
           <Suspense fallback={null}>
             <Coast />
           </Suspense>

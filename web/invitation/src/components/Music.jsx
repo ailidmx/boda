@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 import { EVENT } from "../content.js";
 import { MEDIA } from "../media.js";
 import { useApp } from "../context/AppContext.jsx";
@@ -8,7 +8,7 @@ import { StarVote } from "./StarVote.jsx";
 
 
 export function Music() {
-  const { t } = useApp();
+  const { t, musicEnabled, setMusicEnabled, musicPlaying } = useApp();
   const music = t.music || {};
   // The final chosen background theme is "arty". The temporary theme selector
   // was removed; the section always uses the ARTY variant.
@@ -19,13 +19,87 @@ export function Music() {
     ["shared", EVENT.playlists.shared],
   ];
 
+  // The section's root element, observed so we can auto-start the music stream
+  // the first time the guest scrolls into the Music section.
+  const sectionRef = useRef(null);
+  const autoStartedRef = useRef(false);
+
+  // Auto-play the music stream the first time the Music section scrolls into
+  // view. Scrolling is a user gesture, so the browser generally allows the
+  // audio to start. We only do this once per session; afterwards the guest is
+  // in full control via the FAB.
+  useEffect(() => {
+    const section = sectionRef.current;
+    if (!section) return undefined;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && !autoStartedRef.current) {
+            autoStartedRef.current = true;
+            setMusicEnabled(true);
+            observer.disconnect();
+          }
+        });
+      },
+      { threshold: 0.35 },
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, [setMusicEnabled]);
+
+  // Toggle the music stream on/off from the FAB. When turned off, the player
+  // closes and the button shows a crossed-out note; turning it back on resumes
+  // playback.
+  const handleToggleMusic = () => {
+    setMusicEnabled(!musicEnabled);
+  };
+
   return (
     <section
+      ref={sectionRef}
       className={`music-section section story-bg music-theme--${theme}`}
       id="music"
     >
 
+      {/* Floating action button: clearly shows whether the music stream is
+          playing (animated equalizer) or muted (crossed-out note). Clicking it
+          toggles the stream on/off. */}
+      <button
+        type="button"
+        className={`music-fab${musicPlaying ? " is-playing" : " is-muted"}`}
+        onClick={handleToggleMusic}
+        aria-pressed={musicPlaying}
+        aria-label={
+          musicPlaying
+            ? (music.fabPlayingLabel || "Música en reproducción")
+            : (music.fabMutedLabel || "Música silenciada")
+        }
+        title={
+          musicPlaying
+            ? (music.fabPlayingLabel || "Música en reproducción")
+            : (music.fabMutedLabel || "Música silenciada")
+        }
+      >
+        <span className="music-fab__icon" aria-hidden="true">
+          <span className="music-fab__note">♪</span>
+          <span className="music-fab__bars">
+            <i />
+            <i />
+            <i />
+            <i />
+          </span>
+        </span>
+        <span className="music-fab__label">
+          {musicPlaying
+            ? (music.fabPlayingLabel || "En directo")
+            : (music.fabMutedLabel || "Silenciado")}
+        </span>
+      </button>
+
       <div className="experience-heading reveal">
+
         <p className="eyebrow">{music.eyebrow}</p>
         <h2>{music.title}</h2>
         <p className="lead">{music.body}</p>

@@ -621,3 +621,121 @@
   }
 }
 
+/* ── Music FAB (floating action button) ─────────────────────────────────
+   A fixed pill in the bottom-right corner of the Music section that clearly
+   shows whether the music stream is playing (animated equalizer) or muted
+   (crossed-out note). Clicking it toggles the stream on/off. */
+.music-fab {
+  position: fixed;
+  z-index: 60;
+  right: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 3vw, 2rem);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: 999px;
+  padding: 0.7rem 1.1rem 0.7rem 0.85rem;
+  background: var(--music-accent);
+  color: var(--music-on-accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  box-shadow: 0 0.6rem 1.8rem rgb(0 0 0 / 45%);
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease,
+    opacity 180ms ease;
+}
+
+.music-fab:hover {
+  transform: translateY(-2px);
+  border-color: rgb(255 255 255 / 60%);
+}
+
+.music-fab:focus-visible {
+  outline: 2px solid var(--white);
+  outline-offset: 2px;
+}
+
+/* The icon wraps the note glyph and the animated equalizer bars. */
+.music-fab__icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.music-fab__note {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+/* Equalizer bars: only shown (and animated) while the stream is playing. */
+.music-fab__bars {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+}
+
+.music-fab__bars i {
+  display: block;
+  width: 3px;
+  border-radius: 2px;
+  background: currentColor;
+  animation: music-fab-bounce 1s ease-in-out infinite;
+}
+
+.music-fab__bars i:nth-child(1) { height: 40%; animation-delay: 0s; }
+.music-fab__bars i:nth-child(2) { height: 90%; animation-delay: 0.15s; }
+.music-fab__bars i:nth-child(3) { height: 60%; animation-delay: 0.3s; }
+.music-fab__bars i:nth-child(4) { height: 100%; animation-delay: 0.45s; }
+
+@keyframes music-fab-bounce {
+  0%, 100% { transform: scaleY(0.5); }
+  50% { transform: scaleY(1); }
+}
+
+/* While playing: show the animated bars over the note. */
+.music-fab.is-playing .music-fab__bars {
+  display: flex;
+}
+
+.music-fab.is-playing .music-fab__note {
+  opacity: 0.25;
+}
+
+/* While muted: cross out the note with a diagonal line to clearly signal
+   "no more music". */
+.music-fab.is-muted {
+  background: rgb(255 255 255 / 12%);
+  color: rgb(255 255 255 / 70%);
+  border-color: rgb(255 255 255 / 25%);
+}
+
+.music-fab.is-muted .music-fab__note {
+  position: relative;
+  opacity: 0.55;
+}
+
+.music-fab.is-muted .music-fab__note::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -0.15rem;
+  right: -0.15rem;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transform: rotate(-45deg);
+  transform-origin: center;
+}
+
+

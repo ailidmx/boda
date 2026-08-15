@@ -694,8 +694,16 @@
 
 .hero-invitation__message {
   font: inherit;
+  font-size: 1rem;
   line-height: 1.22;
 }
+
+@media (min-width: 768px) {
+  .hero-invitation__message {
+    font-size: 2rem;
+  }
+}
+
 
 /* Citation author: plain italic light text, no badge, no calligraphy. The
    em-dash ::before reads as the classic "— author" attribution. */
