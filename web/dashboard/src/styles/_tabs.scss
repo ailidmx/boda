@@ -5,8 +5,8 @@
   display: flex;
   gap: 0.35rem;
   margin: 1.5rem 0 0;
-  padding: 0.35rem;
-  border-radius: 1rem;
+  padding: 0.4rem;
+  border-radius: 0.5rem;
   background: rgba(85, 69, 45, 0.08);
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
@@ -16,9 +16,9 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.6rem 1rem;
+  padding: 0.7rem 1.1rem;
   border: 0;
-  border-radius: 0.75rem;
+  border-radius: 0.4rem;
   background: transparent;
   color: $ink-muted;
   cursor: pointer;
@@ -26,6 +26,7 @@
   font-weight: 500;
   white-space: nowrap;
   transition: background 0.15s ease, color 0.15s ease;
+
 
   &:hover {
     background: rgba(85, 69, 45, 0.08);

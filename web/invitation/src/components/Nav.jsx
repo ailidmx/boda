@@ -329,22 +329,11 @@ function UserMenu() {
               <span className="user-menu__item-icon">📷</span>
               {identity.changePhoto}
             </button>
-            {isAdmin && (
-
-              <a
-                className="user-menu__item user-menu__item--admin"
-                href="/dashboard"
-                data-analytics="menu.dashboard"
-                onClick={() => setOpen(false)}
-              >
-                <span className="user-menu__item-icon">📊</span>
-                {nav.dashboard}
-              </a>
-            )}
             <button
               className="user-menu__item"
               type="button"
               data-analytics="menu.email"
+
               onClick={() => openAccountModal("email")}
             >
               <span className="user-menu__item-icon">✉</span>
@@ -392,6 +381,18 @@ function UserMenu() {
               {nav.aboutTitle}
             </button>
 
+            {isAdmin && (
+              <a
+                className="user-menu__item user-menu__item--admin"
+                href="/dashboard"
+                data-analytics="menu.dashboard"
+                onClick={() => setOpen(false)}
+              >
+                <span className="user-menu__item-icon">📊</span>
+                {nav.dashboard}
+              </a>
+            )}
+
             <button
               className="user-menu__item user-menu__item--danger"
               type="button"
@@ -401,6 +402,7 @@ function UserMenu() {
               <span className="user-menu__item-icon">↪</span>
               {nav.logout}
             </button>
+
 
 
 

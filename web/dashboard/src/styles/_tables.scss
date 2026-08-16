@@ -10,7 +10,7 @@
 
 .dashboard-table-card {
   border: 1px solid $border;
-  border-radius: 0.85rem;
+  border-radius: 0.5rem;
   background: $card-bg;
   overflow: hidden;
 }
@@ -20,7 +20,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  padding: 0.75rem 1rem;
+  padding: 0.9rem 1.15rem;
   background: $dark;
   color: $white;
 
@@ -32,10 +32,11 @@
 }
 
 .dashboard-table-card-body {
-  padding: 1rem;
+  padding: 1.15rem;
   display: grid;
   gap: 0.5rem;
 }
+
 
 .dashboard-table-guest {
   display: flex;
