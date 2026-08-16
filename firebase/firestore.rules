@@ -2,974 +2,166 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Any authenticated user whose auth UID matches an existing guest document
-    // (in `guests/{auth.uid}`) is an invited guest and may submit the RSVP,
-    // experience, coast, and petanque forms. Auth UIDs are set to the guest ID
-    // (from the Google Sheet `ID` column), so this reliably links the auth
-    // account to a real guest record.
-    function isInvitedGuest() {
-      return request.auth != null
-        && exists(/databases/$(database)/documents/guests/$(request.auth.uid));
-    }
 
+    // ─────────────────────────────────────────────────────────────────────
+    // SIMPLE RULES MODEL
+    // ─────────────────────────────────────────────────────────────────────
+    // 1. ANY authenticated guest can READ every collection.
+    // 2. ANY authenticated guest can WRITE (create/update) any document,
+    //    including editing any other guest's document.
+    // 3. ONLY administrators (isAdmin) can DELETE.
+    // 4. No schema/field validation — the rules do not depend on any field
+    //    definition. The app validates payloads client-side.
+    //
     // An administrator is any authenticated user whose own guest document in
-    // `guests/{auth.uid}` has `isAdmin == true`. The `isAdmin` field is
-    // sheet-synced (read-only from the client) and is used to grant back-office
-    // (dashboard) access. This is data-driven: promoting/demoting an admin is
-    // done by editing the sheet and re-syncing, not by editing the rules.
+    // `guests/{auth.uid}` has `isAdmin == true`.
+    // ─────────────────────────────────────────────────────────────────────
+
     function isAdmin() {
       return request.auth != null
-        && get(/databases/$(database)/documents/guests/$(request.auth.uid)).data.keys().hasAny(["isAdmin"])
         && get(/databases/$(database)/documents/guests/$(request.auth.uid)).data.isAdmin == true;
     }
 
-
-
-
-
-    function hasSubmissionMetadata(version) {
-      return request.resource.data.schemaVersion == version
-        && request.resource.data.language in ["es", "fr", "en"]
-        && request.resource.data.createdAt == request.time;
+    // Any authenticated user is allowed to read.
+    function canRead() {
+      return request.auth != null;
     }
 
-    function isShortText(field, maximum) {
-      return field is string && field.size() <= maximum;
+    // Any authenticated user is allowed to write (create/update).
+    function canWrite() {
+      return request.auth != null;
     }
 
-    // A short text that may also be null. Used for the cabin/room assignment
-    // fields inside `hosting`: the dashboard clears an assignment by writing
-    // `null` (keeping the key present) rather than deleting the key.
-    function isNullableShortText(field, maximum) {
-      return field == null || (field is string && field.size() <= maximum);
+    // Only administrators may delete.
+    function canDelete() {
+      return isAdmin();
     }
 
-    function hasValidRsvpFields() {
-      return request.resource.data.keys().hasAll([
-          "firstName", "lastName", "email", "whatsapp", "attendance",
-          "groupMode", "groupName", "partySize", "adults", "children",
-          "guests", "accommodation", "travelStatus", "arrivalFrom",
-          "arrivalTo", "arrivalDate", "arrivalTime", "arrivalAirline",
-          "arrivalFlight", "departureFrom", "departureTo", "departureDate",
-          "departureTime", "departureAirline", "departureFlight", "route",
-          "notes", "language", "schemaVersion", "createdAt"
-        ])
-        && request.resource.data.keys().hasOnly([
-          "firstName", "lastName", "email", "whatsapp", "attendance",
-          "groupMode", "groupName", "partySize", "adults", "children",
-          "guests", "accommodation", "independentArrival", "sundayMorning",
-          "travelStatus", "arrivalFrom", "arrivalTo", "arrivalDate",
-          "arrivalTime", "arrivalAirline", "arrivalFlight", "departureFrom",
-          "departureTo", "departureDate", "departureTime",
-          "departureAirline", "departureFlight", "route", "notes",
-          "language", "schemaVersion", "createdAt"
-        ])
-        && isShortText(request.resource.data.firstName, 100)
-        && request.resource.data.firstName.size() > 0
-        && isShortText(request.resource.data.lastName, 100)
-        && request.resource.data.lastName.size() > 0
-        && isShortText(request.resource.data.email, 254)
-        && request.resource.data.email.size() > 0
-        && isShortText(request.resource.data.whatsapp, 50)
-        && request.resource.data.whatsapp.size() > 0
-        && isShortText(request.resource.data.attendance, 30)
-        && isShortText(request.resource.data.groupMode, 30)
-        && isShortText(request.resource.data.groupName, 150)
-        && isShortText(request.resource.data.partySize, 2)
-        && isShortText(request.resource.data.adults, 2)
-        && isShortText(request.resource.data.children, 2)
-        && isShortText(request.resource.data.guests, 1000)
-        && isShortText(request.resource.data.accommodation, 30)
-        && (!request.resource.data.keys().hasAny(["independentArrival"])
-          || isShortText(request.resource.data.independentArrival, 30))
-        && (!request.resource.data.keys().hasAny(["sundayMorning"])
-          || isShortText(request.resource.data.sundayMorning, 30))
-        && isShortText(request.resource.data.travelStatus, 30)
-        && isShortText(request.resource.data.arrivalFrom, 150)
-        && isShortText(request.resource.data.arrivalTo, 150)
-        && isShortText(request.resource.data.arrivalDate, 10)
-        && isShortText(request.resource.data.arrivalTime, 5)
-        && isShortText(request.resource.data.arrivalAirline, 100)
-        && isShortText(request.resource.data.arrivalFlight, 30)
-        && isShortText(request.resource.data.departureFrom, 150)
-        && isShortText(request.resource.data.departureTo, 150)
-        && isShortText(request.resource.data.departureDate, 10)
-        && isShortText(request.resource.data.departureTime, 5)
-        && isShortText(request.resource.data.departureAirline, 100)
-        && isShortText(request.resource.data.departureFlight, 30)
-        && isShortText(request.resource.data.route, 500)
-        && isShortText(request.resource.data.notes, 2000);
+    // ── Guests ───────────────────────────────────────────────────────────
+    match /guests/{guestId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
     }
 
+    // ── Invitation groups ────────────────────────────────────────────────
+    match /invitation_groups/{groupId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Cabins ───────────────────────────────────────────────────────────
+    match /cabins/{cabinId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Rooms ────────────────────────────────────────────────────────────
+    match /rooms/{roomId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Tables ───────────────────────────────────────────────────────────
+    match /tables/{tableId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Thanks / greetings ───────────────────────────────────────────────
+    match /thanks/{creditId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Login events ─────────────────────────────────────────────────────
+    match /login_events/{eventId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Activity events ──────────────────────────────────────────────────
+    match /activity_events/{eventId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Page views ───────────────────────────────────────────────────────
+    match /page_views/{viewId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Card votes ───────────────────────────────────────────────────────
+    match /card_votes/{voteId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Genre ratings ────────────────────────────────────────────────────
+    match /genre_ratings/{ratingId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Guiso rankings ───────────────────────────────────────────────────
+    match /guiso_rankings/{guestId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Song requests ────────────────────────────────────────────────────
+    match /song_requests/{requestId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Attendance responses ─────────────────────────────────────────────
+    match /attendance_responses/{guestId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Legacy submission collections (no longer written by the app) ─────
     match /rsvp_submissions/{submissionId} {
-      allow create: if isInvitedGuest()
-        && hasSubmissionMetadata(3)
-        && hasValidRsvpFields();
-      // Any authenticated guest may read submissions so the app can compute
-      // correct prices and cabin occupancy across the whole guest list.
-      allow read: if request.auth != null;
-      allow update, delete: if false;
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
     }
-
-
 
     match /experience_suggestions/{submissionId} {
-      allow create: if isInvitedGuest()
-        && hasSubmissionMetadata(1)
-        && request.resource.data.keys().hasOnly([
-          "name", "dessert", "foodSuggestion", "songTitle", "songArtist",
-          "singInterest", "extra", "language",
-          "schemaVersion", "createdAt"
-        ])
-        && isShortText(request.resource.data.name, 150)
-        && request.resource.data.name.size() > 0
-        && isShortText(request.resource.data.dessert, 50)
-        && isShortText(request.resource.data.foodSuggestion, 2000)
-        && isShortText(request.resource.data.songTitle, 300)
-        && isShortText(request.resource.data.songArtist, 300)
-        && isShortText(request.resource.data.singInterest, 50)
-        && isShortText(request.resource.data.extra, 2000);
-      // Any authenticated guest may read submissions.
-      allow read: if request.auth != null;
-      allow update, delete: if false;
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
     }
-
-
 
     match /coast_interest/{submissionId} {
-      allow create: if isInvitedGuest()
-        && hasSubmissionMetadata(1)
-        && request.resource.data.keys().hasOnly([
-          "name", "interest", "partySize", "nights", "destination", "style",
-          "note", "language", "schemaVersion", "createdAt"
-        ])
-        && isShortText(request.resource.data.name, 150)
-        && request.resource.data.name.size() > 0
-        && isShortText(request.resource.data.interest, 50)
-        && isShortText(request.resource.data.partySize, 2)
-        && isShortText(request.resource.data.nights, 1)
-        && isShortText(request.resource.data.destination, 100)
-        && isShortText(request.resource.data.style, 100)
-        && isShortText(request.resource.data.note, 2000);
-      // Any authenticated guest may read submissions.
-      allow read: if request.auth != null;
-      allow update, delete: if false;
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
     }
-
-
 
     match /petanque_participation/{submissionId} {
-      allow create: if isInvitedGuest()
-        && request.resource.data.keys().hasOnly([
-          "petanqueParticipation", "petanquePartySize", "petanqueNames",
-          "petanqueOwnBoules", "language",
-          "schemaVersion", "createdAt"
-        ])
-        && isShortText(request.resource.data.petanqueParticipation, 30)
-        && isShortText(request.resource.data.petanquePartySize, 2)
-        && isShortText(request.resource.data.petanqueNames, 500)
-        && isShortText(request.resource.data.petanqueOwnBoules, 30);
-      // Any authenticated guest may read submissions.
-      allow read: if request.auth != null;
-      allow update, delete: if false;
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
     }
 
-
-
-    // Auth UIDs are set to the guest ID (from the Google Sheet `ID` column),
-    // so the editor's invitation group is read directly from their own guest
-    // document in `guests/{auth.uid}`.
-    //
-    // The `guests` documents are synced from the Google Sheet, which stores the
-    // group under the English field name `invitationGroup`. The client writes
-    // the same `invitationGroup` field on save, so we read that one to reliably
-    // resolve the editor's group.
-
-    function editorInvitationGroup() {
-      return get(/databases/$(database)/documents/guests/$(request.auth.uid)).data.invitationGroup;
-    }
-
-    function guestWriteInvitationGroup() {
-      return request.resource.data.keys().hasAny(["invitationGroup"])
-        ? request.resource.data.invitationGroup
-        : (resource == null ? "" : resource.data.invitationGroup);
-    }
-
-
-    // A group member may update the contact details (phone), the
-    // identity-check acknowledgement, the avatar photo (Cloudinary ID), and
-    // name corrections of any member of their own invitation group on the
-    // `guests` collection. Only those fields plus lightweight metadata are
-    // allowed.
-    //
-    // AGREED SCHEMA: English field names only. Names are stored as
-    // `firstName`/`lastName` (combined from the sheet's nombre/apellido
-    // columns). The message author is `messageAuthor`. No Spanish field names
-    // (nombre, apellido, message_author, cabana, cuarto, mesa, etc.) are
-    // allowed — those are derived/calculated and live in the sheet, not here.
-    //
-    // NOTE: `email` is intentionally NOT allowed here. A guest's email is the
-    // Firebase Auth login credential and must be changed via `updateEmail` in
-    // the SDK — it is never stored in the `guests` collection.
-    //
-    // SCHEMA ENFORCEMENT: The `hasOnly()` list below includes ALL fields that
-    // exist in the `guests` documents (both sheet-synced read-only fields and
-    // client-writable fields). This prevents clients from creating NEW fields
-    // that aren't part of the agreed schema. The `affectedKeys().hasOnly()`
-    // check further restricts clients to only MODIFY the writable fields —
-    // sheet-synced fields (id, lang, age, cabin, room, table, rsvp, etc.)
-    // cannot be changed from the client.
-    // Shared base validation for `guests` writes. Enforces the agreed schema
-    // (hasAll/hasOnly) and field types. The `affectedKeys().hasOnly()` check
-    // is intentionally NOT here — it differs between regular guests and
-    // administrators (see hasValidGuestContactFields / hasValidAdminGuestFields).
-    function hasValidGuestIdentityFields() {
-      return (!request.resource.data.keys().hasAny(["identity"])
-          || (request.resource.data.identity is map
-            && request.resource.data.identity.keys().hasOnly([
-              "age", "cloudinaryId", "firstName", "gender", "middleName", "lastName", "maternalLastName", "lang", "phone"
-            ])
-            && (!request.resource.data.identity.keys().hasAny(["age"])
-              || isShortText(request.resource.data.identity.age, 50))
-            && (!request.resource.data.identity.keys().hasAny(["firstName"])
-              || isShortText(request.resource.data.identity.firstName, 100))
-            && (!request.resource.data.identity.keys().hasAny(["middleName"])
-              || isShortText(request.resource.data.identity.middleName, 100))
-            && (!request.resource.data.identity.keys().hasAny(["lastName"])
-              || isShortText(request.resource.data.identity.lastName, 100))
-            && (!request.resource.data.identity.keys().hasAny(["maternalLastName"])
-              || isShortText(request.resource.data.identity.maternalLastName, 100))
-            && (!request.resource.data.identity.keys().hasAny(["gender"])
-              || isShortText(request.resource.data.identity.gender, 30))
-            && (!request.resource.data.identity.keys().hasAny(["cloudinaryId"])
-              || isShortText(request.resource.data.identity.cloudinaryId, 200))
-            && (!request.resource.data.identity.keys().hasAny(["lang"])
-              || isShortText(request.resource.data.identity.lang, 20))
-            && (!request.resource.data.identity.keys().hasAny(["phone"])
-              || isShortText(request.resource.data.identity.phone, 50))));
-    }
-
-    function hasValidGuestHostingFields() {
-      return (!request.resource.data.keys().hasAny(["hosting"])
-          || (request.resource.data.hosting is map
-            && request.resource.data.hosting.keys().hasOnly([
-              "cabin", "room", "xtraCabin", "xtraRoom",
-              "isCabinPaidByNovios", "isCabinPaid",
-              "isXtraCabinPaidByNovios", "isXtraCabinPaid"
-            ])
-            && (!request.resource.data.hosting.keys().hasAny(["cabin"])
-              || isNullableShortText(request.resource.data.hosting.cabin, 150))
-            && (!request.resource.data.hosting.keys().hasAny(["room"])
-              || isNullableShortText(request.resource.data.hosting.room, 150))
-            && (!request.resource.data.hosting.keys().hasAny(["xtraCabin"])
-              || isNullableShortText(request.resource.data.hosting.xtraCabin, 150))
-            && (!request.resource.data.hosting.keys().hasAny(["xtraRoom"])
-              || isNullableShortText(request.resource.data.hosting.xtraRoom, 150))
-            && (!request.resource.data.hosting.keys().hasAny(["isCabinPaidByNovios"])
-              || request.resource.data.hosting.isCabinPaidByNovios is bool)
-            && (!request.resource.data.hosting.keys().hasAny(["isCabinPaid"])
-              || request.resource.data.hosting.isCabinPaid is bool)
-            && (!request.resource.data.hosting.keys().hasAny(["isXtraCabinPaidByNovios"])
-              || request.resource.data.hosting.isXtraCabinPaidByNovios is bool)
-            && (!request.resource.data.hosting.keys().hasAny(["isXtraCabinPaid"])
-              || request.resource.data.hosting.isXtraCabinPaid is bool)));
-    }
-
-    function hasValidGuestContactFieldsBase() {
-      return request.resource.data.keys().hasAll([
-          "guestId", "updatedBy", "updatedAt"
-        ])
-        && request.resource.data.keys().hasOnly([
-          // Client-writable fields
-          "guestId", "identity",
-          "idCheckUser", "cloudinaryId", "messageAuthor",
-          "invitationGroup", "updatedBy", "updatedAt", "_deleted",
-          // Legacy flat fields kept temporarily during migration
-          "firstName", "middleName", "lastName", "maternalLastName", "gender", "cloudinaryId", "lang", "age", "phone",
-          "cabin", "room", "xtraCabin", "xtraRoom",
-          "isCabinPaidByNovios", "isCabinPaid",
-          "isXtraCabinPaidByNovios", "isXtraCabinPaid",
-          // Sheet-synced read-only fields (populated by Admin SDK)
-          "id", "gender", "tagGroup",
-          "hosting", "table", "sent",
-          "modifiedAt", "travelsByPlane", "isAdmin",
-          "_source", "_migratedAt", "message", "rsvp", "flightInfo"
-        ])
-        && isShortText(request.resource.data.guestId, 100)
-        && request.resource.data.guestId.size() > 0
-        && (!request.resource.data.keys().hasAny(["invitationGroup"])
-          || isShortText(request.resource.data.invitationGroup, 150))
-        && isShortText(request.resource.data.updatedBy, 100)
-
-        && request.resource.data.updatedAt == request.time
-        && hasValidGuestIdentityFields()
-        && hasValidGuestHostingFields()
-        && (!request.resource.data.keys().hasAny(["firstName"])
-          || isShortText(request.resource.data.firstName, 100))
-        && (!request.resource.data.keys().hasAny(["middleName"])
-          || isShortText(request.resource.data.middleName, 100))
-        && (!request.resource.data.keys().hasAny(["lastName"])
-          || isShortText(request.resource.data.lastName, 100))
-        && (!request.resource.data.keys().hasAny(["maternalLastName"])
-          || isShortText(request.resource.data.maternalLastName, 100))
-        && (!request.resource.data.keys().hasAny(["gender"])
-          || isShortText(request.resource.data.gender, 30))
-        && (!request.resource.data.keys().hasAny(["cloudinaryId"])
-          || isShortText(request.resource.data.cloudinaryId, 200))
-
-        && (!request.resource.data.keys().hasAny(["phone"])
-          || isShortText(request.resource.data.phone, 50))
-        && (!request.resource.data.keys().hasAny(["idCheckUser"])
-          || request.resource.data.idCheckUser is bool)
-        && (!request.resource.data.keys().hasAny(["cloudinaryId"])
-          || (request.resource.data.cloudinaryId is string
-            && request.resource.data.cloudinaryId.size() <= 200))
-        && (!request.resource.data.keys().hasAny(["messageAuthor"])
-          || isShortText(request.resource.data.messageAuthor, 200))
-        && (!request.resource.data.keys().hasAny(["_deleted"])
-          || request.resource.data._deleted is bool)
-        // `rsvp` holds the sheet-synced RVSP_* flags plus the client-submitted
-        // scale answers under `rsvp.answers` (see saveRsvpAnswers). It is
-        // allowed in hasOnly() and in the affectedKeys() lists so guests can
-        // save their answers; the structure is validated client-side.
-        && (!request.resource.data.keys().hasAny(["rsvp"])
-          || request.resource.data.rsvp is map)
-        // `flightInfo` is allowed in hasOnly() and in the affectedKeys() lists
-        // so guests can save their flight details. Its structure is validated
-        // client-side (see validation.js); we intentionally do NOT deep-validate
-        // it here because the combined expression count of this base function
-        // plus the flightInfo checks exceeds Firestore's 1000-expression limit.
-        && (!request.resource.data.keys().hasAny(["flightInfo"])
-          || request.resource.data.flightInfo is map);
-    }
-
-
-    // The return-trip (departure) details inside `flightInfo`. Mirrors the
-    // arrival fields but grouped under a `departure` map so the two trips stay
-    // clearly separated in the guest document.
-    function hasValidDeparture(value) {
-      return value is map
-        && value.keys().hasOnly([
-          "origin", "connections", "destination", "legs",
-          "departureDate", "departureTime", "finalFlightNumber"
-        ])
-        && (!value.keys().hasAny(["origin"])
-          || isValidAirport(value.origin))
-        && (!value.keys().hasAny(["destination"])
-          || isValidAirport(value.destination))
-        && (!value.keys().hasAny(["connections"])
-          || (value.connections is list
-            && value.connections.size() <= 3))
-        && (!value.keys().hasAny(["legs"])
-          || (value.legs is list
-            && value.legs.size() <= 4))
-
-        && (!value.keys().hasAny(["departureDate"])
-          || value.departureDate.matches('^\\d{4}-\\d{2}-\\d{2}$'))
-        && (!value.keys().hasAny(["departureTime"])
-          || value.departureTime.matches('^\\d{2}:\\d{2}$'))
-        && (!value.keys().hasAny(["finalFlightNumber"])
-          || isShortText(value.finalFlightNumber, 30));
-    }
-
-    function isValidAirport(value) {
-      return value is map
-        && value.keys().hasOnly([
-          "iata", "icao", "name", "city", "country", "countryCode", "latitude", "longitude"
-        ])
-        && isShortText(value.iata, 3)
-        && value.iata.size() > 0
-        && (!value.keys().hasAny(["icao"]) || isShortText(value.icao, 4))
-        && isShortText(value.name, 200)
-        && value.name.size() > 0
-        && (!value.keys().hasAny(["city"]) || isShortText(value.city, 150))
-        && (!value.keys().hasAny(["country"]) || isShortText(value.country, 100))
-        && isShortText(value.countryCode, 2)
-        && value.countryCode.size() > 0
-        && (!value.keys().hasAny(["latitude"]) || value.latitude is number)
-        && (!value.keys().hasAny(["longitude"]) || value.longitude is number);
-    }
-
-    function isValidLeg(value) {
-      return value is map
-        && value.keys().hasOnly(["from", "to", "flightNumber"])
-        && isShortText(value.from, 3)
-        && value.from.size() > 0
-        && isShortText(value.to, 3)
-        && value.to.size() > 0
-        && (!value.keys().hasAny(["flightNumber"]) || isShortText(value.flightNumber, 30));
-    }
-
-
-    // REGULAR GUEST WRITE SCOPE: A group member may update the contact details
-    // (phone), the identity-check acknowledgement, the avatar photo (Cloudinary
-    // ID), name corrections, and the message author of any member of their own
-    // invitation group. `invitationGroup` and `_deleted` are intentionally NOT
-    // in the affectedKeys list: changing group membership or soft-deleting a
-    // guest is an administrative operation (see hasValidAdminGuestFields).
-    function hasValidGuestContactFields() {
-      return hasValidGuestContactFieldsBase()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          "guestId", "identity",
-          "idCheckUser", "cloudinaryId", "messageAuthor",
-          // Legacy flat identity writes allowed only during transition.
-          "firstName", "middleName", "lastName", "maternalLastName", "gender", "cloudinaryId", "lang", "age", "phone",
-          "rsvp", "flightInfo", "updatedBy", "updatedAt"
-        ]);
-    }
-
-
-
-    // ADMIN WRITE SCOPE: Administrators may additionally modify `invitationGroup`
-    // (reassign a guest to a different invitation group), `_deleted`
-    // (soft-delete a guest), and `hosting` (reassign a guest to a different
-    // cabin/room from the dashboard's drag-and-drop cabin panel). These are
-    // privileged operations that regular guests must never perform. All other
-    // field restrictions from hasValidGuestContactFieldsBase() still apply.
-    function hasValidAdminGuestFields() {
-      return hasValidGuestContactFieldsBase()
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          "guestId", "identity",
-          "idCheckUser", "cloudinaryId", "messageAuthor",
-          "firstName", "middleName", "lastName", "maternalLastName", "gender", "cloudinaryId", "lang", "age", "phone",
-          "rsvp", "flightInfo", "invitationGroup", "hosting", "updatedBy", "updatedAt", "_deleted"
-        ]);
-    }
-
-
-    // Metadata-only guest touch. Any authenticated user may refresh
-    // `updatedBy`/`updatedAt` on an existing guest document without changing
-    // group-scoped or identity fields.
-    function hasValidGuestAuditTouch() {
-      return resource != null
-        && request.resource.data.keys().hasAll(["guestId", "updatedBy", "updatedAt"])
-        && request.resource.data.guestId == resource.data.guestId
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
-          "updatedBy", "updatedAt"
-        ])
-        && isShortText(request.resource.data.updatedBy, 100)
-        && request.resource.data.updatedAt == request.time;
-    }
-
-
-
-    // ── Save-the-date attendance responses ────────────────────────────────
-
-    // Each guest may indicate, for each member of their invitation group,
-    // whether they plan to join on Friday, Saturday and Sunday. Responses are
-    // stored per guest under `attendance_responses/{guestId}`.
-    function hasValidAttendanceFields() {
-      return request.resource.data.keys().hasAll([
-          "guestId", "friday", "saturday", "sunday", "invitationGroup",
-          "updatedBy", "language", "schemaVersion", "updatedAt"
-        ])
-        && request.resource.data.keys().hasOnly([
-          "guestId", "friday", "saturday", "sunday", "invitationGroup",
-          "updatedBy", "language", "schemaVersion", "updatedAt"
-        ])
-        && isShortText(request.resource.data.guestId, 100)
-        && request.resource.data.guestId.size() > 0
-        && request.resource.data.friday in ["yes", "no", "maybe", ""]
-        && request.resource.data.saturday in ["yes", "no", "maybe", ""]
-        && request.resource.data.sunday in ["yes", "no", "maybe", ""]
-        && isShortText(request.resource.data.invitationGroup, 150)
-        && isShortText(request.resource.data.updatedBy, 100)
-        && request.resource.data.language in ["es", "fr", "en"]
-        && request.resource.data.schemaVersion == 1
-        && request.resource.data.updatedAt == request.time;
-    }
-
-    match /attendance_responses/{guestId} {
-      // Any authenticated guest may read all responses so the app can compute
-      // correct prices and cabin occupancy across the whole guest list.
-      allow read: if request.auth != null;
-      allow create, update: if request.auth != null
-        && hasValidAttendanceFields()
-        && editorInvitationGroup() == request.resource.data.invitationGroup;
-      allow delete: if false;
-    }
-
-    // ── Login events ────────────────────────────────────────────────────────
-    // A lightweight, append-only log of guest sign-ins. The client writes one
-    // document per successful sign-in; a Cloud Function watches this collection
-    // and posts a Telegram notification. Guests may only create (never update
-    // or delete) their own login events.
-    function hasValidLoginEventFields() {
-      return request.resource.data.keys().hasAll([
-          "guestId", "username", "createdAt"
-        ])
-        && request.resource.data.keys().hasOnly([
-          "guestId", "username", "createdAt",
-          "source", "medium", "campaign", "sentAt", "timeToAnswer"
-        ])
-        && isShortText(request.resource.data.guestId, 100)
-        && request.resource.data.guestId == request.auth.uid
-        && isShortText(request.resource.data.username, 200)
-        && request.resource.data.createdAt == request.time
-        // Optional invitation-link analytics fields (written only when the
-        // guest arrived via a link). `source` is a normalised channel slug
-        // ("email" | "whatsapp" | "other"); `medium`/`campaign` are raw UTM
-        // values; `sentAt` is epoch ms; `timeToAnswer` is seconds. All are
-        // optional, so a plain login (no link) still passes.
-        && (request.resource.data.keys().hasAny(["source", "medium", "campaign", "sentAt", "timeToAnswer"])
-            ? (
-                (!request.resource.data.keys().hasAny(["source"]) || isShortText(request.resource.data.source, 20))
-                && (!request.resource.data.keys().hasAny(["medium"]) || isShortText(request.resource.data.medium, 50))
-                && (!request.resource.data.keys().hasAny(["campaign"]) || isShortText(request.resource.data.campaign, 100))
-                && (!request.resource.data.keys().hasAny(["sentAt"]) || request.resource.data.sentAt is number)
-                && (!request.resource.data.keys().hasAny(["timeToAnswer"]) || request.resource.data.timeToAnswer is number)
-              )
-            : true);
-    }
-
-
-    match /login_events/{eventId} {
-      allow create: if request.auth != null && hasValidLoginEventFields();
-      allow read: if isAdmin();
-      allow update, delete: if false;
-    }
-
-    // ── Activity events (inactivity detection) ─────────────────────────────
-    // A lightweight, append-only log of guest activity signals (currently
-    // "inactive": the guest stopped interacting for the idle threshold). The
-    // client writes one document per inactivity episode; a Cloud Function can
-    // watch this collection and notify the couple. Guests may only create
-    // (never update or delete) their own activity events.
-    function hasValidActivityEventFields() {
-      return request.resource.data.keys().hasAll([
-          "guestId", "type", "idleSeconds", "createdAt"
-        ])
-        && request.resource.data.keys().hasOnly([
-          "guestId", "type", "idleSeconds", "createdAt"
-        ])
-        && isShortText(request.resource.data.guestId, 100)
-        && request.resource.data.guestId == request.auth.uid
-        && request.resource.data.type in ["inactive"]
-        && request.resource.data.idleSeconds is int
-        && request.resource.data.idleSeconds >= 0
-        && request.resource.data.idleSeconds <= 86400
-        && request.resource.data.createdAt == request.time;
-    }
-
-    match /activity_events/{eventId} {
-      allow create: if request.auth != null && hasValidActivityEventFields();
-      allow read: if isAdmin();
-      allow update, delete: if false;
-    }
-
-    // ── Page views (section navigation analytics) ──────────────────────────
-    // A lightweight, append-only log of which invitation sections a guest
-    // views and how they navigated there (nav / side_drawer / mobile_menu /
-    // fab / scroll). The client writes one document per section view; a Cloud
-    // Function or report script can aggregate these into a funnel. Guests may
-    // only create (never update or delete) their own page views.
-    function hasValidPageViewFields() {
-      return request.resource.data.keys().hasAll([
-          "guestId", "sectionId", "navigationType", "createdAt"
-        ])
-        && request.resource.data.keys().hasOnly([
-          "guestId", "sectionId", "navigationType", "createdAt"
-        ])
-        && isShortText(request.resource.data.guestId, 100)
-        && request.resource.data.guestId == request.auth.uid
-        && isShortText(request.resource.data.sectionId, 100)
-        && request.resource.data.sectionId.size() > 0
-        && isShortText(request.resource.data.navigationType, 50)
-        && request.resource.data.navigationType in ["nav", "side_drawer", "mobile_menu", "fab", "scroll", "initial"]
-
-        && request.resource.data.createdAt == request.time;
-    }
-
-    match /page_views/{viewId} {
-      allow create: if request.auth != null && hasValidPageViewFields();
-      allow read: if isAdmin();
-      allow update, delete: if false;
-    }
-
-
-
-
-
-
-
-    // ── Card votes (star ratings on experience cards) ─────────────────────
-    // One document per (card, guest) pair. The document ID is
-    // `${cardType}_${cardKey}_${guestId}`, which is enforced below so a guest
-    // can only ever create/update their own single vote for a given card.
-    // Any authenticated guest may read all votes so the app can compute the
-    // average rating and vote count for each card.
-    function hasValidCardVoteFields() {
-      return request.resource.data.keys().hasAll([
-          "cardType", "cardKey", "guestId", "rating", "updatedBy", "updatedAt"
-        ])
-        && request.resource.data.keys().hasOnly([
-          "cardType", "cardKey", "guestId", "rating", "updatedBy", "updatedAt"
-        ])
-        && request.resource.data.cardType in ["food", "music", "guiso"]
-        && isShortText(request.resource.data.cardKey, 100)
-        && request.resource.data.cardKey.size() > 0
-        && isShortText(request.resource.data.guestId, 100)
-        && request.resource.data.guestId == request.auth.uid
-        && request.resource.data.rating is int
-        && request.resource.data.rating >= 1
-        && request.resource.data.rating <= 5
-        && isShortText(request.resource.data.updatedBy, 100)
-        && request.resource.data.updatedBy == request.auth.uid
-        && request.resource.data.updatedAt == request.time;
-    }
-
-    match /card_votes/{voteId} {
-      allow read: if request.auth != null;
-      allow create, update: if request.auth != null
-        && hasValidCardVoteFields()
-        && voteId == request.resource.data.cardType + "_" + request.resource.data.cardKey + "_" + request.auth.uid;
-      allow delete: if false;
-    }
-
-
-
-
-    // ── Genre ratings (1–5 star ratings on music genres) ─────────────────
-    // One document per (genre, guest) pair. The document ID is
-    // `${genreId}_${guestId}`, which is enforced below so a guest can only
-    // ever create/update their own single rating for a given genre.
-    // Any authenticated guest may read all ratings so the app can compute the
-    // average rating and vote count for each genre.
-    // A parent genre and its subgenres are rated independently — rating a
-    // parent never overwrites a child's rating (each has its own document).
-    function hasValidGenreRatingFields() {
-      return request.resource.data.keys().hasAll([
-          "genreId", "genreName", "guestId", "rating", "updatedBy", "updatedAt"
-        ])
-        && request.resource.data.keys().hasOnly([
-          "genreId", "genreName", "guestId", "rating", "updatedBy", "updatedAt"
-        ])
-        && isShortText(request.resource.data.genreId, 100)
-        && request.resource.data.genreId.size() > 0
-        && isShortText(request.resource.data.genreName, 200)
-        && request.resource.data.genreName.size() > 0
-        && isShortText(request.resource.data.guestId, 100)
-        && request.resource.data.guestId == request.auth.uid
-        && request.resource.data.rating is int
-        && request.resource.data.rating >= 1
-        && request.resource.data.rating <= 5
-        && isShortText(request.resource.data.updatedBy, 100)
-        && request.resource.data.updatedBy == request.auth.uid
-        && request.resource.data.updatedAt == request.time;
-    }
-
-    match /genre_ratings/{ratingId} {
-      allow read: if request.auth != null;
-      allow create, update: if request.auth != null
-        && hasValidGenreRatingFields()
-        && ratingId == request.resource.data.genreId + "_" + request.auth.uid;
-      allow delete: if false;
-    }
-
-
-
-
-    // ── Guiso rankings (ranked ordering of the guisos dishes) ─────────────
-    // One document per guest, stored under `guiso_rankings/{guestId}`. The
-    // `ranking` array holds the dish names in the guest's preferred order
-    // (1st element = favourite). The `selected` array holds the dish names the
-    // guest marked as "in the menu" (the top 9). A guest may only create/update
-    // their own ranking document. Any authenticated guest may read all rankings
-    // so the couple can aggregate the results.
-    function hasValidGuisoRankingFields() {
-      return request.resource.data.keys().hasAll([
-          "guestId", "ranking", "selected", "updatedBy", "updatedAt"
-        ])
-        && request.resource.data.keys().hasOnly([
-          "guestId", "ranking", "selected", "updatedBy", "updatedAt"
-        ])
-        && isShortText(request.resource.data.guestId, 100)
-        && request.resource.data.guestId == request.auth.uid
-        && request.resource.data.ranking is list
-        && request.resource.data.ranking.size() >= 1
-        && request.resource.data.ranking.size() <= 20
-        && request.resource.data.selected is list
-        && request.resource.data.selected.size() <= 9
-        && request.resource.data.selected.size() <= request.resource.data.ranking.size()
-        && isShortText(request.resource.data.updatedBy, 100)
-        && request.resource.data.updatedBy == request.auth.uid
-        && request.resource.data.updatedAt == request.time;
-    }
-
-
-    match /guiso_rankings/{guestId} {
-      allow read: if request.auth != null;
-      allow create, update: if request.auth != null
-        && hasValidGuisoRankingFields()
-        && guestId == request.auth.uid;
-      allow delete: if false;
-    }
-
-
-
-    // ── Song requests (guest song suggestions for the music section) ───────
-    // One document per request, stored under `song_requests/{requestId}` (an
-    // auto-generated id). A guest may only create their own requests. Any
-    // authenticated guest may read all requests so the couple can aggregate
-    // the results.
-    function hasValidSongRequestFields() {
-      return request.resource.data.keys().hasAll([
-          "guestId", "song", "intent", "updatedBy", "updatedAt"
-        ])
-        && request.resource.data.keys().hasOnly([
-          "guestId", "song", "intent", "bandType", "songMeta", "updatedBy", "updatedAt"
-        ])
-        && isShortText(request.resource.data.guestId, 100)
-        && request.resource.data.guestId == request.auth.uid
-        && isShortText(request.resource.data.song, 200)
-        && request.resource.data.song.size() > 0
-        && request.resource.data.intent in ["hear", "sing", "karaoke", "band"]
-        // Optional live-band type, only meaningful when intent == "band".
-        && (!request.resource.data.keys().hasAny(["bandType"])
-            || request.resource.data.bandType in ["marimba", "mariachi", "norteno", "frenchBand"])
-        && isShortText(request.resource.data.updatedBy, 100)
-        && request.resource.data.updatedBy == request.auth.uid
-        && request.resource.data.updatedAt == request.time
-        // Optional normalized song identity (from the autocomplete). Kept
-        // separate from the event request (`intent`) so future event-specific
-        // metadata can be added as sibling fields without touching song identity.
-        && (!request.resource.data.keys().hasAny(["songMeta"])
-            || hasValidSongMetaFields());
-    }
-
-
-    function hasValidSongMetaFields() {
-      return request.resource.data.songMeta.keys().hasOnly([
-          "title", "artist", "year", "externalId", "source", "isrc"
-        ])
-        && (!request.resource.data.songMeta.keys().hasAny(["title"])
-            || isShortText(request.resource.data.songMeta.title, 200))
-        && (!request.resource.data.songMeta.keys().hasAny(["artist"])
-            || isShortText(request.resource.data.songMeta.artist, 200))
-        && (!request.resource.data.songMeta.keys().hasAny(["year"])
-            || (request.resource.data.songMeta.year is int
-                && request.resource.data.songMeta.year >= 1000
-                && request.resource.data.songMeta.year <= 2100))
-        && (!request.resource.data.songMeta.keys().hasAny(["externalId"])
-            || isShortText(request.resource.data.songMeta.externalId, 100))
-        && (!request.resource.data.songMeta.keys().hasAny(["source"])
-            || isShortText(request.resource.data.songMeta.source, 50))
-        && (!request.resource.data.songMeta.keys().hasAny(["isrc"])
-            || isShortText(request.resource.data.songMeta.isrc, 50));
-    }
-
-
-    match /song_requests/{requestId} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null
-        && hasValidSongRequestFields();
-      allow update, delete: if false;
-    }
-
-
-
-
-    match /guests/{guestId} {
-
-
-      // READ SCOPE: Any authenticated guest may read all guests so the app can
-      // compute correct prices and cabin occupancy across the whole guest list.
-      allow read: if request.auth != null;
-
-      // AGREED SCHEMA ENFORCEMENT: ALL writes must pass the schema validation.
-      // Administrators use hasValidAdminGuestFields() (may additionally modify
-      // `invitationGroup` and `_deleted`); regular guests use
-      // hasValidGuestContactFields() (may NOT modify `invitationGroup` or
-      // `_deleted`). Administrators may write to any guest; regular guests may
-      // only write to members of their own invitation group.
-      allow create, update: if request.auth != null
-        && (
-          (
-            (isAdmin()
-              ? hasValidAdminGuestFields()
-              : hasValidGuestContactFields())
-            && (isAdmin()
-              || request.auth.uid == guestId
-              || editorInvitationGroup() == guestWriteInvitationGroup())
-          )
-          || hasValidGuestAuditTouch()
-        );
-
-      allow delete: if isAdmin();
-
-    }
-
-
-
-
-
-    // ── Invitation groups ──────────────────────────────────────────────────
-    // Group content (customContent, tag styling) is personalized per group.
-    // A guest may only read their OWN group's content. Administrators may
-    // read all groups (for the dashboard). The document ID IS the group
-    // name (e.g. "Familia de David"), so we compare the document ID to the
-    // editor's invitation group.
-    //
-    // SCHEMA: Documents contain exactly two top-level fields:
-    //   tag: { color: string, textColor: string, label: string }
-    //   customContent: { greeting: string, message: string, section: string,
-    //                    hideSections: string[] }
-    // Admin writes are validated against this schema to prevent arbitrary
-    // field creation or oversized content.
-    function hasValidInvitationGroupFields() {
-      return request.resource.data.keys().hasOnly(["tag", "customContent"])
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(["tag", "customContent"])
-        && (!request.resource.data.keys().hasAny(["tag"])
-          || (request.resource.data.tag is map
-            && request.resource.data.tag.keys().hasOnly(["color", "textColor", "label"])
-            && isShortText(request.resource.data.tag.color, 20)
-            && isShortText(request.resource.data.tag.textColor, 20)
-            && isShortText(request.resource.data.tag.label, 200)))
-        && (!request.resource.data.keys().hasAny(["customContent"])
-          || (request.resource.data.customContent is map
-            && request.resource.data.customContent.keys().hasOnly(["greeting", "message", "section", "hideSections"])
-            && (!request.resource.data.customContent.keys().hasAny(["greeting"])
-              || isShortText(request.resource.data.customContent.greeting, 2000))
-            && (!request.resource.data.customContent.keys().hasAny(["message"])
-              || isShortText(request.resource.data.customContent.message, 5000))
-            && (!request.resource.data.customContent.keys().hasAny(["section"])
-              || isShortText(request.resource.data.customContent.section, 5000))
-            && (!request.resource.data.customContent.keys().hasAny(["hideSections"])
-              || (request.resource.data.customContent.hideSections is list
-                && request.resource.data.customContent.hideSections.size() <= 20))));
-
-    }
-
-    match /invitation_groups/{groupId} {
-      // Any authenticated guest may read all groups.
-      allow read: if request.auth != null;
-      allow create, update: if isAdmin() && hasValidInvitationGroupFields();
-      allow delete: if isAdmin();
-    }
-
-
-
-
-    // ── Cabins ──────────────────────────────────────────────────────────────
-    // Cabin inventory (id, name, capacity, pricing, isPrivate, showcase,
-    // cloudinaryIds). Readable by invited guests only (the Accommodation
-    // section needs the assigned cabin's capacity, price and photos); writable
-    // only by the couple. The schema is enforced with hasOnly() so no extra
-    // fields can be added from the client.
-    function hasValidCabinFields() {
-      return request.resource.data.keys().hasAll([
-          "id", "name", "capacity", "totalPrice2Nights",
-          "pricePerPerson2Nights", "isPrivate", "showcase", "cloudinaryIds"
-        ])
-        && request.resource.data.keys().hasOnly([
-          "id", "name", "capacity", "totalPrice2Nights",
-          "pricePerPerson2Nights", "isPrivate", "showcase", "cloudinaryIds",
-          "key", "_source", "_migratedAt"
-        ])
-        && isShortText(request.resource.data.id, 100)
-        && request.resource.data.id.size() > 0
-        && isShortText(request.resource.data.name, 150)
-        && request.resource.data.name.size() > 0
-        && request.resource.data.capacity is int
-        && request.resource.data.capacity > 0
-        && request.resource.data.totalPrice2Nights is number
-        && request.resource.data.totalPrice2Nights >= 0
-        && request.resource.data.pricePerPerson2Nights is number
-        && request.resource.data.pricePerPerson2Nights >= 0
-        && request.resource.data.isPrivate is bool
-        && (!request.resource.data.keys().hasAny(["showcase"])
-          || (request.resource.data.showcase is map
-            && request.resource.data.showcase.keys().hasOnly(["es", "fr", "en"])))
-        && (!request.resource.data.keys().hasAny(["cloudinaryIds"])
-          || isShortText(request.resource.data.cloudinaryIds, 2000));
-    }
-
-    match /cabins/{cabinId} {
-      // Any authenticated guest may read all cabins.
-      allow read: if request.auth != null;
-      allow create, update: if isAdmin() && hasValidCabinFields();
-      allow delete: if isAdmin();
-    }
-
-
-
-
-    // ── Rooms ───────────────────────────────────────────────────────────────
-    // Room inventory (id, cabin, description {es,fr,en}, capacity, isShared).
-    // Readable by invited guests only (the Accommodation section needs the
-    // assigned room's capacity, sharing mode and description); writable only by
-    // the couple. The schema is enforced with hasOnly() so no extra fields can
-    // be added from the client.
-    function hasValidRoomFields() {
-      return request.resource.data.keys().hasAll([
-          "id", "cabin", "description", "capacity", "isShared"
-        ])
-        && request.resource.data.keys().hasOnly([
-          "id", "cabin", "description", "capacity", "isShared"
-        ])
-        && isShortText(request.resource.data.id, 100)
-        && request.resource.data.id.size() > 0
-        && isShortText(request.resource.data.cabin, 100)
-        && request.resource.data.cabin.size() > 0
-        && request.resource.data.description is map
-        && request.resource.data.description.keys().hasOnly(["es", "fr", "en"])
-        && request.resource.data.capacity is int
-        && request.resource.data.capacity > 0
-        && request.resource.data.isShared is bool;
-    }
-
-    match /rooms/{roomId} {
-      // Any authenticated guest may read all rooms.
-      allow read: if request.auth != null;
-      allow create, update: if isAdmin() && hasValidRoomFields();
-      allow delete: if isAdmin();
-    }
-
-
-
-
-
-
-    // ── Thanks / greetings ──────────────────────────────────────────────────
-    // Sourced from the Google Sheet THANKS table (guest -> text in fr/es/en).
-    // One document per credit record; a guest may appear in many records.
-    // Readable by everyone, writable only by administrators.
-    //
-    // SCHEMA: { guest: string, fr: string, es: string, en: string,
-    //           _source?: string, _migratedAt?: string }
-    // Admin writes are validated against this schema to prevent arbitrary
-    // field creation or oversized content.
-    function hasValidThanksFields() {
-      return request.resource.data.keys().hasOnly([
-          "guest", "fr", "es", "en", "createdAt", "_source", "_migratedAt"
-        ])
-        && isShortText(request.resource.data.guest, 100)
-        && request.resource.data.guest.size() > 0
-        && isShortText(request.resource.data.fr, 2000)
-        && isShortText(request.resource.data.es, 2000)
-        && isShortText(request.resource.data.en, 2000)
-        && (!request.resource.data.keys().hasAny(["createdAt"])
-          || request.resource.data.createdAt is timestamp)
-        && (!request.resource.data.keys().hasAny(["_source"])
-          || isShortText(request.resource.data._source, 100))
-        && (!request.resource.data.keys().hasAny(["_migratedAt"])
-          || isShortText(request.resource.data._migratedAt, 100));
-    }
-
-
-    match /thanks/{creditId} {
-      allow read: if true;
-      allow create, update: if isAdmin() && hasValidThanksFields();
-      allow delete: if isAdmin();
-    }
-
-
-
-    // ── Default deny ────────────────────────────────────────────────────────
-    // Any collection not explicitly listed above is DENIED by default. This is
-    // the safe baseline: new collections must be explicitly granted access in
-    // this file before clients can read or write them. This prevents accidental
-    // public exposure of future collections.
+    // ── Default deny ─────────────────────────────────────────────────────
+    // Any collection not explicitly listed above is DENIED by default.
     match /{document=**} {
       allow read, write: if false;
     }

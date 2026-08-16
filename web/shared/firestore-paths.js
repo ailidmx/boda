@@ -40,7 +40,13 @@ export const collections = {
   songRequests: "song_requests",
   /** Per-guest 1–5 star ratings for music genres (genre survey). */
   genreRatings: "genre_ratings",
+  /** Guest sign-in events (written on every real login). Readable by admins. */
+  loginEvents: "login_events",
+  /** Table inventory + seating assignments (admin-only planning). */
+  tables: "tables",
 };
+
+
 
 
 

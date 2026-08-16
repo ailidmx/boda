@@ -211,8 +211,10 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   email — no username lookup. Per-guest invitation-link resolution was removed;
   only profile codes are accepted. When adding a new guest-facing list, read
   through `getActiveGuests()` + `resolveGuestName`/`resolveGuestPhoto` so it
-  reflects live Firestore data. (The separate admin dashboard still reads the
-  static `web/shared/guests.js` snapshot; it is not part of the invitation app.)
+  reflects live Firestore data. (The separate admin dashboard is also
+  LIVE-ONLY — see the dashboard bullets below; it does not read the static
+  `web/shared/guests.js` snapshot either.)
+
 - **Telegram bot must be a member of the target chat** — The notification
   Cloud Functions (`functions/index.js` + `telegram.js`) post to a Telegram
   group via the `@boda_dya_bot` bot. If the bot is NOT a member of the group,
@@ -367,13 +369,40 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   The helper `computeDayConfirmations()` aggregates these. When adding a new
   attendance day or changing the confirmation threshold, update
   `RSVP_ATTENDANCE_DAYS` / `RSVP_CONFIRMED_MIN_LEVEL` and the summary cards.
-- **Dashboard INVITADOS table merges static + live guest data** — the guest
-  table in `renderGuestManager()` renders each row from `getMergedGuest(guest)`,
-  which merges the static `web/shared/guests.js` record (group, cabinLabel,
-  unit) with the LIVE Firestore record from `state.liveGuests` (real `identity`
-  names/photo, `hosting` incl. `xtraCabin`/`xtraRoom`, and `rsvp.answers`).
-  Live wins where both exist. Columns: avatar (from `identity.cloudinaryId` via
-  `guestAvatarUrl`, built as `https://res.cloudinary.com/k2ajcgxv/image/upload/q_auto,f_auto,c_fill,g_auto,w_256,h_256/<id>`),
+- **Dashboard is LIVE-ONLY — there is NO static guest registry** — the
+  dashboard (`web/dashboard/src/guests.js` + `dashboard.js`) reads ONLY the
+  live Firestore `guests` collection. `web/shared/guests.js` is NOT imported
+  anywhere in the dashboard and there is NO fallback to it. `setLiveGuests()`
+  (fed by the `onSnapshot` listener in `startDashboard`) normalizes the raw
+  Firestore records into the dashboard's guest shape; `getActiveGuests()`,
+  `getGuest(id)`, `getGuestByUsername()`, `getGuestByEmail()` all read that
+  live cache. Do NOT reintroduce a static registry — the live collection is the
+  single source of truth for everything (identity names/photo, `hosting`
+  cabin/room incl. `xtraCabin`/`xtraRoom`, `tagGroup`, `rsvp.answers`).
+- **Dashboard access check: auth uid IS the guest doc id, and access = `isAdmin`** —
+  the dashboard's access gate (`startDashboard` in `dashboard.js`) grants access
+  ONLY to guests whose Firestore `guests` doc has `isAdmin: true` (David and
+  Aydé). The auth user's `uid` IS the document id in the `guests` collection, so
+  the gate looks the guest up by uid via `getGuest(currentUser.uid)` and checks
+  `isAdminGuest(guest)` (`guest.isAdmin === true`). It does NOT look up by email
+  and there is NO `isNovio`/`Novios`-group logic anymore — that was removed as
+  stale/confusing. The lookup reads the LIVE guest cache, which is ONLY populated
+  by the `onSnapshot` listener on the `guests` collection (via `setLiveGuests`).
+  If that listener is missing or the access decision runs before it fires,
+  `getGuest(uid)` returns `undefined` and EVERYONE is denied access
+  (blank/access-denied screen). The access decision is therefore driven from
+  INSIDE the `onSnapshot` callback (which fires immediately with the current
+  data), not from `onAuthStateChanged` alone. When refactoring `startDashboard`,
+  keep the `onSnapshot(collection(db, collections.guests), …)` listener that
+  calls `setLiveGuests()` and calls `decideAccess()` after populating the cache.
+
+- **Dashboard INVITADOS table renders LIVE guest data** — the guest table in
+  `renderGuestManager()` renders each row from `getMergedGuest(guest)`, which
+  merges the normalized live guest with its raw Firestore record from
+  `state.liveGuests` (real `identity` names/photo, `hosting` incl.
+  `xtraCabin`/`xtraRoom`, and `rsvp.answers`). Live wins where both exist.
+  Columns: avatar (from `identity.cloudinaryId` via `guestAvatarUrl`, built as
+  `https://res.cloudinary.com/k2ajcgxv/image/upload/q_auto,f_auto,c_fill,g_auto,w_256,h_256/<id>`),
   name with the guest ID shown underneath (hover shows the ID in the title),
   colored badges for grupo/cabaña/cuarto/cabaña-extra/cuarto-extra
   (`badgeHtml` → deterministic pastel `badgeStyle`), per-day RSVP chips
@@ -386,23 +415,24 @@ npm run test:rules  # Firestore rules tests (uses emulators)
 - **Dashboard cabin matching reads `cabin`/`xtraCabin` (mirrors the front-end)** —
   the "Asignación de cabañas" panel (`renderCabinAssignments` in
   `web/dashboard/src/dashboard.js`) groups guests by the active period's cabin
-  field. For the primary period (Viernes → Domingo) it reads `cabin`; for the
-  extra period (Domingo → Martes, coast) it reads `xtraCabin`. The dashboard's
-  OWN normalizer (`normalizeGuest` in `web/dashboard/src/guests.js`) exposes the
-  primary-period cabin as BOTH `unit` (the historical field used by the INVITADOS
-  table via `getMergedGuest`) and `cabin` (the field the invitation front-end
-  reads, used by the cabins panel). Both resolve the same chain:
-  `hosting.cabin || g.cabin || g.unit || staticGuest.unit` — so live Firestore
-  `hosting.cabin` wins, then the live record's top-level `cabin`/`unit`, then the
-  static registry. This mirrors the invitation's `normalizeGuestRecord`
-  (`cabin: hosting.cabin ?? data.cabin`) so the dashboard and the invitation
-  agree on assignments. Rooms are matched to cabins via
+  field, reading ONLY the LIVE `hosting` map. For the primary period
+  (Viernes → Domingo) it reads `hosting.cabin`; for the extra period
+  (Domingo → Martes, coast) it reads `hosting.xtraCabin`. Guests with no live
+  assignment in the active period are excluded entirely — a guest with no
+  `hosting` never shows up in a cabin card. The dashboard's OWN normalizer
+  (`normalizeGuest` in `web/dashboard/src/guests.js`) exposes the primary-period
+  cabin as BOTH `unit` (the historical field used by the INVITADOS table via
+  `getMergedGuest`) and `cabin` (the field the invitation front-end reads, used
+  by the cabins panel). Both resolve the same chain: `hosting.cabin` first, then
+  the live record's own top-level `cabin`/`unit`. This mirrors the invitation's
+  `normalizeGuestRecord` (`cabin: hosting.cabin ?? data.cabin`) so the dashboard
+  and the invitation agree on assignments. Rooms are matched to cabins via
   `getCabinDisplayName(cabin)` → `getRoomsByCabin(displayName)`, and guests to
-  rooms via `getRoomOccupancy(room.id, c.guests)` (filters `g.room === roomId`;
-  pass the cabin's MERGED guests so live-assigned rooms on `hosting.room` are
-  counted — raw live guests store their room on `hosting.room`, not `room`).
-  When adding a new cabin field, update `cabinField`/`roomField` in
-  `renderCabinAssignments` and the `CABIN_NAME_MAP` in `rooms.js`.
+  rooms by filtering the cabin's guests on the LIVE `hosting.room` /
+  `hosting.xtraRoom` field (NOT `getRoomOccupancy`, which reads the normalized
+  `room` field). When adding a new cabin field, update `cabinField`/`roomField`
+  in `renderCabinAssignments` and the `CABIN_NAME_MAP` in `rooms.js`.
+
 
 - **`CABIN_NAME_MAP` maps the "Cabaña de madera" units to `CABAÑA 1–4`** — the
   `madera_31/32/33/34` unit codes are the SAME physical cabins as `CABAÑA 1/2/3/4`
@@ -422,17 +452,16 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   `[firebase:load.collection] {collection: 'rsvp_submissions'…}` logs in the
   dashboard console, it's a stale cached build — hard-refresh / redeploy.
 
-- **Dashboard guest list + cabins panel are LIVE-first** — both
+- **Dashboard guest list + cabins panel are LIVE-ONLY** — both
   `getFilteredGuests()` (INVITADOS table) and `renderCabinAssignments()`
   (Cabañas panel) build their guest list from the LIVE Firestore `guests`
-  collection (`state.liveGuests`) as the primary source, mirroring the
-  invitation front-end. Static guests (`web/shared/guests.js`) are only
-  appended for ids that have no live record yet (see `getAllDashboardGuests()`).
-  This means names and cabin assignments always reflect what's actually in
-  Firestore (the true source of truth that guests update themselves), never a
-  stale sheet snapshot. The static snapshot's generator script
-  (`scripts/generate-guests.mjs`) no longer exists, so it cannot be refreshed
-  from the sheet — treat live Firestore as authoritative.
+  collection (`state.liveGuests`) as the ONLY source, mirroring the
+  invitation front-end. There is NO static fallback (`web/shared/guests.js` is
+  not imported anywhere in the dashboard). This means names and cabin
+  assignments always reflect what's actually in Firestore (the true source of
+  truth that guests update themselves), never a stale sheet snapshot. Treat
+  live Firestore as authoritative.
+
 - **Dashboard only loads the `thanks` collection** — the dashboard's
   `COLLECTIONS` map only loads `thanks` (plus the live `guests` listener and
   the `rooms` inventory). The legacy `rsvp_submissions`, `experience_suggestions`,
@@ -450,32 +479,31 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   `setDoc(doc(db, collections.guests, guestId), { guestId, hosting, updatedBy, updatedAt }, { merge: true })`.
   For the primary period it writes `hosting.cabin`/`hosting.room`; for the
   extra (coast) period it writes `hosting.xtraCabin`/`hosting.xtraRoom`,
-  preserving the other period's fields and the payment flags. This requires
-  `hosting` to be in the admin `affectedKeys().hasOnly([...])` list in
-  `firestore.rules` (`hasValidAdminGuestFields`) — it is NOT in the regular
-  guest list, so only admins can reassign cabins. The `hosting` structure is
-  validated by `hasValidGuestHostingFields()`. When adding a new hosting field,
-  add it to both the rules `hasValidGuestHostingFields()` and the admin
-  `affectedKeys()` list. Clearing an assignment (the "✕" remove button) writes
-  `null` to the active period's `cabin`/`room` (or `xtraCabin`/`xtraRoom`), so
-  the rules MUST use `isNullableShortText` (not `isShortText`) for those four
-  fields inside `hasValidGuestHostingFields()` — otherwise the write is denied
-  with a permission error even for admins. If the dashboard's cabin remove /
-  drag-and-drop / add-guest ever starts failing with permission errors, check
-  that (a) `hosting` is in the admin `affectedKeys().hasOnly([...])` list and
-  (b) the four cabin/room fields use `isNullableShortText`, then redeploy the
-  rules (`firebase deploy --only firestore:rules`).
-- **Dashboard cabin edits read `hosting` from the LIVE record, not the static
-  registry** — the remove ("✕"), drag-and-drop, and "+ Agregar" handlers in
-  `renderCabinAssignments()` all build the new `hosting` map from
-  `getLiveHosting(guestId)` (a helper that reads `state.liveGuests`), NOT from
-  `guestHosting(getGuest(guestId))`. The static `web/shared/guests.js` snapshot
-  has NO `hosting` data, so reading it there would build an empty map and wipe
-  the live assignment (and the payment flags / other period's fields) via
-  `merge: true`. Also, guests added via "+ Agregar" only exist in Firestore, so
-  `getGuest()` returns `undefined` for them — the handlers must NOT bail out on
-  that. Each handler logs `traceFirebase("cabin.<op>.start")` with the current
-  and next hosting so permission errors are easy to spot in the console.
+  preserving the other period's fields and the payment flags. **Admins have
+  FULL write access to any guest doc** — the `guests` write rule is
+  `(isAdmin() ? true : hasValidGuestContactFields()) && (isAdmin() || …)`, so
+  an admin can write `hosting` (and any other field) with no schema/affectedKeys
+  gymnastics. There is NO `hasValidAdminGuestFields()` / admin `affectedKeys()`
+  list anymore — that was removed to stop the permission errors. Regular guests
+  are still restricted to `hasValidGuestContactFields()` (which validates
+  `hosting` via `hasValidGuestHostingFields()` and allows `null` for
+  `cabin`/`room`/`xtraCabin`/`xtraRoom` via `isNullableShortText`). If the
+  dashboard's cabin remove / drag-and-drop / add-guest ever fails with a
+  permission error, the cause is almost always that the rules are NOT deployed
+  (the local file is fine but live Firestore is stale) — redeploy with
+  `firebase deploy --only firestore:rules`. `isAdmin()` requires the admin's
+  OWN guest doc (`guests/{auth.uid}`) to have `isAdmin == true`; the couple's
+  docs (`aydé_juárez_guadalupe`, `david_aïli`) have it set.
+- **Dashboard cabin edits read `hosting` from the LIVE record** — the remove
+  ("✕"), drag-and-drop, and "+ Agregar" handlers in `renderCabinAssignments()`
+  all build the new `hosting` map from `getLiveHosting(guestId)` (a helper that
+  reads `state.liveGuests`), NOT from `guestHosting(getGuest(guestId))`. This
+  preserves the other period's fields and the payment flags via `merge: true`.
+  Guests added via "+ Agregar" only exist in Firestore, so `getGuest()` returns
+  `undefined` for them — the handlers must NOT bail out on that. Each handler
+  logs `traceFirebase("cabin.<op>.start")` with the current and next hosting so
+  permission errors are easy to spot in the console.
+
 - **Dashboard cabin panel: remove + add-guest buttons** — besides drag-and-drop,
   the "Asignación de cabañas" panel has two more ways to edit assignments:
   (1) each guest row has a "✕" remove button (`data-remove-guest`) that clears
@@ -510,7 +538,55 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   replaces the old pill/rounded look (999px chips, 50% RSVP dots, 1.25rem+
   radii). When adding new dashboard UI, keep radii small and padding generous
   to match. Chips/badges use `0.35rem` radius, not `999px`.
+- **Dashboard INVITADOS table shows phone + an auth badge on avatars** — the
+  guest table renders a "Teléfono" column (between Grupo and Cabaña) from the
+  merged guest's `phone` (live `identity.phone` wins, then the live record's
+  own `phone`; see `getMergedGuest` in `dashboard.js` and `normalizeGuest` in
+  `guests.js`). The phone renders as a `tel:` link (`.dashboard-phone`) or a
+  muted "—" when empty. Each avatar is wrapped in `.dashboard-avatar-wrap` and
+  gets a small green "✓" badge (`.dashboard-auth-badge`) when the guest has a
+  Firebase Auth account and has logged in at least once. That set is derived
+  from the `login_events` collection (doc id = guest id), which the dashboard
+  loads via `COLLECTIONS.loginEvents` and stores in `state.loggedInGuestIds`
+  (a `Set` rebuilt in `loadDashboardData`). The Firestore rules already allow
+  admins to read `login_events` (`allow read: if isAdmin()`), and the dashboard
+  is admin-only, so the read always succeeds. When adding a new column, update
+  `GUEST_COLUMNS`, `guestSortValue`, the `<thead>`, and the row template.
+- **Dashboard tables panel is a real-life 30m × 6m seating canvas** — the
+  "Mesas" panel lives in `web/dashboard/src/tables.js` (imported by
+  `dashboard.js` as `loadTables` + `renderTablesManager`; styles in
+  `_tables.scss`). The main canvas represents the actual banquet hall floor at
+  real-life dimensions: `CANVAS_W = 30` m wide × `CANVAS_H = 6` m tall. Tables
+  are absolutely positioned at their real-life meter coordinates scaled to px
+  (`pxPerMeter = 20` for the main canvas, `12` for the secondary). The NOVIOS
+  banquet table (22 guests, `NOVIOS_CAPACITY`) sits centered horizontally with
+  11 seats north + 11 south; the remaining round tables of 10 (`ROUND_DIAM =
+  1.8` m) are distributed evenly — 6 on the left, 6 on the right
+  (`ROUNDS_PER_SIDE = 6`), in a 2-column × 3-row grid per side. The main canvas
+  therefore holds 13 tables (NOVIOS + 12 rounds). Any round table beyond the
+  12 main rounds (the 14th) is treated as the secondary table
+  (`isSecondaryTable`) and rendered centered on its own secondary canvas
+  ("Salón secundario"). Seat positions are computed in JS (`tableSeatPos`):
+  round = on the circumference, rectangle = two rows (north/south) spread from
+  the center outward. When adding a new table shape, update `tableSeatPos`,
+  `renderTableCard`, and the `.is-<shape>` CSS.
+- **Numbered "Mesa N" tables are ALWAYS square** — `tableShape()` in
+  `web/dashboard/src/tables.js` forces any table whose name matches
+  `/^Mesa\s+\d+$/i` to the `"square"` shape, regardless of the stored `shape`
+  field. Square tables render as a moderate square card with seats around the
+  4 edges (top/right/bottom/left), each side getting roughly a quarter of the
+  seats (`tableSeatPos` square branch). When adding a new shape, update
+  `tableShape`, `tableSeatPos`, `renderTableCard`, and the `.is-<shape>` CSS.
+- **Tables panel has an "Auto-ordenar" button** — the "Mesas" toolbar has an
+  "Auto-ordenar" button (`data-auto-layout`) that calls `computeLayout()` for
+  every table and persists each table's new `x`/`y`/`shape` via `setDoc`
+  (merge) on the `tables` collection, then re-renders. `computeLayout()` places
+  the NOVIOS table at the canvas CENTER and the round tables in the fixed
+  6-left / 6-right grid described above. When adding a new layout algorithm,
+  keep the NOVIOS-at-center + 6-per-side convention so the couple's mental
+  model stays consistent.
 - *(Add new lessons here as you discover them.)*
+
 
 
 

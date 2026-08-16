@@ -344,6 +344,54 @@
   color: $ink-muted;
 }
 
+// ── Avatar wrapper + auth badge ──
+// The avatar cell wraps the image in a relative container so a small "✓"
+// badge can sit on the corner when the guest has a Firebase Auth account and
+// has logged in at least once (derived from the `login_events` collection).
+.dashboard-avatar-wrap {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+.dashboard-auth-badge {
+  position: absolute;
+  right: -0.15rem;
+  bottom: -0.15rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.05rem;
+  height: 1.05rem;
+  border-radius: 50%;
+  background: $status-yes-bg;
+  color: $status-yes-text;
+  border: 2px solid $card-bg;
+  font-size: 0.6rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+// ── Phone column ──
+.dashboard-td-phone {
+  white-space: nowrap;
+}
+
+.dashboard-phone {
+  color: $accent;
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.dashboard-muted {
+  color: $ink-muted;
+}
+
+
 // ── Guest ID under the name ──
 .dashboard-guest-id {
   display: block;
