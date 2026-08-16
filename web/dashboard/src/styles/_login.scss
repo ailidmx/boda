@@ -9,12 +9,13 @@
 
 .dashboard-login-card {
   width: min(100%, 34rem);
-  padding: clamp(2rem, 6vw, 4rem);
+  padding: clamp(2.25rem, 6vw, 4.5rem);
   border: 1px solid $border-strong;
-  border-radius: 1.5rem;
+  border-radius: 0.75rem;
   background: $card-bg-solid;
   box-shadow: $shadow-login;
   text-align: center;
+
 
   h1 {
     margin-top: 0.4rem;
@@ -95,13 +96,14 @@
 
   input {
     width: 100%;
-    padding: 0.9rem 1rem 0.9rem 3rem;
+    padding: 0.95rem 1.1rem 0.95rem 3rem;
     border: 2px solid $border-strong;
-    border-radius: 0.75rem;
+    border-radius: 0.4rem;
     background: rgba(255, 253, 249, 0.9);
     font: inherit;
     font-size: 1rem;
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
 
     &:focus {
       outline: none;

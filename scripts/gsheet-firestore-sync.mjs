@@ -281,7 +281,12 @@ const PROTECTED_FIRESTORE_FIELDS = new Set([
   "rsvp.petanca",
   "rsvp.needBalls",
   "rsvp.answers",
+  // idCheckUser is a runtime-only flag set by the app when the guest
+  // acknowledges the identity check. The sheet column is empty, so the sync
+  // must never overwrite it (that would reset guests' identity-check status).
+  "idCheckUser",
 ]);
+
 
 function isProtectedField(path) {
   if (PROTECTED_FIRESTORE_FIELDS.has(path)) return true;
@@ -290,10 +295,23 @@ function isProtectedField(path) {
   return false;
 }
 
-// Remove protected (RSVP) fields from a payload so the sync never overwrites
-// guest RSVP responses. Returns a shallow copy with the rsvp object stripped.
+// Runtime-only Firestore paths that are set by the app (not the sheet) and
+// must never block the sync. flightInfo.* holds guest-entered flight details
+// from the FLIGHTS section; the sheet does not track them, so they must be
+// ignored when comparing the sheet/Firestore contract.
+function isRuntimeOnlyFirestorePath(path) {
+  return path.startsWith("flightInfo.");
+}
+
+
+// Remove protected fields from a payload so the sync never overwrites
+// runtime-only values (RSVP responses, idCheckUser). Returns a shallow copy
+// with protected top-level keys and nested rsvp fields stripped.
 function stripProtectedFields(payload) {
   const copy = { ...payload };
+  for (const key of Object.keys(copy)) {
+    if (isProtectedField(key)) delete copy[key];
+  }
   if (copy.rsvp && typeof copy.rsvp === "object") {
     const rsvp = { ...copy.rsvp };
     for (const key of Object.keys(rsvp)) {
@@ -307,6 +325,7 @@ function stripProtectedFields(payload) {
   }
   return copy;
 }
+
 
 
 
@@ -975,9 +994,10 @@ function summarizeAlerts(sheetLeaves, firestoreLeaves) {
     .map(([path]) => path);
 
   const firestoreUnknown = Object.entries(firestoreLeaves)
-    .filter(([path, value]) => !sheetLeaves.hasOwnProperty(path) && !isCompatField(path) && !path.startsWith("_") && !RUNTIME_ONLY_FIRESTORE_FIELDS.has(path) && !isProtectedField(path) && hasActualValue(value))
+    .filter(([path, value]) => !sheetLeaves.hasOwnProperty(path) && !isCompatField(path) && !path.startsWith("_") && !RUNTIME_ONLY_FIRESTORE_FIELDS.has(path) && !isProtectedField(path) && !isRuntimeOnlyFirestorePath(path) && hasActualValue(value))
     .map(([path]) => path);
   return { sheetUnknown, firestoreUnknown };
+
 
 }
 

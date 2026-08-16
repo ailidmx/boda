@@ -114,6 +114,35 @@ function kv(key, value) {
   return `${escapeMarkdown(key)}: ${escapeMarkdown(value)}`;
 }
 
+/**
+ * Format a duration in seconds as a short human-readable string
+ * (e.g. "2 h 5 min", "45 s"). Returns "" when the value is missing.
+ * @param {number|null|undefined} seconds
+ * @returns {string}
+ */
+function formatDuration(seconds) {
+  if (!Number.isFinite(seconds) || seconds < 0) return "";
+  const total = Math.round(seconds);
+  if (total < 60) return `${total} s`;
+  const minutes = Math.floor(total / 60);
+  const secs = total % 60;
+  if (minutes < 60) return secs ? `${minutes} min ${secs} s` : `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  return mins ? `${hours} h ${mins} min` : `${hours} h`;
+}
+
+/** Map a normalised source slug to a friendly label for the notification. */
+function sourceLabel(source) {
+  const map = {
+    email: "Correo",
+    whatsapp: "WhatsApp",
+    other: "Otro",
+  };
+  return map[source] || "Otro";
+}
+
+
 // Cloudinary cloud name is public (embedded in every delivery URL), so it is
 // safe to hard-code here. Guest avatars are stored under the `boda/` folder.
 const CLOUD_NAME = "k2ajcgxv";
@@ -148,13 +177,21 @@ export const onLogin = onDocumentCreated(
     const name = data.guestName || (await resolveGuestName(guestId)) || guestId;
     const time = formatTime(data.createdAt);
 
+    // When the guest arrived via an invitation link, the client also records
+    // the channel (source) and how long it took them to answer (timeToAnswer).
+    const source = sourceLabel(data.source);
+    const duration = formatDuration(data.timeToAnswer);
+
     const lines = [
       "🔓 *Nuevo inicio de sesión*",
       kv("Invitado", name),
       kv("Usuario", data.username || ""),
+      kv("Canal", source),
+      kv("Tiempo de respuesta", duration),
       kv("Hora", time),
     ];
     await notify(lines.filter(Boolean).join("\n"));
+
 
   },
 );

@@ -11,7 +11,6 @@
     "preview": "vite preview",
     "links": "node scripts/generate-invitation-links.mjs",
     "favicons": "node scripts/generate-favicons.mjs",
-    "test:profiles": "node --test tests/invitation-profile.test.mjs",
     "test:rules": "node --test tests/firestore.rules.test.mjs",
     "test:validation": "node --test tests/validation.test.mjs",
     "test:analytics": "node --test tests/analytics.test.mjs"
