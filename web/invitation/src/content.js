@@ -66,7 +66,7 @@ export const content = {
 
 
 
-      dashboard: "admin",
+      dashboard: "Admin",
       changeEmail: "Cambiar correo",
       changePassword: "Cambiar contraseña",
       music: "Música",
@@ -1815,7 +1815,7 @@ export const content = {
 
 
 
-      dashboard: "admin",
+      dashboard: "Admin",
       changeEmail: "Changer l’adresse e-mail",
       changePassword: "Changer le mot de passe",
       music: "Musique",
@@ -3565,7 +3565,7 @@ export const content = {
 
 
 
-      dashboard: "admin",
+      dashboard: "Admin",
       changeEmail: "Change email",
       changePassword: "Change password",
       music: "Music",

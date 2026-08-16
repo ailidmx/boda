@@ -4,8 +4,9 @@
 .dashboard {
   width: min(100% - 2rem, 90rem);
   margin: 0 auto;
-  padding: 2rem 0 5rem;
+  padding: 2.5rem 0 6rem;
 }
+
 
 .dashboard-header,
 .dashboard-section-heading {
@@ -42,8 +43,8 @@
 // Dark hero band behind the dashboard title for contrast with white text.
 .dashboard-header {
   margin: -2rem 0 0;
-  padding: 2.5rem 2rem;
-  border-radius: 1.25rem;
+  padding: 2.75rem 2.5rem;
+  border-radius: 0.75rem;
   background:
     radial-gradient(circle at 85% 20%, rgba(163, 125, 64, 0.35), transparent 22rem),
     linear-gradient(135deg, $dark-deep, $dark);
@@ -53,6 +54,7 @@
     color: $gold;
   }
 }
+
 
 .dashboard-header-actions {
   display: flex;
@@ -88,8 +90,8 @@
 .dashboard-summary-card {
   display: grid;
   gap: 0.35rem;
-  padding: 1.35rem;
-  border-radius: 1rem;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
 
   span,
   small {
@@ -105,14 +107,15 @@
 
 .dashboard-section {
   margin-top: 1.25rem;
-  padding: clamp(1.25rem, 3vw, 2rem);
-  border-radius: 1.25rem;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border-radius: 0.75rem;
 
   h2 {
     margin-top: 0.25rem;
     font-size: clamp(2rem, 4vw, 3rem);
   }
 }
+
 
 .dashboard-export {
   padding: 0.65rem 1rem;
@@ -129,7 +132,7 @@
 
 .dashboard-record {
   overflow: hidden;
-  border-radius: 0.85rem;
+  border-radius: 0.5rem;
 }
 
 .dashboard-record-heading {
@@ -137,7 +140,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  padding: 1rem 1.15rem;
+  padding: 1.15rem 1.4rem;
   color: $white;
   background: $dark;
 
@@ -157,8 +160,9 @@
 
 .dashboard-record-details {
   margin: 0;
-  padding: 0.75rem 1.15rem 1rem;
+  padding: 1rem 1.4rem 1.25rem;
 }
+
 
 .dashboard-detail-row {
   display: grid;

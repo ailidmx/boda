@@ -50,8 +50,23 @@ import "./styles/winamp.css";
 import "./styles/responsive.css";
 
 import { App } from "./App.jsx";
+import {
+  captureInvitationLinkParams,
+  cleanInvitationLinkUrl,
+} from "./invitation-link.js";
+
+// Capture the invitation-link query params (guest, password, utm_*, sent_at)
+// BEFORE they are hidden from the URL, so `signIn()` and `AuthGate` can still
+// read them for pre-fill and analytics after the cleanup below.
+captureInvitationLinkParams();
+
+// Hide the invitation-link query params from the address bar for cleaner
+// navigation and so the shared password is not left visible in the URL. This
+// runs before the first render; the captured params above survive it.
+cleanInvitationLinkUrl();
 
 // Register the service worker for offline support + PWA installability.
+
 
 // Only in production: in dev the Vite server handles HMR and we don't want a
 // service worker caching stale modules during development.

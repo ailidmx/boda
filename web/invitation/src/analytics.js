@@ -136,6 +136,30 @@ export function trackPageView({ pageTitle, pagePath, navigationType = "scroll" }
   });
 }
 
+/**
+ * Log an invitation-link visit. Fired when a guest arrives via a link that
+ * carries the analytics query-string params (guest email, UTM source, sent_at).
+ * Lets us measure which channel (email / WhatsApp / other) drives logins and
+ * how quickly guests answer after the invitation is sent.
+ *
+ * @param {object} opts
+ * @param {string} [opts.guest]       Login email from the `guest` param.
+ * @param {string} [opts.source]      Normalised channel: "email" | "whatsapp" | "other".
+ * @param {string} [opts.medium]      Raw UTM medium.
+ * @param {string} [opts.campaign]    Raw UTM campaign.
+ * @param {number|null} [opts.timeToAnswer]  Seconds between sent_at and now.
+ */
+export function trackInvitationVisit({ guest = "", source = "other", medium = "", campaign = "", timeToAnswer = null } = {}) {
+  trackEvent("invitation_visit", {
+    guest,
+    source,
+    medium,
+    campaign,
+    time_to_answer: timeToAnswer,
+  });
+}
+
+
 
 /**
  * Build the "cart items" for the RSVP funnel from the primary and extra stay
