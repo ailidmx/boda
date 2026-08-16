@@ -157,10 +157,14 @@ export const CABIN_NAME_MAP = {
   cabana_4: "CABAÑA 4",
   cabana_5: "CABAÑA 5",
   cabana_6: "CABAÑA 6",
-  madera_31: "CABAÑA 31",
-  madera_32: "CABAÑA 32",
-  madera_33: "CABAÑA 33",
-  madera_34: "CABAÑA 34",
+  // The "Cabaña de madera" units (31–34) are the SAME physical cabins as
+  // CABAÑA 1–4 in the room inventory. Their rooms are stored under
+  // CABAÑA 1/2/3/4 (e.g. madera_33 → CABAÑA 3-1), so map them accordingly.
+  madera_31: "CABAÑA 1",
+  madera_32: "CABAÑA 2",
+  madera_33: "CABAÑA 3",
+  madera_34: "CABAÑA 4",
+
 };
 
 /**

@@ -531,7 +531,7 @@
   max-width: calc((100% - 2.25rem) / 4);
   margin: 0;
   overflow: hidden;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 2 / 1;
   background: color-mix(in srgb, var(--sage) 12%, var(--white));
   box-shadow: 0 0.4rem 1rem rgb(36 33 25 / 10%);
   scroll-snap-align: start;

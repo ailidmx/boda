@@ -24,13 +24,14 @@
 
   select,
   input {
-    padding: 0.5rem 0.75rem;
+    padding: 0.6rem 0.85rem;
     border: 1px solid $border-strong;
-    border-radius: 0.5rem;
+    border-radius: 0.35rem;
     background: $card-bg;
     font: inherit;
     min-width: 10rem;
   }
+
 }
 
 .dashboard-filter-count {
@@ -46,6 +47,85 @@
   }
 }
 
+// ── Group filter navigation bar ──
+.dashboard-group-filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.dashboard-group-filter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid $border-strong;
+  border-radius: 0.4rem;
+  background: $card-bg;
+  color: $ink;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+
+
+  &:hover {
+    border-color: $accent;
+    background: rgba(138, 106, 54, 0.08);
+  }
+
+  &.is-active {
+    background: $accent;
+    border-color: $accent;
+    color: $white;
+  }
+}
+
+.dashboard-group-filter-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.35rem;
+  border-radius: 0.35rem;
+  background: rgba(85, 69, 45, 0.1);
+  font-size: 0.7rem;
+  font-weight: 700;
+
+
+  .dashboard-group-filter-btn.is-active & {
+    background: rgba(255, 255, 255, 0.25);
+  }
+}
+
+// ── Sortable column headers ──
+.dashboard-th-sort {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: $ink-muted;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s;
+
+  &:hover {
+    color: $accent;
+  }
+
+  &.is-active {
+    color: $accent;
+  }
+}
+
+
 // ── Table ──
 .dashboard-guest-table-wrap {
   overflow-x: auto;
@@ -57,7 +137,7 @@
   font-size: 0.85rem;
 
   th {
-    padding: 0.6rem 0.75rem;
+    padding: 0.75rem 0.9rem;
     border-bottom: 2px solid $border-strong;
     color: $ink-muted;
     font-size: 0.7rem;
@@ -69,10 +149,11 @@
   }
 
   td {
-    padding: 0.55rem 0.75rem;
+    padding: 0.7rem 0.9rem;
     border-bottom: 1px solid $border-light;
     vertical-align: middle;
   }
+
 
   tr:hover td {
     background: rgba(85, 69, 45, 0.03);
@@ -103,12 +184,13 @@
 // ── Badges ──
 .dashboard-badge {
   display: inline-block;
-  padding: 0.2rem 0.5rem;
-  border-radius: 999px;
+  padding: 0.25rem 0.55rem;
+  border-radius: 0.35rem;
   font-size: 0.75rem;
   font-weight: 600;
   white-space: nowrap;
 }
+
 
 .dashboard-badge-pending {
   background: $status-pending-bg;
@@ -222,3 +304,106 @@
     box-shadow: 0 0 0 2px rgba(138, 106, 54, 0.12);
   }
 }
+
+// ── Inline name fields (4 separate inputs) ──
+.dashboard-name-fields {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  min-width: 16rem;
+
+  .dashboard-inline-input {
+    min-width: 0;
+    flex: 1 1 6rem;
+  }
+}
+
+// ── Avatar column ──
+.dashboard-th-avatar,
+.dashboard-td-avatar {
+  width: 3rem;
+  text-align: center;
+}
+
+.dashboard-avatar {
+  display: inline-block;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(85, 69, 45, 0.15);
+  background: rgba(85, 69, 45, 0.06);
+  vertical-align: middle;
+}
+
+.dashboard-avatar-fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  color: $ink-muted;
+}
+
+// ── Guest ID under the name ──
+.dashboard-guest-id {
+  display: block;
+  margin-top: 0.15rem;
+  max-width: 16rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.7rem;
+  color: $ink-muted;
+}
+
+// ── Colored badge chips (grupo / cabaña / cuarto / xtra) ──
+.dashboard-badge-chip {
+  display: inline-block;
+  max-width: 11rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
+
+// ── RSVP attendance day chips (Vie / Sáb / Dom) ──
+.dashboard-th-day,
+.dashboard-td-day {
+  width: 2.6rem;
+  text-align: center;
+}
+
+.dashboard-rsvp-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border-radius: 0.35rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  vertical-align: middle;
+
+
+  &.is-none {
+    background: rgba(85, 69, 45, 0.08);
+    color: $ink-muted;
+  }
+
+  &.is-maybe {
+    background: $status-maybe-bg;
+    color: $status-maybe-text;
+  }
+
+  &.is-yes {
+    background: $status-yes-bg;
+    color: $status-yes-text;
+  }
+}
+

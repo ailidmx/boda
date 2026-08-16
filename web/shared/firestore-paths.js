@@ -23,16 +23,9 @@ export const collections = {
   rooms: "rooms",
   /** Cabin inventory + showcase (public content). */
   cabins: "cabins",
-  /** RSVP form submissions. */
-  rsvpSubmissions: "rsvp_submissions",
-  /** Petanque participation form submissions. */
-  petanqueParticipation: "petanque_participation",
-  /** Coast interest form submissions. */
-  coastInterest: "coast_interest",
-  /** Experience suggestions form submissions. */
-  experienceSuggestions: "experience_suggestions",
   /** Attendance responses (save-the-date). */
   attendanceResponses: "attendance_responses",
+
   /** Thanks / greetings (public content). */
   thanks: "thanks",
   /** RSVP scale config table (levels 1–5, localized messages + emoji). */
