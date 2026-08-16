@@ -37,24 +37,11 @@ service cloud.firestore {
       return field is string && field.size() <= maximum;
     }
 
-    function hasValidInvitationCode() {
-      return !request.resource.data.keys().hasAny(["invitationCode"])
-        || request.resource.data.invitationCode in [
-          "hortencia_privada_pagada",
-          "cabaña_33_privada_porpagar",
-          "azalea_compartida_porpagar",
-          "sin_cabaña",
-          "cabaña_5_privada_porpagar",
-          "cabaña_34_privada_pagada",
-          "cabaña_4_compartida_pagada",
-          "lavanda_compartida_porpagar",
-          "casona_compartida_pagada",
-          "margarita_compartida_porpagar",
-          "cabaña_6_privada_porpagar",
-          "dalia_compartida_porpagar",
-          "cabaña_31_privada_porpagar",
-          "cabaña_32_privada_porpagar"
-        ];
+    // A short text that may also be null. Used for the cabin/room assignment
+    // fields inside `hosting`: the dashboard clears an assignment by writing
+    // `null` (keeping the key present) rather than deleting the key.
+    function isNullableShortText(field, maximum) {
+      return field == null || (field is string && field.size() <= maximum);
     }
 
     function hasValidRsvpFields() {
@@ -75,7 +62,7 @@ service cloud.firestore {
           "arrivalTime", "arrivalAirline", "arrivalFlight", "departureFrom",
           "departureTo", "departureDate", "departureTime",
           "departureAirline", "departureFlight", "route", "notes",
-          "invitationCode", "language", "schemaVersion", "createdAt"
+          "language", "schemaVersion", "createdAt"
         ])
         && isShortText(request.resource.data.firstName, 100)
         && request.resource.data.firstName.size() > 0
@@ -117,7 +104,6 @@ service cloud.firestore {
     match /rsvp_submissions/{submissionId} {
       allow create: if isInvitedGuest()
         && hasSubmissionMetadata(3)
-        && hasValidInvitationCode()
         && hasValidRsvpFields();
       // Any authenticated guest may read submissions so the app can compute
       // correct prices and cabin occupancy across the whole guest list.
@@ -132,10 +118,9 @@ service cloud.firestore {
         && hasSubmissionMetadata(1)
         && request.resource.data.keys().hasOnly([
           "name", "dessert", "foodSuggestion", "songTitle", "songArtist",
-          "singInterest", "extra", "invitationCode", "language",
+          "singInterest", "extra", "language",
           "schemaVersion", "createdAt"
         ])
-        && hasValidInvitationCode()
         && isShortText(request.resource.data.name, 150)
         && request.resource.data.name.size() > 0
         && isShortText(request.resource.data.dessert, 50)
@@ -156,9 +141,8 @@ service cloud.firestore {
         && hasSubmissionMetadata(1)
         && request.resource.data.keys().hasOnly([
           "name", "interest", "partySize", "nights", "destination", "style",
-          "note", "invitationCode", "language", "schemaVersion", "createdAt"
+          "note", "language", "schemaVersion", "createdAt"
         ])
-        && hasValidInvitationCode()
         && isShortText(request.resource.data.name, 150)
         && request.resource.data.name.size() > 0
         && isShortText(request.resource.data.interest, 50)
@@ -178,10 +162,9 @@ service cloud.firestore {
       allow create: if isInvitedGuest()
         && request.resource.data.keys().hasOnly([
           "petanqueParticipation", "petanquePartySize", "petanqueNames",
-          "petanqueOwnBoules", "invitationCode", "language",
+          "petanqueOwnBoules", "language",
           "schemaVersion", "createdAt"
         ])
-        && hasValidInvitationCode()
         && isShortText(request.resource.data.petanqueParticipation, 30)
         && isShortText(request.resource.data.petanquePartySize, 2)
         && isShortText(request.resource.data.petanqueNames, 500)
@@ -275,13 +258,13 @@ service cloud.firestore {
               "isXtraCabinPaidByNovios", "isXtraCabinPaid"
             ])
             && (!request.resource.data.hosting.keys().hasAny(["cabin"])
-              || isShortText(request.resource.data.hosting.cabin, 150))
+              || isNullableShortText(request.resource.data.hosting.cabin, 150))
             && (!request.resource.data.hosting.keys().hasAny(["room"])
-              || isShortText(request.resource.data.hosting.room, 150))
+              || isNullableShortText(request.resource.data.hosting.room, 150))
             && (!request.resource.data.hosting.keys().hasAny(["xtraCabin"])
-              || isShortText(request.resource.data.hosting.xtraCabin, 150))
+              || isNullableShortText(request.resource.data.hosting.xtraCabin, 150))
             && (!request.resource.data.hosting.keys().hasAny(["xtraRoom"])
-              || isShortText(request.resource.data.hosting.xtraRoom, 150))
+              || isNullableShortText(request.resource.data.hosting.xtraRoom, 150))
             && (!request.resource.data.hosting.keys().hasAny(["isCabinPaidByNovios"])
               || request.resource.data.hosting.isCabinPaidByNovios is bool)
             && (!request.resource.data.hosting.keys().hasAny(["isCabinPaid"])
@@ -438,17 +421,18 @@ service cloud.firestore {
 
 
     // ADMIN WRITE SCOPE: Administrators may additionally modify `invitationGroup`
-    // (reassign a guest to a different invitation group) and `_deleted`
-    // (soft-delete a guest). These are privileged operations that regular
-    // guests must never perform. All other field restrictions from
-    // hasValidGuestContactFieldsBase() still apply.
+    // (reassign a guest to a different invitation group), `_deleted`
+    // (soft-delete a guest), and `hosting` (reassign a guest to a different
+    // cabin/room from the dashboard's drag-and-drop cabin panel). These are
+    // privileged operations that regular guests must never perform. All other
+    // field restrictions from hasValidGuestContactFieldsBase() still apply.
     function hasValidAdminGuestFields() {
       return hasValidGuestContactFieldsBase()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           "guestId", "identity",
           "idCheckUser", "cloudinaryId", "messageAuthor",
           "firstName", "middleName", "lastName", "maternalLastName", "gender", "cloudinaryId", "lang", "age", "phone",
-          "rsvp", "flightInfo", "invitationGroup", "updatedBy", "updatedAt", "_deleted"
+          "rsvp", "flightInfo", "invitationGroup", "hosting", "updatedBy", "updatedAt", "_deleted"
         ]);
     }
 
@@ -515,13 +499,29 @@ service cloud.firestore {
           "guestId", "username", "createdAt"
         ])
         && request.resource.data.keys().hasOnly([
-          "guestId", "username", "createdAt"
+          "guestId", "username", "createdAt",
+          "source", "medium", "campaign", "sentAt", "timeToAnswer"
         ])
         && isShortText(request.resource.data.guestId, 100)
         && request.resource.data.guestId == request.auth.uid
         && isShortText(request.resource.data.username, 200)
-        && request.resource.data.createdAt == request.time;
+        && request.resource.data.createdAt == request.time
+        // Optional invitation-link analytics fields (written only when the
+        // guest arrived via a link). `source` is a normalised channel slug
+        // ("email" | "whatsapp" | "other"); `medium`/`campaign` are raw UTM
+        // values; `sentAt` is epoch ms; `timeToAnswer` is seconds. All are
+        // optional, so a plain login (no link) still passes.
+        && (request.resource.data.keys().hasAny(["source", "medium", "campaign", "sentAt", "timeToAnswer"])
+            ? (
+                (!request.resource.data.keys().hasAny(["source"]) || isShortText(request.resource.data.source, 20))
+                && (!request.resource.data.keys().hasAny(["medium"]) || isShortText(request.resource.data.medium, 50))
+                && (!request.resource.data.keys().hasAny(["campaign"]) || isShortText(request.resource.data.campaign, 100))
+                && (!request.resource.data.keys().hasAny(["sentAt"]) || request.resource.data.sentAt is number)
+                && (!request.resource.data.keys().hasAny(["timeToAnswer"]) || request.resource.data.timeToAnswer is number)
+              )
+            : true);
     }
+
 
     match /login_events/{eventId} {
       allow create: if request.auth != null && hasValidLoginEventFields();

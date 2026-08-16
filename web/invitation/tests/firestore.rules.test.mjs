@@ -41,7 +41,6 @@ const rsvp = {
   departureFlight: "AM36",
   route: "Málaga — Madrid — Guadalajara",
   notes: "",
-  invitationCode: "azalea_compartida_porpagar",
   language: "fr",
   schemaVersion: 3,
   createdAt: serverTimestamp(),
@@ -55,7 +54,6 @@ const suggestion = {
   songArtist: "Édith Piaf",
   singInterest: "maybe",
   extra: "",
-  invitationCode: "azalea_compartida_porpagar",
   language: "fr",
   schemaVersion: 1,
   createdAt: serverTimestamp(),
@@ -69,7 +67,6 @@ const coast = {
   destination: "barra",
   style: "hotel",
   note: "",
-  invitationCode: "azalea_compartida_porpagar",
   language: "fr",
   schemaVersion: 1,
   createdAt: serverTimestamp(),
@@ -124,16 +121,6 @@ test("outdated or unexpected RSVP fields are rejected", async () => {
       ...rsvp,
       schemaVersion: 1,
       contact: "not part of schema 3",
-    }),
-  );
-});
-
-test("unknown invitation profiles are rejected", async () => {
-  const db = environment.authenticatedContext(guestUid).firestore();
-  await assertFails(
-    setDoc(doc(db, "rsvp_submissions", "unknown-profile"), {
-      ...rsvp,
-      invitationCode: "palacio_admin_pagado",
     }),
   );
 });
