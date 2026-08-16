@@ -357,7 +357,142 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   load/refresh (the session is restored from `browserLocalPersistence`), so
   writing there would spam the couple with a login notification on every
   refresh even though the guest did not actually log in.
+- **Dashboard summary cards read the live `guests` collection** — the
+  dashboard's top summary cards for FRIDAY / SATURDAY / SUNDAY attendance come
+  from a live `onSnapshot` listener on the `guests` collection
+  (`state.liveGuests` in `web/dashboard/src/dashboard.js`), NOT from the legacy
+  `rsvp_submissions` collection. Each guest's `rsvp.answers` map holds a scale
+  level (int 0–5) per attendance day (`friday`/`saturday`/`sunday`); a guest
+  counts as "confirmed" when the level is ≥ 4 (`RSVP_CONFIRMED_MIN_LEVEL`).
+  The helper `computeDayConfirmations()` aggregates these. When adding a new
+  attendance day or changing the confirmation threshold, update
+  `RSVP_ATTENDANCE_DAYS` / `RSVP_CONFIRMED_MIN_LEVEL` and the summary cards.
+- **Dashboard INVITADOS table merges static + live guest data** — the guest
+  table in `renderGuestManager()` renders each row from `getMergedGuest(guest)`,
+  which merges the static `web/shared/guests.js` record (group, cabinLabel,
+  unit) with the LIVE Firestore record from `state.liveGuests` (real `identity`
+  names/photo, `hosting` incl. `xtraCabin`/`xtraRoom`, and `rsvp.answers`).
+  Live wins where both exist. Columns: avatar (from `identity.cloudinaryId` via
+  `guestAvatarUrl`, built as `https://res.cloudinary.com/k2ajcgxv/image/upload/q_auto,f_auto,c_fill,g_auto,w_256,h_256/<id>`),
+  name with the guest ID shown underneath (hover shows the ID in the title),
+  colored badges for grupo/cabaña/cuarto/cabaña-extra/cuarto-extra
+  (`badgeHtml` → deterministic pastel `badgeStyle`), per-day RSVP chips
+  (`rsvpLevelChip`: gray "—" = no answer, amber = level 1–3, green = level 4–5),
+  and the status badge. The status badge (`guestStatusBadge`) is derived from
+  the LIVE `rsvp.answers` (confirmed = any day ≥ 4, partial = answered but not
+  confirmed, pending = no answers), NOT the legacy `rsvp_submissions`. When
+  adding a column, update the `<thead>`, the row template, and the group-header
+  `colspan` (currently 12).
+- **Dashboard cabin matching reads `cabin`/`xtraCabin` (mirrors the front-end)** —
+  the "Asignación de cabañas" panel (`renderCabinAssignments` in
+  `web/dashboard/src/dashboard.js`) groups guests by the active period's cabin
+  field. For the primary period (Viernes → Domingo) it reads `cabin`; for the
+  extra period (Domingo → Martes, coast) it reads `xtraCabin`. The dashboard's
+  OWN normalizer (`normalizeGuest` in `web/dashboard/src/guests.js`) exposes the
+  primary-period cabin as BOTH `unit` (the historical field used by the INVITADOS
+  table via `getMergedGuest`) and `cabin` (the field the invitation front-end
+  reads, used by the cabins panel). Both resolve the same chain:
+  `hosting.cabin || g.cabin || g.unit || staticGuest.unit` — so live Firestore
+  `hosting.cabin` wins, then the live record's top-level `cabin`/`unit`, then the
+  static registry. This mirrors the invitation's `normalizeGuestRecord`
+  (`cabin: hosting.cabin ?? data.cabin`) so the dashboard and the invitation
+  agree on assignments. Rooms are matched to cabins via
+  `getCabinDisplayName(cabin)` → `getRoomsByCabin(displayName)`, and guests to
+  rooms via `getRoomOccupancy(room.id, c.guests)` (filters `g.room === roomId`;
+  pass the cabin's MERGED guests so live-assigned rooms on `hosting.room` are
+  counted — raw live guests store their room on `hosting.room`, not `room`).
+  When adding a new cabin field, update `cabinField`/`roomField` in
+  `renderCabinAssignments` and the `CABIN_NAME_MAP` in `rooms.js`.
+
+- **`CABIN_NAME_MAP` maps the "Cabaña de madera" units to `CABAÑA 1–4`** — the
+  `madera_31/32/33/34` unit codes are the SAME physical cabins as `CABAÑA 1/2/3/4`
+  in the room inventory (their rooms are stored under `CABAÑA 1-1`, `CABAÑA 2-1`,
+  `CABAÑA 3-1`, `CABAÑA 4-1`, etc.). `getCabinDisplayName` therefore maps
+  `madera_31 → "CABAÑA 1"`, `madera_32 → "CABAÑA 2"`, `madera_33 → "CABAÑA 3"`,
+  `madera_34 → "CABAÑA 4"`. Do NOT map them to `CABAÑA 31–34` — no rooms exist
+  under those names, so the cabin card would show 0 capacity/0 guests.
+- **Dead notification collections have no app writes** — `rsvp_submissions`,
+  `petanque_participation`, `coast_interest`, and `experience_suggestions` are
+  NOT written by the app anymore (the current RSVP/petanque/coast mini-RSVP flows
+  save answers directly to the `guests` collection via `saveRsvpAnswers` →
+  `rsvp.answers`). The dashboard does NOT load them, the path constants were
+  removed from `web/shared/firestore-paths.js`, and the legacy
+  `web/invitation/src/submit-forms.js` (with `submitRsvp`/`submitPetanque`/
+  `submitCoast`) was deleted. If you still see
+  `[firebase:load.collection] {collection: 'rsvp_submissions'…}` logs in the
+  dashboard console, it's a stale cached build — hard-refresh / redeploy.
+
+- **Dashboard guest list + cabins panel are LIVE-first** — both
+  `getFilteredGuests()` (INVITADOS table) and `renderCabinAssignments()`
+  (Cabañas panel) build their guest list from the LIVE Firestore `guests`
+  collection (`state.liveGuests`) as the primary source, mirroring the
+  invitation front-end. Static guests (`web/shared/guests.js`) are only
+  appended for ids that have no live record yet (see `getAllDashboardGuests()`).
+  This means names and cabin assignments always reflect what's actually in
+  Firestore (the true source of truth that guests update themselves), never a
+  stale sheet snapshot. The static snapshot's generator script
+  (`scripts/generate-guests.mjs`) no longer exists, so it cannot be refreshed
+  from the sheet — treat live Firestore as authoritative.
+- **Dashboard only loads the `thanks` collection** — the dashboard's
+  `COLLECTIONS` map only loads `thanks` (plus the live `guests` listener and
+  the `rooms` inventory). The legacy `rsvp_submissions`, `experience_suggestions`,
+  `coast_interest`, and `petanque_participation` collections are NOT loaded and
+  their tabs/panels/CSV-export/record-card code was removed from
+  `web/dashboard/src/dashboard.js`. The path constants may still exist in
+  `web/shared/firestore-paths.js` but nothing reads them from the dashboard.
+  If you still see `[firebase:load.collection] {collection: 'rsvp_submissions'…}`
+  logs in the console, it's a stale cached build — hard-refresh.
+- **Dashboard cabin drag-and-drop reassignment writes `hosting`** — the
+  "Asignación de cabañas" panel supports drag-and-drop: each guest row is
+  `draggable` (`data-guest-id`) and each room block is a drop target
+  (`data-room-id` + `data-cabin-unit`). Dropping a guest persists the new
+  assignment to the guest's `hosting` map in Firestore via
+  `setDoc(doc(db, collections.guests, guestId), { guestId, hosting, updatedBy, updatedAt }, { merge: true })`.
+  For the primary period it writes `hosting.cabin`/`hosting.room`; for the
+  extra (coast) period it writes `hosting.xtraCabin`/`hosting.xtraRoom`,
+  preserving the other period's fields and the payment flags. This requires
+  `hosting` to be in the admin `affectedKeys().hasOnly([...])` list in
+  `firestore.rules` (`hasValidAdminGuestFields`) — it is NOT in the regular
+  guest list, so only admins can reassign cabins. The `hosting` structure is
+  validated by `hasValidGuestHostingFields()`. When adding a new hosting field,
+  add it to both the rules `hasValidGuestHostingFields()` and the admin
+  `affectedKeys()` list. Clearing an assignment (the "✕" remove button) writes
+  `null` to the active period's `cabin`/`room` (or `xtraCabin`/`xtraRoom`), so
+  the rules MUST use `isNullableShortText` (not `isShortText`) for those four
+  fields inside `hasValidGuestHostingFields()` — otherwise the write is denied
+  with a permission error even for admins. If the dashboard's cabin remove /
+  drag-and-drop / add-guest ever starts failing with permission errors, check
+  that (a) `hosting` is in the admin `affectedKeys().hasOnly([...])` list and
+  (b) the four cabin/room fields use `isNullableShortText`, then redeploy the
+  rules (`firebase deploy --only firestore:rules`).
+- **Dashboard cabin edits read `hosting` from the LIVE record, not the static
+  registry** — the remove ("✕"), drag-and-drop, and "+ Agregar" handlers in
+  `renderCabinAssignments()` all build the new `hosting` map from
+  `getLiveHosting(guestId)` (a helper that reads `state.liveGuests`), NOT from
+  `guestHosting(getGuest(guestId))`. The static `web/shared/guests.js` snapshot
+  has NO `hosting` data, so reading it there would build an empty map and wipe
+  the live assignment (and the payment flags / other period's fields) via
+  `merge: true`. Also, guests added via "+ Agregar" only exist in Firestore, so
+  `getGuest()` returns `undefined` for them — the handlers must NOT bail out on
+  that. Each handler logs `traceFirebase("cabin.<op>.start")` with the current
+  and next hosting so permission errors are easy to spot in the console.
+- **Dashboard cabin panel: remove + add-guest buttons** — besides drag-and-drop,
+  the "Asignación de cabañas" panel has two more ways to edit assignments:
+  (1) each guest row has a "✕" remove button (`data-remove-guest`) that clears
+  the ACTIVE period's `cabin`+`room` (primary) or `xtraCabin`+`xtraRoom` (extra)
+  from the guest's `hosting` map by setting those keys to `null` (NOT deleting
+  them — the keys stay present so the field exists; the Firestore rules accept
+  `null` via `isNullableShortText`), preserving the other period's fields and
+  payment flags; (2) each cabin card heading has a
+  "+ Agregar" button (`data-add-guest`) that opens a modal listing every guest
+  WITHOUT a cabin in the active period (unassigned), sorted A→Z by name with
+  their avatar (`guestAvatarUrl`), and assigns the picked guest to the cabin's
+  FIRST room (`getRoomsByCabin(displayName)[0]`). Both write the same `hosting`
+  payload shape as drag-and-drop and re-render on success. The unassigned
+  filter reads the merged guest's `unit` (primary) or `xtraCabin` (extra).
 - **Inactivity tracking is isolated in `useActivityTracker`** — the
+
+
   `web/invitation/src/hooks/useActivityTracker.js` hook listens to user-activity
   events (mouse, keyboard, scroll, touch, pointer) and, after the idle threshold
   (default 5 min), logs a Firebase Analytics `user_inactive` event and writes a
@@ -368,7 +503,15 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   the guest is idle or the tab is hidden — idle/hidden time is NOT counted as
   "time spent" on a section. When adding a new activity signal, extend the
   `ACTIVITY_EVENTS` list and the `type` enum in the rules.
+- **Dashboard design language is "sharp & airy"** — the dashboard SCSS
+  (`web/dashboard/src/styles/*.scss`) uses small border radii (cards/sections
+  `0.5rem`, inputs/buttons `0.35rem`, tabs `0.4rem`) and generous padding
+  (cards `1.15rem`, table cells `0.7rem 0.9rem`, modal body `1.75rem`). This
+  replaces the old pill/rounded look (999px chips, 50% RSVP dots, 1.25rem+
+  radii). When adding new dashboard UI, keep radii small and padding generous
+  to match. Chips/badges use `0.35rem` radius, not `999px`.
 - *(Add new lessons here as you discover them.)*
+
 
 
 
