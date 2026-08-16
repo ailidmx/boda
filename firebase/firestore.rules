@@ -37,6 +37,13 @@ service cloud.firestore {
       return field is string && field.size() <= maximum;
     }
 
+    // A short text that may also be null. Used for the cabin/room assignment
+    // fields inside `hosting`: the dashboard clears an assignment by writing
+    // `null` (keeping the key present) rather than deleting the key.
+    function isNullableShortText(field, maximum) {
+      return field == null || (field is string && field.size() <= maximum);
+    }
+
     function hasValidRsvpFields() {
       return request.resource.data.keys().hasAll([
           "firstName", "lastName", "email", "whatsapp", "attendance",
@@ -251,13 +258,13 @@ service cloud.firestore {
               "isXtraCabinPaidByNovios", "isXtraCabinPaid"
             ])
             && (!request.resource.data.hosting.keys().hasAny(["cabin"])
-              || isShortText(request.resource.data.hosting.cabin, 150))
+              || isNullableShortText(request.resource.data.hosting.cabin, 150))
             && (!request.resource.data.hosting.keys().hasAny(["room"])
-              || isShortText(request.resource.data.hosting.room, 150))
+              || isNullableShortText(request.resource.data.hosting.room, 150))
             && (!request.resource.data.hosting.keys().hasAny(["xtraCabin"])
-              || isShortText(request.resource.data.hosting.xtraCabin, 150))
+              || isNullableShortText(request.resource.data.hosting.xtraCabin, 150))
             && (!request.resource.data.hosting.keys().hasAny(["xtraRoom"])
-              || isShortText(request.resource.data.hosting.xtraRoom, 150))
+              || isNullableShortText(request.resource.data.hosting.xtraRoom, 150))
             && (!request.resource.data.hosting.keys().hasAny(["isCabinPaidByNovios"])
               || request.resource.data.hosting.isCabinPaidByNovios is bool)
             && (!request.resource.data.hosting.keys().hasAny(["isCabinPaid"])
@@ -414,17 +421,18 @@ service cloud.firestore {
 
 
     // ADMIN WRITE SCOPE: Administrators may additionally modify `invitationGroup`
-    // (reassign a guest to a different invitation group) and `_deleted`
-    // (soft-delete a guest). These are privileged operations that regular
-    // guests must never perform. All other field restrictions from
-    // hasValidGuestContactFieldsBase() still apply.
+    // (reassign a guest to a different invitation group), `_deleted`
+    // (soft-delete a guest), and `hosting` (reassign a guest to a different
+    // cabin/room from the dashboard's drag-and-drop cabin panel). These are
+    // privileged operations that regular guests must never perform. All other
+    // field restrictions from hasValidGuestContactFieldsBase() still apply.
     function hasValidAdminGuestFields() {
       return hasValidGuestContactFieldsBase()
         && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
           "guestId", "identity",
           "idCheckUser", "cloudinaryId", "messageAuthor",
           "firstName", "middleName", "lastName", "maternalLastName", "gender", "cloudinaryId", "lang", "age", "phone",
-          "rsvp", "flightInfo", "invitationGroup", "updatedBy", "updatedAt", "_deleted"
+          "rsvp", "flightInfo", "invitationGroup", "hosting", "updatedBy", "updatedAt", "_deleted"
         ]);
     }
 
