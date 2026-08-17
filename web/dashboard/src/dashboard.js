@@ -262,17 +262,21 @@ function guestInitials(guest) {
 // used by `guestSortValue`. "avatar" is intentionally NOT sortable. The ID and
 // phone are NOT standalone columns — they live inside the "Identidad" column.
 const GUEST_SORT_COLUMNS = [
-  "name", "idCheck", "hasAuth", "group", "cabin", "room", "xtraCabin", "xtraRoom",
+  "name", "invitationGroup", "idCheck", "hasAuth", "group", "cabin", "room", "xtraCabin", "xtraRoom",
   "status",
 ];
+
 
 // Extract the sortable value for a guest given a column key.
 function guestSortValue(guest, key) {
   switch (key) {
     case "name":
       return guestFullName(guest).toLowerCase();
+    case "invitationGroup":
+      return (guest.invitationGroup || "").toLowerCase();
     case "idCheck":
       return guest.idCheckUser ? 1 : 0;
+
     case "hasAuth":
       return state.authUsers[guest.id] ? 1 : 0;
 
@@ -812,9 +816,128 @@ async function saveGuestInline(guestId, field, value) {
 }
 
 
+// ── Invitation group column (rename + pick another group) ──────────────
+
+// Sorted set of existing invitation group names: the `invitation_groups`
+// collection ids plus every distinct `invitationGroup` value currently used by
+// guests. Used to populate the "pick another group" dropdown.
+function getInvitationGroupOptions() {
+  const names = new Set();
+  state.invitationGroups.forEach((g) => {
+    if (g.id) names.add(g.id);
+  });
+  getActiveGuests().forEach((g) => {
+    if (g.invitationGroup) names.add(g.invitationGroup);
+  });
+  return [...names].sort((a, b) => a.localeCompare(b));
+}
+
+// Reusable confirm modal. `onConfirm` may be async; the modal shows a working
+// state and only closes on success.
+function openConfirmModal({ title, message, confirmLabel = "Confirmar", cancelLabel = "Cancelar", onConfirm }) {
+  const overlay = document.createElement("div");
+  overlay.className = "dashboard-modal-overlay";
+  overlay.innerHTML = `
+    <div class="dashboard-modal" style="max-width: 28rem;">
+      <div class="dashboard-modal-heading">
+        <h3>${title}</h3>
+        <button class="dashboard-modal-close" data-modal-close type="button">✕</button>
+      </div>
+      <div class="dashboard-modal-form">
+        <p style="line-height:1.6;color:#55452d;">${message}</p>
+        <div class="dashboard-modal-actions">
+          <button class="dashboard-button" type="button" data-confirm>${confirmLabel}</button>
+          <button class="dashboard-button dashboard-button-secondary" type="button" data-modal-close>${cancelLabel}</button>
+        </div>
+        <small data-confirm-status></small>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const close = () => overlay.remove();
+  overlay.querySelectorAll("[data-modal-close]").forEach((btn) => btn.addEventListener("click", close));
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+
+  overlay.querySelector("[data-confirm]").addEventListener("click", async () => {
+    const status = overlay.querySelector("[data-confirm-status]");
+    const btn = overlay.querySelector("[data-confirm]");
+    btn.disabled = true;
+    status.textContent = "Actualizando…";
+    status.dataset.state = "working";
+    try {
+      await onConfirm();
+      close();
+    } catch (err) {
+      console.error("Confirm action failed", err);
+      status.textContent = "❌ Error al actualizar.";
+      status.dataset.state = "error";
+      btn.disabled = false;
+    }
+  });
+}
+
+// Change a guest's `invitationGroup` (rename or pick another group). Saves the
+// new value to this guest first, then — if the old group was shared by other
+// guests — asks whether to apply the same change to all of them.
+async function applyInvitationGroupChange(guestId, oldName, newName) {
+  const trimmedOld = String(oldName || "").trim();
+  const trimmedNew = String(newName || "").trim();
+  if (!trimmedNew || trimmedOld === trimmedNew) return;
+
+  const ok = await saveGuestInline(guestId, "invitationGroup", trimmedNew);
+  if (!ok) return;
+
+  const affected = getActiveGuests().filter(
+    (g) => g.id !== guestId && (g.invitationGroup || "").trim() === trimmedOld,
+  );
+
+  if (trimmedOld && affected.length > 0) {
+    openConfirmModal({
+      title: "Aplicar a todo el grupo",
+      message: `¿Quieres actualizar también a los <strong>${affected.length}</strong> invitados que tenían el grupo de invitación "<strong>${trimmedOld}</strong>"?`,
+      confirmLabel: "Sí, actualizar todos",
+      cancelLabel: "Solo este invitado",
+      onConfirm: async () => {
+        for (const g of affected) {
+          await saveGuestInline(g.id, "invitationGroup", trimmedNew);
+        }
+        renderGuestManager();
+      },
+    });
+  }
+  renderGuestManager();
+}
+
+// Cell for the "Invitación" column: shows the guest's invitation group as a
+// clickable display that reveals an inline editor with a rename input and a
+// dropdown to pick another existing group.
+const invitationGroupCell = (guest) => {
+  const current = guest.invitationGroup || "";
+  const options = getInvitationGroupOptions();
+  const selectOptions = options
+    .map((o) => `<option value="${o}" ${o === current ? "selected" : ""}>${o}</option>`)
+    .join("");
+  return `
+    <div class="dashboard-invgroup-cell" data-invgroup-cell="${guest.id}">
+      <button type="button" class="dashboard-invgroup-display" data-invgroup-display="${guest.id}" title="Editar grupo de invitación">
+        ${current || "—"}
+      </button>
+      <div class="dashboard-invgroup-editor" data-invgroup-editor="${guest.id}" hidden>
+        <input class="dashboard-inline-input" type="text" value="${current}" data-invgroup-rename="${guest.id}" placeholder="Renombrar grupo…" />
+        <select class="dashboard-inline-select" data-invgroup-select="${guest.id}" title="Elegir otro grupo de invitación">
+          <option value="">— Elegir grupo —</option>
+          ${selectOptions}
+        </select>
+        <button type="button" class="dashboard-link-btn" data-invgroup-done="${guest.id}" title="Listo">✓</button>
+      </div>
+    </div>`;
+};
+
 // ── Delete confirm modal ───────────────────────────────────────────────
 
 function openDeleteConfirm(guest) {
+
   const overlay = document.createElement("div");
   overlay.className = "dashboard-modal-overlay";
   overlay.innerHTML = `
@@ -1280,10 +1403,12 @@ function renderGuestManager() {
         <thead>
           <tr>
             ${sortTh("name", "Identidad")}
+            ${sortTh("invitationGroup", "Invitación")}
             ${sortTh("group", "Grupo")}
 
 
             ${sortTh("cabin", "Cabaña")}
+
             ${sortTh("room", "Cuarto")}
             ${sortTh("xtraCabin", "Cabaña extra")}
             ${sortTh("xtraRoom", "Cuarto extra")}
@@ -1305,7 +1430,9 @@ function renderGuestManager() {
               return `
             <tr class="dashboard-guest-row">
               <td>${identityCell(merged)}</td>
+              <td>${invitationGroupCell(merged)}</td>
               <td>${badgeHtml(merged.group)}</td>
+
 
 
               <td>${badgeHtml(merged.cabinLabel || merged.unit || "")}</td>
@@ -1416,7 +1543,58 @@ function renderGuestManager() {
     });
   });
 
+  // ── Invitation group editor: reveal on click ──
+  container.querySelectorAll("[data-invgroup-display]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const guestId = btn.dataset.invgroupDisplay;
+      const editor = container.querySelector(`[data-invgroup-editor="${guestId}"]`);
+      if (!editor) return;
+      editor.hidden = !editor.hidden;
+      if (!editor.hidden) {
+        const rename = editor.querySelector(`[data-invgroup-rename="${guestId}"]`);
+        if (rename) rename.focus();
+      }
+    });
+  });
+
+  // ── Invitation group: rename (free text) ──
+  container.querySelectorAll("[data-invgroup-rename]").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const guestId = input.dataset.invgroupRename;
+      const oldName = getGuest(guestId)?.invitationGroup || "";
+      const newName = input.value.trim();
+      if (!newName || newName === oldName) return;
+      await applyInvitationGroupChange(guestId, oldName, newName);
+    });
+  });
+
+  // ── Invitation group: pick another existing group ──
+  container.querySelectorAll("[data-invgroup-select]").forEach((select) => {
+    select.addEventListener("change", async () => {
+      const guestId = select.dataset.invgroupSelect;
+      const oldName = getGuest(guestId)?.invitationGroup || "";
+      const newName = select.value.trim();
+      if (!newName || newName === oldName) return;
+      await applyInvitationGroupChange(guestId, oldName, newName);
+    });
+  });
+
+  // ── Invitation group: done button ──
+  container.querySelectorAll("[data-invgroup-done]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const guestId = btn.dataset.invgroupDone;
+      const editor = container.querySelector(`[data-invgroup-editor="${guestId}"]`);
+      const display = container.querySelector(`[data-invgroup-display="${guestId}"]`);
+      if (editor) editor.hidden = true;
+      if (display) {
+        const guest = getGuest(guestId);
+        if (guest) display.textContent = guest.invitationGroup || "—";
+      }
+    });
+  });
+
   // ── Edit guest (modal) ──
+
   container.querySelectorAll("[data-edit-guest]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const guestId = btn.dataset.editGuest;

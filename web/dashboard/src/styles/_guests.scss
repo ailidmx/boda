@@ -666,7 +666,74 @@
 }
 
 
+// ── Invitation group cell: read-only display + rename/dropdown editor ──
+.dashboard-invgroup-cell {
+  min-width: 10rem;
+}
+
+.dashboard-invgroup-display {
+  display: inline-block;
+  max-width: 100%;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid transparent;
+  border-radius: 0.35rem;
+  background: transparent;
+  font: inherit;
+  font-size: 0.85rem;
+  color: $ink;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: $border-strong;
+    background: rgba(255, 253, 249, 0.6);
+    color: $accent;
+  }
+}
+
+.dashboard-invgroup-editor {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 0.3rem;
+  align-items: center;
+  margin-top: 0.35rem;
+  padding: 0.5rem;
+  border: 1px solid $border-strong;
+  border-radius: 0.4rem;
+  background: rgba(255, 253, 249, 0.7);
+
+  // The `hidden` attribute must win over `display: grid` so the editor stays
+  // collapsed until the user clicks the group name (view mode → edit mode).
+  &[hidden] {
+    display: none;
+  }
+
+  .dashboard-inline-input {
+    min-width: 0;
+  }
+
+  .dashboard-inline-select {
+    min-width: 0;
+    max-width: 9rem;
+    padding: 0.35rem 0.4rem;
+    border: 1px solid $border-strong;
+    border-radius: 0.35rem;
+    background: #fffdf9;
+    font: inherit;
+    font-size: 0.8rem;
+    color: $ink;
+  }
+
+  .dashboard-link-btn {
+    justify-self: end;
+    font-size: 1.1rem;
+  }
+}
+
+
 // ── Group nav bar (flat chips above the table) ──
+
 .dashboard-group-nav {
   display: flex;
   flex-wrap: wrap;

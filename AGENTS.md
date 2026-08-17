@@ -583,7 +583,23 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   replaces the old pill/rounded look (999px chips, 50% RSVP dots, 1.25rem+
   radii). When adding new dashboard UI, keep radii small and padding generous
   to match. Chips/badges use `0.35rem` radius, not `999px`.
+- **Dashboard INVITADOS table has an "Invitación" column (rename + pick another group)** —
+  the guest table's "Invitación" column (`invitationGroupCell` in `dashboard.js`)
+  shows the guest's `invitationGroup` as a clickable display that reveals an
+  inline editor with a free-text rename input and a dropdown to pick another
+  existing group. The dropdown options come from `getInvitationGroupOptions()`
+  (the `invitation_groups` collection ids plus every distinct `invitationGroup`
+  value currently used by guests). Renaming or picking a group calls
+  `applyInvitationGroupChange`, which saves the new value to that guest via
+  `saveGuestInline` (the `invitationGroup` field is in `GUEST_WRITABLE_FIELDS`)
+  and, if the old group was shared by other guests, opens a confirm modal
+  (`openConfirmModal`) asking whether to apply the same change to all of them.
+  The column is sortable (`sortTh("invitationGroup", "Invitación")`). Styles
+  live in `_guests.scss` (`.dashboard-invgroup-*`). When adding a new column,
+  update `GUEST_SORT_COLUMNS`, `guestSortValue`, the `<thead>`, and the row
+  template.
 - **Dashboard INVITADOS table shows phone + auth email inside the identity cell** —
+
   the guest table's "Identidad" cell (`identityCell` in `dashboard.js`) renders
   the avatar, the name (inline editor), and a mini meta row with the guest ID
   and the phone (live `identity.phone` wins, then the live record's own `phone`;
