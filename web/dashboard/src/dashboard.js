@@ -361,6 +361,24 @@ function getUniqueGuestGroups() {
   return [...groups].sort();
 }
 
+// Per-group attendance summary for the group nav chips. For each group returns
+// `{ confirmedSaturday, size }`:
+//   - `confirmedSaturday` = guests in the group whose SATURDAY RSVP level is
+//     ≥ RSVP_CONFIRMED_MIN_LEVEL (4) — i.e. confirmed for Saturday.
+//   - `size` = total guests in the group.
+// Rendered as "X/Y" on each chip (X = confirmed Saturday, Y = group size).
+function getGroupAttendanceCounts() {
+  const counts = {};
+  getActiveGuests().forEach((guest) => {
+    const group = guest.group || "Sin grupo";
+    if (!counts[group]) counts[group] = { confirmedSaturday: 0, size: 0 };
+    counts[group].size += 1;
+    const saturday = getLiveRsvpAnswers(guest).saturday || 0;
+    if (saturday >= RSVP_CONFIRMED_MIN_LEVEL) counts[group].confirmedSaturday += 1;
+  });
+  return counts;
+}
+
 function getUniqueCabins() {
   const cabins = [
     ...new Set(
@@ -1523,7 +1541,10 @@ function renderGuestManager() {
   };
 
   // ── Group badge nav bar ──
+  // Each chip shows the group name plus an "X/Y" attendance summary where
+  // X = guests confirmed for SATURDAY (RSVP level ≥ 4) and Y = group size.
   const groups = getUniqueGuestGroups();
+  const groupCounts = getGroupAttendanceCounts();
   const groupNav = `
     <div class="dashboard-group-nav">
       <button type="button" class="dashboard-group-nav-chip ${!state.filterGroup ? "dashboard-group-nav-chip-active" : ""}" data-group-nav="">
@@ -1531,10 +1552,14 @@ function renderGuestManager() {
       </button>
       ${groups
         .map(
-          (g) => `
-        <button type="button" class="dashboard-group-nav-chip ${state.filterGroup === g ? "dashboard-group-nav-chip-active" : ""}" data-group-nav="${g}" style="background:${badgeStyle(g)};color:#3a2f1e;">
+          (g) => {
+            const c = groupCounts[g] || { confirmedSaturday: 0, size: 0 };
+            return `
+        <button type="button" class="dashboard-group-nav-chip ${state.filterGroup === g ? "dashboard-group-nav-chip-active" : ""}" data-group-nav="${g}" style="background:${badgeStyle(g)};color:#3a2f1e;" title="${c.confirmedSaturday} de ${c.size} confirmados para el sábado">
           ${g}
-        </button>`,
+          <span class="dashboard-group-nav-count">${c.confirmedSaturday}/${c.size}</span>
+        </button>`;
+          },
         )
         .join("")}
     </div>
