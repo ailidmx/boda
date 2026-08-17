@@ -349,8 +349,20 @@ committed separately. No markup/classes change — appearance is preserved.
   `travelStatus`, identity check, invitation group, group members, live merge). Wired into
   `npm test` via `test:guest-profiles`.
 
-Remaining F7 work: `Nav.jsx` (~1003), `IdentityModal.jsx` (~865), and the
-`AppContext.jsx` auth/login extraction.
+- **`AppContext.jsx` — auth/login logic extracted into a pure service** — the JSX-free,
+  Firebase-free auth helpers moved to `web/invitation/src/auth/auth-logic.js` (a pure
+  module with NO Firestore/Firebase access and NO DOM dependency). `AppContext.jsx` now
+  imports and calls these helpers instead of inlining the logic. Extracted helpers:
+  `getInitialLanguage`, `normalizeIdentifier`, `normalizeLanguage`, `validateCredentials`.
+  This also removed a stale `getGuestByUsername` reference (the function no longer exists
+  in `guests.js`); per the documented login flow, a bare username is now always resolved
+  to `username@AUTH_EMAIL_DOMAIN` with no username lookup.
+- `web/invitation/tests/auth-logic.test.mjs` — unit tests for the auth helpers (language
+  normalization/initialization, identifier normalization, credential validation). Wired
+  into `npm test` via `test:auth-logic`.
+
+Remaining F7 work: `Nav.jsx` (~1003) and `IdentityModal.jsx` (~865).
+
 
 
 

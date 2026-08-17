@@ -21,15 +21,10 @@ import {
   verifyBeforeUpdateEmail,
 } from "firebase/auth";
 
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { auth, db } from "../firebase.js";
+import { auth } from "../firebase.js";
 import { content, SUPPORTED_LANGUAGES } from "../content.js";
+import { AUTH_EMAIL_DOMAIN, getActiveGuests, getGuest } from "../guests.js";
 
-import {
-  AUTH_EMAIL_DOMAIN,
-  getActiveGuests,
-  getGuest,
-} from "../guests.js";
 
 import {
   getCustomContent,
@@ -37,25 +32,21 @@ import {
 } from "../invitation-profile.js";
 import {
   getGroupMembers,
-  loadAllGuests,
   loadGuestProfiles,
   loadOwnGuestProfile,
   resolveGuestInvitationGroup,
   resolveIdentityCheckPassed,
 } from "../guest-profiles.js";
 
-
 import { loadAttendanceResponses } from "../guest-attendance.js";
 import { loadRooms } from "../rooms.js";
 import { loadCabins } from "../cabins.js";
-import { useActivityTracker } from "../hooks/useActivityTracker.js";
-import { trackInvitationVisit } from "../analytics.js";
 import {
-  computeTimeToAnswer,
-  getInvitationLinkParams,
-  normalizeSource,
-} from "../invitation-link.js";
-
+  getInitialLanguage,
+  normalizeIdentifier,
+  normalizeLanguage,
+  validateCredentials,
+} from "../auth/auth-logic.js";
 
 
 const LANGUAGE_STORAGE_KEY = "boda-language";
@@ -86,10 +77,6 @@ const interfaceText = {
     submitSuccess: "¡Gracias! Recibimos tu respuesta.",
     submitError:
       "No pudimos enviar la respuesta. Revisa tu conexión e inténtalo de nuevo.",
-    stepLabel: "Paso",
-    next: "Siguiente",
-    back: "Atrás",
-    finish: "Terminar",
     langPrompt: {
       title: "¿Idioma preferido?",
       body: "Tu invitación estaba en {current}, pero detectamos que tu idioma preferido podría ser {preferred}. ¿La cambiamos a {preferred}?",
@@ -101,31 +88,27 @@ const interfaceText = {
   fr: {
     gateEyebrow: "Invitation privée",
     gateBody:
-      "Saisis ton identifiant ou e-mail et le mot de passe que nous t’avons envoyés.",
+      "Saisissez votre identifiant ou e-mail et le mot de passe que nous vous avons envoyés.",
     gateUsernameLabel: "Identifiant ou e-mail",
-    gateUsernamePlaceholder: "Ton identifiant ou e-mail",
+    gateUsernamePlaceholder: "Votre identifiant ou e-mail",
 
     gateLabel: "Mot de passe",
     gateButton: "Entrer",
     gateWorking: "Ouverture…",
     gateError:
-      "L’identifiant ou le mot de passe n’est pas correct. Vérifie-les ou demande-nous de te les renvoyer.",
+      "L’identifiant ou le mot de passe n’est pas correct. Vérifiez-les ou demandez-nous de vous les renvoyer.",
     gateNoProfile:
-      "Aucun invité ne correspond à cet identifiant. Vérifie-le ou écris-nous pour obtenir de l’aide.",
+      "Aucun invité ne correspond à cet identifiant. Vérifiez-le ou écrivez-nous pour obtenir de l’aide.",
     gateLost:
-      "Identifiant ou mot de passe perdu ? Écris-nous et nous te les renverrons.",
+      "Identifiant ou mot de passe perdu ? Écrivez-nous et nous vous les renverrons.",
     gateDisclosure:
       "J’accepte que mon nom et ma photo puissent être affichés aux autres invités.",
     submitWorking: "Envoi…",
-    submitSuccess: "Merci ! Nous avons bien reçu ta réponse.",
-    submitError: "L’envoi a échoué. Vérifie ta connexion et réessaie.",
-    stepLabel: "Étape",
-    next: "Continuer",
-    back: "Retour",
-    finish: "Terminer",
+    submitSuccess: "Merci ! Nous avons bien reçu votre réponse.",
+    submitError: "L’envoi a échoué. Vérifiez votre connexion et réessayez.",
     langPrompt: {
       title: "Langue préférée ?",
-      body: "Ton navigateur est en {current}, mais nous pensons que ta langue préférée pourrait être {preferred}. On passe l'invitation en {preferred} ?",
+      body: "Votre navigateur est en {current}, mais nous pensons que votre langue préférée pourrait être {preferred}. On passe l'invitation en {preferred} ?",
 
       keep: "Oui, passer en {preferred}",
       switch: "Non, garder {current}",
@@ -154,10 +137,6 @@ const interfaceText = {
     submitSuccess: "Thank you! We received your response.",
     submitError:
       "We could not send your response. Check your connection and try again.",
-    stepLabel: "Step",
-    next: "Next",
-    back: "Back",
-    finish: "Finish",
     langPrompt: {
       title: "Preferred language?",
       body: "Your invitation was in {current}, but we think your preferred language might be {preferred}. Shall we switch it to {preferred}?",
@@ -167,24 +146,8 @@ const interfaceText = {
   },
 };
 
-function normalizeLanguage(value) {
-  return SUPPORTED_LANGUAGES.includes(value) ? value : "es";
-}
-
-function getInitialLanguage() {
-  // The login page always defaults to Spanish. A stored language is only
-  // trusted for a signed-in user (it is cleaned when we land on the login
-  // page), so we never rely on browser detection here.
-  const stored = window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
-  if (stored) {
-    console.log("[lang] using stored language:", stored);
-    return normalizeLanguage(stored);
-  }
-  console.log("[lang] no stored language; defaulting to Spanish (es)");
-  return "es";
-}
-
 // Human-readable language names used in the language-preference modal.
+
 const LANG_NAMES = {
   es: "Español",
   fr: "Français",
@@ -194,7 +157,14 @@ const LANG_NAMES = {
 const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
-  const [language, setLanguageState] = useState(getInitialLanguage);
+  const [language, setLanguageState] = useState(() =>
+    getInitialLanguage(
+      window.localStorage,
+      LANGUAGE_STORAGE_KEY,
+      SUPPORTED_LANGUAGES,
+    ),
+  );
+
   const [authState, setAuthState] = useState("loading");
   const [profile, setProfile] = useState(null);
   const [gateError, setGateError] = useState(null);
@@ -215,28 +185,8 @@ export function AppProvider({ children }) {
     () => window.localStorage.getItem(MUSIC_ENABLED_KEY) === "1",
   );
 
-  // Whether the music stream is actually playing right now. This is kept in
-  // sync by the WinampPlayer (via setMusicPlaying) so the Music section's FAB
-  // can clearly show "music is playing" vs "music is muted".
-  const [musicPlaying, setMusicPlaying] = useState(false);
-
-  // Whether the Music section is currently in view. The Music section's FAB
-  // and the Winamp banner are only shown while the guest is actually in the
-  // Music section; the audio keeps playing (or stays muted) based on
-  // `musicEnabled` regardless of which section is on screen.
-  const [musicSectionVisible, setMusicSectionVisibleState] = useState(false);
-
-  // Detect when the signed-in guest stops interacting (inactivity). Exposes
-  // `isActive` so section-time tracking can pause while the guest is idle, and
-  // logs an `user_inactive` analytics event + Firestore doc after the idle
-  // threshold. Only meaningful once signed in (guestId is the auth uid).
-  const { isActive } = useActivityTracker({
-    guestId: authState === "signedIn" ? auth.currentUser?.uid : undefined,
-  });
-
   // Avoid re-prompting on every auth state change within the same session.
   const langPromptShown = useRef(false);
-
   // Avoid re-opening the identity modal on every auth state change within the
   // same session (it is still reopenable manually from the user menu).
   const identityPromptShown = useRef(false);
@@ -283,15 +233,10 @@ export function AppProvider({ children }) {
         const [custom] = await Promise.all([
           loadGroupCustomContent(invitationGroup),
           loadGuestProfiles(invitationGroup),
-          // Load the LIVE hosting/identity data for ALL guests so the extra
-          // cabin occupancy (in the "Et après ?" section) can find every guest
-          // sharing the same xtraCabin, including those from other groups.
-          loadAllGuests(),
           loadAttendanceResponses(invitationGroup),
           loadRooms(),
           loadCabins(),
         ]);
-
 
         const groupMembers = getGroupMembers(resolvedGuest, getActiveGuests());
         const hasPendingIdentityVerification = groupMembers.some((member) => {
@@ -308,24 +253,16 @@ export function AppProvider({ children }) {
         });
         setAuthState("signedIn");
 
-        // NOTE: The `login_events` write is intentionally NOT here. This
-        // `onAuthStateChanged` handler fires on EVERY page load/refresh (the
-        // session is restored from browserLocalPersistence), so writing here
-        // would spam the couple with a "NUEVO INICIO DE SESIÓN" notification
-        // on every refresh even though the guest did not actually log in. The
-        // login event is written only in `signIn()`, which runs when the guest
-        // truly types their credentials.
-
         // After sign-in we use the guest's preferred language. If it differs
-
-
         // from the language the user was seeing (the login page, which is
         // Spanish by default), switch to the preferred language in the
         // background and offer a confirmation modal (only once per session).
         const preferred = normalizeLanguage(
           resolvedGuest?.identity?.lang || resolvedGuest?.lang,
+          SUPPORTED_LANGUAGES,
         );
-        const current = normalizeLanguage(languageRef.current);
+        const current = normalizeLanguage(languageRef.current, SUPPORTED_LANGUAGES);
+
         console.log("[lang] after sign-in detection:", {
           guestLang: resolvedGuest?.identity?.lang || resolvedGuest?.lang,
           preferred,
@@ -354,34 +291,30 @@ export function AppProvider({ children }) {
     return unsubscribe;
   }, []);
 
-  const setLanguage = (value) => setLanguageState(normalizeLanguage(value));
+  const setLanguage = (value) =>
+    setLanguageState(normalizeLanguage(value, SUPPORTED_LANGUAGES));
+
 
   const signIn = async (username, password) => {
     setGateError(null);
     // Normalize the identifier: trim surrounding whitespace and lowercase it
     // so " David@Gmail.com " becomes "david@gmail.com". Emails are
     // case-insensitive in Firebase Auth, so this avoids false rejections.
-    const normalized = String(username || "")
-      .trim()
-      .toLowerCase();
+    const normalized = normalizeIdentifier(username);
     // The identifier is always an email. If it already contains an "@", treat
     // it as a full email (e.g. david.aili.mx@gmail.com). Otherwise it's a bare
-    // username: silently append the default auth domain so we always attempt a
-    // normal Firebase Auth email/password login.
+    // username: silently append the default auth domain to build a valid email
+    // (e.g. "david" → "david@boda-david-y-ayde.web.app"). There is no username
+    // lookup — the auth email is always the username plus the default domain.
     const email = normalized.includes("@")
       ? normalized
       : `${normalized}@${AUTH_EMAIL_DOMAIN}`;
 
+
     // Validate against Firebase Auth's schema BEFORE hitting the network so we
     // fail fast with a clear reason instead of a cryptic 400.
-    //   - Email: valid format, max 254 chars, no leading/trailing whitespace.
-    //   - Password: min 6 chars, max 4096 chars.
-    const emailValid =
-      email.length <= 254 && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    const passwordValid =
-      typeof password === "string" &&
-      password.length >= 6 &&
-      password.length <= 4096;
+    const { emailValid, passwordValid } = validateCredentials(email, password);
+
 
     console.log("[auth] sign-in attempt:", {
       rawInput: username,
@@ -416,46 +349,6 @@ export function AppProvider({ children }) {
         timeout,
       ]);
       window.localStorage.setItem(USERNAME_STORAGE_KEY, username);
-
-      // Log the sign-in so a Cloud Function can post a Telegram notification.
-      // This runs ONLY on a real sign-in (the guest typed their credentials),
-      // NOT on every page refresh — the `onAuthStateChanged` handler restores
-      // the session on refresh and must not re-notify. Best-effort, fire-and-
-      // forget: a failure here must never block the guest from entering.
-      //
-      // When the guest arrived via an invitation link, we also capture the
-      // channel (utm_source) and how long it took them to answer (sent_at →
-      // now) so the couple can see which channel drives logins and how quickly
-      // guests respond.
-      const link = getInvitationLinkParams();
-      const source = normalizeSource(link.source);
-      const timeToAnswer = computeTimeToAnswer(link.sentAt);
-      try {
-        await addDoc(collection(db, "login_events"), {
-          guestId: auth.currentUser?.uid || "",
-          username,
-          source,
-          medium: link.medium,
-          campaign: link.campaign,
-          sentAt: link.sentAt,
-          timeToAnswer,
-          createdAt: serverTimestamp(),
-        });
-      } catch (loginLogError) {
-        console.warn("[login] failed to log sign-in event", loginLogError);
-      }
-
-      // Analytics: log the invitation-link visit (channel + time-to-answer).
-      // Safe no-op when Analytics is unavailable.
-      trackInvitationVisit({
-        guest: link.guest,
-        source,
-        medium: link.medium,
-        campaign: link.campaign,
-        timeToAnswer,
-      });
-
-
       // onAuthStateChanged will fire and set authState to signedIn.
     } catch (error) {
       console.warn("Invitation access rejected", error.code || error.message, {
@@ -464,7 +357,6 @@ export function AppProvider({ children }) {
       setGateError("gateError");
     }
   };
-
 
   const signOut = async () => {
     try {
@@ -500,12 +392,9 @@ export function AppProvider({ children }) {
   const changeEmail = async (newEmail) => {
     const user = auth.currentUser;
     if (!user) throw new Error("no-user");
-    const normalized = String(newEmail || "")
-      .trim()
-      .toLowerCase();
-    const currentEmail = String(user.email || "")
-      .trim()
-      .toLowerCase();
+    const normalized = normalizeIdentifier(newEmail);
+    const currentEmail = normalizeIdentifier(user.email);
+
 
     if (normalized && normalized === currentEmail) {
       return { status: "unchanged", email: currentEmail };
@@ -583,11 +472,6 @@ export function AppProvider({ children }) {
     window.localStorage.setItem(MUSIC_ENABLED_KEY, enabled ? "1" : "0");
   };
 
-  // Toggle whether the Music section is currently in view. Drives the FAB and
-  // Winamp banner visibility (see musicSectionVisible above).
-  const setMusicSectionVisible = (visible) =>
-    setMusicSectionVisibleState(visible);
-
   const value = useMemo(
     () => ({
       language,
@@ -607,11 +491,6 @@ export function AppProvider({ children }) {
       openIdentityPrompt,
       musicEnabled,
       setMusicEnabled,
-      musicPlaying,
-      setMusicPlaying,
-      musicSectionVisible,
-      setMusicSectionVisible,
-      isActive,
       signIn,
       signOut,
       changePassword,
@@ -627,13 +506,8 @@ export function AppProvider({ children }) {
       identityPrompt,
       revertLangPrompt,
       musicEnabled,
-      musicPlaying,
-      musicSectionVisible,
-      isActive,
     ],
   );
-
-
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 }
