@@ -262,7 +262,7 @@ function guestInitials(guest) {
 // used by `guestSortValue`. "avatar" is intentionally NOT sortable. The ID and
 // phone are NOT standalone columns — they live inside the "Identidad" column.
 const GUEST_SORT_COLUMNS = [
-  "name", "invitationGroup", "idCheck", "hasAuth", "group", "cabin", "room", "xtraCabin", "xtraRoom",
+  "name", "invitationGroup", "idCheck", "hasAuth", "group", "lang", "cabin", "room", "xtraCabin", "xtraRoom",
   "status",
 ];
 
@@ -284,6 +284,8 @@ function guestSortValue(guest, key) {
 
     case "group":
       return (guest.group || "").toLowerCase();
+    case "lang":
+      return (guest.identity?.lang || guest.lang || "").toLowerCase();
     case "cabin":
       return (guest.cabinLabel || guest.unit || "").toLowerCase();
     case "room":
@@ -995,6 +997,78 @@ function openDeleteConfirm(guest) {
   });
 }
 
+// ── Send Invite Modal ─────────────────────────────────────────────────
+
+// Opens a modal to send a guest their invitation link via WhatsApp and/or
+// email. The actual sending is delegated to the `sendInvitation` Cloud
+// Function (Gmail API + WhatsApp deep link), which is admin-only. The modal
+// shows the guest's contact info and lets the admin pick the channel(s).
+function openSendInviteModal(guest) {
+  const overlay = document.createElement("div");
+  overlay.className = "dashboard-modal-overlay";
+  overlay.innerHTML = `
+    <div class="dashboard-modal" style="max-width: 30rem;">
+      <div class="dashboard-modal-heading">
+        <h3>Enviar invitación</h3>
+        <button class="dashboard-modal-close" data-modal-close type="button">✕</button>
+      </div>
+      <div class="dashboard-modal-form">
+        <p style="line-height:1.6;color:#55452d;">
+          Enviar la invitación a <strong>${guestFullName(guest)}</strong>
+          (ID: <code>${guest.id}</code>).
+        </p>
+        <div class="dashboard-modal-field">
+          <label>Teléfono (WhatsApp)</label>
+          <input type="text" value="${guest.identity?.phone || guest.phone || ""}" readonly />
+        </div>
+        <div class="dashboard-modal-field">
+          <label>Correo</label>
+          <input type="text" value="${guestAuthEmail(guest) || guest.identity?.email || guest.email || ""}" readonly />
+        </div>
+        <div class="dashboard-modal-field">
+          <label>Idioma</label>
+          <input type="text" value="${guest.identity?.lang || guest.lang || "es"}" readonly />
+        </div>
+        <div class="dashboard-modal-field">
+          <label>Enlace de invitación</label>
+          <input type="text" value="${getInviteUrl(guest.id)}" readonly />
+        </div>
+        <div class="dashboard-modal-actions">
+          <button class="dashboard-button" type="button" data-send-whatsapp>WhatsApp</button>
+          <button class="dashboard-button" type="button" data-send-email>Email</button>
+          <button class="dashboard-button dashboard-button-secondary" type="button" data-modal-close>Cancelar</button>
+        </div>
+        <small data-send-invite-status></small>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const close = () => overlay.remove();
+  overlay.querySelectorAll("[data-modal-close]").forEach((btn) => btn.addEventListener("click", close));
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+
+  const status = overlay.querySelector("[data-send-invite-status]");
+  const run = async (channel) => {
+    status.textContent = "Enviando…";
+    status.dataset.state = "working";
+    try {
+      const functions = getFunctions();
+      const sendInvitation = httpsCallable(functions, "sendInvitation");
+      const result = await sendInvitation({ guestId: guest.id, channel });
+      status.textContent = `✅ ${result.data?.message || "Enviado."}`;
+      status.dataset.state = "success";
+    } catch (err) {
+      console.error("sendInvitation failed", err);
+      status.textContent = `❌ ${err.message || "Error al enviar."}`;
+      status.dataset.state = "error";
+    }
+  };
+
+  overlay.querySelector("[data-send-whatsapp]").addEventListener("click", () => run("whatsapp"));
+  overlay.querySelector("[data-send-email]").addEventListener("click", () => run("email"));
+}
+
 // ── Create Group Modal ─────────────────────────────────────────────────
 
 function openCreateGroupModal(callback) {
@@ -1405,6 +1479,7 @@ function renderGuestManager() {
             ${sortTh("name", "Identidad")}
             ${sortTh("invitationGroup", "Invitación")}
             ${sortTh("group", "Grupo")}
+            ${sortTh("lang", "Idioma")}
 
 
             ${sortTh("cabin", "Cabaña")}
@@ -1432,6 +1507,7 @@ function renderGuestManager() {
               <td>${identityCell(merged)}</td>
               <td>${invitationGroupCell(merged)}</td>
               <td>${badgeHtml(merged.group)}</td>
+              <td>${badgeHtml(merged.identity?.lang || merged.lang || "")}</td>
 
 
 
@@ -1445,6 +1521,7 @@ function renderGuestManager() {
               <td data-guest-status="${merged.id}"></td>
               <td>
                 <button class="dashboard-link-btn" data-edit-guest="${merged.id}" title="Editar todo (modal)">✏️</button>
+                <button class="dashboard-link-btn" data-send-invite="${merged.id}" title="Enviar invitación (WhatsApp / email)">📨</button>
                 <button class="dashboard-link-btn" data-copy-link="${merged.id}" title="Copiar enlace">🔗</button>
                 <button class="dashboard-link-btn" data-preview-link="${merged.id}" title="Vista previa">👁️</button>
                 <button class="dashboard-link-btn" data-delete-guest="${merged.id}" title="Eliminar" style="color:#a0352c;">🗑️</button>
@@ -1600,6 +1677,15 @@ function renderGuestManager() {
       const guestId = btn.dataset.editGuest;
       const guest = getGuest(guestId);
       if (guest) openGuestEditor(guest);
+    });
+  });
+
+  // ── Send invite (modal) ──
+  container.querySelectorAll("[data-send-invite]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const guestId = btn.dataset.sendInvite;
+      const guest = getGuest(guestId);
+      if (guest) openSendInviteModal(guest);
     });
   });
 

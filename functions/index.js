@@ -37,6 +37,7 @@ import { defineSecret } from "firebase-functions/params";
 import { setGlobalOptions } from "firebase-functions/v2";
 
 import { sendTelegramMessage, sendTelegramPhoto, escapeMarkdown } from "./telegram.js";
+import { google } from "googleapis";
 
 
 
@@ -58,6 +59,16 @@ setGlobalOptions({ region: "us-central1" });
 // `firebase functions:config:get`.
 const TELEGRAM_TOKEN = defineSecret("TELEGRAM_TOKEN");
 const TELEGRAM_CHAT_ID = defineSecret("TELEGRAM_CHAT_ID");
+
+// Gmail API credentials for sending invitation emails from the dashboard.
+// The couple's shared Gmail account (bodadavidyayde@gmail.com) sends the
+// invitations via the Gmail API using OAuth2 (client id + secret + refresh
+// token). These are wired via Secret Manager and must be listed in the
+// function's `secrets: [...]` dependency array.
+const GMAIL_CLIENT_ID = defineSecret("GMAIL_CLIENT_ID");
+const GMAIL_CLIENT_SECRET = defineSecret("GMAIL_CLIENT_SECRET");
+const GMAIL_REFRESH_TOKEN = defineSecret("GMAIL_REFRESH_TOKEN");
+const GMAIL_FROM = defineSecret("GMAIL_FROM");
 
 /** Send a message using the configured secrets. */
 async function notify(text) {
@@ -654,6 +665,202 @@ export const listAuthUsers = onCall(
     } while (pageToken);
 
     return { users };
+  },
+);
+
+// ── Send invitation email (admin dashboard) ────────────────────────────────
+
+/**
+ * Build the guest-facing invitation URL. Mirrors the format the couple's
+ * Google Apps Script used to generate: the guest's login email + password are
+ * passed as query params so the invitation can pre-fill the login form, plus
+ * UTM tracking params and an `inviteType` so we can tell email vs WhatsApp.
+ *
+ * @param {object} guest  the guest document (must have `firebaseEmail` and
+ *                        `firebasePassword`)
+ * @param {string} inviteType  "email" | "whatsapp"
+ * @returns {string}
+ */
+function buildInvitationUrl(guest, inviteType) {
+  const base = "https://boda-david-y-ayde.web.app/";
+  const params = new URLSearchParams({
+    guest: guest.firebaseEmail || "",
+    password: guest.firebasePassword || "",
+    sent_at: new Date().toISOString(),
+    utm_source: "invitacion",
+    utm_medium: inviteType === "whatsapp" ? "whatsapp" : "email",
+    utm_campaign: "invitacion",
+    inviteType,
+  });
+  return `${base}?${params.toString()}`;
+}
+
+/**
+ * The three invitation email templates (ES / FR / EN). Each is a plain-text
+ * body with the guest's name, the invitation link, and their login email +
+ * password. The couple's shared Gmail account sends these.
+ */
+function invitationEmailBody(lang, guest, inviteUrl) {
+  const name = guest.identity?.firstName || guest.firstName || guest.guestId || "";
+  const email = guest.firebaseEmail || "";
+  const password = guest.firebasePassword || "";
+
+  const templates = {
+    es: `¡Hola ${name}!
+
+David y Aydé te invitamos a celebrar nuestra boda. Estamos muy felices de que nos acompañes.
+
+Para ver tu invitación personalizada, entra al siguiente enlace:
+
+${inviteUrl}
+
+Tus datos de acceso son:
+  Correo: ${email}
+  Contraseña: ${password}
+
+Si tienes cualquier duda, escríbenos por WhatsApp.
+
+¡Te esperamos!
+David & Aydé`,
+    fr: `Bonjour ${name} !
+
+David et Aydé t'invitons à célébrer notre mariage. Nous sommes très heureux que tu sois des nôtres.
+
+Pour voir ton invitation personnalisée, clique sur le lien suivant :
+
+${inviteUrl}
+
+Tes identifiants de connexion sont :
+  E-mail : ${email}
+  Mot de passe : ${password}
+
+Si tu as la moindre question, écris-nous sur WhatsApp.
+
+À très bientôt !
+David & Aydé`,
+    en: `Hello ${name}!
+
+David and Aydé invite you to celebrate our wedding. We are so happy to have you with us.
+
+To see your personalised invitation, open the following link:
+
+${inviteUrl}
+
+Your login details are:
+  Email: ${email}
+  Password: ${password}
+
+If you have any questions, message us on WhatsApp.
+
+See you soon!
+David & Aydé`,
+  };
+
+  return templates[lang] || templates.es;
+}
+
+/**
+ * Send an email through the couple's shared Gmail account using the Gmail API
+ * (OAuth2). The credentials come from Secret Manager.
+ *
+ * @param {object} opts  { to, subject, body }
+ */
+async function sendGmail({ to, subject, body }) {
+  const oauth2Client = new google.auth.OAuth2(
+    GMAIL_CLIENT_ID.value(),
+    GMAIL_CLIENT_SECRET.value(),
+  );
+  oauth2Client.setCredentials({ refresh_token: GMAIL_REFRESH_TOKEN.value() });
+
+  const gmail = google.gmail({ version: "v1", auth: oauth2Client });
+
+  // Build a raw RFC-2822 message and base64url-encode it for the Gmail API.
+  const raw = Buffer.from(
+    `From: ${GMAIL_FROM.value()}\r\n` +
+      `To: ${to}\r\n` +
+      `Subject: ${subject}\r\n` +
+      `Content-Type: text/plain; charset=UTF-8\r\n` +
+      `MIME-Version: 1.0\r\n` +
+      `\r\n` +
+      `${body}`,
+    "utf-8",
+  ).toString("base64url");
+
+  await gmail.users.messages.send({
+    userId: "me",
+    requestBody: { raw },
+  });
+}
+
+/**
+ * Callable function that sends a wedding invitation to a guest, either by
+ * email (via the Gmail API) or by returning a pre-built WhatsApp link.
+ *
+ * The dashboard's INVITADOS table calls this when the couple clicks
+ * "Enviar invitación". Only admins may call it.
+ *
+ * Request payload:
+ *   { guestId: string, channel: "email" | "whatsapp" }
+ *
+ * Response:
+ *   { ok: true, channel, inviteUrl, sentAt }
+ *   (for "whatsapp", `inviteUrl` is the wa.me link the dashboard opens)
+ */
+export const sendInvitation = onCall(
+  { secrets: [GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN, GMAIL_FROM] },
+  async (request) => {
+
+    // Reject unauthenticated callers.
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Debes iniciar sesión.");
+    }
+
+    // Only admins may send invitations.
+    const db = getFirestore(DB_ID);
+    const adminSnap = await db.collection("guests").doc(request.auth.uid).get();
+    const admin = adminSnap.exists ? adminSnap.data() : null;
+    if (!admin || admin.isAdmin !== true) {
+      throw new HttpsError("permission-denied", "Solo los administradores pueden enviar invitaciones.");
+    }
+
+    const { guestId, channel } = request.data || {};
+    if (!guestId) {
+      throw new HttpsError("invalid-argument", "Falta el guestId.");
+    }
+    if (channel !== "email" && channel !== "whatsapp") {
+      throw new HttpsError("invalid-argument", "El canal debe ser 'email' o 'whatsapp'.");
+    }
+
+    // Load the target guest.
+    const guestSnap = await db.collection("guests").doc(guestId).get();
+    if (!guestSnap.exists) {
+      throw new HttpsError("not-found", "No se encontró al invitado.");
+    }
+    const guest = guestSnap.data();
+
+    const email = guest.firebaseEmail || guest.identity?.email || "";
+    const password = guest.firebasePassword || "";
+    if (!email) {
+      throw new HttpsError("failed-precondition", "El invitado no tiene correo de acceso (firebaseEmail).");
+    }
+    if (!password) {
+      throw new HttpsError("failed-precondition", "El invitado no tiene contraseña guardada (firebasePassword).");
+    }
+
+    const lang = guest.lang || guest.identity?.lang || "es";
+    const inviteUrl = buildInvitationUrl(guest, channel);
+    const sentAt = new Date().toISOString();
+
+    if (channel === "email") {
+      const subject = lang === "fr"
+        ? "Votre invitation au mariage de David & Aydé"
+        : lang === "en"
+          ? "Your invitation to David & Aydé's wedding"
+          : "Tu invitación a la boda de David & Aydé";
+      await sendGmail({ to: email, subject, body: invitationEmailBody(lang, guest, inviteUrl) });
+    }
+
+    return { ok: true, channel, inviteUrl, sentAt };
   },
 );
 
