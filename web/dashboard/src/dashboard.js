@@ -17,10 +17,10 @@ import { loadRooms } from "./rooms.js";
 import { loadTables, renderTablesManager } from "./tables.js";
 import { collections } from "../../shared/firestore-paths.js";
 import {
-  RSVP_ATTENDANCE_DAYS,
   RSVP_CONFIRMED_MIN_LEVEL,
   DEFAULT_AUTH_EMAIL_DOMAIN,
   GUEST_SORT_COLUMNS,
+
   guestIdentity,
   guestHosting,
   guestFullName,
@@ -32,6 +32,20 @@ import {
   badgeStyle,
   badgeHtml,
 } from "./guestDomain.js";
+
+import {
+  getLiveRsvpAnswers as serviceGetLiveRsvpAnswers,
+  getMergedGuest as serviceGetMergedGuest,
+  guestAuthEmail as serviceGuestAuthEmail,
+  guestHasAuth as serviceGuestHasAuth,
+  guestSendEmail as serviceGuestSendEmail,
+  guestCanEmail as serviceGuestCanEmail,
+  guestCanWhatsapp as serviceGuestCanWhatsapp,
+  rsvpLevelChip as serviceRsvpLevelChip,
+  computeDayConfirmations as serviceComputeDayConfirmations,
+  guestStatusBadge as serviceGuestStatusBadge,
+} from "./guestService.js";
+
 
 import { updateGuest, softDeleteGuest } from "./repositories/guestRepository.js";
 import { createGroup, updateGroupField, deleteGroup } from "./repositories/groupRepository.js";
@@ -385,115 +399,62 @@ function getRsvpForGuest(guestId) {
 
 // ── Live RSVP scale (source of truth: guest's `rsvp.answers`) ──────────
 
-// `RSVP_ATTENDANCE_DAYS` and `RSVP_CONFIRMED_MIN_LEVEL` are imported from
-// guestDomain.js.
+// The derivation logic lives in `guestService.js` (pure, dependency-injected).
+// These thin adapters bind the dashboard's mutable `state` (liveGuests /
+// authUsers) and the live guest cache so the rest of the file can keep calling
+// the same short signatures. `guestStatusBadge` wraps the service's plain
+// descriptor in a DOM element via `make`.
 
 // Read the live RSVP answers for a guest from the raw Firestore record.
 function getLiveRsvpAnswers(guest) {
-
-  const raw = state.liveGuests.find((r) => r.id === guest.id);
-  return raw?.rsvp?.answers || guest?.rsvp?.answers || {};
+  return serviceGetLiveRsvpAnswers(guest, state.liveGuests);
 }
 
 // Merge a normalized guest with its raw live Firestore record. Live wins where
 // both exist (identity names/photo, hosting incl. xtraCabin/xtraRoom, rsvp).
 function getMergedGuest(guest) {
-  const raw = state.liveGuests.find((r) => r.id === guest.id);
-  if (!raw) return guest;
-  return {
-    ...guest,
-    ...raw,
-    identity: { ...(guest.identity || {}), ...(raw.identity || {}) },
-    hosting: { ...(guest.hosting || {}), ...(raw.hosting || {}) },
-    rsvp: { ...(guest.rsvp || {}), ...(raw.rsvp || {}) },
-  };
+  return serviceGetMergedGuest(guest, state.liveGuests);
 }
 
 // A guest "has a Firebase Auth account" when their RAW live record carries an
-// explicit `firebaseEmail` (a real auth account was provisioned for them). The
-// normalized `guest.firebaseEmail` always falls back to `id@domain`, so we must
-// read the raw record, not the normalized one. Returns the auth email or "".
+// explicit `firebaseEmail` (a real auth account was provisioned for them).
 function guestAuthEmail(guest) {
-  const raw = state.liveGuests.find((r) => r.id === guest.id);
-  return raw?.firebaseEmail || "";
+  return serviceGuestAuthEmail(guest, state.liveGuests);
 }
-
-// `DEFAULT_AUTH_EMAIL_DOMAIN` is imported from guestDomain.js.
 
 // A guest can receive an invitation only if they have a Firebase Auth account
-
 // (either present in the live auth list or carrying an explicit firebaseEmail).
 function guestHasAuth(guest) {
-  return Boolean(state.authUsers[guest.id]) || Boolean(guestAuthEmail(guest));
+  return serviceGuestHasAuth(guest, state.liveGuests, state.authUsers);
 }
 
-// The email we would send an invitation to. Priority: the raw record's
-// `firebaseEmail`, then the LIVE Firebase Auth user's email (the same source the
-// identity column uses via `state.authUsers`), then the identity/record email.
+// The email we would send an invitation to.
 function guestSendEmail(guest) {
-  return (
-    guestAuthEmail(guest) ||
-    state.authUsers[guest.id]?.email ||
-    guest.identity?.email ||
-    guest.email ||
-    ""
-  );
+  return serviceGuestSendEmail(guest, state.liveGuests, state.authUsers);
 }
 
 // The email channel is available whenever the guest has a real (non-default
-// domain) email address. We intentionally do NOT require a Firebase Auth
-// account here: the couple may want to send an invitation to a guest who has a
-// real inbox but hasn't been provisioned an auth account yet.
+// domain) email address.
 function guestCanEmail(guest) {
-  const email = guestSendEmail(guest);
-  return Boolean(email) && !email.endsWith(`@${DEFAULT_AUTH_EMAIL_DOMAIN}`);
+  return serviceGuestCanEmail(guest, state.liveGuests, state.authUsers);
 }
 
 // The WhatsApp channel is available only when the guest is auth'd AND has a
 // phone number.
 function guestCanWhatsapp(guest) {
-  const phone = guest.identity?.phone || guest.phone || "";
-  return guestHasAuth(guest) && Boolean(phone);
+  return serviceGuestCanWhatsapp(guest, state.liveGuests, state.authUsers);
 }
 
-
-// `badgeStyle` and `badgeHtml` are imported from guestDomain.js.
-
-// RSVP scale dropdown for a single attendance day. The stored value stays an
-
-// int 0–5 (0 = no answer). The select shows the current level and lets the
-// admin pick any level directly (no click-to-cycle). The select's background
-// reflects the level: gray = 0 (no answer), amber = 1–3, green = 4–5.
+// RSVP scale dropdown for a single attendance day.
 function rsvpLevelChip(guest, day) {
-  const level = getLiveRsvpAnswers(guest)[day];
-  const has = Number.isInteger(level) && level > 0;
-  const cls = has
-    ? level >= RSVP_CONFIRMED_MIN_LEVEL
-      ? "dashboard-rsvp-chip dashboard-rsvp-chip-confirmed"
-      : "dashboard-rsvp-chip dashboard-rsvp-chip-partial"
-    : "dashboard-rsvp-chip dashboard-rsvp-chip-empty";
-  const current = has ? level : 0;
-  const options = [0, 1, 2, 3, 4, 5]
-    .map(
-      (n) =>
-        `<option value="${n}" ${n === current ? "selected" : ""}>${n === 0 ? "—" : n}</option>`,
-    )
-    .join("");
-  return `<select class="${cls}" data-rsvp-chip="${guest.id}" data-rsvp-day="${day}" title="Nivel de asistencia (0 = sin respuesta, 4–5 = confirmado)">${options}</select>`;
+  return serviceRsvpLevelChip(guest, day, state.liveGuests);
 }
-
 
 // Aggregate confirmed counts per attendance day from the live guests.
 function computeDayConfirmations() {
-  const counts = { friday: 0, saturday: 0, sunday: 0 };
-  getActiveGuests().forEach((guest) => {
-    const answers = getLiveRsvpAnswers(guest);
-    RSVP_ATTENDANCE_DAYS.forEach((day) => {
-      if ((answers[day] || 0) >= RSVP_CONFIRMED_MIN_LEVEL) counts[day] += 1;
-    });
-  });
-  return counts;
+  return serviceComputeDayConfirmations(getActiveGuests(), state.liveGuests);
 }
+
 
 // Persist a guest's RSVP scale level for one attendance day via the shared
 // payload builder (writes `rsvp.answers` on the `guests` doc).
@@ -515,17 +476,14 @@ async function saveGuestRsvpAnswer(guestId, day, level) {
 }
 
 // Status badge derived from the LIVE `rsvp.answers` (confirmed = any day ≥ 4,
-// partial = answered but not confirmed, pending = no answers).
+// partial = answered but not confirmed, pending = no answers). The derivation
+// lives in `guestService.js`; this adapter wraps its plain descriptor in a DOM
+// element via `make`.
 function guestStatusBadge(guest) {
-  const answers = getLiveRsvpAnswers(guest);
-  const hasAny = RSVP_ATTENDANCE_DAYS.some((day) => (answers[day] || 0) > 0);
-  const confirmed = RSVP_ATTENDANCE_DAYS.some(
-    (day) => (answers[day] || 0) >= RSVP_CONFIRMED_MIN_LEVEL,
-  );
-  if (confirmed) return make("span", "dashboard-badge dashboard-badge-yes", "✅ Confirmado");
-  if (hasAny) return make("span", "dashboard-badge dashboard-badge-maybe", "🟡 Parcial");
-  return make("span", "dashboard-badge dashboard-badge-pending", "Pendiente");
+  const { className, text } = serviceGuestStatusBadge(guest, state.liveGuests);
+  return make("span", className, text);
 }
+
 
 
 // ── Avatar upload (Cloudinary unsigned) ────────────────────────────────

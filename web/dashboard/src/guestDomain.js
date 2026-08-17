@@ -9,8 +9,13 @@
 // dashboard god-file from growing further. When a function needs live state
 // (e.g. `state.liveGuests`, `state.authUsers`), it stays in `dashboard.js` and
 // reads the state there.
+//
+// IMPORTANT: This module must stay free of browser-only imports (Firebase SDK,
+// `import.meta.env`, DOM). It is imported by the Node unit tests directly, so
+// any transitive browser dependency would break them. `buildInvitationUrl` is
+// inlined below (rather than imported from `invitation-profile.js`, which pulls
+// in `firebase/firestore` + `./firebase.js`) precisely to keep this module pure.
 
-import { buildInvitationUrl } from "./invitation-profile.js";
 
 // ── Domain constants ───────────────────────────────────────────────────
 
@@ -93,9 +98,23 @@ export function isAdminGuest(guest) {
 
 // ── Invitation URL ─────────────────────────────────────────────────────
 
+// Build an invitation URL for a guest. The per-guest invitation-code system was
+// removed (login is now email/password), so the invitation is served at the
+// base origin; the guest id is kept as a query param for analytics/tracking
+// only. Inlined here (instead of imported from `invitation-profile.js`) to keep
+// this module free of the Firebase SDK.
+function buildInvitationUrl(origin, guestId) {
+  const base = (origin || "").replace(/\/+$/, "");
+  const params = new URLSearchParams();
+  if (guestId) params.set("guest", guestId);
+  const qs = params.toString();
+  return qs ? `${base}/?${qs}` : `${base}/`;
+}
+
 export function getInviteUrl(guestId) {
   return buildInvitationUrl(INVITATION_ORIGIN, guestId);
 }
+
 
 // ── Badges ─────────────────────────────────────────────────────────────
 
