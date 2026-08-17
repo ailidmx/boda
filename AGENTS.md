@@ -740,7 +740,62 @@ npm run test:rules  # Firestore rules tests (uses emulators)
 
 ---
 
+## 6b. Front-end engineering rules (ALWAYS follow)
+
+> These rules govern the invitation and dashboard React apps. See
+> `docs/FRONTEND_ARCHITECTURE.md` (intended architecture) and `docs/FRONTEND_AUDIT.md`
+> (current-state audit).
+
+- **Inspect existing primitives before creating a new component.** Search by name, visual
+  purpose, interaction, and similar markup/CSS. Ask: does this already exist? Can an
+  existing component accept one more variant? Is this a UI primitive or a feature component?
+- **Never duplicate an existing UI primitive.** Do NOT create `Button2`, `CustomButton`,
+  `NewModal`, `GenericCard2`, `BetterTable`, `StyledInputNew`. Extend the existing one.
+- **Pages compose features.** A route/page component should compose `PageLayout`,
+  `PageHeader`, feature toolbars/tables/dialogs — not contain Firestore queries, full form
+  implementations, domain calculations, or hundreds of lines of table/modal rendering.
+- **UI primitives contain no business logic.** `components/ui/` (Button, Input, Dialog,
+  Spinner, EmptyState, Badge, Card, Tooltip, Tabs, Table) hold little/no business logic.
+- **Feature components stay inside their feature.** Do NOT put every component in a global
+  `components/` folder. Feature components live in `features/<feature>/components/`.
+- **Firestore does not belong in presentation components.** React components must NOT import
+  Firestore SDK functions directly (`getDocs`, `getDoc`, `setDoc`, `addDoc`, `updateDoc`,
+  `deleteDoc`, `collection`, `doc`, `query`, `onSnapshot`). Route through
+  repositories → services → hooks. The invitation components are the model (zero direct
+  Firestore calls); the dashboard still has leaks to clean up.
+- **Use semantic design tokens.** Reference the app's token source (invitation:
+  `styles/base.css` + `styles/tokens.css`; dashboard: `styles/_tokens.scss`). Do NOT
+  hardcode colors, spacing, radius, shadows, or breakpoints inside individual components.
+  Avoid random values like `13px`, `17px`, `23px`.
+- **Support loading/error/empty states.** Every asynchronous feature must explicitly handle
+  loading, success, empty, and error. Do not leave blank screens. Use shared primitives
+  (`Spinner`, `Skeleton`, `EmptyState`, `ErrorState`) rather than ad-hoc markup.
+- **Preserve accessibility.** Prefer native HTML semantics before ARIA. Use `<button>` for
+  actions, not clickable `<div>`s. Associate labels with inputs. Provide accessible labels
+  for icon-only controls. Manage focus in dialogs (trap, ESC, restore). Use semantic table
+  headers and form error relationships.
+- **Use one icon system.** Do not mix icon libraries. Do not use text glyphs (✏ ❌ 🗑 📷)
+  as interface icons unless deliberately part of the product style. Icon-only controls need
+  accessible labels/tooltips.
+- **Use one notification/toast strategy.** Do not mix `alert()`, multiple toast libraries,
+  and custom banners. Define when to use toast vs inline validation vs page-level error vs
+  confirmation dialog.
+- **Destructive actions need safeguards.** Delete/archive/reset must be visually and
+  behaviorally clear: destructive styling, confirmation, disabled/loading state, clear
+  consequences. Prefer the app's dialog system over `confirm()`.
+- **Verify responsive behavior.** Audit important pages at mobile, tablet, and desktop.
+  Tables may scroll or switch representation on mobile; do not blindly stack everything.
+- **Run lint/typecheck/tests/build** after changes (`npm run build:all`, `npm test`,
+  `npx eslint`). Use browser verification for important UI changes.
+- **Do not redesign unrelated interfaces during feature implementation.** Structural
+  refactoring and visual redesign are separate tasks unless explicitly combined.
+- **Do not over-abstract.** Prefer three clear components over one configurable component
+  with 37 props. Reusability is valuable only when real reuse exists.
+
+---
+
 ## 7. Architecture guardrails (ALWAYS follow)
+
 
 > These rules exist to prevent further architectural degradation. They are the contract
 > every change must respect. See `docs/ARCHITECTURE.md` (intended architecture),
