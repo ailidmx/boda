@@ -44,6 +44,10 @@ import {
   rsvpLevelChip as serviceRsvpLevelChip,
   computeDayConfirmations as serviceComputeDayConfirmations,
   guestStatusBadge as serviceGuestStatusBadge,
+  getUniqueGuestGroups as serviceGetUniqueGuestGroups,
+  getGroupAttendanceCounts as serviceGetGroupAttendanceCounts,
+  getUniqueCabins as serviceGetUniqueCabins,
+  getFilteredGuests as serviceGetFilteredGuests,
 } from "./guestService.js";
 
 
@@ -334,9 +338,13 @@ function renderAccessDenied(app) {
 // ── Guest Manager ──────────────────────────────────────────────────────
 
 
+// The group / cabin / filter derivations live in `guestService.js` (pure,
+// dependency-injected). These thin adapters bind the dashboard's mutable
+// `state` (filterGroup / filterQuery) and the live guest cache so the rest of
+// the file can keep calling the same short signatures.
+
 function getUniqueGuestGroups() {
-  const groups = new Set(getActiveGuests().map((g) => g.group || "Sin grupo"));
-  return [...groups].sort();
+  return serviceGetUniqueGuestGroups(getActiveGuests());
 }
 
 // Per-group attendance summary for the group nav chips. For each group returns
@@ -346,49 +354,18 @@ function getUniqueGuestGroups() {
 //   - `size` = total guests in the group.
 // Rendered as "X/Y" on each chip (X = confirmed Saturday, Y = group size).
 function getGroupAttendanceCounts() {
-  const counts = {};
-  getActiveGuests().forEach((guest) => {
-    const group = guest.group || "Sin grupo";
-    if (!counts[group]) counts[group] = { confirmedSaturday: 0, size: 0 };
-    counts[group].size += 1;
-    const saturday = getLiveRsvpAnswers(guest).saturday || 0;
-    if (saturday >= RSVP_CONFIRMED_MIN_LEVEL) counts[group].confirmedSaturday += 1;
-  });
-  return counts;
+  return serviceGetGroupAttendanceCounts(getActiveGuests(), state.liveGuests);
 }
 
 function getUniqueCabins() {
-  const cabins = [
-    ...new Set(
-      getActiveGuests()
-        .filter((g) => g.hasCabin && g.unit)
-        .map((g) => g.unit),
-    ),
-  ];
-  return cabins.sort();
+  return serviceGetUniqueCabins(getActiveGuests());
 }
 
 function getFilteredGuests() {
-  let filtered = getActiveGuests();
-
-  if (state.filterGroup) {
-    filtered = filtered.filter((g) => g.group === state.filterGroup);
-  }
-  if (state.filterQuery) {
-    const q = state.filterQuery.toLowerCase();
-    filtered = filtered.filter(
-      (g) =>
-        g.id.toLowerCase().includes(q) ||
-        guestFullName(g).toLowerCase().includes(q) ||
-        String(guestIdentity(g).firstName || g.firstName || "").toLowerCase().includes(q) ||
-        String(guestIdentity(g).middleName || g.middleName || "").toLowerCase().includes(q) ||
-        String(guestIdentity(g).lastName || g.lastName || "").toLowerCase().includes(q) ||
-        String(guestIdentity(g).maternalLastName || g.maternalLastName || "").toLowerCase().includes(q) ||
-        g.group.toLowerCase().includes(q),
-    );
-  }
-
-  return filtered;
+  return serviceGetFilteredGuests(getActiveGuests(), {
+    filterGroup: state.filterGroup,
+    filterQuery: state.filterQuery,
+  });
 }
 
 

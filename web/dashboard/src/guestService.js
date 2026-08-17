@@ -15,6 +15,8 @@ import {
   RSVP_ATTENDANCE_DAYS,
   RSVP_CONFIRMED_MIN_LEVEL,
   DEFAULT_AUTH_EMAIL_DOMAIN,
+  guestFullName,
+  guestIdentity,
 } from "./guestDomain.js";
 
 // Read the live RSVP answers for a guest from the raw Firestore record.
@@ -128,4 +130,70 @@ export function guestStatusBadge(guest, liveGuests) {
   if (confirmed) return { className: "dashboard-badge dashboard-badge-yes", text: "✅ Confirmado" };
   if (hasAny) return { className: "dashboard-badge dashboard-badge-maybe", text: "🟡 Parcial" };
   return { className: "dashboard-badge dashboard-badge-pending", text: "Pendiente" };
+}
+
+// ── Group / cabin / filter derivations ──────────────────────────────────────
+// These were previously inline in `dashboard.js` reading the mutable `state`
+// object. They are now dependency-injected pure functions so they can be unit
+// tested and stay decoupled from the dashboard god-file.
+
+// Unique invitation groups across the active guests, sorted A→Z.
+export function getUniqueGuestGroups(activeGuests) {
+  const groups = new Set(activeGuests.map((g) => g.group || "Sin grupo"));
+  return [...groups].sort();
+}
+
+// Per-group attendance summary for the group nav chips. For each group returns
+// `{ confirmedSaturday, size }`:
+//   - `confirmedSaturday` = guests in the group whose SATURDAY RSVP level is
+//     ≥ RSVP_CONFIRMED_MIN_LEVEL (4) — i.e. confirmed for Saturday.
+//   - `size` = total guests in the group.
+// Rendered as "X/Y" on each chip (X = confirmed Saturday, Y = group size).
+export function getGroupAttendanceCounts(activeGuests, liveGuests) {
+  const counts = {};
+  activeGuests.forEach((guest) => {
+    const group = guest.group || "Sin grupo";
+    if (!counts[group]) counts[group] = { confirmedSaturday: 0, size: 0 };
+    counts[group].size += 1;
+    const saturday = getLiveRsvpAnswers(guest, liveGuests).saturday || 0;
+    if (saturday >= RSVP_CONFIRMED_MIN_LEVEL) counts[group].confirmedSaturday += 1;
+  });
+  return counts;
+}
+
+// Unique cabin units among active guests that have a cabin assigned, sorted.
+export function getUniqueCabins(activeGuests) {
+  const cabins = [
+    ...new Set(
+      activeGuests
+        .filter((g) => g.hasCabin && g.unit)
+        .map((g) => g.unit),
+    ),
+  ];
+  return cabins.sort();
+}
+
+// Filter the active guests by the current group + free-text query. The filter
+// state is passed in as a plain `{ filterGroup, filterQuery }` object.
+export function getFilteredGuests(activeGuests, { filterGroup, filterQuery }) {
+  let filtered = activeGuests;
+
+  if (filterGroup) {
+    filtered = filtered.filter((g) => g.group === filterGroup);
+  }
+  if (filterQuery) {
+    const q = filterQuery.toLowerCase();
+    filtered = filtered.filter(
+      (g) =>
+        g.id.toLowerCase().includes(q) ||
+        guestFullName(g).toLowerCase().includes(q) ||
+        String(guestIdentity(g).firstName || g.firstName || "").toLowerCase().includes(q) ||
+        String(guestIdentity(g).middleName || g.middleName || "").toLowerCase().includes(q) ||
+        String(guestIdentity(g).lastName || g.lastName || "").toLowerCase().includes(q) ||
+        String(guestIdentity(g).maternalLastName || g.maternalLastName || "").toLowerCase().includes(q) ||
+        g.group.toLowerCase().includes(q),
+    );
+  }
+
+  return filtered;
 }
