@@ -539,7 +539,21 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   `firebase deploy --only firestore:rules`. `isAdmin()` requires the admin's
   OWN guest doc (`guests/{auth.uid}`) to have `isAdmin == true`; the couple's
   docs (`aydé_juárez_guadalupe`, `david_aïli`) have it set.
+- **Dashboard Firestore WRITES go through repositories** — the dashboard's
+  `web/dashboard/src/repositories/` layer owns ALL Firestore write operations
+  for the dashboard. `guestRepository.js` exposes `updateGuest(guestId, payload)`
+  (a `setDoc` merge on the `guests` doc) and `softDeleteGuest(guestId)` (a
+  `setDoc` merge writing `{ _deleted: true }`); `groupRepository.js` exposes
+  `createGroup(name)`, `updateGroupField(groupId, field, value)` (merge-write a
+  dotted path like `tag.color` or `customContent.greeting`), and
+  `deleteGroup(groupId)`. `dashboard.js` imports these and NEVER calls
+  `setDoc`/`deleteDoc` directly for guests or invitation groups. When adding a
+  new dashboard write, add it to the appropriate repository (or create a new
+  one) rather than calling Firestore from `dashboard.js`. The dashboard's
+  `onSnapshot` listeners (guests, invitation_groups) remain subscription
+  concerns owned by the dashboard bootstrap, not the repositories.
 - **Dashboard cabin edits read `hosting` from the LIVE record** — the remove
+
   ("✕"), drag-and-drop, and "+ Agregar" handlers in `renderCabinAssignments()`
   all build the new `hosting` map from `getLiveHosting(guestId)` (a helper that
   reads `state.liveGuests`), NOT from `guestHosting(getGuest(guestId))`. This
@@ -723,6 +737,78 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   isn't, `sendGmail` fails with `Gmail API has not been used in project ... before
   or it is disabled` (enable via `gcloud services enable gmail.googleapis.com`).
 - *(Add new lessons here as you discover them.)*
+
+---
+
+## 7. Architecture guardrails (ALWAYS follow)
+
+> These rules exist to prevent further architectural degradation. They are the contract
+> every change must respect. See `docs/ARCHITECTURE.md` (intended architecture),
+> `docs/ARCHITECTURE_AUDIT.md` (current-state audit), and `docs/adr/` (decision log).
+
+### 7.1 Inspect before implementing
+- Before changing code, understand the existing architecture and search for an existing
+  abstraction. Do NOT assume how the project is structured.
+- Read `docs/ARCHITECTURE.md` and `docs/ARCHITECTURE_AUDIT.md` before starting a task.
+
+### 7.2 Layer boundaries — no Firestore in UI
+- The dependency flow is: **UI → hooks/use-cases → services → repositories → Firestore**.
+- **React components must NOT import Firestore SDK functions directly** (`getDocs`,
+  `getDoc`, `addDoc`, `updateDoc`, `deleteDoc`, `collection`, `doc`, `query`,
+  `onSnapshot`, `serverTimestamp`). If you find yourself adding one to a component,
+  stop and route it through a repository/service instead.
+- **Repositories** own all Firestore access (paths, queries, CRUD, doc conversion,
+  Firestore errors). They contain NO UI behavior and NO business rules.
+- **Services** own domain logic and business rules. They do NOT touch Firestore.
+- **Hooks/use-cases** orchestrate: call services, hold UI state, manage subscriptions.
+
+### 7.3 Feature-oriented modules
+- Prefer grouping code by domain (`features/guests`, `features/rsvp`, `features/cabins`,
+  `features/music`, `features/travel`, `features/coast`, …) over technical layers.
+- Expose each feature through a public `index.ts` and prefer shallow imports
+  (`import { useGuests } from "features/guests"`), not deep internal paths.
+- Do NOT create folders mechanically — only create a folder when it holds real code.
+
+### 7.4 No god files
+- Do NOT create `utils.js`, `services.js`, `firebase.js` (all behavior), `api.js`, or
+  `helpers.js` containing unrelated functions. Prefer cohesive modules with explicit
+  responsibility.
+- If a component exceeds ~200–300 lines, inspect whether it holds multiple
+  responsibilities and split by responsibility (not by line count).
+
+### 7.5 Single source of truth
+- **Collection names** live ONLY in `web/shared/firestore-paths.js` (`collections.*`).
+  Never hardcode a collection name in a component, service, or repository.
+- **Payloads** are built ONLY via `web/shared/payload-builders.js`. Never spread raw form
+  state into Firestore.
+- **Validation** mirrors the rules via `web/shared/validation.js`. Route ALL writes
+  (including dashboard writes) through it before persisting.
+- **Domain constants** (e.g. `AUTH_EMAIL_DOMAIN`, `RSVP_CONFIRMED_MIN_LEVEL`,
+  `RSVP_ATTENDANCE_DAYS`, `CABIN_NAME_MAP`) must NOT be duplicated across apps. Define
+  once and import.
+- **Guest normalization** must not be duplicated. Use one normalizer shared by both apps.
+
+### 7.6 Reuse before build
+- Search for an existing implementation before creating another abstraction.
+- Prefer extending an existing domain module over creating random global helpers.
+- Reuse existing shared components (carousels, modals) instead of reinventing.
+
+### 7.7 Keep changes scoped & preserve behavior
+- Refactor incrementally, one coherent phase at a time. Do NOT perform a gigantic rewrite.
+- Preserve existing behavior during refactors. Do not mix unrelated UI redesign with
+  architecture refactoring.
+- After each phase: run lint, tests, and a production build (`npm run build:all`), and
+  verify the affected UI.
+
+### 7.8 Dependencies
+- Do not introduce dependencies unnecessarily. Prefer the standard library and existing
+  shared code. If a validation library already exists, use it.
+
+### 7.9 Documentation
+- Update `docs/ARCHITECTURE.md` and add an ADR (`docs/adr/`) when an architectural
+  decision changes.
+- Keep `docs/ARCHITECTURE_AUDIT.md` current as the codebase evolves.
+- Add new operational lessons to this AGENTS.md as you discover them.
 
 
 

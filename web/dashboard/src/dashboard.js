@@ -16,6 +16,9 @@ import { loadRooms } from "./rooms.js";
 import { loadTables, renderTablesManager } from "./tables.js";
 import { buildInvitationUrl } from "./invitation-profile.js";
 import { collections } from "../../shared/firestore-paths.js";
+import { updateGuest, softDeleteGuest } from "./repositories/guestRepository.js";
+import { createGroup, updateGroupField, deleteGroup } from "./repositories/groupRepository.js";
+
 import {
   buildDashboardGuestEditPayload,
   buildDashboardGuestInlinePayload,
@@ -572,8 +575,9 @@ async function saveGuestRsvpAnswer(guestId, day, level) {
     if (level > 0) answers[day] = level;
     else delete answers[day];
     const payload = buildGuestRsvpPayload({ guestId, answers, timestamp: new Date() });
-    await setDoc(doc(db, collections.guests, guestId), payload, { merge: true });
+    await updateGuest(guestId, payload);
     return true;
+
 
   } catch (err) {
     console.error("Failed to save RSVP answer", err);
@@ -790,10 +794,11 @@ function openGuestEditor(guest) {
     });
 
     try {
-      await setDoc(doc(db, collections.guests, guestId), updated, { merge: true });
+      await updateGuest(guestId, updated);
 
 
       // Update in-memory guest
+
       const g = getGuest(guestId);
       if (g) {
         g.identity = {
@@ -856,13 +861,10 @@ async function saveGuestInline(guestId, field, value) {
       new Date(),
     );
     if (!payload) return false;
-    await setDoc(
-      doc(db, collections.guests, guestId),
-      payload,
-      { merge: true },
-    );
+    await updateGuest(guestId, payload);
 
     // Also update the in-memory guest
+
     if (guest) {
       if (["firstName", "middleName", "lastName", "maternalLastName", "phone"].includes(field)) {
         guest.identity = { ...(guest.identity || {}), [field]: value };
@@ -1043,9 +1045,10 @@ function openDeleteConfirm(guest) {
     status.textContent = "Eliminando…";
     status.dataset.state = "working";
     try {
-      await setDoc(doc(db, collections.guests, guest.id), { _deleted: true }, { merge: true });
+      await softDeleteGuest(guest.id);
 
       status.textContent = "✅ Marcado como eliminado. Recarga para ver los cambios.";
+
       status.dataset.state = "success";
       setTimeout(() => overlay.remove(), 1500);
     } catch (err) {
@@ -1208,12 +1211,9 @@ function openCreateGroupModal(callback) {
     status.dataset.state = "working";
 
     try {
-      await setDoc(doc(db, collections.invitationGroups, name), {
-
-        tag: { color: "#55452d", textColor: "#ffffff", label: name },
-        customContent: { greeting: "", message: "", section: "", hideSections: [] },
-      });
+      await createGroup(name);
       status.textContent = "✅ Grupo creado";
+
       status.dataset.state = "success";
       if (callback) callback(name);
       setTimeout(() => overlay.remove(), 1000);
@@ -1330,13 +1330,10 @@ function renderGroupsPanel() {
         // Custom content fields are under customContent.*
         const isTagField = field.startsWith("tag.");
         const docField = isTagField ? field : `customContent.${field}`;
-        await setDoc(
-          doc(db, collections.invitationGroups, groupId),
-          { [docField]: value },
-          { merge: true },
-        );
+        await updateGroupField(groupId, docField, value);
 
         if (status) {
+
           status.textContent = "✅ Guardado";
           setTimeout(() => { if (status) status.textContent = ""; }, 2000);
         }
@@ -1358,12 +1355,13 @@ function renderGroupsPanel() {
     btn.addEventListener("click", () => {
       const groupId = btn.dataset.deleteGroup;
       if (confirm(`¿Eliminar el grupo "${groupId}"? Esto no afecta a los invitados asignados a este grupo.`)) {
-        deleteDoc(doc(db, collections.invitationGroups, groupId)).catch((err) => {
+        deleteGroup(groupId).catch((err) => {
 
           console.error("Failed to delete group", err);
           alert("Error al eliminar el grupo.");
         });
       }
+
     });
   });
 }
