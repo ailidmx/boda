@@ -14,7 +14,9 @@
     "test:rules": "node --test tests/firestore.rules.test.mjs",
     "test:validation": "node --test tests/validation.test.mjs",
     "test:analytics": "node --test tests/analytics.test.mjs",
-    "test:button": "node --test tests/button.test.mjs"
+    "test:button": "node --test tests/button.test.mjs",
+    "test:guest-profiles": "node --test tests/guest-profiles.test.mjs"
+
 
   },
   "devDependencies": {

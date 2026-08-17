@@ -10,7 +10,8 @@
     "lint": "eslint .",
     "sync:gsheet:report": "node scripts/gsheet-firestore-sync.mjs --ci --report-json=reports/gsheet-firestore-sync-report.json --report-md=reports/gsheet-firestore-sync-report.md",
     "sync:gsheet:execute": "node scripts/gsheet-firestore-sync.mjs --execute --report-json=reports/gsheet-firestore-sync-report.json --report-md=reports/gsheet-firestore-sync-report.md",
-    "test": "npm --prefix web/invitation run test:validation && npm --prefix web/invitation run test:analytics && npm --prefix web/invitation run test:button",
+    "test": "npm --prefix web/invitation run test:validation && npm --prefix web/invitation run test:analytics && npm --prefix web/invitation run test:button && npm --prefix web/invitation run test:guest-profiles",
+
 
 
     "test:rules": "cd web/invitation && firebase emulators:exec --only firestore 'node --test tests/firestore.rules.test.mjs'"

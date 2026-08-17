@@ -334,7 +334,23 @@ committed separately. No markup/classes change — appearance is preserved.
   - `Coast.jsx` now composes these sub-components and keeps only the section
     scaffolding, beach scene, Barra carousel, and the mini-RSVP flow.
 
+- **`guest-profiles.js` — pure domain helpers extracted into a service** — the
+  JSX-free, cache-free domain logic moved to `web/invitation/src/guest-profiles/domain.js`
+  (a pure module with NO Firestore access and NO module-level cache). The data-access
+  layer in `guest-profiles.js` now looks up the live record from the cache and passes it
+  in as the `record` argument; the helpers fall back to the static guest fields when
+  `record` is absent, preserving behavior exactly. Extracted helpers:
+  `normalizeGuestRecord`, `mergeGuestRecord`, `resolveGuestName`, `guestTravelsByPlane`,
+  `resolveGuestPhoto`, `resolveGuestPhone`, `resolveGuestEmail`, `resolveGuestMessageAuthor`,
+  `resolveIdentityCheckPassed`, `resolveGuestInvitationGroup`, `getGroupMembers`,
+  `resolveLiveGuest`.
+- `web/invitation/tests/guest-profiles.test.mjs` — unit tests for the domain helpers
+  (normalization, name/photo/phone resolution, `travelsByPlane` boolean + legacy
+  `travelStatus`, identity check, invitation group, group members, live merge). Wired into
+  `npm test` via `test:guest-profiles`.
+
 Remaining F7 work: `Nav.jsx` (~1003), `IdentityModal.jsx` (~865), and the
-`guest-profiles.js` / `AppContext.jsx` service extractions.
+`AppContext.jsx` auth/login extraction.
+
 
 

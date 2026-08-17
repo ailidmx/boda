@@ -1,5 +1,5 @@
 /**
- * Guest profile helpers.
+ * Guest profile data access + public API.
  *
  * The `guests` Firestore collection is the source of truth for guest records:
  * identity (names, avatar `cloudinaryId`, group, cabin refs) and live,
@@ -15,14 +15,17 @@
  * (phone) and the identity-check flag of themselves and of the other
  * members of their invitation group on the `guests` collection (see
  * firebase/firestore.rules).
+ *
+ * This module owns the Firestore cache + reads/writes. The pure domain helpers
+ * (name/photo/phone/group resolution, normalization, merging) live in
+ * `guest-profiles/domain.js` and are re-exported here as thin wrappers that
+ * wire the live cache record in. Components and services import from this
+ * module (the public API) and never touch Firestore directly.
  */
-
 
 import { collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, serverTimestamp, where } from "firebase/firestore";
 
-
 import { db } from "./firebase.js";
-import { cloudinaryImage } from "./cloudinary.js";
 import { collections } from "../../shared/firestore-paths.js";
 import {
   buildGuestNamePayload,
@@ -32,10 +35,20 @@ import {
   buildIdentityCheckPayload,
 } from "../../shared/payload-builders.js";
 import { validateGuestContactPayload } from "../../shared/validation.js";
-
-
-
-
+import {
+  normalizeGuestRecord,
+  mergeGuestRecord,
+  resolveGuestName as resolveGuestNameDomain,
+  guestTravelsByPlane as guestTravelsByPlaneDomain,
+  resolveGuestPhoto as resolveGuestPhotoDomain,
+  resolveGuestPhone as resolveGuestPhoneDomain,
+  resolveGuestEmail as resolveGuestEmailDomain,
+  resolveGuestMessageAuthor as resolveGuestMessageAuthorDomain,
+  resolveIdentityCheckPassed as resolveIdentityCheckPassedDomain,
+  resolveGuestInvitationGroup as resolveGuestInvitationGroupDomain,
+  getGroupMembers as getGroupMembersDomain,
+  resolveLiveGuest as resolveLiveGuestDomain,
+} from "./guest-profiles/domain.js";
 
 /**
  * Cache of the Firestore `guests` collection (the source of truth for live
@@ -98,52 +111,8 @@ export function getGuestRecord(guestId) {
   return guestsCache.get(guestId);
 }
 
-
 function logDb(event, detail) {
   console.log(`[db][guest-profiles][${event}]`, detail);
-}
-
-function normalizeGuestRecord(data = {}) {
-  const identity = data.identity || {};
-  const hosting = data.hosting || {};
-  const maternalLastName = identity.maternalLastName ?? data.maternalLastName;
-  return {
-    ...data,
-    identity,
-    hosting,
-    firstName: identity.firstName ?? data.firstName,
-    middleName: identity.middleName ?? data.middleName,
-    lastName: identity.lastName ?? data.lastName,
-    maternalLastName,
-    gender: identity.gender ?? data.gender,
-    cloudinaryId: identity.cloudinaryId ?? data.cloudinaryId,
-    lang: identity.lang ?? data.lang,
-    age: identity.age ?? data.age,
-    phone: identity.phone ?? data.phone,
-    cabin: hosting.cabin ?? data.cabin,
-    room: hosting.room ?? data.room,
-    xtraCabin: hosting.xtraCabin ?? data.xtraCabin,
-    xtraRoom: hosting.xtraRoom ?? data.xtraRoom,
-    isCabinPaidByNovios: hosting.isCabinPaidByNovios ?? data.isCabinPaidByNovios,
-    isCabinPaid: hosting.isCabinPaid ?? data.isCabinPaid,
-    isXtraCabinPaidByNovios: hosting.isXtraCabinPaidByNovios ?? data.isXtraCabinPaidByNovios,
-    isXtraCabinPaid: hosting.isXtraCabinPaid ?? data.isXtraCabinPaid,
-  };
-}
-
-function mergeGuestRecord(existing = {}, patch = {}) {
-  return normalizeGuestRecord({
-    ...existing,
-    ...patch,
-    identity: {
-      ...(existing.identity || {}),
-      ...(patch.identity || {}),
-    },
-    hosting: {
-      ...(existing.hosting || {}),
-      ...(patch.hosting || {}),
-    },
-  });
 }
 
 function requireLiveGuestWriteContext(guest) {
@@ -188,12 +157,6 @@ export async function loadOwnGuestProfile(guestId) {
   guestsCache.set(guestId, data);
   logDb("read:success", { collection: collections.guests, docId: guestId, op: "getDoc", data });
   return data;
-}
-
-export function resolveGuestInvitationGroup(guest) {
-  if (!guest?.id) return "";
-  const record = guestsCache.get(guest.id);
-  return String(record?.invitationGroup || guest.invitationGroup || "").trim();
 }
 
 /**
@@ -250,7 +213,6 @@ export async function loadAllGuests() {
     console.warn("[guest-profiles] Could not load all guests", error.message);
   }
 }
-
 
 /**
  * Subscribe to the Firestore `guests` collection and keep the in-memory cache
@@ -320,104 +282,107 @@ export function loadGuestProfiles(invitationGroup) {
   );
 }
 
-
+// ---------------------------------------------------------------------------
+// Public domain helpers (thin wrappers that wire the live cache record in).
+// The pure logic lives in guest-profiles/domain.js.
+// ---------------------------------------------------------------------------
 
 /**
- * Resolve the effective display name for a guest. Names come from the sheet
- * (via the static registry) as four separate fields: nombre, nombre2,
- * apellido, apellido2. The combined firstName/lastName are kept for
- * backward compatibility.
- *
- * When a name correction has been saved to the `guests` Firestore collection
- * (via saveGuestName), the Firestore values take precedence over the static
- * registry. The Firestore schema uses English field names: firstName,
- * middleName, lastName, maternalLastName.
- *
+ * Resolve the effective display name for a guest. See domain.js.
  * @param {Object} guest  static guest from guests.js
- * @returns {{ nombre: string, nombre2: string, apellido: string, apellido2: string, firstName: string, lastName: string }}
+ * @returns {{ firstName: string, middleName: string, lastName: string, maternalLastName: string, gender: string, cloudinaryId: string, fullName: string }}
  */
 export function resolveGuestName(guest) {
-  if (!guest) {
-    return {
-      firstName: "",
-      middleName: "",
-      lastName: "",
-      maternalLastName: "",
-      fullName: "",
-    };
-  }
-  // Firestore name override (from saveGuestName) takes precedence.
-  const record = guestsCache.get(guest.id);
-  const firstName = record?.identity?.firstName ?? record?.firstName ?? guest.nombre ?? guest.firstName ?? "";
-  const middleName = record?.identity?.middleName ?? record?.middleName ?? guest.nombre2 ?? guest.middleName ?? "";
-  const lastName = record?.identity?.lastName ?? record?.lastName ?? guest.apellido ?? guest.lastName ?? "";
-  const maternalLastName =
-    record?.identity?.maternalLastName ??
-    record?.maternalLastName ??
-    guest.apellido2 ??
-    guest.maternalLastName ??
-    "";
-  return {
-    firstName,
-    middleName,
-    lastName,
-    maternalLastName,
-    gender: record?.identity?.gender ?? record?.gender ?? guest.gender ?? "",
-    cloudinaryId: record?.identity?.cloudinaryId ?? record?.cloudinaryId ?? guest.cloudinaryId ?? "",
-    fullName: [firstName, middleName, lastName, maternalLastName].filter(Boolean).join(" "),
-  };
+  return resolveGuestNameDomain(guest, guestsCache.get(guest?.id));
 }
 
-
-
 /**
- * Whether a guest travels by plane. The FLIGHTS ("Je viens de loin") section
- * is only shown to guests who fly in, so this drives section visibility, the
- * nav link, and the "next section" bottom links.
- *
- * The source of truth is the boolean `travelsByPlane` on the guest's Firestore
- * record (true = flies in). For backward compatibility we also accept the
- * older `travelStatus` string ("booked" | "planning" = flies in, "local" = no).
- *
+ * Whether a guest travels by plane. See domain.js.
  * @param {Object} guest  the signed-in guest profile (profile.guest)
  * @returns {boolean}
  */
 export function guestTravelsByPlane(guest) {
-  if (!guest) return false;
-  // Boolean flag (current schema) takes precedence.
-  if (typeof guest.travelsByPlane === "boolean") return guest.travelsByPlane;
-  // Legacy string fallback.
-  if (typeof guest.travelStatus === "string") {
-    return ["booked", "planning"].includes(guest.travelStatus);
-  }
-  return false;
+  return guestTravelsByPlaneDomain(guest);
 }
 
 /**
- * Resolve the effective avatar photo URL for a guest from their Cloudinary
- * public id (`cloudinaryId`). The id comes from the sheet (via the static
- * registry or the `guests` Firestore record). Returns null when absent.
+ * Resolve the effective avatar photo URL for a guest. See domain.js.
  * @param {Object} guest  static guest from guests.js
  * @returns {string|null}
  */
 export function resolveGuestPhoto(guest) {
-
-  if (!guest) return null;
-  const record = guestsCache.get(guest.id);
-  const publicId = record?.identity?.cloudinaryId || record?.cloudinaryId || guest.identity?.cloudinaryId || guest.cloudinaryId;
-  if (!publicId) return null;
-  try {
-    // Force a small square crop server-side. Both width AND height are given,
-    // so Cloudinary produces a valid `c_fill,g_auto,h_256,w_256` transform
-    // (the earlier 404 was caused by passing `crop: "fill"` with only a width,
-    // which emitted an empty `h_`). The square is small (256px) for avatars.
-    return cloudinaryImage(publicId, { width: 256, height: 256, crop: "fill" });
-
-  } catch {
-    return null;
-  }
+  return resolveGuestPhotoDomain(guest, guestsCache.get(guest?.id));
 }
 
+/**
+ * Resolve the effective phone number for a guest. See domain.js.
+ * @param {Object} guest  static guest from guests.js
+ * @returns {string}
+ */
+export function resolveGuestPhone(guest) {
+  return resolveGuestPhoneDomain(guest, guestsCache.get(guest?.id));
+}
+
+/**
+ * Resolve the effective email address for a guest. See domain.js.
+ * @param {Object} guest  static guest from guests.js
+ * @returns {string}
+ */
+export function resolveGuestEmail(guest) {
+  return resolveGuestEmailDomain(guest);
+}
+
+/**
+ * Resolve the author of the guest's message. See domain.js.
+ * @param {Object} guest  static guest from guests.js
+ * @returns {string}
+ */
+export function resolveGuestMessageAuthor(guest) {
+  return resolveGuestMessageAuthorDomain(guest, guestsCache.get(guest?.id));
+}
+
+/**
+ * Resolve whether the guest has acknowledged the identity check. See domain.js.
+ * @param {Object} guest  static guest from guests.js
+ * @returns {boolean}
+ */
+export function resolveIdentityCheckPassed(guest) {
+  return resolveIdentityCheckPassedDomain(guest, guestsCache.get(guest?.id));
+}
+
+/**
+ * Resolve the invitation group for a guest. See domain.js.
+ * @param {Object} guest  static guest from guests.js
+ * @returns {string}
+ */
+export function resolveGuestInvitationGroup(guest) {
+  return resolveGuestInvitationGroupDomain(guest, guestsCache.get(guest?.id));
+}
+
+/**
+ * All guests that share an invitation group with the given guest. See domain.js.
+ * @param {Object} guest  static guest from guests.js
+ * @param {Object[]} allGuests  full guest registry
+ * @returns {Object[]}
+ */
+export function getGroupMembers(guest, allGuests) {
+  return getGroupMembersDomain(guest, allGuests, (g) =>
+    resolveGuestInvitationGroupDomain(g, guestsCache.get(g?.id)),
+  );
+}
+
+/**
+ * Merge a static guest record with its live Firestore record. See domain.js.
+ * @param {Object} guest  static guest from guests.js
+ * @returns {Object}
+ */
+export function resolveLiveGuest(guest) {
+  return resolveLiveGuestDomain(guest, guestsCache.get(guest?.id));
+}
+
+// ---------------------------------------------------------------------------
+// Writes (Firestore data access).
+// ---------------------------------------------------------------------------
 
 /**
  * Save a name correction for a guest. The authenticated user must be the guest
@@ -453,7 +418,6 @@ export async function saveGuestName(guest, name, editorGuestId) {
     timestamp: serverTimestamp(),
   });
 
-
   // Runtime validation mirrors the Firestore rules (hasValidGuestContactFields).
   const result = validateGuestContactPayload(next);
   if (!result.valid) {
@@ -469,12 +433,7 @@ export async function saveGuestName(guest, name, editorGuestId) {
     logDb("write:error", { collection: collections.guests, docId: guest.id, op: "setDoc", merge: true, payload: next, error: error.message });
     throw error;
   }
-
 }
-
-
-
-
 
 /**
  * Save an avatar for a guest. The authenticated user must be the guest
@@ -514,39 +473,6 @@ export async function saveGuestPhoto(guest, cloudinaryId, editorGuestId) {
     logDb("write:error", { collection: collections.guests, docId: guest.id, op: "setDoc", merge: true, payload: next, error: error.message });
     throw error;
   }
-
-}
-
-
-
-/**
- * Resolve the effective phone number for a guest. The `guests` collection is
- * the source of truth for live contact details (a guest may correct their own
- * number). When no Firestore override exists, we fall back to the sheet's
- * `Celular` column (via the static registry `phone` field), so the phone is
- * always linked to the real schema.
- * @param {Object} guest  static guest from guests.js
- * @returns {string}
- */
-export function resolveGuestPhone(guest) {
-  if (!guest) return "";
-  const record = guestsCache.get(guest.id);
-  return record?.identity?.phone || record?.phone || guest.phone || "";
-}
-
-
-
-/**
- * Resolve the effective email address for a guest. The email is NOT stored in
- * the `guests` collection — it lives in Firebase Auth (the real login
- * credential). This helper is kept for backward compatibility but always
- * returns an empty string; callers should read the email from the signed-in
- * user's auth profile (`profile.email`) instead.
- * @param {Object} guest  static guest from guests.js
- * @returns {string}
- */
-export function resolveGuestEmail(guest) {
-  return "";
 }
 
 /**
@@ -591,23 +517,6 @@ export async function saveGuestContact(guest, contact, editorGuestId) {
     logDb("write:error", { collection: collections.guests, docId: guest.id, op: "setDoc", merge: true, payload: next, error: error.message });
     throw error;
   }
-
-}
-
-
-
-
-/**
- * Resolve the author of the guest's message. Stored on the `guests` collection
- * as `messageAuthor` (the source of truth for guest records). Empty string
- * when not yet set.
- * @param {Object} guest  static guest from guests.js
- * @returns {string}
- */
-export function resolveGuestMessageAuthor(guest) {
-  if (!guest) return "";
-  const record = guestsCache.get(guest.id);
-  return record?.messageAuthor || "";
 }
 
 /**
@@ -648,25 +557,6 @@ export async function saveGuestMessageAuthor(guest, messageAuthor, editorGuestId
     logDb("write:error", { collection: collections.guests, docId: guest.id, op: "setDoc", merge: true, payload: next, error: error.message });
     throw error;
   }
-
-}
-
-
-
-
-/**
- * Resolve whether the guest has acknowledged the identity check (clicked OK on
- * the identity modal). Stored on the `guests` collection as `idCheckUser`
- * (the source of truth for guest records). Absent/false means the modal should
- * still be shown.
- * @param {Object} guest  static guest from guests.js
- * @returns {boolean}
- */
-export function resolveIdentityCheckPassed(guest) {
-
-  if (!guest) return false;
-  const record = guestsCache.get(guest.id);
-  return record?.idCheckUser === true;
 }
 
 /**
@@ -708,46 +598,4 @@ export async function saveIdentityCheckPassed(guest, passed, editorGuestId) {
     logDb("write:error", { collection: collections.guests, docId: guest.id, op: "setDoc", merge: true, payload: next, error: error.message });
     throw error;
   }
-
-}
-
-
-
-/**
- * All guests that share an invitation group with the given guest.
- * The signed-in guest is listed first, then the rest of the group.
- * @param {Object} guest  static guest from guests.js
- * @param {Object[]} allGuests  full guest registry
- * @returns {Object[]}
- */
-export function getGroupMembers(guest, allGuests) {
-  if (!guest) return [];
-  const group = resolveGuestInvitationGroup(guest);
-  if (!group) return [guest];
-  const members = allGuests.filter(
-    (g) => resolveGuestInvitationGroup(g) === group && !g._deleted,
-  );
-  // Signed-in guest first, then the rest in registry order.
-  const self = members.find((g) => g.id === guest.id);
-  const others = members.filter((g) => g.id !== guest.id);
-  return [self || guest, ...others];
-}
-
-/**
- * Merge a static guest record with its live Firestore record (if loaded).
- * Live fields (hosting, identity, contact, rsvp, etc.) override the static
- * data, so callers can read the effective cabin, room, and payment flags.
- * @param {Object} guest  static guest from guests.js
- * @returns {Object}
- */
-export function resolveLiveGuest(guest) {
-  if (!guest) return null;
-  const record = guestsCache.get(guest.id);
-  if (!record) return guest;
-  return {
-    ...guest,
-    ...Object.fromEntries(
-      Object.entries(record).filter(([, v]) => v !== undefined),
-    ),
-  };
 }
