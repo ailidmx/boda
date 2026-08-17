@@ -1169,13 +1169,14 @@ function renderGuestManager() {
       : `<span class="dashboard-avatar dashboard-avatar-initials">${initials}</span>`;
 
     // Badges on the avatar corners:
-    //  - top-left: ID check (🔒 LOCK when verified, empty badge when not)
+    //  - top-left: ID check (🔒 LOCK when verified, nothing when not)
     //  - top-right: edit photo (opens the guest editor modal)
     //  - bottom-right: auth (🔑 login emoji when the guest has a Firebase Auth
     //    account, ❌ red cross when they don't)
     const idCheckBadge = guest.idCheckUser
       ? '<span class="dashboard-avatar-badge dashboard-avatar-badge--idcheck is-locked" title="Identidad verificada (ID Check)">🔒</span>'
-      : '<span class="dashboard-avatar-badge dashboard-avatar-badge--idcheck is-unlocked" title="Identidad no verificada (ID Check)"></span>';
+      : '';
+
 
     const editPhotoBadge = `<button class="dashboard-avatar-badge dashboard-avatar-badge--edit" data-edit-photo="${guest.id}" title="Editar foto de perfil" type="button">📷</button>`;
     const authBadge = hasAuth
