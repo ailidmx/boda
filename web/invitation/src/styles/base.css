@@ -8,10 +8,8 @@
   --cream: #f4eee4;
   --sand: #d9cfae;
   --terracotta: #a94d31;
-  --terracotta-complement: #3f7f87;
   --marigold: #c68b2b;
   --sage: #7a8b7a;
-  --deep-charcoal: #202520;
   --deep-green: #293b35;
   --white: #fffdf8;
   --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
@@ -156,8 +154,70 @@ p {
   font-size: 0.85rem;
 }
 
-/* ── Site shell ── */
+/* ── Countdown bar ── */
+.countdown-bar {
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.65rem, 3vw, 2rem);
+  height: var(--countdown-height);
+  padding-inline: 1rem;
+  background: var(--ink);
+  color: var(--white);
+}
 
+.countdown-prefix {
+  font-size: clamp(0.4rem, 0.85vw, 0.58rem);
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: #e4b968;
+  white-space: nowrap;
+}
+
+.countdown-values {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.6rem, 2.5vw, 1.5rem);
+  width: min(100%, 32rem);
+}
+
+.countdown-unit {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  white-space: nowrap;
+}
+
+.countdown-unit strong {
+  min-width: 1.3em;
+  font-family: var(--font-countdown);
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: center;
+}
+
+.countdown-unit small {
+  color: rgb(255 253 248 / 72%);
+  font-size: clamp(0.6rem, 1.4vw, 1rem);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* ── Site shell ── */
 
 .site-shell {
   padding-top: var(--countdown-height);
@@ -192,11 +252,7 @@ p {
   flex-direction: column;
   justify-content: center;
   padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 6vw, 6rem);
-  /* Keep decorative/overflowing content (orbs, gradients, images) inside the
-     section so nothing bleeds into neighbouring sections. */
-  overflow: hidden;
 }
-
 
 
 .section-heading {
@@ -289,39 +345,15 @@ p {
   opacity: 0.72;
 }
 
-/* Golden shiny CTA button — the metallic gold gradient with a sweeping
-   light band, matching the identity modal's primary button. Used for the
-   RSVP submit CTAs (the biggest calls-to-action on the site). */
-.button--gold {
-  background: linear-gradient(
-    100deg,
-    #b8860b 0%,
-    #e4b968 42%,
-    #f7e7b3 50%,
-    #e4b968 58%,
-    #b8860b 100%
-  );
-  background-size: 200% auto;
-  color: var(--white);
-  box-shadow: 0 2px 8px rgb(184 134 11 / 40%);
-  animation: identity-shine 9s linear infinite;
-}
-
-/* The golden shine keyframes (shared with the identity modal accents). */
-@keyframes identity-shine {
-  to {
-    background-position: 200% center;
-  }
-}
-
-
 /* ── Forms ── */
 .form-field {
   display: grid;
   gap: 0.45rem;
 }
 
-.form-field-wide {
+.form-field-wide,
+.rsvp-form .button,
+.rsvp-form > small {
   grid-column: 1 / -1;
 }
 
@@ -482,18 +514,6 @@ p {
 .section-nav--light .section-nav-link:focus-visible {
   color: var(--marigold);
 }
-
-/* ── Mobile typography ───────────────────────────────────────────────── */
-@media (max-width: 899px) {
-  h2 {
-    font-size: 1.25rem;
-  }
-
-  .handwritten {
-    font-size: 0.6rem;
-  }
-}
-
 
 
 

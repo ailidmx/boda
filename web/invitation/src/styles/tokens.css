@@ -1,8 +1,9 @@
-/* ── Design tokens: breakpoints, spacing, fluid type ────────────────────
+/* ── Design tokens: color, typography, breakpoints, spacing, fluid type ──
  *
- * This file is the single source of truth for the responsive system.
- * Every breakpoint, spacing step, and fluid type ramp lives here so the
- * invitation scales consistently across devices.
+ * This file is the single source of truth for the design token system.
+ * Every color, font, breakpoint, spacing step, and fluid type ramp lives
+ * here so the invitation scales consistently across devices and stays
+ * visually coherent.
  *
  * USAGE PATTERN
  * ─────────────
@@ -14,6 +15,29 @@
  * The `responsive.css` file is reserved for cross-cutting / shared layout
  * rules that don't belong to a single component (e.g. the `.section` shell,
  * `.section-heading`, shared grid primitives).
+ *
+ * COLOR TOKENS
+ * ────────────
+ * The wedding palette. Reference these instead of hardcoding hex values in
+ * component CSS. (Consolidated here from `base.css` so all design tokens
+ * share one home.)
+ *
+ *   --ink:                 #241921  (primary text)
+ *   --ink-700 / -600 / -500        (muted text steps)
+ *   --cream:               #f4eee4  (page background)
+ *   --sand:                #d9cfae  (warm neutral)
+ *   --terracotta:          #a94d31  (accent)
+ *   --terracotta-complement:#3f7f87 (teal complement)
+ *   --marigold:            #c68b2b  (gold accent)
+ *   --sage:                #7a8b7a  (muted green)
+ *   --deep-charcoal:       #202520  (near-black green)
+ *   --deep-green:          #293b35  (dark green)
+ *   --white:               #fffdf8  (warm white)
+ *
+ * FONT TOKENS
+ * ───────────
+ *   --font-display / --font-body / --font-hero / --font-calligraphy /
+ *   --font-countdown / --font-grid
  *
  * BREAKPOINT TOKENS
  * ─────────────────
@@ -72,12 +96,36 @@
  */
 
 :root {
+  /* ── Color palette ── */
+  --ink: #241921;
+  --ink-700: #4c464f;
+  --ink-600: #625b66;
+  --ink-500: #7a7280;
+  --cream: #f4eee4;
+  --sand: #d9cfae;
+  --terracotta: #a94d31;
+  --terracotta-complement: #3f7f87;
+  --marigold: #c68b2b;
+  --sage: #7a8b7a;
+  --deep-charcoal: #202520;
+  --deep-green: #293b35;
+  --white: #fffdf8;
+
+  /* ── Typography ── */
+  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-body: "Montserrat", "Avenir Next", system-ui, -apple-system, sans-serif;
+  --font-hero: "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-calligraphy: "Ballet", "Fraunces", "Iowan Old Style", Georgia, serif;
+  --font-countdown: "IBM Plex Mono", "Montserrat", "Avenir Next", system-ui, -apple-system, sans-serif;
+  --font-grid: "Bitcount Grid Single", "Montserrat", system-ui, sans-serif;
+
   /* ── Breakpoints (numeric, for reference / JS) ── */
   --bp-sm: 480px;
   --bp-md: 640px;
   --bp-lg: 900px;
   --bp-xl: 1200px;
   --bp-2xl: 1440px;
+
 
   /* ── Fluid type scale ── */
   --text-xs: clamp(0.72rem, 0.65rem + 0.35vw, 0.85rem);
