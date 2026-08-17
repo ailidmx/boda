@@ -448,6 +448,36 @@ function guestAuthEmail(guest) {
   return raw?.firebaseEmail || "";
 }
 
+// The default auth domain the invitation app appends to bare usernames. Emails
+// on this domain are NOT real inboxes, so we must never send an invitation to
+// them.
+const DEFAULT_AUTH_EMAIL_DOMAIN = "boda-david-y-ayde.web.app";
+
+// A guest can receive an invitation only if they have a Firebase Auth account
+// (either present in the live auth list or carrying an explicit firebaseEmail).
+function guestHasAuth(guest) {
+  return Boolean(state.authUsers[guest.id]) || Boolean(guestAuthEmail(guest));
+}
+
+// The email we would send an invitation to (auth email first, then identity).
+function guestSendEmail(guest) {
+  return guestAuthEmail(guest) || guest.identity?.email || guest.email || "";
+}
+
+// The email channel is available only when the guest is auth'd AND has a real
+// (non-default-domain) email address.
+function guestCanEmail(guest) {
+  const email = guestSendEmail(guest);
+  return guestHasAuth(guest) && Boolean(email) && !email.endsWith(`@${DEFAULT_AUTH_EMAIL_DOMAIN}`);
+}
+
+// The WhatsApp channel is available only when the guest is auth'd AND has a
+// phone number.
+function guestCanWhatsapp(guest) {
+  const phone = guest.identity?.phone || guest.phone || "";
+  return guestHasAuth(guest) && Boolean(phone);
+}
+
 
 // Deterministic pastel background color for a badge label (stable per label).
 function badgeStyle(text) {
@@ -1003,7 +1033,32 @@ function openDeleteConfirm(guest) {
 // email. The actual sending is delegated to the `sendInvitation` Cloud
 // Function (Gmail API + WhatsApp deep link), which is admin-only. The modal
 // shows the guest's contact info and lets the admin pick the channel(s).
-function openSendInviteModal(guest) {
+//
+// `channel` (optional) pre-selects a channel and auto-triggers it. Each channel
+// button is disabled when that channel is not available for this guest:
+//   - No Firebase Auth account → both disabled (can't send anything).
+//   - Auth but no real email (or only a default-domain email) → email disabled.
+//   - Auth but no phone → WhatsApp disabled.
+function openSendInviteModal(guest, channel = null) {
+  const canWhatsapp = guestCanWhatsapp(guest);
+  const canEmail = guestCanEmail(guest);
+  const hasAuth = guestHasAuth(guest);
+  const email = guestSendEmail(guest);
+  const phone = guest.identity?.phone || guest.phone || "";
+
+  const waTitle = !hasAuth
+    ? "Sin cuenta de Firebase Auth — no se puede enviar"
+    : !phone
+      ? "Sin teléfono — no se puede enviar por WhatsApp"
+      : "Enviar invitación por WhatsApp";
+  const emailTitle = !hasAuth
+    ? "Sin cuenta de Firebase Auth — no se puede enviar"
+    : !email
+      ? "Sin correo — no se puede enviar por email"
+      : email.endsWith(`@${DEFAULT_AUTH_EMAIL_DOMAIN}`)
+        ? "Correo del dominio por defecto — no se puede enviar por email"
+        : "Enviar invitación por email";
+
   const overlay = document.createElement("div");
   overlay.className = "dashboard-modal-overlay";
   overlay.innerHTML = `
@@ -1019,11 +1074,11 @@ function openSendInviteModal(guest) {
         </p>
         <div class="dashboard-modal-field">
           <label>Teléfono (WhatsApp)</label>
-          <input type="text" value="${guest.identity?.phone || guest.phone || ""}" readonly />
+          <input type="text" value="${phone}" readonly />
         </div>
         <div class="dashboard-modal-field">
           <label>Correo</label>
-          <input type="text" value="${guestAuthEmail(guest) || guest.identity?.email || guest.email || ""}" readonly />
+          <input type="text" value="${email}" readonly />
         </div>
         <div class="dashboard-modal-field">
           <label>Idioma</label>
@@ -1034,8 +1089,8 @@ function openSendInviteModal(guest) {
           <input type="text" value="${getInviteUrl(guest.id)}" readonly />
         </div>
         <div class="dashboard-modal-actions">
-          <button class="dashboard-button" type="button" data-send-whatsapp>WhatsApp</button>
-          <button class="dashboard-button" type="button" data-send-email>Email</button>
+          <button class="dashboard-button" type="button" data-send-whatsapp title="${waTitle}" ${canWhatsapp ? "" : "disabled"}>WhatsApp</button>
+          <button class="dashboard-button" type="button" data-send-email title="${emailTitle}" ${canEmail ? "" : "disabled"}>Email</button>
           <button class="dashboard-button dashboard-button-secondary" type="button" data-modal-close>Cancelar</button>
         </div>
         <small data-send-invite-status></small>
@@ -1049,13 +1104,13 @@ function openSendInviteModal(guest) {
   overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
 
   const status = overlay.querySelector("[data-send-invite-status]");
-  const run = async (channel) => {
+  const run = async (ch) => {
     status.textContent = "Enviando…";
     status.dataset.state = "working";
     try {
       const functions = getFunctions();
       const sendInvitation = httpsCallable(functions, "sendInvitation");
-      const result = await sendInvitation({ guestId: guest.id, channel });
+      const result = await sendInvitation({ guestId: guest.id, channel: ch });
       status.textContent = `✅ ${result.data?.message || "Enviado."}`;
       status.dataset.state = "success";
     } catch (err) {
@@ -1067,6 +1122,10 @@ function openSendInviteModal(guest) {
 
   overlay.querySelector("[data-send-whatsapp]").addEventListener("click", () => run("whatsapp"));
   overlay.querySelector("[data-send-email]").addEventListener("click", () => run("email"));
+
+  // Auto-trigger the pre-selected channel (from the dedicated column button).
+  if (channel === "whatsapp" && canWhatsapp) run("whatsapp");
+  else if (channel === "email" && canEmail) run("email");
 }
 
 // ── Create Group Modal ─────────────────────────────────────────────────
@@ -1408,6 +1467,39 @@ function renderGuestManager() {
 
 
 
+  // ── Send-invite cell helper (dedicated "Enviar" column) ──
+  // Renders the WhatsApp + Email send buttons. Each is disabled when the
+  // channel is not available for this guest:
+  //   - No Firebase Auth account → both disabled (can't send anything).
+  //   - Auth but no real email (or only a default-domain email) → email disabled.
+  //   - Auth but no phone → WhatsApp disabled.
+  const sendCell = (guest) => {
+    const canWhatsapp = guestCanWhatsapp(guest);
+    const canEmail = guestCanEmail(guest);
+    const hasAuth = guestHasAuth(guest);
+    const email = guestSendEmail(guest);
+    const phone = guest.identity?.phone || guest.phone || "";
+
+    const waTitle = !hasAuth
+      ? "Sin cuenta de Firebase Auth — no se puede enviar"
+      : !phone
+        ? "Sin teléfono — no se puede enviar por WhatsApp"
+        : "Enviar invitación por WhatsApp";
+    const emailTitle = !hasAuth
+      ? "Sin cuenta de Firebase Auth — no se puede enviar"
+      : !email
+        ? "Sin correo — no se puede enviar por email"
+        : email.endsWith(`@${DEFAULT_AUTH_EMAIL_DOMAIN}`)
+          ? "Correo del dominio por defecto — no se puede enviar por email"
+          : "Enviar invitación por email";
+
+    return `
+      <div class="dashboard-send-cell">
+        <button class="dashboard-link-btn" data-send-whatsapp="${guest.id}" title="${waTitle}" ${canWhatsapp ? "" : "disabled"}>📱</button>
+        <button class="dashboard-link-btn" data-send-email="${guest.id}" title="${emailTitle}" ${canEmail ? "" : "disabled"}>✉️</button>
+      </div>`;
+  };
+
   // ── Name cell helper ──
   const nameCell = (guest) => {
     const identity = guestIdentity(guest);
@@ -1477,6 +1569,7 @@ function renderGuestManager() {
         <thead>
           <tr>
             ${sortTh("name", "Identidad")}
+            <th title="Enviar invitación (WhatsApp / email)">Enviar</th>
             ${sortTh("invitationGroup", "Invitación")}
             ${sortTh("group", "Grupo")}
             ${sortTh("lang", "Idioma")}
@@ -1505,6 +1598,7 @@ function renderGuestManager() {
               return `
             <tr class="dashboard-guest-row">
               <td>${identityCell(merged)}</td>
+              <td>${sendCell(merged)}</td>
               <td>${invitationGroupCell(merged)}</td>
               <td>${badgeHtml(merged.group)}</td>
               <td>${badgeHtml(merged.identity?.lang || merged.lang || "")}</td>
@@ -1521,7 +1615,6 @@ function renderGuestManager() {
               <td data-guest-status="${merged.id}"></td>
               <td>
                 <button class="dashboard-link-btn" data-edit-guest="${merged.id}" title="Editar todo (modal)">✏️</button>
-                <button class="dashboard-link-btn" data-send-invite="${merged.id}" title="Enviar invitación (WhatsApp / email)">📨</button>
                 <button class="dashboard-link-btn" data-copy-link="${merged.id}" title="Copiar enlace">🔗</button>
                 <button class="dashboard-link-btn" data-preview-link="${merged.id}" title="Vista previa">👁️</button>
                 <button class="dashboard-link-btn" data-delete-guest="${merged.id}" title="Eliminar" style="color:#a0352c;">🗑️</button>
@@ -1680,12 +1773,22 @@ function renderGuestManager() {
     });
   });
 
-  // ── Send invite (modal) ──
-  container.querySelectorAll("[data-send-invite]").forEach((btn) => {
+  // ── Send invite (dedicated "Enviar" column) ──
+  // The WhatsApp / Email buttons in the dedicated column open the send modal
+  // pre-targeted to that channel. Disabled buttons (no auth / no phone / no
+  // real email) are skipped — the modal also enforces the same rules.
+  container.querySelectorAll("[data-send-whatsapp]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const guestId = btn.dataset.sendInvite;
+      const guestId = btn.dataset.sendWhatsapp;
       const guest = getGuest(guestId);
-      if (guest) openSendInviteModal(guest);
+      if (guest && guestCanWhatsapp(guest)) openSendInviteModal(guest, "whatsapp");
+    });
+  });
+  container.querySelectorAll("[data-send-email]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const guestId = btn.dataset.sendEmail;
+      const guest = getGuest(guestId);
+      if (guest && guestCanEmail(guest)) openSendInviteModal(guest, "email");
     });
   });
 
