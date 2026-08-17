@@ -317,3 +317,24 @@ The first F2 step is landed: a shared `Button` UI primitive for the invitation.
 Remaining F2 work: introduce the other primitives (Input, Dialog, Spinner, EmptyState,
 Badge) and consolidate design tokens. Do NOT redesign visuals — preserve appearance.
 
+### F7 progress — giant component decomposition (in progress)
+
+The F7 phase decomposes the largest invitation components into feature-local
+sub-components. Each decomposition is verified with `build:all` + lint + tests and
+committed separately. No markup/classes change — appearance is preserved.
+
+- **`Coast.jsx` (~809 → ~430 lines)** — extracted into `components/coast/`:
+  - `ExtraStayCard.jsx` — the extra-cabin (Plan 1 · stay at Roca Azul) card: member
+    tabs, cabin badge, photo carousel, `CabinOccupancy`, and the shared `StayPlanCard`.
+  - `CoastSuggestions.jsx` — the Airbnb + hotel accommodation suggestions (mirrors the
+    Accommodation "no cabin" pattern).
+  - `CoastBudget.jsx` — the Barra de Navidad budget estimate (per-night rate → group
+    total for the 4 beach nights).
+  - `data.js` — shared `formatPrice` + `MXN_PER_EUR` for the coast feature.
+  - `Coast.jsx` now composes these sub-components and keeps only the section
+    scaffolding, beach scene, Barra carousel, and the mini-RSVP flow.
+
+Remaining F7 work: `Nav.jsx` (~1003), `IdentityModal.jsx` (~865), and the
+`guest-profiles.js` / `AppContext.jsx` service extractions.
+
+
