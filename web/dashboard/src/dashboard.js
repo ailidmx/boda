@@ -262,17 +262,21 @@ function guestInitials(guest) {
 // used by `guestSortValue`. "avatar" is intentionally NOT sortable. The ID and
 // phone are NOT standalone columns — they live inside the "Identidad" column.
 const GUEST_SORT_COLUMNS = [
-  "name", "idCheck", "hasAuth", "group", "cabin", "room", "xtraCabin", "xtraRoom",
+  "name", "invitationGroup", "idCheck", "hasAuth", "group", "lang", "cabin", "room", "xtraCabin", "xtraRoom",
   "status",
 ];
+
 
 // Extract the sortable value for a guest given a column key.
 function guestSortValue(guest, key) {
   switch (key) {
     case "name":
       return guestFullName(guest).toLowerCase();
+    case "invitationGroup":
+      return (guest.invitationGroup || "").toLowerCase();
     case "idCheck":
       return guest.idCheckUser ? 1 : 0;
+
     case "hasAuth":
       return state.authUsers[guest.id] ? 1 : 0;
 
@@ -280,6 +284,8 @@ function guestSortValue(guest, key) {
 
     case "group":
       return (guest.group || "").toLowerCase();
+    case "lang":
+      return (guest.identity?.lang || guest.lang || "").toLowerCase();
     case "cabin":
       return (guest.cabinLabel || guest.unit || "").toLowerCase();
     case "room":
@@ -355,6 +361,24 @@ function getUniqueGuestGroups() {
   return [...groups].sort();
 }
 
+// Per-group attendance summary for the group nav chips. For each group returns
+// `{ confirmedSaturday, size }`:
+//   - `confirmedSaturday` = guests in the group whose SATURDAY RSVP level is
+//     ≥ RSVP_CONFIRMED_MIN_LEVEL (4) — i.e. confirmed for Saturday.
+//   - `size` = total guests in the group.
+// Rendered as "X/Y" on each chip (X = confirmed Saturday, Y = group size).
+function getGroupAttendanceCounts() {
+  const counts = {};
+  getActiveGuests().forEach((guest) => {
+    const group = guest.group || "Sin grupo";
+    if (!counts[group]) counts[group] = { confirmedSaturday: 0, size: 0 };
+    counts[group].size += 1;
+    const saturday = getLiveRsvpAnswers(guest).saturday || 0;
+    if (saturday >= RSVP_CONFIRMED_MIN_LEVEL) counts[group].confirmedSaturday += 1;
+  });
+  return counts;
+}
+
 function getUniqueCabins() {
   const cabins = [
     ...new Set(
@@ -390,15 +414,15 @@ function getFilteredGuests() {
 }
 
 
+// The production invitation origin. Invitation links sent to guests (email
+// body, WhatsApp, and the modal preview) MUST always point here — never to a
+// local dev server — so the guest always lands on the real site.
+const INVITATION_ORIGIN = "https://boda-david-y-ayde.web.app";
+
 function getInviteUrl(guestId) {
-  // In dev, the dashboard runs on port 5174 while the invitation runs on
-  // port 5173. Build invitation links against the invitation's origin.
-  const origin =
-    window.location.port === "5174"
-      ? "http://localhost:5173"
-      : window.location.origin;
-  return buildInvitationUrl(origin, guestId);
+  return buildInvitationUrl(INVITATION_ORIGIN, guestId);
 }
+
 
 
 function getRsvpForGuest(guestId) {
@@ -440,6 +464,46 @@ function getMergedGuest(guest) {
 function guestAuthEmail(guest) {
   const raw = state.liveGuests.find((r) => r.id === guest.id);
   return raw?.firebaseEmail || "";
+}
+
+// The default auth domain the invitation app appends to bare usernames. Emails
+// on this domain are NOT real inboxes, so we must never send an invitation to
+// them.
+const DEFAULT_AUTH_EMAIL_DOMAIN = "boda-david-y-ayde.web.app";
+
+// A guest can receive an invitation only if they have a Firebase Auth account
+// (either present in the live auth list or carrying an explicit firebaseEmail).
+function guestHasAuth(guest) {
+  return Boolean(state.authUsers[guest.id]) || Boolean(guestAuthEmail(guest));
+}
+
+// The email we would send an invitation to. Priority: the raw record's
+// `firebaseEmail`, then the LIVE Firebase Auth user's email (the same source the
+// identity column uses via `state.authUsers`), then the identity/record email.
+function guestSendEmail(guest) {
+  return (
+    guestAuthEmail(guest) ||
+    state.authUsers[guest.id]?.email ||
+    guest.identity?.email ||
+    guest.email ||
+    ""
+  );
+}
+
+// The email channel is available whenever the guest has a real (non-default
+// domain) email address. We intentionally do NOT require a Firebase Auth
+// account here: the couple may want to send an invitation to a guest who has a
+// real inbox but hasn't been provisioned an auth account yet.
+function guestCanEmail(guest) {
+  const email = guestSendEmail(guest);
+  return Boolean(email) && !email.endsWith(`@${DEFAULT_AUTH_EMAIL_DOMAIN}`);
+}
+
+// The WhatsApp channel is available only when the guest is auth'd AND has a
+// phone number.
+function guestCanWhatsapp(guest) {
+  const phone = guest.identity?.phone || guest.phone || "";
+  return guestHasAuth(guest) && Boolean(phone);
 }
 
 
@@ -770,8 +834,9 @@ function openGuestEditor(guest) {
 // edited there, not in Firestore.
 const GUEST_WRITABLE_FIELDS = new Set([
   "firstName", "middleName", "lastName", "maternalLastName", "phone", "idCheckUser", "cloudinaryId",
-  "messageAuthor", "invitationGroup", "_deleted",
+  "messageAuthor", "invitationGroup", "invitationSent", "_deleted",
 ]);
+
 
 
 async function saveGuestInline(guestId, field, value) {
@@ -812,9 +877,128 @@ async function saveGuestInline(guestId, field, value) {
 }
 
 
+// ── Invitation group column (rename + pick another group) ──────────────
+
+// Sorted set of existing invitation group names: the `invitation_groups`
+// collection ids plus every distinct `invitationGroup` value currently used by
+// guests. Used to populate the "pick another group" dropdown.
+function getInvitationGroupOptions() {
+  const names = new Set();
+  state.invitationGroups.forEach((g) => {
+    if (g.id) names.add(g.id);
+  });
+  getActiveGuests().forEach((g) => {
+    if (g.invitationGroup) names.add(g.invitationGroup);
+  });
+  return [...names].sort((a, b) => a.localeCompare(b));
+}
+
+// Reusable confirm modal. `onConfirm` may be async; the modal shows a working
+// state and only closes on success.
+function openConfirmModal({ title, message, confirmLabel = "Confirmar", cancelLabel = "Cancelar", onConfirm }) {
+  const overlay = document.createElement("div");
+  overlay.className = "dashboard-modal-overlay";
+  overlay.innerHTML = `
+    <div class="dashboard-modal" style="max-width: 28rem;">
+      <div class="dashboard-modal-heading">
+        <h3>${title}</h3>
+        <button class="dashboard-modal-close" data-modal-close type="button">✕</button>
+      </div>
+      <div class="dashboard-modal-form">
+        <p style="line-height:1.6;color:#55452d;">${message}</p>
+        <div class="dashboard-modal-actions">
+          <button class="dashboard-button" type="button" data-confirm>${confirmLabel}</button>
+          <button class="dashboard-button dashboard-button-secondary" type="button" data-modal-close>${cancelLabel}</button>
+        </div>
+        <small data-confirm-status></small>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const close = () => overlay.remove();
+  overlay.querySelectorAll("[data-modal-close]").forEach((btn) => btn.addEventListener("click", close));
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+
+  overlay.querySelector("[data-confirm]").addEventListener("click", async () => {
+    const status = overlay.querySelector("[data-confirm-status]");
+    const btn = overlay.querySelector("[data-confirm]");
+    btn.disabled = true;
+    status.textContent = "Actualizando…";
+    status.dataset.state = "working";
+    try {
+      await onConfirm();
+      close();
+    } catch (err) {
+      console.error("Confirm action failed", err);
+      status.textContent = "❌ Error al actualizar.";
+      status.dataset.state = "error";
+      btn.disabled = false;
+    }
+  });
+}
+
+// Change a guest's `invitationGroup` (rename or pick another group). Saves the
+// new value to this guest first, then — if the old group was shared by other
+// guests — asks whether to apply the same change to all of them.
+async function applyInvitationGroupChange(guestId, oldName, newName) {
+  const trimmedOld = String(oldName || "").trim();
+  const trimmedNew = String(newName || "").trim();
+  if (!trimmedNew || trimmedOld === trimmedNew) return;
+
+  const ok = await saveGuestInline(guestId, "invitationGroup", trimmedNew);
+  if (!ok) return;
+
+  const affected = getActiveGuests().filter(
+    (g) => g.id !== guestId && (g.invitationGroup || "").trim() === trimmedOld,
+  );
+
+  if (trimmedOld && affected.length > 0) {
+    openConfirmModal({
+      title: "Aplicar a todo el grupo",
+      message: `¿Quieres actualizar también a los <strong>${affected.length}</strong> invitados que tenían el grupo de invitación "<strong>${trimmedOld}</strong>"?`,
+      confirmLabel: "Sí, actualizar todos",
+      cancelLabel: "Solo este invitado",
+      onConfirm: async () => {
+        for (const g of affected) {
+          await saveGuestInline(g.id, "invitationGroup", trimmedNew);
+        }
+        renderGuestManager();
+      },
+    });
+  }
+  renderGuestManager();
+}
+
+// Cell for the "Invitación" column: shows the guest's invitation group as a
+// clickable display that reveals an inline editor with a rename input and a
+// dropdown to pick another existing group.
+const invitationGroupCell = (guest) => {
+  const current = guest.invitationGroup || "";
+  const options = getInvitationGroupOptions();
+  const selectOptions = options
+    .map((o) => `<option value="${o}" ${o === current ? "selected" : ""}>${o}</option>`)
+    .join("");
+  return `
+    <div class="dashboard-invgroup-cell" data-invgroup-cell="${guest.id}">
+      <button type="button" class="dashboard-invgroup-display" data-invgroup-display="${guest.id}" title="Editar grupo de invitación">
+        ${current || "—"}
+      </button>
+      <div class="dashboard-invgroup-editor" data-invgroup-editor="${guest.id}" hidden>
+        <input class="dashboard-inline-input" type="text" value="${current}" data-invgroup-rename="${guest.id}" placeholder="Renombrar grupo…" />
+        <select class="dashboard-inline-select" data-invgroup-select="${guest.id}" title="Elegir otro grupo de invitación">
+          <option value="">— Elegir grupo —</option>
+          ${selectOptions}
+        </select>
+        <button type="button" class="dashboard-link-btn" data-invgroup-done="${guest.id}" title="Listo">✓</button>
+      </div>
+    </div>`;
+};
+
 // ── Delete confirm modal ───────────────────────────────────────────────
 
 function openDeleteConfirm(guest) {
+
   const overlay = document.createElement("div");
   overlay.className = "dashboard-modal-overlay";
   overlay.innerHTML = `
@@ -870,6 +1054,111 @@ function openDeleteConfirm(guest) {
       status.dataset.state = "error";
     }
   });
+}
+
+// ── Send Invite Modal ─────────────────────────────────────────────────
+
+// Opens a modal to send a guest their invitation link via WhatsApp and/or
+// email. The actual sending is delegated to the `sendInvitation` Cloud
+// Function (Gmail API + WhatsApp deep link), which is admin-only. The modal
+// shows the guest's contact info and lets the admin pick the channel(s).
+//
+// `channel` (optional) pre-selects a channel and auto-triggers it. Each channel
+// button is disabled when that channel is not available for this guest:
+//   - No Firebase Auth account → both disabled (can't send anything).
+//   - Auth but no real email (or only a default-domain email) → email disabled.
+//   - Auth but no phone → WhatsApp disabled.
+function openSendInviteModal(guest, channel = null) {
+  const canWhatsapp = guestCanWhatsapp(guest);
+  const canEmail = guestCanEmail(guest);
+  const hasAuth = guestHasAuth(guest);
+  const email = guestSendEmail(guest);
+  const phone = guest.identity?.phone || guest.phone || "";
+
+  const waTitle = !hasAuth
+    ? "Sin cuenta de Firebase Auth — no se puede enviar"
+    : !phone
+      ? "Sin teléfono — no se puede enviar por WhatsApp"
+      : "Enviar invitación por WhatsApp";
+  // The email channel no longer requires a Firebase Auth account — it only
+  // needs a real (non-default-domain) email address.
+  const emailTitle = !email
+    ? "Sin correo — no se puede enviar por email"
+    : email.endsWith(`@${DEFAULT_AUTH_EMAIL_DOMAIN}`)
+      ? "Correo del dominio por defecto — no se puede enviar por email"
+      : "Enviar invitación por email";
+
+  const overlay = document.createElement("div");
+  overlay.className = "dashboard-modal-overlay";
+  overlay.innerHTML = `
+    <div class="dashboard-modal" style="max-width: 30rem;">
+      <div class="dashboard-modal-heading">
+        <h3>Enviar invitación</h3>
+        <button class="dashboard-modal-close" data-modal-close type="button">✕</button>
+      </div>
+      <div class="dashboard-modal-form">
+        <p style="line-height:1.6;color:#55452d;">
+          Enviar la invitación a <strong>${guestFullName(guest)}</strong>
+          (ID: <code>${guest.id}</code>).
+        </p>
+        <div class="dashboard-modal-field">
+          <label>Teléfono (WhatsApp)</label>
+          <input type="text" value="${phone}" readonly />
+        </div>
+        <div class="dashboard-modal-field">
+          <label>Correo</label>
+          <input type="text" value="${email}" readonly />
+        </div>
+        <div class="dashboard-modal-field">
+          <label>Idioma</label>
+          <input type="text" value="${guest.identity?.lang || guest.lang || "es"}" readonly />
+        </div>
+        <div class="dashboard-modal-field">
+          <label>Enlace de invitación</label>
+          <input type="text" value="${getInviteUrl(guest.id)}" readonly />
+        </div>
+        <div class="dashboard-modal-actions">
+          <button class="dashboard-button" type="button" data-send-whatsapp title="${waTitle}" ${canWhatsapp ? "" : "disabled"}>WhatsApp</button>
+          <button class="dashboard-button" type="button" data-send-email title="${emailTitle}" ${canEmail ? "" : "disabled"}>Email</button>
+          <button class="dashboard-button dashboard-button-secondary" type="button" data-modal-close>Cancelar</button>
+        </div>
+        <small data-send-invite-status></small>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  const close = () => overlay.remove();
+  overlay.querySelectorAll("[data-modal-close]").forEach((btn) => btn.addEventListener("click", close));
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
+
+  const status = overlay.querySelector("[data-send-invite-status]");
+  const run = async (ch) => {
+    status.textContent = "Enviando…";
+    status.dataset.state = "working";
+    try {
+      const functions = getFunctions();
+      const sendInvitation = httpsCallable(functions, "sendInvitation");
+      const result = await sendInvitation({ guestId: guest.id, channel: ch });
+      status.textContent = `✅ ${result.data?.message || "Enviado."}`;
+      status.dataset.state = "success";
+      // Mark the guest as invited so the "Enviada" checkbox reflects it.
+      await saveGuestInline(guest.id, "invitationSent", true);
+      renderGuestManager();
+    } catch (err) {
+      console.error("sendInvitation failed", err);
+      status.textContent = `❌ ${err.message || "Error al enviar."}`;
+      status.dataset.state = "error";
+    }
+  };
+
+
+  overlay.querySelector("[data-send-whatsapp]").addEventListener("click", () => run("whatsapp"));
+  overlay.querySelector("[data-send-email]").addEventListener("click", () => run("email"));
+
+  // Auto-trigger the pre-selected channel (from the dedicated column button).
+  if (channel === "whatsapp" && canWhatsapp) run("whatsapp");
+  else if (channel === "email" && canEmail) run("email");
 }
 
 // ── Create Group Modal ─────────────────────────────────────────────────
@@ -1169,13 +1458,14 @@ function renderGuestManager() {
       : `<span class="dashboard-avatar dashboard-avatar-initials">${initials}</span>`;
 
     // Badges on the avatar corners:
-    //  - top-left: ID check (🔒 LOCK when verified, empty badge when not)
+    //  - top-left: ID check (🔒 LOCK when verified, empty hollow chip when not)
     //  - top-right: edit photo (opens the guest editor modal)
     //  - bottom-right: auth (🔑 login emoji when the guest has a Firebase Auth
     //    account, ❌ red cross when they don't)
     const idCheckBadge = guest.idCheckUser
       ? '<span class="dashboard-avatar-badge dashboard-avatar-badge--idcheck is-locked" title="Identidad verificada (ID Check)">🔒</span>'
       : '<span class="dashboard-avatar-badge dashboard-avatar-badge--idcheck is-unlocked" title="Identidad no verificada (ID Check)"></span>';
+
 
     const editPhotoBadge = `<button class="dashboard-avatar-badge dashboard-avatar-badge--edit" data-edit-photo="${guest.id}" title="Editar foto de perfil" type="button">📷</button>`;
     const authBadge = hasAuth
@@ -1210,6 +1500,39 @@ function renderGuestManager() {
 
 
 
+  // ── Send-invite cell helper (dedicated "Enviar" column) ──
+  // Renders the WhatsApp + Email send buttons. Each is disabled when the
+  // channel is not available for this guest:
+  //   - No Firebase Auth account → both disabled (can't send anything).
+  //   - Auth but no real email (or only a default-domain email) → email disabled.
+  //   - Auth but no phone → WhatsApp disabled.
+  const sendCell = (guest) => {
+    const canWhatsapp = guestCanWhatsapp(guest);
+    const canEmail = guestCanEmail(guest);
+    const hasAuth = guestHasAuth(guest);
+    const email = guestSendEmail(guest);
+    const phone = guest.identity?.phone || guest.phone || "";
+
+    const waTitle = !hasAuth
+      ? "Sin cuenta de Firebase Auth — no se puede enviar"
+      : !phone
+        ? "Sin teléfono — no se puede enviar por WhatsApp"
+        : "Enviar invitación por WhatsApp";
+    // The email channel no longer requires a Firebase Auth account — it only
+    // needs a real (non-default-domain) email address.
+    const emailTitle = !email
+      ? "Sin correo — no se puede enviar por email"
+      : email.endsWith(`@${DEFAULT_AUTH_EMAIL_DOMAIN}`)
+        ? "Correo del dominio por defecto — no se puede enviar por email"
+        : "Enviar invitación por email";
+
+    return `
+      <div class="dashboard-send-cell">
+        <button class="dashboard-link-btn" data-send-whatsapp="${guest.id}" title="${waTitle}" ${canWhatsapp ? "" : "disabled"}>📱</button>
+        <button class="dashboard-link-btn" data-send-email="${guest.id}" title="${emailTitle}" ${canEmail ? "" : "disabled"}>✉️</button>
+      </div>`;
+  };
+
   // ── Name cell helper ──
   const nameCell = (guest) => {
     const identity = guestIdentity(guest);
@@ -1233,7 +1556,10 @@ function renderGuestManager() {
   };
 
   // ── Group badge nav bar ──
+  // Each chip shows the group name plus an "X/Y" attendance summary where
+  // X = guests confirmed for SATURDAY (RSVP level ≥ 4) and Y = group size.
   const groups = getUniqueGuestGroups();
+  const groupCounts = getGroupAttendanceCounts();
   const groupNav = `
     <div class="dashboard-group-nav">
       <button type="button" class="dashboard-group-nav-chip ${!state.filterGroup ? "dashboard-group-nav-chip-active" : ""}" data-group-nav="">
@@ -1241,10 +1567,14 @@ function renderGuestManager() {
       </button>
       ${groups
         .map(
-          (g) => `
-        <button type="button" class="dashboard-group-nav-chip ${state.filterGroup === g ? "dashboard-group-nav-chip-active" : ""}" data-group-nav="${g}" style="background:${badgeStyle(g)};color:#3a2f1e;">
+          (g) => {
+            const c = groupCounts[g] || { confirmedSaturday: 0, size: 0 };
+            return `
+        <button type="button" class="dashboard-group-nav-chip ${state.filterGroup === g ? "dashboard-group-nav-chip-active" : ""}" data-group-nav="${g}" style="background:${badgeStyle(g)};color:#3a2f1e;" title="${c.confirmedSaturday} de ${c.size} confirmados para el sábado">
           ${g}
-        </button>`,
+          <span class="dashboard-group-nav-count">${c.confirmedSaturday}/${c.size}</span>
+        </button>`;
+          },
         )
         .join("")}
     </div>
@@ -1279,10 +1609,16 @@ function renderGuestManager() {
         <thead>
           <tr>
             ${sortTh("name", "Identidad")}
+            <th title="Enviar invitación (WhatsApp / email)">Enviar</th>
+            <th title="Invitación enviada (marcar manualmente o al enviar)">Enviada</th>
+            ${sortTh("invitationGroup", "Invitación")}
+
             ${sortTh("group", "Grupo")}
+            ${sortTh("lang", "Idioma")}
 
 
             ${sortTh("cabin", "Cabaña")}
+
             ${sortTh("room", "Cuarto")}
             ${sortTh("xtraCabin", "Cabaña extra")}
             ${sortTh("xtraRoom", "Cuarto extra")}
@@ -1304,7 +1640,16 @@ function renderGuestManager() {
               return `
             <tr class="dashboard-guest-row">
               <td>${identityCell(merged)}</td>
+              <td>${sendCell(merged)}</td>
+              <td>
+                <input type="checkbox" class="dashboard-invite-sent" data-invite-sent="${merged.id}"
+                  ${merged.invitationSent ? "checked" : ""} title="Invitación enviada" />
+              </td>
+              <td>${invitationGroupCell(merged)}</td>
+
               <td>${badgeHtml(merged.group)}</td>
+              <td>${badgeHtml(merged.identity?.lang || merged.lang || "")}</td>
+
 
 
               <td>${badgeHtml(merged.cabinLabel || merged.unit || "")}</td>
@@ -1415,7 +1760,58 @@ function renderGuestManager() {
     });
   });
 
+  // ── Invitation group editor: reveal on click ──
+  container.querySelectorAll("[data-invgroup-display]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const guestId = btn.dataset.invgroupDisplay;
+      const editor = container.querySelector(`[data-invgroup-editor="${guestId}"]`);
+      if (!editor) return;
+      editor.hidden = !editor.hidden;
+      if (!editor.hidden) {
+        const rename = editor.querySelector(`[data-invgroup-rename="${guestId}"]`);
+        if (rename) rename.focus();
+      }
+    });
+  });
+
+  // ── Invitation group: rename (free text) ──
+  container.querySelectorAll("[data-invgroup-rename]").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const guestId = input.dataset.invgroupRename;
+      const oldName = getGuest(guestId)?.invitationGroup || "";
+      const newName = input.value.trim();
+      if (!newName || newName === oldName) return;
+      await applyInvitationGroupChange(guestId, oldName, newName);
+    });
+  });
+
+  // ── Invitation group: pick another existing group ──
+  container.querySelectorAll("[data-invgroup-select]").forEach((select) => {
+    select.addEventListener("change", async () => {
+      const guestId = select.dataset.invgroupSelect;
+      const oldName = getGuest(guestId)?.invitationGroup || "";
+      const newName = select.value.trim();
+      if (!newName || newName === oldName) return;
+      await applyInvitationGroupChange(guestId, oldName, newName);
+    });
+  });
+
+  // ── Invitation group: done button ──
+  container.querySelectorAll("[data-invgroup-done]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const guestId = btn.dataset.invgroupDone;
+      const editor = container.querySelector(`[data-invgroup-editor="${guestId}"]`);
+      const display = container.querySelector(`[data-invgroup-display="${guestId}"]`);
+      if (editor) editor.hidden = true;
+      if (display) {
+        const guest = getGuest(guestId);
+        if (guest) display.textContent = guest.invitationGroup || "—";
+      }
+    });
+  });
+
   // ── Edit guest (modal) ──
+
   container.querySelectorAll("[data-edit-guest]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const guestId = btn.dataset.editGuest;
@@ -1424,7 +1820,39 @@ function renderGuestManager() {
     });
   });
 
+  // ── Send invite (dedicated "Enviar" column) ──
+  // The WhatsApp / Email buttons in the dedicated column open the send modal
+  // pre-targeted to that channel. Disabled buttons (no auth / no phone / no
+  // real email) are skipped — the modal also enforces the same rules.
+  container.querySelectorAll("[data-send-whatsapp]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const guestId = btn.dataset.sendWhatsapp;
+      const guest = getGuest(guestId);
+      if (guest && guestCanWhatsapp(guest)) openSendInviteModal(guest, "whatsapp");
+    });
+  });
+  container.querySelectorAll("[data-send-email]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const guestId = btn.dataset.sendEmail;
+      const guest = getGuest(guestId);
+      if (guest && guestCanEmail(guest)) openSendInviteModal(guest, "email");
+    });
+  });
+
+  // ── "Invitación enviada" checkbox: toggle the flag on the guest doc ──
+  // The checkbox is a manual toggle so the couple can mark a guest as invited
+  // even if they sent the invitation outside the dashboard. It writes the
+  // `invitationSent` boolean via the shared inline payload builder.
+  container.querySelectorAll("[data-invite-sent]").forEach((checkbox) => {
+    checkbox.addEventListener("change", async () => {
+      const guestId = checkbox.dataset.inviteSent;
+      const ok = await saveGuestInline(guestId, "invitationSent", checkbox.checked);
+      if (!ok) checkbox.checked = !checkbox.checked; // revert on failure
+    });
+  });
+
   // ── Edit photo (avatar badge) → opens the guest editor modal ──
+
   // The 📷 badge on the avatar corner opens the same editor modal, which
   // already contains the photo upload section (preview + "Subir foto" button).
   container.querySelectorAll("[data-edit-photo]").forEach((btn) => {
