@@ -14,134 +14,22 @@ import {
 import { getCabin } from "../cabins.js";
 import { getRoom, getRoomsByCabin } from "../rooms.js";
 import { cloudinaryImage } from "../cloudinary.js";
-import { StayPlanCard } from "./StayPlanCard.jsx";
-import { CabinOccupancy } from "./CabinOccupancy.jsx";
-
-
-
-
 import { getActiveGuests } from "../guests.js";
 import { computeInitialStepIndex } from "../rsvp-responses.js";
 import { Button } from "./ui/Button.jsx";
 
+import { ExtraStayCard } from "./coast/ExtraStayCard.jsx";
+import { CoastSuggestions } from "./coast/CoastSuggestions.jsx";
+import { CoastBudget } from "./coast/CoastBudget.jsx";
 
-
-
-
-
-// ── Coast accommodation suggestions ────────────────────────────────────────
-// Reuses the same card pattern as the Accommodation "no cabin" suggestions.
-// Airbnb: one distinct listing per group size (4, 6, 8, 10, 12 people) for the
-// nights of 23–28 February 2027. Hotels: a short selection ordered by price.
-const COAST_AIRBNB_SEARCH_URL =
-  "https://www.airbnb.mx/s/Barra-de-Navidad--Jalisco/homes?date_picker_type=calendar&checkin=2027-02-23&checkout=2027-02-28&refinement_paths%5B%5D=%2Fhomes&search_type=search_query";
-const COAST_AIRBNB_SUGGESTIONS = [
-  {
-    name: "Casa del Sol · Barra de Navidad",
-    url: "https://www.airbnb.mx/rooms/1573287868886556972?check_in=2027-02-23&check_out=2027-02-28",
-    image: "https://a0.muscache.com/im/pictures/hosting/Hosting-1573287868886556972/original/b06edc58-35b9-4bdb-8892-3b4eadb48661.jpeg?im_w=720&width=720&quality=70&auto=webp",
-    guests: 4,
-    bedrooms: 2,
-    beds: 2,
-    rating: "4.7",
-    price: 1800,
-  },
-  {
-    name: "Departamento Vista al Mar",
-    url: "https://www.airbnb.mx/rooms/43404418?check_in=2027-02-23&check_out=2027-02-28",
-    image: "https://a0.muscache.com/im/pictures/airflow/Hosting-43404418/original/9c5bda77-33aa-43eb-981e-c586bd647e7a.jpg?im_w=720&width=720&quality=70&auto=webp",
-    guests: 6,
-    bedrooms: 3,
-    beds: 3,
-    rating: "4.6",
-    price: 2400,
-  },
-  {
-    name: "Casa Palapa frente a la playa",
-    url: "https://www.airbnb.mx/rooms/5617577?check_in=2027-02-23&check_out=2027-02-28",
-    image: "https://a0.muscache.com/im/pictures/miso/Hosting-5617577/original/24e8e6f1-d167-4a26-b142-c6c73c091528.jpeg?im_w=720&width=720&quality=70&auto=webp",
-    guests: 8,
-    bedrooms: 4,
-    beds: 4,
-    rating: "4.8",
-    price: 3200,
-  },
-  {
-    name: "Villa Marea Alta",
-    url: "https://www.airbnb.mx/rooms/1573287868886556972?check_in=2027-02-23&check_out=2027-02-28",
-    image: "https://a0.muscache.com/im/pictures/hosting/Hosting-1573287868886556972/original/b06edc58-35b9-4bdb-8892-3b4eadb48661.jpeg?im_w=720&width=720&quality=70&auto=webp",
-    guests: 10,
-    bedrooms: 5,
-    beds: 5,
-    rating: "4.5",
-    price: 4000,
-  },
-  {
-    name: "Casa Grande Barra de Navidad",
-    url: "https://www.airbnb.mx/rooms/43404418?check_in=2027-02-23&check_out=2027-02-28",
-    image: "https://a0.muscache.com/im/pictures/airflow/Hosting-43404418/original/9c5bda77-33aa-43eb-981e-c586bd647e7a.jpg?im_w=720&width=720&quality=70&auto=webp",
-    guests: 12,
-    bedrooms: 6,
-    beds: 6,
-    rating: "4.7",
-    price: 4800,
-  },
-];
-const COAST_HOTEL_SUGGESTIONS = [
-  {
-    name: "Hotel Barra de Navidad",
-    url: "https://www.hotelbarradenavidad.com/",
-    image: "https://a0.muscache.com/im/pictures/hosting/Hosting-1573287868886556972/original/b06edc58-35b9-4bdb-8892-3b4eadb48661.jpeg?im_w=720&width=720&quality=70&auto=webp",
-    location: "Barra de Navidad",
-    type: "budgetHotel",
-    price: 1200,
-  },
-  {
-    name: "Hotel Delfín",
-    url: "https://www.hoteldelfinbarra.com/",
-    image: "https://a0.muscache.com/im/pictures/airflow/Hosting-43404418/original/9c5bda77-33aa-43eb-981e-c586bd647e7a.jpg?im_w=720&width=720&quality=70&auto=webp",
-    location: "Barra de Navidad",
-    type: "beachHotel",
-    price: 1800,
-  },
-  {
-    name: "Grand Bay Hotel",
-    url: "https://www.grandbayhotel.com/",
-    image: "https://a0.muscache.com/im/pictures/miso/Hosting-5617577/original/24e8e6f1-d167-4a26-b142-c6c73c091528.jpeg?im_w=720&width=720&quality=70&auto=webp",
-    location: "Barra de Navidad",
-    type: "boutiqueHotel",
-    price: 2500,
-  },
-];
-
-
-
-const MXN_PER_EUR = 20;
-
-function formatPrice(amount, language) {
-  const locale = language === "fr" ? "fr-FR" : language === "en" ? "en-US" : "es-MX";
-  return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(amount);
-}
-
-function getInitials(name) {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toLocaleUpperCase();
-}
 
 export function Coast() {
-
   const { t, language, interfaceText, profile } = useApp();
   const { answers, setAnswer, markResume, saveFlow } = useRsvp();
   const coast = t.coast || {};
   const suggestions = coast.suggestions || {};
   const rsvpMini = coast.rsvpMini || {};
   const flow = RSVP_FLOWS.coast;
-
 
   const barraRef = useRef(null);
   // The mini RSVP card. Used to scroll the flow back into view on every step
@@ -290,9 +178,6 @@ export function Coast() {
     })),
   });
 
-
-
-
   // The two scale questions about the "Et après ?" plans. Levels: 0–5.
   const questions = useMemo(
     () =>
@@ -335,8 +220,6 @@ export function Coast() {
     setAnswer(questionId, guestId, level, RSVP_FLOWS.coast);
   };
 
-
-
   const handleSaveAnswers = async () => {
     if (saveStatus === "working") return;
     const editorGuestId = profile?.guest?.id;
@@ -373,7 +256,6 @@ export function Coast() {
     el.scrollBy({ left: direction * step, behavior: "smooth" });
   };
 
-
   return (
     <section className="coast-section section" id="after">
       {/* Beach story backdrop — a layered scene that reads top-to-bottom:
@@ -408,7 +290,6 @@ export function Coast() {
       </div>
 
       <div className="coast-copy reveal">
-
         <div className="section-heading">
           <p className="eyebrow">{coast.eyebrow}</p>
           <h2>{coast.title}</h2>
@@ -462,196 +343,38 @@ export function Coast() {
           stay. Reuses the same StayPlanCard as the Hébergement section so the
           pricing, "paid by the couple" banner, and on-sale styling match. */}
       {hasExtraCabin && extraCabin && (
-        <div className="coast-extra-stay reveal">
-          <p className="eyebrow">{extraStay.eyebrow}</p>
-          {guests.length > 1 && (
-            <div className="accommodation-member-tabs" role="tablist" aria-label={option.membersLabel || "Group members"}>
-              {guests.map((member) => {
-                const { firstName } = resolveGuestName(member);
-                const memberPhoto = resolveGuestPhoto(member);
-                const isActive = member.id === (activeMember?.id || profile?.guest?.id);
-                return (
-                  <button
-                    key={member.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={isActive}
-                    className={`accommodation-member-tab${isActive ? " is-active" : ""}`}
-                    onClick={() => setActiveMemberId(member.id)}
-                  >
-                    <span className="accommodation-member-tab-avatar" aria-hidden="true">
-                      {memberPhoto
-                        ? <img src={memberPhoto} alt="" loading="lazy" />
-                        : getInitials(resolveGuestName(member).fullName)}
-                    </span>
-                    <span className="accommodation-member-tab-name">{firstName}</span>
-                    {member.id === profile?.guest?.id && <small>{option.youLabel}</small>}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-          <h3>{option.onSiteTitle}</h3>
-          {option.onSiteBody && (
-            <p className="accommodation-citation">{option.onSiteBody}</p>
-          )}
-          {extraPaidByCouple && (
-            <p className="accommodation-covered-note">
-              <strong>{option.onSiteCoveredBody}</strong>
-            </p>
-          )}
-          {extraCabinName && (
-            <p className="accommodation-cabin-badge">{extraCabinName}</p>
-          )}
-          {extraCabinPhotos.length > 0 && (
-            <div className="accommodation-photo-carousel" aria-label={extraCabinName}>
-              {extraCabinPhotos.map((photo, index) => (
-                <figure className="accommodation-photo" key={index}>
-                  <img
-                    src={photo}
-                    alt=""
-                    loading="lazy"
-                    decoding="async"
-                  />
-                  <figcaption>
-                    <span>{extraCabinName}</span>
-                    <small>
-                      {String(index + 1).padStart(2, "0")} /{" "}
-                      {String(extraCabinPhotos.length).padStart(2, "0")}
-                    </small>
-                  </figcaption>
-                </figure>
-              ))}
-            </div>
-          )}
-          {extraRoomOccupants.length > 0 && (
-            <div className="accommodation-occupancy-top">
-              <CabinOccupancy
-                cabinName={extraCabinName}
-                rooms={extraRoomOccupants}
-                assignedRoomId={extraRoom}
-                activeMemberId={liveActive?.id}
-                option={option}
-                language={language}
-              />
-            </div>
-          )}
-          <StayPlanCard
-
-            activeMember={liveActive}
-            groupMembers={guests}
-            getAssignedCabinId={getXtraCabinId}
-            getAssignedRoomId={getXtraRoomId}
-            resolveMemberCovered={resolveXtraCovered}
-            resolveMemberPaid={resolveXtraPaid}
-            option={option}
-            language={language}
-            showExtraCabinRow={false}
-            extraCabin={extraCabin}
-            extraRoom={extraRoom}
-          />
-        </div>
+        <ExtraStayCard
+          guests={guests}
+          activeMember={activeMember}
+          profileGuest={profile?.guest}
+          liveActive={liveActive}
+          extraCabin={extraCabin}
+          extraCabinName={extraCabinName}
+          extraCabinPhotos={extraCabinPhotos}
+          extraPaidByCouple={extraPaidByCouple}
+          extraRoomOccupants={extraRoomOccupants}
+          extraRoom={extraRoom}
+          extraStay={extraStay}
+          option={option}
+          language={language}
+          getXtraCabinId={getXtraCabinId}
+          getXtraRoomId={getXtraRoomId}
+          resolveXtraCovered={resolveXtraCovered}
+          resolveXtraPaid={resolveXtraPaid}
+          onSelectMember={setActiveMemberId}
+        />
       )}
 
       {/* Coast accommodation suggestions — mirrors the Accommodation "no
           cabin" pattern: an Airbnb section (one listing per group size) and a
           hotel section (a short selection ordered by price). */}
-
-
-      {suggestions.title && (
-        <div className="coast-suggestions reveal">
-          <div className="section-heading">
-            <p className="eyebrow">{suggestions.eyebrow}</p>
-            <h3>{suggestions.title}</h3>
-            <blockquote className="coast-suggestions-citation">{suggestions.body}</blockquote>
-          </div>
-
-
-          <section className="accommodation-airbnb">
-            <h4>{suggestions.airbnbTitle}</h4>
-            <p>{suggestions.airbnbBody}</p>
-            <p className="accommodation-market-price">
-              <span>{suggestions.airbnbAreaPrice}</span>
-              <strong>≈ {formatPrice(1800, language)} MXN</strong>
-              <small>≈ {formatPrice(1800 / MXN_PER_EUR, language)} € · {suggestions.perNight} · {suggestions.beforeTaxes}</small>
-            </p>
-            <div className="accommodation-airbnb-list">
-              {COAST_AIRBNB_SUGGESTIONS.map((listing) => (
-                <a
-                  className="accommodation-stay-card"
-                  href={listing.url}
-                  key={listing.name}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{ "--stay-image": `url("${listing.image}")` }}
-                >
-                  <span className="accommodation-airbnb-rating" aria-label={`${suggestions.airbnbRating} ${listing.rating}`}>
-                    ★ {listing.rating}
-                  </span>
-                  <strong>{listing.name}</strong>
-                  <span className="accommodation-airbnb-facts">
-                    {listing.guests} {suggestions.airbnbGuests} · {listing.bedrooms}{" "}
-                    {suggestions.airbnbBedrooms} · {listing.beds} {suggestions.airbnbBeds}
-                  </span>
-                  <span className="accommodation-stay-price">
-                    <span>{suggestions.fromPrice}</span>
-                    <strong>≈ {formatPrice(listing.price, language)} MXN</strong>
-                    <small>≈ {formatPrice(listing.price / MXN_PER_EUR, language)} € · {suggestions.perNight}</small>
-                  </span>
-                  <span className="accommodation-airbnb-link">{suggestions.airbnbView} ↗</span>
-                </a>
-              ))}
-            </div>
-            <a
-              className="accommodation-airbnb-search"
-              href={COAST_AIRBNB_SEARCH_URL}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {suggestions.airbnbSearchAll} ↗
-            </a>
-          </section>
-
-          <section className="accommodation-airbnb accommodation-hotels">
-            <h4>{suggestions.hotelTitle}</h4>
-            <p>{suggestions.hotelBody}</p>
-            <div className="accommodation-airbnb-list">
-              {COAST_HOTEL_SUGGESTIONS.map((hotel) => (
-                <a
-                  className="accommodation-hotel-card accommodation-stay-card"
-                  href={hotel.url}
-                  key={hotel.name}
-                  target="_blank"
-                  rel="noreferrer"
-                  style={{ "--stay-image": `url("${hotel.image}")` }}
-                >
-                  <span className="accommodation-hotel-type">
-                    {suggestions.hotelTypes?.[hotel.type]}
-                  </span>
-                  <strong>{hotel.name}</strong>
-                  <span className="accommodation-airbnb-facts">
-                    {suggestions.hotelLocation}: {hotel.location}
-                  </span>
-                  <span className="accommodation-stay-price">
-                    <span>{suggestions.fromPrice}</span>
-                    <strong>≈ {formatPrice(hotel.price, language)} MXN</strong>
-                    <small>≈ {formatPrice(hotel.price / MXN_PER_EUR, language)} € · {suggestions.perNight}</small>
-                  </span>
-                  <span className="accommodation-airbnb-link">{suggestions.hotelView} ↗</span>
-                </a>
-              ))}
-            </div>
-          </section>
-        </div>
-      )}
+      <CoastSuggestions suggestions={suggestions} language={language} />
 
       {/* Mini RSVP — a 3-step flipable card (like "¡Te animas!" and pétanque):
           Step 1 = stay at Roca Azul, Step 2 = the beach plan, Step 3 = summary.
           Each guest rates how likely they are to join each "Et après ?" plan
           (0–5). Answers are saved per guest to Firestore via saveRsvpAnswers. */}
       <div className="coast-rsvp-mini reveal" ref={rsvpRef}>
-
-
         <div className="coast-rsvp-mini-head">
           <p className="eyebrow">{rsvpMini.eyebrow}</p>
           <h3>{rsvpMini.title}</h3>
@@ -663,7 +386,6 @@ export function Coast() {
           initialIndex={initialStep}
           steps={[
             ...questions.map((question) => ({
-
               id: question.id,
               label: question.title,
               render: () => (
@@ -702,8 +424,6 @@ export function Coast() {
                     </Button>
                     {saveStatusText && <small>{saveStatusText}</small>}
                   </div>
-
-
                 </div>
               ),
             },
@@ -736,76 +456,28 @@ export function Coast() {
             back: interfaceText.back || "Back",
           }}
         />
-
       </div>
 
       {/* Barra de Navidad budget estimate — a "budget to plan" block that
           turns the per-night per-person rate (1,200–2,500 MXN) into a group
           total for the 4 beach nights, based on how many group members rated
           the beach plan as interested (level ≥ 3). */}
-      {budget.title && (
-        <div className="coast-budget reveal">
-          <div className="section-heading">
-            <p className="eyebrow">{budget.eyebrow}</p>
-            <h3>{budget.title}</h3>
-            <p className="coast-budget-intro">{budget.intro}</p>
-          </div>
+      <CoastBudget
+        budget={budget}
+        language={language}
+        barraMinTotal={barraMinTotal}
+        barraMaxTotal={barraMaxTotal}
+        interestedCount={interestedCount}
+      />
 
-          <div className="coast-budget-figures">
-            <div className="coast-budget-figure">
-              <span className="coast-budget-figure__label">
-                {formatPrice(BARRA_MIN_PER_NIGHT, language)}–{formatPrice(BARRA_MAX_PER_NIGHT, language)} MXN
-              </span>
-              <small>{budget.perNightPerPerson}</small>
-            </div>
-            <div className="coast-budget-figure">
-              <span className="coast-budget-figure__label">{BARRA_NIGHTS}</span>
-              <small>{budget.nights}</small>
-            </div>
-            <div className="coast-budget-figure">
-              <span className="coast-budget-figure__label">{interestedCount}</span>
-              <small>{budget.interested}</small>
-            </div>
-          </div>
-
-          <div className="coast-budget-totals">
-            <div className="coast-budget-total coast-budget-total--min">
-              <span>{budget.minLabel}</span>
-              <strong>{formatPrice(barraMinTotal, language)} MXN</strong>
-              <small>≈ {formatPrice(barraMinTotal / MXN_PER_EUR, language)} €</small>
-            </div>
-            <div className="coast-budget-total coast-budget-total--max">
-              <span>{budget.maxLabel}</span>
-              <strong>{formatPrice(barraMaxTotal, language)} MXN</strong>
-              <small>≈ {formatPrice(barraMaxTotal / MXN_PER_EUR, language)} €</small>
-            </div>
-          </div>
-
-          <div className="coast-budget-big">
-            <span>{budget.bigTotal}</span>
-            <strong>
-              {formatPrice(barraMinTotal, language)}–{formatPrice(barraMaxTotal, language)} MXN
-            </strong>
-            <small>
-              ≈ {formatPrice(barraMinTotal / MXN_PER_EUR, language)}–{formatPrice(barraMaxTotal / MXN_PER_EUR, language)} €
-            </small>
-          </div>
-
-          <p className="coast-budget-disclaimer">{budget.disclaimer}</p>
-        </div>
-      )}
 
       {/* Desktop-only bottom nav: leads to the photos section. */}
-
       <nav className="section-nav coast-section-nav" aria-label="Continue">
-
-
         <a className="section-nav-link" href="#rsvp">
           <span>{t.nav.rsvp}</span>
           <span aria-hidden="true">↓</span>
         </a>
       </nav>
-
     </section>
   );
 }
