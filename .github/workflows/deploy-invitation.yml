@@ -7,6 +7,8 @@ on:
       - develop
     paths:
       - "web/invitation/**"
+      - "web/dashboard/**"
+      - "web/shared/**"
       - "integraciones/google_sheets/**"
       - "firebase.json"
       - ".firebaserc"
@@ -17,6 +19,8 @@ on:
       - develop
     paths:
       - "web/invitation/**"
+      - "web/dashboard/**"
+      - "web/shared/**"
       - "integraciones/google_sheets/**"
       - "firebase.json"
       - ".firebaserc"
@@ -60,8 +64,12 @@ jobs:
           cache-dependency-path: web/invitation/package-lock.json
 
 
-      - name: Install dependencies
+      - name: Install invitation dependencies
         working-directory: web/invitation
+        run: npm ci
+
+      - name: Install dashboard dependencies
+        working-directory: web/dashboard
         run: npm ci
 
       - name: Write Cloudinary .env from secrets
@@ -74,9 +82,8 @@ jobs:
           CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
           EOF
 
-      - name: Build invitation
-        working-directory: web/invitation
-        run: npm run build
+      - name: Build invitation + dashboard (build:all)
+        run: npm run build:all
 
   deploy-development:
     if: >-
@@ -97,8 +104,12 @@ jobs:
           cache: npm
           cache-dependency-path: web/invitation/package-lock.json
 
-      - name: Install dependencies
+      - name: Install invitation dependencies
         working-directory: web/invitation
+        run: npm ci
+
+      - name: Install dashboard dependencies
+        working-directory: web/dashboard
         run: npm ci
 
       - name: Write Cloudinary .env from secrets
@@ -111,9 +122,8 @@ jobs:
           CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
           EOF
 
-      - name: Build invitation
-        working-directory: web/invitation
-        run: npm run build
+      - name: Build invitation + dashboard (build:all)
+        run: npm run build:all
 
       - name: Deploy development
         uses: FirebaseExtended/action-hosting-deploy@v0
@@ -143,8 +153,12 @@ jobs:
           cache: npm
           cache-dependency-path: web/invitation/package-lock.json
 
-      - name: Install dependencies
+      - name: Install invitation dependencies
         working-directory: web/invitation
+        run: npm ci
+
+      - name: Install dashboard dependencies
+        working-directory: web/dashboard
         run: npm ci
 
       - name: Write Cloudinary .env from secrets
@@ -157,9 +171,8 @@ jobs:
           CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
           EOF
 
-      - name: Build invitation
-        working-directory: web/invitation
-        run: npm run build
+      - name: Build invitation + dashboard (build:all)
+        run: npm run build:all
 
       - name: Deploy production
         uses: FirebaseExtended/action-hosting-deploy@v0
