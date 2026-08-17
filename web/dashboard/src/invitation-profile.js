@@ -116,3 +116,22 @@ export function getGroupTag(groupName) {
   }
   return { color: "#55452d", textColor: "#ffffff", label: groupName };
 }
+
+/**
+ * Build an invitation URL for a guest.
+ *
+ * The per-guest invitation-code system was removed (login is now
+ * email/password), so the invitation is served at the base origin. The guest
+ * id is kept as a query param for analytics/tracking only.
+ *
+ * @param {string} origin - the invitation origin (e.g. "http://localhost:5173")
+ * @param {string} guestId - the guest's id
+ * @returns {string}
+ */
+export function buildInvitationUrl(origin, guestId) {
+  const base = (origin || "").replace(/\/+$/, "");
+  const params = new URLSearchParams();
+  if (guestId) params.set("guest", guestId);
+  const qs = params.toString();
+  return qs ? `${base}/?${qs}` : `${base}/`;
+}

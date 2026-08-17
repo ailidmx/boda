@@ -40,7 +40,16 @@ export const collections = {
   songRequests: "song_requests",
   /** Per-guest 1–5 star ratings for music genres (genre survey). */
   genreRatings: "genre_ratings",
+  /** Guest sign-in events (written on every real login). Readable by admins. */
+  loginEvents: "login_events",
+  /** Mirror of the FULL Firebase Auth user list (doc id = auth uid = guest id). */
+  authUsers: "auth_users",
+  /** Table inventory + seating assignments (admin-only planning). */
+  tables: "tables",
+
 };
+
+
 
 
 

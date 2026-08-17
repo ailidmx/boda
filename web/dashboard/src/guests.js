@@ -1,11 +1,10 @@
 /**
- * Guest registry — LIVE-FIRST cache backed by the Firestore `guests` collection.
+ * Guest registry — LIVE-ONLY cache backed by the Firestore `guests` collection.
  *
- * The dashboard no longer reads the static snapshot in web/shared/guests.js.
- * The live Firestore `guests` collection is the single source of truth: it
- * carries the real `identity` (names/photo), `hosting` (cabin/room incl.
- * xtraCabin/xtraRoom), `tagGroup`, `rsvp.answers`, etc. — everything the
- * dashboard needs.
+ * The dashboard reads ONLY the live Firestore `guests` collection. There is
+ * NO static registry and NO fallback: the live collection is the single source
+ * of truth for everything (identity names/photo, hosting cabin/room incl.
+ * xtraCabin/xtraRoom, tagGroup, rsvp.answers, etc.).
  *
  * The `onSnapshot` listener in dashboard.js calls `setLiveGuests(...)` with the
  * raw Firestore records; this module normalizes them into the shape the rest of
@@ -14,25 +13,21 @@
  * same accessor functions the dashboard already uses.
  */
 
-import {
-  AUTH_EMAIL_DOMAIN,
-  SHARED_PASSWORD,
-  getGuest as getStaticGuest,
-} from "../../shared/guests.js";
-
-/** @type {import("../../shared/guests.js").GuestProfile[]} */
+/** @type {object[]} */
 let LIVE_GUESTS = [];
 
 /**
  * Normalize a raw Firestore guest record into the dashboard's guest shape.
  *
- * Cabin/room fields are LIVE-first but fall back to the static registry
- * (`web/shared/guests.js`), mirroring the invitation's `resolveLiveGuest`
- * logic. The primary-period (Viernes → Domingo) cabin assignments live in the
- * static sheet (`unit`/`cabinLabel`/`room`), NOT in the live `hosting.cabin`
- * map, so without this fallback the "Asignación de cabañas" panel would show
- * 0 cabins / 0 guests / 0 capacity. Live `hosting.cabin`/`hosting.room`
- * (reassignments made in the dashboard) still win when present.
+ * Everything comes from the LIVE Firestore record only. The primary-period
+ * (Viernes → Domingo) cabin assignment lives in `hosting.cabin`; the coast
+ * (Domingo → Martes) assignment lives in `hosting.xtraCabin`. The primary
+ * cabin is exposed as BOTH `unit` (the dashboard's historical field, used by
+ * the INVITADOS table) and `cabin` (the field the invitation front-end reads,
+ * used by the cabins panel). Both resolve the same way: `hosting.cabin` first,
+ * then the live record's own top-level `cabin`/`unit` fields. This mirrors the
+ * invitation's `normalizeGuestRecord` (`cabin: hosting.cabin ?? data.cabin`)
+ * so the dashboard and the invitation agree on assignments.
  *
  * @param {object} g — raw Firestore doc data (with `id`).
  * @returns {object} normalized guest
@@ -41,49 +36,42 @@ function normalizeGuest(g) {
   const identity = g.identity || {};
   const hosting = g.hosting || {};
   const group = g.tagGroup || g.group || "";
-  // Static registry record (may be undefined for guests added only in
-  // Firestore via the dashboard's "+ Agregar" flow).
-  const staticGuest = getStaticGuest(g.id) || {};
   return {
     ...g,
     // Flat name fields (from `identity`).
-    firstName: identity.firstName ?? g.firstName ?? staticGuest.firstName ?? "",
-    middleName: identity.middleName ?? g.middleName ?? staticGuest.middleName ?? "",
-    lastName: identity.lastName ?? g.lastName ?? staticGuest.lastName ?? "",
-    maternalLastName: identity.maternalLastName ?? g.maternalLastName ?? staticGuest.maternalLastName ?? "",
-    cloudinaryId: identity.cloudinaryId ?? g.cloudinaryId ?? staticGuest.cloudinaryId ?? "",
+    firstName: identity.firstName ?? g.firstName ?? "",
+    middleName: identity.middleName ?? g.middleName ?? "",
+    lastName: identity.lastName ?? g.lastName ?? "",
+    maternalLastName: identity.maternalLastName ?? g.maternalLastName ?? "",
+    cloudinaryId: identity.cloudinaryId ?? g.cloudinaryId ?? "",
+    // Phone: live `identity.phone` wins, then the live record's own `phone`.
+    phone: identity.phone ?? g.phone ?? "",
+
     // Group: live guests store it in `tagGroup` (e.g. "PetanclubGDL").
     group,
-    // Cabin/room: live `hosting` wins, then the live record's own fields,
-    // then the static registry (the source of the primary-period assignment).
-    //
-    // The primary-period cabin is exposed as BOTH `unit` (the dashboard's
-    // historical field, used by the INVITADOS table via getMergedGuest) and
-    // `cabin` (the field the invitation front-end reads, used by the cabins
-    // panel). Both resolve the same way: `hosting.cabin` first, then the
-    // top-level `cabin`/`unit` fields on the live record, then the static
-    // registry. This mirrors the invitation's `normalizeGuestRecord`
-    // (`cabin: hosting.cabin ?? data.cabin`) so the dashboard and the
-    // invitation agree on assignments.
-    unit: hosting.cabin || g.cabin || g.unit || staticGuest.unit || "",
-    cabin: hosting.cabin || g.cabin || g.unit || staticGuest.unit || "",
-    room: hosting.room || g.room || staticGuest.room || "",
-    cabinLabel: hosting.cabin || g.cabinLabel || staticGuest.cabinLabel || "",
-    xtraCabin: hosting.xtraCabin || g.xtraCabin || staticGuest.xtraCabin || "",
-    xtraRoom: hosting.xtraRoom || g.xtraRoom || staticGuest.xtraRoom || "",
-    hasCabin: Boolean(hosting.cabin || g.cabin || g.unit || staticGuest.unit),
+    // Cabin/room: live `hosting` wins, then the live record's own fields.
+    unit: hosting.cabin || g.cabin || g.unit || "",
+    cabin: hosting.cabin || g.cabin || g.unit || "",
+    room: hosting.room || g.room || "",
+    cabinLabel: hosting.cabin || g.cabinLabel || "",
+    xtraCabin: hosting.xtraCabin || g.xtraCabin || "",
+    xtraRoom: hosting.xtraRoom || g.xtraRoom || "",
+    hasCabin: Boolean(hosting.cabin || g.cabin || g.unit),
 
-    occupancy: g.occupancy || staticGuest.occupancy || "",
-    payment: g.payment || staticGuest.payment || "",
+    occupancy: g.occupancy || "",
+    payment: g.payment || "",
     // The couple (David & Aydé) are flagged as admins / "Novios".
-    isNovio: Boolean(g.isAdmin || group === "Novios" || staticGuest.isNovio),
+    isNovio: Boolean(g.isAdmin || group === "Novios"),
     // Auth email: prefer the explicit `firebaseEmail` field on the live
     // record (the couple's real emails, e.g. david.aili.mx@gmail.com). Only
     // fall back to deriving `id@domain` when the field is absent.
-    firebaseEmail:
-      g.firebaseEmail || staticGuest.firebaseEmail || (g.id ? `${g.id}@${AUTH_EMAIL_DOMAIN}` : ""),
+    firebaseEmail: g.firebaseEmail || (g.id ? `${g.id}@${AUTH_EMAIL_DOMAIN}` : ""),
   };
 }
+
+// Auth email domain used to derive a guest's email from their id when the
+// live record has no explicit `firebaseEmail`. Kept local to this module.
+const AUTH_EMAIL_DOMAIN = "boda-david-y-ayde.web.app";
 
 
 /**
@@ -144,5 +132,4 @@ export function getGuestsByUnit(unit) {
   return LIVE_GUESTS.filter((g) => g.hasCabin && g.unit === unit);
 }
 
-export { AUTH_EMAIL_DOMAIN, SHARED_PASSWORD };
 export default LIVE_GUESTS;

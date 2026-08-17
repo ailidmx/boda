@@ -29,11 +29,15 @@
 
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { getAuth } from "firebase-admin/auth";
 import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from "firebase-functions/v2/firestore";
+import { onCall, HttpsError } from "firebase-functions/v2/https";
+
 import { defineSecret } from "firebase-functions/params";
 import { setGlobalOptions } from "firebase-functions/v2";
 
 import { sendTelegramMessage, sendTelegramPhoto, escapeMarkdown } from "./telegram.js";
+
 
 
 initializeApp();
@@ -604,4 +608,53 @@ export const onGuestUpdated = onDocumentUpdated(
 
   },
 );
+
+// ── Live Firebase Auth user list (admin dashboard) ─────────────────────────
+
+/**
+ * Callable function that returns the LIVE Firebase Auth user list (uid + email)
+ * for the admin dashboard's INVITADOS table.
+ *
+ * Firebase Auth has NO client-side API to list all users — only the Admin SDK
+ * (`auth.listUsers()`) can do that, and it runs server-side. Instead of keeping
+ * a stale `auth_users` mirror collection (which required a manual sync script),
+ * the dashboard calls this function on demand to get the authoritative, always
+ * current list of auth accounts. No static config, no mirror, no sync.
+ *
+ * Access control: only admins (guests whose `guests` doc has `isAdmin: true`)
+ * may call it. The caller's auth `uid` IS their guest doc id, so we look the
+ * guest up by uid and check `isAdmin`.
+ */
+export const listAuthUsers = onCall(
+  async (request) => {
+
+    // Reject unauthenticated callers.
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Debes iniciar sesión.");
+    }
+
+    // The caller's auth uid IS their guest doc id. Only admins may list users.
+    const db = getFirestore(DB_ID);
+    const guestSnap = await db.collection("guests").doc(request.auth.uid).get();
+    const guest = guestSnap.exists ? guestSnap.data() : null;
+    if (!guest || guest.isAdmin !== true) {
+      throw new HttpsError("permission-denied", "Solo los administradores pueden ver la lista de usuarios.");
+    }
+
+    // Paginate through the FULL Firebase Auth user list (listUsers caps at 1000
+    // per call, so loop with a page token until exhausted).
+    const users = [];
+    let pageToken;
+    do {
+      const result = await getAuth().listUsers(1000, pageToken);
+      for (const record of result.users) {
+        users.push({ uid: record.uid, email: record.email || "" });
+      }
+      pageToken = result.pageToken;
+    } while (pageToken);
+
+    return { users };
+  },
+);
+
 
