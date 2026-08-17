@@ -590,9 +590,10 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   helpers: `guestHasAuth(guest)` (has a Firebase Auth account — either in the live
   `state.authUsers` list or via an explicit `firebaseEmail` on the raw record),
   `guestCanWhatsapp(guest)` (auth AND has a phone), and `guestCanEmail(guest)`
-  (auth AND has a real email that is NOT on the default auth domain
+  (has a real email that is NOT on the default auth domain
   `@boda-david-y-ayde.web.app` — that domain is auto-appended to bare usernames and
-  is not a real inbox). The send modal (`openSendInviteModal(guest, channel)`)
+  is not a real inbox; email does NOT require auth, see the dedicated bullet
+  below). The send modal (`openSendInviteModal(guest, channel)`)
   disables the same channels with explanatory tooltips and auto-triggers the
   pre-selected channel from the column button. The old 📨 button was removed from
   the "Acciones" column. When adding a new send channel, update `sendCell`, the
@@ -665,7 +666,64 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   6-left / 6-right grid described above. When adding a new layout algorithm,
   keep the NOVIOS-at-center + 6-per-side convention so the couple's mental
   model stays consistent.
+- **Dashboard "Enviar" email channel does NOT require Firebase Auth** — the
+  email send button (`guestCanEmail` in `web/dashboard/src/dashboard.js`) is
+  enabled whenever the guest has a real (non-default-domain) email address,
+  regardless of whether they have a `firebaseEmail` field or a Firebase Auth
+  account. This lets the couple send an invitation to a guest who has a real
+  inbox but hasn't been provisioned an auth account yet. The email address used
+  is resolved by `guestSendEmail`, which reads (in priority order): the raw
+  record's `firebaseEmail`, then the LIVE Firebase Auth user's email from
+  `state.authUsers[guest.id]?.email` (the SAME source the identity column uses
+  to show the auth email — so a guest with an auth account but no `firebaseEmail`
+  field still gets an enabled email button), then `identity.email`/`email`. The
+  WhatsApp channel (`guestCanWhatsapp`) still requires auth AND a phone. When
+  adding a new send channel, update `sendCell`, `openSendInviteModal`, and the
+  `guestCan*` helpers together.
+- **Dashboard "Enviar" email resolves the address from LIVE Firebase Auth** —
+  `guestSendEmail` in `web/dashboard/src/dashboard.js` resolves the email to
+  send to in priority order: the raw record's `firebaseEmail`, then the LIVE
+  Firebase Auth user's email from `state.authUsers[guest.id]?.email` (the SAME
+  source the identity column uses to show the auth email), then
+  `identity.email`/`email`. This means a guest with an auth account but no
+  `firebaseEmail` field still gets a working email button. The Cloud Function
+  `sendInvitation` (in `functions/index.js`) mirrors this resolution server-side:
+  it reads the guest's `firebaseEmail`, then falls back to looking up the guest's
+  Firebase Auth user by uid via `admin.auth().getUser(guestId)` and uses that
+  email. When adding a new email source, update BOTH the dashboard helper and the
+  function so the button's enabled state and the actual send agree.
+- **Invitation URL always uses the prod domain** — the dashboard's
+  `getInviteUrl(guestId)` in `web/dashboard/src/dashboard.js` builds the
+  invitation link as `https://boda-david-y-ayde.web.app/?invite=<guestId>`
+  (the prod hosting domain), NOT `window.location.origin`. This guarantees the
+  link works when the couple sends it from a local dev server or a preview
+  channel. When changing the prod domain, update `getInviteUrl` (and any other
+  place that hardcodes the origin).
+- **`sendInvitation` notifies the couple on Telegram** — the `sendInvitation`
+  Cloud Function posts a Telegram message (via `sendTelegramMessage` in
+  `functions/telegram.js`) whenever an invitation is sent, listing the guest
+  name, channel (WhatsApp/email), and the invite URL. It requires the
+  `TELEGRAM_TOKEN` and `TELEGRAM_CHAT_ID` secrets in its `secrets: [...]`
+  dependency array (verified in the deployed function's
+  `secretEnvironmentVariables`). When adding a new send channel, include the
+  Telegram notification in the function.
+- **Secret Manager values can carry a trailing newline — trim them before use** —
+  `firebase functions:secrets:set` stores the value you paste, and if it ends
+  with a newline (common when pasting from a terminal/editor), the secret
+  includes that `\n`. When the `sendGmail` helper in `functions/index.js` fed
+  `GMAIL_CLIENT_ID.value()` / `GMAIL_CLIENT_SECRET.value()` /
+  `GMAIL_REFRESH_TOKEN.value()` straight into the Google OAuth2 client, the
+  trailing newline made Google reject the client_id with
+  `invalid_client: The OAuth client was not found` (a 500 on the
+  `sendInvitation` callable). The fix: `sendGmail` now trims all four secret
+  values (`GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN`,
+  `GMAIL_FROM`) with `.trim()` before building the OAuth2 client. When adding a
+  new secret-backed credential, always `.trim()` the `.value()` before using it
+  in an API call. **Also ensure the Gmail API is enabled in the project** — if it
+  isn't, `sendGmail` fails with `Gmail API has not been used in project ... before
+  or it is disabled` (enable via `gcloud services enable gmail.googleapis.com`).
 - *(Add new lessons here as you discover them.)*
+
 
 
 

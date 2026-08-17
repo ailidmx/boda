@@ -676,15 +676,15 @@ export const listAuthUsers = onCall(
  * passed as query params so the invitation can pre-fill the login form, plus
  * UTM tracking params and an `inviteType` so we can tell email vs WhatsApp.
  *
- * @param {object} guest  the guest document (must have `firebaseEmail` and
- *                        `firebasePassword`)
+ * @param {object} guest  the guest document
  * @param {string} inviteType  "email" | "whatsapp"
+ * @param {string} email  the resolved login email (may come from Firebase Auth)
  * @returns {string}
  */
-function buildInvitationUrl(guest, inviteType) {
+function buildInvitationUrl(guest, inviteType, email) {
   const base = "https://boda-david-y-ayde.web.app/";
   const params = new URLSearchParams({
-    guest: guest.firebaseEmail || "",
+    guest: email || "",
     password: guest.firebasePassword || "",
     sent_at: new Date().toISOString(),
     utm_source: "invitacion",
@@ -695,91 +695,165 @@ function buildInvitationUrl(guest, inviteType) {
   return `${base}?${params.toString()}`;
 }
 
+
 /**
- * The three invitation email templates (ES / FR / EN). Each is a plain-text
- * body with the guest's name, the invitation link, and their login email +
- * password. The couple's shared Gmail account sends these.
+ * Escape a string for safe inclusion in HTML text or an attribute value.
+ * The entity strings are built via String.fromCharCode so they survive any
+ * tooling that normalises literal HTML entities in source files.
  */
-function invitationEmailBody(lang, guest, inviteUrl) {
+function escapeHtml(value) {
+  const amp = String.fromCharCode(38, 97, 109, 112, 59); // &
+  const lt = String.fromCharCode(38, 108, 116, 59); // <
+  const gt = String.fromCharCode(38, 103, 116, 59); // >
+  const quot = String.fromCharCode(38, 113, 117, 111, 116, 59); // "
+  return String(value ?? "")
+    .replace(/&/g, amp)
+    .replace(/</g, lt)
+    .replace(/>/g, gt)
+    .replace(/"/g, quot);
+}
+
+/**
+ * The three invitation email templates (ES / FR / EN). Each is an HTML body
+ * with the couple's message and the invitation link embedded as a real
+ * clickable <a href> (so the long URL is hidden behind a "CLIQUE ICI!"-style
+ * link). The couple's shared Gmail account sends these.
+ */
+function invitationEmailBody(lang, guest, inviteUrl, email) {
+
   const name = guest.identity?.firstName || guest.firstName || guest.guestId || "";
-  const email = guest.firebaseEmail || "";
   const password = guest.firebasePassword || "";
 
-  const templates = {
-    es: `¡Hola ${name}!
+  // Escape the invite URL for safe use inside an href attribute.
+  const href = escapeHtml(inviteUrl);
 
-David y Aydé te invitamos a celebrar nuestra boda. Estamos muy felices de que nos acompañes.
 
-Para ver tu invitación personalizada, entra al siguiente enlace:
-
-${inviteUrl}
-
-Tus datos de acceso son:
-  Correo: ${email}
-  Contraseña: ${password}
-
-Si tienes cualquier duda, escríbenos por WhatsApp.
-
-¡Te esperamos!
-David & Aydé`,
-    fr: `Bonjour ${name} !
-
-David et Aydé t'invitons à célébrer notre mariage. Nous sommes très heureux que tu sois des nôtres.
-
-Pour voir ton invitation personnalisée, clique sur le lien suivant :
-
-${inviteUrl}
-
-Tes identifiants de connexion sont :
-  E-mail : ${email}
-  Mot de passe : ${password}
-
-Si tu as la moindre question, écris-nous sur WhatsApp.
-
-À très bientôt !
-David & Aydé`,
-    en: `Hello ${name}!
-
-David and Aydé invite you to celebrate our wedding. We are so happy to have you with us.
-
-To see your personalised invitation, open the following link:
-
-${inviteUrl}
-
-Your login details are:
-  Email: ${email}
-  Password: ${password}
-
-If you have any questions, message us on WhatsApp.
-
-See you soon!
-David & Aydé`,
+  // The couple's copy. The French text is the reference (STICK TO THE TEXT);
+  // ES and EN are faithful translations of the same message.
+  const copy = {
+    es: {
+      title: "¡Nos casamos!",
+      body: "Estaríamos muy felices de tenerte a nuestro lado para compartir con nosotros este día, e incluso todo este fin de semana tan especial.",
+      cta: "Encuentra toda la información sobre la boda aquí:",
+      ctaLabel: "CLIC AQUÍ",
+      login: "Tus datos de acceso son:",
+      emailLabel: "Correo",
+      passwordLabel: "Contraseña",
+      help: "Si tienes cualquier duda, escríbenos por WhatsApp.",
+      signoff: "¡Te esperamos!",
+    },
+    fr: {
+      title: "On se marie !",
+      body: "Nous serions très heureux de vous avoir à nos côtés pour partager avec nous ce jour, voire tout ce week-end si spécial.",
+      cta: "Vous trouverez toutes les informations sur le mariage ici :",
+      ctaLabel: "CLIQUE ICI",
+      login: "Vos identifiants de connexion sont :",
+      emailLabel: "E-mail",
+      passwordLabel: "Mot de passe",
+      help: "Si vous avez la moindre question, écrivez-nous sur WhatsApp.",
+      signoff: "À très bientôt !",
+    },
+    en: {
+      title: "We're getting married!",
+      body: "We would be so happy to have you by our side to share this day with us, or even this whole very special weekend.",
+      cta: "You'll find all the information about the wedding here:",
+      ctaLabel: "CLICK HERE",
+      login: "Your login details are:",
+      emailLabel: "Email",
+      passwordLabel: "Password",
+      help: "If you have any questions, message us on WhatsApp.",
+      signoff: "See you soon!",
+    },
   };
 
-  return templates[lang] || templates.es;
+  const t = copy[lang] || copy.es;
+
+  const esc = escapeHtml;
+
+
+  return `<!DOCTYPE html>
+<html lang="${lang}">
+  <body style="margin:0;padding:0;background:#f7f3ec;font-family:Georgia,'Times New Roman',serif;color:#3a2f1e;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#f7f3ec;padding:32px 16px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;background:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e6dcc8;">
+            <tr>
+              <td style="padding:40px 40px 24px;text-align:center;">
+                <h1 style="margin:0 0 8px;font-size:28px;font-weight:400;color:#8a6a36;">${esc(t.title)}</h1>
+                <p style="margin:0;font-size:13px;letter-spacing:0.12em;text-transform:uppercase;color:#b09a6f;">David & Aydé</p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:8px 40px 24px;">
+                <p style="margin:0 0 16px;font-size:16px;line-height:1.7;">${esc(name)},</p>
+                <p style="margin:0 0 16px;font-size:16px;line-height:1.7;">${esc(t.body)}</p>
+                <p style="margin:0 0 20px;font-size:16px;line-height:1.7;">${esc(t.cta)}</p>
+                <p style="margin:0 0 24px;text-align:center;">
+                  <a href="${href}" style="display:inline-block;background:#8a6a36;color:#ffffff;text-decoration:none;font-size:15px;letter-spacing:0.06em;padding:14px 32px;border-radius:8px;">${esc(t.ctaLabel)}</a>
+                </p>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 40px 24px;background:#faf6ee;border-top:1px solid #efe7d6;">
+                <p style="margin:0 0 8px;font-size:13px;color:#8a6a36;">${esc(t.login)}</p>
+                <p style="margin:0 0 4px;font-size:14px;line-height:1.6;">${esc(t.emailLabel)} : ${esc(email)}</p>
+                <p style="margin:0 0 16px;font-size:14px;line-height:1.6;">${esc(t.passwordLabel)} : ${esc(password)}</p>
+                <p style="margin:0 0 4px;font-size:14px;line-height:1.6;">${esc(t.help)}</p>
+                <p style="margin:0;font-size:15px;color:#8a6a36;">${esc(t.signoff)}</p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>`;
+}
+
+
+/**
+ * RFC 2047-encode a header value (e.g. the Subject) so non-ASCII characters
+ * (accents like é) survive the trip through the Gmail API. Without this, the
+ * raw UTF-8 bytes in the header are misinterpreted by the receiving client and
+ * "Aydé" shows up as "AydÃƒÂ©".
+ */
+function encodeHeader(value) {
+  // Only encode when there are non-ASCII characters.
+  if (/^[\x00-\x7F]*$/.test(value)) return value;
+  const encoded = Buffer.from(value, "utf-8").toString("base64");
+  return `=?UTF-8?B?${encoded}?=`;
 }
 
 /**
  * Send an email through the couple's shared Gmail account using the Gmail API
  * (OAuth2). The credentials come from Secret Manager.
  *
- * @param {object} opts  { to, subject, body }
+ * @param {object} opts  { to, subject, body } — body is HTML.
  */
 async function sendGmail({ to, subject, body }) {
-  const oauth2Client = new google.auth.OAuth2(
-    GMAIL_CLIENT_ID.value(),
-    GMAIL_CLIENT_SECRET.value(),
-  );
-  oauth2Client.setCredentials({ refresh_token: GMAIL_REFRESH_TOKEN.value() });
+  // Secret Manager values can carry a trailing newline (e.g. when set via
+  // `firebase functions:secrets:set`). Trim them so the OAuth2 client sends a
+  // clean client_id/secret/refresh_token — otherwise Google rejects the
+  // client_id with `invalid_client: The OAuth client was not found`.
+  const clientId = GMAIL_CLIENT_ID.value().trim();
+  const clientSecret = GMAIL_CLIENT_SECRET.value().trim();
+  const refreshToken = GMAIL_REFRESH_TOKEN.value().trim();
+  const from = GMAIL_FROM.value().trim();
+
+  const oauth2Client = new google.auth.OAuth2(clientId, clientSecret);
+  oauth2Client.setCredentials({ refresh_token: refreshToken });
 
   const gmail = google.gmail({ version: "v1", auth: oauth2Client });
 
   // Build a raw RFC-2822 message and base64url-encode it for the Gmail API.
+  // The Subject is RFC 2047-encoded so accents render correctly; the body is
+  // HTML so the invitation link can be a real clickable <a href>.
   const raw = Buffer.from(
-    `From: ${GMAIL_FROM.value()}\r\n` +
+    `From: ${from}\r\n` +
       `To: ${to}\r\n` +
-      `Subject: ${subject}\r\n` +
-      `Content-Type: text/plain; charset=UTF-8\r\n` +
+      `Subject: ${encodeHeader(subject)}\r\n` +
+      `Content-Type: text/html; charset=UTF-8\r\n` +
       `MIME-Version: 1.0\r\n` +
       `\r\n` +
       `${body}`,
@@ -791,6 +865,7 @@ async function sendGmail({ to, subject, body }) {
     requestBody: { raw },
   });
 }
+
 
 /**
  * Callable function that sends a wedding invitation to a guest, either by
@@ -807,8 +882,9 @@ async function sendGmail({ to, subject, body }) {
  *   (for "whatsapp", `inviteUrl` is the wa.me link the dashboard opens)
  */
 export const sendInvitation = onCall(
-  { secrets: [GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN, GMAIL_FROM] },
+  { secrets: [GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN, GMAIL_FROM, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID] },
   async (request) => {
+
 
     // Reject unauthenticated callers.
     if (!request.auth) {
@@ -838,17 +914,32 @@ export const sendInvitation = onCall(
     }
     const guest = guestSnap.data();
 
-    const email = guest.firebaseEmail || guest.identity?.email || "";
-    const password = guest.firebasePassword || "";
+    // Resolve the guest's login email. Prefer the explicit `firebaseEmail`
+    // field, then `identity.email`, then fall back to the LIVE Firebase Auth
+    // user's email (the same source the dashboard's identity column shows).
+    // This lets the couple email a guest who has an auth account but no
+    // `firebaseEmail` field on their Firestore record (e.g. david_aïli).
+    let email = guest.firebaseEmail || guest.identity?.email || "";
+    if (!email) {
+      try {
+        const authUser = await getAuth().getUser(guestId);
+        email = authUser?.email || "";
+      } catch {
+        // No auth user for this guest — leave email empty.
+      }
+    }
     if (!email) {
       throw new HttpsError("failed-precondition", "El invitado no tiene correo de acceso (firebaseEmail).");
     }
-    if (!password) {
-      throw new HttpsError("failed-precondition", "El invitado no tiene contraseña guardada (firebasePassword).");
-    }
+
+    // The password is optional: it's only included in the email body / link as
+    // informational text. A guest with an existing auth account can still log
+    // in with their own credentials, so a missing `firebasePassword` must NOT
+    // block sending the invitation.
+    const password = guest.firebasePassword || "";
 
     const lang = guest.lang || guest.identity?.lang || "es";
-    const inviteUrl = buildInvitationUrl(guest, channel);
+    const inviteUrl = buildInvitationUrl(guest, channel, email);
     const sentAt = new Date().toISOString();
 
     if (channel === "email") {
@@ -857,10 +948,25 @@ export const sendInvitation = onCall(
         : lang === "en"
           ? "Your invitation to David & Aydé's wedding"
           : "Tu invitación a la boda de David & Aydé";
-      await sendGmail({ to: email, subject, body: invitationEmailBody(lang, guest, inviteUrl) });
+      await sendGmail({ to: email, subject, body: invitationEmailBody(lang, guest, inviteUrl, email) });
     }
 
+    // Notify the couple on Telegram that an invitation was sent. This lets them
+    // track who has been invited and via which channel, without opening the
+    // dashboard. The guest's name is resolved from their Firestore record.
+    const guestName = await resolveGuestName(guestId);
+    const channelLabel = channel === "email" ? "Correo" : "WhatsApp";
+    const notifyLines = [
+      "📨 *Invitación enviada*",
+      kv("Invitado", guestName || guestId),
+      kv("Canal", channelLabel),
+      kv("Correo", email),
+      kv("Hora", formatTime(new Date())),
+    ];
+    await notify(notifyLines.filter(Boolean).join("\n"));
+
     return { ok: true, channel, inviteUrl, sentAt };
+
   },
 );
 

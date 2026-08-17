@@ -414,15 +414,15 @@ function getFilteredGuests() {
 }
 
 
+// The production invitation origin. Invitation links sent to guests (email
+// body, WhatsApp, and the modal preview) MUST always point here — never to a
+// local dev server — so the guest always lands on the real site.
+const INVITATION_ORIGIN = "https://boda-david-y-ayde.web.app";
+
 function getInviteUrl(guestId) {
-  // In dev, the dashboard runs on port 5174 while the invitation runs on
-  // port 5173. Build invitation links against the invitation's origin.
-  const origin =
-    window.location.port === "5174"
-      ? "http://localhost:5173"
-      : window.location.origin;
-  return buildInvitationUrl(origin, guestId);
+  return buildInvitationUrl(INVITATION_ORIGIN, guestId);
 }
+
 
 
 function getRsvpForGuest(guestId) {
@@ -477,16 +477,26 @@ function guestHasAuth(guest) {
   return Boolean(state.authUsers[guest.id]) || Boolean(guestAuthEmail(guest));
 }
 
-// The email we would send an invitation to (auth email first, then identity).
+// The email we would send an invitation to. Priority: the raw record's
+// `firebaseEmail`, then the LIVE Firebase Auth user's email (the same source the
+// identity column uses via `state.authUsers`), then the identity/record email.
 function guestSendEmail(guest) {
-  return guestAuthEmail(guest) || guest.identity?.email || guest.email || "";
+  return (
+    guestAuthEmail(guest) ||
+    state.authUsers[guest.id]?.email ||
+    guest.identity?.email ||
+    guest.email ||
+    ""
+  );
 }
 
-// The email channel is available only when the guest is auth'd AND has a real
-// (non-default-domain) email address.
+// The email channel is available whenever the guest has a real (non-default
+// domain) email address. We intentionally do NOT require a Firebase Auth
+// account here: the couple may want to send an invitation to a guest who has a
+// real inbox but hasn't been provisioned an auth account yet.
 function guestCanEmail(guest) {
   const email = guestSendEmail(guest);
-  return guestHasAuth(guest) && Boolean(email) && !email.endsWith(`@${DEFAULT_AUTH_EMAIL_DOMAIN}`);
+  return Boolean(email) && !email.endsWith(`@${DEFAULT_AUTH_EMAIL_DOMAIN}`);
 }
 
 // The WhatsApp channel is available only when the guest is auth'd AND has a
@@ -824,8 +834,9 @@ function openGuestEditor(guest) {
 // edited there, not in Firestore.
 const GUEST_WRITABLE_FIELDS = new Set([
   "firstName", "middleName", "lastName", "maternalLastName", "phone", "idCheckUser", "cloudinaryId",
-  "messageAuthor", "invitationGroup", "_deleted",
+  "messageAuthor", "invitationGroup", "invitationSent", "_deleted",
 ]);
+
 
 
 async function saveGuestInline(guestId, field, value) {
@@ -1069,13 +1080,13 @@ function openSendInviteModal(guest, channel = null) {
     : !phone
       ? "Sin teléfono — no se puede enviar por WhatsApp"
       : "Enviar invitación por WhatsApp";
-  const emailTitle = !hasAuth
-    ? "Sin cuenta de Firebase Auth — no se puede enviar"
-    : !email
-      ? "Sin correo — no se puede enviar por email"
-      : email.endsWith(`@${DEFAULT_AUTH_EMAIL_DOMAIN}`)
-        ? "Correo del dominio por defecto — no se puede enviar por email"
-        : "Enviar invitación por email";
+  // The email channel no longer requires a Firebase Auth account — it only
+  // needs a real (non-default-domain) email address.
+  const emailTitle = !email
+    ? "Sin correo — no se puede enviar por email"
+    : email.endsWith(`@${DEFAULT_AUTH_EMAIL_DOMAIN}`)
+      ? "Correo del dominio por defecto — no se puede enviar por email"
+      : "Enviar invitación por email";
 
   const overlay = document.createElement("div");
   overlay.className = "dashboard-modal-overlay";
@@ -1131,12 +1142,16 @@ function openSendInviteModal(guest, channel = null) {
       const result = await sendInvitation({ guestId: guest.id, channel: ch });
       status.textContent = `✅ ${result.data?.message || "Enviado."}`;
       status.dataset.state = "success";
+      // Mark the guest as invited so the "Enviada" checkbox reflects it.
+      await saveGuestInline(guest.id, "invitationSent", true);
+      renderGuestManager();
     } catch (err) {
       console.error("sendInvitation failed", err);
       status.textContent = `❌ ${err.message || "Error al enviar."}`;
       status.dataset.state = "error";
     }
   };
+
 
   overlay.querySelector("[data-send-whatsapp]").addEventListener("click", () => run("whatsapp"));
   overlay.querySelector("[data-send-email]").addEventListener("click", () => run("email"));
@@ -1503,13 +1518,13 @@ function renderGuestManager() {
       : !phone
         ? "Sin teléfono — no se puede enviar por WhatsApp"
         : "Enviar invitación por WhatsApp";
-    const emailTitle = !hasAuth
-      ? "Sin cuenta de Firebase Auth — no se puede enviar"
-      : !email
-        ? "Sin correo — no se puede enviar por email"
-        : email.endsWith(`@${DEFAULT_AUTH_EMAIL_DOMAIN}`)
-          ? "Correo del dominio por defecto — no se puede enviar por email"
-          : "Enviar invitación por email";
+    // The email channel no longer requires a Firebase Auth account — it only
+    // needs a real (non-default-domain) email address.
+    const emailTitle = !email
+      ? "Sin correo — no se puede enviar por email"
+      : email.endsWith(`@${DEFAULT_AUTH_EMAIL_DOMAIN}`)
+        ? "Correo del dominio por defecto — no se puede enviar por email"
+        : "Enviar invitación por email";
 
     return `
       <div class="dashboard-send-cell">
@@ -1595,7 +1610,9 @@ function renderGuestManager() {
           <tr>
             ${sortTh("name", "Identidad")}
             <th title="Enviar invitación (WhatsApp / email)">Enviar</th>
+            <th title="Invitación enviada (marcar manualmente o al enviar)">Enviada</th>
             ${sortTh("invitationGroup", "Invitación")}
+
             ${sortTh("group", "Grupo")}
             ${sortTh("lang", "Idioma")}
 
@@ -1624,7 +1641,12 @@ function renderGuestManager() {
             <tr class="dashboard-guest-row">
               <td>${identityCell(merged)}</td>
               <td>${sendCell(merged)}</td>
+              <td>
+                <input type="checkbox" class="dashboard-invite-sent" data-invite-sent="${merged.id}"
+                  ${merged.invitationSent ? "checked" : ""} title="Invitación enviada" />
+              </td>
               <td>${invitationGroupCell(merged)}</td>
+
               <td>${badgeHtml(merged.group)}</td>
               <td>${badgeHtml(merged.identity?.lang || merged.lang || "")}</td>
 
@@ -1817,7 +1839,20 @@ function renderGuestManager() {
     });
   });
 
+  // ── "Invitación enviada" checkbox: toggle the flag on the guest doc ──
+  // The checkbox is a manual toggle so the couple can mark a guest as invited
+  // even if they sent the invitation outside the dashboard. It writes the
+  // `invitationSent` boolean via the shared inline payload builder.
+  container.querySelectorAll("[data-invite-sent]").forEach((checkbox) => {
+    checkbox.addEventListener("change", async () => {
+      const guestId = checkbox.dataset.inviteSent;
+      const ok = await saveGuestInline(guestId, "invitationSent", checkbox.checked);
+      if (!ok) checkbox.checked = !checkbox.checked; // revert on failure
+    });
+  });
+
   // ── Edit photo (avatar badge) → opens the guest editor modal ──
+
   // The 📷 badge on the avatar corner opens the same editor modal, which
   // already contains the photo upload section (preview + "Subir foto" button).
   container.querySelectorAll("[data-edit-photo]").forEach((btn) => {
