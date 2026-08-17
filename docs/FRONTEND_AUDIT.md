@@ -361,7 +361,22 @@ committed separately. No markup/classes change — appearance is preserved.
   normalization/initialization, identifier normalization, credential validation). Wired
   into `npm test` via `test:auth-logic`.
 
-Remaining F7 work: `Nav.jsx` (~1003) and `IdentityModal.jsx` (~865).
+- **`Nav.jsx` (~1003 → ~252 lines)** — decomposed into `components/nav/`:
+  `SideDrawer.jsx` (desktop hamburger side drawer), `MobileNav.jsx` (mobile split
+  dropdowns), `UserMenu.jsx` (user menu + language switcher), and `nav-links.js`
+  (the `getNavLinks`/`trackNav` helpers). `Nav.jsx` keeps the desktop nav bar, the
+  golden underline, the scroll-spy, and the scroll arrows.
+- **`IdentityModal.jsx` (~865 → ~277 lines)** — decomposed into `components/identity/`:
+  `MemberCard.jsx` (per-member identity card: name/photo/phone/email + save),
+  `MemberTabs.jsx` (the top badge strip), `Avatar.jsx` (avatar upload/preview), and
+  `phone-format.js` (pure phone formatting). `IdentityModal.jsx` keeps the modal
+  shell, member list, and confirm flow.
+
+All F7 decompositions are now complete: `Nav.jsx`, `IdentityModal.jsx`, `Coast.jsx`,
+`guest-profiles.js`, and `AppContext.jsx` have all been split into feature-local
+sub-components / pure services. The audit's original line-count figures (~1003 / ~865 /
+~809 / ~753 / ~647) reflect the pre-decomposition state and are now stale.
+
 
 
 
