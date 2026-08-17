@@ -7,22 +7,13 @@
     "build:all": "node scripts/build-all.mjs",
     "dev:invitation": "npm --prefix web/invitation run dev",
     "dev:dashboard": "npm --prefix web/dashboard run dev",
-    "dev:invitation:network": "npm --prefix web/invitation run dev:network",
-    "dev:dashboard:network": "npm --prefix web/dashboard run dev:network",
-    "dev": "npm run dev:invitation & npm run dev:dashboard",
-    "dev:network": "npm run dev:invitation:network & npm run dev:dashboard:network",
     "lint": "eslint .",
     "sync:gsheet:report": "node scripts/gsheet-firestore-sync.mjs --ci --report-json=reports/gsheet-firestore-sync-report.json --report-md=reports/gsheet-firestore-sync-report.md",
     "sync:gsheet:execute": "node scripts/gsheet-firestore-sync.mjs --execute --report-json=reports/gsheet-firestore-sync-report.json --report-md=reports/gsheet-firestore-sync-report.md",
-    "analytics:report": "node scripts/analytics-funnel-report.mjs",
-    "test": "npm --prefix web/invitation run test:validation && npm --prefix web/invitation run test:analytics",
-    "test:rules": "cd web/invitation && firebase emulators:exec --only firestore 'node --test tests/firestore.rules.test.mjs'",
-    "functions:install": "npm --prefix functions install",
-    "functions:deploy": "firebase deploy --only functions",
-    "functions:secrets": "firebase functions:secrets:set TELEGRAM_TOKEN && firebase functions:secrets:set TELEGRAM_CHAT_ID",
-    "functions:logs": "firebase functions:log"
+    "test": "npm --prefix web/invitation run test:validation && npm --prefix web/invitation run test:analytics && npm --prefix web/invitation run test:button",
 
 
+    "test:rules": "cd web/invitation && firebase emulators:exec --only firestore 'node --test tests/firestore.rules.test.mjs'"
 
   },
 

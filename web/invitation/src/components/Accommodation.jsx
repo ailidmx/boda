@@ -29,6 +29,8 @@ import {
   AIRBNB_SUGGESTIONS,
   HOTEL_SUGGESTIONS,
 } from "./accommodation-data.js";
+import { Button } from "./ui/Button.jsx";
+
 
 function getAssignedRoom(candidate) {
   // Resolve the LIVE Firestore record first so the primary cabin occupancy
@@ -514,16 +516,16 @@ export function Accommodation() {
 
             </div>
             <div className="accommodation-recap-save">
-              <button
-                className="button button--gold"
-                type="button"
+              <Button
+                variant="gold"
                 onClick={handleRecapSave}
                 disabled={recapSaveStatus === 'working'}
               >
                 {recap.button}
-              </button>
+              </Button>
               {recapStatusText ? <small data-form-status>{recapStatusText}</small> : null}
             </div>
+
           </div>
         ) : (
           <div className="flip-step-card-body">
@@ -613,15 +615,15 @@ export function Accommodation() {
               )}
 
               <div className="accommodation-recap-save">
-                <button
-                  className="button button--gold"
-                  type="button"
+                <Button
+                  variant="gold"
                   data-analytics="rsvp.modify.accommodation"
                   onClick={() => setRecapStep("question")}
                 >
                   {recap.modifyButton}
-                </button>
+                </Button>
               </div>
+
 
             </div>
           </div>

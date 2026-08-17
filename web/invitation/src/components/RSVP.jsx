@@ -20,6 +20,8 @@ import {
   trackFunnelStep,
   trackPurchase,
 } from "../analytics.js";
+import { Button } from "./ui/Button.jsx";
+
 
 export function RSVP() {
   const { t, profile, language, interfaceText } = useApp();
@@ -556,14 +558,14 @@ export function RSVP() {
         {/* Final submit: persists every flow's answers to Firestore and shows
             a success/error confirmation. */}
         <div className="rsvp-submit">
-          <button
-            className="button button--gold"
-            type="button"
+          <Button
+            variant="gold"
             onClick={handleSubmit}
             disabled={saveStatus === "working"}
           >
             {rsvp.button || scale.saveButton}
-          </button>
+          </Button>
+
 
 
           {saveStatus === "saved" ? (

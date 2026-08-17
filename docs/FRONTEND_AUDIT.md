@@ -295,3 +295,25 @@ These are pure documentation and carry zero behavior risk. After they are commit
 next safe code phase is **F2 (design tokens & UI primitives)**, starting with the smallest,
 highest-leverage primitive (a shared `Button`) and migrating the most duplicated usages
 without changing appearance.
+
+### F2 progress — shared `Button` primitive (in progress)
+
+The first F2 step is landed: a shared `Button` UI primitive for the invitation.
+
+- `web/invitation/src/components/ui/Button.jsx` — renders the EXISTING `.button` /
+  `.button--gold` / `.button-dark` / `.button-light` / `.button-ghost` / `.button-small`
+  classes from `styles/base.css`. Supports `as` (button/a), `variant`, `size`, `disabled`,
+  `loading`, and pass-through props. No CSS was changed.
+- `web/invitation/src/components/ui/button-classes.js` — pure `variant`/`size` → class
+  mapping (JSX-free, unit-testable).
+- `web/invitation/src/components/ui/button-state.js` — pure `as`/`disabled`/`loading` →
+  element + disabled + aria decision (JSX-free, unit-testable).
+- Migrated the highest-traffic usages to the primitive without changing rendered
+  markup/classes: `Accommodation.jsx` (gold), `RSVP.jsx` (gold), `Petanque.jsx` (gold),
+  `Coast.jsx` (ghost).
+- `web/invitation/tests/button.test.mjs` — unit tests for class mapping, `as`, `disabled`,
+  `loading`, and aria attributes.
+
+Remaining F2 work: introduce the other primitives (Input, Dialog, Spinner, EmptyState,
+Badge) and consolidate design tokens. Do NOT redesign visuals — preserve appearance.
+

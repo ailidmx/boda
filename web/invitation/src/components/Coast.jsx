@@ -22,6 +22,8 @@ import { CabinOccupancy } from "./CabinOccupancy.jsx";
 
 import { getActiveGuests } from "../guests.js";
 import { computeInitialStepIndex } from "../rsvp-responses.js";
+import { Button } from "./ui/Button.jsx";
+
 
 
 
@@ -691,16 +693,16 @@ export function Coast() {
                     recapProgress={rsvpMini.recapProgress}
                   />
                   <div className="coast-rsvp-save">
-                    <button
-                      className="button button--ghost"
-                      type="button"
+                    <Button
+                      variant="ghost"
                       data-analytics="rsvp.modify.coast"
                       onClick={goToStart}
                     >
                       {rsvpMini.modifyButton}
-                    </button>
+                    </Button>
                     {saveStatusText && <small>{saveStatusText}</small>}
                   </div>
+
 
                 </div>
               ),
