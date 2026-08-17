@@ -127,6 +127,14 @@ npm run dev:dashboard:network   # dashboard only, LAN
   cleaning first.
 - The invitation injects a build number (`version.json` + service worker cache
   version) so stale cached versions are detectable.
+- **The deploy workflow (`deploy-invitation.yml`) MUST use `npm run build:all`**,
+  NOT `npm run build` in `web/invitation` alone. Building only the invitation
+  means the dashboard is never built into `web/invitation/dist/dashboard`, so
+  `/dashboard/` 404s on prod. The workflow also installs dashboard deps
+  (`npm ci` in `web/dashboard`) and includes `web/dashboard/**` + `web/shared/**`
+  in its push/pull_request path filters so dashboard changes trigger a deploy.
+  When adding a new app to the monorepo, wire it into `build:all` AND the deploy
+  workflow's build + path filters.
 
 ---
 
