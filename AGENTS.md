@@ -583,6 +583,20 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   replaces the old pill/rounded look (999px chips, 50% RSVP dots, 1.25rem+
   radii). When adding new dashboard UI, keep radii small and padding generous
   to match. Chips/badges use `0.35rem` radius, not `999px`.
+- **Dashboard INVITADOS table has a dedicated "Enviar" column with per-channel send guards** —
+  the guest table's "Enviar" column (`sendCell` in `dashboard.js`) sits right after
+  "Identidad" and renders two send buttons: WhatsApp (📱) and Email (✉️). Each is
+  disabled when that channel is not available for the guest, enforced by three
+  helpers: `guestHasAuth(guest)` (has a Firebase Auth account — either in the live
+  `state.authUsers` list or via an explicit `firebaseEmail` on the raw record),
+  `guestCanWhatsapp(guest)` (auth AND has a phone), and `guestCanEmail(guest)`
+  (auth AND has a real email that is NOT on the default auth domain
+  `@boda-david-y-ayde.web.app` — that domain is auto-appended to bare usernames and
+  is not a real inbox). The send modal (`openSendInviteModal(guest, channel)`)
+  disables the same channels with explanatory tooltips and auto-triggers the
+  pre-selected channel from the column button. The old 📨 button was removed from
+  the "Acciones" column. When adding a new send channel, update `sendCell`, the
+  modal, and the `guestCan*` helpers together.
 - **Dashboard INVITADOS table has an "Invitación" column (rename + pick another group)** —
   the guest table's "Invitación" column (`invitationGroupCell` in `dashboard.js`)
   shows the guest's `invitationGroup` as a clickable display that reveals an
