@@ -86,6 +86,16 @@ service cloud.firestore {
       allow delete: if canDelete();
     }
 
+    // ── Auth users mirror (doc id = auth uid = guest id) ─────────────────
+    // Populated by `scripts/sync-auth-users.mjs` (Admin SDK). Readable by any
+    // authenticated guest so the dashboard can show who has an auth account.
+    match /auth_users/{uid} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+
     // ── Activity events ──────────────────────────────────────────────────
     match /activity_events/{eventId} {
       allow read: if canRead();

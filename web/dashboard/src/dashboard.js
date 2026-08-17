@@ -1,4 +1,5 @@
-import { collection, getDocs, doc, setDoc, deleteDoc, onSnapshot, limit, query } from "firebase/firestore";
+import { collection, getDocs, doc, setDoc, deleteDoc, onSnapshot, limit, query, serverTimestamp } from "firebase/firestore";
+
 
 
 import { db } from "./firebase.js";
@@ -18,10 +19,13 @@ import { collections } from "../../shared/firestore-paths.js";
 import {
   buildDashboardGuestEditPayload,
   buildDashboardGuestInlinePayload,
+  buildGuestRsvpPayload,
 } from "../../shared/payload-builders.js";
+
 
 import { auth } from "./firebase.js";
 import { onAuthStateChanged, signOut } from "firebase/auth";
+import { getFunctions, httpsCallable } from "firebase/functions";
 
 
 const COLLECTIONS = {
@@ -38,12 +42,18 @@ const state = {
   coast: [],
   petanque: [],
   invitationGroups: [], // from Firestore collection "invitation_groups"
+  liveGuests: [], // raw Firestore `guests` records (source of truth)
+  authUsers: {}, // uid → { email } LIVE Firebase Auth user list (via listAuthUsers callable)
   filterGroup: "",
-  filterCabin: "",
   filterQuery: "",
-  groupBy: "group",
   activeTab: "guests",
+  sortKey: "name",
+  sortDir: "asc",
 };
+
+
+
+
 
 // ── Sub-page routing ─────────────────────────────────────────────────────
 
@@ -226,7 +236,74 @@ function guestRoom(guest) {
   return guestHosting(guest).room || guest.room || "";
 }
 
+// Build a Cloudinary avatar URL from a guest's photo id. The id is the full
+// public id (e.g. `gimena_k9swal`), so we render it directly without any
+// `boda/` prefix. Returns "" when the guest has no photo.
+function guestAvatarUrl(guest) {
+  const id = guestIdentity(guest).cloudinaryId || guest.cloudinaryId || "";
+  if (!id) return "";
+  return `https://res.cloudinary.com/k2ajcgxv/image/upload/q_auto,f_auto,c_fill,g_auto,w_256,h_256/${id}`;
+}
+
+
+
+
+// Initials fallback for guests without a photo (e.g. "David Aïli" → "DA").
+function guestInitials(guest) {
+  const name = guestFullName(guest);
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  const first = parts[0][0] || "";
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+  return (first + last).toUpperCase();
+}
+
+// Sortable column keys for the INVITADOS table. Each maps to a value extractor
+// used by `guestSortValue`. "avatar" is intentionally NOT sortable. The ID and
+// phone are NOT standalone columns — they live inside the "Identidad" column.
+const GUEST_SORT_COLUMNS = [
+  "name", "idCheck", "hasAuth", "group", "cabin", "room", "xtraCabin", "xtraRoom",
+  "status",
+];
+
+// Extract the sortable value for a guest given a column key.
+function guestSortValue(guest, key) {
+  switch (key) {
+    case "name":
+      return guestFullName(guest).toLowerCase();
+    case "idCheck":
+      return guest.idCheckUser ? 1 : 0;
+    case "hasAuth":
+      return state.authUsers[guest.id] ? 1 : 0;
+
+
+
+    case "group":
+      return (guest.group || "").toLowerCase();
+    case "cabin":
+      return (guest.cabinLabel || guest.unit || "").toLowerCase();
+    case "room":
+      return guestRoom(guest).toLowerCase();
+    case "xtraCabin":
+      return (guest.xtraCabinLabel || guest.xtraCabin || "").toLowerCase();
+    case "xtraRoom":
+      return (guest.xtraRoom || "").toLowerCase();
+    case "status": {
+      const rsvp = getRsvpForGuest(guest.id);
+      if (!rsvp) return 0;
+      if (rsvp.attendance === "yes") return 2;
+      if (rsvp.attendance === "no") return 1;
+      return 0;
+    }
+    default:
+      return "";
+  }
+}
+
+
+
 // ── Access control ─────────────────────────────────────────────────────
+
 // There is no dedicated admin login. The dashboard reuses the same Firebase
 // Auth session as the invitation. Access is granted ONLY to guests whose
 // Firestore `guests` doc has `isAdmin: true` (David and Aydé). Everyone else
@@ -295,14 +372,12 @@ function getFilteredGuests() {
   if (state.filterGroup) {
     filtered = filtered.filter((g) => g.group === state.filterGroup);
   }
-  if (state.filterCabin) {
-    filtered = filtered.filter((g) => g.unit === state.filterCabin);
-  }
   if (state.filterQuery) {
     const q = state.filterQuery.toLowerCase();
     filtered = filtered.filter(
       (g) =>
         g.id.toLowerCase().includes(q) ||
+        guestFullName(g).toLowerCase().includes(q) ||
         String(guestIdentity(g).firstName || g.firstName || "").toLowerCase().includes(q) ||
         String(guestIdentity(g).middleName || g.middleName || "").toLowerCase().includes(q) ||
         String(guestIdentity(g).lastName || g.lastName || "").toLowerCase().includes(q) ||
@@ -313,6 +388,7 @@ function getFilteredGuests() {
 
   return filtered;
 }
+
 
 function getInviteUrl(guestId) {
   // In dev, the dashboard runs on port 5174 while the invitation runs on
@@ -329,17 +405,167 @@ function getRsvpForGuest(guestId) {
   return state.rsvps.find((r) => r.invitationCode === guestId);
 }
 
+// ── Live RSVP scale (source of truth: guest's `rsvp.answers`) ──────────
+
+// Attendance days tracked in the RSVP scale. Each guest's `rsvp.answers` map
+// holds a scale level (int 0–5) per day; a guest counts as "confirmed" when
+// the level is ≥ RSVP_CONFIRMED_MIN_LEVEL.
+const RSVP_ATTENDANCE_DAYS = ["friday", "saturday", "sunday"];
+const RSVP_CONFIRMED_MIN_LEVEL = 4;
+
+// Read the live RSVP answers for a guest from the raw Firestore record.
+function getLiveRsvpAnswers(guest) {
+  const raw = state.liveGuests.find((r) => r.id === guest.id);
+  return raw?.rsvp?.answers || guest?.rsvp?.answers || {};
+}
+
+// Merge a normalized guest with its raw live Firestore record. Live wins where
+// both exist (identity names/photo, hosting incl. xtraCabin/xtraRoom, rsvp).
+function getMergedGuest(guest) {
+  const raw = state.liveGuests.find((r) => r.id === guest.id);
+  if (!raw) return guest;
+  return {
+    ...guest,
+    ...raw,
+    identity: { ...(guest.identity || {}), ...(raw.identity || {}) },
+    hosting: { ...(guest.hosting || {}), ...(raw.hosting || {}) },
+    rsvp: { ...(guest.rsvp || {}), ...(raw.rsvp || {}) },
+  };
+}
+
+// A guest "has a Firebase Auth account" when their RAW live record carries an
+// explicit `firebaseEmail` (a real auth account was provisioned for them). The
+// normalized `guest.firebaseEmail` always falls back to `id@domain`, so we must
+// read the raw record, not the normalized one. Returns the auth email or "".
+function guestAuthEmail(guest) {
+  const raw = state.liveGuests.find((r) => r.id === guest.id);
+  return raw?.firebaseEmail || "";
+}
+
+
+// Deterministic pastel background color for a badge label (stable per label).
+function badgeStyle(text) {
+  const palette = [
+    "#e8dcc8", "#d9e4d2", "#d8e0ec", "#ecd9d9", "#e6d9ec",
+    "#d9ecec", "#ece3d2", "#d2e6e6", "#e6d2d2", "#d2d9e6",
+  ];
+  let hash = 0;
+  const s = String(text || "");
+  for (let i = 0; i < s.length; i += 1) {
+    hash = (hash * 31 + s.charCodeAt(i)) >>> 0;
+  }
+  return palette[hash % palette.length];
+}
+
+// Colored badge span for a short label (grupo/cabaña/cuarto).
+function badgeHtml(text) {
+  const label = String(text || "").trim();
+  if (!label) return '<span class="dashboard-badge dashboard-badge-muted">—</span>';
+  return `<span class="dashboard-badge" style="background:${badgeStyle(label)};color:#3a2f1e;">${label}</span>`;
+}
+
+// RSVP scale dropdown for a single attendance day. The stored value stays an
+// int 0–5 (0 = no answer). The select shows the current level and lets the
+// admin pick any level directly (no click-to-cycle). The select's background
+// reflects the level: gray = 0 (no answer), amber = 1–3, green = 4–5.
+function rsvpLevelChip(guest, day) {
+  const level = getLiveRsvpAnswers(guest)[day];
+  const has = Number.isInteger(level) && level > 0;
+  const cls = has
+    ? level >= RSVP_CONFIRMED_MIN_LEVEL
+      ? "dashboard-rsvp-chip dashboard-rsvp-chip-confirmed"
+      : "dashboard-rsvp-chip dashboard-rsvp-chip-partial"
+    : "dashboard-rsvp-chip dashboard-rsvp-chip-empty";
+  const current = has ? level : 0;
+  const options = [0, 1, 2, 3, 4, 5]
+    .map(
+      (n) =>
+        `<option value="${n}" ${n === current ? "selected" : ""}>${n === 0 ? "—" : n}</option>`,
+    )
+    .join("");
+  return `<select class="${cls}" data-rsvp-chip="${guest.id}" data-rsvp-day="${day}" title="Nivel de asistencia (0 = sin respuesta, 4–5 = confirmado)">${options}</select>`;
+}
+
+
+// Aggregate confirmed counts per attendance day from the live guests.
+function computeDayConfirmations() {
+  const counts = { friday: 0, saturday: 0, sunday: 0 };
+  getActiveGuests().forEach((guest) => {
+    const answers = getLiveRsvpAnswers(guest);
+    RSVP_ATTENDANCE_DAYS.forEach((day) => {
+      if ((answers[day] || 0) >= RSVP_CONFIRMED_MIN_LEVEL) counts[day] += 1;
+    });
+  });
+  return counts;
+}
+
+// Persist a guest's RSVP scale level for one attendance day via the shared
+// payload builder (writes `rsvp.answers` on the `guests` doc).
+async function saveGuestRsvpAnswer(guestId, day, level) {
+  try {
+    const guest = getGuest(guestId);
+    const answers = { ...(guest?.rsvp?.answers || {}) };
+    if (level > 0) answers[day] = level;
+    else delete answers[day];
+    const payload = buildGuestRsvpPayload({ guestId, answers, timestamp: new Date() });
+    await setDoc(doc(db, collections.guests, guestId), payload, { merge: true });
+    return true;
+
+  } catch (err) {
+    console.error("Failed to save RSVP answer", err);
+    return false;
+  }
+}
+
+// Status badge derived from the LIVE `rsvp.answers` (confirmed = any day ≥ 4,
+// partial = answered but not confirmed, pending = no answers).
 function guestStatusBadge(guest) {
-  const rsvp = getRsvpForGuest(guest.id);
-  if (!rsvp) return make("span", "dashboard-badge dashboard-badge-pending", "Pendiente");
-  if (rsvp.attendance === "yes") return make("span", "dashboard-badge dashboard-badge-yes", "✅ Confirmado");
-  if (rsvp.attendance === "no") return make("span", "dashboard-badge dashboard-badge-no", "❌ No asiste");
-  return make("span", "dashboard-badge dashboard-badge-maybe", "🤷 Tal vez");
+  const answers = getLiveRsvpAnswers(guest);
+  const hasAny = RSVP_ATTENDANCE_DAYS.some((day) => (answers[day] || 0) > 0);
+  const confirmed = RSVP_ATTENDANCE_DAYS.some(
+    (day) => (answers[day] || 0) >= RSVP_CONFIRMED_MIN_LEVEL,
+  );
+  if (confirmed) return make("span", "dashboard-badge dashboard-badge-yes", "✅ Confirmado");
+  if (hasAny) return make("span", "dashboard-badge dashboard-badge-maybe", "🟡 Parcial");
+  return make("span", "dashboard-badge dashboard-badge-pending", "Pendiente");
+}
+
+
+// ── Avatar upload (Cloudinary unsigned) ────────────────────────────────
+// Mirrors the invitation's `uploadAvatar` helper so admins can pick an image
+// in the edit modal and have it uploaded to the `boda/avatars` folder. The
+// returned public id is stored on the guest's `identity.cloudinaryId` (and
+// top-level `cloudinaryId`) — the same field the invitation reads.
+const AVATAR_CLOUD_NAME = "k2ajcgxv";
+const AVATAR_UPLOAD_PRESET =
+  import.meta.env?.VITE_CLOUDINARY_UPLOAD_PRESET || "boda_avatars_unsigned";
+const AVATAR_FOLDER = "boda/avatars";
+
+async function uploadAvatarToCloudinary(file) {
+  if (!file) throw new Error("No file selected");
+  if (!file.type.startsWith("image/")) throw new Error("Please choose an image file");
+  if (file.size > 8 * 1024 * 1024) throw new Error("Image is too large (max 8 MB)");
+
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("upload_preset", AVATAR_UPLOAD_PRESET);
+  formData.append("folder", AVATAR_FOLDER);
+
+  const endpoint = `https://api.cloudinary.com/v1_1/${AVATAR_CLOUD_NAME}/image/upload`;
+  const response = await fetch(endpoint, { method: "POST", body: formData });
+  if (!response.ok) {
+    const text = await response.text().catch(() => "");
+    throw new Error(`Upload failed (${response.status}) ${text}`);
+  }
+  const data = await response.json();
+  if (!data?.public_id) throw new Error("Upload failed: no public id returned");
+  return data.public_id;
 }
 
 // ── Guest Editor Modal ─────────────────────────────────────────────────
 
 function openGuestEditor(guest) {
+
   const overlay = document.createElement("div");
   overlay.className = "dashboard-modal-overlay";
   overlay.innerHTML = `
@@ -377,14 +603,31 @@ function openGuestEditor(guest) {
         </div>
 
         <div class="dashboard-modal-field">
-          <label for="edit-identityCloudinaryId">Foto de perfil (identity.cloudinaryId)</label>
+          <label>Foto de perfil</label>
+          <div class="dashboard-avatar-upload">
+            <span class="dashboard-avatar-upload-preview" data-avatar-preview>
+              ${guestAvatarUrl(guest)
+                ? `<img src="${guestAvatarUrl(guest)}" alt="Foto actual" />`
+                : `<span class="dashboard-avatar-upload-placeholder">${guestInitials(guest)}</span>`}
+            </span>
+            <div class="dashboard-avatar-upload-controls">
+              <label class="dashboard-button dashboard-button-secondary dashboard-avatar-upload-btn" for="edit-avatar-file">
+                📷 Subir foto
+              </label>
+              <input id="edit-avatar-file" name="avatarFile" type="file" accept="image/*" hidden />
+              <small data-avatar-upload-status style="color:#8a7a5f;display:block;margin-top:0.25rem;">
+                Se subirá a Cloudinary (carpeta boda/avatars) y se guardará el ID.
+              </small>
+            </div>
+          </div>
           <input id="edit-identityCloudinaryId" name="identityCloudinaryId" value="${guest.identity?.cloudinaryId || guest.cloudinaryId || ""}"
-            placeholder="Ej: v1785544747/IMG_3496_qzt2un.heic" />
+            placeholder="O pega un Cloudinary ID manualmente" style="margin-top:0.5rem;" />
         </div>
 
 
         <div class="dashboard-modal-field">
           <label for="edit-invitationGroup">Grupo de invitación</label>
+
           <input id="edit-invitationGroup" name="invitationGroup" value="${guest.invitationGroup || ""}"
             placeholder="Ej: Familia Rako, Sebastian, Mónica, Iyali y Amélie…" />
           <small style="color:#8a7a5f;display:block;margin-top:0.25rem;">
@@ -406,13 +649,8 @@ function openGuestEditor(guest) {
         </div>
 
         <div class="dashboard-modal-field">
-          <label for="edit-cloudinaryId">Foto de perfil (Cloudinary ID)</label>
-          <input id="edit-cloudinaryId" name="cloudinaryId" value="${guest.cloudinaryId || ""}"
-            placeholder="Ej: v1785544747/IMG_3496_qzt2un.heic" />
-        </div>
-
-        <div class="dashboard-modal-field">
           <label for="edit-messageAuthor">Autor del mensaje</label>
+
           <input id="edit-messageAuthor" name="messageAuthor" value="${guest.messageAuthor || ""}"
             placeholder="Ej: David y Aydé" />
         </div>
@@ -436,8 +674,34 @@ function openGuestEditor(guest) {
     if (e.target === overlay) overlay.remove();
   });
 
+  // ── Avatar file upload ──
+  // When the admin picks an image, upload it to Cloudinary (boda/avatars),
+  // then fill the hidden public-id input and refresh the preview thumbnail.
+  const avatarFileInput = overlay.querySelector("#edit-avatar-file");
+  const avatarIdInput = overlay.querySelector("#edit-identityCloudinaryId");
+  const avatarPreview = overlay.querySelector("[data-avatar-preview]");
+  const avatarStatus = overlay.querySelector("[data-avatar-upload-status]");
+  avatarFileInput.addEventListener("change", async () => {
+    const file = avatarFileInput.files?.[0];
+    if (!file) return;
+    avatarStatus.textContent = "Subiendo…";
+    avatarStatus.style.color = "#8a7a5f";
+    try {
+      const publicId = await uploadAvatarToCloudinary(file);
+      avatarIdInput.value = publicId;
+      avatarPreview.innerHTML = `<img src="https://res.cloudinary.com/k2ajcgxv/image/upload/q_auto,f_auto,c_fill,g_auto,w_256,h_256/${publicId}" alt="Nueva foto" />`;
+      avatarStatus.textContent = `✅ Subida: ${publicId}`;
+      avatarStatus.style.color = "#4caf50";
+    } catch (err) {
+      console.error("Avatar upload failed", err);
+      avatarStatus.textContent = `❌ ${err.message || "Error al subir la foto"}`;
+      avatarStatus.style.color = "#a0352c";
+    }
+  });
+
   // Submit handler — only writes AGREED SCHEMA fields to `guests`
   const form = overlay.querySelector("[data-guest-form]");
+
   form.addEventListener("submit", async (e) => {
     e.preventDefault();
     const data = new FormData(form);
@@ -815,57 +1079,180 @@ function renderGroupsPanel() {
   });
 }
 
-// ── Guest Manager (grouped, inline editable) ───────────────────────────
+// ── Guest Manager (flat, live, inline editable) ────────────────────────
 
 function renderGuestManager() {
   const container = document.querySelector("[data-guest-manager]");
   if (!container) return;
 
-  const filtered = getFilteredGuests();
+  let filtered = getFilteredGuests();
 
-  // Group by the selected dimension (group / cabin / room)
-  const groupKeyOf = (g) => {
-    if (state.groupBy === "cabin") return g.hasCabin && g.unit ? g.cabinLabel || g.unit : "Sin cabaña";
-    if (state.groupBy === "room") return guestRoom(g) || "Sin cuarto";
-    return g.group || "Sin grupo";
-  };
-
-  const grouped = {};
-  filtered.forEach((g) => {
-    const key = groupKeyOf(g);
-    if (!grouped[key]) grouped[key] = [];
-    grouped[key].push(g);
+  // ── Sort by the active column ──
+  const sortKey = GUEST_SORT_COLUMNS.includes(state.sortKey) ? state.sortKey : "name";
+  const dir = state.sortDir === "desc" ? -1 : 1;
+  filtered = [...filtered].sort((a, b) => {
+    const av = guestSortValue(a, sortKey);
+    const bv = guestSortValue(b, sortKey);
+    if (av < bv) return -1 * dir;
+    if (av > bv) return 1 * dir;
+    return 0;
   });
 
-  const groupKeys = Object.keys(grouped).sort();
+  // ── Sortable header helper ──
+  const sortTh = (key, label) => {
+    const active = state.sortKey === key;
+    const arrow = active ? (state.sortDir === "asc" ? " ▲" : " ▼") : "";
+    return `<th class="dashboard-sortable ${active ? "dashboard-sort-active" : ""}" data-sort-key="${key}" title="Ordenar por ${label}">${label}${arrow}</th>`;
+  };
+
+  // ── Phone formatting: international flag + masked display ──
+  // Accepts a raw phone string (e.g. "523312828872" or "+52 33 1282 8872") and
+  // returns { flag, display, href }. The flag is derived from the leading
+  // country code; the display is a human-friendly masked grouping.
+  const COUNTRY_FLAGS = {
+    "52": "🇲🇽", // Mexico
+    "1": "🇺🇸", // US / Canada
+    "33": "🇫🇷", // France
+    "34": "🇪🇸", // Spain
+    "49": "🇩🇪", // Germany
+    "44": "🇬🇧", // UK
+    "381": "🇷🇸", // Serbia
+    "39": "🇮🇹", // Italy
+    "351": "🇵🇹", // Portugal
+    "31": "🇳🇱", // Netherlands
+    "32": "🇧🇪", // Belgium
+    "41": "🇨🇭", // Switzerland
+    "43": "🇦🇹", // Austria
+    "48": "🇵🇱", // Poland
+    "55": "🇧🇷", // Brazil
+    "54": "🇦🇷", // Argentina
+    "56": "🇨🇱", // Chile
+    "57": "🇨🇴", // Colombia
+    "58": "🇻🇪", // Venezuela
+    "51": "🇵🇪", // Peru
+    "593": "🇪🇨", // Ecuador
+    "502": "🇬🇹", // Guatemala
+    "506": "🇨🇷", // Costa Rica
+    "507": "🇵🇦", // Panama
+    "53": "🇨🇺", // Cuba
+    "1-809": "🇩🇴", // Dominican Republic
+  };
+  const formatPhone = (raw) => {
+    const digits = String(raw || "").replace(/\D/g, "");
+    if (!digits) return null;
+    // Detect the country code by trying the longest known prefixes first.
+    const codes = Object.keys(COUNTRY_FLAGS).sort((a, b) => b.length - a.length);
+    const countryCode = codes.find((c) => digits.startsWith(c.replace(/\D/g, ""))) || "";
+    const flag = COUNTRY_FLAGS[countryCode] || "🌐";
+    // Masked grouping: +52 33 1282 8872 (Mexico) or +1 555 123 4567 (US).
+    let display = digits;
+    if (digits.startsWith("52") && digits.length === 12) {
+      display = `+52 ${digits.slice(2, 4)} ${digits.slice(4, 8)} ${digits.slice(8)}`;
+    } else if (digits.startsWith("1") && digits.length === 11) {
+      display = `+1 ${digits.slice(1, 4)} ${digits.slice(4, 7)} ${digits.slice(7)}`;
+    } else {
+      display = `+${digits}`;
+    }
+    return { flag, display, href: `tel:${digits}` };
+  };
+
+
+  // ── Identity cell helper: avatar + name (inline editor) + ID + phone + auth ──
+  const identityCell = (guest) => {
+    const url = guestAvatarUrl(guest);
+    const initials = guestInitials(guest);
+    const hasAuth = Boolean(state.authUsers[guest.id]);
+    const authEmail = state.authUsers[guest.id]?.email || "";
+
+    const img = url
+      ? `<img class="dashboard-avatar" src="${url}" alt="${guestFullName(guest)}" loading="lazy" />`
+      : `<span class="dashboard-avatar dashboard-avatar-initials">${initials}</span>`;
+
+    // Badges on the avatar corners:
+    //  - top-left: ID check (🔒 LOCK when verified, empty badge when not)
+    //  - top-right: edit photo (opens the guest editor modal)
+    //  - bottom-right: auth (🔑 login emoji when the guest has a Firebase Auth
+    //    account, ❌ red cross when they don't)
+    const idCheckBadge = guest.idCheckUser
+      ? '<span class="dashboard-avatar-badge dashboard-avatar-badge--idcheck is-locked" title="Identidad verificada (ID Check)">🔒</span>'
+      : '<span class="dashboard-avatar-badge dashboard-avatar-badge--idcheck is-unlocked" title="Identidad no verificada (ID Check)"></span>';
+
+    const editPhotoBadge = `<button class="dashboard-avatar-badge dashboard-avatar-badge--edit" data-edit-photo="${guest.id}" title="Editar foto de perfil" type="button">📷</button>`;
+    const authBadge = hasAuth
+      ? '<span class="dashboard-avatar-badge dashboard-avatar-badge--auth is-auth" title="Tiene cuenta de Firebase Auth">🔑</span>'
+      : '<span class="dashboard-avatar-badge dashboard-avatar-badge--auth is-noauth" title="Sin cuenta de Firebase Auth">❌</span>';
+
+    const avatar = `<span class="dashboard-avatar-wrap">${img}${idCheckBadge}${editPhotoBadge}${authBadge}</span>`;
+
+
+    const phone = guest.identity?.phone || guest.phone || "";
+    const phoneInfo = formatPhone(phone);
+    const phoneHtml = phoneInfo
+      ? `<a class="dashboard-phone" href="${phoneInfo.href}" title="Llamar"><span class="dashboard-phone-flag">${phoneInfo.flag}</span><span class="dashboard-phone-number">${phoneInfo.display}</span></a>`
+      : '<span class="dashboard-badge dashboard-badge-muted">—</span>';
+    const authHtml = hasAuth && authEmail
+      ? `<span class="dashboard-auth-email" title="Cuenta de Firebase Auth">${authEmail}</span>`
+      : "";
+    return `
+      <div class="dashboard-identity-cell">
+        ${avatar}
+        <div class="dashboard-identity-info">
+          ${nameCell(guest)}
+          <div class="dashboard-identity-meta">${phoneHtml}</div>
+          ${authHtml ? `<div class="dashboard-identity-meta">${authHtml}</div>` : ""}
+          <div class="dashboard-identity-meta">
+            <code title="${guest.id}">${guest.id}</code>
+          </div>
+        </div>
+      </div>`;
+  };
+
+
+
+
+  // ── Name cell helper ──
+  const nameCell = (guest) => {
+    const identity = guestIdentity(guest);
+    const f = identity.firstName || guest.firstName || "";
+    const m = identity.middleName || guest.middleName || "";
+    const l = identity.lastName || guest.lastName || "";
+    const ml = identity.maternalLastName || guest.maternalLastName || "";
+    return `
+      <div class="dashboard-name-cell" data-name-cell="${guest.id}">
+        <button type="button" class="dashboard-name-display" data-name-display="${guest.id}" title="Editar nombre">
+          ${guestFullName(guest) || "—"}
+        </button>
+        <div class="dashboard-name-editor" data-name-editor="${guest.id}" hidden>
+          <input class="dashboard-inline-input" type="text" value="${f}" data-name-field="firstName" data-guest-id="${guest.id}" placeholder="Nombre" />
+          <input class="dashboard-inline-input" type="text" value="${m}" data-name-field="middleName" data-guest-id="${guest.id}" placeholder="Nombre 2" />
+          <input class="dashboard-inline-input" type="text" value="${l}" data-name-field="lastName" data-guest-id="${guest.id}" placeholder="Apellido" />
+          <input class="dashboard-inline-input" type="text" value="${ml}" data-name-field="maternalLastName" data-guest-id="${guest.id}" placeholder="Apellido 2" />
+          <button type="button" class="dashboard-link-btn" data-name-done="${guest.id}" title="Listo">✓</button>
+        </div>
+      </div>`;
+  };
+
+  // ── Group badge nav bar ──
+  const groups = getUniqueGuestGroups();
+  const groupNav = `
+    <div class="dashboard-group-nav">
+      <button type="button" class="dashboard-group-nav-chip ${!state.filterGroup ? "dashboard-group-nav-chip-active" : ""}" data-group-nav="">
+        Todos
+      </button>
+      ${groups
+        .map(
+          (g) => `
+        <button type="button" class="dashboard-group-nav-chip ${state.filterGroup === g ? "dashboard-group-nav-chip-active" : ""}" data-group-nav="${g}" style="background:${badgeStyle(g)};color:#3a2f1e;">
+          ${g}
+        </button>`,
+        )
+        .join("")}
+    </div>
+  `;
 
   container.innerHTML = `
+    ${groupNav}
     <div class="dashboard-guest-filters">
-      <div class="dashboard-filter-group">
-        <label for="filter-group">Grupo</label>
-        <select id="filter-group" data-filter-group>
-          <option value="">Todos los grupos</option>
-          ${getUniqueGuestGroups()
-            .map(
-              (g) =>
-                `<option value="${g}" ${state.filterGroup === g ? "selected" : ""}>${g}</option>`,
-            )
-            .join("")}
-          <option value="__create_group__" style="color:#a0352c;font-weight:600;">＋ Crear nuevo grupo…</option>
-        </select>
-      </div>
-      <div class="dashboard-filter-group">
-        <label for="filter-cabin">Cabaña</label>
-        <select id="filter-cabin" data-filter-cabin>
-          <option value="">Todas las cabañas</option>
-          ${getUniqueCabins()
-            .map(
-              (c) =>
-                `<option value="${c}" ${state.filterCabin === c ? "selected" : ""}>${c}</option>`,
-            )
-            .join("")}
-        </select>
-      </div>
       <div class="dashboard-filter-group">
         <label for="filter-query">Buscar</label>
         <input
@@ -876,95 +1263,68 @@ function renderGuestManager() {
           value="${state.filterQuery}"
         />
       </div>
-      <div class="dashboard-filter-group">
-        <label for="filter-groupby">Agrupar por</label>
-        <select id="filter-groupby" data-filter-groupby>
-          <option value="group" ${state.groupBy === "group" ? "selected" : ""}>Grupo</option>
-          <option value="cabin" ${state.groupBy === "cabin" ? "selected" : ""}>Cabaña</option>
-          <option value="room" ${state.groupBy === "room" ? "selected" : ""}>Cuarto</option>
-        </select>
-      </div>
       <div class="dashboard-filter-count">
         <strong>${filtered.length}</strong> de <strong>${getActiveGuests().length}</strong> invitados
       </div>
     </div>
+    <div class="dashboard-rsvp-legend" title="Escala de asistencia por día">
+      <span class="dashboard-rsvp-legend-title">Asistencia (Vie / Sáb / Dom):</span>
+      <span class="dashboard-rsvp-legend-item"><span class="dashboard-rsvp-chip dashboard-rsvp-chip-empty">—</span> 0 · sin respuesta</span>
+      <span class="dashboard-rsvp-legend-item"><span class="dashboard-rsvp-chip dashboard-rsvp-chip-partial">1–3</span> 1–3 · parcial</span>
+      <span class="dashboard-rsvp-legend-item"><span class="dashboard-rsvp-chip dashboard-rsvp-chip-confirmed">4–5</span> 4–5 · confirmado</span>
+    </div>
     <div class="dashboard-guest-table-wrap">
+
       <table class="dashboard-guest-table">
         <thead>
           <tr>
-            <th>ID</th>
-            <th>Nombre</th>
-            <th>Grupo</th>
-            <th>Cabaña</th>
-            <th>Cuarto</th>
-            <th>Estado</th>
+            ${sortTh("name", "Identidad")}
+            ${sortTh("group", "Grupo")}
+
+
+            ${sortTh("cabin", "Cabaña")}
+            ${sortTh("room", "Cuarto")}
+            ${sortTh("xtraCabin", "Cabaña extra")}
+            ${sortTh("xtraRoom", "Cuarto extra")}
+            <th>Vie</th>
+            <th>Sáb</th>
+            <th>Dom</th>
+            ${sortTh("status", "Estado")}
             <th>Acciones</th>
           </tr>
         </thead>
-        <tbody>
-          ${groupKeys
-            .map(
-              (groupName) => `
-            <tr class="dashboard-group-header" data-group="${groupName}">
-              <td colspan="7">
-                <button class="dashboard-group-toggle" type="button" data-toggle-group="${groupName}" aria-expanded="true">
-                  <span class="dashboard-group-arrow">▼</span>
-                  <strong>${groupName}</strong>
-                  <span class="dashboard-group-count">${grouped[groupName].length} invitados</span>
-                </button>
-              </td>
-            </tr>
-            ${grouped[groupName]
-              .map(
-                (guest) => `
-            <tr class="dashboard-guest-row" data-group="${groupName}">
-              <td><code>${guest.id}</code></td>
-              <td>
-                <input class="dashboard-inline-input" type="text" value="${guestFullName(guest)}"
-                  data-inline-field="name" data-guest-id="${guest.id}" title="Editar nombre" />
-              </td>
 
+        <tbody>
+          ${filtered
+            .map((guest) => {
+              const merged = getMergedGuest(guest);
+              const hosting = merged.hosting || {};
+              const xtraCabin = hosting.xtraCabin || merged.xtraCabin || "";
+              const xtraRoom = hosting.xtraRoom || merged.xtraRoom || "";
+              return `
+            <tr class="dashboard-guest-row">
+              <td>${identityCell(merged)}</td>
+              <td>${badgeHtml(merged.group)}</td>
+
+
+              <td>${badgeHtml(merged.cabinLabel || merged.unit || "")}</td>
+              <td>${badgeHtml(guestRoom(merged))}</td>
+              <td>${badgeHtml(xtraCabin)}</td>
+              <td>${badgeHtml(xtraRoom)}</td>
+              <td>${rsvpLevelChip(merged, "friday")}</td>
+              <td>${rsvpLevelChip(merged, "saturday")}</td>
+              <td>${rsvpLevelChip(merged, "sunday")}</td>
+              <td data-guest-status="${merged.id}"></td>
               <td>
-                <select class="dashboard-inline-select" data-inline-field="group" data-guest-id="${guest.id}">
-                  ${getUniqueGuestGroups()
-                    .map(
-                      (g) =>
-                        `<option value="${g}" ${guest.group === g ? "selected" : ""}>${g}</option>`,
-                    )
-                    .join("")}
-                  <option value="__create_group__" style="color:#a0352c;font-weight:600;">＋ Crear nuevo grupo…</option>
-                </select>
+                <button class="dashboard-link-btn" data-edit-guest="${merged.id}" title="Editar todo (modal)">✏️</button>
+                <button class="dashboard-link-btn" data-copy-link="${merged.id}" title="Copiar enlace">🔗</button>
+                <button class="dashboard-link-btn" data-preview-link="${merged.id}" title="Vista previa">👁️</button>
+                <button class="dashboard-link-btn" data-delete-guest="${merged.id}" title="Eliminar" style="color:#a0352c;">🗑️</button>
               </td>
-              <td>
-                <select class="dashboard-inline-select" data-inline-field="unit" data-guest-id="${guest.id}">
-                  <option value="">— Sin cabaña —</option>
-                  ${getUniqueCabins()
-                    .map(
-                      (c) => {
-                        const label = guest.unit === c ? (guest.cabinLabel || c) : c;
-                        return `<option value="${c}" ${guest.unit === c ? "selected" : ""}>${label}</option>`;
-                      },
-                    )
-                    .join("")}
-                </select>
-              </td>
-              <td>
-                <input class="dashboard-inline-input" type="text" value="${guestRoom(guest)}"
-                  data-inline-field="room" data-guest-id="${guest.id}" placeholder="—" title="Editar cuarto" />
-              </td>
-              <td data-guest-status="${guest.id}"></td>
-              <td>
-                <button class="dashboard-link-btn" data-edit-guest="${guest.id}" title="Editar todo (modal)">✏️</button>
-                <button class="dashboard-link-btn" data-copy-link="${guest.id}" title="Copiar enlace">🔗</button>
-                <button class="dashboard-link-btn" data-preview-link="${guest.id}" title="Vista previa">👁️</button>
-                <button class="dashboard-link-btn" data-delete-guest="${guest.id}" title="Eliminar" style="color:#a0352c;">🗑️</button>
-              </td>
-            </tr>`,
-              )
-              .join("")}
-          `,
-            )
+            </tr>`;
+            })
             .join("")}
+
         </tbody>
       </table>
     </div>
@@ -976,137 +1336,84 @@ function renderGuestManager() {
     if (cell) cell.append(guestStatusBadge(guest));
   });
 
+  // ── Group nav filter ──
+  container.querySelectorAll("[data-group-nav]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.filterGroup = btn.dataset.groupNav;
+      renderGuestManager();
+    });
+  });
+
   // ── Filter events ──
-  container.querySelector("[data-filter-group]")?.addEventListener("change", (e) => {
-    const value = e.target.value;
-    if (value === "__create_group__") {
-      openCreateGroupModal((newGroupName) => {
-        state.filterGroup = newGroupName;
-        renderGuestManager();
-      });
-      // Reset the select to previous value
-      e.target.value = state.filterGroup || "";
-      return;
-    }
-    state.filterGroup = value;
-    renderGuestManager();
-  });
-  container.querySelector("[data-filter-cabin]")?.addEventListener("change", (e) => {
-    state.filterCabin = e.target.value;
-    renderGuestManager();
-  });
   container.querySelector("[data-filter-query]")?.addEventListener("input", (e) => {
     state.filterQuery = e.target.value;
     renderGuestManager();
   });
-  container.querySelector("[data-filter-groupby]")?.addEventListener("change", (e) => {
-    state.groupBy = e.target.value;
-    renderGuestManager();
-  });
 
-  // ── Group toggle ──
-  container.querySelectorAll("[data-toggle-group]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const group = btn.dataset.toggleGroup;
-      const expanded = btn.getAttribute("aria-expanded") === "true";
-      btn.setAttribute("aria-expanded", !expanded);
-      btn.querySelector(".dashboard-group-arrow").textContent = expanded ? "▶" : "▼";
-      container.querySelectorAll(`.dashboard-guest-row[data-group="${group}"]`).forEach((row) => {
-        row.style.display = expanded ? "none" : "";
-      });
+  // ── Sortable headers ──
+  container.querySelectorAll("[data-sort-key]").forEach((th) => {
+    th.addEventListener("click", () => {
+      const key = th.dataset.sortKey;
+      if (state.sortKey === key) {
+        state.sortDir = state.sortDir === "asc" ? "desc" : "asc";
+      } else {
+        state.sortKey = key;
+        state.sortDir = "asc";
+      }
+      renderGuestManager();
     });
   });
 
-  // ── Inline edit: name ──
-  // The full name is split into 4 fields: firstName, middleName, lastName,
-  // maternalLastName. We split on spaces, assigning the first token to
-  // firstName, the last token to maternalLastName, and the middle tokens to
-  // middleName/lastName as best we can.
-  container.querySelectorAll("[data-inline-field='name']").forEach((input) => {
+  // ── RSVP dropdown: save the selected level (0–5) on change ──
+  container.querySelectorAll("[data-rsvp-chip]").forEach((chip) => {
+    chip.addEventListener("change", async () => {
+      const guestId = chip.dataset.rsvpChip;
+      const day = chip.dataset.rsvpDay;
+      const level = Number.parseInt(chip.value, 10);
+      const ok = await saveGuestRsvpAnswer(guestId, day, level);
+      if (ok) renderGuestManager();
+    });
+  });
+
+
+  // ── Name editor: reveal on click ──
+  container.querySelectorAll("[data-name-display]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const guestId = btn.dataset.nameDisplay;
+      const editor = container.querySelector(`[data-name-editor="${guestId}"]`);
+      if (!editor) return;
+      editor.hidden = !editor.hidden;
+      if (!editor.hidden) {
+        const first = editor.querySelector('[data-name-field="firstName"]');
+        if (first) first.focus();
+      }
+    });
+  });
+
+  // ── Name editor: save each field on change ──
+  container.querySelectorAll("[data-name-field]").forEach((input) => {
     input.addEventListener("change", async () => {
       const guestId = input.dataset.guestId;
-      const parts = input.value.trim().split(/\s+/).filter(Boolean);
-      if (parts.length === 0) return;
-      const firstName = parts[0];
-      const maternalLastName = parts.length > 1 ? parts[parts.length - 1] : "";
-      const middle = parts.slice(1, parts.length - 1);
-      const middleName = middle[0] || "";
-      const lastName = middle[1] || "";
-      const ok1 = await saveGuestInline(guestId, "firstName", firstName);
-      const ok2 = await saveGuestInline(guestId, "middleName", middleName);
-      const ok3 = await saveGuestInline(guestId, "lastName", lastName);
-      const ok4 = await saveGuestInline(guestId, "maternalLastName", maternalLastName);
-      if (ok1 && ok2 && ok3 && ok4) {
-        input.style.borderColor = "#4caf50";
-        setTimeout(() => (input.style.borderColor = ""), 1000);
-      } else {
-        input.style.borderColor = "#a0352c";
+      const field = input.dataset.nameField;
+      const ok = await saveGuestInline(guestId, field, input.value.trim());
+      input.style.borderColor = ok ? "#4caf50" : "#a0352c";
+      setTimeout(() => (input.style.borderColor = ""), 1000);
+    });
+  });
+
+  // ── Name editor: done button ──
+  container.querySelectorAll("[data-name-done]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const guestId = btn.dataset.nameDone;
+      const editor = container.querySelector(`[data-name-editor="${guestId}"]`);
+      const display = container.querySelector(`[data-name-display="${guestId}"]`);
+      if (editor) editor.hidden = true;
+      if (display) {
+        const guest = getGuest(guestId);
+        if (guest) display.textContent = guestFullName(guest) || "—";
       }
     });
   });
-
-
-  // ── Inline edit: group (invitationGroup) ──
-  // NOTE: The internal `group` field is static data from the sheet and cannot
-  // be edited from the dashboard. This select edits `invitationGroup` (the
-  // display group shown on the invitation), which IS in the agreed schema.
-  container.querySelectorAll("[data-inline-field='group']").forEach((select) => {
-    select.addEventListener("change", async () => {
-      const value = select.value;
-      // If user selected the "create new group" option
-      if (value === "__create_group__") {
-        openCreateGroupModal((newGroupName) => {
-          // After group is created, assign this guest to the new invitation group
-          const guestId = select.dataset.guestId;
-          saveGuestInline(guestId, "invitationGroup", newGroupName).then((ok) => {
-            if (ok) {
-              select.value = newGroupName;
-              select.style.borderColor = "#4caf50";
-              setTimeout(() => (select.style.borderColor = ""), 1000);
-            }
-          });
-        });
-        return;
-      }
-      const guestId = select.dataset.guestId;
-      const ok = await saveGuestInline(guestId, "invitationGroup", select.value);
-      if (ok) {
-        select.style.borderColor = "#4caf50";
-        setTimeout(() => (select.style.borderColor = ""), 1000);
-      } else {
-        select.style.borderColor = "#a0352c";
-      }
-    });
-  });
-
-  // ── Inline edit: unit (cabin) — READ-ONLY ──
-  // Cabin assignment is static data from the sheet. It cannot be edited from
-  // the dashboard to keep the schema clean. Use the Google Sheet instead.
-  container.querySelectorAll("[data-inline-field='unit']").forEach((select) => {
-    select.addEventListener("change", () => {
-      // Revert the change — cabin is static data from the sheet
-      const guest = getGuest(select.dataset.guestId);
-      if (guest) select.value = guest.unit || "";
-      select.style.borderColor = "#a0352c";
-      setTimeout(() => (select.style.borderColor = ""), 1500);
-      alert("La asignación de cabaña se edita en la hoja de cálculo, no aquí.");
-    });
-  });
-
-  // ── Inline edit: room (cuarto) — READ-ONLY ──
-  // Room assignment is static data from the sheet. It cannot be edited from
-  // the dashboard to keep the schema clean. Use the Google Sheet instead.
-  container.querySelectorAll("[data-inline-field='room']").forEach((input) => {
-    input.addEventListener("change", () => {
-      // Revert the change — room is static data from the sheet
-      const guest = getGuest(input.dataset.guestId);
-      if (guest) input.value = guest.room || "";
-      input.style.borderColor = "#a0352c";
-      setTimeout(() => (input.style.borderColor = ""), 1500);
-      alert("El cuarto se edita en la hoja de cálculo, no aquí.");
-    });
-  });
-
 
   // ── Edit guest (modal) ──
   container.querySelectorAll("[data-edit-guest]").forEach((btn) => {
@@ -1116,6 +1423,18 @@ function renderGuestManager() {
       if (guest) openGuestEditor(guest);
     });
   });
+
+  // ── Edit photo (avatar badge) → opens the guest editor modal ──
+  // The 📷 badge on the avatar corner opens the same editor modal, which
+  // already contains the photo upload section (preview + "Subir foto" button).
+  container.querySelectorAll("[data-edit-photo]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const guestId = btn.dataset.editPhoto;
+      const guest = getGuest(guestId);
+      if (guest) openGuestEditor(guest);
+    });
+  });
+
 
   // ── Copy link ──
   container.querySelectorAll("[data-copy-link]").forEach((btn) => {
@@ -1147,6 +1466,7 @@ function renderGuestManager() {
     });
   });
 }
+
 
 // ── Cabin Assignments ──────────────────────────────────────────────────
 
@@ -1346,18 +1666,20 @@ function updateDashboardData() {
 
   const summary = document.querySelector("[data-dashboard-summary]");
   if (summary) {
+    // FRIDAY / SATURDAY / SUNDAY attendance comes from the LIVE `guests`
+    // collection (`rsvp.answers` scale ≥ RSVP_CONFIRMED_MIN_LEVEL), not the
+    // legacy `rsvp_submissions` collection.
+    const dayCounts = computeDayConfirmations();
     summary.replaceChildren(
-      summaryCard(
-        "Confirmaciones",
-        state.rsvps.length,
-        `${attending.length} respuestas afirmativas`,
-      ),
-      summaryCard("Personas", attendees, "En respuestas confirmadas"),
+      summaryCard("Viernes", dayCounts.friday, "Confirmados (nivel ≥ 4)"),
+      summaryCard("Sábado", dayCounts.saturday, "Confirmados (nivel ≥ 4)"),
+      summaryCard("Domingo", dayCounts.sunday, "Confirmados (nivel ≥ 4)"),
       summaryCard("Alojamiento", lodging.length, "Grupos interesados en cabañas"),
       summaryCard("Viajes", travelers.length, "Reservados o en preparación"),
       summaryCard("Petanca 🎱", petanque.length, `${petanquePeople} personas`),
     );
   }
+
 
   renderCollection(
     document.querySelector('[data-records="rsvps"]'),
@@ -1396,29 +1718,40 @@ const DASHBOARD_QUERY_LIMIT = 1000;
 
 async function loadDashboardData() {
   showMessage("Actualizando respuestas…", "working");
+  // Only load collections that still exist in `firestore-paths.js`. The legacy
+  // `rsvp_submissions` / `experience_suggestions` / `coast_interest` /
+  // `petanque_participation` collections were removed from the app (answers now
+  // live on the `guests` doc), so their path constants are undefined and must
+  // be skipped — otherwise `collection(db, undefined)` throws and the whole
+  // dashboard fails to load.
   const entries = await Promise.all(
-    Object.entries(COLLECTIONS).map(async ([key, collectionName]) => {
-      const snapshot = await getDocs(
-        query(collection(db, collectionName), limit(DASHBOARD_QUERY_LIMIT)),
-      );
-      const records = snapshot.docs.map((item) => ({
-        id: item.id,
-        ...item.data(),
-      }));
-      records.sort((a, b) => {
-        const aTime = a.createdAt?.toMillis?.() || 0;
-        const bTime = b.createdAt?.toMillis?.() || 0;
-        return bTime - aTime;
-      });
-      return [key, records];
-    }),
+    Object.entries(COLLECTIONS)
+      .filter(([, collectionName]) => Boolean(collectionName))
+      .map(async ([key, collectionName]) => {
+        const snapshot = await getDocs(
+          query(collection(db, collectionName), limit(DASHBOARD_QUERY_LIMIT)),
+        );
+        const records = snapshot.docs.map((item) => ({
+          id: item.id,
+          ...item.data(),
+        }));
+        records.sort((a, b) => {
+          const aTime = a.createdAt?.toMillis?.() || 0;
+          const bTime = b.createdAt?.toMillis?.() || 0;
+          return bTime - aTime;
+        });
+        return [key, records];
+      }),
   );
   entries.forEach(([key, records]) => {
     state[key] = records;
   });
+
   updateDashboardData();
   showMessage(`Actualizado a las ${new Date().toLocaleTimeString("es-MX")}`);
+
 }
+
 
 
 function showLoadError(error) {
@@ -1776,6 +2109,9 @@ export function startDashboard(app) {
     (snapshot) => {
       const records = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
       setLiveGuests(records);
+      // Keep the raw records too — the INVITADOS table reads live `rsvp.answers`
+      // and `hosting` (incl. xtraCabin/xtraRoom) straight from these.
+      state.liveGuests = records;
       console.log("[dashboard:auth] guests listener fired", {
         count: records.length,
         sample: records.slice(0, 3).map((r) => ({
@@ -1797,7 +2133,33 @@ export function startDashboard(app) {
       if (currentUser) renderAccessDenied(app);
     },
   );
+
+  // ── LIVE Firebase Auth user list ──
+  // Firebase Auth has NO client-side API to list all users — only the Admin SDK
+  // can do that, and it runs server-side. Instead of keeping a stale `auth_users`
+  // mirror collection (which required a manual sync script), we call the
+  // `listAuthUsers` Cloud Function on demand to get the authoritative, always
+  // current list of auth accounts (uid + email). No static config, no mirror,
+  // no sync. The function is admin-only, so it only succeeds for David/Aydé.
+  const functions = getFunctions();
+  const listAuthUsers = httpsCallable(functions, "listAuthUsers");
+  listAuthUsers()
+    .then((result) => {
+      const users = result.data?.users || [];
+      state.authUsers = Object.fromEntries(
+        users.map((u) => [u.uid, { id: u.uid, email: u.email }]),
+      );
+      console.log("[dashboard:auth] listAuthUsers loaded", { count: users.length });
+      renderGuestManager();
+    })
+    .catch((error) => {
+      console.error("[dashboard:auth] listAuthUsers failed", error);
+    });
+
+
 }
+
+
 
 
 

@@ -412,7 +412,31 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   confirmed, pending = no answers), NOT the legacy `rsvp_submissions`. When
   adding a column, update the `<thead>`, the row template, and the group-header
   `colspan` (currently 12).
+  The avatar is wrapped in `.dashboard-avatar-wrap` with three corner badges:
+  top-left = ID check (`idCheckUser`): a 🔒 LOCK on a green chip when verified,
+  or an EMPTY hollow chip (no lock icon) when not; top-right = a 📷 button
+  (`data-edit-photo`) that opens the guest editor modal (photo upload section);
+  bottom-right = auth (`state.authUsers[guest.id]`): 🔑 on green when the guest
+  has a Firebase Auth account, ❌ on red when they don't. The ID check and auth
+  are NOT standalone columns — they live as badges on the avatar.
+
+- **Dashboard edit modal can upload a guest avatar to Cloudinary** — the
+  "✏️ Editar" modal (`openGuestEditor` in `dashboard.js`) has a photo section
+  with a preview thumbnail, a "📷 Subir foto" file input, and a text input for
+  pasting a Cloudinary ID manually. Picking a file calls
+  `uploadAvatarToCloudinary(file)` (an inline helper in `dashboard.js` that
+  mirrors the invitation's `uploadAvatar`): it POSTs to
+  `https://api.cloudinary.com/v1_1/k2ajcgxv/image/upload` with the unsigned
+  preset `boda_avatars_unsigned` (overridable via
+  `VITE_CLOUDINARY_UPLOAD_PRESET`) and folder `boda/avatars`, then fills the
+  `identityCloudinaryId` input and refreshes the preview. On save, the public
+  id is written to BOTH `identity.cloudinaryId` and top-level `cloudinaryId`
+  via `buildDashboardGuestEditPayload` — the same field the invitation reads.
+  The upload runs client-side (no Cloud Function), so it requires the unsigned
+  preset to be enabled in the Cloudinary dashboard. Styles live in
+  `_guests.scss` (`.dashboard-avatar-upload*`).
 - **Dashboard cabin matching reads `cabin`/`xtraCabin` (mirrors the front-end)** —
+
   the "Asignación de cabañas" panel (`renderCabinAssignments` in
   `web/dashboard/src/dashboard.js`) groups guests by the active period's cabin
   field, reading ONLY the LIVE `hosting` map. For the primary period
@@ -471,7 +495,20 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   `web/shared/firestore-paths.js` but nothing reads them from the dashboard.
   If you still see `[firebase:load.collection] {collection: 'rsvp_submissions'…}`
   logs in the console, it's a stale cached build — hard-refresh.
+- **`loadDashboardData` skips undefined legacy collection names** — the
+  dashboard's `COLLECTIONS` map still lists `rsvps`/`suggestions`/`coast`/
+  `petanque` keys, but their path constants (`collections.rsvpSubmissions` etc.)
+  were removed from `web/shared/firestore-paths.js`, so those values are
+  `undefined`. `loadDashboardData()` therefore filters out entries whose
+  collection name is falsy before calling `collection(db, name)` — otherwise
+  `collection(db, undefined)` throws and the whole dashboard fails to load
+  (summary cards, RSVP/suggestions/coast/petanque tabs all stay empty). The
+  summary cards for FRIDAY / SATURDAY / SUNDAY now come from
+  `computeDayConfirmations()` (live `rsvp.answers` scale ≥ 4), not the legacy
+  `rsvps` collection. When re-adding a legacy collection, restore its path
+  constant AND remove the falsy filter.
 - **Dashboard cabin drag-and-drop reassignment writes `hosting`** — the
+
   "Asignación de cabañas" panel supports drag-and-drop: each guest row is
   `draggable` (`data-guest-id`) and each room block is a drop target
   (`data-room-id` + `data-cabin-unit`). Dropping a guest persists the new
@@ -538,20 +575,25 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   replaces the old pill/rounded look (999px chips, 50% RSVP dots, 1.25rem+
   radii). When adding new dashboard UI, keep radii small and padding generous
   to match. Chips/badges use `0.35rem` radius, not `999px`.
-- **Dashboard INVITADOS table shows phone + an auth badge on avatars** — the
-  guest table renders a "Teléfono" column (between Grupo and Cabaña) from the
-  merged guest's `phone` (live `identity.phone` wins, then the live record's
-  own `phone`; see `getMergedGuest` in `dashboard.js` and `normalizeGuest` in
-  `guests.js`). The phone renders as a `tel:` link (`.dashboard-phone`) or a
-  muted "—" when empty. Each avatar is wrapped in `.dashboard-avatar-wrap` and
-  gets a small green "✓" badge (`.dashboard-auth-badge`) when the guest has a
-  Firebase Auth account and has logged in at least once. That set is derived
-  from the `login_events` collection (doc id = guest id), which the dashboard
-  loads via `COLLECTIONS.loginEvents` and stores in `state.loggedInGuestIds`
-  (a `Set` rebuilt in `loadDashboardData`). The Firestore rules already allow
-  admins to read `login_events` (`allow read: if isAdmin()`), and the dashboard
-  is admin-only, so the read always succeeds. When adding a new column, update
-  `GUEST_COLUMNS`, `guestSortValue`, the `<thead>`, and the row template.
+- **Dashboard INVITADOS table shows phone + auth email inside the identity cell** —
+  the guest table's "Identidad" cell (`identityCell` in `dashboard.js`) renders
+  the avatar, the name (inline editor), and a mini meta row with the guest ID
+  and the phone (live `identity.phone` wins, then the live record's own `phone`;
+  see `getMergedGuest` and `normalizeGuest` in `guests.js`). The phone renders
+  as a `tel:` link (`.dashboard-phone`) or a muted "—" when empty. When the
+  guest has a Firebase Auth account, a second mini meta row shows the auth email
+  (`.dashboard-auth-email`), and the avatar gets a small green "✓" badge
+  (`.dashboard-auth-badge`). There is NO dedicated "Auth" column — the auth
+  email lives inside the identity cell. The auth set is derived from the LIVE
+  Firebase Auth user list, fetched on demand via the `listAuthUsers` Cloud
+  Function (a callable in `functions/index.js` that uses the Admin SDK
+  `auth.listUsers()` and is admin-only). The dashboard calls it in
+  `startDashboard` and stores the result in `state.authUsers` (a map of
+  `uid → { email }`). There is NO `auth_users` mirror collection and NO
+  `login_events`-based auth set anymore — the callable is the authoritative,
+  always-current source. When adding a new column, update `GUEST_COLUMNS`,
+  `guestSortValue`, the `<thead>`, and the row template.
+
 - **Dashboard tables panel is a real-life 30m × 6m seating canvas** — the
   "Mesas" panel lives in `web/dashboard/src/tables.js` (imported by
   `dashboard.js` as `loadTables` + `renderTablesManager`; styles in
