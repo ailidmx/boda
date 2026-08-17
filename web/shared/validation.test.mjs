@@ -37,52 +37,57 @@ test("validateGuestContactPayload: rejects missing required fields", () => {
   assert.ok(result.errors.some((e) => e.includes("missing required fields")));
 });
 
-test("validateGuestContactPayload: rejects sheet-synced fields being modified", () => {
+test("validateGuestContactPayload: rejects protected fields being modified", () => {
   const result = validateGuestContactPayload({
     guestId: "catherine",
-    isAdmin: true, // sheet-synced, not writable
+    isAdmin: true, // protected (privilege-granting), not writable
     invitationGroup: "Familia de David",
     updatedBy: "david_aili",
     updatedAt: "2026-08-04T00:00:00Z",
   });
   assert.equal(result.valid, false);
-  assert.ok(result.errors.some((e) => e.includes("sheet-synced")));
+  assert.ok(result.errors.some((e) => e.includes("protected fields")));
 });
 
-test("validateGuestContactPayload: rejects unknown fields", () => {
+test("validateGuestContactPayload: rejects hosting being modified", () => {
   const result = validateGuestContactPayload({
     guestId: "catherine",
-    email: "catherine@example.com", // not in the allowed schema
+    hosting: { cabin: "CABAÑA 1", room: "CABAÑA 1-1" }, // admin-managed
     invitationGroup: "Familia de David",
     updatedBy: "david_aili",
     updatedAt: "2026-08-04T00:00:00Z",
   });
   assert.equal(result.valid, false);
-  assert.ok(result.errors.some((e) => e.includes("not in the allowed schema")));
+  assert.ok(result.errors.some((e) => e.includes("protected fields")));
 });
 
-test("validateGuestContactPayload: rejects non-boolean idCheckUser", () => {
+test("validateGuestContactPayload: accepts a NEW unknown field (blacklist)", () => {
+  // The guests write rule is a BLACKLIST: any field not in the protected list
+  // may be written freely, so adding a new guest-writable field needs no
+  // change to the validator or the rules.
   const result = validateGuestContactPayload({
     guestId: "catherine",
-    idCheckUser: "yes", // should be boolean
+    email: "catherine@example.com", // not in the old whitelist, now allowed
     invitationGroup: "Familia de David",
     updatedBy: "david_aili",
     updatedAt: "2026-08-04T00:00:00Z",
   });
-  assert.equal(result.valid, false);
-  assert.ok(result.errors.some((e) => e.includes("idCheckUser")));
+  assert.equal(result.valid, true);
+  assert.deepEqual(result.errors, []);
 });
 
-test("validateGuestContactPayload: rejects unsupported identity fields", () => {
+test("validateGuestContactPayload: accepts arbitrary identity sub-fields", () => {
+  // identity is only required to be a map; its internal structure is no longer
+  // enumerated (validated client-side by the app, not by the rules).
   const result = validateGuestContactPayload({
     guestId: "catherine",
-    identity: { nickname: "Kiki" },
+    identity: { nickname: "Kiki", phone: "+33 6 12 34 56 78" },
     invitationGroup: "Familia de David",
     updatedBy: "david_aili",
     updatedAt: "2026-08-04T00:00:00Z",
   });
-  assert.equal(result.valid, false);
-  assert.ok(result.errors.some((e) => e.includes("identity contains unsupported fields")));
+  assert.equal(result.valid, true);
+  assert.deepEqual(result.errors, []);
 });
 
 test("validateGuestContactPayload: rejects non-object payload", () => {
@@ -91,7 +96,8 @@ test("validateGuestContactPayload: rejects non-object payload", () => {
   assert.ok(result.errors.some((e) => e.includes("must be an object")));
 });
 
-test("validateGuestContactPayload: accepts _deleted boolean", () => {
+test("validateGuestContactPayload: rejects _deleted (protected)", () => {
+  // _deleted is a protected (admin-managed) field, so guests may never write it.
   const result = validateGuestContactPayload({
     guestId: "catherine",
     _deleted: true,
@@ -99,19 +105,20 @@ test("validateGuestContactPayload: accepts _deleted boolean", () => {
     updatedBy: "david_aili",
     updatedAt: "2026-08-04T00:00:00Z",
   });
-  assert.equal(result.valid, true);
+  assert.equal(result.valid, false);
+  assert.ok(result.errors.some((e) => e.includes("protected fields")));
 });
 
-test("validateGuestContactPayload: rejects _deleted non-boolean", () => {
+test("validateGuestContactPayload: rejects non-map identity", () => {
   const result = validateGuestContactPayload({
     guestId: "catherine",
-    _deleted: "yes", // should be boolean
+    identity: "not-a-map",
     invitationGroup: "Familia de David",
     updatedBy: "david_aili",
     updatedAt: "2026-08-04T00:00:00Z",
   });
   assert.equal(result.valid, false);
-  assert.ok(result.errors.some((e) => e.includes("_deleted")));
+  assert.ok(result.errors.some((e) => e.includes("identity must be an object")));
 });
 
 // ── validateAttendancePayload ───────────────────────────────────────────

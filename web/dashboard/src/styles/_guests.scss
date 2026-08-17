@@ -344,6 +344,130 @@
   color: $ink-muted;
 }
 
+// ── Avatar wrapper + corner badges ──
+// The avatar cell wraps the image in a relative container so small badges can
+// sit on the corners:
+//   - top-left:    ID check (🔒 locked when verified, 🔓 unlocked when not)
+//   - top-right:   edit photo (📷 button that opens the guest editor modal)
+//   - bottom-right: auth (🔑 login emoji when the guest has a Firebase Auth
+//                   account, ❌ red cross when they don't)
+.dashboard-avatar-wrap {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+// Base badge: a small circular chip anchored to a corner of the avatar.
+.dashboard-avatar-badge {
+  position: absolute;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.05rem;
+  height: 1.05rem;
+  border-radius: 50%;
+  background: $card-bg;
+  border: 2px solid $card-bg;
+  font-size: 0.6rem;
+  line-height: 1;
+  padding: 0;
+  cursor: default;
+}
+
+// Top-left: ID check. When verified it shows a 🔒 LOCK on a green chip; when
+// NOT verified it shows an empty (hollow) chip — no lock icon at all.
+.dashboard-avatar-badge--idcheck {
+  top: -0.15rem;
+  left: -0.15rem;
+}
+.dashboard-avatar-badge--idcheck.is-locked {
+  background: $status-yes-bg;
+}
+.dashboard-avatar-badge--idcheck.is-unlocked {
+  background: transparent;
+  border-color: rgba(85, 69, 45, 0.35);
+}
+
+
+// Top-right: edit photo (📷). It's a real button so it opens the editor modal.
+.dashboard-avatar-badge--edit {
+  top: -0.15rem;
+  right: -0.15rem;
+  cursor: pointer;
+  background: $card-bg;
+  transition: transform 0.12s ease;
+}
+.dashboard-avatar-badge--edit:hover {
+  transform: scale(1.15);
+}
+
+// Bottom-right: auth (🔑 / ❌).
+.dashboard-avatar-badge--auth {
+  right: -0.15rem;
+  bottom: -0.15rem;
+}
+.dashboard-avatar-badge--auth.is-auth {
+  background: $status-yes-bg;
+}
+.dashboard-avatar-badge--auth.is-noauth {
+  background: $status-no-bg;
+}
+
+// Backward-compatible alias for the auth badge (bottom-right).
+.dashboard-auth-badge {
+  position: absolute;
+  right: -0.15rem;
+  bottom: -0.15rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.05rem;
+  height: 1.05rem;
+  border-radius: 50%;
+  background: $status-yes-bg;
+  color: $status-yes-text;
+  border: 2px solid $card-bg;
+  font-size: 0.6rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+
+// ── Phone column ──
+.dashboard-td-phone {
+  white-space: nowrap;
+}
+
+.dashboard-phone {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: $accent;
+  text-decoration: none;
+  font-variant-numeric: tabular-nums;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+// International flag + masked number inside the phone link.
+.dashboard-phone-flag {
+  font-size: 0.95rem;
+  line-height: 1;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15));
+}
+
+.dashboard-phone-number {
+  white-space: nowrap;
+}
+
+
+.dashboard-muted {
+  color: $ink-muted;
+}
+
+
 // ── Guest ID under the name ──
 .dashboard-guest-id {
   display: block;
@@ -371,7 +495,10 @@
 }
 
 
-// ── RSVP attendance day chips (Vie / Sáb / Dom) ──
+// ── RSVP attendance day dropdowns (Vie / Sáb / Dom) ──
+// Each cell holds a compact <select> with options 0–5. The select's background
+// reflects the current level: gray = 0 (no answer), amber = 1–3, green = 4–5.
+// The stored value stays an int 0–5.
 .dashboard-th-day,
 .dashboard-td-day {
   width: 2.6rem;
@@ -379,17 +506,25 @@
 }
 
 .dashboard-rsvp-chip {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.7rem;
-  height: 1.7rem;
+  display: inline-block;
+  width: 3.4rem;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid rgba(85, 69, 45, 0.2);
   border-radius: 0.35rem;
   font-size: 0.75rem;
   font-weight: 700;
   line-height: 1;
   vertical-align: middle;
+  cursor: pointer;
+  appearance: auto;
+  color: $ink;
 
+  // The dropdown list (options) must stay readable regardless of the select's
+  // colored background, so force a light background + dark text on the popup.
+  option {
+    background: $card-bg;
+    color: $ink;
+  }
 
   &.is-none {
     background: rgba(85, 69, 45, 0.08);
@@ -406,4 +541,292 @@
     color: $status-yes-text;
   }
 }
+
+
+// ── Avatar column (first column) ──
+.dashboard-avatar-th,
+.dashboard-avatar-cell {
+  width: 3.2rem;
+  text-align: center;
+}
+
+// Initials fallback when a guest has no photo.
+.dashboard-avatar-initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 50%;
+  background: rgba(138, 106, 54, 0.14);
+  color: $accent;
+  font-size: 0.8rem;
+  font-weight: 700;
+  border: 2px solid rgba(85, 69, 45, 0.15);
+  vertical-align: middle;
+}
+
+// ── Sortable column headers ──
+.dashboard-sortable {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s;
+
+  &:hover {
+    color: $accent;
+  }
+}
+
+.dashboard-sort-active {
+  color: $accent;
+}
+
+// ── Identity cell: avatar + name (inline editor) + ID + phone ──
+.dashboard-identity-cell {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  min-width: 16rem;
+}
+
+.dashboard-identity-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.dashboard-identity-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  color: $ink-muted;
+
+  code {
+    max-width: 12rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.dashboard-identity-sep {
+  color: rgba(85, 69, 45, 0.35);
+}
+
+// ── Name cell: read-only display + 4-input editor ──
+.dashboard-name-cell {
+  min-width: 14rem;
+}
+
+
+.dashboard-name-display {
+  display: inline-block;
+  padding: 0.3rem 0.4rem;
+  border: 1px solid transparent;
+  border-radius: 0.35rem;
+  background: transparent;
+  font: inherit;
+  font-size: 0.85rem;
+  color: $ink;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: $border-strong;
+    background: rgba(255, 253, 249, 0.6);
+    color: $accent;
+  }
+}
+
+.dashboard-name-editor {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.3rem;
+  margin-top: 0.35rem;
+  padding: 0.5rem;
+  border: 1px solid $border-strong;
+  border-radius: 0.4rem;
+  background: rgba(255, 253, 249, 0.7);
+
+  // The `hidden` attribute must win over `display: grid` so the editor stays
+  // collapsed until the user clicks the name (view mode → edit mode).
+  &[hidden] {
+    display: none;
+  }
+
+  .dashboard-inline-input {
+    min-width: 0;
+  }
+
+  .dashboard-link-btn {
+    grid-column: 1 / -1;
+    justify-self: end;
+    font-size: 1.1rem;
+  }
+}
+
+
+// ── Group nav bar (flat chips above the table) ──
+.dashboard-group-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.dashboard-group-nav-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid $border-strong;
+  border-radius: 0.4rem;
+  background: $card-bg;
+  color: $ink;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+
+  &:hover {
+    border-color: $accent;
+    background: rgba(138, 106, 54, 0.08);
+  }
+
+  &.dashboard-group-nav-chip-active {
+    background: $accent;
+    border-color: $accent;
+    color: $white;
+  }
+}
+
+// ── RSVP scale dropdowns (Vie / Sáb / Dom) ──
+// The select already has its own border/background from the base
+// `.dashboard-rsvp-chip` rule above; only the level-specific colors are set
+// here. No hover transform (a native <select> shouldn't scale).
+.dashboard-rsvp-chip-empty {
+  background: rgba(85, 69, 45, 0.08);
+  color: $ink-muted;
+}
+
+.dashboard-rsvp-chip-partial {
+  background: $status-maybe-bg;
+  color: $status-maybe-text;
+}
+
+.dashboard-rsvp-chip-confirmed {
+  background: $status-yes-bg;
+  color: $status-yes-text;
+}
+
+// ── RSVP scale legend (above the guest table) ──
+// Explains the 0–5 attendance scale: 0 = no answer, 1–3 = partial, 4–5 =
+// confirmed. The chips are read-only samples (not interactive selects).
+.dashboard-rsvp-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid $border-light;
+  border-radius: 0.4rem;
+  background: rgba(255, 253, 249, 0.6);
+  font-size: 0.75rem;
+  color: $ink-muted;
+}
+
+.dashboard-rsvp-legend-title {
+  font-weight: 600;
+  color: $ink;
+}
+
+.dashboard-rsvp-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  white-space: nowrap;
+
+  .dashboard-rsvp-chip {
+    width: auto;
+    min-width: 1.7rem;
+    padding: 0.2rem 0.4rem;
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
+
+// ── Muted badge (empty phone / no value) ──
+.dashboard-badge-muted {
+  background: rgba(85, 69, 45, 0.08);
+  color: $ink-muted;
+}
+
+// ── Auth email cell (Firebase Auth account email) ──
+.dashboard-auth-email {
+  display: inline-block;
+  max-width: 14rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  vertical-align: middle;
+  font-size: 0.78rem;
+  color: $ink;
+}
+
+// ── Avatar upload (edit modal) ──
+// Preview thumbnail + "Subir foto" button + status line. The admin picks an
+// image, it's uploaded to Cloudinary (boda/avatars), and the returned public
+// id fills the hidden text input below.
+.dashboard-avatar-upload {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.dashboard-avatar-upload-preview {
+  flex: 0 0 auto;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgba(85, 69, 45, 0.08);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(85, 69, 45, 0.15);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+}
+
+.dashboard-avatar-upload-placeholder {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: $ink-muted;
+}
+
+.dashboard-avatar-upload-controls {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.dashboard-avatar-upload-btn {
+  display: inline-block;
+  cursor: pointer;
+  margin: 0;
+}
+
+
+
+
 

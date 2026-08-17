@@ -1,0 +1,311 @@
+[
+  {
+    "id": "38 tonnes #1",
+    "data": {
+      "id": "38 tonnes #1",
+      "name": "38 tonnes #1",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 2,
+      "y": 2,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "38 tonnes #2",
+    "data": {
+      "id": "38 tonnes #2",
+      "name": "38 tonnes #2",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 16,
+      "y": 2,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Amigas de Aydé",
+    "data": {
+      "id": "Amigas de Aydé",
+      "name": "Amigas de Aydé",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 30,
+      "y": 2,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Amigos David #1",
+    "data": {
+      "id": "Amigos David #1",
+      "name": "Amigos David #1",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 44,
+      "y": 2,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Amigos David #2",
+    "data": {
+      "id": "Amigos David #2",
+      "name": "Amigos David #2",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 2,
+      "y": 14,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Cercanos Aydé",
+    "data": {
+      "id": "Cercanos Aydé",
+      "name": "Cercanos Aydé",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 16,
+      "y": 14,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Golden #1",
+    "data": {
+      "id": "Golden #1",
+      "name": "Golden #1",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 30,
+      "y": 14,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Golden #2",
+    "data": {
+      "id": "Golden #2",
+      "name": "Golden #2",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 44,
+      "y": 14,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Mesa #1",
+    "data": {
+      "id": "Mesa #1",
+      "name": "Mesa #1",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 30,
+      "y": 50,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Mesa #2",
+    "data": {
+      "id": "Mesa #2",
+      "name": "Mesa #2",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 44,
+      "y": 50,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Mesa #3",
+    "data": {
+      "id": "Mesa #3",
+      "name": "Mesa #3",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 2,
+      "y": 62,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Mesa #4",
+    "data": {
+      "id": "Mesa #4",
+      "name": "Mesa #4",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 16,
+      "y": 62,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Mesa #5",
+    "data": {
+      "id": "Mesa #5",
+      "name": "Mesa #5",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 30,
+      "y": 62,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Mika",
+    "data": {
+      "id": "Mika",
+      "name": "Mika",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 2,
+      "y": 26,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Niños #1",
+    "data": {
+      "id": "Niños #1",
+      "name": "Niños #1",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 16,
+      "y": 26,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Niños #2",
+    "data": {
+      "id": "Niños #2",
+      "name": "Niños #2",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 30,
+      "y": 26,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Novios",
+    "data": {
+      "id": "Novios",
+      "name": "Novios",
+      "capacity": 22,
+      "shape": "round",
+      "slots": {},
+      "x": 44,
+      "y": 26,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Petanclub #1",
+    "data": {
+      "id": "Petanclub #1",
+      "name": "Petanclub #1",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 2,
+      "y": 38,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Petanclub #2",
+    "data": {
+      "id": "Petanclub #2",
+      "name": "Petanclub #2",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 16,
+      "y": 38,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Petanclub #3",
+    "data": {
+      "id": "Petanclub #3",
+      "name": "Petanclub #3",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 30,
+      "y": 38,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Petanclub #4",
+    "data": {
+      "id": "Petanclub #4",
+      "name": "Petanclub #4",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 44,
+      "y": 38,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Pintura #1",
+    "data": {
+      "id": "Pintura #1",
+      "name": "Pintura #1",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 2,
+      "y": 50,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Pintura #2",
+    "data": {
+      "id": "Pintura #2",
+      "name": "Pintura #2",
+      "capacity": 10,
+      "shape": "round",
+      "slots": {},
+      "x": 16,
+      "y": 50,
+      "guestIds": []
+    }
+  },
+  {
+    "id": "Sin Mesa",
+    "data": {
+      "id": "Sin Mesa",
+      "name": "Sin Mesa",
+      "capacity": null,
+      "_source": "mesas.csv",
+      "_migratedAt": "2026-08-03T15:31:44.692Z"
+    }
+  }
+]
