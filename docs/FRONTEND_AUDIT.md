@@ -500,6 +500,33 @@ The three feature folders now live under `web/invitation/src/features/` and are 
 via their public `index.js` barrel. The old `components/nav/`, `components/identity/`, and
 `components/coast/` folders were removed. See ADR-0015.
 
+### F5 progress — normalize forms (evaluated, deferred)
+
+Phase F5 ("Normalize forms") proposed a shared form pattern (labels, errors, submitting
+state) — e.g. a `FormField` / `FormStatus` primitive — to replace the hand-rolled forms in
+`IdentityModal.jsx`, `RSVP.jsx`, `AuthGate.jsx` (invitation) and `guestEditorModal.js`,
+`guestModals.js` (dashboard). A full inventory of both apps was performed and the phase
+was **intentionally deferred** — there is no genuine cross-form reuse that justifies a
+primitive without either changing appearance or being a thin pass-through wrapper:
+
+- **Invitation** — the forms are structurally very different: `AuthGate.jsx` is a
+  single-column login form (`.password-field`, `.gate-disclosure`, `data-access-status`),
+  `IdentityModal.jsx`/`MemberCard.jsx` is a 5-step flip wizard (`.form-field`, one field
+  per step, `noValidate`, no per-field errors), and `RSVP.jsx`/`TeAnimas.jsx`/
+  `Accommodation.jsx`/`Coast.jsx` are mini-RSVP flows that ALREADY share the
+  `data-form-status` CSS convention in `base.css` (driven by a `saveStatus` state:
+  working/saved/error). The only shared convention is `data-form-status`, which is already
+  a shared CSS convention and needs no new primitive.
+- **Dashboard** — the `.dashboard-modal-field` + status-`<small>` (`data-state`
+  working/success/error) pattern IS shared across `guestEditorModal.js` and
+  `guestModals.js`, but the dashboard is a separate app (per ADR-0014) and builds its
+  modals via DOM (`document.createElement` + `innerHTML`), not React — so a React
+  `FormField`/`FormStatus` primitive would not apply cleanly.
+
+These primitives should be introduced only when a second genuine React call site shares a
+field/status markup pattern (e.g. a new React form that duplicates the `data-form-status`
+markup). See ADR-0016.
+
 ### F10 progress — dead-code & duplication cleanup (in progress)
 
 - **Dashboard legacy-records code removed** — the dashboard no longer loads or renders
