@@ -1,8 +1,8 @@
 import React from "react";
 
 import { resolveGuestName, resolveGuestPhoto } from "../../guest-profiles.js";
-import { CabinOccupancy } from "../CabinOccupancy.jsx";
-import { StayPlanCard } from "../StayPlanCard.jsx";
+import { CabinOccupancy } from "../../components/CabinOccupancy.jsx";
+import { StayPlanCard } from "../../components/StayPlanCard.jsx";
 import { getInitials } from "./data.js";
 
 // Extra stay (Plan 1 · stay at Roca Azul, Sunday→Tuesday) — shown only when

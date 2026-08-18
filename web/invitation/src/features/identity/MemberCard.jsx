@@ -8,7 +8,7 @@ import {
   saveGuestPhoto,
 } from "../../guest-profiles.js";
 import { uploadAvatar, validateAvatarFile } from "../../cloudinary-upload.js";
-import { PhoneInput } from "../PhoneInput.jsx";
+import { PhoneInput } from "../../components/PhoneInput.jsx";
 import { Avatar } from "./Avatar.jsx";
 import { flagForPhone, formatPhone, formatDisplayEmail } from "./phone-format.js";
 

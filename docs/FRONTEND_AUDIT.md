@@ -420,7 +420,7 @@ The F7 phase decomposes the largest invitation components into feature-local
 sub-components. Each decomposition is verified with `build:all` + lint + tests and
 committed separately. No markup/classes change — appearance is preserved.
 
-- **`Coast.jsx` (~809 → ~430 lines)** — extracted into `components/coast/`:
+- **`Coast.jsx` (~809 → ~430 lines)** — extracted into `features/coast/`:
   - `ExtraStayCard.jsx` — the extra-cabin (Plan 1 · stay at Roca Azul) card: member
     tabs, cabin badge, photo carousel, `CabinOccupancy`, and the shared `StayPlanCard`.
   - `CoastSuggestions.jsx` — the Airbnb + hotel accommodation suggestions (mirrors the
@@ -458,12 +458,12 @@ committed separately. No markup/classes change — appearance is preserved.
   normalization/initialization, identifier normalization, credential validation). Wired
   into `npm test` via `test:auth-logic`.
 
-- **`Nav.jsx` (~1003 → ~252 lines)** — decomposed into `components/nav/`:
+- **`Nav.jsx` (~1003 → ~252 lines)** — decomposed into `features/nav/`:
   `SideDrawer.jsx` (desktop hamburger side drawer), `MobileNav.jsx` (mobile split
   dropdowns), `UserMenu.jsx` (user menu + language switcher), and `nav-links.js`
   (the `getNavLinks`/`trackNav` helpers). `Nav.jsx` keeps the desktop nav bar, the
   golden underline, the scroll-spy, and the scroll arrows.
-- **`IdentityModal.jsx` (~865 → ~277 lines)** — decomposed into `components/identity/`:
+- **`IdentityModal.jsx` (~865 → ~277 lines)** — decomposed into `features/identity/`:
   `MemberCard.jsx` (per-member identity card: name/photo/phone/email + save),
   `MemberTabs.jsx` (the top badge strip), `Avatar.jsx` (avatar upload/preview), and
   `phone-format.js` (pure phone formatting). `IdentityModal.jsx` keeps the modal
@@ -473,6 +473,32 @@ All F7 decompositions are now complete: `Nav.jsx`, `IdentityModal.jsx`, `Coast.j
 `guest-profiles.js`, and `AppContext.jsx` have all been split into feature-local
 sub-components / pure services. The audit's original line-count figures (~1003 / ~865 /
 ~809 / ~753 / ~647) reflect the pre-decomposition state and are now stale.
+
+### F4 progress — extract feature boundaries (in progress)
+
+Phase F4 ("Extract feature boundaries") moves feature components out of the flat
+`components/` folder into `features/<feature>/` folders, each exposing a public `index.js`
+so consumers import shallowly (`import { SideDrawer } from "../features/nav"`) instead of
+deep internal paths. This aligns the invitation with the target architecture in §3 and the
+AGENTS.md §7.3 rule ("expose each feature through a public `index.ts` and prefer shallow
+imports"). No markup/classes change — appearance is preserved.
+
+- **`features/nav/`** — the nav feature (moved from `components/nav/`): `SideDrawer.jsx`,
+  `MobileNav.jsx`, `UserMenu.jsx`, `nav-links.js`, and a public `index.js` exporting
+  `getNavLinks`, `trackNav`, `SideDrawer`, `MobileNav`, `UserMenu`. `Nav.jsx` imports from
+  `../features/nav/index.js`.
+- **`features/identity/`** — the identity feature (moved from `components/identity/`):
+  `MemberCard.jsx`, `MemberTabs.jsx`, `Avatar.jsx`, `phone-format.js`, and a public
+  `index.js` exporting `MemberCard`, `MemberTabs`. `IdentityModal.jsx` imports from
+  `../features/identity/index.js`.
+- **`features/coast/`** — the coast feature (moved from `components/coast/`):
+  `ExtraStayCard.jsx`, `CoastSuggestions.jsx`, `CoastBudget.jsx`, `data.js`, and a public
+  `index.js` exporting `ExtraStayCard`, `CoastSuggestions`, `CoastBudget`. `Coast.jsx`
+  imports from `../features/coast/index.js`.
+
+The three feature folders now live under `web/invitation/src/features/` and are consumed
+via their public `index.js` barrel. The old `components/nav/`, `components/identity/`, and
+`components/coast/` folders were removed. See ADR-0015.
 
 ### F10 progress — dead-code & duplication cleanup (in progress)
 

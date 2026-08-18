@@ -2,10 +2,13 @@ import React, { useCallback, useEffect, useRef, useState } from "react";
 
 import { useApp } from "../context/AppContext.jsx";
 import { guestTravelsByPlane } from "../guest-profiles.js";
-import { getNavLinks, trackNav } from "./nav/nav-links.js";
-import { SideDrawer } from "./nav/SideDrawer.jsx";
-import { MobileNav } from "./nav/MobileNav.jsx";
-import { UserMenu } from "./nav/UserMenu.jsx";
+import {
+  getNavLinks,
+  trackNav,
+  SideDrawer,
+  MobileNav,
+  UserMenu,
+} from "../features/nav/index.js";
 
 export function Nav() {
   const { t, profile } = useApp();

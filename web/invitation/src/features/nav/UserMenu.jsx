@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import { useApp } from "../../context/AppContext.jsx";
-import { LANGUAGE_FLAGS, LANGUAGE_FLAGS_ONLY } from "../ui.jsx";
-import { AboutModal } from "../AboutModal.jsx";
+import { LANGUAGE_FLAGS, LANGUAGE_FLAGS_ONLY } from "../../components/ui.jsx";
+import { AboutModal } from "../../components/AboutModal.jsx";
 
 import { SUPPORTED_LANGUAGES } from "../../content.js";
 import { resolveGuestName, resolveGuestPhoto } from "../../guest-profiles.js";

@@ -11,8 +11,7 @@ import { getGroupTag } from "../invitation-profile.js";
 
 import { CoupleNames } from "./ui.jsx";
 import { Dialog } from "./ui/Dialog.jsx";
-import { MemberCard } from "./identity/MemberCard.jsx";
-import { MemberTabs } from "./identity/MemberTabs.jsx";
+import { MemberCard, MemberTabs } from "../features/identity/index.js";
 
 // Identity-check modal shown after sign-in (and reopenable from the user menu).
 // The guest can confirm or correct their name, add a photo, a phone number and

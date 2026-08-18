@@ -18,9 +18,11 @@ import { getActiveGuests } from "../guests.js";
 import { computeInitialStepIndex } from "../rsvp-responses.js";
 import { Button } from "./ui/Button.jsx";
 
-import { ExtraStayCard } from "./coast/ExtraStayCard.jsx";
-import { CoastSuggestions } from "./coast/CoastSuggestions.jsx";
-import { CoastBudget } from "./coast/CoastBudget.jsx";
+import {
+  ExtraStayCard,
+  CoastSuggestions,
+  CoastBudget,
+} from "../features/coast/index.js";
 
 
 export function Coast() {
