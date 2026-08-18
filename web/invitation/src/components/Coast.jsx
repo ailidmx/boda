@@ -73,12 +73,8 @@ export function Coast() {
     return source?.hosting?.isXtraCabinPaidByNovios ?? source?.isXtraCabinPaidByNovios;
   };
 
-  const resolveXtraPaid = (member) => {
-    const source = resolveLiveGuest(member);
-    return source?.hosting?.isXtraCabinPaid ?? source?.isXtraCabinPaid;
-  };
-
   // The active member shown in the extra-stay card. Defaults to the signed-in
+
   // guest; the guest selector (member tabs) lets the user switch between the
   // members of their invitation group, mirroring the Accommodation section.
   const [activeMemberId, setActiveMemberId] = useState(null);
@@ -93,7 +89,19 @@ export function Coast() {
   const option = t.accommodation?.guestOption || {};
   const extraStay = coast.extraStay || {};
 
+  // Payment block labels for the extra stay, mirroring the final RSVP's
+  // PaymentSummary. We reuse the RSVP payment copy (per-person / per-group /
+  // cabin title) so the extra-stay pricing reads identically to the final
+  // RSVP, and the "covered by the couple" label from the accommodation option.
+  const rsvpPayment = t.rsvp?.payment || {};
+  const extraPayment = {
+    ...rsvpPayment,
+    cabinTitle: rsvpPayment.extraCabinTitle || option.onSiteTitle,
+  };
+  const extraCoveredLabel = option.payment?.covered || "";
+
   // Extra cabin display name (normalised whitespace, like the primary cabin).
+
   const extraCabinName = extraCabin?.name?.replace(/\s+/g, " ") || extraCabinId;
 
   // Photos come from the DB (Cloudinary IDs). cloudinaryIds may be an array
@@ -362,9 +370,11 @@ export function Coast() {
           getXtraCabinId={getXtraCabinId}
           getXtraRoomId={getXtraRoomId}
           resolveXtraCovered={resolveXtraCovered}
-          resolveXtraPaid={resolveXtraPaid}
           onSelectMember={setActiveMemberId}
+          payment={extraPayment}
+          coveredLabel={extraCoveredLabel}
         />
+
       )}
 
       {/* Coast accommodation suggestions — mirrors the Accommodation "no

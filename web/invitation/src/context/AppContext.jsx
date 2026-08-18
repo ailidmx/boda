@@ -32,11 +32,13 @@ import {
 } from "../invitation-profile.js";
 import {
   getGroupMembers,
+  loadAllGuests,
   loadGuestProfiles,
   loadOwnGuestProfile,
   resolveGuestInvitationGroup,
   resolveIdentityCheckPassed,
 } from "../guest-profiles.js";
+
 
 import { loadAttendanceResponses } from "../guest-attendance.js";
 import { loadRooms } from "../rooms.js";
@@ -244,10 +246,18 @@ export function AppProvider({ children }) {
         const [custom] = await Promise.all([
           loadGroupCustomContent(invitationGroup),
           loadGuestProfiles(invitationGroup),
+          // Load the FULL `guests` collection (not just the signed-in guest's
+          // own group) so guest-facing lists like the GUEST CLOUD ("Nos
+          // invités") can show every guest, not only the current group. The
+          // Firestore rules allow any authenticated guest to read the whole
+          // collection; `loadAllGuests` merges only identity/hosting fields so
+          // it never clobbers the fresher group-scoped live data.
+          loadAllGuests(),
           loadAttendanceResponses(invitationGroup),
           loadRooms(),
           loadCabins(),
         ]);
+
 
         const groupMembers = getGroupMembers(resolvedGuest, getActiveGuests());
         const hasPendingIdentityVerification = groupMembers.some((member) => {

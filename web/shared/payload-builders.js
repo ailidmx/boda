@@ -214,6 +214,29 @@ export function buildGuestRsvpPayload({ guestId, answers, editorGuestId, timesta
 
 
 /**
+ * Build a payload for confirming that a guest has paid their accommodation
+ * contribution. Stored as a top-level boolean `paymentConfirmed` on the
+ * `guests` document.
+ *
+ * @param {Object} input
+ * @param {string} input.guestId
+ * @param {boolean} input.confirmed  true = payment done
+ * @param {string} input.editorGuestId
+ * @param {*} input.timestamp
+ * @returns {Object} explicit payload for setDoc(..., { merge: true })
+ */
+export function buildGuestPaymentConfirmedPayload({ guestId, confirmed, editorGuestId, timestamp }) {
+  return {
+    guestId,
+    paymentConfirmed: confirmed === true,
+    updatedBy: String(editorGuestId ?? "").trim(),
+    updatedAt: timestamp,
+  };
+}
+
+
+
+/**
  * Normalize the return-trip (departure) details to the compact persisted shape.
  * @param {Object} departure
  * @returns {Object|null}

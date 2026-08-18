@@ -1,8 +1,10 @@
 import React from "react";
 import { getActiveGuests } from "../guests.js";
-import { resolveLiveGuest } from "../guest-profiles.js";
+import { resolveLiveGuest, resolveGuestName } from "../guest-profiles.js";
 import { getCabin } from "../cabins.js";
 import { getRoom, getRoomDescription } from "../rooms.js";
+import { Avatar } from "../features/identity/Avatar.jsx";
+
 
 const MXN_PER_EUR = 20;
 
@@ -200,6 +202,9 @@ export function PaymentSummary({
     language,
   );
 
+  // The active guest's first name, used to personalise the per-person label.
+  const { firstName: activeFirstName } = resolveGuestName(amounts.liveActive);
+
   // One "Cabin · Room" label per group member (deduplicated, in order).
   const groupLabels = [];
   groupMembers.forEach((member) => {
@@ -217,7 +222,12 @@ export function PaymentSummary({
       <h4 className="rsvp-payment-block-title">{payment.cabinTitle}</h4>
       <dl className="rsvp-payment-rows">
         <div className="rsvp-payment-row">
-          <dt>{payment.perPerson}</dt>
+          <dt>
+            <span className="rsvp-payment-label-avatar">
+              <Avatar guest={amounts.liveActive} size={28} />
+            </span>
+            {payment.perPerson.replace("{name}", activeFirstName || "")}
+          </dt>
           <dd className={`rsvp-payment-value${perPersonSale ? " is-sale" : ""}`}>
             {activeLabel && (
               <span className="rsvp-payment-cabinroom">{activeLabel}</span>
@@ -236,7 +246,14 @@ export function PaymentSummary({
             amount. */}
         {groupMembers.length > 1 && (
           <div className="rsvp-payment-row">
-            <dt>{payment.perGroup}</dt>
+            <dt>
+              <span className="rsvp-payment-label-avatar rsvp-payment-label-avatar--stack">
+                {groupMembers.map((member) => (
+                  <Avatar key={member.id} guest={member} size={28} />
+                ))}
+              </span>
+              {payment.perGroup}
+            </dt>
             <dd className={`rsvp-payment-value${groupSale ? " is-sale" : ""}`}>
               {groupLabels.length > 0 && (
                 <span className="rsvp-payment-cabinroom-list">
@@ -262,3 +279,4 @@ export function PaymentSummary({
     </div>
   );
 }
+

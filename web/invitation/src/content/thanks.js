@@ -30,7 +30,11 @@ export const thanks = {
       modeFull: "Nombre completo",
       modeFirst: "Nombre",
       modeLast: "Apellidos",
+      filterGroupLabel: "Filtrar por asistencia",
+      filterAll: "Todos los invitados",
+      filterSaturday: "Solo los que vienen el sábado",
     },
+
     
   },
   fr: {
@@ -65,7 +69,11 @@ export const thanks = {
       modeFull: "Nom complet",
       modeFirst: "Prénom",
       modeLast: "Nom de famille",
+      filterGroupLabel: "Filtrer par présence",
+      filterAll: "Tous les invités",
+      filterSaturday: "Seulement ceux qui viennent samedi",
     },
+
     
   },
   en: {
@@ -100,7 +108,11 @@ export const thanks = {
       modeFull: "Full name",
       modeFirst: "First name",
       modeLast: "Last name",
+      filterGroupLabel: "Filter by attendance",
+      filterAll: "All guests",
+      filterSaturday: "Only those coming on Saturday",
     },
+
     
   },
 };
