@@ -527,6 +527,31 @@ These primitives should be introduced only when a second genuine React call site
 field/status markup pattern (e.g. a new React form that duplicates the `data-form-status`
 markup). See ADR-0016.
 
+### F6 progress — normalize CRUD tables (evaluated, deferred)
+
+Phase F6 ("Normalize CRUD tables") proposed extracting a reusable `DataTable` abstraction
+where real duplication exists across the dashboard's three "tables": the INVITADOS guest
+table, the cabins panel, and the tables panel. A full inventory was performed and the
+phase was **intentionally deferred** — the three "tables" are structurally completely
+different, so a shared `DataTable` would have exactly one genuine call site and be a thin
+pass-through wrapper:
+
+- **`guestTable.js` (INVITADOS)** — the ONLY real semantic `<table>`: a
+  `.dashboard-guest-table` with `<thead>`/`<tbody>`, sortable `<th>`s via a `sortTh`
+  helper (`data-sort-key`, `▲`/`▼`), and template-literal row rendering. Client-side
+  sorting via `guestSortValue`.
+- **`cabinsPanel.js` (Asignación de cabañas)** — a CARD grid, not a table:
+  `.dashboard-cabin-card` + `.dashboard-cabin-room` + `.dashboard-cabin-guests`
+  (`<ul>`/`<li>`), with period tabs, nav badges, a summary card, a photo carousel, and
+  drag-and-drop / remove / add-guest interactions. No `<table>` semantics.
+- **`tables.js` (Mesas)** — an absolutely-positioned CANVAS floor plan
+  (`.dashboard-tables-canvas`, real-life 30 m × 6 m dimensions, `pxPerMeter` scaling,
+  `tableSeatPos` seat computation). No table semantics at all.
+
+A `DataTable` primitive should be introduced only when a second genuine `<table>` call
+site appears (e.g. a new dashboard table that duplicates the `.dashboard-guest-table` +
+`sortTh` pattern). See ADR-0017.
+
 ### F10 progress — dead-code & duplication cleanup (in progress)
 
 - **Dashboard legacy-records code removed** — the dashboard no longer loads or renders
