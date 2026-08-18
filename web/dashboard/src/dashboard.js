@@ -1,4 +1,4 @@
-import { collection, onSnapshot, limit, query } from "firebase/firestore";
+import { collection, onSnapshot, limit, query, serverTimestamp } from "firebase/firestore";
 
 
 
@@ -6,14 +6,20 @@ import { collection, onSnapshot, limit, query } from "firebase/firestore";
 import { db } from "./firebase.js";
 import {
   getActiveGuests,
-  getGuestsByUnit,
   getGuest,
   getGuestByEmail,
   setLiveGuests,
 } from "./guests.js";
 
 
-import { loadRooms } from "./rooms.js";
+import {
+  loadRooms,
+  getCabinDisplayName,
+  getRoomsByCabin,
+  getRoomOccupancy,
+  getRoomDescription,
+} from "./rooms.js";
+import { getCabinPhotos, cabinPhotoUrl } from "./cabins.js";
 import { loadTables, renderTablesManager } from "./tables.js";
 import { collections } from "../../shared/firestore-paths.js";
 import {
@@ -36,6 +42,7 @@ import {
 import {
   getLiveRsvpAnswers as serviceGetLiveRsvpAnswers,
   getMergedGuest as serviceGetMergedGuest,
+  getLiveHosting as serviceGetLiveHosting,
   guestAuthEmail as serviceGuestAuthEmail,
   guestHasAuth as serviceGuestHasAuth,
   guestSendEmail as serviceGuestSendEmail,
@@ -71,6 +78,7 @@ import {
   buildDashboardGuestEditPayload,
   buildDashboardGuestInlinePayload,
   buildGuestRsvpPayload,
+  buildDashboardGuestHostingPayload,
 } from "../../shared/payload-builders.js";
 
 
@@ -107,6 +115,51 @@ function showMessage(message, stateName = "") {
   if (!status) return;
   status.textContent = message;
   status.dataset.state = stateName;
+}
+
+// The current admin's uid (used as the `editorGuestId` on guest writes). Falls
+// back to "dashboard" when no auth session is present (e.g. during local dev).
+function getCurrentUserId() {
+  return auth.currentUser?.uid || "dashboard";
+}
+
+// Analytics trace helper. The dashboard does not wire Firebase Analytics, so
+// this is a lightweight no-op that logs to the console for debugging. Kept as
+// an injectable dependency so the cabins panel stays presentation-only.
+function traceFirebase(event, data = {}) {
+  if (typeof console !== "undefined") {
+    console.debug(`[dashboard:trace] ${event}`, data);
+  }
+}
+
+// App-wide toast notification, mounted on <body> (see `_toast.scss`). Used for
+// transient feedback (errors, confirmations) that should not depend on a
+// specific view being mounted. Auto-dismisses after a few seconds.
+function showToast(message, type = "info") {
+  let container = document.querySelector(".dashboard-toast-container");
+  if (!container) {
+    container = document.createElement("div");
+    container.className = "dashboard-toast-container";
+    document.body.appendChild(container);
+  }
+
+  const toast = document.createElement("div");
+  toast.className = "dashboard-toast";
+  toast.dataset.toastType = type;
+  const icon = type === "error" ? "✕" : type === "success" ? "✓" : "ℹ";
+  toast.innerHTML = `
+    <span class="dashboard-toast-icon" aria-hidden="true">${icon}</span>
+    <span>${message}</span>
+    <button class="dashboard-toast-close" type="button" aria-label="Cerrar">✕</button>
+  `;
+  container.appendChild(toast);
+
+  const dismiss = () => {
+    toast.classList.add("is-leaving");
+    setTimeout(() => toast.remove(), 250);
+  };
+  toast.querySelector(".dashboard-toast-close").addEventListener("click", dismiss);
+  setTimeout(dismiss, 4000);
 }
 
 // Extract the sortable value for a guest given a column key.
@@ -242,6 +295,14 @@ function getLiveRsvpAnswers(guest) {
 // both exist (identity names/photo, hosting incl. xtraCabin/xtraRoom, rsvp).
 function getMergedGuest(guest) {
   return serviceGetMergedGuest(guest, state.liveGuests);
+}
+
+// Read the LIVE `hosting` map for a guest from the raw Firestore record. The
+// cabins panel builds new assignments from this (preserving the other period's
+// fields and the payment flags) rather than from the normalized guest, which
+// has no `hosting` data.
+function getLiveHosting(guestId) {
+  return serviceGetLiveHosting(guestId, state.liveGuests);
 }
 
 // A guest "has a Firebase Auth account" when their RAW live record carries an
@@ -605,9 +666,25 @@ function renderGuestManager() {
 function renderCabinAssignments() {
   renderCabinAssignmentsPanel({
     container: document.querySelector("[data-cabin-assignments]"),
-    getUniqueCabins,
-    getGuestsByUnit,
+    getActiveGuests,
+    getGuest,
+    getMergedGuest,
+    getLiveHosting,
+    getCabinDisplayName,
+    getRoomsByCabin,
+    getRoomOccupancy,
+    getRoomDescription,
+    getCabinPhotos,
+    cabinPhotoUrl,
+    guestAvatarUrl,
+    guestFullName,
     getInviteUrl,
+    buildHostingPayload: buildDashboardGuestHostingPayload,
+    updateGuest,
+    getCurrentUserId,
+    serverTimestamp,
+    traceFirebase,
+    showToast,
   });
 }
 

@@ -73,3 +73,16 @@ export function getCabinPhotos(displayName) {
   if (!cabin) return [];
   return normalizeCloudinaryIds(cabin.cloudinaryIds);
 }
+
+/**
+ * Build a Cloudinary URL for a cabin showcase photo from its public id.
+ * The id is the full public id (e.g. `cabin/casona/foo`), so we render it
+ * directly without any extra prefix. Returns "" when the id is empty.
+ * @param {string} publicId
+ * @returns {string}
+ */
+export function cabinPhotoUrl(publicId) {
+  if (!publicId) return "";
+  return `https://res.cloudinary.com/k2ajcgxv/image/upload/q_auto,f_auto,c_fill,g_auto,w_1200,h_800/${publicId}`;
+}
+

@@ -647,3 +647,28 @@ export function buildDashboardGuestInlinePayload(guestId, field, value, invitati
   };
 }
 
+/**
+ * Build a payload for the dashboard's cabin-assignment writes (drag-and-drop,
+ * remove, and "+ Agregar"). The `hosting` map is the ONLY domain field written
+ * here — it carries the active period's cabin/room (or xtraCabin/xtraRoom for
+ * the coast period) plus the other period's fields and the payment flags, which
+ * the caller preserves from the LIVE record. `updatedBy`/`updatedAt` are the
+ * standard audit fields.
+ *
+ * @param {Object} params
+ * @param {string} params.guestId
+ * @param {Object} params.hosting — the full `hosting` map to persist (merge).
+ * @param {string} params.editorGuestId — the admin's uid (or "dashboard").
+ * @param {*} params.timestamp — a Firestore serverTimestamp() sentinel.
+ * @returns {Object} explicit payload for the `guests` doc.
+ */
+export function buildDashboardGuestHostingPayload({ guestId, hosting, editorGuestId, timestamp }) {
+  return {
+    guestId,
+    hosting: hosting || {},
+    updatedBy: editorGuestId || "dashboard",
+    updatedAt: timestamp,
+  };
+}
+
+

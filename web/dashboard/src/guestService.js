@@ -39,6 +39,16 @@ export function getMergedGuest(guest, liveGuests) {
   };
 }
 
+// Read the LIVE `hosting` map for a guest directly from the raw Firestore
+// records (the source of truth). This is what the cabin-assignment panel uses
+// to build the next `hosting` map so it preserves the other period's fields
+// and the payment flags. Returns {} when the guest has no live record.
+export function getLiveHosting(guestId, liveGuests) {
+  const raw = liveGuests.find((r) => r.id === guestId);
+  return raw?.hosting || {};
+}
+
+
 // A guest "has a Firebase Auth account" when their RAW live record carries an
 // explicit `firebaseEmail` (a real auth account was provisioned for them). The
 // normalized `guest.firebaseEmail` always falls back to `id@domain`, so we must
