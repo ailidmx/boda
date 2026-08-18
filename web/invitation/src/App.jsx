@@ -28,7 +28,6 @@ import { Weather } from "./components/Weather.jsx";
 import { Food } from "./components/Food.jsx";
 import { Guisos } from "./components/Guisos.jsx";
 import { Music } from "./components/Music.jsx";
-import { SongRequest } from "./components/SongRequest.jsx";
 import { Travel } from "./components/Travel.jsx";
 import { Attire, DressCode } from "./components/Attire.jsx";
 import { Gift } from "./components/Gift.jsx";
@@ -146,13 +145,11 @@ function Invitation() {
         <section id="guisos" className="lazy-section">
           <Guisos />
         </section>
+        {/* The Music section renders the live-music lineup, the "Pide tu
+            canción" song-request subsection, the playlists and the genre
+            survey ("your tastes") in that order. */}
         <section id="music" className="lazy-section">
           <Music />
-        </section>
-        {/* "Pide tu canción" — interactive song-request section, placed right
-            after the music section. */}
-        <section id="song-request" className="lazy-section">
-          <SongRequest />
         </section>
         <section id="coast" className="lazy-section">
           <Coast />

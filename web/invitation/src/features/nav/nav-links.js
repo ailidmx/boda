@@ -51,12 +51,14 @@ export const NAV_LINKS = [
     ],
   },
 
-  // MUSIC groups the live-music, playlist and "your tastes" subsections.
+  // MUSIC groups the live-music, song-request, playlist and "your tastes"
+  // subsections, in the order they appear on the page.
   {
     key: "music",
     href: "#music",
     children: [
       ["musicLive", "#music-live"],
+      ["songRequest", "#song-request"],
       ["musicPlaylist", "#music-playlist"],
       ["musicTastes", "#music-tastes"],
     ],
