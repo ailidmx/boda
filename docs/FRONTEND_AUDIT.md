@@ -465,6 +465,19 @@ sub-components / pure services. The audit's original line-count figures (~1003 /
   (`getDocs` on `invitation_groups`) from a non-repository dashboard data module.
   Stale comments in `guestDomain.js` referencing the deleted module were updated.
 
+- **Cabin-assignments panel extracted into `cabinsPanel.js`** — the inline
+  `renderCabinAssignments()` in `web/dashboard/src/dashboard.js` was moved to a new
+  presentation module `web/dashboard/src/cabinsPanel.js`. The module renders the
+  cabin-assignment cards into `[data-cabin-assignments]` and wires the copy-link
+  buttons; it contains no Firestore access and no business rules (data is injected as
+  dependencies, the same pattern as `guestTable.js` / `groupsPanel.js` / `summary.js`).
+  `dashboard.js` keeps a thin adapter that binds the live guest cache
+  (`getUniqueCabins` + `getGuestsByUnit`) and `getInviteUrl`. Markup/classes are
+  unchanged — appearance is preserved. NOTE: this is the LEGACY simplified cabin view
+  (groups by the normalized `unit` field); the richer `hosting`-based drag-and-drop /
+  remove / add-guest panel described in AGENTS.md is not present in the current
+  codebase and was NOT added (structural refactor only).
+
 
 
 

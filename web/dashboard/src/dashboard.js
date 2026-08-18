@@ -56,6 +56,7 @@ import { openGuestEditor as openGuestEditorModal } from "./guestEditorModal.js";
 import { renderGroupsPanel as renderGroupsPanelModule, openCreateGroupModal as openCreateGroupModalModule } from "./groupsPanel.js";
 import { openDeleteConfirm as openDeleteConfirmModule, openSendInviteModal as openSendInviteModalModule } from "./guestModals.js";
 import { renderSummary } from "./summary.js";
+import { renderCabinAssignments as renderCabinAssignmentsPanel } from "./cabinsPanel.js";
 
 import { updateGuest, softDeleteGuest } from "./repositories/guestRepository.js";
 import { createGroup, updateGroupField, deleteGroup } from "./repositories/groupRepository.js";
@@ -639,57 +640,17 @@ function renderGuestManager() {
 
 // ── Cabin Assignments ──────────────────────────────────────────────────
 
+// The cabin-assignment cards are rendered by the extracted presentation module
+// `cabinsPanel.js`. This thin adapter binds the dashboard's live guest cache and
+// invite-URL helper so the rest of the file keeps calling the same short
+// signature. The renderer itself contains no Firestore access and no business
+// rules.
 function renderCabinAssignments() {
-  const container = document.querySelector("[data-cabin-assignments]");
-  if (!container) return;
-
-  const cabins = getUniqueCabins();
-
-  container.innerHTML = `
-    <div class="dashboard-cabin-grid">
-      ${cabins
-        .map((unit) => {
-          const guests = getGuestsByUnit(unit);
-          const cabinGuest = guests[0];
-          const label = cabinGuest?.cabinLabel || unit;
-          const occupancy = cabinGuest?.occupancy || "";
-          const payment = cabinGuest?.payment || "";
-          return `
-            <div class="dashboard-cabin-card">
-              <div class="dashboard-cabin-heading">
-                <strong>${label}</strong>
-                <span class="dashboard-cabin-meta">${occupancy === "privada" ? "Privada" : "Compartida"} · ${payment === "pagada" ? "Pagada" : "Por pagar"}</span>
-              </div>
-              <ul class="dashboard-cabin-guests">
-                ${guests
-                  .map(
-                    (g) => `
-                  <li>
-                    <span>${[g.firstName, g.middleName, g.lastName, g.maternalLastName].filter(Boolean).join(" ")}</span>
-                    <code class="dashboard-cabin-code">${g.id}</code>
-                    <button class="dashboard-link-btn" data-copy-guest="${g.id}" title="Copiar enlace">🔗</button>
-                  </li>
-
-                `,
-                  )
-                  .join("")}
-              </ul>
-            </div>
-          `;
-        })
-        .join("")}
-    </div>
-  `;
-
-  container.querySelectorAll("[data-copy-guest]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const guestId = btn.dataset.copyGuest;
-      const url = getInviteUrl(guestId);
-      navigator.clipboard.writeText(url).then(() => {
-        btn.textContent = "✅";
-        setTimeout(() => (btn.textContent = "🔗"), 1500);
-      });
-    });
+  renderCabinAssignmentsPanel({
+    container: document.querySelector("[data-cabin-assignments]"),
+    getUniqueCabins,
+    getGuestsByUnit,
+    getInviteUrl,
   });
 }
 
