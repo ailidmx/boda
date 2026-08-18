@@ -1213,10 +1213,55 @@
   color: var(--marigold);
 }
 
-/* Mobile: a parent group renders its label then an indented sub-list. */
+/* Mobile: a parent group renders its label then an indented sub-list. The
+   label row carries a small arrow toggle so the sub-list can be expanded or
+   collapsed. */
 .mobile-nav__group-links {
   display: flex;
   flex-direction: column;
+}
+
+/* The parent label row: the nav link plus a compact arrow toggle on the
+   right that expands/collapses the sub-list. */
+.mobile-nav__group-head {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.mobile-nav__group-head .mobile-nav__link {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Arrow toggle: subtle, floating, rotates when the sub-list is open. */
+.mobile-nav__sub-toggle {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--marigold);
+  cursor: pointer;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.mobile-nav__sub-toggle:hover {
+  background: rgb(255 255 255 / 6%);
+}
+
+.mobile-nav__sub-arrow {
+  font-size: 0.72rem;
+  line-height: 1;
+  transition: transform 180ms ease;
+}
+
+.mobile-nav__sub-toggle.is-open .mobile-nav__sub-arrow {
+  transform: rotate(90deg);
 }
 
 .mobile-nav__sub {
@@ -1226,6 +1271,7 @@
   border-left: 1px solid rgb(255 255 255 / 14%);
   margin-left: 1.1rem;
 }
+
 
 .mobile-nav__sublink {
   position: relative;
@@ -1249,9 +1295,53 @@
 }
 
 /* Side drawer: a parent group renders its label then an indented sub-list,
-   kept inside the same CSS-column flow. */
+   kept inside the same CSS-column flow. The label row carries a small arrow
+   toggle so the sub-list can be expanded or collapsed. */
 .side-drawer__group {
   break-inside: avoid;
+}
+
+/* The parent label row: the nav link plus a compact arrow toggle on the
+   right that expands/collapses the sub-list. */
+.side-drawer__group-head {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.side-drawer__group-head .side-drawer__link {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Arrow toggle: subtle, floating, rotates when the sub-list is open. */
+.side-drawer__sub-toggle {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: var(--marigold);
+  cursor: pointer;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.side-drawer__sub-toggle:hover {
+  background: rgb(255 255 255 / 6%);
+}
+
+.side-drawer__sub-arrow {
+  font-size: 0.72rem;
+  line-height: 1;
+  transition: transform 180ms ease;
+}
+
+.side-drawer__sub-toggle.is-open .side-drawer__sub-arrow {
+  transform: rotate(90deg);
 }
 
 .side-drawer__sub {
@@ -1261,6 +1351,7 @@
   border-left: 1px solid rgb(255 255 255 / 14%);
   margin-left: 0.9rem;
 }
+
 
 .side-drawer__sublink {
   display: block;

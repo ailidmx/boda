@@ -132,11 +132,15 @@ service cloud.firestore {
     }
 
     // ── Song requests ────────────────────────────────────────────────────
+    // A guest may delete their OWN request (the doc stores `guestId`), and
+    // admins may delete any request.
     match /song_requests/{requestId} {
       allow read: if canRead();
       allow create, update: if canWrite();
-      allow delete: if canDelete();
+      allow delete: if canDelete()
+        || (request.auth != null && resource.data.guestId == request.auth.uid);
     }
+
 
     // ── Attendance responses ─────────────────────────────────────────────
     match /attendance_responses/{guestId} {

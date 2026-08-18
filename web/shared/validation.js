@@ -411,8 +411,9 @@ export function validateGuisoRankingPayload(payload) {
 // Mirrors `hasValidSongRequestFields()` in firebase/firestore.rules.
 
 const SONG_REQUEST_ALLOWED_FIELDS = [
-  "guestId", "song", "intent", "bandType", "songMeta", "updatedBy", "updatedAt",
+  "guestId", "song", "intent", "bandType", "songMeta", "assignedGuestId", "updatedBy", "updatedAt",
 ];
+
 const SONG_REQUEST_INTENTS = ["hear", "sing", "karaoke", "band"];
 
 // Allowed live-band types, only meaningful when intent == "band".
@@ -448,7 +449,10 @@ export function validateSongRequestPayload(payload) {
     // Optional bandType, only meaningful when intent == "band"
     { check: !hasAnyKey(payload, ["bandType"]) || isOneOf(payload.bandType, SONG_REQUEST_BAND_TYPES), message: "bandType must be one of: marimba, mariachi, norteno, frenchBand" },
     { check: isShortText(payload.updatedBy, 100) && isNonEmptyString(payload.updatedBy), message: "updatedBy must be a non-empty string ≤ 100 chars" },
+    // Optional assignedGuestId (the guest the song is FOR; defaults to guestId)
+    { check: !hasAnyKey(payload, ["assignedGuestId"]) || (isShortText(payload.assignedGuestId, 100) && isNonEmptyString(payload.assignedGuestId)), message: "assignedGuestId must be a non-empty string ≤ 100 chars" },
     // Optional songMeta map (normalized song identity)
+
 
     { check: !hasAnyKey(payload, ["songMeta"]) || isObject(payload.songMeta), message: "songMeta must be an object" },
     { check: !hasAnyKey(payload, ["songMeta"]) || hasOnlyKeys(payload.songMeta, SONG_META_ALLOWED_FIELDS), message: `songMeta contains unsupported fields: ${Object.keys(payload.songMeta || {}).filter((k) => !SONG_META_ALLOWED_FIELDS.includes(k)).join(", ")}` },
