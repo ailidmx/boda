@@ -1,0 +1,105 @@
+name: CI — Lint & Test
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+  pull_request:
+    branches:
+      - master
+      - develop
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Use Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Use Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/invitation/package-lock.json
+
+
+      - name: Install invitation dependencies
+        working-directory: web/invitation
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm test
+
+      - name: Run Firestore rules tests (emulator)
+        working-directory: web/invitation
+        run: npx firebase emulators:exec --only firestore 'node --test tests/firestore.rules.test.mjs'
+
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Use Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/invitation/package-lock.json
+
+
+      - name: Install invitation dependencies
+        working-directory: web/invitation
+        run: npm ci
+
+      - name: Install dashboard dependencies
+        working-directory: web/dashboard
+        run: npm ci
+
+      - name: Write Cloudinary .env from secrets
+        working-directory: web/invitation
+        run: |
+          cat > .env <<'EOF'
+          CLOUDINARY_URL=cloudinary://${{ secrets.CLOUDINARY_API_KEY }}:${{ secrets.CLOUDINARY_API_SECRET }}@${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
+          EOF
+
+      - name: Build invitation
+        working-directory: web/invitation
+        run: npm run build
+
+
+      - name: Build dashboard
+        working-directory: web/dashboard
+        run: npm run build

@@ -1,0 +1,180 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─────────────────────────────────────────────────────────────────────
+    // SIMPLE RULES MODEL
+    // ─────────────────────────────────────────────────────────────────────
+    // 1. ANY authenticated guest can READ every collection.
+    // 2. ANY authenticated guest can WRITE (create/update) any document,
+    //    including editing any other guest's document.
+    // 3. ONLY administrators (isAdmin) can DELETE.
+    // 4. No schema/field validation — the rules do not depend on any field
+    //    definition. The app validates payloads client-side.
+    //
+    // An administrator is any authenticated user whose own guest document in
+    // `guests/{auth.uid}` has `isAdmin == true`.
+    // ─────────────────────────────────────────────────────────────────────
+
+    function isAdmin() {
+      return request.auth != null
+        && get(/databases/$(database)/documents/guests/$(request.auth.uid)).data.isAdmin == true;
+    }
+
+    // Any authenticated user is allowed to read.
+    function canRead() {
+      return request.auth != null;
+    }
+
+    // Any authenticated user is allowed to write (create/update).
+    function canWrite() {
+      return request.auth != null;
+    }
+
+    // Only administrators may delete.
+    function canDelete() {
+      return isAdmin();
+    }
+
+    // ── Guests ───────────────────────────────────────────────────────────
+    match /guests/{guestId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Invitation groups ────────────────────────────────────────────────
+    match /invitation_groups/{groupId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Cabins ───────────────────────────────────────────────────────────
+    match /cabins/{cabinId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Rooms ────────────────────────────────────────────────────────────
+    match /rooms/{roomId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Tables ───────────────────────────────────────────────────────────
+    match /tables/{tableId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Thanks / greetings ───────────────────────────────────────────────
+    match /thanks/{creditId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Login events ─────────────────────────────────────────────────────
+    match /login_events/{eventId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Auth users mirror (doc id = auth uid = guest id) ─────────────────
+    // Populated by `scripts/sync-auth-users.mjs` (Admin SDK). Readable by any
+    // authenticated guest so the dashboard can show who has an auth account.
+    match /auth_users/{uid} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+
+    // ── Activity events ──────────────────────────────────────────────────
+    match /activity_events/{eventId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Page views ───────────────────────────────────────────────────────
+    match /page_views/{viewId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Card votes ───────────────────────────────────────────────────────
+    match /card_votes/{voteId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Genre ratings ────────────────────────────────────────────────────
+    match /genre_ratings/{ratingId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Guiso rankings ───────────────────────────────────────────────────
+    match /guiso_rankings/{guestId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Song requests ────────────────────────────────────────────────────
+    match /song_requests/{requestId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Attendance responses ─────────────────────────────────────────────
+    match /attendance_responses/{guestId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Legacy submission collections (no longer written by the app) ─────
+    match /rsvp_submissions/{submissionId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    match /experience_suggestions/{submissionId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    match /coast_interest/{submissionId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    match /petanque_participation/{submissionId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
+    // ── Default deny ─────────────────────────────────────────────────────
+    // Any collection not explicitly listed above is DENIED by default.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+  }
+}

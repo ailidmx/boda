@@ -9,6 +9,12 @@ __pycache__/
 # JavaScript
 node_modules/
 dist/
+.firebase/
+firebase-debug.log
+firestore-debug.log
+
+# Media awaiting explicit publication approval
+web/invitation/media/originals/cabins/pending-lavanda/
 
 # Local configuration and credentials
 .env
@@ -18,7 +24,16 @@ service_account.json
 *.pem
 *.key
 
+# Firebase Auth user export (contains password hashes/salts)
+users.json
+
+
 # Editor files
 .idea/
 .vscode/
 *.swp
+
+# Temporary inspection/debug scripts (not for commit)
+_inspect-*.mjs
+scripts/_inspect-*.mjs
+web/invitation/_inspect-*.mjs

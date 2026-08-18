@@ -1,0 +1,130 @@
+/* ── Travel section ───────────────────────────────────────────────────── */
+
+.travel-section {
+  overflow-x: clip;
+  background: var(--deep-green);
+  color: var(--white);
+}
+
+.travel-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.travel-heading .eyebrow {
+  margin-bottom: 1rem;
+}
+
+.travel-heading h2 {
+  margin: 0 0 1.5rem;
+}
+
+/* The "Je viens de loin" intro is a citation (blockquote): a large display
+   quote with a golden left rule and quotation marks. */
+.travel-lead-citation {
+  position: relative;
+  margin: 0;
+  max-width: 60rem;
+  padding: 0.25rem 0 0.25rem 1.75rem;
+  border-left: 3px solid var(--marigold);
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.6vw, 2rem);
+  line-height: 1.35;
+  color: #f3e6c8;
+}
+
+.travel-lead-citation::before {
+  content: "“";
+  position: absolute;
+  top: -0.55em;
+  left: 0.35rem;
+  font-family: var(--font-display);
+  font-size: 2.6em;
+  line-height: 1;
+  color: var(--marigold);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* ── Background mood ────────────────────────────────────────────────────
+   The Travel section always uses the "ciel" (Vol de nuit / Ciel étoilé)
+   mood. It overrides the story-bg orb/sparkle/bloom/vignette palette with a
+   deep indigo sky, cool blues and a golden starfield. */
+.travel-bg--ciel {
+  --orb-a: rgb(64 84 138 / 55%);
+  --orb-b: rgb(41 59 104 / 55%);
+  --orb-c: rgb(122 139 122 / 30%);
+  --orb-d: rgb(198 139 43 / 30%);
+  --orb-e: rgb(255 183 77 / 16%);
+  --sparkle: rgb(255 255 255 / 95%);
+  --bloom: rgb(255 183 77 / 14%);
+  --vignette: rgb(10 14 28 / 62%);
+}
+
+.travel-layout {
+  display: grid;
+  grid-template-columns: 1fr 0.8fr;
+  gap: clamp(3rem, 8vw, 8rem);
+  align-items: stretch;
+}
+
+.travel-points {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.travel-points li {
+  display: grid;
+  grid-template-columns: 4rem 1fr;
+  gap: 1rem;
+  padding: 1.75rem 0;
+  border-top: 1px solid rgb(255 255 255 / 25%);
+}
+
+.travel-points span {
+  color: #e4b968;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  text-shadow: 0 0 1.5rem rgb(228 185 104 / 45%);
+}
+
+.travel-points p {
+  max-width: 34rem;
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2.2vw, 1.75rem);
+}
+
+/* Language-specific flight map. Clicking it opens the shared lightbox viewer.
+   It sits in the second column of the travel layout, filling the column. */
+.travel-vuelos {
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background: none;
+  cursor: zoom-in;
+  box-shadow: 0 1.5rem 3rem rgb(0 0 0 / 25%);
+}
+
+.travel-vuelos img {
+  display: block;
+  width: 100%;
+  height: auto;
+  transition: transform 700ms ease;
+}
+
+.travel-vuelos:hover img {
+  transform: scale(1.02);
+}
+

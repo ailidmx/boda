@@ -1,0 +1,591 @@
+// ── Cabins panel ────────────────────────────────────────────────────────
+// Styles the cabin assignment cards rendered by `renderCabinAssignments()`
+// in dashboard.js. Class names here MUST match the HTML produced there:
+//   .dashboard-cabin-grid, .dashboard-cabin-card, .dashboard-cabin-heading,
+//   .dashboard-cabin-meta, .dashboard-cabin-guests, .dashboard-cabin-code.
+@use "tokens" as *;
+
+.dashboard-cabin-grid {
+  display: grid;
+  // One cabin card per row so each card (with its photo carousel + rooms) has
+  // the full width to breathe. Cards stack vertically.
+  grid-template-columns: 1fr;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+
+// ── Hosting-period tabs (Viernes → Domingo / Domingo → Martes) ─────────
+.dashboard-cabin-period-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.dashboard-cabin-period-tab {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.1rem;
+  padding: 0.6rem 1rem;
+  border: 1px solid $border;
+  border-radius: 0.4rem;
+  background: $card-bg;
+  color: $ink;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    border-color: $accent;
+  }
+
+  &.is-active {
+    background: $dark;
+    border-color: $dark;
+    color: $white;
+  }
+}
+
+.dashboard-cabin-period-label {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.dashboard-cabin-period-sub {
+  font-size: 0.72rem;
+  opacity: 0.75;
+}
+
+.dashboard-cabin-card {
+  border: 1px solid $border;
+  border-radius: 0.5rem;
+  background: $card-bg;
+  overflow: hidden;
+}
+
+// ── Cabin photo carousel ───────────────────────────────────────────────
+// Compact strip: a single short row of square thumbnails so it takes very
+// little vertical space and doesn't dominate the card. The number of photos
+// per slide adapts to what's available (few photos all fit in one slide, many
+// paginate). Only the active slide is visible; the track holds all slides
+// side-by-side and the active one is shown via opacity/position.
+.dashboard-cabin-carousel {
+  position: relative;
+  height: 5rem;
+  background: rgba(85, 69, 45, 0.06);
+  overflow: hidden;
+}
+
+.dashboard-cabin-carousel-track {
+  position: absolute;
+  inset: 0;
+}
+
+.dashboard-cabin-carousel-slide {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  gap: 2px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+
+  &.is-active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  img {
+    height: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+    display: block;
+    flex: 0 0 auto;
+  }
+}
+
+
+
+
+.dashboard-cabin-carousel-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.35);
+  color: $white;
+  font-size: 1.2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.55);
+  }
+
+  &.is-prev {
+    left: 0.6rem;
+  }
+
+  &.is-next {
+    right: 0.6rem;
+  }
+}
+
+.dashboard-cabin-carousel-dots {
+  position: absolute;
+  bottom: 0.6rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  display: flex;
+  gap: 0.4rem;
+}
+
+.dashboard-cabin-carousel-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &.is-active {
+    background: $white;
+  }
+}
+
+// ── Cabin photo lightbox (full-screen view) ──
+// Clicking a cabin photo thumbnail opens a full-screen overlay showing the
+// photo large, with prev/next arrows, a close button and a counter. The
+// overlay reuses the shared .dashboard-modal-overlay backdrop (dark, centered)
+// but the stage is a full-viewport flex container so the image can be as large
+// as the screen allows.
+.dashboard-cabin-lightbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.dashboard-cabin-lightbox-stage {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dashboard-cabin-lightbox-img {
+  max-width: 100%;
+  max-height: 90vh;
+  border-radius: 0.5rem;
+  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.6);
+  object-fit: contain;
+  background: #000;
+}
+
+.dashboard-cabin-lightbox-close {
+  position: absolute;
+  top: -2.75rem;
+  right: 0;
+  z-index: 3;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  color: $white;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.7);
+  }
+}
+
+.dashboard-cabin-lightbox-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 2.75rem;
+  height: 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  color: $white;
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.7);
+  }
+
+  &.is-prev {
+    left: -3.5rem;
+  }
+
+  &.is-next {
+    right: -3.5rem;
+  }
+}
+
+.dashboard-cabin-lightbox-counter {
+  position: absolute;
+  bottom: -2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.35rem;
+  background: rgba(0, 0, 0, 0.55);
+  color: $white;
+  font-size: 0.85rem;
+  letter-spacing: 0.05em;
+}
+
+
+.dashboard-cabin-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.9rem 1.15rem;
+  background: $dark;
+  color: $white;
+
+  strong {
+    font-family: $font-display;
+    font-size: 1.1rem;
+    font-weight: 400;
+  }
+}
+
+.dashboard-cabin-meta {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.85);
+  white-space: nowrap;
+}
+
+.dashboard-cabin-guests {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.15rem;
+  margin: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    padding: 0.4rem 0.6rem;
+    border-radius: 0.4rem;
+    background: rgba(85, 69, 45, 0.04);
+    font-size: 0.85rem;
+  }
+}
+
+.dashboard-cabin-code {
+  padding: 0.15rem 0.35rem;
+  border-radius: 0.25rem;
+  background: rgba(85, 69, 45, 0.08);
+  font-size: 0.72rem;
+  color: $ink-muted;
+}
+
+// ── Nav badge bar ──────────────────────────────────────────────────────
+// One button per cabin showing its label + actual/calculated occupancy.
+// Clicking a badge scrolls to the matching cabin card.
+.dashboard-cabin-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.dashboard-cabin-nav-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid $border;
+  border-radius: 0.35rem;
+  background: $card-bg;
+  color: $ink;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+
+  &:hover {
+    border-color: $accent;
+    background: rgba(85, 69, 45, 0.04);
+  }
+}
+
+.dashboard-cabin-nav-label {
+  font-weight: 600;
+}
+
+.dashboard-cabin-nav-occ {
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+  background: rgba(85, 69, 45, 0.08);
+  font-size: 0.72rem;
+  color: $ink-muted;
+  font-variant-numeric: tabular-nums;
+}
+
+// ── Full-width summary card ────────────────────────────────────────────
+.dashboard-cabin-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 1rem;
+  margin-bottom: 1rem;
+  padding: 1.15rem;
+  border: 1px solid $border;
+  border-radius: 0.5rem;
+  background: $card-bg;
+}
+
+.dashboard-cabin-summary-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+
+  span {
+    font-size: 0.75rem;
+    color: $ink-muted;
+  }
+
+  strong {
+    font-family: $font-display;
+    font-size: 1.6rem;
+    font-weight: 400;
+    color: $dark;
+  }
+}
+
+// ── Room blocks inside each cabin card ─────────────────────────────────
+.dashboard-cabin-room {
+  border-top: 1px solid $border;
+
+  &:first-of-type {
+    border-top: 0;
+  }
+}
+
+.dashboard-cabin-room-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.6rem 1.15rem;
+  background: rgba(85, 69, 45, 0.04);
+
+  strong {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: $dark;
+  }
+}
+
+.dashboard-cabin-room-meta {
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+  background: rgba(85, 69, 45, 0.08);
+  font-size: 0.72rem;
+  color: $ink-muted;
+  font-variant-numeric: tabular-nums;
+
+  &.is-full {
+    background: rgba(160, 53, 44, 0.12);
+    color: #a0352c;
+  }
+}
+
+// Room description (localized, shown in Spanish) under the room heading.
+.dashboard-cabin-room-desc {
+  margin: 0;
+  padding: 0.35rem 1.15rem 0;
+  font-size: 0.72rem;
+  line-height: 1.4;
+  color: $ink-muted;
+  font-style: italic;
+}
+
+// Guest row inside a room: avatar + name + id + copy button.
+.dashboard-cabin-guest {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .dashboard-avatar-sm {
+    flex: 0 0 auto;
+  }
+
+  > span {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+// Small avatar used in the room guest lists (24px).
+.dashboard-avatar-sm {
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  display: inline-block;
+  background: rgba(85, 69, 45, 0.08);
+}
+
+.dashboard-avatar-fallback.dashboard-avatar-sm {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.dashboard-cabin-empty {
+  color: $ink-muted;
+  font-style: italic;
+}
+
+// ── Drag-and-drop reassignment ────────────────────────────────────────
+// Guest rows are draggable; room blocks are drop targets. Visual feedback
+// while dragging: the dragged row dims, and the hovered room highlights.
+.dashboard-cabin-guest[draggable="true"] {
+  cursor: grab;
+
+  &:active {
+    cursor: grabbing;
+  }
+
+  &.is-dragging {
+    opacity: 0.4;
+  }
+}
+
+.dashboard-cabin-room {
+  transition: background-color 0.15s ease, box-shadow 0.15s ease;
+
+  &.is-drop-target {
+    background: rgba(85, 69, 45, 0.06);
+    box-shadow: inset 0 0 0 2px $accent;
+  }
+}
+
+// ── "+ Agregar" button on each cabin card heading ─────────────────────
+.dashboard-cabin-add-btn {
+  flex: 0 0 auto;
+  padding: 0.3rem 0.7rem;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 0.35rem;
+  background: rgba(255, 255, 255, 0.12);
+  color: $white;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+
+  &:hover {
+    background: rgba(255, 255, 255, 0.22);
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+}
+
+// ── "✕" remove button on each guest row ───────────────────────────────
+.dashboard-cabin-remove {
+  flex: 0 0 auto;
+  color: #a0352c;
+  font-weight: 700;
+
+  &:hover {
+    color: #7a241d;
+  }
+}
+
+// ── Add-guest modal (pick an unassigned guest) ────────────────────────
+.dashboard-cabin-add-modal {
+  width: min(100%, 30rem);
+}
+
+.dashboard-cabin-add-hint {
+  margin: 0;
+  font-size: 0.85rem;
+  color: $ink-muted;
+}
+
+.dashboard-cabin-add-list {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  max-height: 50vh;
+  overflow-y: auto;
+}
+
+.dashboard-cabin-add-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid $border;
+  border-radius: 0.4rem;
+  background: $white;
+  color: $ink;
+  font: inherit;
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+
+  .dashboard-avatar-sm {
+    flex: 0 0 auto;
+  }
+
+  > span {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &:hover {
+    border-color: $accent;
+    background: rgba(85, 69, 45, 0.04);
+  }
+}
+

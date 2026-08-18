@@ -1,0 +1,1256 @@
+/* ── Venue / facilities section ───────────────────────────────────────── */
+
+/* ── Responsive: mobile-first ──────────────────────────────────────────
+   The venue section is a 2-column grid on desktop (visual | copy) that
+   stacks on mobile. The venue gallery (4 columns) collapses to 2 columns on
+   tablet and 1 on mobile. The facility slideset stacks its three cards
+   vertically on mobile. */
+
+/* Tablet: stack the venue section, gallery → 2 cols. */
+@media (max-width: 900px) {
+  .venue-gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .venue-visual {
+    min-height: 32rem;
+  }
+}
+
+/* Small phones: gallery → 1 col, facility cards stack vertically. */
+@media (max-width: 600px) {
+  .venue-gallery {
+    grid-template-columns: 1fr;
+  }
+
+  .venue-gallery-card {
+    min-height: min(85vw, 28rem);
+  }
+
+  .venue-visual-copy {
+    align-items: start;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .venue-visual-copy small {
+    text-align: left;
+  }
+
+  /* Facility photo-cards: each slideset slide stacks its three cards
+     vertically on mobile (one card per row) so they stay large and readable.
+     The slideset prev/next + dot navigation switches between the two slides. */
+  .facility-slide {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .facility-card {
+    aspect-ratio: 4 / 3;
+  }
+
+  /* On touch, hover doesn't exist, so keep the list visible by default. */
+  .facility-card ul {
+    max-height: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+
+.venue-section {
+  display: grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: clamp(3rem, 8vw, 8rem);
+  align-items: center;
+  background: var(--sand);
+}
+
+.venue-visual {
+  position: relative;
+  min-height: 44rem;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, #cfae79 0 42%, #798b84 43% 57%, #32453e 58%);
+}
+
+.venue-horizon {
+  position: absolute;
+  inset: 44% -10% auto;
+  height: 18%;
+  background:
+    radial-gradient(ellipse at 10% 100%, #566657 0 22%, transparent 23%),
+    radial-gradient(ellipse at 48% 100%, #48594d 0 29%, transparent 30%),
+    radial-gradient(ellipse at 88% 100%, #526150 0 25%, transparent 26%);
+}
+
+.venue-visual::after {
+  position: absolute;
+  inset: 57% 0 0;
+  background: repeating-linear-gradient(
+    178deg,
+    rgb(255 255 255 / 16%) 0 1px,
+    transparent 1px 1.5rem
+  );
+  content: "";
+}
+
+.venue-visual-copy {
+  position: absolute;
+  z-index: 2;
+  right: 2rem;
+  bottom: 2rem;
+  left: 2rem;
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  color: var(--white);
+}
+
+.venue-visual-copy span {
+  font-family: var(--font-display);
+  font-size: 2rem;
+}
+
+.venue-visual-copy small {
+  max-width: 12rem;
+  text-align: right;
+}
+
+.venue-copy h2 {
+  margin-bottom: 2rem;
+}
+
+.venue-location {
+  margin: 2rem 0 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.venue-cabins-note {
+  margin: 1.5rem 0 0;
+  padding: 1rem 1.25rem;
+  border-left: 3px solid var(--marigold);
+  background: rgb(255 255 255 / 45%);
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.venue-privacy-note {
+  margin: 1rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid rgb(0 0 0 / 12%);
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: rgb(0 0 0 / 55%);
+}
+
+.venue-access {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(0 0 0 / 12%);
+}
+
+.venue-access h3 {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+}
+
+.venue-access p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+}
+
+.venue-video {
+  width: min(100%, 64rem);
+  margin: 0 auto clamp(3rem, 6vw, 6rem);
+}
+
+.facilities-section {
+  overflow-x: clip;
+  background:
+    radial-gradient(circle at 72% 32%, rgb(231 194 125 / 40%), transparent 23%),
+    linear-gradient(180deg, #efecea 0%, #9edffc9c 44%, #d9b36a 100%);
+}
+
+
+
+/* The venue is a single slide that fills the viewport height (minus the
+   countdown + header), so it reads as one full-screen section. */
+.venue-slide {
+  position: relative;
+
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  min-height: calc(100svh - var(--countdown-height) - var(--header-height));
+  padding-top: clamp(0.5rem, 1vw, 1rem);
+  /* Generous bottom padding so the section always has breathing room below
+     the pinned navigation, even when the content is short. */
+  padding-bottom: clamp(2rem, 4vw, 4rem);
+}
+
+
+
+
+
+
+/* The single venue slide is a flex column so the zones stack with balanced
+   spacing and the bottom navigation is pinned to the bottom of the viewport:
+     Zone A · eyebrow + venue link
+     Zone B · title + citation
+     Zone C · photo-card slideset + privacy disclosure
+     Zone D · bottom navigation link
+   Each zone gets a consistent gap, and the nav uses margin-top:auto so it
+   always sits flush with the bottom edge. */
+.venue-slide--one {
+  justify-content: flex-start;
+}
+
+/* Zone A + B: the heading block. */
+.venue-slide--one .experience-heading {
+  margin-bottom: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+/* Zone C: the photo-card slideset. */
+.venue-slide--one .facility-slideset {
+  margin-top: 0;
+}
+
+/* Zone C: the privacy disclosure panel. */
+.venue-slide--one .venue-privacy {
+  margin-top: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+/* Zone C: the small source + note lines. */
+.venue-slide--one .venue-gallery-source {
+  margin-top: clamp(1rem, 2vw, 1.5rem);
+}
+
+.venue-slide--one .facilities-note {
+  margin-top: clamp(0.75rem, 1.5vw, 1.25rem);
+}
+
+/* Zone D: the bottom navigation is pinned to the bottom of the slide. */
+.venue-slide--one .venue-nav {
+  margin-top: auto;
+  padding-top: clamp(1.25rem, 2.5vw, 2rem);
+}
+
+
+.facilities-lead {
+  position: relative;
+  max-width: 34rem;
+  margin: 0;
+  padding-left: 1.5rem;
+  border-left: 2px solid var(--marigold);
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.2vw, 1.8rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+
+.facilities-lead::before {
+  content: "“";
+  position: absolute;
+  top: -0.35em;
+  left: -0.15rem;
+  font-family: var(--font-display);
+  font-size: 3.5em;
+  line-height: 1;
+  color: var(--marigold);
+  opacity: 0.35;
+}
+
+
+/* Merged photo-cards: each facility group lives on top of its photo as an
+   elegant overlay. The six cards (4 facility cards + cabañas photo carousel
+   + video) are shown as a slideset of two slides, each holding three cards in
+   a single row. Only one slide is visible at a time, with prev/next + dot
+   navigation below. */
+.facility-slideset {
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.facility-slideset__track {
+  position: relative;
+}
+
+/* Each slide is a 3-column grid (one row of three cards). The active slide is
+   in normal flow (it defines the container height); inactive slides are
+   absolutely stacked on top and hidden. The slide height is capped so the
+   cards never push the section past one viewport — this keeps the full-height
+   slide effect intact on every screen. */
+.facility-slide {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: 1fr;
+  gap: clamp(1.25rem, 3vw, 2.25rem);
+  height: clamp(15rem, 32vh, 24rem);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(1.5rem);
+  transition: opacity 400ms ease, transform 400ms ease, visibility 400ms;
+  pointer-events: none;
+}
+
+
+.facility-slide.is-active {
+  position: relative;
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+/* Prev/next + dot navigation, centered just below the cards. */
+.facility-slideset__nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.facility-slideset__arrow {
+  display: inline-grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 1px solid rgb(36 33 25 / 30%);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 55%);
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 200ms ease, transform 200ms ease;
+}
+
+.facility-slideset__arrow:hover {
+  background: rgb(255 255 255 / 85%);
+  transform: scale(1.05);
+}
+
+.facility-slideset__dots {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.facility-slideset__dot {
+  width: 0.6rem;
+  height: 0.6rem;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(36 33 25 / 25%);
+  cursor: pointer;
+  transition: background 200ms ease, transform 200ms ease;
+}
+
+.facility-slideset__dot.is-active {
+  background: var(--terracotta);
+  transform: scale(1.2);
+}
+
+/* Play/pause toggle for the autoplaying slideset, shown at the end of the
+   nav row. */
+.facility-slideset__toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border: 1px solid rgb(36 33 25 / 30%);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 55%);
+  color: var(--ink);
+  font-size: 0.8rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 200ms ease, transform 200ms ease;
+}
+
+.facility-slideset__toggle:hover {
+  background: rgb(255 255 255 / 85%);
+  transform: scale(1.05);
+}
+
+
+
+
+
+
+/* Every card is square (aspect-ratio 1:1) so both photo rows read as a clean
+   grid of equal tiles. */
+.facility-card {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 1.25rem;
+  background: var(--ink);
+  box-shadow: 0 14px 34px rgb(36 33 25 / 14%);
+  scroll-snap-align: start;
+}
+
+/* Inside the slideset the cards fill the capped row height (instead of being
+   driven by their own square aspect-ratio), so the whole carousel stays within
+   the max-height and never pushes the section past one viewport. */
+.facility-slide .facility-card {
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+
+
+
+/* The photo is wrapped in a full-bleed button so the whole card is clickable
+   and opens the lightbox carousel. */
+.facility-card__media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.facility-card__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 700ms ease;
+}
+
+.facility-card:hover .facility-card__media img {
+  transform: scale(1.045);
+}
+
+/* Dark scrim so the overlay text stays readable over any photo. It must not
+   intercept pointer events (the photo button / video iframe sit beneath it). */
+.facility-card::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(13 20 14 / 10%) 0%,
+    rgb(13 20 14 / 55%) 55%,
+    rgb(13 20 14 / 82%) 100%
+  );
+  content: "";
+  pointer-events: none;
+}
+
+/* The video card doesn't need the dark scrim — it would dim the player. */
+.facility-card--video::after {
+  display: none;
+}
+
+.facility-card__overlay {
+  position: absolute;
+  z-index: 1;
+  inset: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: clamp(1.5rem, 2.5vw, 2.25rem);
+  color: var(--white);
+  /* Let clicks pass through to the full-bleed photo button so tapping anywhere
+     on the card opens the lightbox carousel. */
+  pointer-events: none;
+}
+
+.facility-card__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 2.9rem;
+  height: 2.9rem;
+  border-radius: 0.8rem;
+  background: var(--marigold);
+  color: var(--ink);
+}
+
+.facility-card__icon svg {
+  width: 1.7rem;
+  height: 1.7rem;
+}
+
+.facility-card h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 3.2vw, 2.9rem);
+  font-weight: 400;
+  line-height: 1.05;
+}
+
+.facility-card ul {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.facility-card li {
+  position: relative;
+  padding-left: 1.1rem;
+  font-size: clamp(0.85rem, 1.3vw, 1rem);
+  line-height: 1.45;
+}
+
+.facility-card li::before {
+  position: absolute;
+  top: 0.55em;
+  left: 0;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-radius: 50%;
+  background: var(--marigold);
+  content: "";
+}
+
+
+/* Video card: a square card within the grid (aspect-ratio from the base
+   card). Before playing it shows a square-cropped YouTube thumbnail with no
+   black letterbox bars; clicking swaps to the real player. */
+.facility-card--video {
+  background: #000;
+}
+
+.facility-card--video .video-frame {
+  position: absolute;
+  inset: 0;
+}
+
+.facility-card--video iframe {
+  width: 100%;
+  height: 100%;
+  border: 0;
+  pointer-events: auto;
+}
+
+/* Click-to-play poster: the YouTube thumbnail is cropped to fill the square
+   card (object-fit: cover) so the vignette has no black bars. */
+.video-poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: #000;
+  cursor: pointer;
+}
+
+.video-poster img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 700ms ease;
+}
+
+.facility-card--video:hover .video-poster img {
+  transform: scale(1.045);
+}
+
+.video-play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  border-radius: 50%;
+  background: rgb(13 20 14 / 55%);
+  color: var(--white);
+  font-size: 1.6rem;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  backdrop-filter: blur(2px);
+  transition: background 200ms ease, transform 200ms ease;
+}
+
+.facility-card--video:hover .video-play {
+  background: var(--terracotta);
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+
+
+
+.facility-card__icon--video {
+  background: var(--terracotta);
+  color: var(--white);
+}
+
+.facility-card__overlay--video {
+  pointer-events: none;
+}
+
+
+
+
+/* Redesigned privacy block: a soft, elegant panel with a decorative icon,
+   a subtle background wash and generous breathing room for the text. */
+.venue-privacy {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: clamp(1.25rem, 3vw, 2rem);
+  align-items: start;
+  margin-top: clamp(1rem, 2vw, 1.5rem);
+  padding: clamp(1.75rem, 4vw, 3rem);
+
+  overflow: hidden;
+  border: 1px solid rgb(36 33 25 / 12%);
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgb(228 185 104 / 22%), transparent 55%),
+    linear-gradient(135deg, rgb(255 255 255 / 78%), rgb(255 255 255 / 45%));
+  box-shadow: 0 18px 44px rgb(36 33 25 / 10%);
+}
+
+.venue-privacy::before {
+  position: absolute;
+  top: -3.5rem;
+  right: -3.5rem;
+  width: 12rem;
+  height: 12rem;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgb(228 185 104 / 28%), transparent 70%);
+  content: "";
+  pointer-events: none;
+}
+
+.venue-privacy__icon {
+  display: inline-grid;
+  place-items: center;
+  width: 4.5rem;
+  height: 4.5rem;
+  flex: 0 0 auto;
+  border-radius: 1.1rem;
+  background: var(--terracotta);
+  color: var(--white);
+  box-shadow: 0 10px 24px rgb(36 33 25 / 18%);
+}
+
+.venue-privacy__icon svg {
+  width: 2.6rem;
+  height: 2.6rem;
+}
+
+.venue-privacy__header {
+  display: contents;
+}
+
+.venue-privacy__body {
+  grid-column: 2;
+}
+
+.venue-privacy h3 {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.6rem, 2.8vw, 2.4rem);
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.venue-privacy p {
+  margin: 0;
+  font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+  line-height: 1.85;
+}
+
+/* The privacy disclosure is a FAB-activated modal on every screen size.
+   The inline panel is hidden by default; a floating lock button opens it as
+   a dimmed overlay. The close button only appears once the modal is open. */
+.venue-privacy-shell {
+  display: none;
+}
+
+/* INTIMITE modal — styled like the other section FAB modals (weather
+   advice / attire pictogram): a white rounded panel with a display-font
+   title and a bordered close button over a dimmed overlay. */
+.venue-privacy-shell.is-mobile-open {
+  position: fixed;
+  z-index: 240;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: rgb(36 33 25 / 55%);
+}
+
+.venue-privacy-shell.is-mobile-open .venue-privacy {
+  position: relative;
+  display: block;
+  width: min(100%, 26rem);
+  max-height: 80svh;
+  margin: 0;
+  padding: 2rem 1.5rem 1.5rem;
+  overflow-y: auto;
+  border: 0;
+  border-radius: 1.25rem;
+  background: var(--white);
+  box-shadow: 0 1.5rem 3.5rem rgb(36 33 25 / 35%);
+  overscroll-behavior: contain;
+}
+
+.venue-privacy__header {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  padding-right: 2.5rem;
+}
+
+.venue-privacy__header .venue-privacy__icon {
+  width: 3.25rem;
+  height: 3.25rem;
+  flex-basis: 3.25rem;
+  border-radius: 50%;
+}
+
+.venue-privacy__header .venue-privacy__icon svg {
+  width: 1.9rem;
+  height: 1.9rem;
+}
+
+.venue-privacy__header h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 400;
+  color: var(--ink);
+}
+
+.venue-privacy__body {
+  margin-top: 1rem;
+}
+
+.venue-privacy__body p {
+  color: rgb(36 33 25 / 78%);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.venue-privacy__close {
+  position: absolute;
+  z-index: 2;
+  top: 0.75rem;
+  right: 0.75rem;
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgb(36 33 25 / 22%);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  font-size: 1.4rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.venue-privacy-fab {
+  position: fixed;
+  z-index: 130;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  width: 4.25rem;
+  height: 4.25rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 3px solid var(--marigold);
+  border-radius: 50%;
+  background: var(--terracotta);
+  box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
+  color: var(--white);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(1rem) scale(0.9);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.venue-privacy-fab.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.venue-privacy-fab svg {
+  width: 2.4rem;
+  height: 2.4rem;
+}
+
+/* ── Extra-large screens: contain the FAB within the 120rem main column ──
+   On very wide displays (≥1440px) the main content is constrained to a
+   centered 120rem container. The privacy FAB is position:fixed, so it would
+   otherwise float at the far viewport edge, outside the container. Anchor it
+   to the container's right edge instead (50% + 60rem = right edge of the
+   centered 120rem column), keeping a 1rem breathing margin. */
+@media (min-width: 1440px) {
+  .venue-privacy-fab {
+    left: 50%;
+    right: auto;
+    transform: translateX(calc(60rem - 100% - 1rem)) translateY(1rem) scale(0.9);
+  }
+
+  .venue-privacy-fab.is-visible {
+    transform: translateX(calc(60rem - 100% - 1rem)) translateY(0) scale(1);
+  }
+}
+
+
+
+
+.facilities-note {
+  max-width: 52rem;
+  margin: 1.5rem 0 0;
+  color: rgb(36 33 25 / 62%);
+  font-size: 0.82rem;
+  font-style: italic;
+  line-height: 1.6;
+}
+
+
+/* The venue heading is a two-row flex column:
+   Row 1 → eyebrow ("EL LUGAR") on the left, venue link on the right.
+   Row 2 → title on the left, citation on the right.
+   Scoped under .facilities-section so it overrides the shared
+   .experience-heading grid rule from food.css (which would otherwise force
+   the eyebrow, title and citation into three side-by-side columns). */
+.facilities-section .experience-heading {
+  display: flex;
+  flex-direction: column;
+  /* Override the shared .experience-heading rule from food.css, which sets
+     align-items: start. In a flex column that would shrink each heading row
+     to its content width, so the venue link would not reach the right edge.
+     Stretch keeps every row full-width so the link sits flush with the cards. */
+  align-items: stretch;
+  gap: 0.75rem;
+  margin-bottom: 0;
+}
+
+
+/* Each heading row is a two-column split (left label/title, right link/
+   citation). */
+.facilities-section .experience-heading-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.facilities-section .experience-heading-row--main {
+  margin-top: 0.25rem;
+}
+
+/* The venue eyebrow ("EL LUGAR") uses the shared standard eyebrow treatment
+   (2rem, terracotta, uppercase) so it stays consistent with every other
+   section. It sits on the left of the first heading row, with the location
+   link on the right. */
+.facilities-section .experience-heading .eyebrow {
+  margin: 0;
+}
+
+
+
+
+
+
+
+.venue-location-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--terracotta);
+  color: var(--terracotta);
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-decoration: none;
+  transition: opacity 180ms ease;
+}
+
+.venue-location-link:hover {
+  opacity: 0.75;
+}
+
+
+.venue-gallery {
+  display: grid;
+  grid-template-columns: 1.15fr 1fr 1fr 1.15fr;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.venue-gallery-card {
+  position: relative;
+  min-height: clamp(18rem, 26vw, 28rem);
+  margin: 0;
+  overflow: hidden;
+}
+
+.venue-gallery-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 700ms ease;
+}
+
+.venue-gallery-card:hover img {
+  transform: scale(1.035);
+}
+
+.venue-gallery-card::after {
+  position: absolute;
+  inset: auto 0 0;
+  height: 45%;
+  background: linear-gradient(transparent, rgb(13 20 14 / 72%));
+  content: "";
+}
+
+.venue-gallery-card figcaption {
+  position: absolute;
+  z-index: 1;
+  right: 1.2rem;
+  bottom: 1.1rem;
+  left: 1.2rem;
+  color: white;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.3vw, 2.2rem);
+}
+
+.venue-gallery-source {
+  display: inline-block;
+  margin: 0;
+  color: rgb(36 33 25 / 64%);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-decoration: underline;
+  text-transform: uppercase;
+  text-underline-offset: 0.3em;
+}
+
+
+/* The photo slideset is a square card in the facility row (just before the
+   video). The autoplaying strip fills the card, and the play/pause + counter
+   controls live inside the card (at the bottom) so the card keeps the same
+   height as the other cards in the row. */
+.roca-gallery-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  /* Fill the grid cell so the card inside can resolve height: 100% against
+     the capped slide height (otherwise the gallery card grows with its
+     content and overflows the slide on slide 2). */
+  height: 100%;
+  min-height: 0;
+}
+
+
+.facility-card--gallery {
+  display: flex;
+  flex-direction: column;
+  padding: 0.6rem;
+  background: #efe9da;
+}
+
+/* The gallery card is a light panel, so it doesn't need the dark scrim. */
+.facility-card--gallery::after {
+  display: none;
+}
+
+.roca-gallery {
+  display: grid;
+  grid-auto-columns: 100%;
+  grid-auto-flow: column;
+  gap: 0.5rem;
+  flex: 1;
+  min-height: 0;
+  overflow-x: auto;
+  padding-bottom: 0.4rem;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: var(--terracotta) rgb(36 33 25 / 12%);
+  scrollbar-width: thin;
+}
+
+
+.roca-gallery-item {
+  position: relative;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0.9rem;
+  background: var(--ink);
+  cursor: pointer;
+  scroll-snap-align: start;
+}
+
+.roca-gallery-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 700ms ease;
+}
+
+.roca-gallery-item:hover img {
+  transform: scale(1.05);
+}
+
+/* Play/pause + counter control row, centered just below the photo cards. */
+.roca-gallery-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+
+.roca-gallery-toggle {
+  display: inline-grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: 1px solid rgb(36 33 25 / 30%);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 55%);
+  color: var(--ink);
+  font-size: 0.8rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 200ms ease, transform 200ms ease;
+}
+
+.roca-gallery-toggle:hover {
+  background: rgb(255 255 255 / 85%);
+  transform: scale(1.05);
+}
+
+.roca-gallery-count {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+  color: rgb(36 33 25 / 70%);
+}
+
+
+/* Elegant navigation links at the bottom of each venue slide */
+.venue-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem 2.5rem;
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(255 255 255 / 18%);
+}
+
+.venue-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--white);
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 250ms ease;
+}
+
+.venue-nav-link:hover,
+.venue-nav-link:focus-visible {
+  color: var(--accent, #d9b36a);
+  text-decoration: underline;
+}
+
+/* Dark text variant for the venue footer links. The venue slides sit on a
+   light background (#d9d5c5), so the links need dark ink to stay readable. */
+.venue-nav--dark {
+  border-top-color: rgb(36 33 25 / 18%);
+}
+
+.venue-nav--dark .venue-nav-link {
+  color: var(--ink);
+}
+
+.venue-nav--dark .venue-nav-link:hover,
+.venue-nav--dark .venue-nav-link:focus-visible {
+  color: var(--terracotta);
+}
+
+@media (max-width: 899px) {
+  /* Match the mobile Story heading rhythm:
+     1. eyebrow, 2. venue link, 3. title, 4. citation. */
+  .facilities-section {
+    padding: 1.2rem;
+  }
+
+  /* The section adds 1.2rem of vertical padding on each side (2.4rem total).
+     The slide's min-height is border-box, so subtract that padding here to
+     keep the whole venue section exactly one viewport tall (minus the
+     countdown + header) instead of overflowing by 2.4rem. */
+  .venue-slide {
+    min-height: calc(100svh - var(--countdown-height) - var(--header-height) - 2.4rem);
+  }
+
+  /* Tighten the gallery source line on mobile so it doesn't push the section
+     taller than expected. */
+  .venue-slide--one .venue-gallery-source {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    display: inline-flex;
+  }
+
+  .facilities-section .experience-heading {
+    gap: 0;
+  }
+
+
+
+  .facilities-section .experience-heading-row {
+    width: 100%;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 0.6rem;
+  }
+
+  .facilities-section .experience-heading-row:not(.experience-heading-row--main) {
+    align-items: baseline;
+    flex-direction: row;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .facilities-section .venue-location-link {
+    max-width: 68%;
+    padding-bottom: 0.15rem;
+    font-size: clamp(0.68rem, 2.7vw, 0.82rem);
+    line-height: 1.25;
+    text-align: right;
+  }
+
+  .facilities-section .experience-heading-row--main {
+    gap: 1rem;
+    margin-top: 1.25rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .facilities-section .experience-heading-row--main h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 6vw, 5.5rem);
+  }
+
+  .facilities-section .facilities-lead {
+    font-size: 0.8rem;
+  }
+
+
+  .facility-slide {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    height: auto;
+  }
+
+  /* One card per slide on mobile, sized 4:3. */
+  .facility-slide .facility-card {
+    height: auto;
+    aspect-ratio: 4 / 3;
+  }
+
+  .facility-slideset__nav {
+    gap: 0.85rem;
+    margin-top: 0.85rem;
+  }
+
+  .facility-slideset__arrow,
+  .facility-slideset__toggle {
+    width: 1.5rem;
+    height: 1.5rem;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    font-size: 0.75rem;
+    font-weight: 400;
+  }
+
+  .facility-slideset__arrow:hover,
+  .facility-slideset__toggle:hover {
+    background: transparent;
+  }
+
+  .facility-slideset__dots {
+    gap: 0.4rem;
+  }
+
+  .facility-slideset__dot {
+    width: 0.45rem;
+    height: 0.45rem;
+  }
+
+  .facility-card__overlay {
+    gap: 0.5rem;
+    padding: 1.25rem;
+  }
+
+  .facility-card__icon {
+    width: 2.4rem;
+    height: 2.4rem;
+    border-radius: 0.65rem;
+  }
+
+  .facility-card__icon svg {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+
+  .facility-card h3 {
+    font-size: clamp(1.4rem, 5.5vw, 1.9rem);
+  }
+
+  .facility-card ul {
+    gap: 0.3rem;
+  }
+
+  .facility-card li {
+    padding-left: 0.85rem;
+    font-size: clamp(0.85rem, 3vw, 1.05rem);
+    line-height: 1.35;
+  }
+
+  .facility-card li::before {
+    width: 0.25rem;
+    height: 0.25rem;
+  }
+
+  .video-play {
+    width: 3rem;
+    height: 3rem;
+    font-size: 1.1rem;
+  }
+}

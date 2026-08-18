@@ -1,0 +1,220 @@
+/* ── Countdown bar ────────────────────────────────────────────────────── */
+
+/* ── Responsive: mobile-first ──────────────────────────────────────────
+   On small screens the countdown bar compacts: the label collapses to just
+   the monogram, and the unit values tighten so all five units fit on one
+   line. */
+
+@media (max-width: 600px) {
+  :root {
+    --countdown-height: 3.2rem;
+  }
+
+  .countdown-bar {
+    gap: 0.4rem;
+    padding-inline: 0.5rem;
+    padding-block: 0.3rem;
+  }
+
+  /* Keep the "CASADOS EN / DESDE" line under the monogram, just tiny. */
+  .countdown-prefix {
+    font-size: 0.3rem;
+    letter-spacing: 0.18em;
+  }
+
+  .countdown-values {
+    width: auto;
+    justify-content: space-evenly;
+    gap: 0.3rem;
+  }
+
+  .countdown-unit {
+    gap: 0;
+  }
+
+  .countdown-unit strong {
+    font-size: clamp(1.5rem, 4vw, 3rem);
+  }
+
+  .countdown-unit small {
+    font-size: clamp(0.6rem, 1.4vw, 1rem);
+  }
+
+  .identity-swap--countdown {
+    font-size: clamp(0.7rem, 1.6vw, 1rem);
+  }
+}
+
+.countdown-bar {
+
+  position: sticky;
+  z-index: 90;
+  /* The nav bar sits on top (sticky at top:0); the countdown sticks just
+     below it on desktop. On mobile it is non-sticky (see above) and scrolls
+     away. */
+  top: var(--header-height);
+
+
+  display: flex;
+  min-height: var(--countdown-height);
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.65rem, 3vw, 2rem);
+  padding: 0.45rem 1rem;
+  background: var(--deep-green);
+  color: var(--white);
+  box-shadow: 0 8px 24px rgb(31 30 23 / 18%);
+  letter-spacing: 0.02em;
+}
+
+/* Compact stacked layout: number on top, label below — used on all
+   breakpoints so desktop matches the mobile look. */
+.countdown-unit {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  white-space: nowrap;
+}
+
+.countdown-unit strong {
+  min-width: 1.3em;
+  font-family: var(--font-countdown);
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: center;
+}
+
+.countdown-unit small {
+  color: rgb(255 253 248 / 72%);
+  font-size: clamp(0.6rem, 1.4vw, 1rem);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.countdown-label {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.18rem;
+  white-space: nowrap;
+}
+
+/* "CASADOS EN / DESDE" sits in a small, letter-spaced line directly under
+   the animated D&A monogram. */
+.countdown-prefix {
+  font-family: var(--font-display);
+  font-size: clamp(0.4rem, 0.85vw, 0.58rem);
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: rgb(255 253 248 / 78%);
+}
+
+
+/* Small animated A&D monogram that sits above the "CASADOS EN / DESDE"
+   label in the countdown bar. */
+.identity-swap--countdown {
+  --identity-cycle: 18s;
+  font-size: clamp(1.1rem, 2.4vw, 1.6rem);
+  line-height: 1;
+}
+
+
+.identity-swap--countdown .identity-connector {
+  font-size: 0.55em;
+}
+
+.identity-swap--countdown .identity-swap-state i {
+  font-size: 0.6em;
+}
+
+
+
+.countdown-guest {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: 16rem;
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-size: clamp(0.8rem, 1.6vw, 1rem);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.countdown-guest::before {
+  content: "✦";
+  color: var(--marigold);
+  font-size: 0.7em;
+}
+
+.countdown-values {
+  display: flex;
+  width: min(100%, 32rem);
+  align-items: center;
+  flex: 1;
+  gap: clamp(0.6rem, 2.5vw, 1.5rem);
+}
+
+/* ── Desktop: slightly bigger countdown bar ────────────────────────────
+   Instead of shrinking the numbers to fit the bar, give the bar a bit
+   more height on desktop so the figures can breathe at a comfortable
+   size. The clamp() on the base rule caps at 3rem; here we use a
+   slightly larger bar and a comfortable middle-ground figure size. */
+@media (min-width: 901px) {
+  :root {
+    --countdown-height: 4rem;
+  }
+
+  .countdown-bar {
+    min-height: var(--countdown-height);
+    padding-block: 0.6rem;
+  }
+
+  .countdown-unit strong {
+    font-size: clamp(1.4rem, 2.2vw, 2rem);
+  }
+
+  .countdown-unit small {
+    font-size: clamp(0.55rem, 0.8vw, 0.75rem);
+  }
+
+  .countdown-values {
+    gap: clamp(0.7rem, 1.8vw, 1.4rem);
+  }
+
+  .countdown-prefix {
+    font-size: clamp(0.5rem, 0.8vw, 0.65rem);
+  }
+
+  .identity-swap--countdown {
+    font-size: clamp(1.3rem, 2.2vw, 1.7rem);
+  }
+}
+
+/* On mobile the countdown is NOT sticky: it scrolls away naturally so the
+   nav bar can stay pinned to the very top at all times. The countdown
+   reappears when the user scrolls back up to the top of the page. This
+   override lives AFTER the base `.countdown-bar` rule so it wins in the
+   cascade (equal specificity, later source order). */
+@media (max-width: 899px) {
+  .countdown-bar {
+    position: relative;
+    top: auto;
+  }
+}
+
+
+

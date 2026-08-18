@@ -1,0 +1,21 @@
+// ── Buttons ─────────────────────────────────────────────────────────────
+@use "tokens" as *;
+
+.dashboard-button {
+  border: 0;
+  border-radius: 0.35rem;
+  cursor: pointer;
+  transition: transform 160ms ease, background 160ms ease;
+  padding: 1rem 1.6rem;
+  color: $white;
+  background: $dark;
+
+  &:hover {
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    cursor: wait;
+    opacity: 0.65;
+  }
+}

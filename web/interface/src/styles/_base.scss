@@ -1,0 +1,62 @@
+// ── Base: reset, global layout, typography ──────────────────────────────
+@use "tokens" as *;
+
+// Base CSS custom properties. Theme classes (.theme-*) override the
+// --brand / --brand-dark / --teal values per page.
+:root {
+  --ink: #{$ink};
+  --ink-soft: #{$ink-soft};
+  --linen: #{$linen};
+  --paper: #{$paper};
+  --line: #{$line};
+  --brand: #{$brand};
+  --brand-dark: #{$brand-dark};
+  --teal: #{$teal};
+  --gold: #{$gold};
+  --wine: #{$wine};
+  --shadow: #{$shadow};
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  color: $ink;
+  background:
+    radial-gradient(circle at 8% 10%, rgba(194, 86, 48, 0.28), transparent 32%),
+    radial-gradient(circle at 90% 0%, rgba(31, 111, 103, 0.27), transparent 38%),
+    linear-gradient(160deg, #f4ecdf 0%, #f8f3ea 56%, #f2e8da 100%);
+  font-family: $font-body;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.17) 1px, transparent 1px);
+  background-size: 8px 8px;
+  opacity: 0.25;
+}
+
+h1,
+h2,
+h3 {
+  font-family: $font-display;
+  letter-spacing: 0.2px;
+}
+
+a {
+  color: inherit;
+}
+
+.shell {
+  max-width: 1160px;
+  margin: 0 auto;
+  padding: 24px;
+  position: relative;
+  z-index: 1;
+}

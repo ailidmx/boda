@@ -1,0 +1,452 @@
+/* ── Story section ────────────────────────────────────────────────────── */
+
+.story-section {
+  position: relative;
+  display: grid;
+  grid-template-columns: 0.6fr 1.4fr;
+
+  align-items: center;
+  align-content: space-between;
+  gap: clamp(2rem, 5vw, 5rem);
+  min-height: calc(100svh - var(--countdown-height) - var(--header-height));
+  padding-block: clamp(2rem, 4vw, 3.5rem);
+  /* Light, airy gradient that tells the couple's story: a warm dawn rising
+     from the lake (sand) into a soft cream sky, with a faint golden glow
+     where the sun would sit. */
+  background:
+    radial-gradient(
+      circle at 78% 18%,
+      rgb(241 211 144 / 34%) 0%,
+      rgb(241 211 144 / 0%) 34%
+    ),
+    radial-gradient(
+      circle at 12% 88%,
+      rgb(169 77 49 / 12%) 0%,
+      rgb(169 77 49 / 0%) 40%
+    ),
+    linear-gradient(180deg, #fbf7ee 0%, var(--cream) 46%, #efe6d2 100%);
+  isolation: isolate;
+}
+
+/* Decorative background art: a soft sun disc, a winding "path" and diamond
+   motifs echoing the couple's journey. Purely decorative, sits behind the
+   content. */
+.story-section::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  pointer-events: none;
+  background:
+    /* Sun disc (upper right) */
+    radial-gradient(
+      circle at 82% 16%,
+      rgb(198 139 43 / 22%) 0 3.5rem,
+      rgb(198 139 43 / 0%) 3.6rem
+    ),
+    /* Outer sun halo */
+    radial-gradient(
+      circle at 82% 16%,
+      rgb(198 139 43 / 10%) 0 5.5rem,
+      rgb(198 139 43 / 0%) 5.6rem
+    ),
+    /* Diamond motif (upper left) */
+    conic-gradient(
+      from 45deg at 14% 22%,
+      rgb(169 77 49 / 16%) 0 25%,
+      transparent 25% 50%,
+      rgb(169 77 49 / 16%) 50% 75%,
+      transparent 75% 100%
+    ),
+    /* Small diamond (lower right) */
+    conic-gradient(
+      from 45deg at 88% 82%,
+      rgb(122 139 122 / 18%) 0 25%,
+      transparent 25% 50%,
+      rgb(122 139 122 / 18%) 50% 75%,
+      transparent 75% 100%
+    ),
+    /* Winding path across the middle */
+    repeating-linear-gradient(
+      115deg,
+      transparent 0 2.2rem,
+      rgb(198 139 43 / 7%) 2.2rem 2.35rem,
+      transparent 2.35rem 4.4rem
+    );
+  content: "";
+}
+
+/* Keep the section's own children above the decorative background. */
+.story-section > * {
+  position: relative;
+  z-index: 1;
+}
+
+
+/* Pin the "continue" nav to the bottom of the full-height slide. The margin
+   is kept tight so the link stays visible within the viewport height. */
+.story-section .section-nav {
+  grid-column: 1 / -1;
+  align-self: end;
+  margin-top: auto;
+}
+
+
+
+
+
+
+.story-mark {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(1.5rem, 3vw, 2.5rem);
+  color: var(--terracotta);
+  font-family: var(--font-display);
+  font-size: clamp(8rem, 23vw, 22rem);
+  letter-spacing: -0.13em;
+  line-height: 0.8;
+  opacity: 0.9;
+}
+
+/* The map to the venue sits in the left column, below the animated initials.
+   It is a clickable button that opens the full-screen viewer. It fills as
+   much of the left column as possible so it reads almost like a background
+   image, while staying compact enough for the whole Story slide to fit. */
+.story-map {
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  padding: 0;
+  border: 0;
+  border-radius: 0.75rem;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  box-shadow: 0 0.75rem 2rem rgb(36 33 25 / 14%);
+  cursor: zoom-in;
+  transition: transform 400ms ease, box-shadow 400ms ease;
+}
+
+.story-map:hover {
+  transform: scale(1.02);
+  box-shadow: 0 1rem 2.5rem rgb(36 33 25 / 22%);
+}
+
+@media (max-width: 899px) {
+  .story-mark {
+    position: absolute;
+    top: 10%;
+    right: 15%;
+    color: var(--terracotta);
+    font-family: var(--font-display);
+    font-size: 1rem;
+    letter-spacing: -0.13em;
+    line-height: 0.8;
+    opacity: 0.9;
+  }
+
+
+
+  /* On mobile the map is hidden below the initials; it is instead opened via
+     the old-map FAB on the left edge of the screen. */
+  .story-map {
+    display: none;
+  }
+}
+
+.identity-swap--story .identity-swap-state {
+  gap: 0.02em;
+}
+
+.identity-swap--story .identity-swap-state i {
+  color: var(--marigold);
+  font-size: 0.32em;
+}
+
+
+
+.story-copy {
+  min-width: 0;
+}
+
+.story-copy h2 {
+  margin-bottom: 1rem;
+}
+
+
+/* Lead de la story stylisé comme une citation littéraire. */
+#story .story-lead {
+  position: relative;
+  max-width: 34rem;
+  margin: 1.5rem 0 1.5rem;
+  padding-left: 1.5rem;
+
+  border-left: 2px solid var(--marigold);
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.6vw, 2rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--ink);
+}
+
+.story-lead::before {
+  content: "“";
+  position: absolute;
+  top: -0.35em;
+  left: -0.15rem;
+  font-family: var(--font-display);
+  font-size: 3.5em;
+  line-height: 1;
+  color: var(--marigold);
+  opacity: 0.35;
+}
+
+
+
+.chapala-photos {
+  display: grid;
+  grid-auto-columns: minmax(15rem, 22vw);
+  grid-auto-flow: column;
+  gap: 0.8rem;
+  margin-top: 1.25rem;
+  overflow-x: auto;
+  padding-bottom: 1.25rem;
+
+  scroll-snap-type: x mandatory;
+  scrollbar-color: var(--terracotta) rgb(36 33 25 / 12%);
+  scrollbar-width: thin;
+}
+
+
+
+
+.chapala-photo {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0.5rem;
+  background: none;
+  cursor: pointer;
+  scroll-snap-align: start;
+}
+
+
+
+.chapala-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 700ms ease;
+}
+
+.chapala-photo:hover img {
+  transform: scale(1.04);
+}
+
+/* Section footer that hosts the reusable fun-fact carousel. On every screen
+   size the explorer is FAB-activated: it is removed from the section flow
+   and becomes a modal overlay only after the avatar FAB is pressed. */
+.story-footer {
+  display: none;
+}
+
+.story-footer.is-mobile-open {
+  position: fixed;
+  z-index: 240;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding:
+    max(1rem, env(safe-area-inset-top))
+    1rem
+    max(1rem, env(safe-area-inset-bottom));
+  border: 0;
+  background: rgb(18 27 24 / 72%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.story-facts-panel {
+  position: relative;
+  width: min(100%, 34rem);
+  max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  overflow-y: auto;
+  border: 1px solid rgb(198 139 43 / 48%);
+  border-radius: 1.25rem;
+  background: var(--cream);
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 38%);
+  overscroll-behavior: contain;
+}
+
+.story-facts-panel .fun-fact-list {
+  border: 0;
+  background: transparent;
+}
+
+.story-facts-panel .fun-fact-list-heading {
+  justify-content: flex-start;
+  padding-right: 2.75rem;
+}
+
+.story-facts-panel .fun-fact-header-avatar {
+  display: inline-flex;
+  width: 3.25rem;
+  height: 3.25rem;
+  flex: 0 0 3.25rem;
+  overflow: hidden;
+  border: 2px solid var(--marigold);
+  border-radius: 50%;
+  box-shadow: 0 0.25rem 0.75rem rgb(36 33 25 / 20%);
+}
+
+.story-facts-panel .fun-fact-header-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.story-facts-panel .fun-fact-row {
+  grid-template-columns: 1fr;
+}
+
+.story-facts-panel .fun-fact-avatar {
+  display: none;
+}
+
+.story-facts-close {
+  position: absolute;
+  z-index: 2;
+  top: 0.65rem;
+  right: 0.75rem;
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgb(36 33 25 / 20%);
+  border-radius: 50%;
+  background: rgb(255 253 248 / 88%);
+  color: var(--ink);
+  font-size: 1.5rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.story-map-fab {
+  display: none;
+}
+
+
+/* ── Fun-facts section FAB ──────────────────────────────────────────────
+   A floating action button that appears while the Story section is in view
+   and opens the fun-fact carousel as a modal. Active on every screen size
+   (mobile and desktop). Oscar + Diego use the same circular, marigold-
+   bordered avatar treatment as the explorer itself. */
+.story-facts-fab {
+  position: fixed;
+  z-index: 130;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: max(1rem, env(safe-area-inset-bottom));
+  display: block;
+  width: 4.25rem;
+  height: 4.25rem;
+  padding: 0;
+  overflow: hidden;
+  border: 3px solid var(--marigold);
+  border-radius: 50%;
+  background: var(--terracotta);
+  color: var(--white);
+  box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(1rem) scale(0.9);
+  transition: opacity 180ms ease, transform 180ms ease;
+}
+
+.story-facts-fab.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
+}
+
+.story-facts-fab img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+
+@media (max-width: 899px) {
+  /* Reduce chapala photo height on mobile so the section fits within 100vh. */
+  .chapala-photo {
+    aspect-ratio: 16 / 9;
+  }
+
+  /* Mobile-only map FAB on the left edge. Styled like an old-time map:
+
+     parchment wash, a compass-rose icon and a double sepia ring, so it reads
+     as a little "map" button that opens the venue map in the lightbox. */
+  .story-map-fab {
+
+    position: fixed;
+    z-index: 130;
+    left: max(1rem, env(safe-area-inset-left));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    display: grid;
+    width: 4.25rem;
+    height: 4.25rem;
+    place-items: center;
+    padding: 0;
+    border: 2px solid rgb(120 84 40 / 55%);
+    border-radius: 50%;
+    background:
+      radial-gradient(circle at 30% 25%, rgb(255 244 214 / 95%), rgb(214 178 116 / 92%) 70%);
+    box-shadow:
+      inset 0 0 0 3px rgb(255 250 235 / 55%),
+      inset 0 0 0 4px rgb(120 84 40 / 35%),
+      0 0.65rem 1.5rem rgb(36 33 25 / 32%);
+    color: rgb(90 60 25 / 90%);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(1rem) scale(0.9);
+    transition: opacity 180ms ease, transform 180ms ease;
+  }
+
+  .story-map-fab.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
+
+  .story-map-fab svg {
+    width: 2.3rem;
+    height: 2.3rem;
+    fill: currentColor;
+  }
+}
+
+/* ── Extra-large screens: contain the FAB within the 120rem main column ──
+   On very wide displays (≥1440px) the main content is constrained to a
+   centered 120rem container. The fun-facts FAB is position:fixed, so it
+   would otherwise float at the far viewport edge, outside the container.
+   Anchor it to the container's right edge instead (50% + 60rem = right edge
+   of the centered 120rem column), keeping a 1rem breathing margin. */
+@media (min-width: 1440px) {
+  .story-facts-fab {
+    left: 50%;
+    right: auto;
+    transform: translateX(calc(60rem - 100% - 1rem)) translateY(1rem) scale(0.9);
+  }
+
+  .story-facts-fab.is-visible {
+    transform: translateX(calc(60rem - 100% - 1rem)) translateY(0) scale(1);
+  }
+}
+

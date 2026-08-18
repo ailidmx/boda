@@ -1,0 +1,254 @@
+/* ── Reusable "fun fact" carousel ───────────────────────────────────────
+   A thin, self-contained strip that cycles through short facts. It is
+   generic so it can be dropped into any section with a different set of
+   facts. */
+
+.fun-fact-list {
+  display: grid;
+  grid-template-areas:
+    "header"
+    "divider"
+    "content"
+    "footer";
+  margin: 1.5rem auto 0;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgb(36 33 25 / 14%);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 45%);
+  max-width: 46rem;
+}
+
+
+.fun-fact-list-heading {
+  grid-area: header;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.fun-fact-label {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--terracotta);
+}
+
+/* Optional compact avatar used by modal presentations. Inline carousels keep
+   the larger avatar beside the fact body. */
+.fun-fact-header-avatar {
+  display: none;
+}
+
+.fun-fact-divider {
+  grid-area: divider;
+  margin: 0.85rem 0 1rem;
+  border: none;
+  border-top: 1px solid rgb(36 33 25 / 16%);
+}
+
+.fun-fact-viewport {
+  grid-area: content;
+  overflow: hidden;
+}
+
+/* On mobile the carousel controls form a dedicated footer, keeping the title
+   stable at the top while facts of different lengths rotate above it. */
+.fun-fact-footer {
+  grid-area: footer;
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  padding-top: 0.85rem;
+  border-top: 1px solid rgb(36 33 25 / 16%);
+}
+
+.fun-fact-track {
+  display: flex;
+  /* Slow, smooth slide between pages. The cubic-bezier eases in and out so
+     the carousel glides rather than snapping. */
+  transition: transform 900ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fun-fact-rows {
+  flex: 0 0 100%;
+  min-width: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.85rem;
+}
+
+.fun-fact-row {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  justify-items: center;
+  gap: 1.1rem;
+  text-align: center;
+}
+
+.fun-fact-row-body {
+  display: grid;
+  gap: 0.35rem;
+  min-width: 0;
+  justify-items: center;
+}
+
+.fun-fact-row-index {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--marigold);
+  padding-top: 0.15rem;
+}
+
+.fun-fact-row-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--ink);
+  text-align: center;
+}
+
+.fun-fact-row p {
+  margin: 0;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--ink);
+  text-align: center;
+}
+
+.fun-fact-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+
+.fun-fact-arrow {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgb(36 33 25 / 22%);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+.fun-fact-arrow:hover {
+  background: var(--marigold);
+  border-color: var(--marigold);
+  color: var(--white);
+}
+
+/* Play / pause toggle for the autoplay carousel. */
+.fun-fact-pause {
+  width: 2rem;
+  height: 2rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgb(36 33 25 / 22%);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.7rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 200ms ease, color 200ms ease, border-color 200ms ease;
+}
+
+.fun-fact-pause:hover {
+  background: var(--marigold);
+  border-color: var(--marigold);
+  color: var(--white);
+}
+
+.fun-fact-pause[aria-pressed="true"] {
+  background: var(--terracotta);
+  border-color: var(--terracotta);
+  color: var(--white);
+}
+
+
+.fun-fact-dots {
+  display: flex;
+  gap: 0.45rem;
+}
+
+.fun-fact-dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgb(36 33 25 / 22%);
+  cursor: pointer;
+  transition: background 200ms ease, transform 200ms ease;
+}
+
+.fun-fact-dot[aria-current="true"] {
+  background: var(--terracotta);
+  transform: scale(1.25);
+}
+
+/* Avatar shown beside a fun fact when a guest has uploaded a photo. */
+.fun-fact-avatar {
+  width: 6rem;
+  height: 6rem;
+  border-radius: 50%;
+  border: 3px solid var(--marigold);
+  box-shadow: 0 4px 14px rgb(36 33 25 / 20%);
+  flex-shrink: 0;
+  overflow: hidden;
+  display: inline-flex;
+}
+
+.fun-fact-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.fun-fact-row--avatar {
+  grid-template-columns: auto 1fr;
+  align-items: center;
+}
+
+.fun-fact-row--avatar .fun-fact-row-index {
+  display: none;
+}
+
+/* Preserve the compact title + controls header used on larger screens. The
+   controls remain a footer in the markup and move visually into the header. */
+@media (min-width: 900px) {
+  .fun-fact-list {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "header footer"
+      "divider divider"
+      "content content";
+  }
+
+  .fun-fact-footer {
+    align-items: center;
+    justify-content: flex-end;
+    margin: 0;
+    padding: 0;
+    border-top: 0;
+  }
+}

@@ -1,37 +1,58 @@
-# Acceso a la invitacion y formularios privados
+# Acceso a la invitación y formularios privados
 
-## Decision recomendada
+## Arquitectura publicada
 
-La clave compartida `vivamexico` puede usarse como puerta sencilla para
-invitados, pero no debe validarse solamente en JavaScript si queremos proteger
-los datos del RSVP.
+La invitación está desplegada en Firebase:
 
-### Opcion de previsualizacion
+- Firebase Hosting sirve la aplicación Vite y sus imágenes aprobadas.
+- Firebase Authentication valida la clave compartida `vivamexico`.
+- El navegador recuerda el acceso en el dispositivo.
+- Cloud Firestore recibe los formularios en la región de Querétaro
+  (`northamerica-south1`).
+- Las reglas de seguridad permiten al usuario invitado crear respuestas, pero
+  le impiden leer, modificar o borrar cualquier respuesta.
+- Las altas y bajas públicas de cuentas están deshabilitadas.
 
-- Pantalla de acceso en el navegador.
-- Clave recordada durante la sesion.
-- Sin backend.
-- Util solamente para evitar descubrimiento casual.
-- No protege el contenido frente a una persona que inspeccione el codigo.
+La configuración pública de Firebase y el correo técnico del usuario invitado
+pueden estar en el bundle. La contraseña no forma parte del código.
 
-### Opcion para publicar
+## Alcance de la puerta
 
-- Validar la clave en una funcion serverless.
-- Guardar la clave como secreto del proveedor, nunca en Git.
-- Crear una cookie de sesion segura, `HttpOnly`, `Secure` y con expiracion.
-- Proteger tanto los archivos del sitio como los endpoints de formularios.
-- Aplicar limite de intentos basico.
+La puerta protege la navegación normal de la aplicación y el acceso de
+escritura al backend. Al tratarse de Hosting estático, una persona que conociera
+la URL exacta de un recurso compilado podría solicitarlo directamente. No se
+publica ninguna información privada de los invitados en esos archivos.
 
-Cloudflare Pages Functions permite ejecutar autenticacion y procesamiento de
-formularios antes de servir el sitio estatico. Las respuestas pueden enviarse
-despues al Google Sheet privado mediante una credencial disponible solo en el
-servidor.
-
-## Formularios previstos
+## Formularios activos
 
 1. RSVP, identidad, grupo, menores, alojamiento y vuelos.
-2. Sugerencias de comida, postre, musica y participacion en escena.
+2. Sugerencias de comida, postre, música y participación en escena.
 3. Sondeo sin compromiso para prolongar el viaje en Costalegre.
 
-Los tres deben compartir identificador de invitado o contacto para evitar
-duplicados y permitir actualizaciones posteriores.
+Las respuestas se guardan respectivamente en:
+
+- `rsvp_submissions`
+- `experience_suggestions`
+- `coast_interest`
+
+Solo los organizadores con acceso al proyecto Firebase pueden consultar esas
+colecciones.
+
+## Publicación
+
+- Producción (`master`): `https://boda-david-y-ayde.web.app`
+- Desarrollo (`develop`): `https://boda-500805.web.app`
+- Proyecto: `boda-500805`
+- Configuración: `firebase.json`
+- Reglas: `firebase/firestore.rules`
+
+Los pushes se publican mediante `.github/workflows/deploy-invitation.yml`.
+Para publicar manualmente desde la raíz:
+
+```bash
+# Desarrollo
+firebase deploy --only hosting:invitation-primary
+
+# Producción
+firebase deploy --only hosting:invitation-named
+```

@@ -1,0 +1,58 @@
+{
+  "id": "dalia",
+  "nombre": "Dalia",
+  "venue": "Club Roca Azul",
+  "capacidad_anunciada": 10,
+  "habitaciones": 3,
+  "camas": {
+    "matrimoniales": 3,
+    "individuales": 4,
+    "total_fisico": 7,
+    "couchages_descritos": 10
+  },
+  "distribucion": [
+    {
+      "habitacion": 1,
+      "camas_matrimoniales": 2,
+      "camas_individuales": 0
+    },
+    {
+      "habitacion": 2,
+      "camas_matrimoniales": 0,
+      "camas_individuales": 4,
+      "configuracion": "2 literas"
+    },
+    {
+      "habitacion": 3,
+      "camas_matrimoniales": 1,
+      "camas_individuales": 0
+    }
+  ],
+  "espacios_observados_en_fotos": [
+    "sala",
+    "comedor",
+    "baño con ducha",
+    "vista hacia la alberca"
+  ],
+  "precio": {
+    "total_2_noches_mxn": 11150,
+    "incluye_desayunos": true,
+    "uso": "interno_hasta_confirmacion_final"
+  },
+  "fotos": [
+    "CAB-DAL-01",
+    "CAB-DAL-02",
+    "CAB-DAL-03",
+    "CAB-DAL-04",
+    "CAB-DAL-05",
+    "CAB-DAL-06",
+    "CAB-DAL-07"
+  ],
+  "estado": "confirmado",
+  "pendiente": [],
+  "fuente": {
+    "tipo": "mensaje_y_fotos_del_venue",
+    "fecha_material": "2026-02-18",
+    "registrado": "2026-07-29"
+  }
+}

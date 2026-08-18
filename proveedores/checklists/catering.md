@@ -11,6 +11,8 @@
 - [ ] Confirmar cantidad final por persona (adulto/nino)
 - [ ] Confirmar tiempos de servicio por bloque y tiempo total de cena
 - [ ] Acordar protocolo para pastel/postres
+- [ ] Cerrar sondeo jericalla / gelatinas / alternativa
+- [ ] Confirmar agua, bebidas sin alcohol y cafe
 - [ ] Definir punto de hidratacion continuo durante pista
 - [ ] Cerrar plan de contingencia para retrasos de cocina
 
@@ -25,5 +27,7 @@
 - [ ] Confirmer la quantite finale par personne (adulte/enfant)
 - [ ] Confirmer les timings de service par bloc et la duree totale du diner
 - [ ] Valider le protocole pour gateau/desserts
+- [ ] Clore le sondage jericalla / gelees / alternative
+- [ ] Confirmer eau, boissons sans alcool et cafe
 - [ ] Definir un point d'hydratation continue pendant la piste
 - [ ] Finaliser un plan de contingence en cas de retard cuisine

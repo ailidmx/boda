@@ -1,0 +1,218 @@
+/* Reusable card carousel: transparent on desktop so existing grids keep their
+   layout, native horizontal scroll-snap on mobile. */
+.swipe-card-carousel,
+.swipe-card-carousel__viewport {
+  width: 100%;
+  min-width: 0;
+}
+
+.swipe-card-carousel__dots {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .swipe-card-carousel {
+    margin-bottom: 1.5rem;
+  }
+
+  .swipe-card-carousel__viewport {
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .swipe-card-carousel__viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .swipe-card-carousel__track {
+    display: flex;
+    align-items: stretch;
+    gap: 0.75rem;
+    width: max-content;
+    min-width: 100%;
+    padding: 0.2rem 0.75rem 0.8rem;
+  }
+
+  .swipe-card-carousel__track > * {
+    flex: 0 0 min(78vw, 19rem);
+    width: min(78vw, 19rem);
+    min-width: 0;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+
+  .playlist-section {
+
+    padding: 1rem;
+  }
+
+  .swipe-card-carousel__track .music-act {
+    min-height: 18rem;
+    border: 1px solid rgb(255 255 255 / 22%);
+  }
+
+  .swipe-card-carousel__track .playlist-card {
+    min-height: 20rem;
+  }
+
+  .swipe-card-carousel__dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    margin-top: 0.35rem;
+  }
+
+  .swipe-card-carousel__dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: currentColor;
+    color: rgb(36 33 25 / 25%);
+    cursor: pointer;
+    transition: color 180ms ease, transform 180ms ease;
+  }
+
+  .music-section .swipe-card-carousel__dot {
+    color: rgb(255 255 255 / 30%);
+  }
+
+  .swipe-card-carousel__dot.is-active {
+    color: var(--terracotta);
+    transform: scale(1.25);
+  }
+
+  .music-section .swipe-card-carousel__dot.is-active {
+    color: var(--marigold);
+  }
+}
+
+/* ── DESKTOP food carousel ─────────────────────────────────────────────
+   The food cards are swipeable on every screen. On desktop the static
+   3-column grid is replaced by a horizontal scroll-snap carousel that shows
+   roughly three cards per view and lets guests swipe/drag to reveal the rest,
+   with the same dots navigation as the mobile carousel. Scoped to the food
+   section so the other carousels keep their desktop grid layout. */
+@media (min-width: 900px) {
+  .food-section .swipe-card-carousel__viewport {
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .food-section .swipe-card-carousel__viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .food-section .swipe-card-carousel__track {
+    display: flex;
+    align-items: stretch;
+    gap: clamp(1.25rem, 3vw, 2.25rem);
+    width: max-content;
+    min-width: 100%;
+    padding: 0.2rem 0.75rem 0.8rem;
+  }
+
+  .food-section .swipe-card-carousel__track > * {
+    flex: 0 0 min(30vw, 24rem);
+    width: min(30vw, 24rem);
+    min-width: 0;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+
+  .food-section .swipe-card-carousel__dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    margin-top: 0.35rem;
+  }
+
+  .food-section .swipe-card-carousel__dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: currentColor;
+    color: rgb(36 33 25 / 25%);
+    cursor: pointer;
+    transition: color 180ms ease, transform 180ms ease;
+  }
+
+  .food-section .swipe-card-carousel__dot.is-active {
+    color: var(--terracotta);
+    transform: scale(1.25);
+  }
+
+  /* ── DESKTOP guisos carousel ────────────────────────────────────────────
+     The guisos cards mirror the food cards: swipeable on every screen, with a
+     horizontal scroll-snap carousel showing ~3 cards per view on desktop and
+     the same dots navigation. Scoped to the guisos section. */
+  .guisos-section .swipe-card-carousel__viewport {
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-inline: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .guisos-section .swipe-card-carousel__viewport::-webkit-scrollbar {
+    display: none;
+  }
+
+  .guisos-section .swipe-card-carousel__track {
+    display: flex;
+    align-items: stretch;
+    gap: clamp(1.25rem, 3vw, 2.25rem);
+    width: max-content;
+    min-width: 100%;
+    padding: 0.2rem 0.75rem 0.8rem;
+  }
+
+  .guisos-section .swipe-card-carousel__track > * {
+    flex: 0 0 min(30vw, 24rem);
+    width: min(30vw, 24rem);
+    min-width: 0;
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+
+  .guisos-section .swipe-card-carousel__dots {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.45rem;
+    margin-top: 0.35rem;
+  }
+
+  .guisos-section .swipe-card-carousel__dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: currentColor;
+    color: rgb(36 33 25 / 25%);
+    cursor: pointer;
+    transition: color 180ms ease, transform 180ms ease;
+  }
+
+  .guisos-section .swipe-card-carousel__dot.is-active {
+    color: var(--terracotta);
+    transform: scale(1.25);
+  }
+}
+
+

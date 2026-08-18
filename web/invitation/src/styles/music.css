@@ -1,0 +1,1013 @@
+/* ── Music / playlist section ─────────────────────────────────────────── */
+
+/* ── Responsive: mobile-first ──────────────────────────────────────────
+   The music lineup is 4 columns on desktop, collapsing to 2 on tablet and 1
+   on mobile. The playlist section stacks its heading above the cards, and the
+   playlist grid collapses to 1 column on mobile. */
+
+/* The music lineup is a single row of 4 cards on desktop. On mobile
+   (≤899px) the SwipeCardCarousel takes over and shows one card per slide,
+   so no intermediate grid is needed here. */
+@media (max-width: 899px) {
+  .playlist-section,
+  .open-stage {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+
+/* ── Music section background themes ────────────────────────────────────
+   The section exposes a set of CSS custom properties that drive the whole
+   palette (section background, act cards, playlist panel, playlist cards,
+   accent and ink). Three vibrant themes are available and the visitor can
+   switch between them with the selector: BRUTAL (the classic ink + gold),
+   WAO (electric night) and ARTY (sunset studio). */
+.music-section {
+  /* BRUTAL — the classic ink + gold look */
+  --music-bg: var(--ink);
+  --music-act-bg:
+    radial-gradient(120% 90% at 100% 0%, rgb(255 244 214 / 55%), transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgb(198 139 43 / 45%), transparent 60%),
+    linear-gradient(160deg, #e4b968 0%, #c99a4a 48%, #a97c33 100%);
+  --music-act-bg-hover:
+    radial-gradient(120% 90% at 100% 0%, rgb(255 250 235 / 70%), transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgb(198 139 43 / 55%), transparent 60%),
+    linear-gradient(160deg, #f0c97e 0%, #d9ab58 48%, #b98a3c 100%);
+  --music-panel-bg: #182620;
+  --music-card-bg: var(--cream);
+  --music-card-number: rgb(169 77 49 / 14%);
+  --music-accent: var(--marigold);
+  --music-ink: var(--ink);
+  --music-on-accent: var(--ink);
+
+  background: var(--music-bg);
+  color: var(--white);
+}
+
+/* WAO — electric night: deep indigo with neon pink/purple act cards */
+.music-theme--wao {
+  --music-bg: linear-gradient(160deg, #2a0a4a 0%, #1a0b3a 50%, #0d1b3e 100%);
+  --music-act-bg:
+    radial-gradient(120% 90% at 100% 0%, rgb(255 120 200 / 45%), transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgb(90 60 220 / 55%), transparent 60%),
+    linear-gradient(160deg, #ff4d8d 0%, #b14bd4 48%, #6a3bd6 100%);
+  --music-act-bg-hover:
+    radial-gradient(120% 90% at 100% 0%, rgb(255 150 215 / 60%), transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgb(110 80 240 / 65%), transparent 60%),
+    linear-gradient(160deg, #ff6ba3 0%, #c45fe0 48%, #7d4be6 100%);
+  --music-panel-bg: #1c0f3a;
+  --music-card-bg: #f3e8ff;
+  --music-card-number: rgb(177 75 212 / 16%);
+  --music-accent: #ff4d8d;
+  --music-ink: #2a0a4a;
+  --music-on-accent: #fff;
+}
+
+/* ARTY — sunset studio: warm terracotta/coral with peach cards */
+.music-theme--arty {
+  --music-bg: linear-gradient(160deg, #3a1a10 0%, #2a1208 50%, #1a0a05 100%);
+  --music-act-bg:
+    radial-gradient(120% 90% at 100% 0%, rgb(255 200 150 / 45%), transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgb(194 58 42 / 50%), transparent 60%),
+    linear-gradient(160deg, #ff8a5c 0%, #e85d3a 48%, #c23a2a 100%);
+  --music-act-bg-hover:
+    radial-gradient(120% 90% at 100% 0%, rgb(255 215 175 / 60%), transparent 55%),
+    radial-gradient(90% 80% at 0% 100%, rgb(214 78 58 / 60%), transparent 60%),
+    linear-gradient(160deg, #ffa07a 0%, #f06f4a 48%, #d04a36 100%);
+  --music-panel-bg: #2a1208;
+  --music-card-bg: #fff0e6;
+  --music-card-number: rgb(194 58 42 / 14%);
+  --music-accent: #ff8a5c;
+  --music-ink: #3a1a10;
+  --music-on-accent: #fff;
+}
+
+/* ── Theme selector ─────────────────────────────────────────────────────
+   A small pill row that lets the visitor switch between the three music
+   themes (BRUTAL / WAO / ARTY). Each button carries its own accent colour so
+   the choice is legible at a glance, and the active theme is highlighted. */
+.music-theme-selector {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0 0 clamp(2.5rem, 5vw, 4rem);
+}
+
+.music-theme-selector__label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 60%);
+}
+
+.music-theme-selector__options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.music-theme-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid rgb(255 255 255 / 28%);
+  border-radius: 999px;
+  padding: 0.5rem 1rem;
+  background: rgb(255 255 255 / 8%);
+  color: var(--white);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.music-theme-btn::before {
+  content: "";
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.music-theme-btn:hover {
+  transform: translateY(-1px);
+  border-color: rgb(255 255 255 / 55%);
+}
+
+.music-theme-btn:focus-visible {
+  outline: 2px solid var(--music-accent);
+  outline-offset: 2px;
+}
+
+/* Each theme button previews its accent colour. */
+.music-theme-btn--brutal {
+  color: var(--marigold);
+}
+
+.music-theme-btn--wao {
+  color: #ff4d8d;
+}
+
+.music-theme-btn--arty {
+  color: #ff8a5c;
+}
+
+/* The active theme button fills with its accent. */
+.music-theme-btn.is-selected {
+  border-color: transparent;
+  background: currentColor;
+  color: var(--ink);
+}
+
+.music-theme-btn--wao.is-selected,
+.music-theme-btn--arty.is-selected {
+  color: var(--white);
+}
+
+/* The music intro line is styled as a literary citation: a marigold left
+   rule, display serif, italic, with a large opening quote mark. It reads
+   smaller on mobile so it stays elegant on small screens. */
+.music-section .experience-heading .lead {
+  position: relative;
+  max-width: 40rem;
+  margin: 0;
+  padding-left: 1.5rem;
+  border-left: 2px solid var(--music-accent);
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2.2vw, 1.7rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--white);
+}
+
+.music-section .experience-heading .lead::before {
+  content: "“";
+  position: absolute;
+  top: -0.35em;
+  left: -0.15rem;
+  font-family: var(--font-display);
+  font-size: 3.5em;
+  line-height: 1;
+  color: var(--music-accent);
+  opacity: 0.35;
+}
+
+@media (max-width: 899px) {
+  .music-section .experience-heading .lead {
+    font-size: clamp(1rem, 4.5vw, 1.2rem);
+    padding-left: 1.1rem;
+  }
+}
+
+
+.music-lineup {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  margin-bottom: clamp(4rem, 8vw, 8rem);
+}
+
+.music-act {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 22rem;
+  padding: 2rem;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-right: 0;
+  background: var(--music-act-bg);
+  transition: background 320ms ease, border-color 320ms ease;
+}
+
+
+.music-act:last-child {
+  border-right: 1px solid rgb(255 255 255 / 22%);
+}
+
+.music-act:hover {
+  border-color: rgb(255 253 248 / 60%);
+  background: var(--music-act-bg-hover);
+}
+
+
+
+.music-act__photo {
+  position: relative;
+  margin: -2rem -2rem 2rem;
+  overflow: hidden;
+}
+
+
+.music-act__photo img {
+  display: block;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+
+.music-act__logo {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 3.5rem;
+  height: 3.5rem;
+  object-fit: contain;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 92%);
+  box-shadow: 0 2px 10px rgb(0 0 0 / 35%);
+  padding: 0.25rem;
+}
+
+
+/* The act number is a large, stylised display numeral that sits behind the
+   card content as a subtle background watermark. */
+.music-act__number {
+  position: absolute;
+  z-index: 0;
+  top: 0.4rem;
+  right: 0.9rem;
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 9vw, 8rem);
+  font-weight: 400;
+  line-height: 1;
+  color: color-mix(in srgb, var(--music-accent) 16%, transparent);
+  letter-spacing: -0.02em;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Keep the card's text content above the watermark number. */
+.music-act__photo,
+.music-act__moment,
+.music-act h3,
+.music-act small,
+.music-act__links {
+  position: relative;
+  z-index: 1;
+}
+
+
+/* The "moment" label (e.g. "Après l'apéro", "Après le dîner") is a refined
+   eyebrow: a small gold pill with a leading diamond, sitting on a hairline
+   divider so it reads as a deliberate chapter marker rather than plain text. */
+.music-act__moment {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.5rem;
+  margin: 0 0 1.25rem;
+  padding: 0.45rem 0.9rem;
+
+  width: fit-content;
+  max-width: 100%;
+  border: 1px solid rgb(36 33 25 / 22%);
+  border-radius: 999px;
+  background: rgb(255 253 248 / 42%);
+  color: var(--music-ink);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  line-height: 1.2;
+  text-transform: uppercase;
+  backdrop-filter: blur(0.2rem);
+}
+
+/* Decorative diamond before the moment label. */
+.music-act__moment::before {
+  content: "✦";
+  flex: 0 0 auto;
+  color: var(--terracotta, #b85c38);
+  font-size: 0.72rem;
+  line-height: 1;
+}
+
+/* The inner content card (act name + description) is a translucent panel with
+   rounded corners and padding, floating over the gold card background. It
+   grows to fill the remaining card height so every act's inner content card
+   is the same size, regardless of how long the description is. */
+.music-act__inner {
+  position: relative;
+  z-index: 1;
+  flex: 1 1 auto;
+  padding: 1.25rem 1.25rem 1.1rem;
+  border: 1px solid rgb(255 253 248 / 55%);
+  border-radius: 1rem;
+  background: rgb(255 253 248 / 55%);
+  box-shadow: 0 0.6rem 1.6rem rgb(36 33 25 / 14%);
+  backdrop-filter: blur(0.3rem);
+}
+
+
+.music-act__inner h3 {
+  margin: 0 0 0.5rem;
+  color: var(--music-ink);
+}
+
+.music-act__inner small {
+  display: block;
+  color: rgb(36 33 25 / 78%);
+  line-height: 1.5;
+}
+
+
+
+.music-act__links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: auto;
+  padding-top: 1.5rem;
+}
+
+
+.music-act__links .text-link {
+  color: var(--music-ink);
+}
+
+
+
+/* The playlist block stacks its heading above the cards (no side-by-side
+   columns): the eyebrow + title + citation lead sit on top, and the three
+   playlist cards appear directly below. */
+.playlist-section {
+  display: block;
+  margin-bottom: clamp(4rem, 8vw, 8rem);
+  padding: clamp(2rem, 5vw, 5rem);
+  border: 1px solid rgb(255 255 255 / 22%);
+  background: var(--music-panel-bg);
+}
+
+.playlist-heading {
+  max-width: 46rem;
+}
+
+.playlist-heading h3 {
+  max-width: 12ch;
+  margin: 0 0 1.5rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.3rem, 4vw, 4rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+/* The playlist eyebrow and its little rule use the theme accent. */
+.playlist-heading .eyebrow {
+  color: var(--music-accent);
+}
+
+.playlist-heading .eyebrow::before {
+  background: var(--music-accent);
+}
+
+
+/* The "Trois playlists…" line is styled as a literary citation: an accent
+   left rule, display serif, italic, with a large opening quote mark. */
+.playlist-citation {
+  position: relative;
+  max-width: 34rem;
+  margin: 1.5rem 0 2.5rem;
+  padding-left: 1.5rem;
+
+  border-left: 2px solid var(--music-accent);
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 2.4vw, 1.9rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--white);
+}
+
+.playlist-citation::before {
+  content: "“";
+  position: absolute;
+  top: -0.35em;
+  left: -0.15rem;
+  font-family: var(--font-display);
+  font-size: 3.5em;
+  line-height: 1;
+  color: var(--music-accent);
+  opacity: 0.35;
+}
+
+.playlist-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+
+.playlist-card {
+  position: relative;
+  min-height: 22rem;
+  padding: 2rem;
+  overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--music-accent) 12%, transparent), transparent 55%),
+    var(--music-card-bg);
+  color: var(--music-ink);
+}
+
+/* The playlist number is a large, stylised display numeral that sits behind
+   the card content as a subtle background watermark. */
+.playlist-number {
+  position: absolute;
+  z-index: 0;
+  top: 0.4rem;
+  right: 0.9rem;
+  font-family: var(--font-display);
+  font-size: clamp(5rem, 9vw, 8rem);
+  font-weight: 400;
+  line-height: 1;
+  color: var(--music-card-number);
+  letter-spacing: -0.02em;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Keep the playlist card content above the watermark number. */
+.playlist-card .spotify-mark,
+.playlist-card h4,
+.playlist-card p,
+.playlist-card .text-link {
+  position: relative;
+  z-index: 1;
+}
+
+
+.spotify-mark {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-content: center;
+  gap: 0.18rem;
+  margin: 2.5rem 0 2rem;
+  border-radius: 50%;
+  background: #1ed760;
+}
+
+.spotify-mark i {
+  display: block;
+  width: 1.55rem;
+  height: 0.28rem;
+  border-top: 2px solid #102216;
+  border-radius: 50%;
+  transform: rotate(7deg);
+}
+
+.playlist-card h4 {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.7rem, 2.5vw, 2.4rem);
+  font-weight: 400;
+}
+
+.playlist-card p {
+  min-height: 4.5rem;
+}
+
+.open-stage {
+  display: grid;
+  grid-template-columns: 0.75fr 1.25fr;
+  gap: clamp(2rem, 6vw, 6rem);
+  padding: clamp(2rem, 5vw, 5rem);
+  background: var(--music-accent);
+  color: var(--music-on-accent);
+}
+
+.open-stage h3 {
+  max-width: 12ch;
+  font-size: clamp(2.4rem, 5vw, 4.5rem);
+}
+
+.suggestion-form,
+.coast-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.genre-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.genre-chip {
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.genre-chip input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.genre-chip span {
+  display: inline-block;
+  border: 1px solid rgb(36 33 25 / 35%);
+  border-radius: 999px;
+  padding: 0.5rem 0.9rem;
+  background: rgb(255 253 248 / 55%);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition:
+    background 160ms ease,
+    border-color 160ms ease,
+    color 160ms ease,
+    transform 160ms ease;
+}
+
+.genre-chip input:checked + span {
+  border-color: var(--terracotta);
+  background: var(--terracotta);
+  color: var(--white);
+}
+
+.genre-chip input:focus-visible + span {
+  outline: 2px solid var(--marigold);
+  outline-offset: 2px;
+}
+
+.genre-chip:hover span {
+  transform: translateY(-1px);
+}
+
+.suggestion-form .button,
+.suggestion-form > small,
+.coast-form .button,
+.coast-form > small {
+  grid-column: 1 / -1;
+}
+
+.suggestion-form > small,
+.coast-form > small {
+  color: rgb(36 33 25 / 65%);
+  text-align: center;
+}
+
+/* Keep the mobile overrides after the desktop declarations so intrinsic
+   card widths cannot widen the page. */
+@media (max-width: 899px) {
+  .playlist-section,
+  .playlist-grid,
+  .open-stage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .playlist-section > *,
+  .playlist-grid > *,
+  .open-stage > * {
+    min-width: 0;
+  }
+
+  .playlist-citation {
+    font-size: 1rem;
+  }
+}
+
+/* ── Music FAB (floating action button) ─────────────────────────────────
+   A fixed circular button in the bottom-right corner of the Music section
+   that clearly shows whether the music stream is playing (animated equalizer)
+   or muted (crossed-out note). Clicking it toggles the stream on/off. It is
+   icon-only (no text label) and is only rendered while the Music section is
+   in view. */
+.music-fab {
+  position: fixed;
+  z-index: 60;
+  right: clamp(1rem, 3vw, 2rem);
+  bottom: clamp(1rem, 3vw, 2rem);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: 50%;
+  padding: 0;
+  background: var(--music-accent);
+  color: var(--music-on-accent);
+  cursor: pointer;
+  box-shadow: 0 0.6rem 1.8rem rgb(0 0 0 / 45%);
+  transition:
+    background 180ms ease,
+    border-color 180ms ease,
+    transform 180ms ease,
+    opacity 180ms ease;
+}
+
+
+.music-fab:hover {
+  transform: translateY(-2px);
+  border-color: rgb(255 255 255 / 60%);
+}
+
+.music-fab:focus-visible {
+  outline: 2px solid var(--white);
+  outline-offset: 2px;
+}
+
+/* The icon wraps the note glyph and the animated equalizer bars. */
+.music-fab__icon {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.music-fab__note {
+  font-size: 1.15rem;
+  line-height: 1;
+}
+
+/* Equalizer bars: only shown (and animated) while the stream is playing. */
+.music-fab__bars {
+  position: absolute;
+  inset: 0;
+  display: none;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+}
+
+.music-fab__bars i {
+  display: block;
+  width: 3px;
+  border-radius: 2px;
+  background: currentColor;
+  animation: music-fab-bounce 1s ease-in-out infinite;
+}
+
+.music-fab__bars i:nth-child(1) { height: 40%; animation-delay: 0s; }
+.music-fab__bars i:nth-child(2) { height: 90%; animation-delay: 0.15s; }
+.music-fab__bars i:nth-child(3) { height: 60%; animation-delay: 0.3s; }
+.music-fab__bars i:nth-child(4) { height: 100%; animation-delay: 0.45s; }
+
+@keyframes music-fab-bounce {
+  0%, 100% { transform: scaleY(0.5); }
+  50% { transform: scaleY(1); }
+}
+
+/* While playing: show the animated bars over the note. */
+.music-fab.is-playing .music-fab__bars {
+  display: flex;
+}
+
+.music-fab.is-playing .music-fab__note {
+  opacity: 0.25;
+}
+
+/* While muted: cross out the note with a diagonal line to clearly signal
+   "no more music". */
+.music-fab.is-muted {
+  background: rgb(255 255 255 / 12%);
+  color: rgb(255 255 255 / 70%);
+  border-color: rgb(255 255 255 / 25%);
+}
+
+.music-fab.is-muted .music-fab__note {
+  position: relative;
+  opacity: 0.55;
+}
+
+.music-fab.is-muted .music-fab__note::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -0.15rem;
+  right: -0.15rem;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transform: rotate(-45deg);
+  transform-origin: center;
+}
+
+/* ── Music genre survey ─────────────────────────────────────────────────
+   The "Rate the music you love" survey lets guests rate curated genres
+   (Mexican Regional, Serbia/Balkans, Latina/Caribe, etc.) with 1–5 stars and
+   search for obscure genres via MusicBrainz. It sits on the dark music
+   background, so it uses light text and the theme accent. */
+.genre-survey {
+  margin: clamp(3rem, 6vw, 6rem) 0;
+  padding: clamp(1.5rem, 4vw, 3rem);
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: 1.25rem;
+  background: var(--music-panel-bg);
+  color: var(--white);
+}
+
+.genre-survey__intro {
+  max-width: 42rem;
+  margin: 0 0 2rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2.4vw, 1.8rem);
+  font-style: italic;
+  line-height: 1.5;
+  color: var(--white);
+}
+
+/* Search box */
+.genre-survey__search {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.genre-survey__search-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 60%);
+}
+
+.genre-survey__search-input {
+  width: 100%;
+  max-width: 30rem;
+  border: 1px solid rgb(255 255 255 / 28%);
+  border-radius: 0.75rem;
+  padding: 0.8rem 1rem;
+  background: rgb(255 255 255 / 8%);
+  color: var(--white);
+  font-size: 1rem;
+}
+
+.genre-survey__search-input::placeholder {
+  color: rgb(255 255 255 / 45%);
+}
+
+.genre-survey__search-input:focus-visible {
+  outline: 2px solid var(--music-accent);
+  outline-offset: 2px;
+}
+
+.genre-survey__searching {
+  font-size: 0.85rem;
+  color: rgb(255 255 255 / 60%);
+}
+
+.genre-survey__search-error {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #ffb4a2;
+}
+
+/* Search results */
+.genre-survey__results {
+  margin-bottom: 2rem;
+}
+
+.genre-survey__results-title {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  font-weight: 400;
+}
+
+.genre-survey__results-list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Catalog */
+.genre-survey__catalog {
+  display: grid;
+  gap: 1rem;
+}
+
+.genre-survey__category {
+  border: 1px solid rgb(255 255 255 / 16%);
+  border-radius: 1rem;
+  overflow: hidden;
+  background: rgb(255 255 255 / 4%);
+}
+
+.genre-survey__category-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.9rem 1.1rem;
+}
+
+.genre-survey__category-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  border: 0;
+  background: none;
+  color: var(--white);
+  font-size: 1.05rem;
+  font-weight: 700;
+  text-align: left;
+  cursor: pointer;
+}
+
+.genre-survey__category-toggle:focus-visible {
+  outline: 2px solid var(--music-accent);
+  outline-offset: 2px;
+  border-radius: 0.4rem;
+}
+
+.genre-survey__chevron {
+  color: var(--music-accent);
+  font-size: 0.8rem;
+  transition: transform 160ms ease;
+}
+
+.genre-survey__subgenres {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0 1.1rem 1rem;
+  list-style: none;
+}
+
+.genre-survey__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 0.2rem;
+  border-top: 1px solid rgb(255 255 255 / 10%);
+}
+
+.genre-survey__row-name {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.genre-survey__name {
+  font-weight: 600;
+}
+
+.genre-survey__region {
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 50%);
+}
+
+/* ── Genre vote (1–5 stars) ───────────────────────────────────────────── */
+.genre-vote {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.genre-vote__stars {
+  display: inline-flex;
+  gap: 0.15rem;
+}
+
+.genre-vote__star {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 0;
+  padding: 0;
+  background: none;
+  color: rgb(255 255 255 / 30%);
+  cursor: pointer;
+  transition: color 120ms ease, transform 120ms ease;
+}
+
+.genre-vote__star svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: currentColor;
+}
+
+.genre-vote__star:hover {
+  transform: scale(1.15);
+}
+
+.genre-vote__star.is-filled {
+  color: var(--music-accent);
+}
+
+.genre-vote__star:focus-visible {
+  outline: 2px solid var(--music-accent);
+  outline-offset: 2px;
+  border-radius: 0.3rem;
+}
+
+.genre-vote__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.8rem;
+  color: rgb(255 255 255 / 70%);
+}
+
+.genre-vote__average {
+  font-weight: 700;
+  color: var(--music-accent);
+}
+
+.genre-vote__count {
+  font-weight: 400;
+  color: rgb(255 255 255 / 55%);
+}
+
+.genre-vote__empty {
+  font-style: italic;
+  color: rgb(255 255 255 / 45%);
+}
+
+.genre-vote__mine {
+  font-size: 0.75rem;
+  color: rgb(255 255 255 / 60%);
+}
+
+.genre-vote__error {
+  margin: 0;
+  font-size: 0.8rem;
+  color: #ffb4a2;
+}
+
+@media (max-width: 899px) {
+  .genre-survey {
+    padding: 1.25rem;
+  }
+
+  .genre-survey__category-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .genre-survey__row {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+
+

@@ -1,0 +1,1233 @@
+/* ── Identity-check modal ────────────────────────────────────────────────
+ * Shown right after sign-in (and reopenable from the user menu). The guest
+ * confirms or corrects their name, adds a photo and a phone number, and can
+ * join the WhatsApp group. Clicking OK records `identityCheckPassed = true`
+ * so it won't pop up again; closing/cancelling does NOT record it.
+ */
+
+.identity-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 1.25rem;
+  background: rgb(41 59 53 / 72%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: identity-modal-fade 0.25s ease-out;
+}
+
+.identity-modal-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 40rem);
+  min-width: 0;
+  max-height: min(92vh, 52rem);
+  /* overflow stays visible so the close (✕) button can bleed out above the
+     card; the scrollable area lives in the inner .identity-modal-body. */
+  overflow: visible;
+  border: 1px solid rgb(255 253 248 / 35%);
+  background: var(--cream);
+  box-shadow: 0 2rem 6rem rgb(0 0 0 / 35%);
+  color: var(--ink);
+  text-align: center;
+  animation: identity-modal-pop 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Header — always visible, never scrolls. Contains the monogram, eyebrow
+   and title. */
+.identity-modal-header {
+  flex: 0 0 auto;
+  min-width: 0;
+  padding: clamp(1.75rem, 6vw, 2.75rem) clamp(1.75rem, 6vw, 2.75rem) 1rem;
+  border-bottom: 1px solid rgb(36 33 25 / 10%);
+  overflow: hidden;
+}
+
+/* Body — the ONLY scrollable area. Contains member cards. */
+.identity-modal-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  padding: 1rem clamp(1.75rem, 6vw, 2.75rem);
+  color: var(--ink);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+/* Footer — always visible, never scrolls. Contains Cancel + OK buttons. */
+.identity-modal-footer {
+  flex: 0 0 auto;
+  padding: 1rem clamp(1.75rem, 6vw, 2.75rem) clamp(1.75rem, 6vw, 2.75rem);
+  border-top: 1px solid rgb(36 33 25 / 10%);
+}
+
+/* Close (✕) button — attached to the header, not the body. Its centre sits
+   exactly on the top-right border of the card (half the button pokes out),
+   matching the login and language-modal treatment. */
+.identity-modal-close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(50%, -50%);
+  z-index: 2;
+  width: 2.25rem;
+  height: 2.25rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgb(36 33 25 / 18%);
+  border-radius: 50%;
+  background: var(--cream);
+  color: var(--ink);
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+
+.identity-modal-close:hover {
+  background: var(--marigold);
+  border-color: var(--marigold);
+  color: var(--white);
+}
+
+
+.identity-modal-close:focus-visible {
+  outline: 2px solid #1f8a4c;
+  outline-offset: 2px;
+}
+
+.identity-modal-monogram {
+  margin-bottom: 1rem;
+  padding-top: 0.35rem;
+  overflow: visible;
+  color: var(--ink);
+  font-family: var(--font-calligraphy);
+  font-size: clamp(1.5rem, 4.5vw, 2rem);
+  line-height: 1.3;
+}
+
+
+
+/* "David y Aydé" — typo Ballet en noir, same treatment as the login page.
+   The names use their natural width and stay centered, so they never get
+   clipped on the left/right edges of the card. */
+.identity-modal-monogram .identity-swap--modal-names {
+  font-family: var(--font-calligraphy);
+  color: var(--ink);
+}
+
+/* Balanced row: one name on the left, the other on the right, and the union
+   symbol (& / y) pinned to the exact center. Natural width (no forced 100%)
+   so the header can never overflow the card. */
+.identity-modal-monogram .identity-swap--modal-names .identity-swap-state {
+  justify-content: center;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.identity-modal-monogram .identity-swap--modal-names .identity-person {
+  flex: 0 0 auto;
+  color: var(--ink);
+  will-change: transform;
+}
+
+/* Static header — the names stay put (no crossing animation). On open the
+   modal randomly picks one order (David left / Aydé right, or the reverse)
+   via the `is-primary` / `is-secondary` class, and only that state is shown. */
+.identity-modal-monogram .identity-swap--modal-names.is-primary .identity-swap-state--primary,
+.identity-modal-monogram .identity-swap--modal-names.is-secondary .identity-swap-state--secondary {
+  animation: none;
+  opacity: 1;
+}
+
+.identity-modal-monogram .identity-swap--modal-names.is-primary .identity-swap-state--secondary,
+.identity-modal-monogram .identity-swap--modal-names.is-secondary .identity-swap-state--primary {
+  animation: none;
+  opacity: 0;
+}
+
+
+.identity-modal-monogram .identity-swap--modal-names .identity-connector {
+  color: var(--marigold);
+  font-family: var(--font-calligraphy);
+  font-size: 0.55em;
+  font-weight: 800;
+  line-height: 1;
+
+  background: linear-gradient(
+    100deg,
+    #b8860b 0%,
+    #e4b968 42%,
+    #f7e7b3 50%,
+    #e4b968 58%,
+    #b8860b 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  background-size: 200% auto;
+  animation: identity-shine 9s linear infinite;
+}
+
+
+.identity-modal-eyebrow {
+  margin-top: 0.65rem;
+  font-size: clamp(0.9rem, 2.3vw, 1.06rem);
+}
+
+.identity-modal-title {
+  margin: 0.45rem 0 0.85rem;
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 4.2vw, 1.4rem);
+  font-weight: 400;
+  line-height: 1.2;
+  color: var(--ink);
+}
+
+.identity-group-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.1rem auto 0;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.36rem 0.95rem;
+  background: linear-gradient(
+    100deg,
+    #b8860b 0%,
+    #e4b968 42%,
+    #f7e7b3 50%,
+    #e4b968 58%,
+    #b8860b 100%
+  );
+  background-size: 200% auto;
+  color: var(--white);
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  box-shadow: 0 2px 8px rgb(184 134 11 / 40%);
+  animation: identity-shine 9s linear infinite;
+}
+
+.identity-group-badge::before {
+  content: "✦";
+  color: var(--white);
+  font-size: 0.78em;
+}
+
+.identity-modal-note {
+  margin: 0.75rem auto 0;
+  max-width: 30rem;
+  color: rgb(36 33 25 / 70%);
+  font-size: 0.8rem;
+  line-height: 1.5;
+}
+
+/* Member cards are left-aligned for readability inside the centered card.
+   The group is shown as an extended list: every member's card is stacked
+   here and the badge selector above scrolls to / highlights the selected
+   one. The modal body handles the vertical scrolling. */
+.identity-members {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+  text-align: left;
+  /* Top padding gives the bleeding toggle button room to poke out above each
+     card, and right padding gives it room to poke out past the right edge
+     without being covered by the scrollbar. */
+  padding: 1.25rem 1.25rem 0;
+}
+
+
+
+
+/* ── Member tabs (only when the group has more than one member) ───────── */
+.identity-tabs-viewport {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin-top: 1.25rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+}
+
+.identity-tabs {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 0.5rem;
+  width: max-content;
+  min-width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  padding: 0 0 0.5rem;
+  overflow-x: visible;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  overscroll-behavior-x: contain;
+}
+
+.identity-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+  min-width: max-content;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid rgb(36 33 25 / 16%);
+  border-radius: 999px;
+  background: rgb(255 253 248 / 55%);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+
+.identity-tab:hover {
+  background: rgb(255 253 248 / 90%);
+  border-color: rgb(36 33 25 / 30%);
+}
+
+.identity-tab.is-active {
+  background: linear-gradient(
+    100deg,
+    #b8860b 0%,
+    #e4b968 42%,
+    #f7e7b3 50%,
+    #e4b968 58%,
+    #b8860b 100%
+  );
+  background-size: 200% auto;
+  border-color: transparent;
+  color: var(--white);
+  box-shadow: 0 2px 8px rgb(184 134 11 / 40%);
+  animation: identity-shine 9s linear infinite;
+}
+
+.identity-tab:focus-visible {
+  outline: 2px solid #1f8a4c;
+  outline-offset: 2px;
+}
+
+.identity-tab-name {
+  font-weight: 600;
+}
+
+.identity-tab-flag {
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+/* ── Member card ──────────────────────────────────────────────────────── */
+/* Every card has a FIXED height so the display↔edit flip never changes the
+   layout of the scrollable list — the front and back faces both fill the
+   same box, so flipping one card doesn't push the others around. The height
+   is tall enough for the edit form (name grid + phone + email + nav rail). */
+.identity-member {
+  position: relative;
+  height: 9.5rem;
+  padding: 1rem;
+  border: 1px solid rgb(36 33 25 / 14%);
+  border-radius: 0.5rem;
+  background: rgb(255 253 248 / 60%);
+  /* 3D perspective so the display↔edit flip reads as a real card turn. */
+  perspective: 1200px;
+  transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+/* Verification marker (pending/verified) floating on the top-right corner.
+   It intentionally bleeds out of the card edge like a quality seal. */
+.identity-member-status {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(45%, -45%);
+  z-index: 4;
+  width: 1.7rem;
+  height: 1.7rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgb(36 33 25 / 18%);
+  border-radius: 50%;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 18%);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.identity-member-status.is-pending {
+  background: linear-gradient(145deg, #fff9e6 0%, #f0e0be 100%);
+  color: #9c6b12;
+  border-color: rgb(184 134 11 / 35%);
+}
+
+.identity-member-status.is-verified {
+  background: linear-gradient(145deg, #e9f9ed 0%, #c8efda 100%);
+  color: #1f8a4c;
+  border-color: rgb(31 138 76 / 35%);
+  box-shadow: 0 2px 10px rgb(31 138 76 / 28%);
+}
+
+
+
+/* Single toggle button pinned to the bottom-right edge of the card. It is a
+   thin link-style control so it stays lightweight and uses the free space at
+   the bottom of the card. */
+.identity-member-toggle {
+  position: absolute;
+  right: 0.8rem;
+  bottom: 0.62rem;
+  z-index: 3;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--terracotta);
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.identity-member-toggle:hover {
+  color: var(--ink);
+}
+
+.identity-member-toggle:focus-visible {
+  outline: 2px solid #1f8a4c;
+  outline-offset: 2px;
+}
+
+/* When editing, the toggle turns into a golden ✓ so it reads as "done". */
+.identity-member.is-flipped .identity-member-toggle {
+  color: #8f2f22;
+}
+
+
+/* The member selected via the badge selector gets a soft golden ring so it
+   stands out from the rest of the extended list. */
+.identity-member.is-active {
+  border-color: rgb(184 134 11 / 55%);
+  background: rgb(255 253 248 / 92%);
+  box-shadow: 0 0 0 1px rgb(184 134 11 / 25%), 0 4px 14px rgb(184 134 11 / 18%);
+}
+
+/* Flip container — holds the front (display) and back (edit) faces. The
+   whole card rotates 180° around the Y axis when editing starts, so the
+   display view is replaced by the edit form (and vice-versa on cancel). */
+.identity-member-flip {
+  position: absolute;
+  inset: 0;
+  transform-style: preserve-3d;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.identity-member.is-flipped .identity-member-flip {
+  transform: rotateY(180deg);
+}
+
+.identity-member-face {
+  position: absolute;
+  inset: 0;
+  padding: 1rem;
+  overflow: hidden;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* The back face (edit form) starts rotated 180° so it is hidden behind the
+   front face; when the card flips it comes around to the front. */
+.identity-member-face--back {
+  transform: rotateY(180deg);
+  overflow: visible;
+  z-index: 2;
+}
+
+
+
+.identity-member-head {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+/* Avatar wrapper — the small ✎ edit button sits on the avatar's bottom-right
+   corner so the guest can change their photo without opening the wizard. */
+.identity-avatar-wrap {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+/* The avatar is clickable to change the photo. On hover a soft golden ring
+   appears so guests discover it's editable without it looking like a button. */
+.identity-avatar-wrap .identity-avatar {
+  transition: box-shadow 0.2s, transform 0.2s;
+}
+
+.identity-avatar-wrap:hover .identity-avatar {
+  box-shadow: 0 0 0 2px rgb(184 134 11 / 45%);
+  transform: scale(1.03);
+}
+
+
+.identity-avatar-edit {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  display: grid;
+  place-items: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  border: 1px solid rgb(36 33 25 / 18%);
+  border-radius: 50%;
+  background: var(--cream);
+  color: var(--ink);
+  font-size: 0.72rem;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 20%);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.identity-avatar-edit:hover {
+  background: var(--marigold);
+  border-color: var(--marigold);
+  color: var(--white);
+}
+
+/* Small per-field edit button shown next to the name, phone and email on the
+   front face. Clicking it opens the flip form at the matching step. */
+.identity-field-edit {
+  flex: 0 0 auto;
+  margin-left: 0.35rem;
+  border: 1px solid rgb(36 33 25 / 20%);
+  border-radius: 999px;
+  padding: 0.1rem 0.55rem;
+  background: transparent;
+  color: rgb(36 33 25 / 62%);
+  font: inherit;
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.identity-field-edit:hover {
+  background: rgb(36 33 25 / 6%);
+  border-color: rgb(36 33 25 / 38%);
+  color: var(--ink);
+}
+
+.identity-field-edit:focus-visible {
+  outline: 2px solid #1f8a4c;
+  outline-offset: 2px;
+}
+
+
+.identity-avatar {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  overflow: hidden;
+  background: rgb(36 33 25 / 8%);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.identity-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.identity-member-id {
+  display: grid;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.identity-member-name {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.identity-member-name strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+/* "You" badge — shiny golden, matching the login's golden union symbol. */
+.identity-member-tag {
+  padding: 0.1rem 0.6rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    100deg,
+    #b8860b 0%,
+    #e4b968 42%,
+    #f7e7b3 50%,
+    #e4b968 58%,
+    #b8860b 100%
+  );
+  background-size: 200% auto;
+  color: var(--white);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: 0 1px 4px rgb(184 134 11 / 45%);
+  animation: identity-shine 9s linear infinite;
+}
+
+
+/* Guest ID — the stable unique identifier from the sheet. Shown as a subtle
+   monospace line so guests can reference it when contacting the couple. */
+.identity-member-guestid {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: rgb(36 33 25 / 48%);
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  overflow-wrap: anywhere;
+}
+
+.identity-member-phone {
+
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: rgb(36 33 25 / 72%);
+  font-size: 0.85rem;
+}
+
+.identity-member-flag {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.identity-member-email {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: rgb(36 33 25 / 72%);
+  font-size: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.identity-member-missing {
+  color: rgb(36 33 25 / 52%);
+  font-style: italic;
+}
+
+/* Single Edit button, pushed to the right of the member info. */
+.identity-member-edit {
+  margin-left: auto;
+  flex: 0 0 auto;
+  border: 1px solid rgb(36 33 25 / 22%);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.identity-member-edit:hover {
+  background: rgb(36 33 25 / 6%);
+  border-color: rgb(36 33 25 / 38%);
+}
+
+.identity-member-edit:focus-visible {
+  outline: 2px solid #1f8a4c;
+  outline-offset: 2px;
+}
+
+.text-link {
+  display: inline;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--terracotta);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: normal;
+  text-decoration: underline;
+  text-transform: none;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.text-link:hover {
+  color: var(--ink);
+}
+
+.text-link:focus-visible {
+  outline: 2px solid #1f8a4c;
+  outline-offset: 2px;
+}
+
+.identity-photo-label {
+  cursor: pointer;
+}
+
+.identity-message {
+  margin: 0.75rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.identity-message--success {
+  color: #2e7d32;
+}
+
+.identity-message--error {
+  color: #b3261e;
+}
+
+/* Edit form — the back face of the member card flip. It fills the whole
+   card as a flex column so the reserved nav rail at the bottom is always
+   pinned to the bottom edge (the fields sit above it). */
+.identity-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  height: 100%;
+  text-align: left;
+}
+
+/* The four separate name fields (nombre, nombre2, apellido, apellido2)
+   laid out in a 2×2 grid so they stay compact on narrow cards. */
+.identity-name-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+
+@media (max-width: 30rem) {
+  .identity-name-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.identity-edit-photo {
+
+  display: flex;
+  justify-content: flex-start;
+}
+
+.identity-edit-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+/* ── 4-step edit wizard (flip effect) ─────────────────────────────────── */
+.identity-wizard-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.identity-wizard-step {
+  color: rgb(36 33 25 / 55%);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.identity-wizard-title {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* Flip container — the visible step turns over between steps. The face is
+   given a 3D perspective so the rotation reads as a real card flip. It takes
+   the remaining height above the nav rail so the rail stays pinned at the
+   bottom of the thin card. */
+.identity-wizard-flip {
+  flex: 1 1 auto;
+  min-height: 0;
+  perspective: 1200px;
+}
+
+
+.identity-wizard-face {
+  display: grid;
+  gap: 0.7rem;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* While flipping, rotate the face around the Y axis. Forward goes +90deg
+   (turning away), back goes -90deg (turning back). The step swap happens
+   mid-flip (260ms) so the new face appears as the card turns around. */
+.identity-wizard-flip.is-flipping .identity-wizard-face {
+  transition: transform 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.identity-wizard-flip.is-flipping.is-forward .identity-wizard-face {
+  transform: rotateY(90deg);
+}
+
+.identity-wizard-flip.is-flipping.is-back .identity-wizard-face {
+  transform: rotateY(-90deg);
+}
+
+/* Wizard navigation — a thin, inline, lightweight rail. Instead of big
+   buttons, the controls are small text links with a subtle underline and a
+   hairline divider, so the edit form stays airy and the fixed-height card
+   never feels crowded. */
+.identity-wizard-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  /* Push the rail to the bottom of the flex-column edit form so it is always
+     reserved at the bottom edge, regardless of how many fields are above. */
+  margin-top: auto;
+  padding-top: 0.38rem;
+  border-top: 1px solid rgb(36 33 25 / 10%);
+}
+
+
+.identity-wizard-nav .identity-wizard-back,
+.identity-wizard-nav .identity-wizard-next {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  border: none;
+  background: none;
+  padding: 0;
+  color: var(--terracotta);
+  font: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  line-height: 1;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.identity-wizard-nav .identity-wizard-back:hover,
+.identity-wizard-nav .identity-wizard-next:hover {
+  outline: 2px solid #1f8a4c;
+}
+
+.identity-wizard-nav .identity-wizard-back:focus-visible,
+.identity-wizard-nav .identity-wizard-next:focus-visible {
+  outline: 2px solid #1f8a4c;
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+.identity-wizard-nav .identity-wizard-next:disabled {
+  opacity: 0.6;
+  cursor: default;
+  pointer-events: none;
+}
+
+
+
+
+/* WhatsApp group invitation card */
+.identity-whatsapp {
+  margin-top: 1.5rem;
+  text-align: left;
+}
+
+/* WhatsApp group invitation — solid WhatsApp-green CTA so it reads as the
+   primary action of the card. */
+.identity-whatsapp-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid transparent;
+  border-radius: 0.4rem;
+  background: #25d366;
+  color: var(--ink);
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgb(37 211 102 / 35%);
+  transition: background 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+
+.identity-whatsapp-link:hover {
+  background: #1ebe5b;
+  box-shadow: 0 3px 12px rgb(37 211 102 / 45%);
+}
+
+.identity-whatsapp-link:active {
+  transform: translateY(1px);
+}
+
+.identity-whatsapp-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.identity-whatsapp-text {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.identity-whatsapp-text strong {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.identity-whatsapp-text small {
+  color: rgb(36 33 25 / 78%);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.identity-whatsapp-arrow {
+  margin-left: auto;
+  color: var(--ink);
+  font-size: 1rem;
+}
+
+/* Modal actions — single full-width confirm button. The footer already
+  provides the padding, so no extra margin is needed here. */
+.identity-modal-actions {
+  display: flex;
+  gap: 0.6rem;
+}
+
+.identity-modal-message {
+  margin: 0 0 0.75rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  text-align: left;
+}
+
+.identity-modal-message--success {
+  color: #2e7d32;
+}
+
+.identity-modal-message--error {
+  color: #b3261e;
+}
+
+.identity-modal-btn {
+  flex: 1 1 0;
+  border: 1px solid transparent;
+  padding: 0.8rem 1.25rem;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.15s, background 0.2s, color 0.2s;
+}
+
+.identity-modal-btn:hover {
+  opacity: 0.9;
+}
+
+.identity-modal-btn:active {
+  transform: translateY(1px);
+}
+
+.identity-modal-btn:focus-visible {
+  outline: 2px solid #1f8a4c;
+  outline-offset: 3px;
+}
+
+/* Primary OK button — shiny golden, matching the login's golden accent. */
+.identity-modal-btn--primary {
+  background: linear-gradient(
+    100deg,
+    #b8860b 0%,
+    #e4b968 42%,
+    #f7e7b3 50%,
+    #e4b968 58%,
+    #b8860b 100%
+  );
+  background-size: 200% auto;
+  color: var(--white);
+  box-shadow: 0 2px 8px rgb(184 134 11 / 40%);
+  animation: identity-shine 9s linear infinite;
+}
+
+.identity-modal-btn--ghost {
+  border-color: rgb(36 25 33 / 35%);
+  background: transparent;
+  color: var(--ink);
+}
+
+.identity-modal-btn--ghost:hover {
+  background: rgb(36 25 33 / 6%);
+}
+
+/* Slower, narrower golden shine for the modal accents (connector, "you"
+   badge, active tab, primary button). The light band is tighter than the
+   login gate's and travels more slowly for a calmer, subtler shimmer. */
+@keyframes identity-shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+@keyframes identity-modal-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes identity-modal-pop {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .identity-modal-overlay,
+  .identity-modal-card {
+    animation: none;
+  }
+}
+
+@media (max-width: 600px) {
+  .identity-modal-overlay {
+    padding: 0.5rem;
+  }
+
+  .identity-modal-card {
+    width: 100%;
+    max-height: calc(100dvh - 1rem);
+    border-radius: 0.85rem;
+  }
+
+  .identity-modal-header {
+    padding: 1.25rem 1rem 0.85rem;
+  }
+
+  .identity-modal-body {
+    padding: 0.85rem 1rem 1rem;
+  }
+
+  .identity-modal-footer {
+    padding: 0.85rem 1rem 1rem;
+  }
+
+  .identity-modal-close {
+    top: 0.5rem;
+    right: 0.5rem;
+    transform: none;
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .identity-modal-monogram {
+    margin-bottom: 0.75rem;
+  }
+
+  .identity-modal-title {
+    margin: 0.42rem 0 0.65rem;
+    font-size: clamp(1.1rem, 5vw, 1.45rem);
+    line-height: 1.22;
+  }
+
+  .identity-modal-eyebrow {
+    margin-top: 0.5rem;
+    font-size: clamp(0.78rem, 3.1vw, 0.95rem);
+    line-height: 1.25;
+  }
+
+  .identity-modal-note {
+    font-size: 0.75rem;
+  }
+
+  .identity-tabs {
+    gap: 0.55rem;
+    padding-bottom: 0.45rem;
+    width: max-content;
+    min-width: 100%;
+  }
+
+  .identity-tabs-viewport {
+    margin-top: 0.75rem;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .identity-group-badge {
+    margin-top: 0.25rem;
+    font-size: 0.67rem;
+    letter-spacing: 0.07em;
+  }
+
+  .identity-tab {
+    flex: 0 0 auto;
+    min-width: max-content;
+    padding: 0.48rem 0.7rem;
+    font-size: 0.78rem;
+    gap: 0.45rem;
+  }
+
+  .identity-tab .identity-avatar {
+    width: 32px !important;
+    height: 32px !important;
+    font-size: 0.78rem;
+  }
+
+  .identity-tab-name {
+    white-space: nowrap;
+    font-weight: 600;
+  }
+
+  .identity-tab-flag {
+    font-size: 0.86rem;
+  }
+
+  .identity-members {
+    gap: 0.6rem;
+    margin-top: 1rem;
+    padding: 1rem 0.25rem 0;
+  }
+
+  .identity-member {
+    height: 8.75rem;
+    padding: 0.85rem;
+  }
+
+  .identity-member-status {
+    width: 1.5rem;
+    height: 1.5rem;
+    font-size: 0.8rem;
+    transform: translate(35%, -35%);
+  }
+
+  .identity-member-toggle {
+    right: 0.7rem;
+    bottom: 0.55rem;
+    font-size: 0.7rem;
+  }
+
+  .identity-member-face {
+    padding: 0.85rem;
+  }
+
+  .identity-member-head {
+    gap: 0.65rem;
+  }
+
+  .identity-member-name strong {
+    font-size: 0.98rem;
+  }
+
+  .identity-member-guestid,
+  .identity-member-phone,
+  .identity-member-email {
+    font-size: 0.75rem;
+  }
+
+  .identity-member-edit {
+    padding: 0.32rem 0.75rem;
+    font-size: 0.76rem;
+  }
+
+  .identity-edit-form {
+    gap: 0.55rem;
+  }
+
+  .identity-name-grid {
+    gap: 0.55rem;
+  }
+
+  .identity-edit-actions {
+    gap: 0.45rem;
+  }
+
+  .identity-wizard-head {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .identity-wizard-nav {
+    gap: 0.5rem;
+  }
+
+  .identity-wizard-nav .identity-wizard-back,
+  .identity-wizard-nav .identity-wizard-next {
+    font-size: 0.74rem;
+  }
+
+  .identity-whatsapp {
+    margin-top: 1rem;
+  }
+
+  .identity-whatsapp-link {
+    gap: 0.65rem;
+    padding: 0.8rem 0.85rem;
+  }
+
+  .identity-whatsapp-text strong {
+    font-size: 0.85rem;
+  }
+
+  .identity-whatsapp-text small {
+    font-size: 0.72rem;
+  }
+
+  .identity-modal-btn {
+    padding: 0.6rem 0.75rem;
+    font-size: 0.82rem;
+  }
+
+  .identity-modal-message {
+    margin-bottom: 0.6rem;
+    font-size: 0.76rem;
+  }
+}

@@ -1,0 +1,733 @@
+/* ── Weather section ──────────────────────────────────────────────────── */
+
+.weather-section {
+  overflow-x: clip;
+  padding-top: clamp(2rem, 4vw, 3rem);
+  padding-bottom: clamp(1.5rem, 3vw, 2.5rem);
+  background:
+    linear-gradient(180deg, #d9cfae 0%, #f4eee4 58%, #293b35 58%);
+}
+
+.weather-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  margin-bottom: clamp(1.5rem, 3vw, 3rem);
+}
+
+.weather-heading .eyebrow {
+  margin-bottom: 1rem;
+}
+
+.weather-heading h2 {
+  margin: 0 0 1.5rem;
+}
+
+/* Citation-style lead for the weather intro, echoing the attire citation. */
+.weather-citation {
+  position: relative;
+  margin: 0;
+  max-width: 60rem;
+  padding-left: 1.25rem;
+  border-left: 2px solid var(--marigold, #d9b36a);
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.weather-citation::before {
+  content: "“";
+  position: absolute;
+  top: -0.5em;
+  left: -0.1rem;
+  color: var(--marigold, #d9b36a);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.6em;
+  line-height: 1;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.weather-sun {
+  display: grid;
+  width: min(7rem, 16vw);
+  border: 1px solid rgb(36 33 25 / 28%);
+  border-radius: 50%;
+  place-self: center;
+  aspect-ratio: 1;
+  place-items: center;
+  margin-top: 1.25rem;
+}
+
+.weather-sun span {
+  width: 62%;
+  border-radius: 50%;
+  aspect-ratio: 1;
+  background: var(--marigold);
+  box-shadow: 0 0 3rem rgb(198 139 43 / 45%);
+}
+
+.weather-facts {
+  display: grid;
+  background: var(--white);
+}
+
+/* Desktop: the four meteo facts sit in a single horizontal row of 4 cards.
+   This is desktop-only so it never collides with the mobile 2×2 grid. */
+@media (min-width: 900px) {
+  .weather-facts {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+
+.weather-fact {
+  display: grid;
+  min-height: 9rem;
+  align-content: start;
+  border-right: 1px solid rgb(36 33 25 / 18%);
+  padding: clamp(1rem, 2vw, 1.75rem);
+}
+
+.weather-fact:last-child {
+  border-right: 0;
+}
+
+.weather-fact strong {
+  color: var(--terracotta);
+  font-family: var(--font-display);
+  font-size: clamp(2.1rem, 4vw, 3.8rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.weather-fact span {
+  margin-top: 1rem;
+  font-weight: 600;
+}
+
+.weather-fact small {
+  margin-top: 0.35rem;
+  color: rgb(36 33 25 / 62%);
+}
+
+/* Desktop: the moments + advice block gets its own distinct treatment,
+   separate from the white facts panel above it. It sits on a warm tinted
+   card so it reads as a different component, not a continuation of the
+   facts. */
+@media (min-width: 900px) {
+  .weather-day {
+    display: grid;
+    grid-template-columns: 1.35fr 0.65fr;
+    gap: clamp(1.5rem, 4vw, 4rem);
+    margin-top: clamp(1.5rem, 3vw, 3rem);
+    padding: clamp(1.5rem, 3vw, 3rem);
+    border: 1px solid rgb(255 253 248 / 22%);
+    border-radius: 1.25rem;
+    background:
+      radial-gradient(120% 140% at 100% 0%, rgb(255 253 248 / 14%), transparent 55%),
+      var(--sage);
+    color: var(--white);
+  }
+
+  /* Light text overrides so the moments timeline reads clearly on the sage
+     background. The advice card keeps its own light panel. These rules use
+     the higher-specificity `.weather-day .weather-moment` selector so they
+     win over the base `.weather-moment` styles that appear later in the file.
+     Alignment: the time (horario) sits top-left, with the title and body
+     stacked beneath it on the left — a clean, left-aligned timeline. */
+  .weather-day .weather-moment {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "time"
+      "title"
+      "body";
+    gap: 0.3rem;
+  }
+
+  .weather-day .weather-moment strong {
+    grid-area: time;
+    justify-self: start;
+    align-self: start;
+    color: var(--deep-charcoal);
+    font-size: clamp(1.1rem, 2vw, 1.7rem);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .weather-day .weather-moment span {
+    grid-area: title;
+    justify-self: start;
+    align-self: start;
+    color: rgb(255 253 248 / 95%);
+    font-size: clamp(0.95rem, 1.7vw, 1.3rem);
+  }
+
+
+  .weather-day .weather-moment small {
+    grid-area: body;
+    justify-self: start;
+    align-self: start;
+    color: rgb(255 253 248 / 72%);
+  }
+
+  .weather-day .weather-moment {
+    border-top-color: rgb(255 253 248 / 22%);
+  }
+
+
+
+
+  /* The "Qué traer" advice card gets an elegant desktop-only treatment: a
+     warm tinted panel with a marigold top rule, a display-font title and
+     custom ✦ markers. On mobile it lives in the modal instead. */
+  .weather-advice {
+    position: relative;
+    align-self: start;
+    border: 1px solid rgb(198 139 43 / 30%);
+    border-radius: 1rem;
+    padding: clamp(1.5rem, 2.5vw, 2.25rem);
+    background:
+      radial-gradient(120% 140% at 100% 0%, rgb(198 139 43 / 14%), transparent 55%),
+      rgb(255 253 248 / 92%);
+    box-shadow: 0 0.75rem 2rem rgb(36 33 25 / 8%);
+  }
+
+  .weather-advice::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--marigold), transparent 85%);
+  }
+
+  .weather-advice h3 {
+    margin-bottom: 1.25rem;
+    font-size: clamp(1.1rem, 1.9vw, 1.5rem);
+  }
+
+
+  .weather-advice ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .weather-advice li {
+    position: relative;
+    margin-bottom: 0.85rem;
+    padding-left: 1.5rem;
+    color: rgb(36 33 25 / 78%);
+    line-height: 1.5;
+  }
+
+  .weather-advice li::before {
+    content: "✦";
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: var(--marigold);
+    font-size: 0.8rem;
+  }
+}
+
+
+
+.weather-moments {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.weather-moment {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.4fr) 1fr;
+  gap: 1.5rem;
+  border-top: 1px solid rgb(36 33 25 / 18%);
+  padding: 0.9rem 0;
+}
+
+.weather-moment strong {
+  color: var(--terracotta);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.weather-moment span {
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+  font-weight: 400;
+}
+
+.weather-moment small {
+  display: block;
+  margin-top: 0.4rem;
+  color: rgb(36 33 25 / 70%);
+}
+
+.weather-advice h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+  font-weight: 400;
+}
+
+
+.weather-advice {
+  border: 1px solid rgb(36 33 25 / 18%);
+  padding: clamp(1.25rem, 2.5vw, 2rem);
+  color: var(--ink);
+}
+
+
+.weather-advice ul {
+  margin: 1rem 0 0;
+  padding-left: 1.2rem;
+}
+
+.weather-advice li {
+  margin-bottom: 0.6rem;
+}
+
+/* ── Slideset (facts + moments) ─────────────────────────────────────────
+   On desktop the slideset is a plain block: both slides render in their
+   usual layout and the navigation is hidden. On mobile the two slides
+   become a compact 2-slide carousel with big side arrows and swipe. */
+.weather-slideset {
+  position: relative;
+}
+
+.weather-slideset__track {
+  display: block;
+}
+
+.weather-slideset__slide {
+  display: block;
+}
+
+.weather-slideset__arrow {
+  display: none;
+}
+
+/* Section nav pinned to the bottom of the weather section */
+.weather-section .section-nav {
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+
+/* The advice FAB + modal are mobile-only affordances. On desktop the advice
+   card is rendered inline, so these are hidden. */
+.weather-advice-fab,
+.weather-advice-shell {
+  display: none;
+}
+
+
+/* ── Mobile ─────────────────────────────────────────────────────────────
+   The weather-day block is "exploded" into two distinct pieces: the moments
+   stay a clean timeline list (time + title + copy), while the advice becomes
+   a FAB-activated modal. They stack vertically instead of sharing a cramped
+   two-column row. */
+@media (max-width: 899px) {
+  /* Center the heading on mobile. */
+  .weather-heading {
+    align-items: center;
+    text-align: center;
+  }
+
+  .weather-heading .eyebrow {
+    align-self: center;
+  }
+
+  /* Smaller title + citation on mobile so the heading stays compact. */
+  .weather-heading h2 {
+    font-size: clamp(1.6rem, 6vw, 2.4rem);
+  }
+
+  .weather-citation {
+    font-size: clamp(0.85rem, 2.6vw, 1.05rem);
+    line-height: 1.45;
+  }
+
+  /* The sun disc is replaced by a soft symbolic glow on the section
+     background so it reads as a warm morning without taking up space. */
+  .weather-sun {
+    display: none;
+  }
+
+  .weather-section {
+    background:
+      radial-gradient(circle at 82% 12%, rgb(217 179 106 / 55%) 0%, rgb(217 179 106 / 0%) 42%),
+      linear-gradient(180deg, #d9cfae 0%, #f4eee4 58%, #293b35 58%);
+  }
+
+  /* On mobile the moments slide sits on a white panel so it reads as a
+     distinct card in the carousel, separate from the facts slide. Like the
+     facts slide, the panel has no padding so the card borders reach the
+     edges. */
+  .weather-slideset__slide--moments {
+    background: var(--white);
+  }
+
+
+  .weather-day {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    padding-top: 1.5rem;
+  }
+
+  /* The inline advice card is hidden on mobile — it lives in the modal. */
+  .weather-advice {
+    display: none;
+  }
+
+
+  /* The 4 meteo facts stack into a 2-column grid so every card keeps all of
+     its lines (value, label, note) visible on a narrow screen. Equal-height
+     rows keep all four cards the same height. */
+  .weather-facts {
+    grid-template-columns: repeat(2, 1fr);
+    grid-auto-rows: 1fr;
+    aspect-ratio: 1;
+  }
+
+
+
+  .weather-fact {
+    min-height: 0;
+    place-content: center;
+    text-align: center;
+    border-right: 1px solid rgb(36 33 25 / 18%);
+    border-bottom: 1px solid rgb(36 33 25 / 18%);
+    padding: 0.6rem;
+  }
+
+
+  .weather-fact:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .weather-fact:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .weather-fact strong {
+    font-size: clamp(1.1rem, 4.5vw, 1.6rem);
+    line-height: 1.05;
+  }
+
+  .weather-fact span {
+    margin-top: 0.4rem;
+    font-size: clamp(0.72rem, 2.6vw, 0.88rem);
+    line-height: 1.2;
+  }
+
+  .weather-fact small {
+    margin-top: 0.2rem;
+    font-size: clamp(0.62rem, 2.2vw, 0.78rem);
+    line-height: 1.2;
+  }
+
+  /* The first meteo card (the temperature) carries the longest value and
+     label, so on mobile its title and content are reduced to keep the card
+     compact and avoid overflow in the 2×2 grid. */
+  .weather-fact:first-child strong {
+    font-size: clamp(0.95rem, 3.8vw, 1.3rem);
+  }
+
+  .weather-fact:first-child span {
+    font-size: clamp(0.62rem, 2.2vw, 0.78rem);
+  }
+
+  .weather-fact:first-child small {
+    font-size: clamp(0.56rem, 1.9vw, 0.7rem);
+  }
+
+
+
+  /* ── Slideset (facts + moments) ──
+     The facts and the moments become two slides of a compact carousel so the
+     section stays short on mobile. Only the active slide is shown, with a
+     gentle fade/slide transition, and arrows + dots let the user switch. */
+  .weather-slideset__track {
+    position: relative;
+  }
+
+  .weather-slideset__slide {
+    display: none;
+    /* Both slides share the same horizontal inset so the square 2×2 grids
+       stay compact and consistent on mobile. */
+    margin-inline: clamp(0.75rem, 5vw, 1.75rem);
+  }
+
+  .weather-slideset__slide.is-active {
+    display: block;
+    animation: weather-slide-in 0.3s ease;
+  }
+
+  @keyframes weather-slide-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Big side arrows, vertically centred on the left/right edges of the
+     slideset. They float over the section background (the dark sage band)
+     so they read clearly against it. */
+  .weather-slideset__arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    display: grid;
+    width: 3.25rem;
+    height: 3.25rem;
+    place-items: center;
+    padding: 0;
+    border: 2px solid rgb(255 253 248 / 55%);
+    border-radius: 50%;
+    background: rgb(36 33 25 / 28%);
+    color: var(--white);
+    font-size: 1.6rem;
+    line-height: 1;
+    cursor: pointer;
+    transform: translateY(-50%);
+    transition: background 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
+  }
+
+  .weather-slideset__arrow--prev {
+    left: 0.25rem;
+  }
+
+  .weather-slideset__arrow--next {
+    right: 0.25rem;
+  }
+
+  .weather-slideset__arrow:disabled {
+    opacity: 0.3;
+    cursor: default;
+  }
+
+  .weather-slideset__arrow:not(:disabled):hover {
+    background: rgb(255 253 248 / 18%);
+    border-color: rgb(255 253 248 / 85%);
+  }
+
+  .weather-slideset__arrow:focus-visible {
+    outline: 2px solid var(--marigold);
+    outline-offset: 2px;
+  }
+
+  /* ── Moments as cards ──
+     On mobile slide 2 mirrors slide 1 exactly: a 2×2 grid of equal-height
+     cards with centered content and the same hairline borders. Only the
+     content differs (moments instead of facts). Desktop keeps the full-width
+     timeline list. */
+  .weather-moments {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-rows: 1fr;
+    aspect-ratio: 1;
+    background: var(--white);
+  }
+
+  .weather-moment {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.35rem;
+    place-content: center;
+    text-align: center;
+    min-width: 0;
+    min-height: 0;
+    overflow: hidden;
+    border-top: 0;
+    border-right: 1px solid rgb(36 33 25 / 18%);
+    border-bottom: 1px solid rgb(36 33 25 / 18%);
+    padding: 0.9rem;
+  }
+  .weather-moment strong {
+    color: var(--terracotta);
+    font-family: var(--font-display);
+    font-size: 1.7rem;
+    font-weight: 400;
+    line-height: 1;
+    overflow-wrap: anywhere;
+  }
+
+
+  .weather-moment:nth-child(2n) {
+    border-right: 0;
+  }
+
+  .weather-moment:nth-last-child(-n + 2) {
+    border-bottom: 0;
+  }
+
+  .weather-moment span {
+
+    margin-top: 0.75rem;
+    font-size: clamp(0.95rem, 3.5vw, 1.2rem);
+    font-weight: 600;
+  }
+
+
+  .weather-moment small {
+    margin-top: 0.35rem;
+    color: rgb(36 33 25 / 62%);
+  }
+
+  /* On mobile, the moments slide (slide 2) uses a compact 2×2 grid of cards.
+     The inner content (time, title, body) is made smaller here so the four
+     cards stay balanced and readable on the now-smaller square panels. */
+  .weather-slideset__slide--moments .weather-moment strong {
+    font-size: 1rem;
+  }
+
+  .weather-slideset__slide--moments .weather-moment span {
+    margin-top: 0.4rem;
+    font-size: clamp(0.66rem, 2.3vw, 0.8rem);
+  }
+
+  .weather-slideset__slide--moments .weather-moment small {
+    margin-top: 0.2rem;
+    font-size: clamp(0.55rem, 1.9vw, 0.66rem);
+    line-height: 1.25;
+  }
+
+
+
+
+  /* ── Advice FAB ── */
+
+
+
+  .weather-advice-fab {
+    position: fixed;
+    z-index: 130;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    display: grid;
+    width: 4.25rem;
+    height: 4.25rem;
+    place-items: center;
+    border: 3px solid var(--marigold);
+    border-radius: 50%;
+    background: var(--terracotta);
+    color: var(--white);
+    font-size: 1.4rem;
+    box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
+    cursor: pointer;
+    opacity: 0;
+    transform: translateY(1rem) scale(0.9);
+    pointer-events: none;
+    transition: opacity 180ms ease, transform 180ms ease;
+  }
+
+
+  .weather-advice-fab.is-visible {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    pointer-events: auto;
+  }
+
+  .weather-advice-fab:focus-visible {
+    outline: 2px solid var(--marigold);
+    outline-offset: 2px;
+  }
+
+  /* ── Advice modal ──
+     Shares the same visual language as the programme warning modal
+     (weekend-warning-shell / weekend-warning-panel): a white rounded panel
+     with a display-font title and a bordered close button. */
+  .weather-advice-shell {
+    position: fixed;
+    z-index: 120;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 1.25rem;
+    background: rgb(36 33 25 / 55%);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 300ms ease, visibility 300ms;
+  }
+
+  .weather-advice-shell.is-open {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .weather-advice-panel {
+    position: relative;
+    width: min(100%, 26rem);
+    max-height: 80svh;
+    overflow-y: auto;
+    padding: 2rem 1.5rem 1.5rem;
+    border-radius: 1.25rem;
+    background: var(--white);
+    box-shadow: 0 1.5rem 3.5rem rgb(36 33 25 / 35%);
+  }
+
+  .weather-advice__eyebrow {
+    display: block;
+    margin-bottom: 0.65rem;
+  }
+
+  .weather-advice-panel h3 {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-display);
+    font-size: 1.35rem;
+    font-weight: 400;
+    color: var(--ink);
+  }
+
+
+  .weather-advice-panel ul {
+    margin: 0;
+    padding-left: 1.2rem;
+  }
+
+  .weather-advice-panel li {
+    margin-bottom: 0.6rem;
+    color: rgb(36 33 25 / 78%);
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .weather-advice__close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    place-items: center;
+    padding: 0;
+    border: 1px solid rgb(36 33 25 / 22%);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink);
+    font-size: 1.4rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .weather-advice__close:focus-visible {
+    outline: 2px solid var(--marigold);
+    outline-offset: 2px;
+  }
+}
+
+

@@ -1,0 +1,138 @@
+// ── Login screen ────────────────────────────────────────────────────────
+@use "tokens" as *;
+
+.dashboard-login {
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+
+.dashboard-login-card {
+  width: min(100%, 34rem);
+  padding: clamp(2.25rem, 6vw, 4.5rem);
+  border: 1px solid $border-strong;
+  border-radius: 0.75rem;
+  background: $card-bg-solid;
+  box-shadow: $shadow-login;
+  text-align: center;
+
+
+  h1 {
+    margin-top: 0.4rem;
+    font-size: clamp(2.5rem, 8vw, 4.5rem);
+  }
+
+  .dashboard-button {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 1rem;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+}
+
+.dashboard-login-icon {
+  margin-bottom: 1rem;
+  color: $accent;
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.dashboard-login-card h1,
+.dashboard-header h1,
+.dashboard-section h2 {
+  margin: 0;
+  font-family: $font-display;
+  font-weight: 400;
+}
+
+.dashboard-login-desc {
+  color: $ink-soft;
+  line-height: 1.7;
+  margin: 0.75rem 0 2rem;
+}
+
+.dashboard-back {
+  color: $ink;
+  font-weight: 600;
+  text-underline-offset: 0.25rem;
+}
+
+// "Ver invitación" lives in the dark hero header, so it needs white text.
+.dashboard-link {
+  color: $white;
+  font-weight: 600;
+  text-underline-offset: 0.25rem;
+}
+
+.dashboard-eyebrow {
+  margin: 0;
+  color: $accent;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.dashboard-login-field {
+  text-align: left;
+  margin-bottom: 1.25rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.4rem;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: $dark;
+  }
+}
+
+.dashboard-login-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  input {
+    width: 100%;
+    padding: 0.95rem 1.1rem 0.95rem 3rem;
+    border: 2px solid $border-strong;
+    border-radius: 0.4rem;
+    background: rgba(255, 253, 249, 0.9);
+    font: inherit;
+    font-size: 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+
+    &:focus {
+      outline: none;
+      border-color: $accent;
+      box-shadow: 0 0 0 3px rgba(138, 106, 54, 0.15);
+    }
+
+    &::placeholder {
+      color: #b0a694;
+    }
+  }
+}
+
+.dashboard-login-input-icon {
+  position: absolute;
+  left: 1rem;
+  font-size: 1.1rem;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+[data-dashboard-status] {
+  display: block;
+  min-height: 1.4em;
+  margin-top: 1rem;
+  color: $ink;
+  font-weight: 500;
+
+  &[data-state="error"] {
+    color: #a0352c;
+  }
+}

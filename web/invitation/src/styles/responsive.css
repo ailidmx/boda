@@ -1,0 +1,317 @@
+/* ── Responsive system: mobile-first, co-located ────────────────────────
+ *
+ * This file is reserved for CROSS-CUTTING responsive rules that don't belong
+ * to a single component (shared layout primitives, global shell behavior).
+ *
+ * Component-specific responsive rules live in each component's own CSS file
+ * (e.g. `styles/hero.css` contains the hero's media queries). See
+ * `styles/README.md` for the full architecture guide.
+ *
+ * BREAKPOINTS (keep in sync with tokens.css):
+ *   --bp-sm: 480px   --bp-md: 640px   --bp-lg: 900px
+ *   --bp-xl: 1200px  --bp-2xl: 1440px
+ *
+ * PATTERN: base styles are mobile-first; enhance with `min-width` queries.
+ */
+
+/* ── Shared section shell ───────────────────────────────────────────────
+   The `.section` primitive (defined in base.css) is a full-height slide.
+   On small screens we reduce the min-height so content isn't cramped, and
+   we let sections grow naturally. */
+
+/* Once mobile scrolling begins, the countdown slides away and only the
+   sticky navigation remains. Reserve that measured height for hash/next-
+   section jumps so the destination lands directly below the nav. */
+@media (max-width: 899px) {
+  html {
+    scroll-padding-top: var(--header-height);
+  }
+
+  .eyebrow {
+    font-size: 1rem;
+  }
+
+  /* Match the base rule's specificity (#story .story-lead) so the mobile
+     override wins over the higher-specificity base declaration. */
+  #story .story-lead {
+    font-size: clamp(0.9rem, 2.2vw, 1.3rem);
+  }
+
+
+
+  h2 {
+    font-size: clamp(1.5rem, 6vw, 5.5rem);
+  }
+}
+
+/* Small phones: tighter padding, allow sections to be shorter than viewport
+   when content is compact (e.g. a short form). */
+@media (max-width: 480px) {
+  .section {
+    min-height: auto;
+    padding-block: var(--space-7);
+  }
+
+  /* The accommodation (HEBERGEMENT) section keeps its compact mobile
+     padding-block instead of inheriting the shared `.section` value, so the
+     two stacked panels (overview + form) stay snug on small phones. */
+  .accommodation-section {
+    padding-block: var(--space-3);
+  }
+}
+
+
+/* ── Shared section heading ─────────────────────────────────────────────
+   `.section-heading` is a stacked layout (eyebrow | title | copy) on all
+   breakpoints. */
+.section-heading {
+  gap: 0;
+}
+
+/* ── Shared grid primitives ─────────────────────────────────────────────
+   Several sections use a 2-column grid on mobile that widens to 3+ columns
+   on larger screens. These are the shared defaults; components may override
+   with their own classes. */
+
+/* Mobile-first: 1 column. */
+.gallery-row,
+.venue-gallery {
+  grid-template-columns: 1fr;
+}
+
+/* Small phones → 2 columns for compact grids. */
+@media (min-width: 480px) {
+  .gallery-row,
+  .venue-gallery {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Tablet+ → 3 columns for wider grids. */
+@media (min-width: 900px) {
+  .gallery-row,
+  .venue-gallery {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+
+
+
+
+/* ── Shared form grids ──────────────────────────────────────────────────
+   Suggestion and coast forms both use a 2-column grid on desktop that
+   collapses to 1 column on mobile. */
+
+/* Mobile-first: 1 column. */
+.suggestion-form,
+.coast-form {
+  grid-template-columns: 1fr;
+}
+
+.accommodation-facts {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+/* On mobile the accommodation fact cards are small, so the content elements
+   (value, euro conversion, label, note) get smaller fonts to fit without
+   overflowing. */
+@media (max-width: 899px) {
+  .accommodation-facts strong {
+    font-size: clamp(1.05rem, 4.6vw, 1.35rem);
+  }
+
+  .accommodation-facts article:nth-child(2) strong {
+    font-size: clamp(0.95rem, 4.2vw, 1.2rem);
+  }
+
+  .accommodation-facts .accommodation-fact-conversion {
+    font-size: 0.68rem;
+  }
+
+  .accommodation-facts span {
+    font-size: 0.6rem;
+    line-height: 1.2;
+  }
+
+  .accommodation-facts-note {
+    font-size: 0.78rem;
+    line-height: 1.45;
+  }
+
+  /* The member tabs (guest avatar chips) and the cabin badge are both
+     prominent pills. On mobile give the tabs breathing room so they don't
+     sit right on top of the cabin badge below — applies to both the
+     Hébergement section and the Coast extra-stay section. */
+  .accommodation-member-tabs {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Tablet+: 2 columns. */
+@media (min-width: 640px) {
+  .suggestion-form,
+  .coast-form {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Shared layout stacks ───────────────────────────────────────────────
+   Sections that use a 2-column editorial layout (story | venue | travel |
+   day-program) collapse to 1 column on mobile. */
+
+/* Mobile-first: 1 column. */
+.story-section,
+.venue-section,
+.accommodation-section,
+.coast-section,
+.attire-section,
+.gift-section,
+.travel-layout,
+.day-program,
+.open-stage,
+.playlist-section,
+.route-map-diagram {
+  grid-template-columns: 1fr;
+}
+
+/* Tablet+: restore the multi-column editorial layout. */
+@media (min-width: 900px) {
+  .story-section,
+  .venue-section,
+  .accommodation-section,
+  .attire-section,
+  .gift-section,
+  .travel-layout,
+  .day-program,
+  .open-stage,
+  .playlist-section,
+  .route-map-diagram {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+  }
+
+  /* The Story section uses a tighter gap between its two columns than the
+     other editorial sections. */
+  .story-section {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+    gap: 1.5rem;
+  }
+}
+
+
+/* ── Shared mobile carousel controls ───────────────────────────────────
+   Keep arrows and play/pause actions visually light and borderless across
+   every carousel. Pagination indicators remain circular. */
+@media (max-width: 899px) {
+  .fun-fact-arrow,
+  .fun-fact-pause,
+  .schedule-carousel-toggle,
+  .day-program-slideset__arrow,
+  .facility-slideset__arrow,
+  .facility-slideset__toggle,
+  .roca-gallery-toggle,
+  .map-carousel-arrow,
+  .map-carousel-toggle,
+  .lightbox-arrow {
+    width: 1.5rem;
+    height: 1.5rem;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    font-size: 0.75rem;
+    font-weight: 400;
+    line-height: 1;
+  }
+
+  .fun-fact-arrow:hover,
+  .fun-fact-arrow:focus-visible,
+  .fun-fact-pause:hover,
+  .fun-fact-pause:focus-visible,
+  .schedule-carousel-toggle:hover,
+  .schedule-carousel-toggle:focus-visible,
+  .day-program-slideset__arrow:hover,
+  .day-program-slideset__arrow:focus-visible,
+  .facility-slideset__arrow:hover,
+  .facility-slideset__arrow:focus-visible,
+  .facility-slideset__toggle:hover,
+  .facility-slideset__toggle:focus-visible,
+  .roca-gallery-toggle:hover,
+  .roca-gallery-toggle:focus-visible,
+  .map-carousel-arrow:hover,
+  .map-carousel-arrow:focus-visible,
+  .map-carousel-toggle:hover,
+  .map-carousel-toggle:focus-visible,
+  .lightbox-arrow:hover,
+  .lightbox-arrow:focus-visible {
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+    transform: none;
+  }
+}
+
+/* ── THEMATIQUE citation on small screens ───────────────────────────────
+   Give the attire citation breathing room and a slightly larger, readable
+   size when the section collapses to a single column. */
+@media (max-width: 720px) {
+  .attire-citation {
+    margin-bottom: 1rem;
+    padding: 0.5rem 0 0 1rem;
+    font-size: clamp(1rem, 2.6vw, 2rem);
+    line-height: 1.35;
+  }
+}
+
+/* ── Extra-large screens: contain the whole page ────────────────────────
+   On very wide displays (≥1440px) the invitation stretches edge-to-edge.
+   Constrain the main content column (all sections) into a centered max-width
+   container so the layout doesn't get uncomfortably wide. The footer is left
+   full-width (up to 100vw), mirroring the top header bar. */
+@media (min-width: 1440px) {
+  main {
+    max-width: 120rem;
+    margin-inline: auto;
+  }
+}
+
+
+
+
+/* ── Reduced motion ─────────────────────────────────────────────────────
+   Respect users who prefer reduced motion: disable animations/transitions
+   and show the primary identity state statically. */
+
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .identity-swap-state,
+  .identity-accent::after,
+  .hero-date-day,
+  .hero-date-dayname {
+    animation: none;
+  }
+
+  .identity-swap-state--secondary,
+  .hero-date-day--secondary,
+  .hero-date-day--tertiary,
+  .hero-date-dayname--secondary,
+  .hero-date-dayname--tertiary {
+    display: none;
+  }
+
+  .hero-date-day--primary {
+    opacity: 1;
+  }
+
+  .hero-date-dayname--primary {
+    opacity: 0.34;
+  }
+}

@@ -1,0 +1,342 @@
+[
+  {
+    "id": "1LMmXtPecL6Z9GsxjWmg",
+    "data": {
+      "item": "Cena sábado",
+      "totalMxn": 10000,
+      "approxMxn": 10000,
+      "paidMxn": 0,
+      "paidDate": "",
+      "paidBy": "",
+      "davidPct": 0,
+      "aydePct": 0,
+      "davidAmount": 0,
+      "aydeAmount": 0,
+      "confirmedCount": 6,
+      "estimatedCount": 28
+    }
+  },
+  {
+    "id": "4Hn9ItVviORcGvxyDti1",
+    "data": {
+      "item": "Roca Azul - Espacio",
+      "totalMxn": 24570,
+      "approxMxn": 24570,
+      "paidMxn": 0,
+      "paidDate": "$585",
+      "paidBy": "",
+      "davidPct": 0,
+      "aydePct": 0,
+      "davidAmount": 0,
+      "aydeAmount": 0,
+      "confirmedCount": 82,
+      "estimatedCount": 0
+    }
+  },
+  {
+    "id": "7Mx2rEB7Y9pwLYMFoqBz",
+    "data": {
+      "item": "Vestido Novia",
+      "totalMxn": 5000,
+      "approxMxn": 5000,
+      "paidMxn": 0,
+      "paidDate": "",
+      "paidBy": "",
+      "davidPct": 0,
+      "aydePct": 0,
+      "davidAmount": 0,
+      "aydeAmount": 0,
+      "confirmedCount": 11,
+      "estimatedCount": 0
+    }
+  },
+  {
+    "id": "7pSemWogUmsdrjfgtQMV",
+    "data": {
+      "item": "Aregolla #1",
+      "totalMxn": 4460,
+      "approxMxn": 0,
+      "paidMxn": 4460,
+      "paidDate": "",
+      "paidBy": "9/2/2026",
+      "davidPct": 0.5,
+      "aydePct": 0.5,
+      "davidAmount": 2230,
+      "aydeAmount": 2230,
+      "confirmedCount": 0,
+      "estimatedCount": 0
+    }
+  },
+  {
+    "id": "Ba0mKbuXVlUbpMlXVIdR",
+    "data": {
+      "item": "Comida domingo",
+      "totalMxn": 0,
+      "approxMxn": 0,
+      "paidMxn": 0,
+      "paidDate": "",
+      "paidBy": "",
+      "davidPct": 0,
+      "aydePct": 0,
+      "davidAmount": 0,
+      "aydeAmount": 0,
+      "confirmedCount": 6,
+      "estimatedCount": 0
+    }
+  },
+  {
+    "id": "BgNVaQlIZQmV1XKFo9TR",
+    "data": {
+      "item": "Musica en Vivo #1",
+      "totalMxn": 5000,
+      "approxMxn": 5000,
+      "paidMxn": 0,
+      "paidDate": "",
+      "paidBy": "",
+      "davidPct": 0,
+      "aydePct": 0,
+      "davidAmount": 0,
+      "aydeAmount": 0,
+      "confirmedCount": 5,
+      "estimatedCount": 0
+    }
+  },
+  {
+    "id": "DGQlBrOfXIDj7ULOX82U",
+    "data": {
+      "item": "Juez Civil",
+      "totalMxn": 1500,
+      "approxMxn": 1500,
+      "paidMxn": 0,
+      "paidDate": "",
+      "paidBy": "",
+      "davidPct": 0,
+      "aydePct": 0,
+      "davidAmount": 0,
+      "aydeAmount": 0,
+      "confirmedCount": 5,
+      "estimatedCount": 0
+    }
+  },
+  {
+    "id": "JeQd48BRg48biSNXb5J6",
+    "data": {
+      "item": "Toldo Arabe",
+      "totalMxn": 4500,
+      "approxMxn": 4500,
+      "paidMxn": 0,
+      "paidDate": "",
+      "paidBy": "",
+      "davidPct": 0,
+      "aydePct": 0,
+      "davidAmount": 0,
+      "aydeAmount": 0,
+      "confirmedCount": 82,
+      "estimatedCount": 0
+    }
+  },
+  {
+    "id": "Jp6pLXoHVYq8tTQsGYXo",
+    "data": {
+      "item": "Transporte Van GDL - Ajijic",
+      "totalMxn": 3000,
+      "approxMxn": 3000,
+      "paidMxn": 0,
+      "paidDate": "",
+      "paidBy": "",
+      "davidPct": 0,
+      "aydePct": 0,
+      "davidAmount": 0,
+      "aydeAmount": 0,
+      "confirmedCount": 9,
+      "estimatedCount": 0
+    }
+  },
+  {
+    "id": "QxSroR4x3mdufMSCpUpA",
+    "data": {
+      "item": "Traje Novio",
+      "totalMxn": 5000,
+      "approxMxn": 5000,
+      "paidMxn": 0,
+      "paidDate": "",
+      "paidBy": "",
+      "davidPct": 0,
+      "aydePct": 0,
+      "davidAmount": 0,
+      "aydeAmount": 0,
+      "confirmedCount": 14,
+      "estimatedCount": 0
+    }
+  },
+  {
+    "id": "RDrwlPxApgDZWmHez04s",
+    "data": {
+      "item": "Roca Azul - Adelanto",
+      "totalMxn": 50000,
+      "approxMxn": 0,
+      "paidMxn": 50000,
+      "paidDate": "",
+      "paidBy": "27/6/2026",
+      "davidPct": 0.5,
+      "aydePct": 0.5,
+      "davidAmount": 25000,
+      "aydeAmount": 25000,
+      "confirmedCount": 82,
+      "estimatedCount": 0
+    }
+  },
+  {
+    "id": "SkzUwLe6YofN3568EZqk",
+    "data": {
+      "item": "Aregolla #2",
+      "totalMxn": 5400,
+      "approxMxn": 0,
+      "paidMxn": 5400,
+      "paidDate": "",
+      "paidBy": "9/2/2026",
+      "davidPct": 0.5,
+      "aydePct": 0.5,
+      "davidAmount": 2700,
+      "aydeAmount": 2700,
+      "confirmedCount": 0,
+      "estimatedCount": 0
+    }
+  },
+  {
+    "id": "Xt5DP0zXSaRSUVeH3ZWT",
+    "data": {
+      "item": "Roca Azul - Espacio",
+      "totalMxn": 70200,
+      "approxMxn": 70200,
+      "paidMxn": 0,
+      "paidDate": "$585",
+      "paidBy": "",
+      "davidPct": 0,
+      "aydePct": 0,
+      "davidAmount": 0,
+      "aydeAmount": 0,
+      "confirmedCount": 82,
+      "estimatedCount": 0
+    }
+  },
+  {
+    "id": "Zm6CMHc2tvamDS5JdFoN",
+    "data": {
+      "item": "Cena viernes",
+      "totalMxn": 10000,
+      "approxMxn": 10000,
+      "paidMxn": 0,
+      "paidDate": "",
+      "paidBy": "",
+      "davidPct": 0,
+      "aydePct": 0,
+      "davidAmount": 0,
+      "aydeAmount": 0,
+      "confirmedCount": 82,
+      "estimatedCount": 0
+    }
+  },
+  {
+    "id": "cXYimMMXH2v58vpmU4P6",
+    "data": {
+      "item": "Roca Azul - Alojamiento 2 noches + 2 desayunos",
+      "totalMxn": 103110,
+      "approxMxn": 103110,
+      "paidMxn": 0,
+      "paidDate": "$1,778",
+      "paidBy": "",
+      "davidPct": 0,
+      "aydePct": 0,
+      "davidAmount": 0,
+      "aydeAmount": 0,
+      "confirmedCount": 82,
+      "estimatedCount": 120
+    }
+  },
+  {
+    "id": "gpZTEFhxmWt8COAdmOYG",
+    "data": {
+      "item": "Flores",
+      "totalMxn": 5000,
+      "approxMxn": 5000,
+      "paidMxn": 0,
+      "paidDate": "",
+      "paidBy": "",
+      "davidPct": 0,
+      "aydePct": 0,
+      "davidAmount": 0,
+      "aydeAmount": 0,
+      "confirmedCount": 27,
+      "estimatedCount": 0
+    }
+  },
+  {
+    "id": "lQBrHsq8nusgNi4Uspv9",
+    "data": {
+      "item": "Musica en Vivo #2",
+      "totalMxn": 10000,
+      "approxMxn": 10000,
+      "paidMxn": 0,
+      "paidDate": "",
+      "paidBy": "",
+      "davidPct": 0,
+      "aydePct": 0,
+      "davidAmount": 0,
+      "aydeAmount": 0,
+      "confirmedCount": 5,
+      "estimatedCount": 0
+    }
+  },
+  {
+    "id": "sMjrv8EqJRd5d94K1ONT",
+    "data": {
+      "item": "Bebidas",
+      "totalMxn": 30000,
+      "approxMxn": 30000,
+      "paidMxn": 0,
+      "paidDate": "",
+      "paidBy": "",
+      "davidPct": 0,
+      "aydePct": 0,
+      "davidAmount": 0,
+      "aydeAmount": 0,
+      "confirmedCount": 2,
+      "estimatedCount": 0
+    }
+  },
+  {
+    "id": "uC8uMalLsr1N4Jw75Okg",
+    "data": {
+      "item": "Comida sábado",
+      "totalMxn": 10000,
+      "approxMxn": 10000,
+      "paidMxn": 0,
+      "paidDate": "",
+      "paidBy": "",
+      "davidPct": 0,
+      "aydePct": 0,
+      "davidAmount": 0,
+      "aydeAmount": 0,
+      "confirmedCount": 2,
+      "estimatedCount": 0
+    }
+  },
+  {
+    "id": "w0L6ukyrq98YsfWabk6F",
+    "data": {
+      "item": "Mobiliario",
+      "totalMxn": 3000,
+      "approxMxn": 3000,
+      "paidMxn": 0,
+      "paidDate": "",
+      "paidBy": "",
+      "davidPct": 0,
+      "aydePct": 0,
+      "davidAmount": 0,
+      "aydeAmount": 0,
+      "confirmedCount": 0,
+      "estimatedCount": 0
+    }
+  }
+]

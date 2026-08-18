@@ -1,0 +1,2079 @@
+/* ── Accommodation section ────────────────────────────────────────────── */
+
+.accommodation-section {
+  display: grid;
+  grid-template-columns: 1fr 0.9fr;
+  gap: clamp(3rem, 8vw, 8rem);
+  align-items: start;
+  background:
+    radial-gradient(
+      circle at 88% 12%,
+      rgb(198 139 43 / 18%) 0,
+      rgb(198 139 43 / 18%) 9rem,
+      transparent 9.1rem
+    ),
+    linear-gradient(
+      145deg,
+      color-mix(in srgb, var(--sage) 19%, var(--cream)) 0%,
+      color-mix(in srgb, var(--sand) 55%, var(--cream)) 100%
+    );
+}
+
+.accommodation-copy {
+  position: relative;
+  min-width: 0;
+}
+
+.accommodation-copy h2 {
+  margin-bottom: 2rem;
+}
+
+/* Citation-style lead: large quote mark + left border, echoing the venue's
+   facilities-lead. Slightly smaller on desktop with extra breathing room
+   above so it reads as a quiet pull-quote rather than a headline. */
+.accommodation-citation {
+  position: relative;
+  max-width: 60rem;
+  margin: 2.25rem 0 2rem;
+  padding-left: 1.5rem;
+  border-left: 2px solid var(--marigold, #d9b36a);
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-style: italic;
+  line-height: 1.45;
+}
+
+
+
+.accommodation-citation::before {
+  content: "“";
+  position: absolute;
+  top: -0.55em;
+  left: -0.15rem;
+  color: var(--marigold, #d9b36a);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 3.2em;
+  line-height: 1;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+
+.accommodation-facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.45rem;
+  margin-top: 1.5rem;
+}
+
+.accommodation-facts article {
+  --fact-accent: var(--marigold);
+
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  aspect-ratio: 1;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  overflow: hidden;
+  padding: 0.75rem 0.4rem 0.55rem;
+  border: 0;
+  background: color-mix(in srgb, var(--marigold) 13%, var(--white));
+  box-shadow:
+    inset 0 0 0 1px rgb(36 33 25 / 10%),
+    0 0.5rem 1.2rem rgb(36 33 25 / 9%);
+  text-align: center;
+}
+
+.accommodation-facts article:nth-child(2) {
+  --fact-accent: var(--terracotta);
+  background: color-mix(in srgb, var(--terracotta) 10%, var(--white));
+}
+
+.accommodation-facts article:nth-child(3) {
+  --fact-accent: var(--sage);
+  background: color-mix(in srgb, var(--sage) 13%, var(--white));
+}
+
+.accommodation-facts article::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 0.22rem;
+  background: var(--fact-accent);
+}
+
+.accommodation-facts article::after {
+  content: "✦";
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  color: var(--fact-accent);
+  font-size: 0.5rem;
+  opacity: 0.55;
+}
+
+.accommodation-facts strong {
+  color: var(--fact-accent, var(--marigold));
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 4.2vw, 2rem);
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+}
+
+.accommodation-facts article:nth-child(2) strong {
+  font-size: clamp(1.2rem, 3.7vw, 1.8rem);
+}
+
+.accommodation-facts span {
+  max-width: 9rem;
+  color: rgb(36 33 25 / 72%);
+  font-size: 0.7rem;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+
+.accommodation-fact-conversion {
+  color: var(--fact-accent, var(--marigold));
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  line-height: 1;
+}
+
+.accommodation-note {
+  max-width: 44rem;
+  margin-top: 2rem;
+  color: rgb(36 33 25 / 75%);
+}
+
+.accommodation-note-shell,
+.accommodation-note-panel {
+  display: contents;
+}
+
+.accommodation-note-close,
+.accommodation-note-eyebrow,
+.accommodation-note-panel h3,
+.accommodation-note-fab,
+.accommodation-note {
+  display: none;
+}
+
+.accommodation-facts-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 1rem 0 0;
+  color: rgb(36 33 25 / 75%);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.accommodation-personal-note {
+  max-width: 44rem;
+  margin: 1.25rem 0 0;
+  padding: 1rem 1.1rem;
+  border-left: 3px solid var(--terracotta);
+  background: color-mix(in srgb, var(--terracotta) 8%, var(--white));
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.35rem);
+  font-style: normal;
+  line-height: 1.35;
+}
+
+.accommodation-covered-note {
+  max-width: 44rem;
+  margin: 1rem 0 0;
+  padding: 0.85rem 1.1rem;
+  border-left: 3px solid var(--marigold);
+  background: color-mix(in srgb, var(--marigold) 10%, var(--white));
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 1.8vw, 1.25rem);
+  line-height: 1.35;
+}
+
+.accommodation-covered-note strong {
+  color: var(--terracotta);
+  font-weight: 700;
+}
+
+/* Cabin name badge — a golden, metallic pill echoing the hero's group label.
+   Used for BOTH the primary cabin (Hébergement) and the extra cabin
+   ("Et après ?" / Coast). A subtle gold gradient + a moving sheen give it a
+   polished, shiny look. */
+.accommodation-cabin-badge {
+  position: relative;
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1rem auto 0;
+  overflow: hidden;
+  border: 1px solid rgb(198 139 43 / 55%);
+  border-radius: 999px;
+  padding: 0.5rem 1.35rem;
+  background:
+    linear-gradient(
+      180deg,
+      #f7e6b8 0%,
+      #e9c878 45%,
+      #d9a94e 55%,
+      #f0d795 100%
+    );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 65%),
+    inset 0 -1px 0 rgb(120 80 20 / 35%),
+    0 0.35rem 0.9rem rgb(120 80 20 / 28%);
+  color: #5c3a0e;
+  font-size: clamp(0.7rem, 1.1vw, 0.85rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 45%);
+}
+
+/* Moving sheen that sweeps across the badge. */
+.accommodation-cabin-badge::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -60%;
+  width: 45%;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgb(255 255 255 / 55%) 50%,
+    transparent 100%
+  );
+  transform: skewX(-20deg);
+  animation: cabin-badge-shine 3.2s ease-in-out infinite;
+}
+
+@keyframes cabin-badge-shine {
+  0% {
+    left: -60%;
+  }
+  55% {
+    left: 130%;
+  }
+  100% {
+    left: 130%;
+  }
+}
+
+.accommodation-cabin-badge::before {
+  content: "✦";
+  color: #8a5a12;
+  font-size: 0.8em;
+  text-shadow: 0 1px 0 rgb(255 255 255 / 45%);
+}
+
+
+
+.accommodation-contacts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(36 33 25 / 20%);
+}
+
+.accommodation-contacts span {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.accommodation-contacts a {
+  color: var(--terracotta);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  text-decoration: none;
+}
+
+
+.accommodation-contact-link {
+  text-decoration: none;
+}
+
+.accommodation-contact-link:hover {
+  text-decoration: none;
+  opacity: 0.8;
+}
+
+
+.accommodation-form-wrap {
+  min-width: 0;
+  padding: clamp(2rem, 4vw, 4rem);
+  border: 1px solid rgb(36 33 25 / 12%);
+  background: rgb(255 253 248 / 72%);
+  box-shadow: 0 1.5rem 4rem rgb(36 33 25 / 9%);
+  backdrop-filter: blur(0.4rem);
+}
+
+/* Header row of the accommodation form: the eyebrow on the left and the
+   member tabs on the right, on the same line on desktop. On mobile the tabs
+   wrap below the eyebrow. */
+.accommodation-form-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.accommodation-form-head .eyebrow {
+  margin: 0;
+}
+
+/* Member tabs — switch between group members' accommodation details.
+   Each tab is an avatar chip: circular photo/initials + name. */
+.accommodation-member-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+}
+
+
+.accommodation-member-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.3rem 0.9rem 0.3rem 0.35rem;
+  border: 1px solid rgb(36 33 25 / 18%);
+  border-radius: 999px;
+  background: rgb(255 253 248 / 55%);
+  color: var(--ink, #241f16);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.accommodation-member-tab:hover {
+  border-color: var(--terracotta, #b85c38);
+  color: var(--terracotta, #b85c38);
+}
+
+.accommodation-member-tab.is-active {
+  background: var(--terracotta, #b85c38);
+  border-color: var(--terracotta, #b85c38);
+  color: #fff;
+}
+
+.accommodation-member-tab-avatar {
+  display: grid;
+  flex: 0 0 1.9rem;
+  width: 1.9rem;
+  height: 1.9rem;
+  overflow: hidden;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--terracotta, #b85c38);
+  color: var(--cream);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.accommodation-member-tab.is-active .accommodation-member-tab-avatar {
+  background: rgb(255 253 248 / 22%);
+}
+
+.accommodation-member-tab-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.accommodation-member-tab-name {
+  white-space: nowrap;
+}
+
+.accommodation-member-tab small {
+  font-size: 0.62rem;
+  font-weight: 500;
+  opacity: 0.75;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.accommodation-member-tab.is-active small {
+  opacity: 0.9;
+}
+
+.accommodation-form-wrap h3 {
+  margin: 0 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+/* Title row: the section heading with a cluster of the group members'
+   avatars on the right. The avatars overlap slightly (like a shared-group
+   facepile) and stay on one line with the heading. */
+.accommodation-form-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.accommodation-form-title h3 {
+  margin: 0;
+}
+
+.accommodation-form-avatars {
+  display: flex;
+  align-items: center;
+  padding-left: 0.75rem;
+}
+
+.accommodation-form-avatar {
+  display: grid;
+  flex: 0 0 2.6rem;
+  width: 2.6rem;
+  height: 2.6rem;
+  margin-left: -0.75rem;
+  overflow: hidden;
+  place-items: center;
+  border: 2px solid var(--cream);
+  border-radius: 50%;
+  background: var(--terracotta, #b85c38);
+  color: var(--cream);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  box-shadow: 0 0.2rem 0.5rem rgb(36 33 25 / 18%);
+}
+
+.accommodation-form-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.accommodation-form-wrap > p:not(.eyebrow) {
+  margin-bottom: 2rem;
+}
+
+.accommodation-option-details {
+  display: grid;
+  gap: 0;
+  margin: 2rem 0;
+}
+
+.accommodation-option-details div {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.7fr) 1fr;
+  gap: 1rem;
+  padding: 1rem 0;
+  border-top: 1px solid rgb(36 33 25 / 18%);
+}
+
+.accommodation-option-details div:last-child {
+  border-bottom: 1px solid rgb(36 33 25 / 18%);
+}
+
+.accommodation-option-details dt {
+  color: rgb(36 33 25 / 60%);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.accommodation-option-details dd {
+  margin: 0;
+  color: var(--terracotta);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+
+/* Photo carousel for the guest's assigned cabin — horizontal swipeable
+   slideset. On large screens it shows 4 cards at a time; on medium 3; on
+   mobile 1 photo at a time plus a peek of the next one. */
+.accommodation-photo-carousel {
+  display: flex;
+  width: 100%;
+  min-width: 0;
+  gap: 0.75rem;
+  margin: 2rem 0;
+  padding-bottom: 0.25rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.accommodation-photo-carousel::-webkit-scrollbar {
+  display: none;
+}
+
+.accommodation-photo {
+  position: relative;
+  flex: 0 0 calc((100% - 2.25rem) / 4);
+  max-width: calc((100% - 2.25rem) / 4);
+  margin: 0;
+  overflow: hidden;
+  aspect-ratio: 2 / 1;
+  background: color-mix(in srgb, var(--sage) 12%, var(--white));
+  box-shadow: 0 0.4rem 1rem rgb(36 33 25 / 10%);
+  scroll-snap-align: start;
+}
+
+
+
+.accommodation-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 320ms ease;
+}
+
+.accommodation-photo:hover img {
+  transform: scale(1.04);
+}
+
+.accommodation-photo figcaption {
+  position: absolute;
+  inset: auto 0 0;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.7rem;
+  background: linear-gradient(180deg, transparent 0%, rgb(24 31 28 / 72%) 100%);
+  color: var(--white);
+  font-size: 0.62rem;
+  line-height: 1.2;
+}
+
+.accommodation-photo figcaption span {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  text-shadow: 0 1px 0 rgb(0 0 0 / 35%);
+}
+
+.accommodation-photo figcaption small {
+  flex: 0 0 auto;
+  color: rgb(255 253 248 / 82%);
+  font-size: 0.58rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-shadow: 0 1px 0 rgb(0 0 0 / 35%);
+}
+
+/* Plan card — price per person + group total with "covered" strikethrough
+   and an EUR estimate disclaimer. */
+.accommodation-plan-card {
+  margin: 2rem 0;
+  padding: 1.25rem 1.25rem 1rem;
+  border: 1px solid rgb(36 33 25 / 14%);
+  border-top: 0.3rem solid var(--marigold);
+  background: color-mix(in srgb, var(--marigold) 7%, var(--white));
+  box-shadow: 0 0.5rem 1.5rem rgb(36 33 25 / 8%);
+}
+
+.accommodation-plan-card > h4 {
+  margin: 0 0 1rem;
+  color: var(--terracotta);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.accommodation-plan-row {
+  display: grid;
+  grid-template-columns: minmax(7rem, 0.7fr) 1fr;
+  gap: 0.75rem 1rem;
+  align-items: baseline;
+  padding: 0.85rem 0;
+  border-top: 1px solid rgb(36 33 25 / 14%);
+}
+
+.accommodation-plan-row:first-of-type {
+  border-top: 0;
+}
+
+.accommodation-plan-label {
+  color: rgb(36 33 25 / 60%);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.accommodation-plan-price {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+/* Each price line (MXN / EUR) is a flex row so the struck-through original
+   and the price to pay sit side by side, baseline-aligned with a small gap
+   instead of running together. */
+.accommodation-plan-line {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  white-space: nowrap;
+}
+
+.accommodation-plan-price strong {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+  line-height: 1.1;
+}
+
+.accommodation-plan-price small {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+
+
+.accommodation-plan-price.is-covered {
+  opacity: 0.58;
+  text-decoration-color: var(--terracotta);
+  text-decoration-line: line-through;
+  text-decoration-thickness: 0.12em;
+}
+
+.accommodation-plan-row > em {
+  grid-column: 2;
+  justify-self: start;
+  padding: 0.32rem 0.48rem;
+  background: var(--marigold);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.58rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  line-height: 1;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+
+/* Sale styling — when a stay is covered by the couple, the original price is
+   struck through and the discounted price to pay is shown in red, like a
+   standard "on sale" price. The struck-through original lives inside
+   .accommodation-plan-original so it stays muted. */
+.accommodation-plan-price.is-sale > strong,
+.accommodation-plan-price.is-sale > small {
+  color: #c0392b;
+}
+
+.accommodation-price.is-sale .accommodation-price-values > strong,
+.accommodation-price.is-sale .accommodation-price-values > small {
+  color: #c0392b;
+}
+
+.accommodation-plan-original {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  opacity: 0.55;
+  text-decoration-color: var(--terracotta);
+  text-decoration-line: line-through;
+  text-decoration-thickness: 0.12em;
+}
+
+.accommodation-plan-original strong,
+.accommodation-plan-original small {
+  font-size: 0.85em;
+}
+
+
+
+.accommodation-plan-disclaimer {
+  margin: 0.85rem 0 0;
+  padding-top: 0.75rem;
+  border-top: 1px dashed rgb(36 33 25 / 18%);
+  color: rgb(36 33 25 / 52%);
+  font-size: 0.62rem;
+  line-height: 1.45;
+}
+
+.accommodation-price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.55rem 0.75rem;
+}
+
+
+
+.accommodation-price-values {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.accommodation-price-values strong {
+  font-weight: 400;
+}
+
+.accommodation-price-values small {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  line-height: 1.1;
+}
+
+
+.accommodation-price.is-covered .accommodation-price-values {
+  opacity: 0.58;
+  text-decoration-color: var(--terracotta);
+  text-decoration-line: line-through;
+  text-decoration-thickness: 0.12em;
+}
+
+.accommodation-price > em {
+  padding: 0.32rem 0.48rem;
+  background: var(--marigold);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.58rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  line-height: 1;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+
+/* Occupancy trigger placed at the top of a stay block (primary cabin and
+   extra cabin). */
+.accommodation-occupancy-top {
+  display: flex;
+  justify-content: flex-start;
+  margin: 0 0 1.25rem;
+}
+
+.accommodation-occupancy-trigger {
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.7rem 1.1rem;
+  border: 1px solid color-mix(in srgb, var(--terracotta) 45%, transparent);
+  border-radius: 999px;
+  background: rgb(255 253 248 / 60%);
+  color: var(--terracotta);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.accommodation-occupancy-trigger:hover {
+  background: var(--terracotta);
+  color: var(--cream);
+}
+
+
+.accommodation-occupancy-shell {
+  position: fixed;
+  z-index: 190;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgb(36 33 25 / 58%);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 180ms ease, visibility 180ms ease;
+}
+
+.accommodation-occupancy-shell.is-open {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.accommodation-occupancy-panel {
+  position: relative;
+  display: block;
+  width: min(100%, 52rem);
+  max-height: min(90vh, 60rem);
+  overflow: auto;
+  padding: 2.5rem 2rem 2rem;
+  border-top: 0.3rem solid var(--marigold);
+  background: var(--cream);
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 28%);
+}
+
+
+.accommodation-occupancy-close {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.75rem;
+  display: grid;
+  width: 2.1rem;
+  height: 2.1rem;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  font-size: 1.6rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.accommodation-occupancy-eyebrow {
+  display: block;
+  margin-bottom: 0.65rem;
+}
+
+.accommodation-occupancy-panel h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 6vw, 2.5rem);
+  font-weight: 400;
+  line-height: 1;
+}
+
+.accommodation-occupancy-body {
+  margin: 1rem 0 1.25rem;
+  color: rgb(36 33 25 / 78%);
+  line-height: 1.6;
+}
+
+
+.accommodation-room-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.accommodation-room-list article {
+  padding: 1rem;
+  border: 1px solid rgb(36 33 25 / 15%);
+  background: rgb(255 253 248 / 48%);
+}
+
+.accommodation-room-list article.is-current {
+  border-color: color-mix(in srgb, var(--terracotta) 55%, transparent);
+  box-shadow: inset 3px 0 var(--terracotta);
+}
+
+.accommodation-room-list header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgb(36 33 25 / 12%);
+}
+
+.accommodation-room-list header strong {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+.accommodation-room-list header > span {
+  flex: 0 0 auto;
+  color: rgb(36 33 25 / 58%);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.accommodation-room-occupants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem 1rem;
+  padding-top: 0.75rem;
+}
+
+.accommodation-room-person {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 8rem;
+  font-size: 0.78rem;
+  line-height: 1.2;
+}
+
+.accommodation-room-person small {
+  display: block;
+  margin-top: 0.12rem;
+  color: var(--terracotta);
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.accommodation-room-person-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.12rem;
+  min-width: 0;
+}
+
+.accommodation-room-person-name {
+  display: flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  flex-wrap: wrap;
+}
+
+.accommodation-room-covered {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  width: fit-content;
+  margin-top: 0.1rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--marigold, #d9b36a) 22%, transparent);
+  color: var(--terracotta);
+  font-size: 0.58rem;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.3;
+}
+
+.accommodation-room-covered::before {
+  content: "✦";
+  font-size: 0.6rem;
+}
+
+.accommodation-room-avatar {
+
+  display: grid;
+  flex: 0 0 2.25rem;
+  width: 2.25rem;
+  height: 2.25rem;
+  overflow: hidden;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--terracotta);
+  color: var(--cream);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.accommodation-room-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.accommodation-room-empty {
+  color: rgb(36 33 25 / 52%);
+  font-size: 0.76rem;
+  font-style: italic;
+}
+
+.accommodation-airbnb {
+  margin: 0 0 2rem;
+}
+
+.accommodation-airbnb > h4 {
+  margin: 0;
+  color: var(--terracotta);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 400;
+}
+
+.accommodation-airbnb > p {
+  margin: 0.35rem 0 1rem;
+  color: rgb(36 33 25 / 65%);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.accommodation-airbnb > .accommodation-market-price {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.45rem;
+  margin: 0 0 1rem;
+  padding: 0.55rem 0.7rem;
+  border-left: 2px solid var(--marigold);
+  background: rgb(255 253 248 / 45%);
+  color: var(--ink);
+}
+
+.accommodation-market-price span,
+.accommodation-stay-price span {
+  font-size: 0.58rem;
+  line-height: 1.25;
+}
+
+.accommodation-market-price strong {
+  font-size: 0.78rem;
+}
+
+.accommodation-market-price small {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+
+.accommodation-airbnb-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.accommodation-airbnb-list > a {
+  position: relative;
+  display: flex;
+  min-height: 11rem;
+  flex-direction: column;
+  padding: 1rem;
+  border: 1px solid rgb(36 33 25 / 15%);
+  background: rgb(255 253 248 / 55%);
+  color: var(--ink);
+  text-decoration: none;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.accommodation-airbnb-list > a:hover {
+  border-color: var(--terracotta);
+  transform: translateY(-0.15rem);
+}
+
+.accommodation-airbnb-list > .accommodation-stay-card {
+  isolation: isolate;
+  overflow: hidden;
+  border-color: rgb(255 253 248 / 38%);
+  background: var(--deep-green);
+  color: var(--white);
+}
+
+.accommodation-stay-card::before,
+.accommodation-stay-card::after {
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  content: "";
+}
+
+.accommodation-stay-card::before {
+  background-image: var(--stay-image);
+  background-position: center;
+  background-size: cover;
+  transform: scale(1.01);
+  transition: transform 320ms ease;
+}
+
+.accommodation-stay-card::after {
+  z-index: -1;
+  background:
+    linear-gradient(180deg, rgb(24 31 28 / 28%) 0%, rgb(24 31 28 / 72%) 62%, rgb(24 31 28 / 92%) 100%);
+}
+
+.accommodation-stay-card:hover::before {
+  transform: scale(1.06);
+}
+
+.accommodation-stay-card .accommodation-airbnb-rating,
+.accommodation-stay-card .accommodation-hotel-type,
+.accommodation-stay-card .accommodation-airbnb-link {
+  color: var(--marigold);
+  text-shadow: 0 1px 0 rgb(0 0 0 / 35%);
+}
+
+.accommodation-stay-card .accommodation-airbnb-facts {
+  color: rgb(255 253 248 / 82%);
+}
+
+.accommodation-stay-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0 0 0.85rem;
+  color: rgb(255 253 248 / 82%);
+}
+
+.accommodation-stay-price span {
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.accommodation-stay-price strong {
+  max-width: none;
+  margin: 0.18rem 0 0;
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.accommodation-stay-price small {
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  font-weight: 400;
+  line-height: 1.25;
+}
+
+
+.accommodation-airbnb-list strong {
+  max-width: 85%;
+  margin-top: 1.7rem;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.15;
+}
+
+.accommodation-airbnb-rating {
+  position: absolute;
+  top: 0.85rem;
+  right: 0.85rem;
+  color: var(--terracotta);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.accommodation-hotels {
+  padding-top: 0.5rem;
+  border-top: 1px solid rgb(36 33 25 / 14%);
+}
+
+.accommodation-hotel-type {
+  position: absolute;
+  top: 0.85rem;
+  left: 1rem;
+  color: var(--terracotta);
+  font-size: 0.58rem;
+  font-weight: 750;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.accommodation-airbnb-facts {
+  margin: 0.65rem 0 1rem;
+  color: rgb(36 33 25 / 60%);
+  font-size: 0.66rem;
+  line-height: 1.45;
+}
+
+.accommodation-airbnb-link {
+  margin-top: auto;
+  color: var(--terracotta);
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.accommodation-airbnb-search {
+  display: inline-block;
+  margin-top: 1rem;
+  color: var(--ink);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-decoration-thickness: 1px;
+  text-transform: uppercase;
+  text-underline-offset: 0.3em;
+}
+
+.accommodation-subnav {
+  display: none;
+}
+
+/* Desktop-only bottom nav linking to the next section (Food / "A TABLE").
+   The section is a 2-column grid: row 1 holds the copy + form-wrap, row 2
+   holds the full-width recap, and row 3 holds the nav spanning both columns.
+   Hidden on mobile, where the stacked panels already provide their own
+   sub-navigation. */
+@media (min-width: 900px) {
+  .accommodation-section {
+    grid-template-rows: 1fr auto auto;
+  }
+
+  .accommodation-section-nav {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    align-self: end;
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 899px) {
+  .accommodation-section-nav {
+    display: none;
+  }
+}
+
+
+.accommodation-steps {
+  margin: 2rem 0;
+  padding: 0;
+  list-style: none;
+}
+
+.accommodation-steps li {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  border-top: 1px solid rgb(36 33 25 / 20%);
+}
+
+.accommodation-steps span {
+  color: var(--terracotta);
+  font-size: 0.65rem;
+  letter-spacing: 0.1em;
+}
+
+.accommodation-steps p {
+  margin: 0;
+}
+
+@media (max-width: 1199px) {
+  .accommodation-photo {
+    flex: 0 0 calc((100% - 1.5rem) / 3);
+    max-width: calc((100% - 1.5rem) / 3);
+  }
+}
+
+@media (max-width: 899px) {
+
+
+  .accommodation-section {
+    gap: 0;
+    min-width: 0;
+    overflow: hidden;
+    padding-block: var(--space-3);
+  }
+
+  /* Smaller citation on mobile so the intro stays compact. */
+  .accommodation-citation {
+    font-size: clamp(1.05rem, 3.4vw, 1.35rem);
+    line-height: 1.45;
+  }
+
+  .accommodation-photo-carousel {
+    gap: 0.6rem;
+    margin: 1.5rem 0;
+  }
+
+  .accommodation-photo {
+    flex: 0 0 82vw;
+    flex-basis: min(82vw, 22rem);
+    max-width: 82vw;
+  }
+
+
+
+
+  .accommodation-copy,
+  .accommodation-form-wrap {
+    min-height: calc(100svh - var(--header-height));
+    scroll-margin-top: var(--header-height);
+  }
+
+  .accommodation-copy {
+    display: flex;
+    flex-direction: column;
+    padding: clamp(2.5rem, 8vw, 4rem) clamp(1.25rem, 6vw, 2rem);
+  }
+
+  .accommodation-form-wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    min-width: 0;
+    overflow: hidden;
+    padding: clamp(2.5rem, 8vw, 4rem) clamp(1.25rem, 6vw, 2rem);
+    border-inline: 0;
+    box-shadow: inset 0 1px rgb(36 33 25 / 12%);
+  }
+
+  .accommodation-option-details {
+    width: 100%;
+    margin: 1.5rem 0;
+  }
+
+  .accommodation-option-details div {
+    grid-template-columns: minmax(6.25rem, 0.65fr) 1fr;
+    padding: 0.8rem 0;
+  }
+
+  .accommodation-plan-card {
+    margin: 1.5rem 0;
+    padding: 1rem 1rem 0.85rem;
+  }
+
+  .accommodation-plan-row {
+    grid-template-columns: minmax(6.25rem, 0.65fr) 1fr;
+    padding: 0.75rem 0;
+  }
+
+
+  .accommodation-room-list header {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .accommodation-room-list header > span {
+    white-space: normal;
+  }
+
+  .accommodation-airbnb {
+    min-width: 0;
+  }
+
+  .accommodation-airbnb-list {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    padding-bottom: 0.25rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .accommodation-airbnb-list::-webkit-scrollbar {
+    display: none;
+  }
+
+  .accommodation-airbnb-list > a {
+    flex: 0 0 78vw;
+    flex-basis: min(78vw, 18rem);
+    max-width: 78vw;
+    min-height: 10rem;
+    scroll-snap-align: start;
+  }
+
+  .accommodation-airbnb > .accommodation-market-price {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .accommodation-subnav {
+    display: block;
+    width: 100%;
+    margin-top: auto;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgb(36 33 25 / 18%);
+  }
+
+  .accommodation-subnav a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    color: var(--ink);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-decoration: none;
+    text-transform: uppercase;
+  }
+
+  .accommodation-subnav--back {
+    margin-top: 1.5rem;
+  }
+
+  .accommodation-subnav--back a {
+    justify-content: flex-start;
+  }
+
+  .accommodation-note-shell {
+    position: fixed;
+    z-index: 190;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    padding: 1rem;
+    background: rgb(36 33 25 / 58%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 180ms ease, visibility 180ms ease;
+  }
+
+  .accommodation-note-shell.is-mobile-open {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .accommodation-note-panel {
+    position: relative;
+    display: block;
+    width: min(100%, 28rem);
+    max-height: min(90vh, 40rem);
+    overflow: auto;
+    padding: 2.25rem 1.5rem 1.75rem;
+    border-top: 0.3rem solid var(--marigold);
+    background: var(--cream);
+    box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 28%);
+  }
+
+  .accommodation-note-close {
+    position: absolute;
+    top: 0.65rem;
+    right: 0.75rem;
+    display: grid;
+    width: 2.1rem;
+    height: 2.1rem;
+    place-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--ink);
+    font-size: 1.6rem;
+    line-height: 1;
+  }
+
+  .accommodation-note-eyebrow {
+    display: block;
+    margin-bottom: 0.65rem;
+  }
+
+  .accommodation-note-panel h3 {
+    display: block;
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 10vw, 3.25rem);
+    font-weight: 400;
+    line-height: 0.95;
+  }
+
+  .accommodation-note-panel .accommodation-note {
+    display: block;
+    margin: 1.25rem 0 0;
+    color: rgb(36 33 25 / 78%);
+    line-height: 1.6;
+  }
+
+  .accommodation-facts-note {
+    display: none;
+  }
+
+  .accommodation-note-fab {
+    position: fixed;
+    z-index: 130;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    display: grid;
+    width: 4.25rem;
+    height: 4.25rem;
+    place-items: center;
+    padding: 0;
+    border: 3px solid var(--marigold);
+    border-radius: 50%;
+    background: var(--terracotta);
+    box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
+    color: var(--white);
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(1rem) scale(0.9);
+    transition: opacity 180ms ease, transform 180ms ease;
+  }
+
+  .accommodation-note-fab.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
+
+  .accommodation-note-fab span {
+    font-family: var(--font-display);
+    font-size: 2.25rem;
+    font-style: italic;
+    line-height: 1;
+  }
+}
+
+
+/* ── Accommodation recap question ──────────────────────────────────────── */
+
+.accommodation-recap {
+  margin: 2.5rem 0 0;
+  padding-top: 2rem;
+  border-top: 1px solid rgb(36 33 25 / 18%);
+}
+
+/* The recap is rendered once, in its own full-width space below the
+   two-column grid (copy + form-wrap), so it always sits below the
+   accommodation options on every breakpoint. `min-width: 0` lets the grid
+   item shrink within its track so long nowrap content (e.g. the per-person
+   price) can't push it past the container edge. */
+.accommodation-recap--inline {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin: 0;
+  padding: clamp(2.5rem, 8vw, 4rem) clamp(1.25rem, 6vw, 2rem);
+  border-top: 1px solid rgb(36 33 25 / 18%);
+}
+
+
+.accommodation-recap-head h3 {
+  margin: 0.5rem 0 0.75rem;
+}
+
+/* Citation-style intro: left border + display italic, echoing the section's
+   pull-quote so the recap reads as a quiet, personal note. Scaled down from
+   the main citation since it sits inside the recap card. */
+.accommodation-recap-intro {
+  position: relative;
+  max-width: 60rem;
+  margin: 0 0 1.5rem;
+  padding-left: 1.25rem;
+  border-left: 2px solid var(--marigold, #d9b36a);
+  color: rgb(36 33 25 / 82%);
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 2.6vw, 1.35rem);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.accommodation-recap-intro::before {
+  content: "“";
+  position: absolute;
+  top: -0.45em;
+  left: -0.1rem;
+  color: var(--marigold, #d9b36a);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.6em;
+  line-height: 1;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.accommodation-recap-rows {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.accommodation-recap-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid rgb(36 33 25 / 14%);
+  border-radius: 0.75rem;
+  background: rgb(255 255 255 / 55%);
+}
+
+
+.accommodation-recap-person {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.accommodation-recap-person .accommodation-member-tab-avatar {
+  flex: 0 0 2.4rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  font-size: 0.75rem;
+}
+
+.accommodation-recap-person-text {
+  display: grid;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+.accommodation-recap-person-text strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+}
+
+.accommodation-recap-person-text span {
+  color: rgb(36 33 25 / 78%);
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+.accommodation-recap-toggle {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.5rem;
+}
+
+/* Per-person price shown in the recap question rows. */
+.accommodation-recap-price {
+  display: grid;
+  gap: 0.15rem;
+  flex: 0 0 auto;
+  text-align: right;
+  min-width: 0;
+}
+
+.accommodation-recap-price small {
+  color: rgb(36 33 25 / 62%);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.accommodation-recap-price-value {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  white-space: nowrap;
+}
+
+.accommodation-recap-price-value strong {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.accommodation-recap-price-value s {
+  color: rgb(36 33 25 / 45%);
+  font-size: 0.85rem;
+}
+
+.accommodation-recap-price-value.is-covered strong {
+  color: var(--terracotta, #c96f4a);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.accommodation-recap-price-value small {
+  color: rgb(36 33 25 / 55%);
+  font-size: 0.8rem;
+}
+
+/* Full-width banner shown when a member's stay is covered by the couple.
+   The recap row wraps so this banner spans the whole row width. Uses the
+   green "success" style (sage) so it reads as a positive confirmation and
+   matches the summary-view covered banner. */
+.accommodation-recap-covered-banner {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--sage, #7a9b76) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sage, #7a9b76) 42%, transparent);
+  color: #2f4d2c;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.accommodation-recap-covered-banner span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  background: var(--sage, #7a9b76);
+  color: #fff;
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
+
+
+/* The recap sits on the light accommodation background, so the shared
+   .rsvp-boolean-btn (designed for the dark RSVP section) needs a light-theme
+   override: dark text + visible border by default, gold fill when selected. */
+.accommodation-recap-toggle .rsvp-boolean-btn {
+  background: rgb(255 255 255 / 60%);
+  border-color: rgb(36 33 25 / 28%);
+  color: var(--ink);
+}
+
+.accommodation-recap-toggle .rsvp-boolean-btn:hover {
+  border-color: var(--marigold, #d9b36a);
+}
+
+.accommodation-recap-toggle .rsvp-boolean-btn.is-selected {
+  background: #e4b968;
+  border-color: #e4b968;
+  color: var(--deep-green);
+  font-weight: 600;
+}
+
+/* The flip-step-card (shared with the dark RSVP section) is reused here on the
+   light accommodation background, so its white title and toggle need a
+   light-theme override to stay readable and clickable. */
+.accommodation-recap .flip-step-card-title {
+  color: var(--ink);
+}
+
+.accommodation-recap .flip-step-card-toggle {
+  border-color: rgb(36 33 25 / 28%);
+  color: var(--ink);
+}
+
+.accommodation-recap .flip-step-card-toggle:hover {
+  border-color: var(--marigold, #d9b36a);
+}
+
+.accommodation-recap-save {
+
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.25rem;
+}
+
+.accommodation-recap-save .button {
+  width: 100%;
+}
+
+.accommodation-recap-save small {
+  color: rgb(36 33 25 / 70%);
+  font-size: 0.85rem;
+}
+
+/* Summary of the accommodation confirmation: a quiet panel listing each
+   person's Oui/Non choice once at least one answer has been given, plus a
+   confirmation banner once the confirmation has been sent. */
+.accommodation-recap-summary {
+  margin-top: 1.75rem;
+  padding: 1.5rem 1.5rem 1.25rem;
+  border: 1px solid rgb(36 33 25 / 14%);
+  border-left: 0.3rem solid var(--marigold, #d9b36a);
+  background: rgb(255 255 255 / 45%);
+}
+
+.accommodation-recap-summary h4 {
+  margin: 0 0 0.35rem;
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.accommodation-recap-summary-intro {
+  margin: 0 0 1rem;
+  color: rgb(36 33 25 / 70%);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.accommodation-recap-summary-list {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.accommodation-recap-summary-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px dashed rgb(36 33 25 / 14%);
+}
+
+.accommodation-recap-summary-row:last-child {
+  border-bottom: 0;
+}
+
+.accommodation-recap-summary-person {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+/* The avatar face in the resumen mirrors the question step: a circular
+   photo/initials badge sized like the recap rows. */
+.accommodation-recap-summary-person .accommodation-member-tab-avatar {
+  flex: 0 0 2.4rem;
+  width: 2.4rem;
+  height: 2.4rem;
+  font-size: 0.75rem;
+}
+
+.accommodation-recap-summary-person-text {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.accommodation-recap-summary-person-text strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+.accommodation-recap-summary-person-text small {
+  color: rgb(36 33 25 / 62%);
+  font-size: 0.78rem;
+  line-height: 1.35;
+}
+
+
+.accommodation-recap-summary-value {
+  flex: 0 0 auto;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  background: rgb(36 33 25 / 8%);
+  color: rgb(36 33 25 / 72%);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.accommodation-recap-summary-value.is-yes {
+  background: color-mix(in srgb, var(--sage, #7a9b76) 22%, transparent);
+  color: #2f4d2c;
+}
+
+.accommodation-recap-summary-value.is-no {
+  background: color-mix(in srgb, var(--terracotta, #c96f4a) 16%, transparent);
+  color: #8a3d24;
+}
+
+/* Per-person price shown in the recap summary rows. */
+.accommodation-recap-summary-price {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.accommodation-recap-summary-price strong {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ink);
+}
+
+.accommodation-recap-summary-price s {
+  color: rgb(36 33 25 / 45%);
+  font-size: 0.8rem;
+}
+
+.accommodation-recap-summary-price small {
+  color: var(--terracotta, #c96f4a);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+/* The EUR estimate in the non-covered summary price is muted, unlike the
+   terracotta "covered" label. */
+.accommodation-recap-summary-price small.is-eur {
+  color: rgb(36 33 25 / 55%);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+
+.accommodation-recap-summary-price.is-covered strong {
+  color: var(--terracotta, #c96f4a);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+/* Full-width banner shown in the summary rows when a member's stay is
+   covered by the couple. Mirrors the question-step covered banner so the
+   "Pris en charge" label has the same success style and sits on its own line
+   (the summary row wraps, so this spans the full row width). */
+.accommodation-recap-summary-covered-banner {
+  flex: 1 1 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--sage, #7a9b76) 18%, transparent);
+  border: 1px solid color-mix(in srgb, var(--sage, #7a9b76) 42%, transparent);
+  color: #2f4d2c;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.accommodation-recap-summary-covered-banner span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 50%;
+  background: var(--sage, #7a9b76);
+  color: #fff;
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
+
+.accommodation-recap-confirmation {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 1rem 0 0;
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  background: color-mix(in srgb, var(--sage, #7a9b76) 18%, transparent);
+  color: #2f4d2c;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.accommodation-recap-confirmation span {
+  display: grid;
+  flex: 0 0 auto;
+  width: 1.4rem;
+  height: 1.4rem;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--sage, #7a9b76);
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.accommodation-recap-confirmation.is-error {
+  background: color-mix(in srgb, #b23b3b 14%, transparent);
+  color: #7a1f1f;
+}
+
+
+@media (max-width: 899px) {
+
+  /* On mobile the section already provides its own horizontal padding, so
+     trim the recap's side padding to give the child rows more width. */
+  .accommodation-recap--inline {
+    padding-inline: clamp(0.5rem, 2vw, 1rem);
+  }
+
+  /* The shared flip-step-card is reused here on the light accommodation
+     background. On mobile we strip its default card chrome (padding + top
+     margin) so the recap rows own the full width and the layout is rebuilt
+     from scratch to fit the narrow viewport. */
+  .accommodation-recap .flip-step-card {
+    padding: 0;
+    margin-top: 0;
+  }
+
+  .accommodation-recap .flip-step-card-body {
+    gap: 0.75rem;
+  }
+
+  /* Each recap row keeps the desktop flex-wrap layout: avatar + name on the
+     left, per-person price on the right, the covered banner full-width on its
+     own line, and the Yes/No toggle on the right. */
+  .accommodation-recap-row {
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.85rem 0.9rem;
+  }
+
+  .accommodation-recap-person-text strong {
+    font-size: 1rem;
+  }
+
+  .accommodation-recap-person-text span {
+    font-size: 0.82rem;
+    line-height: 1.35;
+  }
+
+  .accommodation-recap-price-value {
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+
+  /* The covered banner spans the full row width. */
+  .accommodation-recap-covered-banner {
+    margin-top: 0;
+  }
+
+  /* The Yes/No toggle is a full-width two-button row. */
+  .accommodation-recap-toggle {
+    width: 100%;
+  }
+
+  .accommodation-recap-toggle .rsvp-boolean-btn {
+    flex: 1 1 0;
+    min-height: 2.9rem;
+  }
+
+  /* Save row: stack the button and status text so they fit the width. */
+  .accommodation-recap-save {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .accommodation-recap-save small {
+    text-align: center;
+  }
+
+  /* Summary rows: stack person info, price and value so each line is
+     readable on a narrow screen. */
+  .accommodation-recap-summary {
+    padding: 1.1rem 1rem;
+  }
+
+  .accommodation-recap-summary-row {
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
+  }
+
+  .accommodation-recap-summary-person {
+    flex: 1 1 100%;
+  }
+
+  .accommodation-recap-summary-price {
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+
+  .accommodation-recap-summary-value {
+    margin-left: auto;
+  }
+}

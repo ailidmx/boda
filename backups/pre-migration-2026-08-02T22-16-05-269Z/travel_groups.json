@@ -1,0 +1,34 @@
+[
+  {
+    "id": "G-001",
+    "data": {
+      "groupId": "G-001",
+      "name": "Dimitar + acompañante",
+      "arrivalDate": "2027-02-14",
+      "departureDate": "2027-02-28",
+      "dateStatus": "partial",
+      "attendanceStatus": "confirmed",
+      "origin": "Malaga",
+      "airport": "GDL",
+      "totalPeople": 2,
+      "coordinator": "Dimitar",
+      "notes": "Dimitar reservado; falta confirmar si Dimitar +1 comparte el itinerario"
+    }
+  },
+  {
+    "id": "G-002",
+    "data": {
+      "groupId": "G-002",
+      "name": "Mama Tina",
+      "arrivalDate": "2027-02-10",
+      "departureDate": "2027-03-15",
+      "dateStatus": "tentative",
+      "attendanceStatus": "confirmed",
+      "origin": "",
+      "airport": "",
+      "totalPeople": 1,
+      "coordinator": "Mama Tina",
+      "notes": "Asistencia a la boda confirmada; fechas de viaje aun no confirmadas"
+    }
+  }
+]

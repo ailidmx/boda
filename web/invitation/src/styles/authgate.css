@@ -1,0 +1,472 @@
+/* ── AuthGate (access gate) ───────────────────────────────────────────── */
+
+.access-gate {
+  display: grid;
+  min-height: 100svh;
+  place-items: center;
+  padding: 1.5rem;
+  background:
+    radial-gradient(circle at 15% 15%, rgb(198 139 43 / 24%), transparent 28rem),
+    radial-gradient(circle at 85% 85%, rgb(169 77 49 / 24%), transparent 30rem),
+    var(--deep-green);
+}
+
+.access-card {
+  --access-card-padding-block: clamp(2rem, 7vw, 5rem);
+  --access-card-padding-inline: clamp(2rem, 7vw, 5rem);
+
+  position: relative;
+  width: min(100%, 34rem);
+  border: 1px solid rgb(228 185 104 / 45%);
+  padding: var(--access-card-padding-block) var(--access-card-padding-inline);
+  background: var(--cream);
+  box-shadow:
+    0 0 0 1px rgb(228 185 104 / 16%),
+    0 0 2.5rem rgb(198 139 43 / 20%),
+    0 2rem 6rem rgb(0 0 0 / 24%);
+  color: var(--ink);
+  text-align: center;
+}
+
+.access-card .countdown-bar--contained {
+  position: static;
+  min-height: auto;
+  width: calc(100% + 2 * var(--access-card-padding-inline));
+  margin:
+    calc(-1 * var(--access-card-padding-block))
+    calc(-1 * var(--access-card-padding-inline))
+    1.75rem;
+  padding: 0.9rem clamp(1rem, 3vw, 1.4rem);
+  border-bottom: 1px solid rgb(228 185 104 / 24%);
+  box-shadow: none;
+}
+
+/* Elegant golden gradient border + soft light glow around the login card. */
+.access-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    135deg,
+    rgb(228 185 104 / 75%),
+    rgb(255 253 248 / 12%) 40%,
+    rgb(198 139 43 / 60%)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+
+
+.gate-monogram {
+  margin-bottom: 2rem;
+  color: var(--terracotta);
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 8vw, 4rem);
+}
+
+.access-card h1 {
+  margin: 0.4rem 0 1rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.9rem, 6vw, 3rem);
+  font-weight: 400;
+  color: var(--ink);
+}
+
+
+/* "David y Aydé" — typo Ballet en noir */
+.access-card .identity-swap--gate-names {
+  width: 100%;
+  font-family: var(--font-calligraphy);
+  color: var(--ink);
+}
+
+/* Lay the two names out as a balanced row: one name on the left, the other
+   on the right, and the union symbol (& / y) pinned to the exact center so
+   the header always feels harmonious and centered. */
+.access-card .identity-swap--gate-names .identity-swap-state {
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.35em;
+}
+
+
+.access-card .identity-swap--gate-names .identity-person {
+  flex: 1 1 0;
+  color: var(--ink);
+  text-align: left;
+  will-change: transform;
+}
+
+.access-card .identity-swap--gate-names .identity-person:last-child {
+  text-align: right;
+}
+
+/* Continuous crossing: keep a single visible state and let the names glide
+   back and forth — the left name slides right then returns left, the right
+   name slides left then returns right, passing each other in the middle. */
+.access-card .identity-swap--gate-names .identity-swap-state--primary {
+  animation: none;
+  opacity: 1;
+}
+
+.access-card .identity-swap--gate-names .identity-swap-state--secondary {
+  animation: none;
+  opacity: 0;
+}
+
+
+.access-card .identity-swap--gate-names .identity-swap-state--primary .identity-person:first-child {
+  animation: gate-person-left 18s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+.access-card .identity-swap--gate-names .identity-swap-state--primary .identity-person:last-child {
+  animation: gate-person-right 18s cubic-bezier(0.5, 0, 0.5, 1) infinite;
+}
+
+
+
+/* Each name breathes 3 times at its own side, then crosses to the other side
+   with a perfectly symmetric, natural rhythm: start slow, accelerate, reach
+   max speed exactly at the midpoint (in front of the &), then decelerate
+   progressively up to the opposite edge, breathe 3 times there, and cross
+   back the same way. The midpoint keyframes only set opacity (no transform),
+   so the translateX interpolates as ONE smooth segment with max speed at the
+   center, while the name fades out as it passes the golden union symbol. */
+@keyframes gate-person-left {
+  0%   { transform: translateX(0) scale(1); opacity: 1; }
+  5%   { transform: translateX(0) scale(1.04); opacity: 1; }
+  10%  { transform: translateX(0) scale(1); opacity: 1; }
+  15%  { transform: translateX(0) scale(1.04); opacity: 1; }
+  20%  { transform: translateX(0) scale(1); opacity: 1; }
+  25%  { transform: translateX(0) scale(1.04); opacity: 1; }
+  30%  { transform: translateX(0) scale(1); opacity: 1; }
+  36%  { opacity: 0.05; }
+  42%  { transform: translateX(160%) scale(1); opacity: 1; }
+  47%  { transform: translateX(160%) scale(1.04); opacity: 1; }
+  52%  { transform: translateX(160%) scale(1); opacity: 1; }
+  57%  { transform: translateX(160%) scale(1.04); opacity: 1; }
+  62%  { transform: translateX(160%) scale(1); opacity: 1; }
+  67%  { transform: translateX(160%) scale(1.04); opacity: 1; }
+  72%  { transform: translateX(160%) scale(1); opacity: 1; }
+  78%  { opacity: 0.05; }
+  84%  { transform: translateX(0) scale(1); opacity: 1; }
+  100% { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+@keyframes gate-person-right {
+  0%   { transform: translateX(0) scale(1); opacity: 1; }
+  5%   { transform: translateX(0) scale(1.04); opacity: 1; }
+  10%  { transform: translateX(0) scale(1); opacity: 1; }
+  15%  { transform: translateX(0) scale(1.04); opacity: 1; }
+  20%  { transform: translateX(0) scale(1); opacity: 1; }
+  25%  { transform: translateX(0) scale(1.04); opacity: 1; }
+  30%  { transform: translateX(0) scale(1); opacity: 1; }
+  36%  { opacity: 0.05; }
+  42%  { transform: translateX(-160%) scale(1); opacity: 1; }
+  47%  { transform: translateX(-160%) scale(1.04); opacity: 1; }
+  52%  { transform: translateX(-160%) scale(1); opacity: 1; }
+  57%  { transform: translateX(-160%) scale(1.04); opacity: 1; }
+  62%  { transform: translateX(-160%) scale(1); opacity: 1; }
+  67%  { transform: translateX(-160%) scale(1.04); opacity: 1; }
+  72%  { transform: translateX(-160%) scale(1); opacity: 1; }
+  78%  { opacity: 0.05; }
+  84%  { transform: translateX(0) scale(1); opacity: 1; }
+  100% { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+
+
+
+
+
+
+
+
+
+.access-card .identity-swap--gate-names .identity-connector {
+  color: var(--marigold);
+  font-family: var(--font-calligraphy);
+  font-size: 1.1em;
+  font-weight: 800;
+  line-height: 1;
+
+  background: linear-gradient(
+    100deg,
+    #b8860b 0%,
+    #e4b968 25%,
+    #f7e7b3 50%,
+    #e4b968 75%,
+    #b8860b 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  background-size: 200% auto;
+  animation: gate-eyebrow-shine 4s linear infinite;
+}
+
+
+
+
+.access-card .eyebrow {
+  color: var(--marigold);
+  font-size: clamp(0.62rem, 1.6vw, 0.78rem);
+  font-weight: 600;
+  letter-spacing: 0.32em;
+  text-transform: uppercase;
+  background: linear-gradient(
+    100deg,
+    #b8860b 0%,
+    #e4b968 25%,
+    #f7e7b3 50%,
+    #e4b968 75%,
+    #b8860b 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  background-size: 200% auto;
+  animation: gate-eyebrow-shine 4s linear infinite;
+}
+
+@keyframes gate-eyebrow-shine {
+  to {
+    background-position: 200% center;
+  }
+}
+
+
+
+
+
+.access-card > p {
+  color: var(--ink);
+}
+
+
+.access-card form {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  text-align: left;
+}
+
+.gate-profile-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0.5rem 0 0;
+  color: var(--deep-green);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.gate-profile-hint::before {
+  color: var(--marigold);
+  content: "◆";
+  font-size: 0.65em;
+}
+
+.access-card form label {
+  color: var(--ink-600);
+  font-size: 0.67rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+
+.access-card form input {
+  width: 100%;
+  border: 1px solid rgb(55 55 55 / 40%);
+  padding: 0.9rem 1rem;
+  background: var(--white);
+  font: inherit;
+}
+
+/* Password field with a show/hide toggle button. */
+.password-field {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.password-field input {
+  padding-right: 3rem;
+}
+
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 0.4rem;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 2.2rem;
+  height: 2.2rem;
+  border: none;
+  background: transparent;
+  font-size: 1.05rem;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.65;
+  transition: opacity 0.2s;
+}
+
+.password-toggle:hover {
+  opacity: 1;
+}
+
+.password-toggle:focus-visible {
+  outline: 2px solid var(--marigold);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+
+
+/* Required disclosure checkbox — the guest must agree that their name and
+   photo may be shown to other guests before they can sign in. */
+.gate-disclosure {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin: 0.25rem 0 0.25rem;
+  color: var(--ink-600);
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: normal;
+  line-height: 1.45;
+  text-transform: none;
+  cursor: pointer;
+}
+
+.gate-disclosure span {
+  color: var(--ink-500);
+  font-size: clamp(0.5rem, 1.8vw, 0.62rem);
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  line-height: 1.35;
+}
+
+
+.gate-disclosure input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: 1.05rem;
+  height: 1.05rem;
+  margin-top: 0.1rem;
+  accent-color: var(--marigold);
+  cursor: pointer;
+}
+
+.access-card form small {
+  display: block;
+  margin-top: 0.1rem;
+  color: var(--terracotta);
+  text-align: center;
+}
+
+.gate-lost-key {
+  margin: 1.2rem 0 0.4rem;
+  font-size: 0.78rem;
+  color: var(--ink);
+  opacity: 0.7;
+}
+
+.gate-contacts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem 1.2rem;
+  margin-top: 0.6rem;
+}
+
+.gate-contact-link {
+  color: var(--deep-green);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.gate-contact-link:hover {
+  opacity: 0.7;
+  text-decoration: underline;
+}
+
+.gate-languages {
+  display: flex;
+  justify-content: center;
+  gap: 0.8rem;
+  margin-top: 1.5rem;
+}
+
+.gate-languages .language-switcher {
+  border-color: rgb(55 55 55 / 50%);
+}
+
+
+.gate-languages .language-button {
+  color: var(--ink);
+}
+
+.gate-languages .language-button[aria-pressed="true"] {
+  background: var(--marigold);
+  color: var(--white);
+}
+
+/* Mobile: tighten the D&A monogram spacing and shrink the inputs so the
+   login card feels less tall and more compact on small screens. */
+@media (max-width: 600px) {
+  .access-gate {
+    padding: 0.75rem;
+  }
+
+  .access-card {
+    --access-card-padding-block: 1.5rem;
+    --access-card-padding-inline: 1.25rem;
+  }
+
+  .gate-monogram {
+    display: none;
+  }
+
+
+  .access-card h1 {
+    margin: 0.3rem 0 0.6rem;
+    font-size: clamp(2rem, 7vw, 2.6rem);
+  }
+
+  .access-card .eyebrow {
+    font-size: 0.58rem;
+  }
+
+  .access-card > p {
+    font-size: 0.82rem;
+    line-height: 1.4;
+  }
+
+  .access-card form {
+    gap: 0.6rem;
+    margin-top: 1.25rem;
+  }
+
+  .access-card form input {
+    padding: 0.55rem 0.7rem;
+    font-size: 0.9rem;
+  }
+}
+
+

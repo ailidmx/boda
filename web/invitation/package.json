@@ -5,10 +5,47 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:network": "vite --host",
     "build": "vite build",
-    "preview": "vite preview"
+
+    "preview": "vite preview",
+    "links": "node scripts/generate-invitation-links.mjs",
+    "favicons": "node scripts/generate-favicons.mjs",
+    "test:rules": "node --test tests/firestore.rules.test.mjs",
+    "test:validation": "node --test tests/validation.test.mjs",
+    "test:analytics": "node --test tests/analytics.test.mjs",
+    "test:button": "node --test tests/button.test.mjs",
+    "test:dialog": "node --test tests/dialog.test.mjs",
+    "test:guest-profiles": "node --test tests/guest-profiles.test.mjs",
+    "test:auth-logic": "node --test tests/auth-logic.test.mjs"
+
+
+
   },
   "devDependencies": {
-    "vite": "^6.4.3"
+    "@firebase/rules-unit-testing": "^5.0.1",
+    "@vitejs/plugin-basic-ssl": "^2.3.0",
+    "@vitejs/plugin-react": "^5.2.0",
+    "favicons": "^7.3.1",
+    "firebase-admin": "^14.2.0",
+    "firebase-tools": "^14.0.0",
+    "sass": "^1.102.0",
+    "sharp": "^0.35.3",
+    "vite": "^7.3.6"
+  },
+  "dependencies": {
+    "@cloudinary/react": "^1.14.4",
+    "@cloudinary/url-gen": "^1.22.0",
+    "cloudinary": "^2.10.0",
+    "dotenv": "^17.4.2",
+    "firebase": "^12.17.0",
+    "react": "^19.2.8",
+    "react-dom": "^19.2.8"
+  },
+  "allowScripts": {
+    "@firebase/util@1.15.2": true,
+    "esbuild@0.28.1": true,
+    "fsevents@2.3.3": true,
+    "protobufjs@7.6.5": true
   }
 }

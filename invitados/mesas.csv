@@ -1,1 +1,25 @@
-id,nombre_completo,grupo,mesa,status,notas
+ID,capacidad,nombre,ocupacion
+38 tonnes #1,10,38 tonnes #1,10
+38 tonnes #2,10,38 tonnes #2,7
+Amigas de Aydé,10,Amigas de Aydé,10
+Amigos David #1,10,Amigos David #1,10
+Amigos David #2,10,Amigos David #2,7
+Cercanos Aydé,10,Cercanos Aydé,7
+Golden #1,10,Golden #1,10
+Golden #2,10,Golden #2,8
+Mika,10,Mika,7
+Niños #1,10,Niños #1,10
+Niños #2,10,Niños #2,6
+Novios,22,Novios,20
+Petanclub #1,10,Petanclub #1,10
+Petanclub #2,10,Petanclub #2,10
+Petanclub #3,10,Petanclub #3,10
+Petanclub #4,10,Petanclub #4,6
+Pintura #1,10,Pintura #1,10
+Pintura #2,10,Pintura #2,6
+Mesa #1,10,Mesa #1,10
+Mesa #2,10,Mesa #2,10
+Mesa #3,10,Mesa #3,10
+Mesa #4,10,Mesa #4,10
+Mesa #5,10,Mesa #5,10
+Sin Mesa,,Sin Mesa,0

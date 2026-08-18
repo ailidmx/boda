@@ -1,0 +1,247 @@
+/* ── Ultra-thin Winamp-style pixelated music player ───────────────────── */
+
+/* ── Thin pixelated scrolling banner ──────────────────────────────────── */
+
+
+.winamp-banner {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1190;
+  height: 1.5rem;
+  overflow: hidden;
+  border-top: 2px solid #0a0a0a;
+  background: #101010;
+  color: #e4b968;
+  cursor: pointer;
+  box-shadow: 0 -2px 0 #e4b968;
+  image-rendering: pixelated;
+  font-family: "Bitcount Grid Single", monospace;
+  font-size: 0.8rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* When "open", the banner grows into a taller strip with controls. */
+.winamp-banner.is-open {
+  height: auto;
+  min-height: 4.5rem;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.95rem;
+}
+
+
+.winamp-banner-track {
+  display: inline-flex;
+  align-items: center;
+  height: 100%;
+  animation: winamp-scroll 18s linear infinite;
+  will-change: transform;
+}
+
+.winamp-banner-text {
+  display: inline-block;
+  padding: 0 2rem;
+  line-height: 1.5rem;
+  text-shadow: 1px 1px 0 #000;
+}
+
+.winamp-banner.is-open .winamp-banner-text {
+  line-height: 2.25rem;
+}
+
+@keyframes winamp-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Pause the marquee on hover so the text is readable. */
+.winamp-banner:hover .winamp-banner-track {
+  animation-play-state: paused;
+}
+
+/* ── Transport controls (prev / play / next) ──────────────────────────── */
+
+.winamp-controls {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.15rem 0.5rem;
+}
+
+.winamp-banner.is-open .winamp-controls {
+  display: flex;
+}
+
+.winamp-btn {
+  display: inline-grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border: 1px solid #0a0a0a;
+  border-radius: 0.2rem;
+  background: linear-gradient(180deg, #3a3a3a 0%, #1a1a1a 100%);
+  color: #e4b968;
+  cursor: pointer;
+  font-size: 0.7rem;
+  line-height: 1;
+  box-shadow: 0 2px 0 #000;
+  transition: transform 80ms steps(2, end), background 80ms steps(2, end);
+  image-rendering: pixelated;
+}
+
+.winamp-btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, #4a4a4a 0%, #2a2a2a 100%);
+}
+
+.winamp-btn:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 #000;
+}
+
+.winamp-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.winamp-btn:focus-visible {
+  outline: 2px dashed #e4b968;
+  outline-offset: 2px;
+}
+
+/* Loop button: highlighted when active (ON by default). */
+.winamp-btn.winamp-loop.is-on {
+  background: linear-gradient(180deg, #c68b2b 0%, #8a5a12 100%);
+  color: #0a0a0a;
+  box-shadow: 0 2px 0 #000, inset 0 0 0 1px #e4b968;
+}
+
+.winamp-btn.winamp-loop.is-on:hover {
+  background: linear-gradient(180deg, #d99a35 0%, #9a6a18 100%);
+}
+
+/* ── Copyright attribution ────────────────────────────────────────────── */
+
+.winamp-copyright {
+  display: none;
+  padding: 0 0.5rem 0.35rem;
+  font-family: "Bitcount Grid Single", monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.06em;
+  color: rgb(228 185 104 / 70%);
+  text-shadow: 1px 1px 0 #000;
+  white-space: nowrap;
+}
+
+.winamp-banner.is-open .winamp-copyright {
+  display: block;
+}
+
+
+/* ── Time display (current / remaining) ───────────────────────────────── */
+
+.winamp-time {
+  display: none;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0 0.5rem;
+  font-family: "Bitcount Grid Single", monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  color: #e4b968;
+  text-shadow: 1px 1px 0 #000;
+  white-space: nowrap;
+}
+
+.winamp-banner.is-open .winamp-time {
+  display: flex;
+}
+
+.winamp-time-sep {
+  color: rgb(228 185 104 / 50%);
+}
+
+.winamp-time-remaining {
+  color: rgb(228 185 104 / 75%);
+}
+
+/* ── Thin pixelated progress bar (click to seek) ──────────────────────── */
+
+.winamp-progress {
+  display: none;
+  position: relative;
+  height: 0.45rem;
+  margin: 0 0.5rem 0.35rem;
+  border: 1px solid #0a0a0a;
+  background: #1a1a1a;
+  cursor: pointer;
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 60%);
+  image-rendering: pixelated;
+}
+
+.winamp-banner.is-open .winamp-progress {
+  display: block;
+}
+
+.winamp-progress-fill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, #c68b2b 0%, #e4b968 100%);
+  box-shadow: 0 0 6px rgb(228 185 104 / 60%);
+  transition: width 120ms steps(4, end);
+}
+
+.winamp-progress:hover {
+  border-color: #e4b968;
+}
+
+.winamp-progress:focus-visible {
+  outline: 2px dashed #e4b968;
+  outline-offset: 2px;
+}
+
+
+/* ── Error toast ──────────────────────────────────────────────────────── */
+
+.winamp-error {
+  position: fixed;
+  left: 50%;
+  bottom: 3.5rem;
+  z-index: 1210;
+  max-width: min(90vw, 24rem);
+  transform: translateX(-50%);
+  border: 2px solid #0a0a0a;
+  background: #2a0f0f;
+  color: #ffd9d9;
+  padding: 0.6rem 0.9rem;
+  font-size: 0.8rem;
+  box-shadow: 0 4px 0 #000;
+  image-rendering: pixelated;
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .winamp-banner {
+    height: 1.25rem;
+    font-size: 0.7rem;
+  }
+
+
+  .winamp-banner.is-open {
+    height: auto;
+    min-height: 4rem;
+    font-size: 0.85rem;
+  }
+
+}

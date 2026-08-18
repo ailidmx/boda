@@ -1,0 +1,37 @@
+// ── Responsive: tablet & mobile ─────────────────────────────────────────
+@use "tokens" as *;
+
+@media (max-width: $bp-tablet) {
+  .dashboard-summary {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .dashboard-header,
+  .dashboard-section-heading {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .dashboard-header-actions {
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: $bp-mobile) {
+  .dashboard-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .dashboard-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dashboard-tab {
+    padding: 0.5rem 0.75rem;
+  }
+
+  .dashboard-tab-label {
+    display: none;
+  }
+}

@@ -1,0 +1,345 @@
+/* ── Pétanque section ────────────────────────────────────────────────────
+ * A tribute to the traditional French ball game. Sits between the detailed
+ * programme (white) and the accommodation section (light). It uses a deep
+ * blue base (sampled from the GDL club logo) so all text is rendered in light
+ * tones for contrast, with the club logo floating as a large, blurred,
+ * far-away background motif.
+ */
+
+.petanque-section {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 6vw, 6rem);
+  background:
+    radial-gradient(120% 140% at 100% 0%, rgb(228 185 104 / 14%), transparent 55%),
+    radial-gradient(90% 120% at 0% 100%, rgb(20 40 90 / 55%), transparent 60%),
+    linear-gradient(160deg, #1d3f86 0%, #2255a4 48%, #16305f 100%);
+  color: var(--white);
+}
+
+
+/* Large, blurred, far-away GDL club logo. The solid blue background is
+   stripped via Cloudinary, so the logo floats transparently over the section's
+   blue base. It reads as a soft, integrated watermark rather than a crisp
+   foreground graphic. */
+.petanque-logo-bg {
+  position: absolute;
+  z-index: 0;
+  top: 0;
+  right: 0;
+  width: min(120vw, 60rem);
+  max-width: none;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
+  opacity: 0.3;
+  filter: blur(10px) saturate(0.95);
+  transform: translate(18%, -8%) scale(1.1);
+  pointer-events: none;
+  user-select: none;
+
+}
+
+
+
+
+.petanque-copy {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 52rem;
+  margin: 0 auto;
+}
+
+
+.petanque-copy .section-heading {
+  border-bottom: 0;
+  padding-bottom: 0;
+}
+
+/* Light text for the section heading on the dark background. */
+.petanque-copy .section-heading .eyebrow {
+  color: var(--marigold);
+}
+
+.petanque-copy .section-heading h2 {
+  color: var(--white);
+}
+
+.petanque-copy .section-heading p:last-child {
+  color: rgb(255 253 248 / 88%);
+}
+
+.petanque-lead {
+  max-width: 46rem;
+}
+
+/* The "Pour nous…" body is styled as a citation: a large quote mark + left
+   border, echoing the venue facilities-lead and the attire citation. */
+.petanque-body {
+  position: relative;
+  max-width: 46rem;
+  margin: 1.5rem 0 0;
+  padding: 1.5rem 0 0 1.25rem;
+  border-left: 2px solid var(--marigold, #d9b36a);
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-style: italic;
+  line-height: 1.4;
+  color: var(--white);
+}
+
+.petanque-body::before {
+  content: "“";
+  position: absolute;
+  top: 0;
+  left: -0.1rem;
+  color: var(--marigold, #d9b36a);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.6em;
+  line-height: 1;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* The homage line is styled as a handwritten note, echoing the story section. */
+.petanque-homage {
+  max-width: 46rem;
+  margin: 1.5rem 0 0;
+  font-size: clamp(1.15rem, 2vw, 1.5rem);
+  line-height: 1.6;
+  color: rgb(255 253 248 / 92%);
+}
+
+
+/* Photo strip, mirroring the Chapala gallery: a horizontal scroll on mobile
+   that becomes a tidy grid on desktop. */
+.petanque-photos {
+  display: grid;
+  grid-auto-columns: minmax(15rem, 22vw);
+  grid-auto-flow: column;
+  gap: 0.8rem;
+  margin-top: 2rem;
+  overflow-x: auto;
+  padding-bottom: 1.25rem;
+
+  scroll-snap-type: x mandatory;
+  scrollbar-color: var(--terracotta) rgb(36 33 25 / 12%);
+  scrollbar-width: thin;
+}
+
+.petanque-photo {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0.5rem;
+  background: none;
+  cursor: pointer;
+  scroll-snap-align: start;
+}
+
+.petanque-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 700ms ease;
+}
+
+.petanque-photo:hover img {
+  transform: scale(1.04);
+}
+
+/* Desktop-only bottom nav: leads to the accommodation section. Hidden on
+   mobile, matching the pattern used across the other sections. */
+.petanque-nav {
+  display: none;
+}
+
+@media (min-width: 900px) {
+  .petanque-nav {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1.5rem 2.5rem;
+    margin-top: 2.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgb(255 253 248 / 22%);
+  }
+
+  .petanque-nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--white);
+    font-size: 0.62rem;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+    text-decoration: none;
+    transition: color 250ms ease;
+  }
+
+  .petanque-nav-link:hover,
+  .petanque-nav-link:focus-visible {
+    color: var(--marigold);
+    text-decoration: underline;
+  }
+
+}
+
+@media (max-width: 899px) {
+  .petanque-section {
+    padding: 1.25rem clamp(1.25rem, 4vw, 4rem);
+  }
+
+  .petanque-copy .section-heading h2 {
+    margin: 0;
+    font-size: clamp(1.6rem, 6vw, 4.5rem);
+  }
+
+  /* On mobile the shared flip-step-card and rsvp-recap panels (used by the
+     mini RSVP) blend into the parent card: no extra padding, border or
+     background so they don't read as nested cards on the dark blue base. */
+  .petanque-rsvp-mini .flip-step-card {
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .petanque-rsvp-mini .rsvp-recap {
+    padding: 0;
+    border: 0;
+  }
+}
+
+
+/* ── Mini RSVP question section ─────────────────────────────────────────
+   A compact card at the end of the pétanque tribute asking guests whether
+   they will join the friendly Friday tournament and whether they bring
+   their own boules. It reuses the shared RSVP components ("¡Te animas!"
+   look) with the boolean variant — one row per guest with a Yes/No toggle.
+   Sits on the dark blue base. */
+.petanque-rsvp-mini {
+  display: grid;
+  gap: 1.5rem;
+  margin-top: 2.5rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgb(255 255 255 / 28%);
+  background: rgb(255 255 255 / 4%);
+  text-align: left;
+}
+
+.petanque-rsvp-mini-head .eyebrow {
+  color: var(--marigold);
+}
+
+.petanque-rsvp-mini-head h3 {
+  margin: 0 0 0.5rem;
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+}
+
+.petanque-rsvp-mini-intro {
+  margin: 0;
+  max-width: 46rem;
+  color: rgb(255 253 248 / 75%);
+}
+
+/* "Contact Pierre" link shown right after the intro, for tournament details.
+   A subtle inline link on the dark blue base, accented in marigold. */
+.petanque-organizer-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  width: fit-content;
+  margin-top: 0.75rem;
+  color: var(--marigold);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
+  transition: color 200ms ease;
+}
+
+.petanque-organizer-link:hover,
+.petanque-organizer-link:focus-visible {
+  color: var(--white);
+}
+
+
+/* The shared RsvpQuestion blocks (boolean variant) and RsvpRecap summary
+   render inside the mini card. Their own styles live in rsvp.css; here we
+   only stack them and align the save button. */
+.petanque-rsvp-questions {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.petanque-rsvp-save {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.petanque-rsvp-save .button {
+  width: 100%;
+  margin: 0;
+}
+
+
+.petanque-rsvp-save small {
+  color: #e4b968;
+  font-size: 0.9rem;
+}
+
+/* Prominent confirmation shown after the answers are saved. */
+.rsvp-confirmation {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.7rem 1rem;
+  border-radius: 0.75rem;
+  background: rgb(46 125 50 / 0.16);
+  border: 1px solid rgb(76 175 80 / 0.45);
+  color: #a5d6a7;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.rsvp-confirmation > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #4caf50;
+  color: #0b1a0c;
+  font-size: 0.9rem;
+  font-weight: 800;
+}
+
+.rsvp-confirmation--error {
+  background: rgb(211 47 47 / 0.16);
+  border-color: rgb(229 115 115 / 0.5);
+  color: #ef9a9a;
+}
+
+.rsvp-confirmation--error > span {
+  background: #e53935;
+  color: #fff;
+}
+
+
+
+

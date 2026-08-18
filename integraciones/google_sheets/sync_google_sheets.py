@@ -11,7 +11,6 @@ BASE_DIR = Path(__file__).resolve().parents[2]
 ENV_PATH = Path(__file__).resolve().parent / ".env"
 
 SHEET_TO_CSV = {
-    "WS_INVITADOS": BASE_DIR / "invitados" / "lista_invitados.csv",
     "WS_CABANAS": BASE_DIR / "invitados" / "cabanas_inventario.csv",
     "WS_PRESUPUESTO": BASE_DIR / "presupuesto" / "presupuesto.csv",
     "WS_ASIGNACION": BASE_DIR / "invitados" / "asignacion_cabanas.csv",

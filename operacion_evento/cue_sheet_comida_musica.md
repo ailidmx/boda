@@ -7,20 +7,27 @@ Documento operativo unico para coordinar catering, DJ/banda y coordinacion gener
 Document operationnel unique pour coordonner catering, DJ/groupe et coordination generale.
 
 ## Bloques operativos
-| Hora | Comida | Musica | Owner | Check |
+
+Las horas de llegada, civil y ceremonia en el faro estan confirmadas. Las horas
+exactas de los bloques intermedios y nocturnos se ajustaran con los proveedores.
+
+| Hora orientativa | Comida / bebida | Musica / experiencia | Owner | Check |
 |---|---|---|---|---|
-| Viernes 18:30 | Pre-torneo petanca | Ambient bienvenida | Coord. + Musica | [ ] |
-| Viernes 20:30 | Pizzas de bienvenida | Playlist social | Manu + Ismael + Musica | [ ] |
-| Sabado 13:30 | Carnitas (comida, MXN 110 pp, incluye salsa y tortillas) | Marimba (bloque 1) | Catering + Musica | [ ] |
-| Sabado 16:00 | Tejuino (servicio especial) | Marimba (bloque 2) | Catering + Musica | [ ] |
-| Sabado 18:00 | Coctel/previo ceremonia | Mariachi (bloque 1) | Catering + Musica | [ ] |
-| Sabado 19:00 | Ceremonia/transicion | Mariachi (bloque 2) | Coord. + Musica | [ ] |
-| Sabado 21:00 | Taquiza (noche) | Norteno (bloque 1) | Manu + Catering + Musica | [ ] |
-| Sabado 22:00 | Sesion emociones | Norteno live (bloque 2) | Novios + Musica | [ ] |
-| Sabado 23:00 | Barra + hidratacion | Karaoke set 1 (1h) | Barra + Musica | [ ] |
-| Domingo 00:00 | Recena ligera + tejuino loco | Karaoke set 2 (1h) | Catering + Musica | [ ] |
-| Domingo 01:00 | Barra continuidad controlada | Playlist fiesta final | Barra + Musica | [ ] |
-| Domingo 02:00 | Cierre de servicio | Cierre musica (objetivo 2am) | Coord. + Musica | [ ] |
+| Jueves | Llegada y estancia de los novios | Preparacion en venue | Novios + Coord. | [ ] |
+| Viernes desde 12:00 | Agua y refrescos disponibles | Llegadas y check-in escalonado | Venue + Coord. | [ ] |
+| Viernes 18:30 | Hidratacion pre-petanca | Playlist general de bienvenida | Coord. + Musica | [ ] |
+| Viernes 20:30 | Pizzas de bienvenida | Playlist general | Manu + Ismael + Musica | [ ] |
+| Sabado desayuno | Desayuno incluido para cabanas | Ambiente libre | Venue | [ ] |
+| Sabado 13:00 | Agua, refrescos y bienvenida | Llegada completa de invitados | Coord. + Barra | [ ] |
+| Sabado 14:00 | Bebidas listas para salida | Ceremonia civil | Coord. + Musica | [ ] |
+| Al terminar el civil | Primer brindis / bebidas | Marimba en vivo | Marimba + Barra | [ ] |
+| Despues de la marimba | Carnitas (MXN 110 pp, salsa, tortillas, 2h) + tejuino | Comida y convivencia | Catering + Barra + Musica | [ ] |
+| Sabado 18:00 | Hidratacion disponible | Ceremonia en el faro | Coord. + Musica | [ ] |
+| Al terminar el faro | Apertura de cena / taquiza | Mariachi en vivo | Mariachi + Catering | [ ] |
+| Despues de cenar | Barra + hidratacion | Norteno: apertura de baile y fiesta | Norteno + Barra | [ ] |
+| Mas tarde | Barra / posible recena | Karaoke set 1 | Musica + Coord. | [ ] |
+| Transicion | Hidratacion | Playlist de baile | DJ / Musica | [ ] |
+| Cierre por definir | Barra continuidad controlada | Karaoke set 2 + cierre bailable | Musica + Coord. | [ ] |
 
 ## ES - Contingencias
 - Si cocina se retrasa > 10 min: extender bloque musical de transicion.
@@ -29,6 +36,16 @@ Document operationnel unique pour coordonner catering, DJ/groupe et coordination
 
 ## Confirmaciones parciales (comida)
 - Carnitas sabado comida: cotizacion recibida de MXN 110 por persona, incluye salsa y tortillas, con 2 horas de servicio.
+- Pizzas viernes noche: operativo asignado a Manu + Ismael.
+- Dos desayunos: incluidos para quienes ocupan las cabanas.
+
+## Enlaces de respaldo y participacion
+
+- Playlist ambiente:
+  https://open.spotify.com/playlist/4izmJJXTOnsUz3BQsrkZBh
+- Playlist karaoke:
+  https://open.spotify.com/playlist/6hmu5velXNH68JAhQ3xaU4
+- Mantener una copia local de musica esencial para contingencia de internet.
 
 ## FR - Contingences
 - Si la cuisine a > 10 min de retard : prolonger le bloc musical de transition.

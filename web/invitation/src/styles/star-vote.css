@@ -1,0 +1,134 @@
+/* ── Star vote widget ────────────────────────────────────────────────────
+   Reusable 1–5 star rating used on the food flavour cards and the music
+   act cards. Designed to sit on both the light parchment food cards and the
+   dark ink music cards, so it uses the shared gold (marigold) accent that
+   reads well on either background. */
+
+.star-vote {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1.1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgb(198 139 43 / 22%);
+}
+
+/* The row of five star buttons. */
+.star-vote__stars {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.star-vote__star {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: rgb(36 33 25 / 22%);
+  cursor: pointer;
+  transition: color 160ms ease, transform 160ms ease, background 160ms ease;
+}
+
+.star-vote__star svg {
+  width: 1.35rem;
+  height: 1.35rem;
+  fill: currentColor;
+}
+
+.star-vote__star:hover {
+  transform: translateY(-2px) scale(1.08);
+}
+
+.star-vote__star.is-filled {
+  color: var(--marigold);
+}
+
+/* Meta row: average, vote count, and the guest's own rating. */
+.star-vote__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.4rem 0.9rem;
+  font-size: 0.82rem;
+  line-height: 1.4;
+}
+
+.star-vote__average {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  font-weight: 700;
+  color: rgb(36 33 25 / 78%);
+}
+
+/* The general score rendered as a row of star glyphs (filled + empty).
+   Filled stars are gold; empty stars stay muted. */
+.star-vote__stars-row {
+  letter-spacing: 0.08em;
+  color: rgb(36 33 25 / 22%);
+}
+.star-vote__stars-row::first-letter {
+  color: var(--marigold);
+}
+
+.star-vote__count {
+  font-weight: 400;
+  color: rgb(36 33 25 / 55%);
+}
+
+.star-vote__empty {
+  color: rgb(36 33 25 / 55%);
+  font-style: italic;
+}
+
+.star-vote__mine {
+  color: var(--terracotta);
+  font-weight: 600;
+}
+
+.star-vote__error {
+  margin: 0;
+  color: var(--terracotta);
+  font-size: 0.8rem;
+}
+
+/* ── Dark music cards ────────────────────────────────────────────────────
+   The music section sits on a deep ink background, so the widget needs
+   lighter text and a softer divider to stay legible. */
+.music-act .star-vote {
+  border-top-color: rgb(255 255 255 / 16%);
+}
+
+.music-act .star-vote__star {
+  color: rgb(255 255 255 / 26%);
+}
+
+.music-act .star-vote__star.is-filled {
+  color: var(--marigold);
+}
+
+.music-act .star-vote__average {
+  color: rgb(255 253 248 / 88%);
+}
+
+.music-act .star-vote__stars-row {
+  color: rgb(255 255 255 / 26%);
+}
+.music-act .star-vote__stars-row::first-letter {
+  color: var(--marigold);
+}
+
+.music-act .star-vote__count,
+.music-act .star-vote__empty {
+  color: rgb(255 253 248 / 55%);
+}
+
+.music-act .star-vote__mine {
+  color: var(--marigold);
+}

@@ -1,0 +1,40 @@
+// ── Design tokens: colors, fonts, shadows ────────────────────────────────
+// Single source of truth for the interface. Import this first in every
+// partial so variables are available everywhere.
+
+// ── Color palette ──
+$ink: #1f1a1b;
+$ink-soft: #4b4347;
+$linen: #f6efe6;
+$paper: #fffaf4;
+$line: #ddcfc1;
+$brand: #c25630;
+$brand-dark: #7e2f17;
+$teal: #1f6f67;
+$gold: #bd9453;
+$wine: #7a2746;
+
+// ── Shadows ──
+$shadow: 0 20px 42px rgba(46, 26, 13, 0.13);
+$shadow-card: 0 10px 24px rgba(43, 23, 14, 0.08);
+$shadow-hover: 0 14px 30px rgba(43, 23, 14, 0.1);
+
+// ── Fonts ──
+$font-display: "Fraunces", "Iowan Old Style", serif;
+$font-body: "Sora", "Avenir Next", sans-serif;
+
+// ── Breakpoints ──
+$bp-tablet: 960px;
+
+// ── Theme variants ──
+$theme-portal-brand: #c25630;
+$theme-portal-brand-dark: #7e2f17;
+$theme-portal-teal: #1f6f67;
+
+$theme-planning-brand: #9f3e62;
+$theme-planning-brand-dark: #61223a;
+$theme-planning-teal: #1c6167;
+
+$theme-guests-brand: #b1622f;
+$theme-guests-brand-dark: #6d3a1b;
+$theme-guests-teal: #2e7d63;

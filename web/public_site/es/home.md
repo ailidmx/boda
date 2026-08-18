@@ -8,5 +8,6 @@ Nos casamos el fin de semana del 20 de febrero de 2027 en Roca Azul, Jocotepec, 
 - Seccion especial: Vengo de Lejos (traslados, vuelos, acompanamiento)
 - Nuestros coup de coeur en Mexico
 - Servicios de Roca Azul
+- Nuestros sponsors y aliados
 - FAQ
 - Updates importantes

@@ -1,0 +1,1160 @@
+/* ── RSVP section ─────────────────────────────────────────────────────── */
+
+/* ── Responsive: mobile-first ──────────────────────────────────────────
+   The frame padding tightens on small screens. */
+
+@media (max-width: 600px) {
+  .rsvp-section {
+    padding: clamp(2rem, 6vw, 3rem);
+    outline-offset: -0.4rem;
+  }
+
+  /* Compact the 0–5 scale buttons on mobile so the per-guest rows stay snug
+     and the selector doesn't overflow on narrow screens. */
+  .rsvp-question-guest .rsvp-scale-btn {
+    width: 2.0rem;
+    height: 2.0rem;
+    font-size: 0.9rem;
+  }
+}
+
+
+
+
+
+
+/* The RSVP section is a single container: the section itself is the dark
+   green frame (border, outline, padding, white text). No nested wrapper. */
+.rsvp-section {
+  min-height: 78svh;
+  background: var(--deep-green);
+  color: var(--white);
+  text-align: center;
+  padding: clamp(3rem, 8vw, 7rem) clamp(1.25rem, 6vw, 6rem);
+  border: 1px solid #e4b968;
+  outline: 1px solid #e4b968;
+  outline-offset: -0.7rem;
+}
+
+.rsvp-section h2 {
+  margin: 0 auto 2rem;
+}
+
+/* The "Tu te lances" eyebrow sits on the dark green frame, so it uses the
+   golden marigold accent (instead of the default terracotta) to stay legible
+   and match the gold used across the RSVP frame. */
+.rsvp-section .eyebrow {
+  color: #e4b968;
+}
+
+.rsvp-section .eyebrow::before {
+  background: #e4b968;
+}
+
+/* The RSVP intro is styled as an elegant citation (quote): italic display
+   type, a marigold quote mark and a left rule, echoing the venue and weather
+   citations. It sits on the dark green frame, so the text is light and the
+   accent is the golden marigold used across the RSVP section. */
+.rsvp-section > p:not(.eyebrow) {
+  position: relative;
+  max-width: 34rem;
+  margin: 0 auto 2rem;
+  padding-left: 1.5rem;
+  border-left: 2px solid #e4b968;
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-style: italic;
+  line-height: 1.5;
+  color: rgb(255 253 248 / 92%);
+  text-align: left;
+}
+
+.rsvp-section > p:not(.eyebrow)::before {
+  content: "“";
+  position: absolute;
+  top: -0.35em;
+  left: -0.15rem;
+  font-family: var(--font-display);
+  font-size: 3.5em;
+  line-height: 1;
+  color: #e4b968;
+  opacity: 0.45;
+  pointer-events: none;
+}
+
+
+.fieldset-note {
+  max-width: 46rem;
+  margin: 0 0 1.5rem;
+  color: rgb(255 253 248 / 70%);
+  /* Ensure the note is a plain paragraph, never a citation: reset any
+     left border, padding, italic and quote mark that a generic `p` rule
+     (e.g. `.rsvp-section > p:not(.eyebrow)`) might apply. */
+  padding-left: 0;
+  border-left: 0;
+  font-style: normal;
+  font-family: inherit;
+  text-align: inherit;
+}
+.fieldset-note::before,
+.fieldset-note::after {
+  content: none;
+}
+
+/* Bottom "continue" nav inside the "¡Te animas!" RSVP section. Mirrors the
+   elegant bottom nav used on the weekend slides: a hairline top border and a
+   small-caps link that points to the next section (FLIGHTS for guests who
+   travel by plane, otherwise Pétanque). */
+.te-animas-nav {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(255 255 255 / 22%);
+}
+
+.te-animas-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--white);
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 250ms ease;
+}
+
+.te-animas-nav-link:hover,
+.te-animas-nav-link:focus-visible {
+  color: #e4b968;
+  text-decoration: underline;
+}
+
+
+/* ── Pétanque tournament ── */
+.petanque-section {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  border: 1px solid rgb(36 33 25 / 15%);
+  border-radius: 0.75rem;
+  background: rgb(36 33 25 / 3%);
+}
+
+.petanque-section__eyebrow {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--terracotta);
+  margin: 0 0 0.5rem;
+}
+
+.petanque-section__intro {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 1rem;
+  color: var(--ink);
+}
+
+.petanque-section__organizer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+
+.petanque-section__organizer a {
+  color: var(--terracotta);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.petanque-section__organizer a:hover {
+  color: var(--marigold);
+}
+
+.petanque-section .form-field {
+  margin-bottom: 1rem;
+}
+
+.petanque-section .form-field label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 0.35rem;
+}
+
+.petanque-section .form-field select,
+.petanque-section .form-field input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgb(36 33 25 / 20%);
+  border-radius: 0.375rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: var(--white);
+  color: var(--ink);
+}
+
+.petanque-section .form-field select:focus,
+.petanque-section .form-field input:focus {
+  outline: none;
+  border-color: var(--terracotta);
+  box-shadow: 0 0 0 2px rgb(169 77 49 / 15%);
+}
+
+/* ── RSVP scale questions ─────────────────────────────────────────────── */
+
+.rsvp-question {
+  display: grid;
+  gap: 1.5rem;
+  padding: 0;
+  border: none;
+}
+
+
+.rsvp-question-head {
+  text-align: left;
+}
+
+.rsvp-question-title {
+  margin: 0 0 0.5rem;
+  color: #e4b968;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+}
+
+.rsvp-question-subtitle {
+  margin: 0;
+  max-width: 46rem;
+  color: rgb(255 253 248 / 70%);
+}
+
+/* Legend: the 5 scale levels */
+.rsvp-scale-legend {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px dashed rgb(228 185 104 / 45%);
+  background: rgb(255 255 255 / 4%);
+}
+
+.rsvp-scale-legend-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  line-height: 1.35;
+  color: rgb(255 253 248 / 80%);
+}
+
+.rsvp-scale-legend-emoji {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+/* Guest rows */
+.rsvp-question-guests {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.rsvp-question-guest {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgb(255 255 255 / 14%);
+  background: rgb(255 255 255 / 3%);
+  overflow: hidden;
+}
+
+
+.rsvp-guest-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.rsvp-guest-avatar {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #e4b968;
+  flex: none;
+}
+
+.rsvp-guest-avatar--fallback {
+  display: grid;
+  place-items: center;
+  background: var(--terracotta);
+  color: var(--white);
+  font-weight: 700;
+}
+
+.rsvp-guest-name {
+  font-weight: 600;
+  color: var(--white);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+/* 0–5 selector */
+.rsvp-scale-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+.rsvp-scale-btn {
+  width: 2.4rem;
+  height: 2.4rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 50%;
+  background: transparent;
+  color: var(--white);
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.rsvp-scale-btn:hover {
+  transform: scale(1.08);
+  border-color: #e4b968;
+}
+
+.rsvp-scale-btn.is-selected {
+  background: #e4b968;
+  border-color: #e4b968;
+  color: var(--deep-green);
+}
+
+.rsvp-scale-btn--zero {
+  font-size: 1rem;
+  color: rgb(255 253 248 / 60%);
+}
+
+.rsvp-scale-btn--zero.is-selected {
+  background: rgb(255 255 255 / 18%);
+  border-color: rgb(255 255 255 / 45%);
+  color: var(--white);
+}
+
+/* Boolean (Yes/No) selector — the same per-guest row look as the scale, but
+   with pill-style Yes/No toggles instead of the 0–5 emoji buttons. Used by
+   the pétanque tournament mini-RSVP. */
+.rsvp-boolean-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.rsvp-boolean-btn {
+  padding: 0.45rem 1.1rem;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--white);
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.rsvp-boolean-btn:hover {
+  transform: scale(1.04);
+  border-color: #e4b968;
+}
+
+.rsvp-boolean-btn.is-selected {
+  background: #e4b968;
+  border-color: #e4b968;
+  color: var(--deep-green);
+  font-weight: 600;
+}
+
+
+/* ── RSVP recap / summary ─────────────────────────────────────────────── */
+
+.rsvp-recap {
+  display: grid;
+  gap: 1.5rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgb(255 255 255 / 28%);
+  text-align: left;
+}
+
+/* On mobile the recap sits directly on the dark green frame, so drop the
+   card border and padding to avoid a nested "box in a box" look. This rule
+   must come AFTER the base .rsvp-recap rule so it wins the cascade. */
+@media (max-width: 600px) {
+  .rsvp-recap {
+    border: 0;
+    padding: 0;
+  }
+}
+
+.rsvp-recap-head {
+
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.rsvp-recap-title {
+  margin: 0;
+  color: #e4b968;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+}
+
+.rsvp-recap-progress {
+  margin: 0;
+  color: rgb(255 253 248 / 70%);
+  font-size: 0.9rem;
+}
+
+/* Each guest gets one card with a row per question (e.g. Friday, Saturday,
+   Sunday). The card is intentionally light/transparent so it reads as a
+   grouped list rather than a nested box. */
+.rsvp-recap-guest {
+  display: grid;
+  gap: 0.5rem;
+  padding: 0.9rem 0.25rem;
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
+}
+
+.rsvp-recap-guest:last-child {
+  border-bottom: 0;
+}
+
+.rsvp-recap-guest-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+  margin-bottom: 0.25rem;
+}
+
+.rsvp-recap-question-label {
+  color: rgb(255 253 248 / 70%);
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+
+.rsvp-recap-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.rsvp-recap-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.4rem 0.75rem;
+  border-bottom: 1px solid rgb(255 255 255 / 8%);
+}
+
+.rsvp-recap-row:last-child {
+  border-bottom: 0;
+}
+
+
+.rsvp-recap-identity {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.rsvp-recap-avatar {
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid rgb(255 255 255 / 30%);
+}
+
+.rsvp-recap-avatar--fallback {
+  display: grid;
+  place-items: center;
+  background: #e4b968;
+  color: var(--deep-green);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.rsvp-recap-name {
+  font-weight: 600;
+  color: var(--white);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rsvp-recap-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+
+.rsvp-recap-answer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: rgb(255 253 248 / 85%);
+  font-size: 0.9rem;
+}
+
+.rsvp-recap-emoji {
+  font-size: 1.1rem;
+  margin-left: auto;
+}
+
+
+.rsvp-recap-answer--empty {
+  color: rgb(255 253 248 / 45%);
+}
+
+/* ── Flipable step card ───────────────────────────────────────────────── */
+
+.flip-step-card {
+  display: grid;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1.25rem;
+  border: 0;
+  background: rgb(255 255 255 / 3%);
+}
+
+/* On mobile the flip card sits directly on the section's own frame/panel, so
+   drop the card padding and translucent background to avoid a nested "box in
+   a box" look. This rule must come AFTER the base .flip-step-card rule so it
+   wins the cascade. */
+@media (max-width: 600px) {
+  .flip-step-card {
+    padding: 0;
+    background: transparent;
+  }
+}
+
+
+/* Stepped RSVP mini used by the accommodation recap: a card with a header
+   (title + flip toggle) and a body that swaps between the question step and
+   the resumen (summary) step. */
+.flip-step-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.flip-step-card-title {
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+}
+
+.flip-step-card-toggle {
+  padding: 0.5rem 1.25rem;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--white);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.flip-step-card-toggle:hover {
+  transform: scale(1.04);
+  border-color: #e4b968;
+}
+
+.flip-step-card-body {
+  display: grid;
+  gap: 1rem;
+}
+
+
+.flip-step-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.flip-step-count {
+  color: #e4b968;
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.flip-step-label {
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.5rem);
+}
+
+/* On mobile the step label is redundant with the "Étape X / Y" counter, so
+   hide it to keep the step header compact. */
+@media (max-width: 600px) {
+  .flip-step-label {
+    display: none;
+  }
+}
+
+
+.flip-step-body {
+  position: relative;
+  perspective: 1200px;
+}
+
+.flip-step-face {
+  transition: transform 0.26s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: rotateY(0deg);
+}
+
+.flip-step-body.is-flipping.is-forward .flip-step-face {
+  transform: rotateY(90deg);
+}
+
+.flip-step-body.is-flipping.is-back .flip-step-face {
+  transform: rotateY(-90deg);
+}
+
+.flip-step-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.flip-step-btn {
+  padding: 0.5rem 1.25rem;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--white);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, background 0.12s ease, border-color 0.12s ease;
+}
+
+.flip-step-btn:hover:not(:disabled) {
+  transform: scale(1.04);
+  border-color: #e4b968;
+}
+
+.flip-step-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.flip-step-btn--primary {
+  background: #e4b968;
+  border-color: #e4b968;
+  color: var(--deep-green);
+  font-weight: 600;
+}
+
+.rsvp-recap-step {
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* The "¡Te animas!" save button sits inside the recap step; make it span the
+   full width so it reads as the primary call-to-action. */
+.rsvp-scale-save .button {
+  width: 100%;
+}
+
+/* Secondary "Modify my answers" action on the recap step. It replaces the
+   generic "Back" button on the last step and jumps back to the first question
+   so the guest can review and change their answers. */
+.rsvp-scale-modify {
+  width: 100%;
+  padding: 0.6rem 1.25rem;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--white);
+  font-family: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: transform 0.12s ease, border-color 0.12s ease;
+}
+
+.rsvp-scale-modify:hover {
+  transform: scale(1.02);
+  border-color: #e4b968;
+}
+
+
+
+/* ── Mobile scale legend modal + FAB ────────────────────────────────────
+   On desktop the 5-level legend is shown inline. On mobile it is collapsed
+   into a FAB-activated modal (mirroring the Story "facts" explorer) so the
+   question stays compact. The FAB appears only while the question is in view
+   and is hidden at desktop widths. */
+
+.rsvp-legend-fab,
+.rsvp-legend-modal {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  /* Hide the inline legend on mobile; it lives in the FAB modal instead. */
+  .rsvp-scale-legend-inline {
+    display: none;
+  }
+
+  /* The modal is removed from the flow until the FAB is pressed. */
+  .rsvp-legend-modal {
+    display: none;
+  }
+
+  .rsvp-legend-modal.is-mobile-open {
+    position: fixed;
+    z-index: 240;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding:
+      max(1rem, env(safe-area-inset-top))
+      1rem
+      max(1rem, env(safe-area-inset-bottom));
+    background: rgb(18 27 24 / 72%);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .rsvp-legend-panel {
+    position: relative;
+    width: min(100%, 34rem);
+    max-height: calc(100dvh - 2rem - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    overflow-y: auto;
+    padding: 1.5rem 1.25rem 1.25rem;
+    border: 1px solid rgb(198 139 43 / 48%);
+    border-radius: 1.25rem;
+    background: var(--cream);
+    box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 38%);
+    overscroll-behavior: contain;
+  }
+
+  .rsvp-legend-title {
+    margin: 0 0 1rem;
+    padding-right: 2.5rem;
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 1.25rem;
+  }
+
+  /* The legend items sit on the cream panel, so restyle them for contrast. */
+  .rsvp-legend-panel .rsvp-scale-legend {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .rsvp-legend-panel .rsvp-scale-legend-item {
+    font-size: 0.95rem;
+    color: var(--ink);
+  }
+
+  .rsvp-legend-panel .rsvp-scale-legend-emoji {
+    font-size: 1.4rem;
+  }
+
+  .rsvp-legend-close {
+    position: absolute;
+    z-index: 2;
+    top: 0.65rem;
+    right: 0.75rem;
+    display: grid;
+    width: 2.25rem;
+    height: 2.25rem;
+    place-items: center;
+    padding: 0;
+    border: 1px solid rgb(36 33 25 / 20%);
+    border-radius: 50%;
+    background: rgb(255 253 248 / 88%);
+    color: var(--ink);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  /* Circular, golden FAB fixed to the bottom-right. Appears only while the
+     question is in view. It is portaled to <body> so `position: fixed` is
+     resolved against the viewport (not a transformed ancestor). */
+  .rsvp-legend-fab {
+    position: fixed;
+    z-index: 130;
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: max(1rem, env(safe-area-inset-bottom));
+    display: grid;
+    width: 4.25rem;
+    height: 4.25rem;
+    place-items: center;
+    padding: 0;
+    border: 3px solid var(--marigold);
+    border-radius: 50%;
+    background: var(--marigold);
+    color: var(--deep-green);
+    box-shadow: 0 0.65rem 1.5rem rgb(36 33 25 / 32%);
+    line-height: 1;
+
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(1rem) scale(0.9);
+    transition: opacity 180ms ease, transform 180ms ease;
+  }
+
+  .rsvp-legend-fab-icon {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 700;
+    line-height: 1;
+  }
+
+  .rsvp-legend-fab.is-visible {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0) scale(1);
+  }
+}
+
+
+/* ── RSVP progress checklist ────────────────────────────────────────────
+   A compact checklist that shows which mini-RSVP flows (Te animas, Pétanque,
+   Coast) still need to be walked through before the final form can be
+   submitted. Each row shows a mark, a label, and a state. */
+.rsvp-progress {
+  display: grid;
+  gap: 0.6rem;
+  max-width: 34rem;
+  margin: 0 auto 2rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid rgb(228 185 104 / 45%);
+  background: rgb(255 255 255 / 4%);
+  text-align: left;
+}
+
+.rsvp-progress-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.95rem;
+  color: rgb(255 253 248 / 75%);
+}
+
+.rsvp-progress-mark {
+  flex: none;
+  display: grid;
+  width: 1.5rem;
+  height: 1.5rem;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 50%;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.rsvp-progress-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.rsvp-progress-state {
+  flex: none;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(255 253 248 / 55%);
+}
+
+.rsvp-progress-item.is-done {
+  color: var(--white);
+}
+
+.rsvp-progress-item.is-done .rsvp-progress-mark {
+  background: #e4b968;
+  border-color: #e4b968;
+  color: var(--deep-green);
+}
+
+.rsvp-progress-item.is-done .rsvp-progress-state {
+  color: #e4b968;
+}
+
+
+/* ── RSVP "À payer" payment summary ─────────────────────────────────────
+   A read-only block shown before the final form. It lists the per-person and
+   per-group amounts for the primary cabin and (when present) the extra cabin.
+   It sits on the dark green RSVP frame, so it uses white text, gold accents,
+   and the same red "on sale" price treatment as the Hébergement section. */
+.rsvp-payment {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 2.5rem;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgb(228 185 104 / 45%);
+  background: rgb(255 255 255 / 4%);
+  text-align: left;
+}
+
+.rsvp-payment h3 {
+  margin: 0;
+  color: #e4b968;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+}
+
+.rsvp-payment > p {
+  margin: 0;
+  max-width: 46rem;
+  color: rgb(255 253 248 / 70%);
+}
+
+.rsvp-payment-block {
+  display: grid;
+  gap: 0.75rem;
+  padding-top: 1rem;
+  border-top: 1px dashed rgb(228 185 104 / 35%);
+}
+
+.rsvp-payment-block-title {
+  margin: 0;
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+}
+
+.rsvp-payment-rows {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+}
+
+.rsvp-payment-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid rgb(255 255 255 / 12%);
+  background: rgb(255 255 255 / 3%);
+}
+
+.rsvp-payment-row dt {
+  color: rgb(255 253 248 / 75%);
+  font-size: 0.9rem;
+}
+
+.rsvp-payment-value {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.15rem;
+  text-align: right;
+}
+
+.rsvp-payment-line {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5rem;
+}
+
+.rsvp-payment-line strong {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--white);
+}
+
+.rsvp-payment-line small {
+  color: rgb(255 253 248 / 70%);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 400;
+}
+
+/* Struck-through original price, muted, shown next to the discounted price
+   when a stay is covered by the couple (e-commerce "on sale" pattern). */
+.rsvp-payment-original {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  opacity: 0.55;
+  text-decoration-color: var(--terracotta);
+  text-decoration-line: line-through;
+  text-decoration-thickness: 0.12em;
+}
+
+.rsvp-payment-original strong,
+.rsvp-payment-original small {
+  font-size: 0.85em;
+}
+
+/* When a price is discounted (covered by the couple), the price to pay turns
+   red, mirroring the Hébergement sale treatment. */
+.rsvp-payment-value.is-sale .rsvp-payment-line > strong,
+.rsvp-payment-value.is-sale .rsvp-payment-line > small {
+  color: #c0392b;
+}
+
+/* "Covered by the couple" banner: a small gold tag next to the price. */
+.rsvp-payment-value em {
+  padding: 0.32rem 0.48rem;
+  background: var(--marigold);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 0.58rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  line-height: 1;
+  text-transform: uppercase;
+  transform: rotate(-2deg);
+}
+
+/* Cabin · room label shown above the per-person price, and the list of
+   cabin · room labels shown above the per-group price. Small, muted, and
+   left-aligned so the price stays right-aligned. */
+.rsvp-payment-cabinroom {
+  display: block;
+  max-width: 100%;
+  color: rgb(255 253 248 / 62%);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  text-align: right;
+}
+
+.rsvp-payment-cabinroom-list {
+  display: grid;
+  gap: 0.15rem;
+  margin-bottom: 0.35rem;
+}
+
+/* The "Total" block: visually distinct from the per-stay blocks with a
+   stronger top border and a slightly larger title. */
+.rsvp-payment-total {
+  border-top: 1px solid rgb(228 185 104 / 70%);
+}
+
+.rsvp-payment-total .rsvp-payment-block-title {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.rsvp-payment-asterisk {
+  font-size: 0.85rem;
+  color: rgb(255 253 248 / 55%);
+}
+
+/* Final submit block: the button that persists every flow's answers to
+   Firestore, plus the success/error confirmation and the preview note. */
+.rsvp-submit {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.9rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgb(228 185 104 / 40%);
+}
+
+.rsvp-submit .button {
+  width: 100%;
+}
+
+
+.rsvp-submit .rsvp-confirmation {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.7rem 1rem;
+  border-radius: 0.75rem;
+  background: rgb(46 125 50 / 0.12);
+  color: rgb(255 253 248 / 92%);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.rsvp-submit .rsvp-confirmation > span {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: #2e7d32;
+  color: #fff;
+  font-size: 0.85rem;
+}
+
+.rsvp-submit .rsvp-confirmation--error {
+  background: rgb(211 47 47 / 0.16);
+}
+
+.rsvp-submit .rsvp-confirmation--error > span {
+  background: #e53935;
+}
+
+.rsvp-submit small[data-form-status] {
+  color: #e4b968;
+  font-size: 0.9rem;
+}
+
+.rsvp-preview-note {
+  max-width: 46rem;
+  color: rgb(255 253 248 / 62%);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+
+

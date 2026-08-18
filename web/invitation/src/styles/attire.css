@@ -1,0 +1,417 @@
+/* ── Attire section ───────────────────────────────────────────────────── */
+
+.attire-section {
+  position: relative;
+  background: var(--terracotta);
+  color: var(--white);
+  padding-top: clamp(3rem, 8vw, 6rem);
+  overflow: hidden;
+}
+
+/* Full-bleed background behind the whole dress-code section. The base class
+   only handles positioning; the actual artwork lives in the variant classes
+   (--confetti for the dress-code section, --terracotta for the tematica
+   section). The foreground content (montages + text) stays above it. */
+.attire-bg {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Terracotta earth with a sun and moon, radiating light and subtle
+   Mesoamerican geometric motifs. Used by the tematica section. */
+.attire-bg--terracotta {
+
+  background:
+    /* Radiating sun rays (top-right) */
+    repeating-conic-gradient(
+      from 205deg at 80% 10%,
+      rgb(255 253 248 / 0.06) 0deg 5deg,
+      transparent 5deg 13deg
+    ),
+    /* Sun orb (top-right) */
+    radial-gradient(
+      circle at 80% 10%,
+      rgb(255 214 130 / 0.6) 0%,
+      rgb(217 179 106 / 0.3) 20%,
+      transparent 48%
+    ),
+    /* Warm earth glow rising from below */
+    radial-gradient(
+      circle at 50% 118%,
+      rgb(90 30 15 / 0.6) 0%,
+      transparent 58%
+    ),
+    /* Terracotta earth base */
+    linear-gradient(
+      180deg,
+      #b85a33 0%,
+      #a94d2a 42%,
+      #8f3f22 72%,
+      #7a341c 100%
+    );
+}
+
+/* Variant C — confetti fiesta: a festive burst of scattered Mexican-colour
+   confetti dots over a deep warm base, evoking celebration and joy. */
+.attire-bg--confetti {
+  background:
+    /* Scattered confetti dots in Mexican colours */
+    radial-gradient(circle at 12% 18%, #e4007c 0 2.2%, transparent 2.4%),
+    radial-gradient(circle at 28% 8%, #f7c600 0 1.8%, transparent 2%),
+    radial-gradient(circle at 44% 22%, #00b5ad 0 2.4%, transparent 2.6%),
+    radial-gradient(circle at 62% 12%, #7b2d8b 0 1.9%, transparent 2.1%),
+    radial-gradient(circle at 78% 26%, #a8e000 0 2.2%, transparent 2.4%),
+    radial-gradient(circle at 90% 14%, #ff7f00 0 1.8%, transparent 2%),
+    radial-gradient(circle at 8% 42%, #1e90ff 0 2%, transparent 2.2%),
+    radial-gradient(circle at 22% 58%, #e4007c 0 2.4%, transparent 2.6%),
+    radial-gradient(circle at 38% 44%, #f7c600 0 1.8%, transparent 2%),
+    radial-gradient(circle at 55% 62%, #00b5ad 0 2.2%, transparent 2.4%),
+    radial-gradient(circle at 70% 46%, #7b2d8b 0 2%, transparent 2.2%),
+    radial-gradient(circle at 86% 60%, #a8e000 0 2.4%, transparent 2.6%),
+    radial-gradient(circle at 16% 78%, #ff7f00 0 1.9%, transparent 2.1%),
+    radial-gradient(circle at 34% 88%, #1e90ff 0 2.2%, transparent 2.4%),
+    radial-gradient(circle at 50% 76%, #e4007c 0 1.8%, transparent 2%),
+    radial-gradient(circle at 66% 90%, #f7c600 0 2.4%, transparent 2.6%),
+    radial-gradient(circle at 82% 78%, #00b5ad 0 2%, transparent 2.2%),
+    radial-gradient(circle at 94% 88%, #7b2d8b 0 1.9%, transparent 2.1%),
+    /* Warm festive base */
+    linear-gradient(160deg, #7a341c 0%, #a94d2a 45%, #8f3f22 100%);
+}
+
+/* Moon orb (top-left), a subtle sun-calendar ring motif, and floating warm
+
+   orbs — the "light effects" that give the terracotta earth a cosmic feel. */
+.attire-bg--terracotta::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background:
+    /* Concentric sun-calendar rings (subtle, centre) */
+    radial-gradient(
+      circle at 50% 46%,
+      transparent 0 30%,
+      rgb(255 253 248 / 0.05) 30% 30.6%,
+      transparent 30.6% 36%,
+      rgb(255 253 248 / 0.04) 36% 36.6%,
+      transparent 36.6% 42%,
+      rgb(255 253 248 / 0.03) 42% 42.6%,
+      transparent 42.6%
+    ),
+    /* Moon orb (top-left) */
+    radial-gradient(
+      circle at 14% 16%,
+      rgb(255 253 248 / 0.55) 0%,
+      rgb(255 253 248 / 0.2) 28%,
+      transparent 52%
+    ),
+    /* Floating warm orbs (light effects) */
+    radial-gradient(circle at 26% 80%, rgb(255 205 120 / 0.2) 0%, transparent 30%),
+    radial-gradient(circle at 90% 66%, rgb(255 253 248 / 0.12) 0%, transparent 26%),
+    radial-gradient(circle at 62% 26%, rgb(255 205 120 / 0.14) 0%, transparent 24%);
+}
+
+/* Soft dark wash over the abstract background so the section keeps its warm
+   tone and the foreground text remains legible. */
+.attire-bg::after {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgb(36 33 25 / 45%) 0%,
+    rgb(36 33 25 / 28%) 45%,
+    rgb(36 33 25 / 48%) 100%
+  );
+  content: "";
+}
+
+/* Keep all foreground content (eyebrow, montages, dress-code text, nav)
+
+   above the full-bleed background layer. */
+.attire-section > :not(.attire-bg) {
+  position: relative;
+  z-index: 1;
+}
+
+.attire-eyebrow {
+  margin-bottom: clamp(2rem, 5vw, 3.5rem);
+  color: rgb(255 253 248 / 88%);
+  text-align: center;
+}
+
+/* The shared eyebrow draws a terracotta rule above the text. On the attire
+   section's terracotta background that rule would be invisible, so it is
+   recoloured to the light text tone to stay visible. */
+.attire-eyebrow::before {
+  margin-inline: auto;
+  background: rgb(255 253 248 / 88%);
+}
+
+/* Desktop: bigger eyebrow text, consistent with other section eyebrows. */
+@media (min-width: 900px) {
+  .attire-eyebrow {
+    font-size: clamp(2.4rem, 4vw, 3.2rem);
+  }
+}
+
+/* The tematica section is a single vertical stack on every screen size:
+   eyebrow → title → Oaxaca banner (row of 4) → citation → Huichol banner
+   (row of 4). This keeps the Oaxaca and Huichol photos as full-width rows of
+   four cards, matching the mobile treatment. */
+.attire-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(2rem, 4vw, 3rem);
+  align-items: start;
+}
+
+/* Title sits at the top of the stack, centred. */
+.attire-title {
+  grid-column: 1;
+  grid-row: 1;
+  margin: 0 0 1rem;
+  text-align: center;
+}
+
+/* Oaxaca montage: a single full-width row of four cards (banner). */
+.oaxaca-grid {
+  grid-column: 1;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  padding: 0.5rem;
+  max-width: 60rem;
+  margin-inline: auto;
+  background: rgb(255 255 255 / 10%);
+  border: 0.5rem solid rgb(255 255 255 / 10%);
+}
+
+/* Citation sits below the Oaxaca banner, centred. */
+.attire-copy {
+  grid-column: 1;
+  grid-row: 3;
+  max-width: 52rem;
+  margin-inline: auto;
+}
+
+.oaxaca-tile {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  display: block;
+  border-radius: 0.25rem;
+  filter: saturate(0.95);
+  transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.oaxaca-tile:hover {
+  transform: scale(1.03);
+  filter: saturate(1.1);
+}
+
+/* Wixárika (Huichol) photo montage — a full-width strip below the Oaxaca
+   montage, reusing the same tile treatment. Four tiles in a row. */
+.wixarica-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  padding: 0.5rem;
+  max-width: 60rem;
+  margin: clamp(2.5rem, 6vw, 4rem) auto 0;
+  background: rgb(255 255 255 / 10%);
+  border: 0.5rem solid rgb(255 255 255 / 10%);
+}
+
+/* Citation-style lead: large quote mark + left border, echoing the venue's
+   facilities-lead and the accommodation citation. */
+.attire-citation {
+  position: relative;
+  max-width: 34rem;
+  margin: 0 0 1.25rem;
+  padding: 1.5rem 0 0 1.25rem;
+  border-left: 2px solid var(--marigold, #d9b36a);
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2vw, 1.4rem);
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.attire-citation::before {
+  content: "“";
+  position: absolute;
+  top: 0;
+  left: -0.1rem;
+  color: var(--marigold, #d9b36a);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2.6em;
+  line-height: 1;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* The dress-code block is a full-width row below the photos + citation
+   grid. It holds the title and the text paragraphs. A soft dark overlay sits
+   behind the text so it stays legible over the confetti background. */
+.attire-dress-code {
+
+  position: relative;
+  max-width: 52rem;
+  margin: clamp(2.5rem, 6vw, 4rem) auto 0;
+  padding: clamp(1.5rem, 3vw, 2rem);
+  border-top: 1px solid rgb(255 255 255 / 35%);
+  background: rgb(36 33 25 / 38%);
+  border-radius: 1rem;
+}
+
+.attire-dress-code__title {
+  margin: 0 0 1.25rem;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.attire-dress-code__body {
+  margin: 0 0 0.85rem;
+  font-size: clamp(1rem, 1.6vw, 1.15rem);
+  line-height: 1.7;
+  color: rgb(255 253 248 / 92%);
+}
+
+.attire-dress-code__body:last-child {
+  margin-bottom: 0;
+}
+
+.attire-copy .note {
+
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgb(255 255 255 / 35%);
+  font-size: 0.8rem;
+}
+
+/* Elegant navigation link at the bottom of the attire section */
+.attire-nav {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgb(255 255 255 / 18%);
+}
+
+
+.attire-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--white);
+  font-size: 0.62rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 250ms ease;
+}
+
+.attire-nav-link:hover,
+.attire-nav-link:focus-visible {
+  color: var(--accent, #d9b36a);
+  text-decoration: underline;
+}
+
+@media (max-width: 720px) {
+  /* Tighter vertical padding on mobile so the attire section doesn't feel
+     oversized on small screens. */
+  .attire-section {
+    padding-top: clamp(1.5rem, 4vw, 2.5rem);
+    padding-bottom: clamp(1.5rem, 4vw, 2.5rem);
+  }
+
+  .attire-eyebrow {
+    margin-bottom: 1rem;
+  }
+
+  /* On mobile the tematica section stacks vertically in this order:
+     eyebrow → title → Oaxaca banner → citation → Huichol banner. */
+  .attire-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+    align-items: start;
+  }
+
+  .attire-title {
+    grid-column: 1;
+    grid-row: 1;
+    margin-bottom: 0.5rem;
+    font-size: clamp(1.35rem, 5.2vw, 1.65rem);
+  }
+
+  .oaxaca-grid {
+    grid-column: 1;
+    grid-row: 2;
+    /* A single full-width row of four cards (banner). */
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.35rem;
+    padding: 0.4rem;
+    border-width: 0.4rem;
+    max-width: none;
+  }
+
+  .attire-copy {
+    grid-column: 1;
+    grid-row: 3;
+  }
+
+  .attire-citation {
+    margin-bottom: 1rem;
+    padding: 0.5rem 0 0 1rem;
+    /* Aligned with the venue facilities-lead citation on mobile. */
+    font-size: clamp(0.8rem, 2.6vw, 2rem);
+    line-height: 1.35;
+  }
+
+
+  /* On mobile the quote mark is tucked into the existing top padding so the
+     decoration still shows without adding vertical space. */
+  .attire-citation::before {
+    top: 0;
+    font-size: 1.8em;
+  }
+
+  .attire-dress-code {
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+  }
+
+  .attire-dress-code__title {
+    margin-bottom: 0.75rem;
+    /* Small enough that the longest title ("Habillez-vous de couleur") fits
+       on a single line on mobile. */
+    font-size: 1.1rem;
+  }
+
+  .attire-dress-code__body {
+    margin: 0 0 0.4rem;
+    font-size: 0.8rem;
+    line-height: 1.55;
+  }
+
+  /* The guest note ("Merci de faire partie de notre histoire !") is hidden on
+
+     mobile to keep the attire section compact. */
+  .attire-copy .note {
+    display: none;
+  }
+
+  /* The Wixárika montage is a full-width strip, so on mobile the four tiles
+     stay in a single row of four (banner). */
+  .wixarica-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.35rem;
+    padding: 0.4rem;
+    border-width: 0.4rem;
+    margin-top: 1.5rem;
+  }
+}

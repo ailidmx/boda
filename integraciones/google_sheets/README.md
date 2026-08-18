@@ -10,8 +10,11 @@ Esta integracion permite usar Google Sheets como fuente de verdad y sincronizar 
 - FR: Optionnellement, renvoyer vers Google Sheets les affectations generees dans le repo.
 
 ## Archivos
-- sync_google_sheets.py: script de sincronizacion.
+- sync_google_sheets.py: script de sincronizacion (pull/push CSVs).
 - .env.example: variables requeridas.
+- scripts/sheet-mapping.cjs: mapeo de columnas CSV → Firestore (fuente unica).
+- scripts/sync-sheet-to-firestore.mjs: sync seguro CSV → Firestore (dry-run + diff).
+- scripts/verify-sheet-sync.mjs: verificacion post-sync (read-only).
 
 ## Requisitos
 - Python 3.10+
@@ -45,3 +48,32 @@ python integraciones/google_sheets/sync_google_sheets.py push
 - presupuesto/presupuesto.csv
 - invitados/asignacion_cabanas.csv
 - invitados/mesas.csv
+
+## Flujo completo: Google Sheets → Firestore
+
+1. **Pull** (hoja → CSV local):
+   ```bash
+   python integraciones/google_sheets/sync_google_sheets.py pull
+   ```
+
+2. **Dry-run sync** (CSV → Firestore, sin escribir):
+   ```bash
+   ~/.nvm/versions/node/v20.20.2/bin/node scripts/sync-sheet-to-firestore.mjs
+   ```
+
+3. **Ejecutar sync** (aplicar cambios):
+   ```bash
+   ~/.nvm/versions/node/v20.20.2/bin/node scripts/sync-sheet-to-firestore.mjs --execute
+   ```
+
+4. **Verificar** (read-only, compara CSV vs Firestore):
+   ```bash
+   ~/.nvm/versions/node/v20.20.2/bin/node scripts/verify-sheet-sync.mjs
+   ```
+
+### Notas
+- El sync usa `setDoc(..., { merge: true })` — nunca sobreescribe documentos completos.
+- Los campos `firestoreOnly` (message, messageAuthor, cloudinaryId, RSVP responses, _source, _migratedAt) se preservan.
+- El sync NUNCA borra documentos a menos que se pase `--delete-stale` explicitamente.
+- Usar Node 20 (evita el problema ESM de jwks-rsa/jose en Node 22).
+- `sheet-mapping.cjs` es la fuente unica de verdad para el mapeo de columnas.

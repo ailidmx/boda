@@ -1,0 +1,684 @@
+/* ── Thanks / Agradecimientos (cinema-credit style) ── */
+
+/* ── Cinematic backdrop ────────────────────────────────────────────────
+   The section is a deep midnight-indigo "screen" lit by jewel-toned glows
+   (gold, teal, violet, magenta), a slow drifting light bloom, a subtle
+   film-grain texture and a vignette — a big, cinematic thank-you to the
+   guests. The dark base keeps the light text readable while the jewel
+   accents add colour, shine and elegance. */
+.thanks-section {
+  position: relative;
+  /* Deep indigo → violet → near-black gradient base. Dark enough to keep
+     the light text crisp, but with a rich, colourful undertone. */
+  background: linear-gradient(
+    165deg,
+    #241a4d 0%,
+    #1a1033 38%,
+    #0d0a1f 72%,
+    #070512 100%
+  );
+  color: var(--white);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Warm jewel-toned radial glows drifting behind the content. */
+.thanks-section::before,
+.thanks-section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.thanks-section::before {
+  background:
+    radial-gradient(60rem 40rem at 12% 8%, rgb(245 197 66 / 22%), transparent 60%),
+    radial-gradient(50rem 36rem at 88% 18%, rgb(167 139 250 / 30%), transparent 62%),
+    radial-gradient(70rem 50rem at 50% 112%, rgb(45 212 191 / 20%), transparent 65%),
+    radial-gradient(40rem 30rem at 20% 90%, rgb(244 114 182 / 18%), transparent 60%),
+    radial-gradient(36rem 28rem at 80% 70%, rgb(34 211 238 / 20%), transparent 62%),
+    linear-gradient(180deg, rgb(255 255 255 / 5%), transparent 45%);
+  animation: thanks-glow-drift 26s ease-in-out infinite alternate;
+}
+
+/* Slow breathing light bloom. */
+.thanks-section::after {
+  background: radial-gradient(
+    42rem 30rem at 50% 45%,
+    rgb(245 197 66 / 9%),
+    transparent 70%
+  );
+  animation: thanks-bloom 14s ease-in-out infinite alternate;
+}
+
+@keyframes thanks-glow-drift {
+  from {
+    transform: translate3d(-1.5%, -1%, 0) scale(1);
+  }
+  to {
+    transform: translate3d(1.5%, 1%, 0) scale(1.06);
+  }
+}
+
+@keyframes thanks-bloom {
+  from {
+    opacity: 0.55;
+    transform: scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+/* Film-grain overlay for the cinematic feel. */
+.thanks-section .thanks-grain {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+  animation: thanks-grain-shift 1.2s steps(4) infinite;
+}
+
+@keyframes thanks-grain-shift {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-2%, 1%); }
+  50% { transform: translate(1%, -2%); }
+  75% { transform: translate(-1%, 2%); }
+  100% { transform: translate(2%, -1%); }
+}
+
+/* Vignette to focus the eye on the credits. */
+.thanks-section .thanks-vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(
+    120% 90% at 50% 45%,
+    transparent 55%,
+    rgb(7 5 18 / 60%) 100%
+  );
+}
+
+/* ── Geometric art-deco backdrop ──────────────────────────────────────
+   A decorative layer of jewel-toned geometric shapes (sunburst rays,
+   diamonds, rings, arcs, triangles, dots) and a metallic sheen floating
+   over the deep indigo base. Purely visual; sits behind the content. */
+.thanks-art {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+/* Sunburst rays — a slow-spinning radial burst in the top-right. */
+.thanks-art__sunburst {
+  position: absolute;
+  top: -18%;
+  right: -12%;
+  width: 46rem;
+  height: 46rem;
+  background: repeating-conic-gradient(
+    from 0deg,
+    rgb(245 197 66 / 10%) 0deg 8deg,
+    transparent 8deg 22deg
+  );
+  border-radius: 50%;
+  -webkit-mask-image: radial-gradient(circle, #000 0%, transparent 68%);
+  mask-image: radial-gradient(circle, #000 0%, transparent 68%);
+  animation: thanks-sunburst-spin 90s linear infinite;
+  opacity: 0.9;
+}
+
+@keyframes thanks-sunburst-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Shared shape base. */
+.thanks-art__shape {
+  position: absolute;
+  display: block;
+}
+
+/* Diamond — a rotated square with a gold gradient and glow. */
+.thanks-art__shape--diamond {
+  top: 16%;
+  left: 6%;
+  width: 7rem;
+  height: 7rem;
+  transform: rotate(45deg);
+  background: linear-gradient(135deg, rgb(245 197 66 / 55%), rgb(255 138 101 / 35%));
+  border: 1px solid rgb(255 255 255 / 30%);
+  box-shadow: 0 0 3rem rgb(245 197 66 / 35%);
+  border-radius: 0.5rem;
+  animation: thanks-float 12s ease-in-out infinite alternate;
+}
+
+/* Ring — a hollow circle outline in teal. */
+.thanks-art__shape--ring {
+  bottom: 22%;
+  right: 8%;
+  width: 9rem;
+  height: 9rem;
+  border: 2px solid rgb(45 212 191 / 45%);
+  border-radius: 50%;
+  box-shadow: 0 0 2.5rem rgb(45 212 191 / 25%), inset 0 0 2rem rgb(45 212 191 / 15%);
+  animation: thanks-float 16s ease-in-out infinite alternate-reverse;
+}
+
+/* Arc — a quarter-circle stroke in violet. */
+.thanks-art__shape--arc {
+  top: 30%;
+  right: 18%;
+  width: 8rem;
+  height: 8rem;
+  border: 2px solid rgb(167 139 250 / 50%);
+  border-radius: 50%;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+  box-shadow: 0 0 2rem rgb(167 139 250 / 25%);
+  animation: thanks-float 14s ease-in-out infinite alternate;
+}
+
+/* Triangle — a small coral triangle near the bottom-left. */
+.thanks-art__shape--triangle {
+  bottom: 12%;
+  left: 16%;
+  width: 0;
+  height: 0;
+  border-left: 3.5rem solid transparent;
+  border-right: 3.5rem solid transparent;
+  border-bottom: 6rem solid rgb(255 107 107 / 40%);
+  filter: drop-shadow(0 0 1.5rem rgb(255 107 107 / 30%));
+  animation: thanks-float 18s ease-in-out infinite alternate-reverse;
+}
+
+/* Dots — small glowing circles scattered around. */
+.thanks-art__shape--dot {
+  width: 0.9rem;
+  height: 0.9rem;
+  border-radius: 50%;
+  background: rgb(244 114 182 / 70%);
+  box-shadow: 0 0 1rem rgb(244 114 182 / 60%);
+  animation: thanks-pulse 4s ease-in-out infinite alternate;
+}
+
+.thanks-art__shape--dot-1 { top: 12%; left: 30%; }
+.thanks-art__shape--dot-2 { top: 48%; left: 12%; background: rgb(34 211 238 / 70%); box-shadow: 0 0 1rem rgb(34 211 238 / 60%); animation-delay: 0.6s; }
+.thanks-art__shape--dot-3 { bottom: 30%; right: 26%; background: rgb(245 197 66 / 70%); box-shadow: 0 0 1rem rgb(245 197 66 / 60%); animation-delay: 1.2s; }
+.thanks-art__shape--dot-4 { top: 22%; right: 34%; background: rgb(167 139 250 / 70%); box-shadow: 0 0 1rem rgb(167 139 250 / 60%); animation-delay: 1.8s; }
+
+@keyframes thanks-float {
+  from { transform: translateY(0) rotate(0deg); }
+  to { transform: translateY(-1.5rem) rotate(6deg); }
+}
+
+@keyframes thanks-pulse {
+  from { opacity: 0.4; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1.25); }
+}
+
+/* Metallic sheen — a soft diagonal light sweep across the whole section. */
+.thanks-art__sheen {
+  position: absolute;
+  inset: -20%;
+  background: linear-gradient(
+    115deg,
+    transparent 30%,
+    rgb(255 255 255 / 5%) 45%,
+    rgb(255 255 255 / 9%) 50%,
+    rgb(255 255 255 / 5%) 55%,
+    transparent 70%
+  );
+  animation: thanks-sheen-sweep 16s ease-in-out infinite;
+}
+
+@keyframes thanks-sheen-sweep {
+  0% { transform: translateX(-30%); }
+  50% { transform: translateX(30%); }
+  100% { transform: translateX(-30%); }
+}
+
+
+.thanks-frame {
+  position: relative;
+  z-index: 2;
+  max-width: 60rem;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.thanks-frame .eyebrow {
+  color: #ffd54f;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 35%);
+}
+
+/* The thanks section keeps its centered cinema-credit header, but adopts the
+   shared section-heading separator (light border on the dark background). */
+.thanks-heading {
+  align-items: center;
+  text-align: center;
+  border-bottom-color: rgb(255 255 255 / 22%);
+}
+
+.thanks-heading .eyebrow {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.thanks-quote {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.thanks-quote h2 {
+  max-width: none;
+  margin: 0 0 1.5rem;
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  color: var(--white);
+  text-shadow: 0 0 2.5rem rgb(255 183 77 / 35%);
+  /* Much bigger on desktop */
+  font-size: clamp(4rem, 12vw, 11rem);
+}
+
+.thanks-section .thanks-heading .thanks-subtitle {
+  position: relative;
+  max-width: 46rem;
+  margin: 0 auto;
+  font-family: var(--font-display);
+  font-size: clamp(1.15rem, 2.2vw, 1.6rem);
+  font-style: italic;
+  font-weight: 400;
+  line-height: 1.5;
+  color: #ffffff !important;
+}
+
+.thanks-subtitle::before {
+  content: "\201C";
+  color: #ffffff;
+  opacity: 0.85;
+  font-size: 1.4em;
+  margin-right: 0.15em;
+}
+
+.thanks-subtitle::after {
+  content: "\201D";
+  color: #ffffff;
+  opacity: 0.85;
+  font-size: 1.4em;
+  margin-left: 0.15em;
+}
+
+/* ── Cinematic credits roll ─────────────────────────────────────── */
+
+.thanks-credits-stage {
+  position: relative;
+  height: clamp(24rem, 62vh, 40rem);
+  margin: clamp(3rem, 6vw, 5rem) auto 0;
+  max-width: 34rem;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    transparent 100%
+  );
+}
+
+/* The roll is a flex column of two identical lists; translating -50% then
+   loops seamlessly because each list occupies exactly half the roll. No
+   perspective / tilt — a simple infinite vertical scroll. */
+.thanks-credits-roll {
+  display: flex;
+  flex-direction: column;
+  animation: thanks-credits-roll 60s linear infinite;
+  will-change: transform;
+}
+
+.thanks-credits-stage.is-paused .thanks-credits-roll {
+  animation-play-state: paused;
+}
+
+@keyframes thanks-credits-roll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+.thanks-credits {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  flex: 0 0 auto;
+}
+
+.thanks-credit {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+  padding: 0.85rem 1.25rem;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 0.75rem;
+  background: rgb(255 255 255 / 5%);
+  text-align: left;
+}
+
+
+.thanks-credit--featured {
+  border-color: rgb(255 183 77 / 45%);
+  background: linear-gradient(
+    135deg,
+    rgb(255 183 77 / 16%),
+    rgb(255 255 255 / 5%)
+  );
+}
+
+/* Avatar shown next to a featured credit (padrino / helper). */
+.thanks-credit-avatar {
+  flex: 0 0 auto;
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgb(255 183 77 / 55%);
+  box-shadow: 0 0 0 2px rgb(0 0 0 / 20%), 0 0.4rem 1rem rgb(0 0 0 / 35%);
+  background: rgb(255 255 255 / 8%);
+}
+
+.thanks-credit-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.thanks-credit-avatar .thanks-avatar-mono {
+  width: 100%;
+  height: 100%;
+  font-size: 0.85rem;
+}
+
+.thanks-credit-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+
+.thanks-name {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--white);
+  text-shadow: 0 1px 3px rgb(0 0 0 / 45%);
+}
+
+.thanks-credit--featured .thanks-name {
+  color: var(--marigold);
+}
+
+.thanks-role {
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgb(255 253 248 / 70%);
+}
+
+/* ── Avatar marquee toggle ─────────────────────────────────────────
+   A small pill toggle that switches the crossed marquee between the
+   featured "sponsoring" partners (default) and every active guest. */
+.thanks-avatar-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+}
+
+.thanks-avatar-toggle-btn {
+  padding: 0.55rem 1.1rem;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 8%);
+  color: rgb(255 253 248 / 85%);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background 250ms ease, color 250ms ease, border-color 250ms ease;
+}
+
+.thanks-avatar-toggle-btn:hover {
+  border-color: rgb(255 255 255 / 60%);
+  background: rgb(255 255 255 / 14%);
+}
+
+.thanks-avatar-toggle-btn.is-active {
+  border-color: var(--marigold);
+  background: var(--marigold);
+  color: var(--ink);
+}
+
+/* ── Crossed avatar marquee (bleeds to the section edges) ───────── */
+
+.thanks-avatars {
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  display: grid;
+
+  gap: 0.9rem;
+  /* Bleed the marquee to the full width of the section, edge to edge. */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+}
+
+.thanks-avatars-row {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+}
+
+.thanks-avatars-track {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 0.9rem;
+  padding-right: 0.9rem;
+  will-change: transform;
+}
+
+.thanks-avatars-row--a .thanks-avatars-track {
+  animation: thanks-marquee-left 40s linear infinite;
+}
+
+.thanks-avatars-row--b .thanks-avatars-track {
+  animation: thanks-marquee-right 40s linear infinite;
+}
+
+@keyframes thanks-marquee-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes thanks-marquee-right {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.thanks-avatar {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--terracotta);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  border: 2px solid rgb(255 255 255 / 35%);
+  box-shadow: 0 0 1.25rem rgb(255 183 77 / 25%);
+}
+
+.thanks-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thanks-avatar-mono {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* ── Humor: vertical auto-scrolling carousel (bleeds to section) ── */
+
+.thanks-humor {
+  position: relative;
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  /* Bleed the banner to the full width of the section. */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  /* Single-row breaking-news banner height. */
+  height: clamp(3.5rem, 7vh, 5rem);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    #000 8%,
+    #000 92%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    #000 8%,
+    #000 92%,
+    transparent 100%
+  );
+}
+
+.thanks-humor-track {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.5rem;
+  animation: thanks-humor-scroll 42s linear infinite;
+  will-change: transform;
+}
+
+/* Each duplicated set occupies exactly half the track so the -50% translate
+   loops seamlessly. */
+.thanks-humor-set {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 1.5rem;
+  flex: 0 0 auto;
+}
+
+.thanks-humor-line {
+  margin: 0;
+  padding: 0.55rem 1.25rem;
+  border-left: 3px solid var(--marigold);
+  background: rgb(255 255 255 / 5%);
+  border-radius: 0.5rem;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.thanks-humor-line p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  color: #ffffff !important;
+  font-style: italic;
+  white-space: nowrap;
+}
+
+@keyframes thanks-humor-scroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.thanks-contacts {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem 1.5rem;
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  align-items: center;
+}
+
+.thanks-contacts span {
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.thanks-contacts a {
+  color: var(--marigold);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.thanks-contacts a:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .thanks-quote h2 {
+    font-size: clamp(3.25rem, 18vw, 5.5rem);
+  }
+
+  .thanks-credits-stage {
+    height: clamp(20rem, 58vh, 30rem);
+  }
+
+  .thanks-avatar {
+    width: 2.75rem;
+    height: 2.75rem;
+    font-size: 0.95rem;
+  }
+}

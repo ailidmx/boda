@@ -1,0 +1,498 @@
+/* ── Base: reset, global layout, shared primitives ─────────────────────
+   Design tokens (colors, fonts, breakpoints, spacing, fluid type) live in
+   `tokens.css` — the single source of truth. This file only defines the
+   layout tokens specific to the base shell (countdown + header heights),
+   which are not part of the shared token system. */
+
+:root {
+  --countdown-height: 3.2rem;
+  --header-height: 5rem;
+}
+
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+  /* Offset anchor jumps by the full height of the fixed countdown bar plus
+     the sticky header, so each section lands flush below them (no hidden top
+     and no leftover white space at the bottom). */
+  scroll-padding-top: calc(var(--countdown-height) + var(--header-height));
+}
+
+
+body {
+  margin: 0;
+  overflow-x: clip;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  font-weight: 400;
+}
+
+h2 {
+  font-size: clamp(2.6rem, 6vw, 5.5rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+}
+
+p {
+  line-height: 1.7;
+}
+
+
+::selection {
+  background: var(--marigold);
+  color: var(--white);
+}
+
+/* ── Access gate (name confirmation before entering) ── */
+.access-gate {
+  position: fixed;
+  z-index: 200;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1.5rem;
+  background: var(--deep-green);
+  color: var(--white);
+}
+
+.access-gate__card {
+  width: min(100%, 30rem);
+  padding: clamp(2rem, 5vw, 3rem);
+  border: 1px solid #e4b968;
+  outline: 1px solid #e4b968;
+  outline-offset: -0.6rem;
+  text-align: center;
+}
+
+.access-gate__card h1 {
+  margin: 0 0 1rem;
+  font-size: clamp(2rem, 6vw, 3rem);
+  line-height: 1;
+}
+
+.access-gate__card p {
+  color: rgb(255 253 248 / 75%);
+}
+
+.access-gate__card form {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.access-gate__card input {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid rgb(255 255 255 / 45%);
+  padding: 0.75rem 0.2rem;
+  background: transparent;
+  color: var(--white);
+  font: inherit;
+  text-align: center;
+}
+
+.access-gate__card input:focus {
+  outline: 2px solid #e4b968;
+  outline-offset: 3px;
+}
+
+.access-gate__error {
+  color: #ffb4a2;
+  font-size: 0.85rem;
+}
+
+/* ── Countdown bar ── */
+.countdown-bar {
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(0.65rem, 3vw, 2rem);
+  height: var(--countdown-height);
+  padding-inline: 1rem;
+  background: var(--ink);
+  color: var(--white);
+}
+
+.countdown-prefix {
+  font-size: clamp(0.4rem, 0.85vw, 0.58rem);
+  font-weight: 600;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: #e4b968;
+  white-space: nowrap;
+}
+
+.countdown-values {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.6rem, 2.5vw, 1.5rem);
+  width: min(100%, 32rem);
+}
+
+.countdown-unit {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  white-space: nowrap;
+}
+
+.countdown-unit strong {
+  min-width: 1.3em;
+  font-family: var(--font-countdown);
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-align: center;
+}
+
+.countdown-unit small {
+  color: rgb(255 253 248 / 72%);
+  font-size: clamp(0.6rem, 1.4vw, 1rem);
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* ── Site shell ── */
+
+.site-shell {
+  padding-top: var(--countdown-height);
+}
+
+.skip-link {
+  position: absolute;
+  z-index: 300;
+  top: 0.5rem;
+  left: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: var(--marigold);
+  color: var(--white);
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+/* ── Section primitives ──
+   Every slide is a full-height viewport slide: content is vertically
+   centered and the section grows beyond the viewport only when its content
+   is taller than the screen (e.g. long forms or dense grids). Sections that
+   override `display` (grid/flex) keep their own layout but still inherit the
+   min-height and reduced padding. */
+.section {
+  min-height: calc(100svh - var(--countdown-height) - var(--header-height));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 6vw, 6rem);
+}
+
+
+.section-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0;
+  padding-bottom: clamp(2rem, 4vw, 4rem);
+  border-bottom: 1px solid rgb(36 33 25 / 20%);
+}
+
+.section-heading .eyebrow {
+  margin-bottom: 1rem;
+}
+
+.section-heading h2 {
+  margin: 0 0 1.5rem;
+  font-size: clamp(2.6rem, 6vw, 6.5rem);
+}
+
+
+.section-heading p:last-child {
+  margin: 0;
+  max-width: 60rem;
+  color: rgb(36 33 25 / 85%);
+}
+
+
+.eyebrow {
+  position: relative;
+  margin: 0 0 1rem;
+  color: var(--terracotta);
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.eyebrow::before {
+  content: "";
+  display: block;
+  width: 3.5rem;
+  height: 0.22rem;
+  margin-bottom: 1.25rem;
+  background: var(--terracotta);
+}
+
+
+.lead {
+  max-width: 44rem;
+  font-size: clamp(1.05rem, 1.8vw, 1.3rem);
+  line-height: 1.6;
+}
+
+/* ── Buttons ── */
+.button {
+  display: inline-flex;
+  min-height: 3.4rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid currentColor;
+  padding: 0.8rem 1.25rem;
+  cursor: pointer;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.button-dark {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.button-light {
+  background: var(--white);
+  color: var(--ink);
+}
+
+.button-ghost {
+  background: transparent;
+}
+
+.button-small {
+  min-height: 2.4rem;
+}
+
+.button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
+/* ── Forms ── */
+.form-field {
+  display: grid;
+  gap: 0.45rem;
+}
+
+.form-field-wide,
+.rsvp-form .button,
+.rsvp-form > small {
+  grid-column: 1 / -1;
+}
+
+.form-field label {
+  font-size: 0.67rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.form-field-label {
+  display: block;
+}
+
+.form-field input,
+.form-field select,
+.form-field textarea {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid rgb(36 33 25 / 45%);
+  border-radius: 0;
+  padding: 0.75rem 0.2rem;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+}
+
+.form-field textarea {
+  border: 1px solid rgb(36 33 25 / 35%);
+  padding: 0.75rem;
+  resize: vertical;
+}
+
+.form-field input:focus,
+.form-field select:focus,
+.form-field textarea:focus {
+  outline: 2px solid rgb(228 185 104 / 70%);
+  outline-offset: 2px;
+  border-bottom-color: var(--marigold);
+  box-shadow: 0 0 0 3px rgb(228 185 104 / 20%);
+}
+
+/* ── Video frame ── */
+.video-frame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  aspect-ratio: 16 / 9;
+  background: #000;
+}
+
+.video-frame iframe,
+.video-frame video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* ── Handwritten accent ── */
+.handwritten {
+  font-family: var(--font-display);
+  font-style: italic;
+}
+
+/* ── Form status ── */
+[data-form-status] {
+  display: none;
+}
+
+[data-form-status="success"] {
+  display: block;
+  color: var(--deep-green);
+  font-weight: 600;
+}
+
+[data-form-status="error"] {
+  display: block;
+  color: #b3261e;
+  font-weight: 600;
+}
+
+/* ── Text link ── */
+.text-link {
+  display: inline-block;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid currentColor;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Google Fonts utility classes ──
+   Ballet (calligraphic variable) + Bitcount Grid Single (variable grid). */
+.ballet {
+  font-family: "Ballet", cursive;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.bitcount-grid-single {
+  font-family: "Bitcount Grid Single", system-ui;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "slnt" 0,
+    "CRSV" 0.5,
+    "ELSH" 0,
+    "ELXP" 0;
+}
+
+/* ── Section footer navigation ─────────────────────────────────────────
+   A single "continue" link pinned to the bottom of a full-height slide.
+   The default (dark ink) variant is for light backgrounds (cream / white);
+   add `.section-nav--light` on dark backgrounds for a light link. */
+.section-nav {
+  display: flex;
+  justify-content: center;
+  margin-top: auto;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgb(36 33 25 / 18%);
+}
+
+
+.section-nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--ink);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 250ms ease, opacity 250ms ease;
+}
+
+.section-nav-link:hover,
+.section-nav-link:focus-visible {
+  color: var(--terracotta);
+  text-decoration: underline;
+}
+
+/* Light variant for dark backgrounds (deep green / ink / navy). */
+.section-nav--light {
+  border-top-color: rgb(255 255 255 / 22%);
+}
+
+.section-nav--light .section-nav-link {
+  color: var(--white);
+}
+
+.section-nav--light .section-nav-link:hover,
+.section-nav--light .section-nav-link:focus-visible {
+  color: var(--marigold);
+}
+
+
+

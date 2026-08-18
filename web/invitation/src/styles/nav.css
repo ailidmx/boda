@@ -1,0 +1,1147 @@
+/* ── Nav (site header, monogram, language switcher) ──────────────────── */
+
+/* ── Responsive: mobile-first ──────────────────────────────────────────
+   Base (mobile): the header shows the monogram + actions, and a native
+   <select> replaces the desktop nav links. The desktop nav and RSVP button
+   are hidden until the tablet breakpoint. */
+
+/* Mobile-first: hide desktop nav, show the custom mobile dropdown. */
+.desktop-nav-wrap,
+.nav-underline,
+.header-rsvp {
+  display: none;
+}
+
+/* The mobile nav dropdown lives in the first grid column, on the same row as
+   the user avatar (right column), so the whole header fits on one line. */
+.mobile-nav {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
+}
+
+/* Each split dropdown (Part I / Part II) is its own positioned group so the
+   floating panel anchors to its own trigger. */
+.mobile-nav__group {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.mobile-nav__trigger {
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  gap: 0.45rem;
+  border: 0;
+  padding: 0.35rem 0;
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+/* REPONDRE call-to-action in the mobile nav: a compact round icon-only CTA
+   that stands out from the two dropdown triggers while leaving more room for
+   the menu dropdowns. The text label is hidden on mobile; only the checkmark
+   icon shows. */
+.mobile-nav__cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 2.4rem;
+  height: 2.4rem;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--terracotta);
+  color: var(--white);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 180ms ease, transform 180ms ease;
+}
+
+.mobile-nav__cta-icon {
+  font-size: 1.05rem;
+  line-height: 1;
+}
+
+.mobile-nav__cta-label {
+  display: none;
+}
+
+.mobile-nav__cta:hover,
+.mobile-nav__cta:focus-visible {
+  background: var(--marigold);
+  color: var(--deep-green);
+  transform: translateY(-1px);
+}
+
+
+
+.mobile-nav__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Arrow indicator: subtle, floating, rotates when open. */
+.mobile-nav__arrow {
+  flex: 0 0 auto;
+  color: var(--marigold);
+  font-size: 0.7rem;
+  line-height: 1;
+  transition: transform 180ms ease;
+}
+
+.mobile-nav__arrow.is-open {
+  transform: rotate(180deg);
+}
+
+/* Borderless, translucent floating panel that mirrors the desktop nav's
+   golden underline treatment. */
+.mobile-nav__dropdown {
+  position: absolute;
+  z-index: 120;
+  top: calc(100% + 0.6rem);
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 13rem;
+  padding: 0.5rem 0;
+  border: 0;
+  border-radius: 0.75rem;
+  background: rgb(36 33 25 / 82%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 18px 40px rgb(0 0 0 / 35%);
+}
+
+.mobile-nav__link {
+  position: relative;
+  display: block;
+  padding: 0.6rem 1.1rem;
+  color: var(--white);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.mobile-nav__link:hover {
+  color: var(--marigold);
+}
+
+/* Large golden underline on the active item, matching the desktop nav. */
+.mobile-nav__link.is-active {
+  color: var(--marigold);
+}
+
+.mobile-nav__link.is-active::after {
+  position: absolute;
+  right: 1.1rem;
+  bottom: 0.15rem;
+  left: 1.1rem;
+  height: 2px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(198, 139, 43, 0) 0%,
+    var(--marigold) 18%,
+    #f0c060 50%,
+    var(--marigold) 82%,
+    rgba(198, 139, 43, 0) 100%
+  );
+  box-shadow: 0 0 10px rgb(198 139 43 / 55%);
+  content: "";
+}
+
+.mobile-nav__link--dashboard {
+  color: var(--marigold);
+}
+
+
+/* Tablet+: restore the desktop nav and hide the mobile dropdown. The mobile
+   round RSVP CTA (now in the header actions) is hidden too; the desktop
+   pill `.header-rsvp` takes over. */
+@media (min-width: 900px) {
+  .desktop-nav-wrap,
+  .nav-underline,
+  .header-rsvp {
+    display: flex;
+  }
+
+  .mobile-nav,
+  .mobile-nav__cta {
+    display: none;
+  }
+
+
+  .site-header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1.25rem;
+  }
+}
+
+
+/* Small phones: tighten header padding and compact the user menu so the
+   whole header (nav dropdown + avatar) fits on one line. The reduced
+   vertical padding makes the header thinner on mobile. */
+@media (max-width: 600px) {
+  .site-header {
+    padding: 0.3rem 1.1rem;
+    gap: 0.75rem;
+  }
+
+
+  .user-menu__name,
+  .user-menu__lang {
+    display: none;
+  }
+
+  .user-menu__trigger {
+    padding: 0.2rem 0.5rem 0.2rem 0.25rem;
+  }
+
+  .mobile-nav__trigger {
+    padding: 0.2rem 0;
+  }
+}
+
+/* Mobile: the nav bar is ALWAYS pinned to the very top. The countdown bar
+   scrolls away naturally (see countdown.css) and reappears when the user
+   returns to the top of the page. The header must stay fully opaque at the
+   top — blur + alpha can look transparent on some mobile browsers.
+   `body .site-header` (higher specificity than the base `.site-header` rule
+   below) guarantees `top: 0` wins over `top: var(--countdown-height)`. */
+@media (max-width: 899px) {
+  body .site-header {
+    top: 0;
+    background: var(--deep-green);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+
+
+
+
+
+.site-header {
+  position: sticky;
+  z-index: 100;
+  top: 0;
+  right: 0;
+  left: 0;
+
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 1.25rem;
+
+  padding: 0.35rem clamp(1.25rem, 4vw, 4rem);
+
+  border-bottom: 1px solid rgb(255 255 255 / 25%);
+  background: rgb(36 33 25 / 88%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 8px 24px rgb(31 30 23 / 18%);
+  color: var(--white);
+  transition: top 200ms ease, background 200ms ease, border-color 200ms ease,
+    box-shadow 200ms ease, opacity 200ms ease;
+  isolation: isolate;
+}
+
+.site-header > * {
+  position: relative;
+  z-index: 1;
+}
+
+
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  white-space: nowrap;
+}
+
+
+
+.site-header a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.monogram {
+  display: inline-grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.desktop-nav-wrap {
+  align-items: stretch;
+  gap: 0.25rem;
+  min-width: 0;
+}
+
+
+.desktop-nav {
+  display: flex;
+  align-items: stretch;
+  gap: clamp(1rem, 2.5vw, 2.25rem);
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.desktop-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.desktop-nav a,
+.header-rsvp {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.desktop-nav a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+
+.nav-scroll-btn {
+  display: none;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  width: 1.7rem;
+  height: 1.7rem;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 50%;
+  background: rgb(255 255 255 / 8%);
+  color: var(--white);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: background 150ms ease, border-color 150ms ease;
+}
+
+.nav-scroll-btn:hover {
+  border-color: var(--marigold);
+  background: rgb(255 255 255 / 16%);
+}
+
+.nav-scroll-btn.is-visible {
+  display: inline-flex;
+}
+
+/* Golden underline that slides under the active/hovered nav link and touches
+
+   the header's bottom border exactly. It lives outside the scrollable nav so
+   it is never clipped. */
+.nav-underline {
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 0;
+  height: 3px;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(
+    90deg,
+    rgba(198, 139, 43, 0) 0%,
+    var(--marigold) 18%,
+    #f0c060 50%,
+    var(--marigold) 82%,
+    rgba(198, 139, 43, 0) 100%
+  );
+  box-shadow: 0 0 12px rgb(198 139 43 / 55%), 0 0 26px rgb(198 139 43 / 30%);
+  pointer-events: none;
+  transition: left 260ms cubic-bezier(0.22, 1, 0.36, 1),
+    width 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.desktop-nav a.is-active {
+  color: var(--marigold);
+}
+
+
+
+.nav-dashboard-link {
+  color: var(--marigold) !important;
+}
+
+.language-switcher {
+  display: flex;
+  gap: 0.15rem;
+  padding: 0.2rem;
+  border-radius: 999px;
+}
+
+.language-button {
+  border: 1px solid transparent;
+  border-radius: 999px;
+  padding: 0.35rem 0.55rem;
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+
+.language-button:hover {
+  border-color: rgb(255 255 255 / 45%);
+}
+
+.language-button[aria-pressed="true"] {
+  border-color: var(--white);
+  background: var(--white);
+  color: var(--ink);
+}
+
+
+.header-rsvp {
+  padding: 0.65rem 1rem;
+  border: 1px solid var(--white);
+}
+
+/* ── User menu (avatar + dropdown) ───────────────────────────────────── */
+.user-menu {
+  position: relative;
+}
+
+.user-menu__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid rgb(255 255 255 / 35%);
+  border-radius: 999px;
+  padding: 0.3rem 0.7rem 0.3rem 0.35rem;
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+  font: inherit;
+  transition: border-color 180ms ease, background 180ms ease;
+}
+
+.user-menu__trigger:hover {
+  border-color: var(--marigold);
+  background: rgb(255 255 255 / 8%);
+}
+
+.user-menu__avatar {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  background: var(--marigold);
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  overflow: hidden;
+}
+
+.user-menu__avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+
+.user-menu__name {
+  max-width: 9rem;
+  overflow: hidden;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Selected language flag shown to the right of the user name. */
+.user-menu__lang {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.user-menu__chevron {
+
+  color: rgb(255 255 255 / 70%);
+  font-size: 0.7rem;
+  transition: transform 180ms ease;
+}
+
+.user-menu__chevron.is-open {
+  transform: rotate(180deg);
+}
+
+.user-menu__dropdown {
+  position: absolute;
+  z-index: 120;
+  top: calc(100% + 0.6rem);
+  right: 0;
+  min-width: 15rem;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 0.75rem;
+  background: var(--ink);
+  box-shadow: 0 18px 40px rgb(0 0 0 / 35%);
+  color: var(--white);
+}
+
+.user-menu__item {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 0.6rem;
+  border: 0;
+  border-bottom: 1px solid rgb(255 255 255 / 10%);
+  padding: 0.8rem 1rem;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 500;
+  text-align: left;
+  transition: background 150ms ease;
+}
+
+.user-menu__item:last-child {
+  border-bottom: 0;
+}
+
+.user-menu__item:hover {
+  background: rgb(255 255 255 / 8%);
+}
+
+.user-menu__item--admin {
+  color: var(--marigold);
+  text-decoration: none;
+}
+
+.user-menu__item--danger {
+  color: #ffb4a2;
+}
+
+.user-menu__item--primary {
+  justify-content: center;
+  border: 1px solid var(--marigold);
+  border-radius: 0.4rem;
+  color: var(--ink);
+  background: var(--marigold);
+  font-weight: 600;
+}
+
+.user-menu__item--primary:hover {
+  background: #d99a3a;
+}
+
+.user-menu__item-icon {
+  width: 1.1rem;
+  text-align: center;
+}
+
+/* Music toggle switch inside the user dropdown. */
+.user-menu__item-label {
+  flex: 1;
+}
+
+.user-menu__toggle {
+  position: relative;
+  display: inline-block;
+  width: 2.1rem;
+  height: 1.15rem;
+  flex: 0 0 auto;
+  border: 1px solid rgb(255 255 255 / 30%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 12%);
+  transition: background 180ms ease, border-color 180ms ease;
+}
+
+.user-menu__toggle-knob {
+  position: absolute;
+  top: 50%;
+  left: 0.15rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: var(--white);
+  transition: left 180ms ease, background 180ms ease;
+}
+
+.user-menu__toggle.is-on {
+  border-color: var(--marigold);
+  background: var(--marigold);
+}
+
+.user-menu__toggle.is-on .user-menu__toggle-knob {
+  left: calc(100% - 0.95rem);
+  background: var(--ink);
+}
+
+/* Language section inside the user dropdown. */
+
+.user-menu__section {
+  padding: 0.75rem 1rem 0.85rem;
+  border-bottom: 1px solid rgb(255 255 255 / 10%);
+}
+
+.user-menu__section-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 55%);
+}
+
+.user-menu__langs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.user-menu__lang-option {
+  border: 1px solid rgb(255 255 255 / 25%);
+  border-radius: 999px;
+  padding: 0.35rem 0.6rem;
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.user-menu__lang-option:hover {
+  border-color: var(--marigold);
+}
+
+.user-menu__lang-option.is-active {
+  border-color: var(--marigold);
+  background: var(--marigold);
+  color: var(--ink);
+}
+
+.user-menu__password {
+
+  display: grid;
+  gap: 0.6rem;
+  padding: 1rem;
+}
+
+.user-menu__email {
+  display: grid;
+  gap: 0.6rem;
+  padding: 1rem;
+}
+
+.user-menu__password label,
+.user-menu__email label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.user-menu__password input,
+.user-menu__email input {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid rgb(255 255 255 / 45%);
+  padding: 0.5rem 0.2rem;
+  background: transparent;
+  color: var(--white);
+  font: inherit;
+}
+
+.user-menu__password input:focus,
+.user-menu__email input:focus {
+  outline: 2px solid rgb(228 185 104 / 75%);
+  outline-offset: 2px;
+  border-bottom-color: var(--marigold);
+  box-shadow: 0 0 0 3px rgb(228 185 104 / 18%);
+}
+
+.user-menu__notice {
+  display: grid;
+  gap: 0.25rem;
+  margin: 0;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 0.55rem;
+  padding: 0.65rem 0.7rem;
+  background: rgb(255 255 255 / 6%);
+  color: rgb(255 255 255 / 90%);
+  font-size: 0.72rem;
+  line-height: 1.35;
+}
+
+.user-menu__notice-title {
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.user-menu__current-email {
+  display: grid;
+  gap: 0.2rem;
+  margin: 0.15rem 0 0.2rem;
+}
+
+.user-menu__current-email-label {
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 58%);
+}
+
+.user-menu__current-email-value {
+  color: rgb(255 255 255 / 92%);
+  font-size: 0.74rem;
+  word-break: break-all;
+}
+
+.user-menu__password-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.user-menu__password-actions .user-menu__item {
+  width: auto;
+  border: 0;
+  padding: 0.5rem 0.9rem;
+}
+
+.user-menu__status {
+  font-size: 0.72rem;
+}
+
+.user-menu__status--error {
+  color: #ffb4a2;
+}
+
+.user-menu__status--success {
+  color: #9fd6a8;
+}
+
+.user-menu__status--info {
+  color: #f6d48a;
+}
+
+.user-menu-modal__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 280;
+  display: grid;
+  place-items: center;
+  padding: 1.1rem;
+  background: rgb(20 18 13 / 62%);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.user-menu-modal__card {
+  position: relative;
+  width: min(34rem, 100%);
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 0.85rem;
+  padding: 1rem;
+  background: linear-gradient(180deg, rgb(25 23 18 / 96%), rgb(19 18 14 / 96%));
+  box-shadow: 0 24px 58px rgb(0 0 0 / 42%);
+  color: var(--white);
+}
+
+.user-menu-modal__close {
+  position: absolute;
+  top: 0.65rem;
+  right: 0.65rem;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 999px;
+  width: 1.9rem;
+  height: 1.9rem;
+  background: rgb(255 255 255 / 5%);
+  color: rgb(255 255 255 / 86%);
+  cursor: pointer;
+}
+
+.user-menu-modal__close:hover {
+  background: rgb(255 255 255 / 10%);
+}
+
+.user-menu-modal__title {
+  margin: 0 2.3rem 0.8rem 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.05rem, 3vw, 1.35rem);
+  font-weight: 500;
+  color: var(--marigold);
+}
+
+.user-menu-modal__form {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.user-menu-modal__form label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.user-menu-modal__form input {
+  width: 100%;
+  border: 0;
+  border-bottom: 1px solid rgb(255 255 255 / 45%);
+  padding: 0.5rem 0.2rem;
+  background: transparent;
+  color: var(--white);
+  font: inherit;
+}
+
+.user-menu-modal__form input:focus {
+  outline: 2px solid rgb(228 185 104 / 75%);
+  outline-offset: 2px;
+  border-bottom-color: var(--marigold);
+  box-shadow: 0 0 0 3px rgb(228 185 104 / 18%);
+}
+
+.user-menu-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  margin-top: 0.25rem;
+}
+
+.user-menu-modal__btn {
+  border: 1px solid rgb(255 255 255 / 24%);
+  border-radius: 0.45rem;
+  padding: 0.5rem 0.9rem;
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.78rem;
+}
+
+.user-menu-modal__btn:hover {
+  background: rgb(255 255 255 / 10%);
+}
+
+.user-menu-modal__btn--primary {
+  border-color: var(--marigold);
+  background: var(--marigold);
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.user-menu-modal__btn--primary:hover {
+  background: #d99a3a;
+}
+
+/* ── "À propos" (About) modal ────────────────────────────────────────────
+   Reuses the user-menu modal shell (overlay/card/close/title/buttons) and
+   adds a scrollable feature list fed by features.js. The card clips its
+   content to the rounded border and every inner element is constrained to
+   the card's width so nothing overflows horizontally (no horizontal scroll).
+   Long text wraps at the container border instead of spilling out. */
+.about-modal__card {
+  display: flex;
+  flex-direction: column;
+  width: min(64rem, 100%);
+  max-height: min(90vh, 48rem);
+  min-width: 0;
+  overflow: hidden;
+}
+
+
+.about-modal__subtitle {
+  max-width: 34rem;
+  margin: 0 auto 1.1rem;
+  color: rgb(255 255 255 / 82%);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  text-align: center;
+  overflow-wrap: anywhere;
+}
+
+
+.about-modal__list {
+  display: grid;
+  gap: 0.55rem;
+  margin: 0;
+  padding: 0.15rem 0.4rem 0.4rem;
+  overflow-y: auto;
+  overflow-x: hidden;
+  list-style: none;
+  min-width: 0;
+}
+
+.about-modal__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  min-width: 0;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 0.6rem;
+  padding: 0.7rem 0.8rem;
+  background: rgb(255 255 255 / 4%);
+}
+
+.about-modal__icon {
+  flex: 0 0 auto;
+  width: 1.5rem;
+  font-size: 1.15rem;
+  line-height: 1.3;
+  text-align: center;
+}
+
+.about-modal__text {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.about-modal__feature-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--marigold);
+  overflow-wrap: anywhere;
+}
+
+.about-modal__feature-body {
+  color: rgb(255 255 255 / 82%);
+  font-size: 0.76rem;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+  text-wrap: auto;
+}
+
+
+
+.about-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  margin-top: 0.9rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgb(255 255 255 / 12%);
+}
+
+/* ── Desktop side drawer (hamburger menu) ────────────────────────────────
+   A hamburger button is always visible on the LEFT of the desktop nav bar.
+   It opens an elegant, transparent side drawer that lists the full nav in
+   CSS columns: if the links exceed the viewport height they flow into more
+   columns instead of scrolling. Desktop only — the whole `.desktop-nav-wrap`
+   (and therefore this button) is hidden below the tablet breakpoint. */
+/* The hamburger button is borderless and transparent so it reads as part of
+   the nav bar (matching the nav links' typographic style) rather than a
+   boxed control. It is vertically centered and sits flush at the left edge. */
+.side-drawer__toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  align-self: stretch;
+  width: 2.1rem;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--white);
+  cursor: pointer;
+  transition: color 180ms ease;
+}
+
+.side-drawer__toggle:hover,
+.side-drawer__toggle.is-open {
+  color: var(--marigold);
+}
+
+/* The three stacked bars; the middle bar fades and the outer two rotate into
+   an X when the drawer is open. */
+.side-drawer__bars {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.22rem;
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.side-drawer__bars span {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1), opacity 180ms ease;
+}
+
+
+.side-drawer__toggle.is-open .side-drawer__bars span:nth-child(1) {
+  transform: translateY(0.3rem) rotate(45deg);
+}
+
+.side-drawer__toggle.is-open .side-drawer__bars span:nth-child(2) {
+  opacity: 0;
+}
+
+.side-drawer__toggle.is-open .side-drawer__bars span:nth-child(3) {
+  transform: translateY(-0.3rem) rotate(-45deg);
+}
+
+/* Full-screen transparent backdrop. */
+.side-drawer__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 260;
+  display: flex;
+  justify-content: flex-start;
+  background: rgb(20 18 13 / 55%);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+
+/* The drawer panel: slides in from the left, translucent and elegant. */
+.side-drawer__panel {
+  display: flex;
+  flex-direction: column;
+  width: min(30rem, 92vw);
+  height: 100%;
+  overflow: hidden;
+  border-right: 1px solid rgb(255 255 255 / 16%);
+  background: linear-gradient(
+    180deg,
+    rgb(28 26 20 / 92%),
+    rgb(20 18 13 / 92%)
+  );
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: 24px 0 60px rgb(0 0 0 / 40%);
+  animation: side-drawer-in 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes side-drawer-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.side-drawer__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
+}
+
+.side-drawer__title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--marigold);
+}
+
+.side-drawer__close {
+  display: inline-grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 5%);
+  color: rgb(255 255 255 / 86%);
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.side-drawer__close:hover {
+  border-color: var(--marigold);
+  background: rgb(255 255 255 / 10%);
+}
+
+/* Multi-column link list: fills the viewport height and, when the links run
+   past the bottom, flows into additional columns instead of scrolling. */
+.side-drawer__links {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 1.25rem;
+  column-width: 12rem;
+  column-gap: 2rem;
+  column-fill: balance;
+}
+
+.side-drawer__link {
+  display: block;
+  break-inside: avoid;
+  padding: 0.55rem 0.6rem;
+  border-radius: 0.4rem;
+  color: var(--white);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.side-drawer__link:hover {
+  color: var(--marigold);
+  background: rgb(255 255 255 / 6%);
+}
+
+.side-drawer__link.is-active {
+  color: var(--marigold);
+}
+

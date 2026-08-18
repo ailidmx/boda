@@ -1,0 +1,12 @@
+{
+  "id": "lavanda-pending",
+  "estado": "pendiente_de_confirmacion",
+  "motivo": "Las cinco fotos están fechadas entre 15:13:53 y 15:13:54 y muestran una sola habitación con dos camas matrimoniales, coincidiendo con el bloque Lavanda de 15:13:54.",
+  "fotos": [
+    "CAB-LAV-P01",
+    "CAB-LAV-P02",
+    "CAB-LAV-P03",
+    "CAB-LAV-P04",
+    "CAB-LAV-P05"
+  ]
+}

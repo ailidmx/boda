@@ -1,0 +1,123 @@
+// ── Layout: header, summary, sections, records ──────────────────────────
+@use "tokens" as *;
+
+.dashboard {
+  width: min(100% - 2rem, 90rem);
+  margin: 0 auto;
+  padding: 2.5rem 0 6rem;
+}
+
+
+.dashboard-header,
+.dashboard-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+
+.dashboard-header {
+  padding: 1.5rem 0 2.5rem;
+
+  h1 {
+    margin-top: 0.35rem;
+    font-size: clamp(2.6rem, 6vw, 5rem);
+    color: $white;
+  }
+
+  p:last-child {
+    margin-bottom: 0;
+    color: #6f665b;
+  }
+
+  .dashboard-eyebrow {
+    color: $gold;
+  }
+
+  .dashboard-header-actions .dashboard-button-secondary {
+    color: $dark;
+    background: $accent-light;
+  }
+}
+
+// Dark hero band behind the dashboard title for contrast with white text.
+.dashboard-header {
+  margin: -2rem 0 0;
+  padding: 2.75rem 2.5rem;
+  border-radius: 0.75rem;
+  background:
+    radial-gradient(circle at 85% 20%, rgba(163, 125, 64, 0.35), transparent 22rem),
+    linear-gradient(135deg, $dark-deep, $dark);
+  color: $white;
+
+  p:last-child {
+    color: $gold;
+  }
+}
+
+
+.dashboard-header-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.65rem;
+}
+
+.dashboard-button-secondary {
+  color: $dark;
+  background: $accent-light;
+}
+
+.dashboard-status {
+  margin: -1.25rem 0 1.5rem;
+}
+
+.dashboard-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.dashboard-summary-card,
+.dashboard-section {
+  border: 1px solid $border;
+  background: $card-bg;
+  box-shadow: $shadow-card;
+}
+
+.dashboard-summary-card {
+  display: grid;
+  gap: 0.35rem;
+  padding: 1.5rem;
+  border-radius: 0.5rem;
+
+  span,
+  small {
+    color: #766c5f;
+  }
+
+  strong {
+    font-family: $font-display;
+    font-size: 2.7rem;
+    font-weight: 400;
+  }
+}
+
+.dashboard-section {
+  margin-top: 1.25rem;
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border-radius: 0.75rem;
+
+  h2 {
+    margin-top: 0.25rem;
+    font-size: clamp(2rem, 4vw, 3rem);
+  }
+}
+
+.dashboard-empty {
+  grid-column: 1 / -1;
+  color: #746a5d;
+}
+
+

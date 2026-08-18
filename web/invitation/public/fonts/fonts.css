@@ -1,0 +1,85 @@
+/* ── Self-hosted fonts (Ballet + Fraunces + Montserrat) ────────────────
+   Served locally from /fonts/ so the invitation renders correctly even when
+   Google Fonts is blocked (ad-blockers, offline, restricted networks).
+   Source: Google Fonts (SIL Open Font License).
+   - Ballet     → calligraphic display (couple names)
+   - Fraunces   → display / headings (elegant serif)
+   - Montserrat → body / UI (geometric sans-serif) */
+
+/* Ballet (calligraphic display — couple names) */
+@font-face {
+  font-family: "Ballet";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./ballet.ttf") format("truetype");
+}
+
+/* IBM Plex Mono (countdown numerals) */
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./ibmplexmono-400.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "IBM Plex Mono";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("./ibmplexmono-500.ttf") format("truetype");
+}
+
+/* Fraunces (display / headings) */
+
+
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("./fraunces-500.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Fraunces";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./fraunces-700.ttf") format("truetype");
+}
+
+/* Montserrat (body / UI) */
+@font-face {
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url("./montserrat-400.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+  src: url("./montserrat-500.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url("./montserrat-600.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Montserrat";
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url("./montserrat-700.ttf") format("truetype");
+}

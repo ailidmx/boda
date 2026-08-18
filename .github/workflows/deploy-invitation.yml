@@ -1,0 +1,310 @@
+name: Deploy wedding invitation
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+    paths:
+      - "web/invitation/**"
+      - "web/dashboard/**"
+      - "web/shared/**"
+      - "functions/**"
+      - "integraciones/google_sheets/**"
+      - "firebase.json"
+      - ".firebaserc"
+      - ".github/workflows/deploy-invitation.yml"
+  pull_request:
+    branches:
+      - master
+      - develop
+    paths:
+      - "web/invitation/**"
+      - "web/dashboard/**"
+      - "web/shared/**"
+      - "functions/**"
+      - "integraciones/google_sheets/**"
+      - "firebase.json"
+      - ".firebaserc"
+      - ".github/workflows/deploy-invitation.yml"
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Firebase Hosting destination
+        required: true
+        type: choice
+        default: development
+        options:
+          - development
+          - production
+      description:
+        description: Optional PR description (markdown) to include in the Telegram notification
+        required: false
+        type: string
+
+
+permissions:
+  contents: read
+
+concurrency:
+  group: firebase-hosting-${{ github.event_name == 'workflow_dispatch' && inputs.environment || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  validate-pull-request:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Use Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/invitation/package-lock.json
+
+
+      - name: Install invitation dependencies
+        working-directory: web/invitation
+        run: npm ci
+
+      - name: Install dashboard dependencies
+        working-directory: web/dashboard
+        run: npm ci
+
+      - name: Write Cloudinary .env from secrets
+        working-directory: web/invitation
+        run: |
+          cat > .env <<'EOF'
+          CLOUDINARY_URL=cloudinary://${{ secrets.CLOUDINARY_API_KEY }}:${{ secrets.CLOUDINARY_API_SECRET }}@${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
+          EOF
+
+      - name: Build invitation + dashboard (build:all)
+        run: npm run build:all
+
+  deploy-development:
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/develop') ||
+      (github.event_name == 'workflow_dispatch' && inputs.environment == 'development')
+    environment:
+      name: development
+      url: https://boda-500805.web.app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Use Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/invitation/package-lock.json
+
+      - name: Install invitation dependencies
+        working-directory: web/invitation
+        run: npm ci
+
+      - name: Install dashboard dependencies
+        working-directory: web/dashboard
+        run: npm ci
+
+      - name: Write Cloudinary .env from secrets
+        working-directory: web/invitation
+        run: |
+          cat > .env <<'EOF'
+          CLOUDINARY_URL=cloudinary://${{ secrets.CLOUDINARY_API_KEY }}:${{ secrets.CLOUDINARY_API_SECRET }}@${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
+          EOF
+
+      - name: Build invitation + dashboard (build:all)
+        run: npm run build:all
+
+      - name: Deploy development
+        uses: FirebaseExtended/action-hosting-deploy@v0
+
+        with:
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BODA_500805 }}
+          projectId: boda-500805
+          target: invitation-primary
+          channelId: live
+
+  deploy-functions:
+    if: >-
+      (github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop')) ||
+      (github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Use Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+
+      - name: Install functions dependencies
+        working-directory: functions
+        run: npm ci
+
+      - name: Deploy Cloud Functions
+        working-directory: functions
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "$FIREBASE_TOKEN" ]; then
+            echo "::error::Missing FIREBASE_TOKEN secret. Run 'firebase login:ci' locally and store the token as the FIREBASE_TOKEN repository secret."
+            exit 1
+          fi
+          # Deploy all functions. The Gmail + Telegram secrets are read from
+          # Secret Manager at runtime via defineSecret, so no env vars are
+          # needed here — they must exist in Secret Manager for the project.
+          npx firebase-tools deploy --only functions --token "$FIREBASE_TOKEN" --project boda-500805
+
+  deploy-production:
+    if: >-
+      (github.event_name == 'push' && github.ref == 'refs/heads/master') ||
+      (github.event_name == 'workflow_dispatch' && inputs.environment == 'production')
+    environment:
+      name: production
+      url: https://boda-david-y-ayde.web.app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Use Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: web/invitation/package-lock.json
+
+      - name: Install invitation dependencies
+        working-directory: web/invitation
+        run: npm ci
+
+      - name: Install dashboard dependencies
+        working-directory: web/dashboard
+        run: npm ci
+
+      - name: Write Cloudinary .env from secrets
+        working-directory: web/invitation
+        run: |
+          cat > .env <<'EOF'
+          CLOUDINARY_URL=cloudinary://${{ secrets.CLOUDINARY_API_KEY }}:${{ secrets.CLOUDINARY_API_SECRET }}@${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }}
+          EOF
+
+      - name: Build invitation + dashboard (build:all)
+        run: npm run build:all
+
+      - name: Deploy production
+        uses: FirebaseExtended/action-hosting-deploy@v0
+
+        with:
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BODA_500805 }}
+          projectId: boda-500805
+          target: invitation-named
+          channelId: live
+
+      # Deploy the invitation-emails Google Apps Script to the live project.
+      # clasp authenticates via the CLASPRC_JSON secret (the contents of the
+      # local ~/.clasprc.json produced by `clasp login`). We push the code and
+      # create a new versioned deployment so the live onEdit trigger runs the
+      # latest email logic.
+      #
+      # The script reads the guest's email language from the sheet `lang`
+      # column only — it no longer talks to Firestore, so there is no
+      # service-account key to inject.
+      - name: Deploy invitation-emails Apps Script (clasp)
+        working-directory: integraciones/google_sheets
+        env:
+          CLASPRC_JSON: ${{ secrets.CLASPRC_JSON }}
+        run: |
+          set -euo pipefail
+          # Restore clasp credentials from the secret.
+          if [ -z "$CLASPRC_JSON" ]; then
+            echo "::error::Missing CLASPRC_JSON secret. Run 'clasp login' locally and store the contents of ~/.clasprc.json as the CLASPRC_JSON repository secret."
+            exit 1
+          fi
+          printf '%s' "$CLASPRC_JSON" > "$HOME/.clasprc.json"
+          chmod 600 "$HOME/.clasprc.json"
+
+          # Install clasp (pinned) and deploy.
+          npm install --no-save @google/clasp@3.2.0 >/dev/null 2>&1
+          npx clasp push --force
+          npx clasp deploy --description "Deploy from GitHub Actions (${{ github.sha }})"
+
+
+
+      - name: Notify Telegram on production deploy
+        if: always()
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          DEPLOY_STATUS: ${{ job.status }}
+          ACTOR: ${{ github.actor }}
+          REF: ${{ github.ref_name }}
+          SHA: ${{ github.sha }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
+          DESCRIPTION: ${{ github.event.inputs.description }}
+        run: |
+          # Escape Telegram MarkdownV2 special characters in dynamic content.
+          esc() { printf '%s' "$1" | sed 's/[\\_*[\]()~`>#+\-=|{}.!]/\\&/g'; }
+
+          STATUS_ICON="✅"
+          STATUS_TEXT="réussi"
+          if [ "$DEPLOY_STATUS" != "success" ]; then
+            STATUS_ICON="❌"
+            STATUS_TEXT="échoué"
+          fi
+
+          # Build the description block. For PR-triggered deploys (or a manual
+          # workflow_dispatch with a "description" input) we include the full
+          # markdown description as CLEAR TEXT inside a preformatted block, so
+          # the markdown reads as-is instead of being mangled by MarkdownV2
+          # escaping. For direct pushes we fall back to the commit message.
+          if [ -n "$DESCRIPTION" ]; then
+            DESC="$DESCRIPTION"
+          elif [ -n "$PR_BODY" ]; then
+            DESC="$PR_BODY"
+          else
+            DESC="${COMMIT_MSG:-Déploiement direct}"
+          fi
+
+          # Guard against a description that itself contains a closing fence.
+          DESC="$(printf '%s' "$DESC" | sed 's/```/` ` `/g')"
+
+          MESSAGE="🚀 *Déploiement production ${STATUS_TEXT}* ${STATUS_ICON}
+          *Branche :* $(esc "$REF")
+          *Commit :* $(esc "$SHA")
+          *Par :* $(esc "$ACTOR")
+          *Description :*
+          \`\`\`markdown
+          ${DESC}
+          \`\`\`
+          [Voir le run]($(esc "$RUN_URL"))"
+
+          curl -sS -X POST "https://api.telegram.org/bot${TELEGRAM_TOKEN}/sendMessage" \
+            -d chat_id="${TELEGRAM_CHAT_ID}" \
+            --data-urlencode "text=${MESSAGE}" \
+            -d parse_mode="MarkdownV2" \
+            -d disable_web_page_preview="true" \
+            > /dev/null
+

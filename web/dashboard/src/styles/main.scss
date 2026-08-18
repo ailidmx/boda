@@ -1,0 +1,18 @@
+// ── Dashboard main stylesheet ───────────────────────────────────────────
+// Entry point: imports all partials in dependency order.
+// Import this file from your JS entry point (e.g. main.jsx).
+
+@use "tokens";
+@use "base";
+@use "login";
+@use "layout";
+@use "buttons";
+@use "tabs";
+@use "guests";
+@use "groups";
+@use "cabins";
+@use "tables";
+@use "modal";
+@use "thanks";
+@use "toast";
+@use "responsive";
