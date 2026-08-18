@@ -45,11 +45,6 @@ export function Guisos() {
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
 
-  // Spice-note modal state (the "À propos du piquant" note opens in a modal
-  // triggered by a floating action button instead of inline content).
-  const [spiceOpen, setSpiceOpen] = useState(false);
-
-
   // The guest's own star ratings, keyed by dish name (used for the pre-order).
   const [myRatings, setMyRatings] = useState({});
   // Whether the guest has manually reordered (drag/arrows) since opening.
@@ -262,6 +257,14 @@ export function Guisos() {
         <p className="accommodation-citation">{guisos.body}</p>
       </div>
 
+      {/* Important notice about the chilli — shown inline before the dish cards
+          on every screen so guests know most stews are not spicy. */}
+      {guisos.spiceNote && (
+        <p className="guisos-spice-note reveal" role="note">
+          {guisos.spiceNote}
+        </p>
+      )}
+
       <SwipeCardCarousel className="guisos-grid" label={guisos.flavoursTitle}>
         {dishes.map((dish, index) => (
           <article className="flavour-card reveal" key={index}>
@@ -290,47 +293,6 @@ export function Guisos() {
       </SwipeCardCarousel>
 
       <p className="experience-note reveal">{guisos.note}</p>
-
-      {/* Floating action button that opens the spice-note modal */}
-      {guisos.spiceNote && guisos.spiceButton && (
-        <button
-          type="button"
-          className="guisos-spice-fab"
-          onClick={() => setSpiceOpen(true)}
-          aria-haspopup="dialog"
-          data-analytics="fab.guisos.spice"
-        >
-
-          <span className="guisos-spice-fab__icon" aria-hidden="true">🌶️</span>
-          <span className="guisos-spice-fab__label">{guisos.spiceButton}</span>
-        </button>
-      )}
-
-      {/* Spice-note modal */}
-      {spiceOpen && (
-        <div
-          className="guisos-spice-modal"
-          role="dialog"
-          aria-modal="true"
-          aria-label={guisos.spiceButton}
-          onClick={(e) => {
-            if (e.target === e.currentTarget) setSpiceOpen(false);
-          }}
-        >
-          <div className="guisos-spice-modal__card">
-            <button
-              type="button"
-              className="guisos-spice-modal__close"
-              onClick={() => setSpiceOpen(false)}
-              aria-label={guisos.spiceClose}
-            >
-              ×
-            </button>
-            <p className="guisos-spice-modal__text">{guisos.spiceNote}</p>
-          </div>
-        </div>
-      )}
-
 
       {/* Reorder panel */}
       {guestId && (

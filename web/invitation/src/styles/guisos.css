@@ -56,84 +56,30 @@
   z-index: 1;
 }
 
-/* Floating action button that opens the spice-note modal. Keeps the section
-   clean while still letting curious guests read the "À propos du piquant"
-   note on demand. */
-.guisos-spice-fab {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+/* Important notice about the chilli — an inline callout shown before the dish
+   cards on every screen (desktop and mobile) so guests know most stews are not
+   spicy. Uses the section's warm, festive palette (gold + terracotta accents). */
+.guisos-spice-note {
+  max-width: 46rem;
   margin: 1.4rem auto 0;
-  padding: 0.7rem 1.3rem;
-  font: inherit;
-  font-weight: 600;
-  color: var(--ink, #2b2418);
-  background: rgb(255 253 248 / 85%);
-  border: 1px solid rgb(198 139 43 / 35%);
-  border-radius: 999px;
-  cursor: pointer;
-  box-shadow: 0 4px 14px rgb(198 139 43 / 18%);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-.guisos-spice-fab:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgb(198 139 43 / 28%);
-}
-.guisos-spice-fab__icon {
-  font-size: 1.1rem;
-  line-height: 1;
-}
-
-/* Spice-note modal — a centred dialog that overlays the section. */
-.guisos-spice-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.2rem;
-  background: rgb(20 16 10 / 55%);
-  backdrop-filter: blur(3px);
-  animation: guisos-fade-in 0.18s ease;
-}
-.guisos-spice-modal__card {
-  position: relative;
-  max-width: 30rem;
-  width: 100%;
-  padding: 1.6rem 1.4rem;
-  border: 1px solid rgb(198 139 43 / 35%);
-  border-radius: 1rem;
-  background: var(--cream, #fffdf8);
-  box-shadow: 0 18px 50px rgb(20 16 10 / 35%);
+  padding: 1rem 1.2rem;
+  font-size: 0.98rem;
+  line-height: 1.55;
   text-align: center;
-}
-.guisos-spice-modal__close {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.6rem;
-  width: 2rem;
-  height: 2rem;
-  font-size: 1.4rem;
-  line-height: 1;
   color: var(--ink, #2b2418);
-  background: transparent;
-  border: none;
-  border-radius: 50%;
-  cursor: pointer;
+  background: rgb(255 253 248 / 88%);
+  border: 1px solid rgb(198 139 43 / 40%);
+  border-left: 4px solid var(--terracotta, #a94d31);
+  border-radius: 0.75rem;
+  box-shadow: 0 6px 18px rgb(198 139 43 / 14%);
 }
-.guisos-spice-modal__close:hover {
-  background: rgb(198 139 43 / 15%);
-}
-.guisos-spice-modal__text {
-  margin: 0;
-  font-style: normal;
-  color: var(--ink, #2b2418);
-}
-
-@keyframes guisos-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+@media (max-width: 640px) {
+  .guisos-spice-note {
+    margin-top: 1.1rem;
+    padding: 0.9rem 1rem;
+    font-size: 0.92rem;
+    text-align: left;
+  }
 }
 
 
