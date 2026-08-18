@@ -588,6 +588,32 @@ or behavioral trade-off):**
 
 See ADR-0018.
 
+### F9 progress — testing (evaluated, deferred)
+
+Phase F9 ("Testing") proposed "component + feature tests for reusable primitives and
+critical flows." The current test setup uses Node's built-in `node --test` runner with
+pure `.mjs` unit tests — there is NO jsdom and NO React Testing Library configured. The
+existing suite already covers the pure logic extracted during this refactor:
+
+- `tests/button.test.mjs` — the shared `Button` primitive (class mapping, `as`, `disabled`,
+  `loading`, aria).
+- `tests/dialog.test.mjs` — the shared `Dialog` primitive (behavior defaults, class
+  composition).
+- `tests/guest-profiles.test.mjs` — the extracted guest-profiles domain service.
+- `tests/auth-logic.test.mjs` — the extracted auth/login logic service.
+- `tests/validation.test.mjs` — shared validation.
+- `tests/song-search.test.mjs` — the song-search service.
+- `tests/firestore.rules.test.mjs` — Firestore rules (emulator).
+
+All JSX-free, Firebase-free logic is already unit-tested. Component-level rendering tests
+(mount a React component, assert on the DOM) would require a new test harness (jsdom +
+React Testing Library), which introduces new infrastructure and dependencies that the
+AGENTS.md §7.8 rule ("do not introduce dependencies unnecessarily") and the "smallest
+coherent system" principle discourage for a structural refactor. The phase was therefore
+**intentionally deferred** — a component-test harness should be introduced only when a
+critical user flow needs regression protection that pure-logic tests cannot provide, as
+its own scoped infrastructure change. See ADR-0019.
+
 ### F10 progress — dead-code & duplication cleanup (in progress)
 
 - **Dashboard legacy-records code removed** — the dashboard no longer loads or renders
