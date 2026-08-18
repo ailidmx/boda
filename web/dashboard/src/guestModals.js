@@ -178,7 +178,18 @@ export function openSendInviteModal(guest, channel, ctx) {
       const functions = getFunctions();
       const sendInvitation = httpsCallable(functions, "sendInvitation");
       const result = await sendInvitation({ guestId: guest.id, channel: ch });
-      status.textContent = `✅ ${result.data?.message || "Enviado."}`;
+      const data = result.data || {};
+
+      // For WhatsApp, the function returns a `waLink` (a wa.me deep link that
+      // opens the guest's chat with the invitation message pre-filled). Open it
+      // in a new tab so the admin reviews and sends it themselves in WhatsApp —
+      // nothing is auto-sent. The status reflects that WhatsApp was opened.
+      if (ch === "whatsapp" && data.waLink) {
+        window.open(data.waLink, "_blank", "noopener,noreferrer");
+        status.textContent = "✅ WhatsApp abierto — revisa y envía el mensaje.";
+      } else {
+        status.textContent = `✅ ${data.message || "Enviado."}`;
+      }
       status.dataset.state = "success";
       // Mark the guest as invited so the "Enviada" checkbox reflects it.
       await saveGuestInline(guest.id, "invitationSent", true);
@@ -189,6 +200,7 @@ export function openSendInviteModal(guest, channel, ctx) {
       status.dataset.state = "error";
     }
   };
+
 
 
   overlay.querySelector("[data-send-whatsapp]").addEventListener("click", () => run("whatsapp"));

@@ -325,55 +325,47 @@
 
 .thanks-credits-stage {
   position: relative;
-  height: clamp(24rem, 62vh, 40rem);
+  /* Much taller than before so the guest can comfortably scroll through the
+     thanks messages by hand. */
+  height: clamp(32rem, 80vh, 54rem);
   margin: clamp(3rem, 6vw, 5rem) auto 0;
   max-width: 34rem;
-  overflow: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgb(255 255 255 / 30%) transparent;
   -webkit-mask-image: linear-gradient(
     to bottom,
     transparent 0%,
-    #000 12%,
-    #000 88%,
+    #000 10%,
+    #000 90%,
     transparent 100%
   );
   mask-image: linear-gradient(
     to bottom,
     transparent 0%,
-    #000 12%,
-    #000 88%,
+    #000 10%,
+    #000 90%,
     transparent 100%
   );
 }
 
-/* The roll is a flex column of two identical lists; translating -50% then
-   loops seamlessly because each list occupies exactly half the roll. No
-   perspective / tilt — a simple infinite vertical scroll. */
-.thanks-credits-roll {
-  display: flex;
-  flex-direction: column;
-  animation: thanks-credits-roll 60s linear infinite;
-  will-change: transform;
+.thanks-credits-stage::-webkit-scrollbar {
+  width: 0.5rem;
 }
 
-.thanks-credits-stage.is-paused .thanks-credits-roll {
-  animation-play-state: paused;
+.thanks-credits-stage::-webkit-scrollbar-thumb {
+  background: rgb(255 255 255 / 30%);
+  border-radius: 999px;
 }
 
-@keyframes thanks-credits-roll {
-  from {
-    transform: translateY(0);
-  }
-  to {
-    transform: translateY(-50%);
-  }
-}
-
+/* The credits list is a plain vertical list inside a manually scrollable
+   stage — no auto-scroll animation, so the guest controls the pace. */
 .thanks-credits {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  flex: 0 0 auto;
 }
 
 .thanks-credit {
@@ -673,7 +665,7 @@
   }
 
   .thanks-credits-stage {
-    height: clamp(20rem, 58vh, 30rem);
+    height: clamp(26rem, 72vh, 40rem);
   }
 
   .thanks-avatar {

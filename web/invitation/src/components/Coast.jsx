@@ -245,6 +245,19 @@ export function Coast() {
     }
   };
 
+  // Runs before the card advances forward. When leaving the LAST question step
+  // (i.e. entering the recap), persist the answers automatically so the guest
+  // never reaches the recap thinking they saved when they didn't. Always
+  // returns true so the recap is shown with the save result (working/saved/
+  // error) in its reserved message area.
+  const handleBeforeNext = async (currentIndex) => {
+    if (currentIndex === questions.length - 1) {
+      await handleSaveAnswers();
+    }
+    return true;
+  };
+
+
   const saveStatusText =
     saveStatus === "working"
       ? interfaceText.submitWorking
@@ -434,8 +447,25 @@ export function Coast() {
                     >
                       {rsvpMini.modifyButton}
                     </Button>
-                    {saveStatusText && <small>{saveStatusText}</small>}
+                    {/* Dedicated, always-present save-status placeholder.
+                        It reserves space and announces the result
+                        (working / saved / error) via aria-live so the guest
+                        always sees the outcome of the save. */}
+                    <p
+                      className={`rsvp-status${
+                        saveStatus === "saved"
+                          ? " rsvp-status--success"
+                          : saveStatus === "error"
+                            ? " rsvp-status--error"
+                            : ""
+                      }`}
+                      role="status"
+                      aria-live="polite"
+                    >
+                      {saveStatusText}
+                    </p>
                   </div>
+
                 </div>
               ),
             },
@@ -444,24 +474,25 @@ export function Coast() {
           onNavigate={handleNavigate}
           hideBackOnLast
           hideNextOn={[questions.length - 1]}
+          onBeforeNext={handleBeforeNext}
           navRight={({ index, next }) => {
             // On the last question step, replace the "Next" button with the
             // gold "Save my responses" CTA, on the same line as Back.
+            // Clicking it advances to the recap; `onBeforeNext` persists the
+            // answers first and the result shows in the recap.
             if (index !== questions.length - 1) return null;
             return (
               <button
                 className="flip-step-btn flip-step-btn--primary"
                 type="button"
-                onClick={async () => {
-                  await handleSaveAnswers();
-                  next();
-                }}
+                onClick={() => next()}
                 disabled={saveStatus === "working"}
               >
                 {rsvpMini.button}
               </button>
             );
           }}
+
           copy={{
             step: interfaceText.stepLabel || "Step",
             next: interfaceText.next || "Next",

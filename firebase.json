@@ -163,7 +163,7 @@
 
   "functions": {
     "source": "functions",
-    "runtime": "nodejs20"
+    "runtime": "nodejs22"
   },
   "firestore": {
     "database": "boda-us-central1",
