@@ -1,31 +1,10 @@
-/* ── Base: tokens, reset, global layout, shared primitives ───────────── */
+/* ── Base: reset, global layout, shared primitives ─────────────────────
+   Design tokens (colors, fonts, breakpoints, spacing, fluid type) live in
+   `tokens.css` — the single source of truth. This file only defines the
+   layout tokens specific to the base shell (countdown + header heights),
+   which are not part of the shared token system. */
 
 :root {
-  --ink: #241921;
-  --ink-700: #4c464f;
-  --ink-600: #625b66;
-  --ink-500: #7a7280;
-  --cream: #f4eee4;
-  --sand: #d9cfae;
-  --terracotta: #a94d31;
-  --marigold: #c68b2b;
-  --sage: #7a8b7a;
-  --deep-green: #293b35;
-  --white: #fffdf8;
-  --font-display: "Fraunces", "Iowan Old Style", Georgia, serif;
-  --font-body: "Montserrat", "Avenir Next", system-ui, -apple-system, sans-serif;
-  --font-hero: "Fraunces", "Iowan Old Style", Georgia, serif;
-  --font-calligraphy: "Ballet", "Fraunces", "Iowan Old Style", Georgia, serif;
-  --font-countdown: "IBM Plex Mono", "Montserrat", "Avenir Next", system-ui, -apple-system, sans-serif;
-  --font-grid: "Bitcount Grid Single", "Montserrat", system-ui, sans-serif;
-
-
-
-
-
-
-
-
   --countdown-height: 3.2rem;
   --header-height: 5rem;
 }

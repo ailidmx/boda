@@ -27,10 +27,11 @@ This audit covers the two React applications in this monorepo:
 ### Styling approach
 - **Invitation**: plain CSS files co-located in `web/invitation/src/styles/`, one per
   section/component (e.g. `hero.css`, `rsvp.css`). Two token files:
-  - `base.css` — `:root` color + font tokens, reset, global layout, and the shared
-    `.button` primitive system (`.button`, `.button-dark`, `.button-light`,
-    `.button-ghost`, `.button-small`).
-  - `tokens.css` — breakpoints, spacing scale, fluid type ramp (CSS custom properties).
+  - `tokens.css` — the SINGLE source of truth for design tokens: colors, fonts,
+    breakpoints, spacing scale, and fluid type ramp (CSS custom properties).
+  - `base.css` — reset, global layout, the shared `.button` primitive system
+    (`.button`, `.button-dark`, `.button-light`, `.button-ghost`, `.button-small`), and
+    the two base-shell layout tokens (`--countdown-height`, `--header-height`).
   - `responsive.css` — cross-cutting shared layout (`.section`, `.section-heading`, grids).
   - `story-bg.css` — animated background effects used by most sections.
 - **Dashboard**: SCSS in `web/dashboard/src/styles/`, compiled via `main.scss` which
@@ -350,7 +351,15 @@ The second F2 step is landed: a shared `Dialog` UI primitive for the invitation.
 - `web/invitation/tests/dialog.test.mjs` — unit tests for the behavior defaults and class
   composition. Wired into `npm test` via `test:dialog`.
 
-Remaining F2 work: consolidate design tokens. Do NOT redesign visuals — preserve appearance.
+The final F2 step is landed: **design tokens consolidated into a single source of truth.**
+
+- `web/invitation/src/styles/tokens.css` is now the ONLY home for the invitation's design
+  tokens (colors, fonts, breakpoints, spacing, fluid type). The duplicated color/font
+  tokens that previously lived in `styles/base.css`'s `:root` block were removed; `base.css`
+  now defines only the two layout tokens specific to the base shell (`--countdown-height`,
+  `--header-height`). Since `tokens.css` is imported before `base.css` and the values were
+  identical, appearance is preserved exactly (the built CSS output is byte-identical in
+  size). See ADR-0013.
 
 **F2 primitive evaluation (deferred — no genuine reuse):** The remaining primitives
 listed in the original audit (Input, Spinner, EmptyState, Badge) were evaluated against
