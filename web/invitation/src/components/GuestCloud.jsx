@@ -1,7 +1,21 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { getActiveGuests } from "../guests.js";
 import { resolveGuestName, resolveGuestPhoto } from "../guest-profiles.js";
+import { resolveRsvpAnswer } from "../rsvp-responses.js";
 import { useApp } from "../context/AppContext.jsx";
+
+// A guest counts as "confirmed" for an attendance day when their RSVP scale
+// level for that day is ≥ 4 (mirrors the dashboard's RSVP_CONFIRMED_MIN_LEVEL).
+const RSVP_CONFIRMED_MIN_LEVEL = 4;
+const SATURDAY_QUESTION = "saturday";
+
+// Attendance filter for the guest cloud: "all" shows every guest (including
+// those who said no), "saturday" shows only guests confirmed for Saturday.
+const FILTER_MODES = {
+  all: "all",
+  saturday: "saturday",
+};
+
 
 // A small palette of warm, festive tones that echo the wedding's Mexican
 // aesthetic (terracotta, marigold, sand, ink, olive).
@@ -77,9 +91,26 @@ export function GuestCloud() {
   const { t } = useApp();
   const cloud = t.thanks?.guestCloud || {};
   const [nameMode, setNameMode] = useState(NAME_MODES.full);
+  // Attendance filter: "all" (everyone, incl. those who said no) or
+  // "saturday" (only guests confirmed for Saturday). Defaults to "all" so the
+  // cloud shows every guest by default.
+  const [filterMode, setFilterMode] = useState(FILTER_MODES.all);
+
+  // Apply the attendance filter to the full guest list. In "saturday" mode we
+  // keep only guests whose Saturday RSVP scale level is ≥ the confirmed
+  // threshold (level 4+). Guests who haven't answered are excluded in that
+  // mode (they are not confirmed).
+  const filteredGuests = useMemo(() => {
+    const all = getActiveGuests();
+    if (filterMode === FILTER_MODES.all) return all;
+    return all.filter(
+      (guest) =>
+        resolveRsvpAnswer(guest, SATURDAY_QUESTION) >= RSVP_CONFIRMED_MIN_LEVEL,
+    );
+  }, [filterMode]);
 
   const tags = useMemo(() => {
-    const guests = shuffle(getActiveGuests());
+    const guests = shuffle(filteredGuests);
     return guests
       .map((guest) => {
         const name = resolveCloudName(guest, nameMode).trim();
@@ -99,12 +130,12 @@ export function GuestCloud() {
         };
       })
       .filter(Boolean);
-  }, [nameMode]);
+  }, [nameMode, filteredGuests]);
 
   // ── Avatar carousel ─────────────────────────────────────────────────────
   // Collect every guest that has an uploaded avatar photo (Cloudinary id).
   const avatars = useMemo(() => {
-    const guests = shuffle(getActiveGuests());
+    const guests = shuffle(filteredGuests);
     return guests
       .map((guest) => {
         const photo = resolveGuestPhoto(guest);
@@ -114,7 +145,8 @@ export function GuestCloud() {
         return { id: guest.id, photo, name: name || "Invitado" };
       })
       .filter(Boolean);
-  }, []);
+  }, [filteredGuests]);
+
 
   const viewportRef = useRef(null);
   // True while the guest is actively dragging the carousel (pointer down).
@@ -244,7 +276,29 @@ export function GuestCloud() {
           </button>
         </div>
 
+        <div
+          className="guest-cloud-filter"
+          role="group"
+          aria-label={cloud.filterGroupLabel || "Filter by attendance"}
+        >
+          <button
+            type="button"
+            className={`guest-cloud-filter__btn${filterMode === FILTER_MODES.all ? " is-active" : ""}`}
+            onClick={() => setFilterMode(FILTER_MODES.all)}
+          >
+            {cloud.filterAll || "Todos los invitados"}
+          </button>
+          <button
+            type="button"
+            className={`guest-cloud-filter__btn${filterMode === FILTER_MODES.saturday ? " is-active" : ""}`}
+            onClick={() => setFilterMode(FILTER_MODES.saturday)}
+          >
+            {cloud.filterSaturday || "Solo los que vienen el sábado"}
+          </button>
+        </div>
+
         <div className="guest-cloud" aria-label={cloud.title}>
+
           {tags.map((tag) => (
             <span
               key={tag.id}

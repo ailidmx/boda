@@ -280,9 +280,10 @@ export function StayPlanCard({
             />
           </div>
         )}
-        {groupMembers.length > 0 && groupTotal > 0 && (
+        {groupMembers.length > 1 && groupTotal > 0 && (
           <div>
             <dt>{option.groupPriceLabel}</dt>
+
             <AccommodationPrice
               original={groupTotal}
               toPay={priceToPay}

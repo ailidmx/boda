@@ -1,121 +1,9 @@
-/* ── Photos section (merged: "Notre chemin" gallery + upload) ─────────── */
+/* ── Photos section (contrast-safe) ───────────────────────────────────── */
 
 .photos-section {
   background: var(--white);
   color: var(--ink);
 }
-
-/* The gallery block keeps the dark ink background of the former gallery
-   section, while the upload block below sits on white. It stays within the
-   usual section width limits (no full-width bleed). */
-.photos-gallery-block {
-  background: var(--ink);
-  color: var(--white);
-  padding: clamp(3rem, 6vw, 5rem) clamp(1.25rem, 6vw, 6rem);
-  border-radius: 1.25rem;
-}
-
-.photos-gallery-block .gallery-heading.section-heading {
-  border-bottom-color: rgb(255 253 248 / 22%);
-}
-
-.photos-gallery-block .gallery-heading .eyebrow {
-  margin-bottom: 1rem;
-}
-
-.photos-gallery-block .gallery-heading h2 {
-  margin: 0 0 1.5rem;
-}
-
-.photos-gallery-block .gallery-heading p:last-child {
-  max-width: 60rem;
-  margin: 0;
-  color: rgb(255 253 248 / 72%);
-}
-
-/* The gallery intro is a citation (blockquote): a large display quote with a
-   golden left rule and quotation marks, echoing the travel citation. */
-.gallery-lead-citation {
-  position: relative;
-  margin: 0;
-  max-width: 60rem;
-  padding: 0.25rem 0 0.25rem 1.75rem;
-  border-left: 3px solid var(--marigold);
-  font-family: var(--font-display);
-  font-size: clamp(1.15rem, 2.2vw, 1.6rem);
-  line-height: 1.5;
-  color: #f3e6c8;
-}
-
-.gallery-lead-citation::before {
-  content: "“";
-  position: absolute;
-  top: -0.55em;
-  left: 0.35rem;
-  font-family: var(--font-display);
-  font-size: 2.6em;
-  line-height: 1;
-  color: var(--marigold);
-  opacity: 0.55;
-  pointer-events: none;
-}
-
-.photo-gallery {
-
-  display: grid;
-  grid-auto-columns: calc((100% - 3 * 0.75rem) / 4);
-  grid-auto-flow: column;
-  gap: 0.75rem;
-  overflow-x: auto;
-  padding-bottom: 1.25rem;
-
-  scroll-snap-type: x mandatory;
-  scrollbar-color: var(--terracotta) rgb(255 253 248 / 22%);
-  scrollbar-width: thin;
-}
-
-.gallery-item {
-  position: relative;
-  display: block;
-  overflow: hidden;
-  border-radius: 0.35rem;
-  background: rgb(0 0 0 / 30%);
-  aspect-ratio: 1;
-  scroll-snap-align: start;
-}
-
-/* Medium screens: 3 cards per row */
-@media (max-width: 1024px) {
-  .photo-gallery {
-    grid-auto-columns: calc((100% - 2 * 0.75rem) / 3);
-  }
-}
-
-/* Mobile: 1 card per row */
-@media (max-width: 640px) {
-  .photo-gallery {
-    grid-auto-columns: 100%;
-  }
-}
-
-.gallery-item img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 700ms ease;
-}
-
-.gallery-item:hover img {
-  transform: scale(1.04);
-}
-
-/* ── Upload block (light) ──────────────────────────────────────────────── */
-.photos-upload-block {
-  padding-top: clamp(3rem, 6vw, 5rem);
-  border-top: 1px solid rgb(36 33 25 / 14%);
-}
-
 
 .photos-heading h2 {
   margin: 0;
@@ -126,52 +14,10 @@
   color: rgb(36 33 25 / 92%);
 }
 
-/* The intro line is presented as a citation, echoing the guest-cloud
-   subtitle style: a marigold rule, display serif and an opening quote. */
-.photos-heading .lead.photos-lead-citation {
-  position: relative;
-  max-width: 34rem;
-  margin: 1.5rem auto 0;
-  padding-left: 1.5rem;
-  border-left: 2px solid var(--marigold);
-  font-family: var(--font-display);
-  font-size: clamp(1.25rem, 2.4vw, 1.8rem);
-  font-style: italic;
-  font-weight: 400;
-  line-height: 1.5;
-  color: var(--ink);
-  text-align: left;
-}
-
-.photos-heading .lead.photos-lead-citation::before {
-  content: "“";
-  position: absolute;
-  top: -0.35em;
-  left: -0.15rem;
-  font-family: var(--font-display);
-  font-size: 3.5em;
-  line-height: 1;
-  color: var(--marigold);
-  opacity: 0.35;
-}
-
-/* Two photo-gallery cards (before / after), each with its own upload
-   button. Side by side on wide screens, stacked on mobile. */
-.photos-cards {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1.4rem;
-  margin-top: 1.4rem;
-}
-
 .photos-before,
 .photos-during {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.9rem;
-  margin-top: 0;
-  padding: 1.4rem 1.4rem 1.6rem;
+  margin-top: 1.4rem;
+  padding: 1rem 1.1rem;
   border: 1px solid rgb(36 33 25 / 14%);
   border-radius: 0.8rem;
   background: rgb(255 253 248 / 95%);
@@ -179,7 +25,7 @@
 
 .photos-before h3,
 .photos-during h3 {
-  margin: 0;
+  margin: 0 0 0.45rem;
   color: var(--ink);
 }
 
@@ -190,75 +36,30 @@
   color: rgb(36 33 25 / 88%);
 }
 
-/* Radiant photo flash: a soft, animated sparkle that sweeps across the card
-   like light catching a lens. A diagonal sheen plus a few twinkling dots
-   give the "photo flash" feel without distracting from the content. */
-.photos-before,
-.photos-during {
-  position: relative;
-  isolation: isolate;
-  overflow: hidden;
+.photos-upload {
+  margin-top: 1.4rem;
 }
-
-.photos-before::before,
-.photos-during::before {
-  position: absolute;
-  z-index: 0;
-  inset: 0;
-  background:
-    radial-gradient(120% 120% at 100% 0%, rgb(228 185 104 / 22%), transparent 55%),
-    linear-gradient(115deg, transparent 30%, rgb(255 255 255 / 55%) 46%, transparent 62%);
-  content: "";
-  pointer-events: none;
-  animation: photos-flash 5.5s ease-in-out infinite;
-}
-
-.photos-before::after,
-.photos-during::after {
-  position: absolute;
-  z-index: 0;
-  top: 18%;
-  right: 14%;
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow:
-    0 0 0.6rem 0.15rem rgb(255 255 255 / 85%),
-    2.6rem 1.4rem 0 -0.05rem rgb(255 255 255 / 70%),
-    -1.8rem 2.2rem 0 -0.08rem rgb(255 255 255 / 55%);
-  content: "";
-  pointer-events: none;
-  animation: photos-sparkle 4s ease-in-out infinite;
-}
-
-@keyframes photos-flash {
-  0%, 100% { opacity: 0.35; transform: translateX(-8%); }
-  50%      { opacity: 0.9;  transform: translateX(8%); }
-}
-
-@keyframes photos-sparkle {
-  0%, 100% { opacity: 0.4; transform: scale(0.8); }
-  50%      { opacity: 1;   transform: scale(1.15); }
-}
-
-.photos-before > *,
-.photos-during > * {
-  position: relative;
-  z-index: 1;
-}
-
-.photos-upload-btn {
-  margin-top: auto;
-}
-
 
 .photos-note {
   margin-top: 1rem;
 }
 
-@media (max-width: 640px) {
-  .photos-cards {
-    grid-template-columns: 1fr;
-  }
+/* The "after the wedding" album is locked until the wedding date passes.
+   The card is dimmed, the button becomes a non-interactive placeholder and a
+   short note explains when it will open. */
+.photos-during.is-locked {
+  background: rgb(255 253 248 / 60%);
 }
+
+.photos-upload-btn--disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  filter: grayscale(0.4);
+}
+
+.photos-locked-note {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: rgb(36 33 25 / 62%);
+}
+

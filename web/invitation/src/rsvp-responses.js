@@ -19,10 +19,13 @@ import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 import { db } from "./firebase.js";
 import { collections } from "../../shared/firestore-paths.js";
-import { resolveGuestInvitationGroup, resolveLiveGuest } from "./guest-profiles.js";
-import { buildGuestRsvpPayload } from "../../shared/payload-builders.js";
+import { getGroupMembers, resolveGuestInvitationGroup, resolveLiveGuest } from "./guest-profiles.js";
+import { getActiveGuests } from "./guests.js";
+
+import { buildGuestPaymentConfirmedPayload, buildGuestRsvpPayload } from "../../shared/payload-builders.js";
 import { validateGuestContactPayload } from "../../shared/validation.js";
 import { UNANSWERED_LEVEL } from "./rsvp-scale.js";
+
 
 function logDb(event, detail) {
   console.log(`[db][rsvp-responses][${event}]`, detail);
@@ -180,3 +183,58 @@ export async function saveRsvpAnswers(guest, answers, editorGuestId) {
     throw error;
   }
 }
+
+/**
+ * Confirm that the signed-in guest's invitation group has paid their
+ * accommodation contribution.
+ *
+ * Writes the top-level boolean `paymentConfirmed: true` to the `guests`
+ * document of the signed-in guest AND of every other member of their
+ * invitation group (the same group scope the RSVP answers use). The Firestore
+ * rules allow any authenticated guest to update this field on themselves and
+ * on the other members of their invitation group, so no explicit field
+ * declaration is needed in the rules.
+ *
+ * @param {Object} guest  the signed-in guest (from guests.js)
+ * @param {string} editorGuestId  the signed-in guest id performing the action
+ * @returns {Promise<void>}
+ */
+export async function savePaymentConfirmed(guest, editorGuestId) {
+  if (!guest?.id) throw new Error("No guest id");
+
+  const groupMembers = guest
+    ? getGroupMembers(guest, getActiveGuests())
+    : [guest];
+  const targets = groupMembers.length > 0 ? groupMembers : [guest];
+
+  const timestamp = serverTimestamp();
+
+  await Promise.all(
+    targets.map(async (member) => {
+      if (!member?.id) return;
+      const ref = doc(db, collections.guests, member.id);
+      const next = buildGuestPaymentConfirmedPayload({
+        guestId: member.id,
+        confirmed: true,
+        editorGuestId,
+        timestamp,
+      });
+
+      // Runtime validation mirrors the Firestore rules.
+      const result = validateGuestContactPayload(next);
+      if (!result.valid) {
+        throw new Error(`Invalid payment-confirmation payload: ${result.errors.join("; ")}`);
+      }
+
+      logDb("write:start", { collection: collections.guests, docId: member.id, op: "setDoc", merge: true, payload: next });
+      try {
+        await setDoc(ref, next, { merge: true });
+        logDb("write:success", { collection: collections.guests, docId: member.id, op: "setDoc", merge: true, payload: next });
+      } catch (error) {
+        logDb("write:error", { collection: collections.guests, docId: member.id, op: "setDoc", merge: true, payload: next, error: error.message });
+        throw error;
+      }
+    })
+  );
+}
+

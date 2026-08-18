@@ -736,6 +736,26 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   in an API call. **Also ensure the Gmail API is enabled in the project** — if it
   isn't, `sendGmail` fails with `Gmail API has not been used in project ... before
   or it is disabled` (enable via `gcloud services enable gmail.googleapis.com`).
+- **Accommodation payment confirmation is a top-level `paymentConfirmed` boolean** —
+  the RSVP "Participation aux frais" section ends with a payment-confirmation
+  block (bank details in `payment.accounts`, a `payment.confirmNote` asking the
+  guest to pay before the wedding weekend, and a repurposed submit button
+  `payment.confirmButton`). Clicking it calls `savePaymentConfirmed` in
+  `web/invitation/src/rsvp-responses.js`, which writes `paymentConfirmed: true`
+  (via `buildGuestPaymentConfirmedPayload` in `web/shared/payload-builders.js`)
+  to the signed-in guest's `guests` doc AND to every other member of their
+  invitation group (`getGroupMembers`). The Firestore rules use the SIMPLE model
+  (`allow create, update: if canWrite()`), so ANY authenticated guest may write
+  this field on their own doc and on any group member's doc WITHOUT declaring
+  the field name in the rules — the app validates the payload client-side via
+  `validateGuestContactPayload` (which allows `paymentConfirmed` as a boolean).
+  The RSVP submit button is NOT a re-send of RSVP data anymore; it is the
+  payment-confirmation action. When `paymentConfirmed` is already true, the
+  button area shows the `payment.confirmedNote` success banner instead. The
+  `.rsvp-payment-value.is-sale` price color is whiteish (`var(--white)` /
+  `rgb(255 253 248 / 85%)`), NOT red. Rules tests in
+  `web/invitation/tests/firestore.rules.test.mjs` prove a guest can write
+  `paymentConfirmed` + `rsvp.answers` on their own and on a group member's doc.
 - *(Add new lessons here as you discover them.)*
 
 ---
