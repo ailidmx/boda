@@ -152,13 +152,25 @@
 }
 
 /* ── Reorder panel (rank the guisos 1–20, top 9 in the menu) ─────────────
-   Always visible as a normal section layout — no toggle button, no collapse,
-   no extra padding. */
+   Always visible as a normal section layout — no toggle button, no collapse.
+   Styled as a distinct section/panel (cream card, gold border, soft shadow)
+   so it reads as its own block within the guisos section. */
 .guisos-reorder {
   max-width: 46rem;
   margin: 2.4rem auto 0;
+  padding: 1.4rem 1.5rem 1.6rem;
   text-align: left;
+  background: rgb(255 253 248 / 88%);
+  border: 1px solid rgb(198 139 43 / 35%);
+  border-radius: 0.9rem;
+  box-shadow: 0 8px 24px rgb(198 139 43 / 12%);
 }
+@media (max-width: 640px) {
+  .guisos-reorder {
+    padding: 1.1rem 1rem 1.3rem;
+  }
+}
+
 
 
 
