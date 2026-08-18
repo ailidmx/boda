@@ -1,4 +1,4 @@
-import { collection, getDocs, onSnapshot, limit, query } from "firebase/firestore";
+import { collection, onSnapshot, limit, query } from "firebase/firestore";
 
 
 
@@ -55,7 +55,7 @@ import { renderGuestManager as renderGuestManagerTable } from "./guestTable.js";
 import { openGuestEditor as openGuestEditorModal } from "./guestEditorModal.js";
 import { renderGroupsPanel as renderGroupsPanelModule, openCreateGroupModal as openCreateGroupModalModule } from "./groupsPanel.js";
 import { openDeleteConfirm as openDeleteConfirmModule, openSendInviteModal as openSendInviteModalModule } from "./guestModals.js";
-import { updateDashboardData as updateDashboardDataModule, downloadCsvForType } from "./recordsPanel.js";
+import { renderSummary } from "./summary.js";
 
 import { updateGuest, softDeleteGuest } from "./repositories/guestRepository.js";
 import { createGroup, updateGroupField, deleteGroup } from "./repositories/groupRepository.js";
@@ -72,19 +72,7 @@ import { onAuthStateChanged, signOut } from "firebase/auth";
 import { getFunctions, httpsCallable } from "firebase/functions";
 
 
-const COLLECTIONS = {
-  rsvps: collections.rsvpSubmissions,
-  suggestions: collections.experienceSuggestions,
-  coast: collections.coastInterest,
-  petanque: collections.petanqueParticipation,
-};
-
-
 const state = {
-  rsvps: [],
-  suggestions: [],
-  coast: [],
-  petanque: [],
   invitationGroups: [], // from Firestore collection "invitation_groups"
   liveGuests: [], // raw Firestore `guests` records (source of truth)
   authUsers: {}, // uid → { email } LIVE Firebase Auth user list (via listAuthUsers callable)
@@ -109,10 +97,6 @@ const PATH_TO_TAB = {
   grupos: "groups",
   cabins: "cabins",
   tables: "tables",
-  rsvps: "rsvps",
-  suggestions: "suggestions",
-  coast: "coast",
-  petanque: "petanque",
 };
 
 /**
@@ -123,10 +107,6 @@ const TAB_TO_PATH = {
   groups: "grupos",
   cabins: "cabins",
   tables: "tables",
-  rsvps: "rsvps",
-  suggestions: "suggestions",
-  coast: "coast",
-  petanque: "petanque",
 };
 
 /**
@@ -199,13 +179,12 @@ function guestSortValue(guest, key) {
       return (guest.xtraCabinLabel || guest.xtraCabin || "").toLowerCase();
     case "xtraRoom":
       return (guest.xtraRoom || "").toLowerCase();
-    case "status": {
-      const rsvp = getRsvpForGuest(guest.id);
-      if (!rsvp) return 0;
-      if (rsvp.attendance === "yes") return 2;
-      if (rsvp.attendance === "no") return 1;
+    // The legacy `rsvp_submissions` collection is no longer written by the app
+    // (answers live on the `guests` doc), so there is no per-guest RSVP record
+    // to sort by. The status column is derived live from `rsvp.answers`; keep
+    // the sort neutral (0) to preserve prior behavior.
+    case "status":
       return 0;
-    }
     default:
       return "";
   }
@@ -287,11 +266,6 @@ function getFilteredGuests() {
   });
 }
 
-
-function getRsvpForGuest(guestId) {
-
-  return state.rsvps.find((r) => r.invitationCode === guestId);
-}
 
 // ── Live RSVP scale (source of truth: guest's `rsvp.answers`) ──────────
 
@@ -729,69 +703,18 @@ function renderTableAssignments() {
 
 // ── Data loading ───────────────────────────────────────────────────────
 
-// The summary cards, legacy record rendering, and CSV export live in
-// `recordsPanel.js`. This thin adapter injects the dashboard's module-scope
-// dependencies (state + live-derived helpers) so the panel stays a pure
-// presentation module that never touches Firestore directly.
-function updateDashboardData() {
-  updateDashboardDataModule({
-    state,
-    computeDayConfirmations,
-    renderGuestManager,
-    renderTableAssignments,
-  });
-}
+// The dashboard is LIVE-ONLY: the `guests` collection (via the `onSnapshot`
+// listener in `startDashboard`) is the single source of truth. The legacy
+// `rsvp_submissions` / `experience_suggestions` / `coast_interest` /
+// `petanque_participation` collections are no longer written by the app
+// (answers live on the `guests` doc), so there is no batch `loadDashboardData`
+// step anymore. The attendance summary cards are rendered live from
+// `computeDayConfirmations()` via `renderSummary` (see `summary.js`).
 
 // Bounded query limit for dashboard collections. Prevents unbounded reads
 // that would grow with the number of submissions. For a wedding (~100-200
 // guests) 1000 is generous; it also protects against runaway growth.
 const DASHBOARD_QUERY_LIMIT = 1000;
-
-async function loadDashboardData() {
-  showMessage("Actualizando respuestas…", "working");
-  // Only load collections that still exist in `firestore-paths.js`. The legacy
-  // `rsvp_submissions` / `experience_suggestions` / `coast_interest` /
-  // `petanque_participation` collections were removed from the app (answers now
-  // live on the `guests` doc), so their path constants are undefined and must
-  // be skipped — otherwise `collection(db, undefined)` throws and the whole
-  // dashboard fails to load.
-  const entries = await Promise.all(
-    Object.entries(COLLECTIONS)
-      .filter(([, collectionName]) => Boolean(collectionName))
-      .map(async ([key, collectionName]) => {
-        const snapshot = await getDocs(
-          query(collection(db, collectionName), limit(DASHBOARD_QUERY_LIMIT)),
-        );
-        const records = snapshot.docs.map((item) => ({
-          id: item.id,
-          ...item.data(),
-        }));
-        records.sort((a, b) => {
-          const aTime = a.createdAt?.toMillis?.() || 0;
-          const bTime = b.createdAt?.toMillis?.() || 0;
-          return bTime - aTime;
-        });
-        return [key, records];
-      }),
-  );
-  entries.forEach(([key, records]) => {
-    state[key] = records;
-  });
-
-  updateDashboardData();
-  showMessage(`Actualizado a las ${new Date().toLocaleTimeString("es-MX")}`);
-
-}
-
-
-
-function showLoadError(error) {
-  console.error("Dashboard data load failed", error);
-  showMessage(
-    "No pudimos cargar las respuestas. Verifica tu acceso y vuelve a intentar.",
-    "error",
-  );
-}
 
 // ── Tab Navigation ─────────────────────────────────────────────────────
 
@@ -811,10 +734,6 @@ function renderTabNavigation() {
     { id: "groups", label: "Grupos", icon: "🏷️" },
     { id: "cabins", label: "Cabañas", icon: "🏠" },
     { id: "tables", label: "Mesas", icon: "🪑" },
-    { id: "rsvps", label: "RSVP", icon: "📋" },
-    { id: "suggestions", label: "Sugerencias", icon: "🎵" },
-    { id: "coast", label: "Costa", icon: "🏖️" },
-    { id: "petanque", label: "Petanca", icon: "🎱" },
   ];
 
   const nav = document.querySelector("[data-dashboard-tabs]");
@@ -853,7 +772,6 @@ function renderDashboard(app) {
         </div>
         <div class="dashboard-header-actions">
           <a class="dashboard-link" href="${invitationHref()}">Ver invitación</a>
-          <button class="dashboard-button dashboard-button-secondary" type="button" data-refresh>Actualizar</button>
           <button class="dashboard-button dashboard-button-secondary" type="button" data-sign-out>Salir</button>
         </div>
 
@@ -918,61 +836,6 @@ function renderDashboard(app) {
         </div>
       </section>
 
-      <!-- ── Panel: RSVPs ── -->
-      <section class="dashboard-panel" data-dashboard-panel="rsvps">
-        <div class="dashboard-section">
-          <div class="dashboard-section-heading">
-            <div>
-              <p class="dashboard-eyebrow">Invitados y logística</p>
-              <h2>RSVP</h2>
-            </div>
-            <button class="dashboard-export" type="button" data-export="rsvps">Descargar CSV</button>
-          </div>
-          <div class="dashboard-records" data-records="rsvps"></div>
-        </div>
-      </section>
-
-      <!-- ── Panel: Suggestions ── -->
-      <section class="dashboard-panel" data-dashboard-panel="suggestions">
-        <div class="dashboard-section">
-          <div class="dashboard-section-heading">
-            <div>
-              <p class="dashboard-eyebrow">Comida, música y momentos</p>
-              <h2>Sugerencias</h2>
-            </div>
-            <button class="dashboard-export" type="button" data-export="suggestions">Descargar CSV</button>
-          </div>
-          <div class="dashboard-records" data-records="suggestions"></div>
-        </div>
-      </section>
-
-      <!-- ── Panel: Coast ── -->
-      <section class="dashboard-panel" data-dashboard-panel="coast">
-        <div class="dashboard-section">
-          <div class="dashboard-section-heading">
-            <div>
-              <p class="dashboard-eyebrow">Después de la boda</p>
-              <h2>Escapada a la costa</h2>
-            </div>
-            <button class="dashboard-export" type="button" data-export="coast">Descargar CSV</button>
-          </div>
-          <div class="dashboard-records" data-records="coast"></div>
-        </div>
-      </section>
-
-      <!-- ── Panel: Petanque ── -->
-      <section class="dashboard-panel" data-dashboard-panel="petanque">
-        <div class="dashboard-section">
-          <div class="dashboard-section-heading">
-            <div>
-              <p class="dashboard-eyebrow">Torneo de petanca</p>
-              <h2>Petanca</h2>
-            </div>
-            <button class="dashboard-export" type="button" data-export="petanque">Descargar CSV</button>
-          </div>
-          <div class="dashboard-records" data-records="petanque"></div>
-        </div>
-      </section>
     </main>
   `;
 
@@ -1029,9 +892,6 @@ function renderDashboard(app) {
     renderTabNavigation();
   });
 
-  document
-    .querySelector("[data-refresh]")
-    .addEventListener("click", () => loadDashboardData().catch(showLoadError));
   document.querySelector("[data-sign-out]").addEventListener("click", async () => {
     try {
       await signOut(auth);
@@ -1041,13 +901,6 @@ function renderDashboard(app) {
     // Return to the invitation, which will show its own access gate.
     window.location.href = invitationHref();
   });
-
-
-  document.querySelectorAll("[data-export]").forEach((button) => {
-    button.addEventListener("click", () => downloadCsvForType(button.dataset.export, state));
-  });
-
-  loadDashboardData().catch(showLoadError);
 
   // Store unsub for cleanup
   app._groupsUnsub = groupsUnsub;
@@ -1157,6 +1010,8 @@ export function startDashboard(app) {
       // Re-render live-dependent panels if the dashboard is already shown.
       renderGuestManager();
       renderCabinAssignments();
+      // Re-render the attendance summary cards from the live guests.
+      renderSummary({ computeDayConfirmations });
     },
     (error) => {
       console.error("[dashboard:auth] Failed to load live guests", error);

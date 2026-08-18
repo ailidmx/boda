@@ -75,13 +75,12 @@
 
 .dashboard-summary {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
 }
 
 .dashboard-summary-card,
-.dashboard-section,
-.dashboard-record {
+.dashboard-section {
   border: 1px solid $border;
   background: $card-bg;
   box-shadow: $shadow-card;
@@ -116,77 +115,9 @@
   }
 }
 
-
-.dashboard-export {
-  padding: 0.65rem 1rem;
-  color: $dark;
-  background: $accent-bg;
-}
-
-.dashboard-records {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
-  margin-top: 1.5rem;
-}
-
-.dashboard-record {
-  overflow: hidden;
-  border-radius: 0.5rem;
-}
-
-.dashboard-record-heading {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 1.15rem 1.4rem;
-  color: $white;
-  background: $dark;
-
-  h3 {
-    margin: 0;
-    font-family: $font-display;
-    font-size: 1.35rem;
-    font-weight: 400;
-  }
-
-  time {
-    color: $gold;
-    font-size: 0.75rem;
-    text-align: right;
-  }
-}
-
-.dashboard-record-details {
-  margin: 0;
-  padding: 1rem 1.4rem 1.25rem;
-}
-
-
-.dashboard-detail-row {
-  display: grid;
-  grid-template-columns: minmax(8rem, 0.85fr) minmax(0, 1.4fr);
-  gap: 1rem;
-  padding: 0.5rem 0;
-  border-bottom: 1px solid $border-light;
-
-  &:last-child {
-    border-bottom: 0;
-  }
-
-  dt {
-    color: #746a5d;
-    font-size: 0.82rem;
-  }
-
-  dd {
-    margin: 0;
-    overflow-wrap: anywhere;
-  }
-}
-
 .dashboard-empty {
   grid-column: 1 / -1;
   color: #746a5d;
 }
+
+

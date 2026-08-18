@@ -1,23 +1,16 @@
 // ── Buttons ─────────────────────────────────────────────────────────────
 @use "tokens" as *;
 
-.dashboard-button,
-.dashboard-export {
+.dashboard-button {
   border: 0;
   border-radius: 0.35rem;
   cursor: pointer;
   transition: transform 160ms ease, background 160ms ease;
-}
-
-.dashboard-button {
   padding: 1rem 1.6rem;
   color: $white;
   background: $dark;
 
-
-
-  &:hover,
-  .dashboard-export:hover {
+  &:hover {
     transform: translateY(-1px);
   }
 
@@ -25,8 +18,4 @@
     cursor: wait;
     opacity: 0.65;
   }
-}
-
-.dashboard-export:hover {
-  transform: translateY(-1px);
 }

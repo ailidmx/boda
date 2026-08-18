@@ -38,7 +38,7 @@ This audit covers the two React applications in this monorepo:
   `_guests.scss`, `_tables.scss`, `_cabins.scss`, `_groups.scss`, `_tabs.scss`,
   `_thanks.scss`, `_toast.scss`, `_login.scss`, `_responsive.scss`, `_base.scss`).
   - `_tokens.scss` — SCSS variables for colors, fonts, shadows, breakpoints.
-  - `_buttons.scss` — `.dashboard-button`, `.dashboard-export`.
+  - `_buttons.scss` — `.dashboard-button`.
 
 ### Component organization
 - **Invitation**: flat `web/invitation/src/components/` (~50 files). Mostly one component
@@ -50,7 +50,7 @@ This audit covers the two React applications in this monorepo:
   New primitives should live here and be reused rather than re-implemented per feature.
 - **Dashboard**: `web/dashboard/src/` with `dashboard.js` (the shell + most UI) plus
   extracted panels/modals (`guestTable.js`, `guestEditorModal.js`, `guestModals.js`,
-  `groupsPanel.js`, `recordsPanel.js`, `cabins.js`, `tables.js`) and data modules
+  `groupsPanel.js`, `summary.js`, `cabins.js`, `tables.js`) and data modules
   (`guests.js`, `rooms.js`, `invitation-profile.js`, `firebase.js`, `repositories/`).
 
 ### State management
@@ -431,6 +431,29 @@ All F7 decompositions are now complete: `Nav.jsx`, `IdentityModal.jsx`, `Coast.j
 `guest-profiles.js`, and `AppContext.jsx` have all been split into feature-local
 sub-components / pure services. The audit's original line-count figures (~1003 / ~865 /
 ~809 / ~753 / ~647) reflect the pre-decomposition state and are now stale.
+
+### F10 progress — dead-code & duplication cleanup (in progress)
+
+- **Dashboard legacy-records code removed** — the dashboard no longer loads or renders
+  the legacy `rsvp_submissions` / `experience_suggestions` / `coast_interest` /
+  `petanque_participation` collections (the app writes answers directly to the `guests`
+  doc via `rsvp.answers`). Removed from `web/dashboard/src/dashboard.js`:
+  - The `COLLECTIONS` map, `loadDashboardData()`, `showLoadError()`, and
+    `updateDashboardData()` (the batch loader + refresh handler).
+  - The `getRsvpForGuest()` helper and the `state.rsvps` / `state.suggestions` /
+    `state.coast` / `state.petanque` caches.
+  - The "Registros" tab, the per-collection record cards, the CSV export buttons
+    (`downloadCsvForType`), and the "Actualizar" refresh button.
+  - The `recordsPanel.js` module was deleted.
+  - The attendance summary cards are now rendered live from `computeDayConfirmations()`
+    via a new `web/dashboard/src/summary.js` presentation module, wired into the live
+    `guests` `onSnapshot` listener (so FRIDAY / SATURDAY / SUNDAY counts update in
+    real time as guests answer). The summary grid was reduced from 5 columns to 3.
+  - Orphaned records CSS was removed from `_layout.scss`, `_buttons.scss`, and
+    `_responsive.scss` (`.dashboard-record*`, `.dashboard-export`, `.dashboard-records`,
+    `.dashboard-detail-row`). `.dashboard-empty` was kept (still used by the groups
+    panel).
+  - See ADR-0012.
 
 
 
