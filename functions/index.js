@@ -1051,11 +1051,16 @@ export const sendInvitation = onCall(
         // No auth user for this guest — leave email empty.
       }
     }
-    if (!email) {
+    // The email is only REQUIRED for the email channel. The WhatsApp channel
+    // only needs a phone to build the `wa.me` link — the email is used (when
+    // available) just to pre-fill the login details in the message text. So we
+    // only throw when the email channel is selected and no email can be found.
+    if (!email && channel === "email") {
       throw new HttpsError("failed-precondition", "El invitado no tiene correo de acceso (firebaseEmail).");
     }
 
     const lang = guest.lang || guest.identity?.lang || "es";
+
     // The plaintext password is only included in the URL for the WhatsApp
     // channel (where the couple sends the link directly). For email we omit it
     // and instead send a Firebase password-reset link so the guest sets their
