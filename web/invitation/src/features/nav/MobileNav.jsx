@@ -30,7 +30,10 @@ export function MobileNav({ activeKey }) {
 
   const travelsByPlane = guestTravelsByPlane(profile?.guest);
   const links = getNavLinks(travelsByPlane);
-  const part1EndIndex = links.findIndex(([key]) => key === PART_I_END);
+  const part1EndIndex = links.findIndex((entry) => {
+    const key = Array.isArray(entry) ? entry[0] : entry.key;
+    return key === PART_I_END;
+  });
 
   const part1 = links.slice(0, part1EndIndex + 1);
   const part2 = links.slice(part1EndIndex + 1);
@@ -55,21 +58,61 @@ export function MobileNav({ activeKey }) {
 
       {openMenu === menuKey && (
         <div className="mobile-nav__dropdown">
-          {links.map(([key, href]) => (
-            <a
-              key={key}
-              href={href}
-              data-analytics={`nav.${key}`}
-              className={`mobile-nav__link${key === activeKey ? " is-active" : ""}`}
-              aria-current={key === activeKey ? "true" : undefined}
-              onClick={() => {
-                setOpenMenu(null);
-                trackNav(key, "mobile_menu");
-              }}
-            >
-              {t.nav[key]}
-            </a>
-          ))}
+          {links.map((entry) => {
+            if (Array.isArray(entry)) {
+              const [key, href] = entry;
+              return (
+                <a
+                  key={key}
+                  href={href}
+                  data-analytics={`nav.${key}`}
+                  className={`mobile-nav__link${key === activeKey ? " is-active" : ""}`}
+                  aria-current={key === activeKey ? "true" : undefined}
+                  onClick={() => {
+                    setOpenMenu(null);
+                    trackNav(key, "mobile_menu");
+                  }}
+                >
+                  {t.nav[key]}
+                </a>
+              );
+            }
+
+            const { key, href, children } = entry;
+            return (
+              <div key={key} className="mobile-nav__group-links">
+                <a
+                  href={href}
+                  data-analytics={`nav.${key}`}
+                  className={`mobile-nav__link${key === activeKey ? " is-active" : ""}`}
+                  aria-current={key === activeKey ? "true" : undefined}
+                  onClick={() => {
+                    setOpenMenu(null);
+                    trackNav(key, "mobile_menu");
+                  }}
+                >
+                  {t.nav[key]}
+                </a>
+                <div className="mobile-nav__sub">
+                  {children.map(([childKey, childHref]) => (
+                    <a
+                      key={childKey}
+                      href={childHref}
+                      data-analytics={`nav.${childKey}`}
+                      className={`mobile-nav__sublink${childKey === activeKey ? " is-active" : ""}`}
+                      aria-current={childKey === activeKey ? "true" : undefined}
+                      onClick={() => {
+                        setOpenMenu(null);
+                        trackNav(childKey, "mobile_menu");
+                      }}
+                    >
+                      {t.nav[childKey]}
+                    </a>
+                  ))}
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

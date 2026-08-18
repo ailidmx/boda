@@ -71,21 +71,61 @@ export function SideDrawer({ links, activeKey }) {
                 </button>
               </div>
               <nav className="side-drawer__links" aria-label={t.nav.menu1}>
-                {links.map(([key, href]) => (
-                  <a
-                    key={key}
-                    href={href}
-                    data-analytics={`nav.${key}`}
-                    className={`side-drawer__link${key === activeKey ? " is-active" : ""}`}
-                    aria-current={key === activeKey ? "true" : undefined}
-                    onClick={() => {
-                      setOpen(false);
-                      trackNav(key, "side_drawer");
-                    }}
-                  >
-                    {t.nav[key]}
-                  </a>
-                ))}
+                {links.map((entry) => {
+                  if (Array.isArray(entry)) {
+                    const [key, href] = entry;
+                    return (
+                      <a
+                        key={key}
+                        href={href}
+                        data-analytics={`nav.${key}`}
+                        className={`side-drawer__link${key === activeKey ? " is-active" : ""}`}
+                        aria-current={key === activeKey ? "true" : undefined}
+                        onClick={() => {
+                          setOpen(false);
+                          trackNav(key, "side_drawer");
+                        }}
+                      >
+                        {t.nav[key]}
+                      </a>
+                    );
+                  }
+
+                  const { key, href, children } = entry;
+                  return (
+                    <div key={key} className="side-drawer__group">
+                      <a
+                        href={href}
+                        data-analytics={`nav.${key}`}
+                        className={`side-drawer__link${key === activeKey ? " is-active" : ""}`}
+                        aria-current={key === activeKey ? "true" : undefined}
+                        onClick={() => {
+                          setOpen(false);
+                          trackNav(key, "side_drawer");
+                        }}
+                      >
+                        {t.nav[key]}
+                      </a>
+                      <div className="side-drawer__sub">
+                        {children.map(([childKey, childHref]) => (
+                          <a
+                            key={childKey}
+                            href={childHref}
+                            data-analytics={`nav.${childKey}`}
+                            className={`side-drawer__sublink${childKey === activeKey ? " is-active" : ""}`}
+                            aria-current={childKey === activeKey ? "true" : undefined}
+                            onClick={() => {
+                              setOpen(false);
+                              trackNav(childKey, "side_drawer");
+                            }}
+                          >
+                            {t.nav[childKey]}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
               </nav>
             </div>
           </div>,

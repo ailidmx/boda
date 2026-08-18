@@ -494,5 +494,20 @@ p {
   color: var(--marigold);
 }
 
+/* Inline variant: a standalone "next" link between subsections of a section,
+   centered on its own line (not inside a .section-nav flex container). */
+.section-nav-link--inline {
+  display: flex;
+  justify-content: center;
+  margin: 1.5rem auto 0;
+  color: var(--white);
+}
+
+.section-nav-link--inline:hover,
+.section-nav-link--inline:focus-visible {
+  color: var(--marigold);
+}
+
+
 
 

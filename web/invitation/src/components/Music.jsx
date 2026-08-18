@@ -123,7 +123,9 @@ export function Music() {
       </div>
 
 
+      <div id="music-live" className="music-live">
       <SwipeCardCarousel className="music-lineup" label={music.title}>
+
         {music.acts.map((act, index) => {
           const photo = act.image ? MEDIA.music[act.image] : null;
           return (
@@ -182,9 +184,16 @@ export function Music() {
           );
         })}
       </SwipeCardCarousel>
+      </div>
+
+      <a className="section-nav-link section-nav-link--inline" href="#music-playlist">
+        <span>{t.nav.musicPlaylist}</span>
+        <span aria-hidden="true">↓</span>
+      </a>
+
+      <div id="music-playlist" className="playlist-section reveal">
 
 
-      <div className="playlist-section reveal">
         <div className="playlist-heading">
           <p className="eyebrow">{music.playlists.eyebrow}</p>
           <h3>{music.playlists.title}</h3>
@@ -214,10 +223,19 @@ export function Music() {
         </SwipeCardCarousel>
       </div>
 
+      <a className="section-nav-link section-nav-link--inline" href="#music-tastes">
+        <span>{t.nav.musicTastes}</span>
+        <span aria-hidden="true">↓</span>
+      </a>
+
       {/* Music genre survey: guests rate the genres they love (Mexican
           Regional, Serbia/Balkans, Latina/Caribe, etc.) with 1–5 stars and can
           search for obscure genres via MusicBrainz. */}
-      <GenreSurvey />
+      <div id="music-tastes" className="music-tastes">
+
+        <GenreSurvey />
+      </div>
+
 
       {/* Desktop-only bottom nav: leads to the "Et après ?" (coast) section.
           The music section sits on a dark ink background, so the nav uses the

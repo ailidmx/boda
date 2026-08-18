@@ -56,127 +56,111 @@
   z-index: 1;
 }
 
-/* Floating action button that opens the spice-note modal. Keeps the section
-   clean while still letting curious guests read the "À propos du piquant"
-   note on demand. */
-.guisos-spice-fab {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
+/* Important notice about the chilli — an inline callout shown before the dish
+   cards on every screen (desktop and mobile) so guests know most stews are not
+   spicy. Uses the section's warm, festive palette (gold + terracotta accents). */
+.guisos-spice-note {
+  max-width: 46rem;
   margin: 1.4rem auto 0;
-  padding: 0.7rem 1.3rem;
-  font: inherit;
-  font-weight: 600;
+  padding: 1rem 1.2rem;
+  font-size: 0.98rem;
+  line-height: 1.55;
+  text-align: center;
   color: var(--ink, #2b2418);
-  background: rgb(255 253 248 / 85%);
-  border: 1px solid rgb(198 139 43 / 35%);
-  border-radius: 999px;
-  cursor: pointer;
-  box-shadow: 0 4px 14px rgb(198 139 43 / 18%);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  background: rgb(255 253 248 / 88%);
+  border: 1px solid rgb(198 139 43 / 40%);
+  border-left: 4px solid var(--terracotta, #a94d31);
+  border-radius: 0.75rem;
+  box-shadow: 0 6px 18px rgb(198 139 43 / 14%);
 }
-.guisos-spice-fab:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 8px 20px rgb(198 139 43 / 28%);
-}
-.guisos-spice-fab__icon {
-  font-size: 1.1rem;
-  line-height: 1;
+@media (max-width: 640px) {
+  .guisos-spice-note {
+    margin-top: 1.1rem;
+    padding: 0.9rem 1rem;
+    font-size: 0.92rem;
+    text-align: left;
+  }
 }
 
-/* Spice-note modal — a centred dialog that overlays the section. */
-.guisos-spice-modal {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
+
+
+
+/* ── Expandable/collapsible subsections ──────────────────────────────────
+   The section is split into two subsections (dish cards + reorder panel),
+   each with a toggle header and an arrow visual that signals it can be
+   expanded/collapsed. */
+.guisos-subsection {
+  max-width: 46rem;
+  margin: 1.6rem auto 0;
+}
+
+/* The dish-cards subsection is full-width (the carousel spans the section),
+   so it does not constrain its width like the reorder panel does. */
+.guisos-subsection--dishes {
+  max-width: none;
+}
+
+.guisos-subsection__toggle {
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 1.2rem;
-  background: rgb(20 16 10 / 55%);
-  backdrop-filter: blur(3px);
-  animation: guisos-fade-in 0.18s ease;
-}
-.guisos-spice-modal__card {
-  position: relative;
-  max-width: 30rem;
-  width: 100%;
-  padding: 1.6rem 1.4rem;
-  border: 1px solid rgb(198 139 43 / 35%);
-  border-radius: 1rem;
-  background: var(--cream, #fffdf8);
-  box-shadow: 0 18px 50px rgb(20 16 10 / 35%);
-  text-align: center;
-}
-.guisos-spice-modal__close {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.6rem;
-  width: 2rem;
-  height: 2rem;
-  font-size: 1.4rem;
-  line-height: 1;
+  gap: 0.6rem;
+  font: inherit;
+  font-family: var(--font-display, serif);
+  font-size: 1.3rem;
+  font-weight: 600;
   color: var(--ink, #2b2418);
   background: transparent;
   border: none;
-  border-radius: 50%;
+  border-bottom: 1px solid rgb(198 139 43 / 35%);
+  padding: 0.7rem 0.4rem;
   cursor: pointer;
+  text-align: center;
+  transition: color 0.15s ease;
 }
-.guisos-spice-modal__close:hover {
-  background: rgb(198 139 43 / 15%);
-}
-.guisos-spice-modal__text {
-  margin: 0;
-  font-style: normal;
-  color: var(--ink, #2b2418);
+.guisos-subsection__toggle:hover {
+  color: var(--gold, #c68b2b);
 }
 
-@keyframes guisos-fade-in {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+.guisos-subsection__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  flex: 0 0 auto;
+  color: var(--gold, #c68b2b);
+  font-size: 1rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+.guisos-subsection__toggle.is-open .guisos-subsection__arrow {
+  transform: rotate(90deg);
 }
 
+.guisos-subsection__body {
+  margin-top: 1.2rem;
+}
 
+/* Anchor subsection — a "continue" link that scrolls to the reorder panel.
+   The base `.section-nav` provides the top border + centered link; this just
+   aligns the nav with the reorder panel's column width. */
+.guisos-section-nav {
+  max-width: 46rem;
+  margin: 2.4rem auto 0;
+}
 
-
-/* ── Reorder panel (rank the guisos 1–20, top 9 in the menu) ───────────── */
+/* ── Reorder panel (rank the guisos 1–20, top 9 in the menu) ─────────────
+   Always visible as a normal section layout — no toggle button, no collapse,
+   no extra padding. */
 .guisos-reorder {
   max-width: 46rem;
-  margin: 1.6rem auto 0;
-  text-align: center;
-}
-
-.guisos-reorder__toggle {
-  font: inherit;
-  font-weight: 600;
-  color: var(--cream);
-  background: var(--gold, #c68b2b);
-  border: none;
-  border-radius: 999px;
-  padding: 0.8rem 1.6rem;
-  cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-.guisos-reorder__toggle:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgb(198 139 43 / 35%);
-}
-
-.guisos-reorder__panel {
-  margin-top: 1.2rem;
-  padding: 1.4rem 1.2rem;
-  border: 1px solid rgb(198 139 43 / 30%);
-  border-radius: 1rem;
-  background: rgb(255 253 248 / 85%);
+  margin: 2.4rem auto 0;
   text-align: left;
 }
 
-.guisos-reorder__title {
-  margin: 0 0 0.4rem;
-  font-family: var(--font-display, serif);
-  font-size: 1.4rem;
-  color: var(--ink, #2b2418);
-}
+
 
 .guisos-reorder__body,
 .guisos-reorder__hint,
