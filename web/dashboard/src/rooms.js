@@ -16,9 +16,8 @@
  *   - isShared    (boolean) — whether the room is shared among guest groups
  */
 
-import { collection, getDocs, limit, query } from "firebase/firestore";
-import { db } from "./firebase.js";
-import { collections } from "../../shared/firestore-paths.js";
+import { fetchRooms } from "./repositories/roomRepository.js";
+
 
 
 
@@ -52,22 +51,7 @@ let roomsLoaded = false;
 export async function loadRooms() {
   if (roomsLoaded) return ROOMS;
   try {
-    const snapshot = await getDocs(
-      query(collection(db, collections.rooms), limit(500)),
-    );
-
-
-    const loaded = [];
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      loaded.push({
-        id: data.id || doc.id,
-        cabin: data.cabin,
-        description: data.description,
-        capacity: data.capacity,
-        isShared: data.isShared,
-      });
-    });
+    const loaded = await fetchRooms();
     if (loaded.length > 0) {
       ROOMS = loaded;
       roomsLoaded = true;
@@ -78,6 +62,7 @@ export async function loadRooms() {
   }
   return ROOMS;
 }
+
 
 // ── Static fallback inventory ─────────────────────────────────────────────
 // Used only if Firestore is unavailable (offline / dev). The Firestore

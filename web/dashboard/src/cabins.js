@@ -13,9 +13,8 @@
  *   - cloudinaryIds (string|string[]) — showcase photo public IDs
  */
 
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "./firebase.js";
-import { collections } from "../../shared/firestore-paths.js";
+import { fetchCabins } from "./repositories/cabinRepository.js";
+
 
 /** @type {Array<{ id: string, name: string, cloudinaryIds: string[] }>} */
 let CABINS = [];
@@ -30,16 +29,7 @@ let cabinsLoaded = false;
 export async function loadCabins() {
   if (cabinsLoaded) return CABINS;
   try {
-    const snapshot = await getDocs(collection(db, collections.cabins));
-    const loaded = [];
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      loaded.push({
-        id: data.id || doc.id,
-        name: data.name,
-        cloudinaryIds: data.cloudinaryIds,
-      });
-    });
+    const loaded = await fetchCabins();
     if (loaded.length > 0) {
       CABINS = loaded;
       cabinsLoaded = true;
@@ -50,6 +40,7 @@ export async function loadCabins() {
   }
   return CABINS;
 }
+
 
 /**
  * Normalize a cabin's `cloudinaryIds` into an array of public IDs.

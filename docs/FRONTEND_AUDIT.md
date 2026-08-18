@@ -112,18 +112,21 @@ Severity legend: **CRITICAL** / **HIGH** / **MEDIUM** / **LOW**.
 ### HIGH
 
 3. **Direct Firestore access in dashboard UI/data files.**
-   - Files: `web/dashboard/src/dashboard.js`, `web/dashboard/src/cabins.js`,
-     `web/dashboard/src/guests.js`, `web/dashboard/src/rooms.js`,
-     `web/dashboard/src/tables.js`, `web/dashboard/src/invitation-profile.js`.
+   - Files: `web/dashboard/src/dashboard.js`, `web/dashboard/src/guests.js`,
+     `web/dashboard/src/invitation-profile.js`.
    - The dashboard still calls `collection()`, `doc()`, `setDoc()`, `onSnapshot()`, etc.
-     directly in several places. The repositories layer (`repositories/`) exists for guest,
-     group, and table writes, but cabin/room data access is not fully routed through it.
-   - **Progress:** the `tables` collection WRITE path is now fully routed through
+     directly in a few places. The repositories layer (`repositories/`) exists for guest,
+     group, table, room, and cabin data access.
+   - **Progress:** the `tables` collection WRITE path is fully routed through
      `repositories/tableRepository.js` (`updateTableLayout`, `updateTableGuests`); the
-     `tables.js` `onSnapshot` listener (a subscription concern) stays in the module. See
-     ADR-0010.
+     `tables.js` `onSnapshot` listener (a subscription concern) stays in the module. The
+     `rooms` and `cabins` READ paths are now routed through `repositories/roomRepository.js`
+     (`fetchRooms`) and `repositories/cabinRepository.js` (`fetchCabins`); the pure lookup
+     helpers (`getRoomsByCabin`, `getCabinPhotos`, etc.) stay in `rooms.js`/`cabins.js`.
+     See ADR-0010 and ADR-0011.
    - Note: the **invitation** components are clean — zero direct Firestore SDK calls in
      `web/invitation/src/components/`. This is the model to follow.
+
 
 
 4. **No shared UI primitives; duplicated button/input/card/modal markup.**
