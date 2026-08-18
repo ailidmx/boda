@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { EVENT } from "../content.js";
 import { MEDIA } from "../media.js";
 import { useApp } from "../context/AppContext.jsx";
 
@@ -10,6 +11,19 @@ export function Photos() {
   const gallery = t.gallery || {};
   const photos = t.photos || {};
   const galleryPhotos = MEDIA.gallery || [];
+
+  // The "after the wedding" album stays locked until the wedding date passes.
+  const [isMarried, setIsMarried] = useState(
+    () => Date.now() >= new Date(EVENT.weddingDate).getTime()
+  );
+
+  useEffect(() => {
+    const check = () =>
+      setIsMarried(Date.now() >= new Date(EVENT.weddingDate).getTime());
+    const interval = window.setInterval(check, 60000);
+    return () => window.clearInterval(interval);
+  }, []);
+
 
   return (
     <section className="photos-section section story-bg" id="photos">
@@ -63,18 +77,33 @@ export function Photos() {
             </a>
           </div>
 
-          <div className="photos-during reveal">
+          <div
+            className={`photos-during reveal${isMarried ? "" : " is-locked"}`}
+          >
             <h3>{photos.duringTitle}</h3>
             <p>{photos.duringBody}</p>
-            <a
-              className="button button-dark photos-upload-btn"
-              href={photos.duringLink}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              {photos.upload}
-            </a>
+            {isMarried ? (
+              <a
+                className="button button-dark photos-upload-btn"
+                href={photos.duringLink}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {photos.upload}
+              </a>
+            ) : (
+              <>
+                <span
+                  className="button button-dark photos-upload-btn photos-upload-btn--disabled"
+                  aria-disabled="true"
+                >
+                  {photos.uploadLocked}
+                </span>
+                <p className="photos-locked-note">{photos.duringLocked}</p>
+              </>
+            )}
           </div>
+
 
         </div>
 
