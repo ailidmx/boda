@@ -478,6 +478,17 @@ sub-components / pure services. The audit's original line-count figures (~1003 /
   remove / add-guest panel described in AGENTS.md is not present in the current
   codebase and was NOT added (structural refactor only).
 
+- **Tab navigation extracted into `tabNav.js`** — the inline sub-page routing
+  (`PATH_TO_TAB` / `TAB_TO_PATH` / `getTabFromPath` / `navigateToTab`) and the tab bar
+  (`switchTab` / `renderTabNavigation`) in `web/dashboard/src/dashboard.js` were moved
+  to a new presentation module `web/dashboard/src/tabNav.js`. The module owns the
+  URL-path ↔ tab-id mapping, the active-tab state (exposed via `getActiveTab`), the tab
+  bar rendering, and the DOM class toggling that shows/hides panels. It contains no
+  Firestore access and no business rules. `dashboard.js` imports `getTabFromPath`,
+  `navigateToTab`, `switchTab`, and `renderTabNavigation` and dropped its own
+  `state.activeTab` (the module now owns that state). Markup/classes are unchanged —
+  appearance is preserved.
+
 
 
 

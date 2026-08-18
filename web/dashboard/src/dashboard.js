@@ -57,6 +57,12 @@ import { renderGroupsPanel as renderGroupsPanelModule, openCreateGroupModal as o
 import { openDeleteConfirm as openDeleteConfirmModule, openSendInviteModal as openSendInviteModalModule } from "./guestModals.js";
 import { renderSummary } from "./summary.js";
 import { renderCabinAssignments as renderCabinAssignmentsPanel } from "./cabinsPanel.js";
+import {
+  getTabFromPath,
+  navigateToTab,
+  switchTab,
+  renderTabNavigation,
+} from "./tabNav.js";
 
 import { updateGuest, softDeleteGuest } from "./repositories/guestRepository.js";
 import { createGroup, updateGroupField, deleteGroup } from "./repositories/groupRepository.js";
@@ -79,7 +85,6 @@ const state = {
   authUsers: {}, // uid → { email } LIVE Firebase Auth user list (via listAuthUsers callable)
   filterGroup: "",
   filterQuery: "",
-  activeTab: "guests",
   sortKey: "name",
   sortDir: "asc",
 };
@@ -87,54 +92,6 @@ const state = {
 
 
 
-
-// ── Sub-page routing ─────────────────────────────────────────────────────
-
-/**
- * Map URL path segments to internal tab IDs.
- */
-const PATH_TO_TAB = {
-  invitados: "guests",
-  grupos: "groups",
-  cabins: "cabins",
-  tables: "tables",
-};
-
-/**
- * Map internal tab IDs to URL path segments.
- */
-const TAB_TO_PATH = {
-  guests: "invitados",
-  groups: "grupos",
-  cabins: "cabins",
-  tables: "tables",
-};
-
-/**
- * Get the active tab from the URL path.
- * Returns "guests" as default.
- */
-function getTabFromPath() {
-  const path = window.location.pathname.replace(/\/+$/u, "");
-  const match = path.match(/^\/dashboard\/(\w+)$/u);
-  if (match) {
-    const segment = match[1];
-    if (PATH_TO_TAB[segment]) return PATH_TO_TAB[segment];
-  }
-  return "guests";
-}
-
-/**
- * Navigate to a sub-page tab without full page reload.
- */
-function navigateToTab(tabId) {
-  const segment = TAB_TO_PATH[tabId] || "invitados";
-  const newPath = `/dashboard/${segment}`;
-  if (window.location.pathname.replace(/\/+$/u, "") !== newPath) {
-    window.history.pushState({ tab: tabId }, "", newPath);
-  }
-  switchTab(tabId);
-}
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
@@ -677,49 +634,6 @@ function renderTableAssignments() {
 // guests) 1000 is generous; it also protects against runaway growth.
 const DASHBOARD_QUERY_LIMIT = 1000;
 
-// ── Tab Navigation ─────────────────────────────────────────────────────
-
-function switchTab(tab) {
-  state.activeTab = tab;
-  document.querySelectorAll("[data-dashboard-tab]").forEach((btn) => {
-    btn.classList.toggle("dashboard-tab-active", btn.dataset.dashboardTab === tab);
-  });
-  document.querySelectorAll("[data-dashboard-panel]").forEach((panel) => {
-    panel.classList.toggle("dashboard-panel-active", panel.dataset.dashboardPanel === tab);
-  });
-}
-
-function renderTabNavigation() {
-  const tabs = [
-    { id: "guests", label: "Invitados", icon: "👥" },
-    { id: "groups", label: "Grupos", icon: "🏷️" },
-    { id: "cabins", label: "Cabañas", icon: "🏠" },
-    { id: "tables", label: "Mesas", icon: "🪑" },
-  ];
-
-  const nav = document.querySelector("[data-dashboard-tabs]");
-  if (!nav) return;
-
-  nav.innerHTML = tabs
-    .map(
-      (tab) => `
-      <button
-        class="dashboard-tab ${tab.id === state.activeTab ? "dashboard-tab-active" : ""}"
-        data-dashboard-tab="${tab.id}"
-        type="button"
-      >
-        <span class="dashboard-tab-icon">${tab.icon}</span>
-        <span class="dashboard-tab-label">${tab.id === state.activeTab ? tab.label : ""}</span>
-      </button>
-    `,
-    )
-    .join("");
-
-  nav.querySelectorAll("[data-dashboard-tab]").forEach((btn) => {
-    btn.addEventListener("click", () => navigateToTab(btn.dataset.dashboardTab));
-  });
-}
-
 // ── Main dashboard render ──────────────────────────────────────────────
 
 function renderDashboard(app) {
@@ -802,7 +716,6 @@ function renderDashboard(app) {
 
   // ── Set initial tab from URL path ──
   const initialTab = getTabFromPath();
-  state.activeTab = initialTab;
   // If at /dashboard (no sub-path), redirect to /dashboard/invitados
   const currentPath = window.location.pathname.replace(/\/+$/u, "");
   if (currentPath === "/dashboard") {
@@ -848,7 +761,6 @@ function renderDashboard(app) {
 
   window.addEventListener("popstate", (event) => {
     const tab = getTabFromPath();
-    state.activeTab = tab;
     switchTab(tab);
     renderTabNavigation();
   });
