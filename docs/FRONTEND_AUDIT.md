@@ -381,6 +381,39 @@ primitive would either change appearance or be a thin pass-through wrapper:
 These should be introduced only when a second genuine call site appears (e.g. a new search
 feature that needs an empty state, or a second loader). See ADR-0009.
 
+### F3 progress — shared states (evaluated, deferred)
+
+Phase F3 ("Shared states") proposed standardizing loading/error/empty states and
+dialog/notification behavior into shared primitives (`Spinner`, `Skeleton`, `EmptyState`,
+`ErrorState`, a toast system). A full inventory of both apps was performed and the phase
+was **intentionally deferred** — there is no genuine reuse today, so a shared primitive
+would either change appearance or be a thin pass-through wrapper:
+
+- **Loading** — the invitation has exactly ONE loader (`MatrixLoader.jsx`, a bespoke
+  cinematic full-screen component with its own `matrix-loader.css`) plus a bare unstyled
+  `<div className="app-loading">` in `App.jsx`. The dashboard has NO spinner/loader/skeleton
+  markup at all (only inline `<small>` status text inside modals). No 2+ call sites share a
+  pattern.
+- **EmptyState** — every empty message is bespoke with its own class:
+  `.song-request-results__status`, `.airport-autocomplete__status`, `.genre-vote__empty`,
+  `.star-vote__empty`, `.accommodation-room-empty`, `.rsvp-recap-answer--empty`,
+  `.phone-input__empty` (invitation) and `.dashboard-empty` (dashboard). No shared class.
+- **ErrorState** — errors are shown via divergent inline status text: the `data-form-status`
+  CSS convention (base.css, used by TeAnimas/Accommodation/RSVP), `rsvp-confirmation--error`,
+  `song-request-feedback is-error`, `genre-vote__error` (invitation), plus the dashboard's
+  toast system and per-modal `<small>` status text.
+- **Notification/toast** — the two apps are intentionally separate systems. The invitation
+  has NO toast component and uses ZERO `window.alert`/`confirm`/`prompt`; all feedback is
+  inline status text. The dashboard HAS a toast system (`_toast.scss`, used by `dashboard.js`
+  and `cabinsPanel.js`). There is no cross-app duplication to unify.
+
+The one genuinely shared convention — the `data-form-status` CSS attribute in `base.css`
+(used by TeAnimas, Accommodation, RSVP) — is already a shared CSS convention and needs no
+new primitive. These primitives should be introduced only when a second genuine call site
+appears (e.g. a new search feature needing an empty state, or a second loader). See
+ADR-0014.
+
+
 ### F7 progress — giant component decomposition (in progress)
 
 The F7 phase decomposes the largest invitation components into feature-local
