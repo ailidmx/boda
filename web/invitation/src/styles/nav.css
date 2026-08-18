@@ -1145,3 +1145,142 @@
   color: var(--marigold);
 }
 
+/* ── Hierarchical nav: dropdowns & sub-levels ────────────────────────────
+   The desktop nav, mobile dropdowns and side drawer now support parent
+   entries (e.g. FOOD, MUSIC) that expand into sub-links. These styles keep
+   the same visual language as the existing nav (translucent panels, golden
+   underline, uppercase letter-spaced labels). */
+
+/* Desktop: a parent item is a positioned wrapper so its dropdown anchors to
+   the trigger. The parent label keeps the exact `.desktop-nav a` styling. */
+.desktop-nav__item {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.desktop-nav__caret {
+  margin-left: 0.35rem;
+  color: var(--marigold);
+  font-size: 0.6rem;
+  line-height: 1;
+  transition: transform 180ms ease;
+}
+
+.desktop-nav__item.is-open .desktop-nav__caret {
+  transform: rotate(180deg);
+}
+
+/* Floating translucent dropdown panel, mirroring the mobile dropdown's
+   borderless, integrated look. */
+.desktop-nav__dropdown {
+  position: absolute;
+  z-index: 120;
+  top: calc(100% + 0.6rem);
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 13rem;
+  padding: 0.5rem;
+  border: 1px solid rgb(255 255 255 / 12%);
+  border-radius: 0.6rem;
+  background: rgb(18 26 20 / 92%);
+  box-shadow: 0 12px 32px rgb(0 0 0 / 35%);
+  backdrop-filter: blur(10px);
+}
+
+.desktop-nav__dropdown a {
+  display: block;
+  padding: 0.55rem 0.8rem;
+  border-radius: 0.4rem;
+  color: var(--white);
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.desktop-nav__dropdown a:hover {
+  color: var(--marigold);
+  background: rgb(255 255 255 / 6%);
+}
+
+.desktop-nav__dropdown a.is-active {
+  color: var(--marigold);
+}
+
+/* Mobile: a parent group renders its label then an indented sub-list. */
+.mobile-nav__group-links {
+  display: flex;
+  flex-direction: column;
+}
+
+.mobile-nav__sub {
+  display: flex;
+  flex-direction: column;
+  padding-left: 1.1rem;
+  border-left: 1px solid rgb(255 255 255 / 14%);
+  margin-left: 1.1rem;
+}
+
+.mobile-nav__sublink {
+  position: relative;
+  display: block;
+  padding: 0.5rem 1.1rem;
+  color: rgb(255 255 255 / 82%);
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+
+.mobile-nav__sublink:hover {
+  color: var(--marigold);
+}
+
+.mobile-nav__sublink.is-active {
+  color: var(--marigold);
+}
+
+/* Side drawer: a parent group renders its label then an indented sub-list,
+   kept inside the same CSS-column flow. */
+.side-drawer__group {
+  break-inside: avoid;
+}
+
+.side-drawer__sub {
+  display: flex;
+  flex-direction: column;
+  padding-left: 0.9rem;
+  border-left: 1px solid rgb(255 255 255 / 14%);
+  margin-left: 0.9rem;
+}
+
+.side-drawer__sublink {
+  display: block;
+  padding: 0.45rem 0.6rem;
+  border-radius: 0.4rem;
+  color: rgb(255 255 255 / 82%);
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.side-drawer__sublink:hover {
+  color: var(--marigold);
+  background: rgb(255 255 255 / 6%);
+}
+
+.side-drawer__sublink.is-active {
+  color: var(--marigold);
+}
+

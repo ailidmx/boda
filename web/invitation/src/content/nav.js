@@ -29,7 +29,11 @@ export const nav = {
     changeEmail: "Cambiar correo",
     changePassword: "Cambiar contraseña",
     music: "Música",
+    musicLive: "Música en vivo",
+    musicPlaylist: "Playlist",
+    musicTastes: "Tus gustos",
     logout: "Cerrar sesión",
+
     
     emailWarningTitle: "Atención al cambiar tu correo",
     emailWarningBody:
@@ -62,7 +66,10 @@ export const nav = {
     petanque: "Petanca",
     food: "Comida",
     guisos: "Guisos",
+    guisosOrder: "Orden de guisos",
+    foodComment: "Comentario",
     coast: "¿Y después?",
+
     
     menu1: "Menú",
     menu2: "Más",
@@ -116,7 +123,11 @@ export const nav = {
     changeEmail: "Changer l’adresse e-mail",
     changePassword: "Changer le mot de passe",
     music: "Musique",
+    musicLive: "Musique live",
+    musicPlaylist: "Playlist",
+    musicTastes: "Tes goûts",
     logout: "Se déconnecter",
+
     
     emailWarningTitle: "Attention avant de changer l’adresse e-mail",
     emailWarningBody:
@@ -149,7 +160,10 @@ export const nav = {
     petanque: "Pétanque",
     food: "Cuisine",
     guisos: "Plats mijotés",
+    guisosOrder: "Ordre des plats",
+    foodComment: "Commentaire",
     coast: "Et après ?",
+
     
     menu1: "Menu",
     menu2: "Plus",
@@ -203,7 +217,11 @@ export const nav = {
     changeEmail: "Change email",
     changePassword: "Change password",
     music: "Music",
+    musicLive: "Live music",
+    musicPlaylist: "Playlist",
+    musicTastes: "Your tastes",
     logout: "Log out",
+
     
     emailWarningTitle: "Before you change your email",
     emailWarningBody:
@@ -235,7 +253,10 @@ export const nav = {
     petanque: "Pétanque",
     food: "Food",
     guisos: "Stews",
+    guisosOrder: "Stew order",
+    foodComment: "Comment",
     coast: "And afterwards?",
+
     
     menu1: "Menu",
     menu2: "More",

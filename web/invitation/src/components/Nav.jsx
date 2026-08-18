@@ -4,6 +4,8 @@ import { useApp } from "../context/AppContext.jsx";
 import { guestTravelsByPlane } from "../guest-profiles.js";
 import {
   getNavLinks,
+  flattenNavLinks,
+  buildSectionKeyMap,
   trackNav,
   SideDrawer,
   MobileNav,
@@ -19,11 +21,16 @@ export function Nav() {
   const [canRight, setCanRight] = useState(false);
   const [activeKey, setActiveKey] = useState("home");
   const [hoverKey, setHoverKey] = useState(null);
+  const [openDropdown, setOpenDropdown] = useState(null);
 
   // The effective nav links for this guest (FLIGHTS hidden when not travelling
   // by plane). Used by the desktop nav, the underline, and the scroll-spy.
   const travelsByPlane = guestTravelsByPlane(profile?.guest);
   const links = getNavLinks(travelsByPlane);
+  // Flat [key, href] list (parents + children) for the underline + scroll-spy.
+  const flatLinks = flattenNavLinks(links);
+  // section id → nav key (children map to their parent) for the scroll-spy.
+  const sectionKeyMap = buildSectionKeyMap(links);
 
   // Keep CSS shell vars in sync with the real rendered sticky bar heights.
   // This avoids layout gaps when mobile bar heights differ from static rem
@@ -87,9 +94,10 @@ export function Nav() {
 
   // Resolve the real href for a nav key (the key and the section id can
   // differ, e.g. "you" → "#identity"), so the underline always finds the
-  // correct link no matter how items are named or reordered.
+  // correct link no matter how items are named or reordered. Works for both
+  // flat entries and parent objects (parents resolve to their own href).
   const hrefFor = (key) => {
-    const entry = links.find(([k]) => k === key);
+    const entry = flatLinks.find(([k]) => k === key);
     return entry ? entry[1] : null;
   };
 
@@ -114,9 +122,14 @@ export function Nav() {
   );
 
   // Scroll-spy: highlight the section currently in view and auto-scroll the
-  // nav horizontally so the active link sits at the leading edge.
+  // nav horizontally so the active link sits at the leading edge. Subsection
+  // anchors map to their parent key (via sectionKeyMap) so the parent nav item
+  // is highlighted while the guest is inside any of its subsections.
   useEffect(() => {
-    const ids = links.map(([key, href]) => ({ key, id: href.slice(1) }));
+    const ids = flatLinks.map(([key, href]) => ({
+      key: sectionKeyMap[href.slice(1)] || key,
+      id: href.slice(1),
+    }));
 
     const headerOffset = () => {
       const countdown = document.querySelector(".countdown-bar");
@@ -194,26 +207,86 @@ export function Nav() {
           ‹
         </button>
         <nav className="desktop-nav" ref={navRef} aria-label="Primary">
-          {links.map(([key, href]) => (
-            <a
-              key={key}
-              href={href}
-              data-analytics={`nav.${key}`}
-              className={key === activeKey ? "is-active" : undefined}
-              aria-current={key === activeKey ? "true" : undefined}
-              onClick={() => trackNav(key, "nav")}
-              onMouseEnter={() => {
-                setHoverKey(key);
-                positionUnderline(key);
-              }}
-              onMouseLeave={() => {
-                setHoverKey(null);
-                positionUnderline();
-              }}
-            >
-              {t.nav[key]}
-            </a>
-          ))}
+          {links.map((entry) => {
+            if (Array.isArray(entry)) {
+              const [key, href] = entry;
+              return (
+                <a
+                  key={key}
+                  href={href}
+                  data-analytics={`nav.${key}`}
+                  className={key === activeKey ? "is-active" : undefined}
+                  aria-current={key === activeKey ? "true" : undefined}
+                  onClick={() => trackNav(key, "nav")}
+                  onMouseEnter={() => {
+                    setHoverKey(key);
+                    positionUnderline(key);
+                  }}
+                  onMouseLeave={() => {
+                    setHoverKey(null);
+                    positionUnderline();
+                  }}
+                >
+                  {t.nav[key]}
+                </a>
+              );
+            }
+
+            const { key, href, children } = entry;
+            const isOpen = openDropdown === key;
+            return (
+              <div
+                key={key}
+                className={`desktop-nav__item${isOpen ? " is-open" : ""}`}
+                onMouseEnter={() => {
+                  setHoverKey(key);
+                  positionUnderline(key);
+                }}
+                onMouseLeave={() => {
+                  setHoverKey(null);
+                  positionUnderline();
+                }}
+              >
+                <a
+                  href={href}
+                  data-analytics={`nav.${key}`}
+                  className={key === activeKey ? "is-active" : undefined}
+                  aria-current={key === activeKey ? "true" : undefined}
+                  aria-haspopup="true"
+                  aria-expanded={isOpen}
+                  onClick={() => {
+                    setOpenDropdown((v) => (v === key ? null : key));
+                    trackNav(key, "nav");
+                  }}
+                >
+                  {t.nav[key]}
+                  <span className="desktop-nav__caret" aria-hidden="true">
+                    ▾
+                  </span>
+                </a>
+                {isOpen && (
+                  <div className="desktop-nav__dropdown" role="menu">
+                    {children.map(([childKey, childHref]) => (
+                      <a
+                        key={childKey}
+                        href={childHref}
+                        role="menuitem"
+                        data-analytics={`nav.${childKey}`}
+                        className={childKey === activeKey ? "is-active" : undefined}
+                        aria-current={childKey === activeKey ? "true" : undefined}
+                        onClick={() => {
+                          setOpenDropdown(null);
+                          trackNav(childKey, "nav");
+                        }}
+                      >
+                        {t.nav[childKey]}
+                      </a>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </nav>
 
         <button
