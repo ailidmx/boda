@@ -9,6 +9,7 @@ on:
       - "web/invitation/**"
       - "web/dashboard/**"
       - "web/shared/**"
+      - "functions/**"
       - "integraciones/google_sheets/**"
       - "firebase.json"
       - ".firebaserc"
@@ -21,6 +22,7 @@ on:
       - "web/invitation/**"
       - "web/dashboard/**"
       - "web/shared/**"
+      - "functions/**"
       - "integraciones/google_sheets/**"
       - "firebase.json"
       - ".firebaserc"
@@ -133,6 +135,41 @@ jobs:
           projectId: boda-500805
           target: invitation-primary
           channelId: live
+
+  deploy-functions:
+    if: >-
+      (github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/develop')) ||
+      (github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Use Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: functions/package-lock.json
+
+      - name: Install functions dependencies
+        working-directory: functions
+        run: npm ci
+
+      - name: Deploy Cloud Functions
+        working-directory: functions
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "$FIREBASE_TOKEN" ]; then
+            echo "::error::Missing FIREBASE_TOKEN secret. Run 'firebase login:ci' locally and store the token as the FIREBASE_TOKEN repository secret."
+            exit 1
+          fi
+          # Deploy all functions. The Gmail + Telegram secrets are read from
+          # Secret Manager at runtime via defineSecret, so no env vars are
+          # needed here — they must exist in Secret Manager for the project.
+          npx firebase-tools deploy --only functions --token "$FIREBASE_TOKEN" --project boda-500805
 
   deploy-production:
     if: >-

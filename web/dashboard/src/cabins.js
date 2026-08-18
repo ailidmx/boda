@@ -13,9 +13,8 @@
  *   - cloudinaryIds (string|string[]) — showcase photo public IDs
  */
 
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "./firebase.js";
-import { collections } from "../../shared/firestore-paths.js";
+import { fetchCabins } from "./repositories/cabinRepository.js";
+
 
 /** @type {Array<{ id: string, name: string, cloudinaryIds: string[] }>} */
 let CABINS = [];
@@ -30,16 +29,7 @@ let cabinsLoaded = false;
 export async function loadCabins() {
   if (cabinsLoaded) return CABINS;
   try {
-    const snapshot = await getDocs(collection(db, collections.cabins));
-    const loaded = [];
-    snapshot.forEach((doc) => {
-      const data = doc.data();
-      loaded.push({
-        id: data.id || doc.id,
-        name: data.name,
-        cloudinaryIds: data.cloudinaryIds,
-      });
-    });
+    const loaded = await fetchCabins();
     if (loaded.length > 0) {
       CABINS = loaded;
       cabinsLoaded = true;
@@ -50,6 +40,7 @@ export async function loadCabins() {
   }
   return CABINS;
 }
+
 
 /**
  * Normalize a cabin's `cloudinaryIds` into an array of public IDs.
@@ -82,3 +73,16 @@ export function getCabinPhotos(displayName) {
   if (!cabin) return [];
   return normalizeCloudinaryIds(cabin.cloudinaryIds);
 }
+
+/**
+ * Build a Cloudinary URL for a cabin showcase photo from its public id.
+ * The id is the full public id (e.g. `cabin/casona/foo`), so we render it
+ * directly without any extra prefix. Returns "" when the id is empty.
+ * @param {string} publicId
+ * @returns {string}
+ */
+export function cabinPhotoUrl(publicId) {
+  if (!publicId) return "";
+  return `https://res.cloudinary.com/k2ajcgxv/image/upload/q_auto,f_auto,c_fill,g_auto,w_1200,h_800/${publicId}`;
+}
+

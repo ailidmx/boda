@@ -71,7 +71,8 @@ var LIMIT = 0;
 var SENDER_NAME = "David & Aydé";
 
 /** Couple's emails — always CC'd on every invitation. */
-var CC_RECIPIENTS = ["david.aili.mx@gmail.com", "aydemiss@gmail.com"];
+var CC_RECIPIENTS = ["bodadavidyayde@gmail.com"];
+
 
 /** Base URL of the invitation site. */
 var INVITATION_BASE_URL = "https://boda-david-y-ayde.web.app/";

@@ -57,7 +57,7 @@ const { getFirestore, FieldValue } = await import(firestorePath);
 const { getAuth } = await import(authPath);
 
 const app = initializeApp({ credential: cert(serviceAccount), projectId: serviceAccount.project_id });
-const db = getFirestore(app, "boda-us-central1");
+const db = getFirestore(app);
 const auth = getAuth(app);
 
 const SHEETS_ENV_PATH = join(__dirname, "../integraciones/google_sheets/.env");
@@ -232,6 +232,8 @@ const CANONICAL_COMPARE_FIELDS = new Set([
   "modifiedAt",
   "travelsByPlane",
   "isAdmin",
+  "firebaseEmail",
+  "firebasePassword",
   "hosting.cabin",
   "hosting.room",
   "hosting.xtraCabin",
@@ -262,72 +264,7 @@ const RUNTIME_ONLY_FIRESTORE_FIELDS = new Set([
   "createdAt",
   "guestId",
   "_deleted",
-  // cloudinaryId is a runtime-only field (set by the app when a guest uploads
-  // a photo). It is not sourced from the sheet, so it must not block the sync.
-  "cloudinaryId",
 ]);
-
-// RSVP fields are protected: they are set by the guest through the RSVP flow,
-// not by the sheet. The sync must never overwrite them, and they must not
-// block the refresh of other fields (e.g. hosting.xtraCabin / hosting.xtraRoom).
-const PROTECTED_FIRESTORE_FIELDS = new Set([
-  "rsvp.friday",
-  "rsvp.saturday",
-  "rsvp.sunday",
-  "rsvp.confirmCabin",
-  "rsvp.cabinWaitingList",
-  "rsvp.xtra",
-  "rsvp.playa",
-  "rsvp.petanca",
-  "rsvp.needBalls",
-  "rsvp.answers",
-  // idCheckUser is a runtime-only flag set by the app when the guest
-  // acknowledges the identity check. The sheet column is empty, so the sync
-  // must never overwrite it (that would reset guests' identity-check status).
-  "idCheckUser",
-]);
-
-
-function isProtectedField(path) {
-  if (PROTECTED_FIRESTORE_FIELDS.has(path)) return true;
-  // Nested runtime answers (e.g. rsvp.answers.petanqueParticipation).
-  if (path.startsWith("rsvp.answers.")) return true;
-  return false;
-}
-
-// Runtime-only Firestore paths that are set by the app (not the sheet) and
-// must never block the sync. flightInfo.* holds guest-entered flight details
-// from the FLIGHTS section; the sheet does not track them, so they must be
-// ignored when comparing the sheet/Firestore contract.
-function isRuntimeOnlyFirestorePath(path) {
-  return path.startsWith("flightInfo.");
-}
-
-
-// Remove protected fields from a payload so the sync never overwrites
-// runtime-only values (RSVP responses, idCheckUser). Returns a shallow copy
-// with protected top-level keys and nested rsvp fields stripped.
-function stripProtectedFields(payload) {
-  const copy = { ...payload };
-  for (const key of Object.keys(copy)) {
-    if (isProtectedField(key)) delete copy[key];
-  }
-  if (copy.rsvp && typeof copy.rsvp === "object") {
-    const rsvp = { ...copy.rsvp };
-    for (const key of Object.keys(rsvp)) {
-      if (isProtectedField(`rsvp.${key}`)) delete rsvp[key];
-    }
-    if (Object.keys(rsvp).length === 0) {
-      delete copy.rsvp;
-    } else {
-      copy.rsvp = rsvp;
-    }
-  }
-  return copy;
-}
-
-
-
 
 function parseCsv(text) {
   const rows = [];
@@ -624,6 +561,12 @@ function normalizeSheetRow(row) {
   // Compatibility copy kept temporarily for maternalLastName only.
   payload.maternalLastName = payload.identity.maternalLastName || "";
 
+  // Persist the auth login email + password on the guest doc so the dashboard
+  // can send invitations (email / WhatsApp) without re-reading the sheet. The
+  // Cloud Function `sendInvitation` reads these fields to build the invite URL.
+  payload.firebaseEmail = auth.identifier || "";
+  payload.firebasePassword = auth.password || "";
+
   return { payload, auth, sheetPaths };
 }
 
@@ -751,14 +694,12 @@ function compareLeaves(sheetPayload, firestorePayload) {
 
   const mismatches = [];
   for (const path of CANONICAL_COMPARE_FIELDS) {
-    if (isProtectedField(path)) continue;
     const sheetValue = comparableValue(path, sheetLeaves[path]);
     const firestoreValue = comparableValue(path, firestoreLeaves[path]);
     if (!deepEqual(sheetValue, firestoreValue)) {
       mismatches.push({ path, sheetValue, firestoreValue });
     }
   }
-
 
   // Compatibility copies must mirror their canonical nested sources when they exist.
   const compatChecks = [
@@ -994,11 +935,9 @@ function summarizeAlerts(sheetLeaves, firestoreLeaves) {
     .map(([path]) => path);
 
   const firestoreUnknown = Object.entries(firestoreLeaves)
-    .filter(([path, value]) => !sheetLeaves.hasOwnProperty(path) && !isCompatField(path) && !path.startsWith("_") && !RUNTIME_ONLY_FIRESTORE_FIELDS.has(path) && !isProtectedField(path) && !isRuntimeOnlyFirestorePath(path) && hasActualValue(value))
+    .filter(([path, value]) => !sheetLeaves.hasOwnProperty(path) && !isCompatField(path) && !path.startsWith("_") && !RUNTIME_ONLY_FIRESTORE_FIELDS.has(path) && hasActualValue(value))
     .map(([path]) => path);
   return { sheetUnknown, firestoreUnknown };
-
-
 }
 
 function mdEscape(value) {
@@ -1277,30 +1216,6 @@ function writeReportMarkdown(report) {
       lines.push("");
     }
   }
-
-  // Dedicated summary of cabin / extra-cabin assignments detected in the sheet.
-  const hostingPaths = ["hosting.cabin", "hosting.room", "hosting.xtraCabin", "hosting.xtraRoom"];
-  const hostingRows = [];
-  for (const item of report.changed) {
-    const row = { id: item.id };
-    for (const mismatch of item.mismatches) {
-      if (hostingPaths.includes(mismatch.path)) {
-        row[mismatch.path] = formatValue(mismatch.sheetValue);
-      }
-    }
-    if (Object.keys(row).length > 1) hostingRows.push(row);
-  }
-  if (hostingRows.length > 0) {
-    lines.push("## Cabin & Extra Cabin Assignments");
-    lines.push("");
-    lines.push("| Guest | Cabaña | Cuarto | Xtra Cabaña | Xtra Cuarto |");
-    lines.push("|---|---|---|---|---|");
-    for (const row of hostingRows) {
-      lines.push(`| ${mdEscape(row.id)} | ${mdEscape(row["hosting.cabin"] || "")} | ${mdEscape(row["hosting.room"] || "")} | ${mdEscape(row["hosting.xtraCabin"] || "")} | ${mdEscape(row["hosting.xtraRoom"] || "")} |`);
-    }
-    lines.push("");
-  }
-
 
   const comparisonAuditToRender = report.comparisonAudit.filter((item) => item.status !== "unchanged");
   if (comparisonAuditToRender.length > 0) {
@@ -1590,7 +1505,7 @@ async function main() {
   for (const item of report.added) {
     await db.collection(GUEST_COLLECTION).doc(item.id).set(
       {
-        ...stripProtectedFields(item.payload),
+        ...item.payload,
         updatedBy: "sync_script",
         updatedAt: FieldValue.serverTimestamp(),
       },
@@ -1602,7 +1517,7 @@ async function main() {
   for (const item of report.changed) {
     await db.collection(GUEST_COLLECTION).doc(item.id).set(
       {
-        ...stripProtectedFields(item.payload),
+        ...item.payload,
         updatedBy: "sync_script",
         updatedAt: FieldValue.serverTimestamp(),
       },
@@ -1610,7 +1525,6 @@ async function main() {
     );
     written++;
   }
-
 
   if (MARK_STALE && report.stale.length > 0) {
     for (const item of report.stale) {

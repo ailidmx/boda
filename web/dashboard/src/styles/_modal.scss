@@ -59,6 +59,15 @@
   gap: 1.1rem;
 }
 
+// The send-invite modal uses this class instead of `.dashboard-modal-body`.
+// Give it the same generous padding so the form doesn't hug the modal edges.
+.dashboard-modal-form {
+  padding: 1.75rem;
+  display: grid;
+  gap: 1.1rem;
+}
+
+
 .dashboard-modal-field {
   display: grid;
   gap: 0.3rem;
