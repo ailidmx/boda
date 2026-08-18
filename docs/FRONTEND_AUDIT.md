@@ -207,10 +207,13 @@ Severity legend: **CRITICAL** / **HIGH** / **MEDIUM** / **LOW**.
       firebase chunk. No route-level code splitting (single-page app). Worth revisiting
       only if it becomes a real problem.
 
-15. **`content.js` is a 5,261-line trilingual copy file.**
-    - File: `web/invitation/src/content.js`.
-    - This is data (copy), not logic, so it is lower risk, but it is unwieldy. Could be
-      split by domain if it grows further.
+15. **`content.js` was a 5,261-line trilingual copy file.**
+    - **Resolved (ADR-0021):** split by section into `web/invitation/src/content/` (one
+      file per section exporting `{ es, fr, en }`), composed in `content/index.js` into the
+      exact same `content` object shape. `content.js` is now a thin re-export of `content`,
+      `EVENT`, and `SUPPORTED_LANGUAGES`, so all existing imports are unchanged. The
+      composed object is deep-equal to the original (verified for all three languages).
+
 
 ---
 
