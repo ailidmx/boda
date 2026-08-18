@@ -54,6 +54,13 @@ npm run dev:invitation:network  # invitation only, LAN
 npm run dev:dashboard:network   # dashboard only, LAN
 ```
 
+These scripts live in the ROOT `package.json`. `dev:network` runs both Vite
+servers with `--host` in parallel using shell backgrounding (`&` + `wait`) —
+there is NO `concurrently` dependency. Both ports use `strictPort: true`, so if
+either port (5173/5174) is already taken the server fails loudly instead of
+silently moving; kill any stale dev server before running `dev:network`.
+
+
 ### LAN testing (network mode)
 
 - `dev:network` starts both Vite servers with `--host`, binding them to the
@@ -721,7 +728,53 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   dependency array (verified in the deployed function's
   `secretEnvironmentVariables`). When adding a new send channel, include the
   Telegram notification in the function.
+- **Email invitations use a Firebase password-RESET link, not a plaintext password** —
+  the `sendInvitation` email channel no longer emails the guest's stored
+  `firebasePassword`. Instead it generates a Firebase password-reset link via
+  `getAuth().generatePasswordResetLink(email)` and the email template
+  (`invitationEmailBody`) shows a "set your password" button pointing at it. If
+  the guest has no auth account yet, the function auto-creates one with a random
+  password (`randomBytes(16).toString("hex")`, never shown or stored) so the
+  reset link works. If the reset link can't be generated, the email falls back
+  to the invitation link. The invitation URL (`buildInvitationUrl`) therefore
+  OMITS the `password` query param for the email channel (`includePassword=false`)
+  — no plaintext password in the URL (browser history / referrer headers). The
+  WhatsApp channel still includes the password (`includePassword=true`) because
+  the couple sends that link directly. The login form pre-fills the email from
+  the `guest` param and the guest types the password they set via the reset link.
+  When adding a new send channel, decide whether it should carry a plaintext
+  password or a reset link and pass the matching `includePassword` flag.
+- **WhatsApp invitations open a `wa.me` deep link with the message pre-filled** —
+  the `sendInvitation` WhatsApp channel does NOT auto-send anything. It builds a
+  plain-text invitation message via `buildWhatsAppMessage` (SAME content as the
+  email template — title, body, CTA, login details, password note, help line with
+  both phone numbers, signoff — but adapted for WhatsApp: no HTML, no buttons,
+  the invite URL pasted inline) and returns a `waLink`:
+  `https://wa.me/<digits>?text=<urlencoded message>`, where `<digits>` is the
+  guest's phone from the live record (`identity.phone` wins, then `phone`),
+  stripped to digits only. The dashboard (`guestModals.js` `run()`) opens that
+  `waLink` in a new tab (`window.open(waLink, "_blank", "noopener,noreferrer")`)
+  so the admin reviews and sends the message themselves in WhatsApp. The status
+  shows "WhatsApp abierto — revisa y envía el mensaje." instead of "Enviado.".
+  The couple is notified on Telegram. When adding a new send channel, decide
+  whether it auto-sends (email) or opens a deep link for the admin to review
+  (WhatsApp).
+- **`invitationSent` is set SERVER-SIDE in `sendInvitation`** — the Cloud
+  Function marks the guest as invited automatically after a successful send by
+  writing `{ invitationSent: true, invitationSentAt, invitationChannel,
+  updatedBy, updatedAt }` (merge) to the guest's `guests` doc via the Admin SDK
+  (which bypasses the client rules). This happens for BOTH channels right after
+  the email is sent / the waLink is built, so the dashboard's "Enviada" checkbox
+  updates automatically via its live `onSnapshot` listener — the dashboard no
+  longer needs to call `saveGuestInline(guest.id, "invitationSent", true)` for
+  this. Note: for WhatsApp the flag is set as soon as the waLink is generated
+  (before the admin actually sends the message), which matches the previous
+  client-side behavior. When adding a new send channel, keep the server-side
+  write so the flag stays reliable regardless of the client.
+
+
 - **Secret Manager values can carry a trailing newline — trim them before use** —
+
   `firebase functions:secrets:set` stores the value you paste, and if it ends
   with a newline (common when pasting from a terminal/editor), the secret
   includes that `\n`. When the `sendGmail` helper in `functions/index.js` fed

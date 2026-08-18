@@ -71,6 +71,19 @@ export function TeAnimas() {
     }
   };
 
+  // Runs before the card advances forward. When leaving the LAST question step
+  // (i.e. entering the recap), persist the answers automatically so the guest
+  // never reaches the recap thinking they saved when they didn't. Always
+  // returns true so the recap is shown with the save result (working/saved/
+  // error) in its reserved message area.
+  const handleBeforeNext = async (currentIndex) => {
+    if (currentIndex === lastQuestionIndex) {
+      await handleSaveAnswers();
+    }
+    return true;
+  };
+
+
   // Scroll the RSVP back into view on every step change (next/back/modify) so
   // the guest always lands at the top of the flow instead of being left
   // mid-page.
@@ -111,8 +124,13 @@ export function TeAnimas() {
                 question step after "Enregistrer mes réponses" is pressed. */}
             {isLastQuestion &&
             (saveStatus === "saved" || saveStatus === "error") ? (
-              <small data-form-status>{saveStatusText}</small>
+              <small
+                data-form-status={saveStatus === "saved" ? "success" : "error"}
+              >
+                {saveStatusText}
+              </small>
             ) : null}
+
           </div>
         ),
       };
@@ -124,9 +142,12 @@ export function TeAnimas() {
         <div className="rsvp-recap-step">
           <RsvpRecap questions={questions} guests={guests} answers={answers} />
 
-          {saveStatus === "saved" || saveStatus === "error" ? (
-            <small data-form-status>{saveStatusText}</small>
-          ) : null}
+          {/* Dedicated, always-present save-status placeholder. It reserves
+              space and announces the result (working / saved / error) via
+              aria-live so the guest always sees the outcome of the save. */}
+          <p className="rsvp-status" role="status" aria-live="polite">
+            {saveStatusText}
+          </p>
 
           <div className="rsvp-scale-save">
             <button
@@ -141,6 +162,7 @@ export function TeAnimas() {
 
         </div>
       ),
+
 
     },
   ];
@@ -167,22 +189,18 @@ export function TeAnimas() {
           hideNextOn={[lastQuestionIndex]}
           countSteps={questions.length}
           onNavigate={handleNavigate}
+          onBeforeNext={handleBeforeNext}
           navRight={({ index, next }) => {
             // On the last question step, replace the "Next" button with the
             // gold "Enregistrer mes réponses" CTA, on the same line as Back.
+            // Clicking it advances to the recap; `onBeforeNext` persists the
+            // answers first and the result shows in the recap's message area.
             if (index !== lastQuestionIndex) return null;
             return (
               <button
                 className="flip-step-btn flip-step-btn--primary"
                 type="button"
-                onClick={async () => {
-                  const ok = await handleSaveAnswers();
-                  if (ok) {
-                    // Let the success message show on this step before
-                    // advancing to the review.
-                    window.setTimeout(() => next(), 900);
-                  }
-                }}
+                onClick={() => next()}
                 disabled={saveStatus === "working"}
               >
                 {scale.saveButton}
@@ -195,6 +213,7 @@ export function TeAnimas() {
             back: interfaceText.back || "Back",
           }}
         />
+
 
 
       )}
