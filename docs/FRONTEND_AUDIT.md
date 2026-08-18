@@ -51,7 +51,7 @@ This audit covers the two React applications in this monorepo:
 - **Dashboard**: `web/dashboard/src/` with `dashboard.js` (the shell + most UI) plus
   extracted panels/modals (`guestTable.js`, `guestEditorModal.js`, `guestModals.js`,
   `groupsPanel.js`, `summary.js`, `cabins.js`, `tables.js`) and data modules
-  (`guests.js`, `rooms.js`, `invitation-profile.js`, `firebase.js`, `repositories/`).
+  (`guests.js`, `rooms.js`, `guestDomain.js`, `firebase.js`, `repositories/`).
 
 ### State management
 - **Invitation**: `context/AppContext.jsx` provides global app state (language, auth,
@@ -454,6 +454,16 @@ sub-components / pure services. The audit's original line-count figures (~1003 /
     `.dashboard-detail-row`). `.dashboard-empty` was kept (still used by the groups
     panel).
   - See ADR-0012.
+
+- **`invitation-profile.js` removed (dead code)** — the dashboard's
+  `web/dashboard/src/invitation-profile.js` module was deleted. It was never imported
+  anywhere in the dashboard (its exports `loadGroupCustomContent`, `getCustomContent`,
+  `getGroupContentCache`, `getGroupTag`, `buildInvitationUrl` had zero callers; the
+  dashboard reads groups via the live `onSnapshot` listener in `dashboard.js` and
+  `groupsPanel.js`, and `buildInvitationUrl` was already inlined into the pure
+  `guestDomain.js`). Removing it also eliminated the last direct-Firestore READ
+  (`getDocs` on `invitation_groups`) from a non-repository dashboard data module.
+  Stale comments in `guestDomain.js` referencing the deleted module were updated.
 
 
 

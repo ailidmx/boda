@@ -13,8 +13,8 @@
 // IMPORTANT: This module must stay free of browser-only imports (Firebase SDK,
 // `import.meta.env`, DOM). It is imported by the Node unit tests directly, so
 // any transitive browser dependency would break them. `buildInvitationUrl` is
-// inlined below (rather than imported from `invitation-profile.js`, which pulls
-// in `firebase/firestore` + `./firebase.js`) precisely to keep this module pure.
+// inlined below precisely to keep this module pure (the former
+// `invitation-profile.js` module that held it was removed as dead code).
 
 
 // ── Domain constants ───────────────────────────────────────────────────
@@ -101,8 +101,7 @@ export function isAdminGuest(guest) {
 // Build an invitation URL for a guest. The per-guest invitation-code system was
 // removed (login is now email/password), so the invitation is served at the
 // base origin; the guest id is kept as a query param for analytics/tracking
-// only. Inlined here (instead of imported from `invitation-profile.js`) to keep
-// this module free of the Firebase SDK.
+// only. Inlined here to keep this module free of the Firebase SDK.
 function buildInvitationUrl(origin, guestId) {
   const base = (origin || "").replace(/\/+$/, "");
   const params = new URLSearchParams();
