@@ -2,13 +2,14 @@ import React from "react";
 
 import { resolveGuestName, resolveGuestPhoto } from "../../guest-profiles.js";
 import { CabinOccupancy } from "../../components/CabinOccupancy.jsx";
-import { StayPlanCard } from "../../components/StayPlanCard.jsx";
+import { PaymentSummary } from "../../components/PaymentSummary.jsx";
 import { getInitials } from "./data.js";
 
 // Extra stay (Plan 1 · stay at Roca Azul, Sunday→Tuesday) — shown only when
-// the active guest has an extra cabin assigned for the second stay. Reuses the
-// same StayPlanCard as the Hébergement section so the pricing, "paid by the
-// couple" banner, and on-sale styling match.
+// the active guest has an extra cabin assigned for the second stay. The
+// payment block reuses the same PaymentSummary as the final RSVP so the
+// pricing, avatars, cabin·room labels, "paid by the couple" banner, and
+// on-sale styling match exactly.
 export function ExtraStayCard({
   guests,
   activeMember,
@@ -26,8 +27,9 @@ export function ExtraStayCard({
   getXtraCabinId,
   getXtraRoomId,
   resolveXtraCovered,
-  resolveXtraPaid,
   onSelectMember,
+  payment,
+  coveredLabel,
 }) {
   return (
     <div className="coast-extra-stay reveal">
@@ -117,18 +119,15 @@ export function ExtraStayCard({
           />
         </div>
       )}
-      <StayPlanCard
+      <PaymentSummary
         activeMember={liveActive}
         groupMembers={guests}
         getAssignedCabinId={getXtraCabinId}
         getAssignedRoomId={getXtraRoomId}
         resolveMemberCovered={resolveXtraCovered}
-        resolveMemberPaid={resolveXtraPaid}
-        option={option}
         language={language}
-        showExtraCabinRow={false}
-        extraCabin={extraCabin}
-        extraRoom={extraRoom}
+        payment={payment}
+        coveredLabel={coveredLabel}
       />
     </div>
   );

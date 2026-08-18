@@ -3,11 +3,13 @@ import { useApp } from "../context/AppContext.jsx";
 import { useRsvp, RSVP_FLOWS } from "../context/RsvpContext.jsx";
 import { RsvpQuestion, BOOLEAN_YES } from "./RsvpQuestion.jsx";
 import { RsvpRecap } from "./RsvpRecap.jsx";
-import { getGroupMembers, resolveLiveGuest } from "../guest-profiles.js";
+import { getGroupMembers, resolveLiveGuest, resolveGuestName } from "../guest-profiles.js";
+
 import { getActiveGuests } from "../guests.js";
 import { getCabin } from "../cabins.js";
 import { getRoom } from "../rooms.js";
-import { computeInitialStepIndex } from "../rsvp-responses.js";
+import { computeInitialStepIndex, savePaymentConfirmed } from "../rsvp-responses.js";
+
 
 import {
   PaymentSummary,
@@ -21,6 +23,8 @@ import {
   trackPurchase,
 } from "../analytics.js";
 import { Button } from "./ui/Button.jsx";
+import { Avatar } from "../features/identity/Avatar.jsx";
+
 
 
 export function RSVP() {
@@ -157,8 +161,34 @@ export function RSVP() {
     }
   };
 
+  // ── Payment confirmation ───────────────────────────────────────────────
+  // The final "Envoyer ma réponse" button no longer re-sends the RSVP answers
+  // (those are already persisted per flow). Instead it lets the guest confirm
+  // that they have paid their accommodation contribution. The confirmation is
+  // written to the `guests` document of the signed-in guest AND of every other
+  // member of their invitation group (top-level boolean `paymentConfirmed`).
+  const [paymentStatus, setPaymentStatus] = useState("idle"); // idle | working | saved | error
+  const paymentConfirmed = Boolean(
+    resolveLiveGuest(profile?.guest)?.paymentConfirmed,
+  );
+
+  const handlePaymentConfirm = async () => {
+    if (paymentStatus === "working" || paymentConfirmed) return;
+    const editorGuestId = profile?.guest?.id;
+    if (!editorGuestId) return;
+    setPaymentStatus("working");
+    try {
+      await savePaymentConfirmed(profile?.guest, editorGuestId);
+      setPaymentStatus("saved");
+    } catch (error) {
+      console.warn("[rsvp] payment confirmation failed", error.code || error.message);
+      setPaymentStatus("error");
+    }
+  };
+
 
   // ── Payment summary resolvers ──────────────────────────────────────────
+
   // These mirror the resolvers used by StayPlanCard so the read-only "À payer"
   // block shows exactly the same amounts as the Hébergement section.
   const payment = rsvp.payment || {};
@@ -488,12 +518,30 @@ export function RSVP() {
               const groupSale =
                 (primary?.groupSale || false) || (extra?.groupSale || false);
 
+              // The per-person label carries a `{name}` placeholder that we
+              // fill with the signed-in guest's first name, and we show their
+              // avatar next to it (same treatment as PaymentSummary).
+              const { firstName: activeFirstName } = resolveGuestName(
+                profile?.guest,
+              );
+              const perPersonLabel = (payment.perPerson || "").replace(
+                "{name}",
+                activeFirstName || "",
+              );
+
               return (
                 <div className="rsvp-payment-block rsvp-payment-total">
                   <h4 className="rsvp-payment-block-title">{payment.total}</h4>
                   <dl className="rsvp-payment-rows">
                     <div className="rsvp-payment-row">
-                      <dt>{payment.perPerson}</dt>
+                      <dt>
+                        <span className="rsvp-payment-label-avatar">
+                          <Avatar guest={profile?.guest} size={28} />
+                        </span>
+                        {perPersonLabel}
+                      </dt>
+
+
                       <dd
                         className={`rsvp-payment-value${perPersonSale ? " is-sale" : ""}`}
                       >
@@ -552,39 +600,70 @@ export function RSVP() {
             {payment.asterisk && (
               <p className="rsvp-payment-asterisk">{payment.asterisk}</p>
             )}
+
+            {/* Payment confirmation: asks the guest to settle their
+                accommodation contribution before the wedding weekend and to
+                confirm once done. */}
+            {payment.confirmNote && (
+              <p className="rsvp-payment-confirm-note">{payment.confirmNote}</p>
+            )}
+
+            {/* Bank account details for the accommodation contribution,
+                mirroring the CADEAUX section. Expanded by default. */}
+            {payment.accounts && (
+              <div className="rsvp-payment-accounts">
+                {Object.entries(payment.accounts).map(([currency, account]) => (
+                  <details
+                    className="rsvp-payment-account"
+                    open
+                    key={currency}
+                  >
+                    <summary>{account.title}</summary>
+                    <dl>
+                      {account.details.map((detail, index) => (
+                        <dd key={index}>{detail}</dd>
+                      ))}
+                    </dl>
+                    {account.note && <small>{account.note}</small>}
+                  </details>
+                ))}
+              </div>
+            )}
           </section>
         )}
 
-        {/* Final submit: persists every flow's answers to Firestore and shows
-            a success/error confirmation. */}
+        {/* Payment confirmation: the final button no longer re-sends the RSVP
+            answers (those are already persisted per flow). Instead it lets the
+            guest confirm that they have paid their accommodation contribution.
+            The confirmation is written to the `guests` document of the
+            signed-in guest AND of every other member of their invitation
+            group. */}
         <div className="rsvp-submit">
-          <Button
-            variant="gold"
-            onClick={handleSubmit}
-            disabled={saveStatus === "working"}
-          >
-            {rsvp.button || scale.saveButton}
-          </Button>
-
-
-
-          {saveStatus === "saved" ? (
-            <p className="rsvp-confirmation" role="status">
+          {paymentConfirmed ? (
+            <p className="rsvp-confirmation rsvp-confirmation--paid" role="status">
               <span aria-hidden="true">✓</span>
-              {scale.savedNote || interfaceText.submitSuccess}
+              {payment.confirmedNote || interfaceText.submitSuccess}
             </p>
-          ) : saveStatus === "error" ? (
+          ) : (
+            <Button
+              variant="gold"
+              onClick={handlePaymentConfirm}
+              disabled={paymentStatus === "working"}
+            >
+              {payment.confirmButton || rsvp.button || scale.saveButton}
+            </Button>
+          )}
+
+          {paymentStatus === "error" && (
             <p className="rsvp-confirmation rsvp-confirmation--error" role="alert">
               {interfaceText.submitError}
             </p>
-          ) : saveStatus === "working" ? (
+          )}
+          {paymentStatus === "working" && (
             <small data-form-status>{interfaceText.submitWorking}</small>
-          ) : null}
-
-          {rsvp.previewNote && (
-            <p className="rsvp-preview-note">{rsvp.previewNote}</p>
           )}
         </div>
+
 
         {/* Desktop-only bottom nav: leads to the INVITES section. */}
         <nav className="section-nav section-nav--light rsvp-section-nav" aria-label="Continue">

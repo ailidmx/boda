@@ -33,8 +33,9 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.4rem;
-  margin: 0 auto 1.1rem;
+  margin: 0 auto 0.45rem;
 }
+
 
 .guest-cloud-mode__btn {
   border: 1px solid rgb(36 33 25 / 25%);
@@ -62,7 +63,43 @@
   color: var(--white);
 }
 
+/* ── Attendance filter (all guests / only Saturday) ─────────────────────── */
+.guest-cloud-filter {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem;
+  margin: 0 auto 1.1rem;
+}
+
+.guest-cloud-filter__btn {
+  border: 1px solid rgb(36 33 25 / 25%);
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  background: rgb(255 253 248 / 70%);
+  color: rgb(36 33 25 / 78%);
+  font: inherit;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: border-color 180ms ease, background 180ms ease, color 180ms ease;
+}
+
+.guest-cloud-filter__btn:hover {
+  border-color: rgb(36 33 25 / 42%);
+  color: var(--ink);
+}
+
+.guest-cloud-filter__btn.is-active {
+  border-color: var(--terracotta);
+  background: var(--terracotta);
+  color: var(--white);
+}
+
 .guest-cloud {
+
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -180,87 +217,7 @@
   max-width: 11ch;
 }
 
-/* ── Carousel controls (play/pause, speed, prev/next) ─────────────────── */
-.guest-avatar-carousel__controls {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 1.25rem;
-}
-
-.guest-avatar-carousel__btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 2.4rem;
-  height: 2.4rem;
-  padding: 0 0.7rem;
-  border: 1px solid rgb(36 33 25 / 22%);
-  border-radius: 999px;
-  background: rgb(255 253 248 / 80%);
-  color: rgb(36 33 25 / 82%);
-  font: inherit;
-  font-size: 0.85rem;
-  font-weight: 600;
-  line-height: 1;
-  cursor: pointer;
-  transition: border-color 180ms ease, background 180ms ease, color 180ms ease;
-}
-
-.guest-avatar-carousel__btn:hover {
-  border-color: rgb(36 33 25 / 42%);
-  color: var(--ink);
-}
-
-.guest-avatar-carousel__btn--play {
-  min-width: 3rem;
-  font-size: 0.9rem;
-}
-
-.guest-avatar-carousel__btn--nav {
-  font-size: 1.3rem;
-  padding: 0 0.9rem;
-}
-
-.guest-avatar-carousel__speed {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  padding: 0.35rem 0.7rem;
-  border: 1px solid rgb(36 33 25 / 18%);
-  border-radius: 999px;
-  background: rgb(255 253 248 / 55%);
-}
-
-.guest-avatar-carousel__speed-label {
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: rgb(36 33 25 / 62%);
-  white-space: nowrap;
-}
-
-.guest-avatar-carousel__speed-slider {
-  width: clamp(6rem, 18vw, 10rem);
-  accent-color: var(--marigold);
-  cursor: pointer;
-}
-
-.guest-avatar-carousel__speed-value {
-  min-width: 2.4rem;
-  text-align: center;
-  font-size: 0.85rem;
-  font-weight: 700;
-  color: var(--ink);
-  font-variant-numeric: tabular-nums;
-}
-
-
 @media (max-width: 640px) {
-
   .guest-avatar-carousel {
     margin-top: 2rem;
   }
