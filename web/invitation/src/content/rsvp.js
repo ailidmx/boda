@@ -108,8 +108,6 @@ export const rsvp = {
             ],
           },
           button: "Enviar mi respuesta",
-          previewNote:
-            "Tu respuesta se guardará de forma privada y solo los novios podrán consultarla.",
           progressLabel: "Antes de enviar, completa cada sección:",
           progressTeAnimas: "¿Te animas? (viernes, sábado, domingo)",
           progressPetanque: "Torneo de petanca",
@@ -154,11 +152,36 @@ export const rsvp = {
               "Aquí está el detalle de lo que deberás pagar por tu alojamiento.",
             cabinTitle: "Cabaña del viernes al domingo",
             extraCabinTitle: "Cabaña extra del domingo al martes",
-            perPerson: "A pagar por persona",
-            perGroup: "A pagar por el grupo",
+            perPerson: "A pagar para {name}",
+            perGroup: "A pagar para el grupo",
             total: "Total",
             asterisk:
               "Agradecemos tu comprensión: nos encantaría pagar por todos, pero no es posible. Esta es solo una opción que planeamos para ti, y entendemos si prefieres otra cosa. Solo háznos saber tu elección.",
+
+            confirmNote:
+              "Te agradecemos que realices el pago de tu alojamiento antes del fin de semana de la boda, para que podamos pagar a nuestros proveedores a tiempo. Una vez hecho, puedes volver aquí y confirmar tu pago con el botón de abajo, o simplemente avisarnos a Aydé o a mí. ¡Gracias!",
+            confirmButton: "Confirmo mi pago",
+            confirmedNote: "¡Gracias! Hemos registrado tu pago.",
+            accounts: {
+              eur: {
+                title: "Transferencia en EUR (SEPA)",
+                details: [
+                  "Nombre: David AILI",
+                  "IBAN: BE43 9671 3798 6001",
+                  "Swift/BIC: TRWIBEB1XXX",
+                  "Banco: Wise, Rue du Trône 100, 3rd floor, Brussels, 1050, Belgium",
+                ],
+                note: "Solo para transferencias SEPA en EUR.",
+              },
+              mx: {
+                title: "Transferencia en MXN",
+                details: [
+                  "Cuenta Clave: 012 320 01559313382 0",
+                  "Banco: BBVA",
+                  "Nombre: David AILI",
+                ],
+              },
+            },
           },
     
   },
@@ -271,8 +294,6 @@ export const rsvp = {
             ],
           },
           button: "Envoyer ma réponse",
-          previewNote:
-            "Ta réponse sera enregistrée de façon privée et accessible uniquement aux mariés.",
           progressLabel: "Avant d’envoyer, complète chaque section :",
           progressTeAnimas: "Ça te tente ? (vendredi, samedi, dimanche)",
           progressPetanque: "Tournoi de pétanque",
@@ -317,12 +338,37 @@ export const rsvp = {
               "Voici le détail de ta participation aux frais pour ton hébergement.",
             cabinTitle: "Gîte du vendredi au dimanche",
             extraCabinTitle: "Gîte supplémentaire du dimanche au mardi",
-            perPerson: "Participation aux frais par personne",
-            perGroup: "Participation aux frais par le groupe",
+            perPerson: "Participation aux frais pour {name}",
+            perGroup: "Participation aux frais pour le groupe",
             total: "Total",
     
             asterisk:
               "Nous apprécions ta compréhension : nous aurions aimé tout payer pour tout le monde, mais ce n’est pas possible. C’est une option que nous avons prévue pour toi, et nous comprenons si tu préfères autre chose. Fais-nous simplement part de ton choix.",
+
+            confirmNote:
+              "Nous te remercions de bien vouloir t’acquitter des frais d’hébergement avant le week-end du mariage, afin que nous puissions payer nos prestataires à temps. Une fois effectué, tu peux revenir ici et valider ton paiement en cliquant sur le bouton ci-dessous, ou tout simplement nous prévenir, Aydé ou moi. Merci !",
+            confirmButton: "J’ai effectué mon paiement",
+            confirmedNote: "Merci ! Nous avons bien noté ton paiement.",
+            accounts: {
+              eur: {
+                title: "Virement en EUR (SEPA)",
+                details: [
+                  "Nom : David AILI",
+                  "IBAN : BE43 9671 3798 6001",
+                  "Swift/BIC : TRWIBEB1XXX",
+                  "Banque : Wise, Rue du Trône 100, 3rd floor, Brussels, 1050, Belgium",
+                ],
+                note: "Uniquement pour les virements SEPA en EUR.",
+              },
+              mx: {
+                title: "Virement en MXN",
+                details: [
+                  "CLABE : 012 320 01559313382 0",
+                  "Banque : BBVA",
+                  "Nom : David AILI",
+                ],
+              },
+            },
           },
     
   },
@@ -435,8 +481,6 @@ export const rsvp = {
             ],
           },
           button: "Send my response",
-          previewNote:
-            "Your response will be stored privately and only the couple can view it.",
           progressLabel: "Before sending, complete each section:",
           progressTeAnimas: "Are you in? (Friday, Saturday, Sunday)",
           progressPetanque: "Pétanque tournament",
@@ -481,11 +525,36 @@ export const rsvp = {
               "Here is the breakdown of what you will pay for your accommodation.",
             cabinTitle: "Guest house, Friday to Sunday",
             extraCabinTitle: "Extra guest house, Sunday to Tuesday",
-            perPerson: "To pay per person",
+            perPerson: "To pay for {name}",
             perGroup: "To pay for the group",
             total: "Total",
+
             asterisk:
               "We appreciate your understanding: we would love to pay for everyone, but it is not possible. This is only an option we planned for you, and we understand if you prefer something else. Just let us know your choice.",
+            confirmNote:
+              "We kindly ask you to settle your accommodation payment before the wedding weekend, so we can pay our vendors on time. Once done, you can come back here and confirm your payment with the button below, or simply let Aydé or me know. Thank you!",
+            confirmButton: "I’ve made my payment",
+            confirmedNote: "Thank you! We’ve recorded your payment.",
+            accounts: {
+              eur: {
+                title: "Transfer in EUR (SEPA)",
+                details: [
+                  "Name: David AILI",
+                  "IBAN: BE43 9671 3798 6001",
+                  "Swift/BIC: TRWIBEB1XXX",
+                  "Bank: Wise, Rue du Trône 100, 3rd floor, Brussels, 1050, Belgium",
+                ],
+                note: "For SEPA transfers in EUR only.",
+              },
+              mx: {
+                title: "Transfer in MXN",
+                details: [
+                  "CLABE: 012 320 01559313382 0",
+                  "Bank: BBVA",
+                  "Name: David AILI",
+                ],
+              },
+            },
           },
     
   },

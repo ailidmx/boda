@@ -990,6 +990,28 @@
   font-size: 0.9rem;
 }
 
+/* The per-person label shows the guest's avatar next to the label text. The
+   avatar wrapper is an inline-flex so the round thumbnail aligns with the
+   baseline of the label. The stacked variant (per-group row) overlaps the
+   group members' avatars slightly. */
+.rsvp-payment-label-avatar {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  margin-right: 0.5rem;
+}
+
+.rsvp-payment-label-avatar--stack {
+  margin-right: 0.35rem;
+}
+
+.rsvp-payment-label-avatar--stack > * {
+  margin-right: -0.35rem;
+  border: 2px solid var(--deep-green);
+  border-radius: 50%;
+}
+
+
 .rsvp-payment-value {
   display: inline-flex;
   flex-direction: column;
@@ -1035,11 +1057,15 @@
   font-size: 0.85em;
 }
 
-/* When a price is discounted (covered by the couple), the price to pay turns
-   red, mirroring the Hébergement sale treatment. */
-.rsvp-payment-value.is-sale .rsvp-payment-line > strong,
+/* When a price is discounted (covered by the couple), the price to pay is
+   shown in a whiteish tone so it stays legible on the dark green frame
+   without the harsh red used elsewhere. */
+.rsvp-payment-value.is-sale .rsvp-payment-line > strong {
+  color: var(--white);
+}
+
 .rsvp-payment-value.is-sale .rsvp-payment-line > small {
-  color: #c0392b;
+  color: rgb(255 253 248 / 85%);
 }
 
 /* "Covered by the couple" banner: a small gold tag next to the price. */
@@ -1094,6 +1120,64 @@
   color: rgb(255 253 248 / 55%);
 }
 
+/* Confirmation note shown after the asterisk: asks the guest to settle their
+   accommodation contribution before the wedding weekend and explains how to
+   confirm the payment. Same muted, small treatment as the asterisk. */
+.rsvp-payment-confirm-note {
+  max-width: 46rem;
+  font-size: 0.9rem;
+  color: rgb(255 253 248 / 70%);
+  line-height: 1.5;
+}
+
+/* Bank account details for the accommodation contribution, mirroring the
+   CADEAUX section. Expanded by default so the guest sees the transfer
+   details right away. */
+.rsvp-payment-accounts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  text-align: left;
+}
+
+.rsvp-payment-account {
+  background: rgb(255 255 255 / 6%);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid rgb(255 255 255 / 12%);
+}
+
+.rsvp-payment-account summary {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #e4b968;
+  padding: 0.25rem 0;
+}
+
+.rsvp-payment-account dl {
+  margin: 0.75rem 0 0.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.rsvp-payment-account dd {
+  margin: 0;
+  font-size: 0.85rem;
+  font-family: var(--font-body);
+  letter-spacing: 0.02em;
+  word-break: break-all;
+}
+
+.rsvp-payment-account small {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
 /* Final submit block: the button that persists every flow's answers to
    Firestore, plus the success/error confirmation and the preview note. */
 .rsvp-submit {
@@ -1142,6 +1226,17 @@
 
 .rsvp-submit .rsvp-confirmation--error > span {
   background: #e53935;
+}
+
+/* "Payment confirmed" success state: a green confirmation banner shown after
+   the guest confirms their accommodation contribution. Reuses the same
+   confirmation look as the generic success banner. */
+.rsvp-submit .rsvp-confirmation--paid {
+  background: rgb(46 125 50 / 0.16);
+}
+
+.rsvp-submit .rsvp-confirmation--paid > span {
+  background: #2e7d32;
 }
 
 .rsvp-submit small[data-form-status] {

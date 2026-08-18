@@ -98,17 +98,20 @@ function runChecks(payload, checks) {
 const GUEST_ALLOWED_FIELDS = [
   "guestId", "identity", "hosting", "idCheckUser", "cloudinaryId", "messageAuthor",
   "invitationGroup", "updatedBy", "updatedAt", "_deleted", "rsvp", "flightInfo",
-];
-
-const GUEST_IDENTITY_FIELDS = [
-  "age", "cloudinaryId", "firstName", "gender", "middleName", "lastName", "maternalLastName", "lang", "phone",
+  "paymentConfirmed",
 ];
 
 // Fields that clients may MODIFY (mirrors the `affectedKeys().hasOnly()` list).
 const GUEST_WRITABLE_FIELDS = [
   "guestId", "identity", "idCheckUser", "cloudinaryId", "messageAuthor",
   "invitationGroup", "updatedBy", "updatedAt", "_deleted", "rsvp", "flightInfo",
+  "paymentConfirmed",
 ];
+
+const GUEST_IDENTITY_FIELDS = [
+  "age", "cloudinaryId", "firstName", "gender", "middleName", "lastName", "maternalLastName", "lang", "phone",
+];
+
 
 // ── flightInfo (guest flight details for the Travel section) ────────────
 // Mirrors `hasValidFlightInfo()` in firebase/firestore.rules.
@@ -224,7 +227,9 @@ export function validateGuestContactPayload(payload) {
     { check: !hasAnyKey(payload, ["cloudinaryId"]) || (isString(payload.cloudinaryId) && payload.cloudinaryId.length <= 200), message: "cloudinaryId must be a string ≤ 200 chars" },
     { check: !hasAnyKey(payload, ["messageAuthor"]) || isShortText(payload.messageAuthor, 200), message: "messageAuthor must be a string ≤ 200 chars" },
     { check: !hasAnyKey(payload, ["_deleted"]) || isBoolean(payload._deleted), message: "_deleted must be a boolean" },
+    { check: !hasAnyKey(payload, ["paymentConfirmed"]) || isBoolean(payload.paymentConfirmed), message: "paymentConfirmed must be a boolean" },
     // rsvp.answers map (questionId → int 0–5)
+
     { check: !hasAnyKey(payload, ["rsvp"]) || isObject(payload.rsvp), message: "rsvp must be an object" },
     { check: !hasAnyKey(payload, ["rsvp"]) || hasOnlyKeys(payload.rsvp, ["answers"]), message: `rsvp contains unsupported fields: ${Object.keys(payload.rsvp || {}).filter((k) => k !== "answers").join(", ")}` },
     { check: !hasAnyKey(payload, ["rsvp"]) || !hasAnyKey(payload.rsvp, ["answers"]) || isObject(payload.rsvp.answers), message: "rsvp.answers must be an object" },

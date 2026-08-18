@@ -231,6 +231,57 @@ test("an authenticated guest can write to any collection", async () => {
   );
 });
 
+// ── Payment confirmation (accommodation contribution) ───────────────────
+// Mirrors the exact payload shape written by `savePaymentConfirmed` →
+// `buildGuestPaymentConfirmedPayload` in the invitation app: a top-level
+// boolean `paymentConfirmed` plus the standard audit fields. The rules use
+// the SIMPLE model (`allow create, update: if canWrite()`), so ANY
+// authenticated guest may write this field on their OWN doc AND on any other
+// guest's doc (including every member of their invitation group) WITHOUT
+// declaring the field name explicitly in the rules. These tests prove there
+// is no permission error on prod when a guest confirms payment for
+// themselves or for another guest in their group.
+
+test("a guest can confirm payment on their OWN guest doc", async () => {
+  await seedGuestAuth();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "guests", editorUid), {
+      guestId: editorUid,
+      paymentConfirmed: true,
+      updatedBy: editorUid,
+      updatedAt: serverTimestamp(),
+    }, { merge: true }),
+  );
+});
+
+test("a guest can confirm payment on ANOTHER guest's doc (group member)", async () => {
+  await seedGuestAuth();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  // `catherine` is a different guest (same invitation group in the seed data).
+  await assertSucceeds(
+    setDoc(doc(db, "guests", "catherine"), {
+      guestId: "catherine",
+      paymentConfirmed: true,
+      updatedBy: editorUid,
+      updatedAt: serverTimestamp(),
+    }, { merge: true }),
+  );
+});
+
+test("a guest can write RSVP answers on ANOTHER guest's doc (group member)", async () => {
+  await seedGuestAuth();
+  const db = environment.authenticatedContext(editorUid).firestore();
+  await assertSucceeds(
+    setDoc(doc(db, "guests", "catherine"), {
+      guestId: "catherine",
+      rsvp: { answers: { friday: 4, saturday: 5, sunday: 4 } },
+      updatedBy: editorUid,
+      updatedAt: serverTimestamp(),
+    }, { merge: true }),
+  );
+});
+
 test("an unauthenticated visitor cannot write anything", async () => {
   const db = environment.unauthenticatedContext().firestore();
   await assertFails(
