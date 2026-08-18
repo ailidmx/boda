@@ -185,6 +185,17 @@ export function AppProvider({ children }) {
     () => window.localStorage.getItem(MUSIC_ENABLED_KEY) === "1",
   );
 
+  // Whether the music stream is actually playing right now. This is kept in
+  // sync by the WinampPlayer (via setMusicPlaying) so the Music section's FAB
+  // can clearly show "music is playing" vs "music is muted".
+  const [musicPlaying, setMusicPlaying] = useState(false);
+
+  // Whether the Music section is currently in view. The Music section's FAB
+  // and the Winamp banner are only shown while the guest is actually in the
+  // Music section; the audio keeps playing (or stays muted) based on
+  // `musicEnabled` regardless of which section is on screen.
+  const [musicSectionVisible, setMusicSectionVisibleState] = useState(false);
+
   // Avoid re-prompting on every auth state change within the same session.
   const langPromptShown = useRef(false);
   // Avoid re-opening the identity modal on every auth state change within the
@@ -472,6 +483,11 @@ export function AppProvider({ children }) {
     window.localStorage.setItem(MUSIC_ENABLED_KEY, enabled ? "1" : "0");
   };
 
+  // Toggle whether the Music section is currently in view. Drives the FAB and
+  // Winamp banner visibility (see musicSectionVisible above).
+  const setMusicSectionVisible = (visible) =>
+    setMusicSectionVisibleState(visible);
+
   const value = useMemo(
     () => ({
       language,
@@ -491,6 +507,10 @@ export function AppProvider({ children }) {
       openIdentityPrompt,
       musicEnabled,
       setMusicEnabled,
+      musicPlaying,
+      setMusicPlaying,
+      musicSectionVisible,
+      setMusicSectionVisible,
       signIn,
       signOut,
       changePassword,
@@ -506,6 +526,8 @@ export function AppProvider({ children }) {
       identityPrompt,
       revertLangPrompt,
       musicEnabled,
+      musicPlaying,
+      musicSectionVisible,
     ],
   );
 
