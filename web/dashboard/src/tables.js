@@ -12,10 +12,12 @@
 //   slots (object), x, y, rotation, guestIds (array)
 // ─────────────────────────────────────────────────────────────────────────
 
-import { collection, doc, setDoc, onSnapshot, limit, query } from "firebase/firestore";
+import { collection, onSnapshot, limit, query } from "firebase/firestore";
 import { db } from "./firebase.js";
 import { getGuest } from "./guests.js";
 import { collections } from "../../shared/firestore-paths.js";
+import { updateTableLayout, updateTableGuests } from "./repositories/tableRepository.js";
+
 
 // ── Real-life canvas dimensions (meters) ────────────────────────────────
 const CANVAS_W = 30; // 30 m wide
@@ -282,10 +284,11 @@ export function renderTablesManager(container) {
         updatedAt: new Date(),
       };
       try {
-        await setDoc(doc(db, collections.tables, table.id), payload, { merge: true });
+        await updateTableLayout(table.id, payload);
       } catch (err) {
         console.error("Failed to save table layout", err);
       }
+
     }
     renderTablesManager(container);
   });
@@ -318,12 +321,13 @@ export function renderTablesManager(container) {
       toGuests.splice(Math.min(seatIndex, toGuests.length), 0, guestId);
 
       try {
-        await setDoc(doc(db, collections.tables, fromTableId), { guestIds: fromGuests }, { merge: true });
-        await setDoc(doc(db, collections.tables, toTableId), { guestIds: toGuests }, { merge: true });
+        await updateTableGuests(fromTableId, fromGuests);
+        await updateTableGuests(toTableId, toGuests);
         renderTablesManager(container);
       } catch (err) {
         console.error("Failed to move guest between tables", err);
       }
+
     });
   });
 }

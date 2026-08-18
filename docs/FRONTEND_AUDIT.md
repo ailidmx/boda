@@ -116,10 +116,15 @@ Severity legend: **CRITICAL** / **HIGH** / **MEDIUM** / **LOW**.
      `web/dashboard/src/guests.js`, `web/dashboard/src/rooms.js`,
      `web/dashboard/src/tables.js`, `web/dashboard/src/invitation-profile.js`.
    - The dashboard still calls `collection()`, `doc()`, `setDoc()`, `onSnapshot()`, etc.
-     directly in several places. The repositories layer (`repositories/`) exists for guest
-     and group writes, but cabin/table/room data access is not fully routed through it.
+     directly in several places. The repositories layer (`repositories/`) exists for guest,
+     group, and table writes, but cabin/room data access is not fully routed through it.
+   - **Progress:** the `tables` collection WRITE path is now fully routed through
+     `repositories/tableRepository.js` (`updateTableLayout`, `updateTableGuests`); the
+     `tables.js` `onSnapshot` listener (a subscription concern) stays in the module. See
+     ADR-0010.
    - Note: the **invitation** components are clean — zero direct Firestore SDK calls in
      `web/invitation/src/components/`. This is the model to follow.
+
 
 4. **No shared UI primitives; duplicated button/input/card/modal markup.**
    - Files: `web/invitation/src/styles/base.css` (`.button`), `web/dashboard/src/styles/_buttons.scss`
