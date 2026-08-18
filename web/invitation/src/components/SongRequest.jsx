@@ -661,8 +661,8 @@ export function SongRequest() {
       )}
 
       <nav className="section-nav" aria-label="Continue">
-        <a className="section-nav-link" href="#coast">
-          <span>{t.nav.coast}</span>
+        <a className="section-nav-link" href="#music-playlist">
+          <span>{t.nav.musicPlaylist}</span>
           <span aria-hidden="true">↓</span>
         </a>
       </nav>
