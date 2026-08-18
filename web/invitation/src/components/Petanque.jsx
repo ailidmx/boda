@@ -11,6 +11,8 @@ import { MEDIA } from "../media.js";
 import { getGroupMembers } from "../guest-profiles.js";
 import { getActiveGuests } from "../guests.js";
 import { computeInitialStepIndex } from "../rsvp-responses.js";
+import { Button } from "./ui/Button.jsx";
+
 
 
 
@@ -298,14 +300,14 @@ export function Petanque() {
                         answers={answers}
                       />
                       <div className="petanque-rsvp-save">
-                        <button
-                          className="button button--gold"
-                          type="button"
+                        <Button
+                          variant="gold"
                           data-analytics="rsvp.modify.petanque"
                           onClick={back}
                         >
                           {rsvpMini.modifyButton || rsvpMini.button}
-                        </button>
+                        </Button>
+
 
                         {saveStatus === "saved" ? (
                           <p className="rsvp-confirmation" role="status">

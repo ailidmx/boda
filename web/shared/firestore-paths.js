@@ -11,7 +11,11 @@
  *
  *   const ref = doc(db, collections.guests, guestId);
  *   const q = query(collection(db, collections.guests), where("invitationGroup", "==", group));
+ *
+ * NOTE: This file is intentionally kept free of business logic. It only maps
+ * collection names and path builders so both apps stay in sync.
  */
+
 
 /** All Firestore collection names used by the application. */
 export const collections = {
@@ -42,8 +46,6 @@ export const collections = {
   genreRatings: "genre_ratings",
   /** Guest sign-in events (written on every real login). Readable by admins. */
   loginEvents: "login_events",
-  /** Mirror of the FULL Firebase Auth user list (doc id = auth uid = guest id). */
-  authUsers: "auth_users",
   /** Table inventory + seating assignments (admin-only planning). */
   tables: "tables",
 

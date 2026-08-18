@@ -17,66 +17,20 @@ import { RsvpQuestion, BOOLEAN_YES, BOOLEAN_NO } from "./RsvpQuestion.jsx";
 import { resolveRsvpAnswer, saveRsvpAnswers } from "../rsvp-responses.js";
 import { StayPlanCard } from "./StayPlanCard.jsx";
 import { CabinOccupancy } from "./CabinOccupancy.jsx";
+import {
+  MXN_PER_EUR,
+  formatPrice,
+  PriceLines,
+  AccommodationPrice,
+  PlanPrice,
+} from "./accommodation-price.jsx";
+import {
+  AIRBNB_SEARCH_URL,
+  AIRBNB_SUGGESTIONS,
+  HOTEL_SUGGESTIONS,
+} from "./accommodation-data.js";
+import { Button } from "./ui/Button.jsx";
 
-
-
-
-const AIRBNB_SEARCH_URL = "https://www.airbnb.mx/s/roca-azul/homes?date_picker_type=calendar&checkin=2027-02-19&checkout=2027-02-21&refinement_paths%5B%5D=%2Fhomes&search_type=search_query";
-const AIRBNB_SUGGESTIONS = [
-  {
-    name: "Casa Roca Azul en Jocotepec, Lago Chapala",
-    url: "https://www.airbnb.mx/rooms/1573287868886556972?check_in=2027-02-19&check_out=2027-02-21",
-    image: "https://a0.muscache.com/im/pictures/hosting/Hosting-1573287868886556972/original/b06edc58-35b9-4bdb-8892-3b4eadb48661.jpeg?im_w=720&width=720&quality=70&auto=webp",
-    guests: 8,
-    bedrooms: 3,
-    beds: 5,
-    rating: "4.0",
-  },
-  {
-    name: "Casa Vista Roca Azul Jocotepec",
-    url: "https://www.airbnb.mx/rooms/43404418?check_in=2027-02-19&check_out=2027-02-21",
-    image: "https://a0.muscache.com/im/pictures/airflow/Hosting-43404418/original/9c5bda77-33aa-43eb-981e-c586bd647e7a.jpg?im_w=720&width=720&quality=70&auto=webp",
-    guests: 12,
-    bedrooms: 4,
-    beds: 6,
-    rating: "4.54",
-  },
-  {
-    name: "Roca Azul, vecindario agradable cerca de Ajijic",
-    url: "https://www.airbnb.mx/rooms/5617577?check_in=2027-02-19&check_out=2027-02-21",
-    image: "https://a0.muscache.com/im/pictures/miso/Hosting-5617577/original/24e8e6f1-d167-4a26-b142-c6c73c091528.jpeg?im_w=720&width=720&quality=70&auto=webp",
-    guests: 5,
-    bedrooms: 2,
-    beds: 3,
-    rating: "4.68",
-  },
-];
-const HOTEL_SUGGESTIONS = [
-  {
-    name: "El Chante Spa Hotel",
-    url: "https://www.elchantespa.com/",
-    image: "https://www.elchantespa.com/img/bg_chapala.jpg",
-    location: "Jocotepec",
-    type: "spaHotel",
-    price: 2000,
-  },
-  {
-    name: "Cosalá Grand Boutique Resort & Spa",
-    url: "https://www.cosalagrand.com/",
-    image: "https://images-new.pxsol.com/2A1m2dNdG2XVEBIghDhfc1AMd4n5SfERbAkax-Hop0Q/rs:fill:630:430:1/q:80/plain/https%3A%2F%2Ffiles-p.pxsol.com%2F25150%2Fcompany%2Flibrary%2Fuser%2F14205952368dd68e4f0c0cefe337e8b050b752607dd.png@png",
-    location: "San Juan Cosalá",
-    type: "boutiqueSpa",
-    price: 3700,
-  },
-  {
-    name: "Hotel Balneario San Juan Cosalá",
-    url: "https://www.hotelspacosala.com/",
-    image: "https://static.wixstatic.com/media/a38016_f23f8b18b81a424381d7a612c2988396.jpg/v1/fill/w_696,h_304,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/a38016_f23f8b18b81a424381d7a612c2988396.jpg",
-    location: "San Juan Cosalá",
-    type: "thermalHotel",
-    price: 3300,
-  },
-];
 
 function getAssignedRoom(candidate) {
   // Resolve the LIVE Firestore record first so the primary cabin occupancy
@@ -97,77 +51,6 @@ function getInitials(name) {
     .join("")
     .toLocaleUpperCase();
 }
-
-const MXN_PER_EUR = 20;
-
-function formatPrice(amount, language) {
-  const locale = language === "fr" ? "fr-FR" : language === "en" ? "en-US" : "es-MX";
-  return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(amount);
-}
-
-/* Two-line price block: line 1 shows MXN, line 2 shows EUR. When the stay is
-   covered by the couple, each line shows the original price struck through
-   next to the discounted price to pay (red); otherwise it shows the plain
-   price. */
-function PriceLines({ original, toPay, language, showSale }) {
-  return (
-    <>
-      <span className="accommodation-plan-line">
-        {showSale && (
-          <span className="accommodation-plan-original">
-            {formatPrice(original, language)} MXN
-          </span>
-        )}
-        <strong>{formatPrice(toPay, language)} MXN</strong>
-      </span>
-      <span className="accommodation-plan-line">
-        {showSale && (
-          <span className="accommodation-plan-original">
-            ≈ {formatPrice(original / MXN_PER_EUR, language)} €
-          </span>
-        )}
-        <small>≈ {formatPrice(toPay / MXN_PER_EUR, language)} €</small>
-      </span>
-    </>
-  );
-}
-
-function AccommodationPrice({ original, toPay, language, covered = false, coveredLabel, showSale }) {
-  const isSale = showSale ?? (covered && toPay < original);
-  return (
-    <dd className={`accommodation-price${isSale ? " is-sale" : ""}`}>
-      <span className="accommodation-price-values">
-        <PriceLines
-          original={original}
-          toPay={toPay}
-          language={language}
-          showSale={isSale}
-        />
-      </span>
-      {covered && <em>{coveredLabel}</em>}
-    </dd>
-  );
-}
-
-
-/* Price block used inside the plan card rows. When the stay is covered by the
-   couple it shows the original price struck through next to the discounted
-   price to pay (red); otherwise it shows the plain price. */
-function PlanPrice({ original, toPay, language, covered = false }) {
-  const showSale = covered && toPay < original;
-  return (
-    <div className={`accommodation-plan-price${showSale ? " is-sale" : ""}`}>
-      <PriceLines
-        original={original}
-        toPay={toPay}
-        language={language}
-        showSale={showSale}
-      />
-    </div>
-  );
-}
-
-
 
 export function Accommodation() {
   const { t, profile, language, interfaceText } = useApp();
@@ -633,16 +516,16 @@ export function Accommodation() {
 
             </div>
             <div className="accommodation-recap-save">
-              <button
-                className="button button--gold"
-                type="button"
+              <Button
+                variant="gold"
                 onClick={handleRecapSave}
                 disabled={recapSaveStatus === 'working'}
               >
                 {recap.button}
-              </button>
+              </Button>
               {recapStatusText ? <small data-form-status>{recapStatusText}</small> : null}
             </div>
+
           </div>
         ) : (
           <div className="flip-step-card-body">
@@ -732,15 +615,15 @@ export function Accommodation() {
               )}
 
               <div className="accommodation-recap-save">
-                <button
-                  className="button button--gold"
-                  type="button"
+                <Button
+                  variant="gold"
                   data-analytics="rsvp.modify.accommodation"
                   onClick={() => setRecapStep("question")}
                 >
                   {recap.modifyButton}
-                </button>
+                </Button>
               </div>
+
 
             </div>
           </div>

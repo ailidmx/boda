@@ -127,6 +127,14 @@ npm run dev:dashboard:network   # dashboard only, LAN
   cleaning first.
 - The invitation injects a build number (`version.json` + service worker cache
   version) so stale cached versions are detectable.
+- **The deploy workflow (`deploy-invitation.yml`) MUST use `npm run build:all`**,
+  NOT `npm run build` in `web/invitation` alone. Building only the invitation
+  means the dashboard is never built into `web/invitation/dist/dashboard`, so
+  `/dashboard/` 404s on prod. The workflow also installs dashboard deps
+  (`npm ci` in `web/dashboard`) and includes `web/dashboard/**` + `web/shared/**`
+  in its push/pull_request path filters so dashboard changes trigger a deploy.
+  When adding a new app to the monorepo, wire it into `build:all` AND the deploy
+  workflow's build + path filters.
 
 ---
 
@@ -531,7 +539,21 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   `firebase deploy --only firestore:rules`. `isAdmin()` requires the admin's
   OWN guest doc (`guests/{auth.uid}`) to have `isAdmin == true`; the couple's
   docs (`aydé_juárez_guadalupe`, `david_aïli`) have it set.
+- **Dashboard Firestore WRITES go through repositories** — the dashboard's
+  `web/dashboard/src/repositories/` layer owns ALL Firestore write operations
+  for the dashboard. `guestRepository.js` exposes `updateGuest(guestId, payload)`
+  (a `setDoc` merge on the `guests` doc) and `softDeleteGuest(guestId)` (a
+  `setDoc` merge writing `{ _deleted: true }`); `groupRepository.js` exposes
+  `createGroup(name)`, `updateGroupField(groupId, field, value)` (merge-write a
+  dotted path like `tag.color` or `customContent.greeting`), and
+  `deleteGroup(groupId)`. `dashboard.js` imports these and NEVER calls
+  `setDoc`/`deleteDoc` directly for guests or invitation groups. When adding a
+  new dashboard write, add it to the appropriate repository (or create a new
+  one) rather than calling Firestore from `dashboard.js`. The dashboard's
+  `onSnapshot` listeners (guests, invitation_groups) remain subscription
+  concerns owned by the dashboard bootstrap, not the repositories.
 - **Dashboard cabin edits read `hosting` from the LIVE record** — the remove
+
   ("✕"), drag-and-drop, and "+ Agregar" handlers in `renderCabinAssignments()`
   all build the new `hosting` map from `getLiveHosting(guestId)` (a helper that
   reads `state.liveGuests`), NOT from `guestHosting(getGuest(guestId))`. This
@@ -575,7 +597,38 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   replaces the old pill/rounded look (999px chips, 50% RSVP dots, 1.25rem+
   radii). When adding new dashboard UI, keep radii small and padding generous
   to match. Chips/badges use `0.35rem` radius, not `999px`.
+- **Dashboard INVITADOS table has a dedicated "Enviar" column with per-channel send guards** —
+  the guest table's "Enviar" column (`sendCell` in `dashboard.js`) sits right after
+  "Identidad" and renders two send buttons: WhatsApp (📱) and Email (✉️). Each is
+  disabled when that channel is not available for the guest, enforced by three
+  helpers: `guestHasAuth(guest)` (has a Firebase Auth account — either in the live
+  `state.authUsers` list or via an explicit `firebaseEmail` on the raw record),
+  `guestCanWhatsapp(guest)` (auth AND has a phone), and `guestCanEmail(guest)`
+  (has a real email that is NOT on the default auth domain
+  `@boda-david-y-ayde.web.app` — that domain is auto-appended to bare usernames and
+  is not a real inbox; email does NOT require auth, see the dedicated bullet
+  below). The send modal (`openSendInviteModal(guest, channel)`)
+  disables the same channels with explanatory tooltips and auto-triggers the
+  pre-selected channel from the column button. The old 📨 button was removed from
+  the "Acciones" column. When adding a new send channel, update `sendCell`, the
+  modal, and the `guestCan*` helpers together.
+- **Dashboard INVITADOS table has an "Invitación" column (rename + pick another group)** —
+  the guest table's "Invitación" column (`invitationGroupCell` in `dashboard.js`)
+  shows the guest's `invitationGroup` as a clickable display that reveals an
+  inline editor with a free-text rename input and a dropdown to pick another
+  existing group. The dropdown options come from `getInvitationGroupOptions()`
+  (the `invitation_groups` collection ids plus every distinct `invitationGroup`
+  value currently used by guests). Renaming or picking a group calls
+  `applyInvitationGroupChange`, which saves the new value to that guest via
+  `saveGuestInline` (the `invitationGroup` field is in `GUEST_WRITABLE_FIELDS`)
+  and, if the old group was shared by other guests, opens a confirm modal
+  (`openConfirmModal`) asking whether to apply the same change to all of them.
+  The column is sortable (`sortTh("invitationGroup", "Invitación")`). Styles
+  live in `_guests.scss` (`.dashboard-invgroup-*`). When adding a new column,
+  update `GUEST_SORT_COLUMNS`, `guestSortValue`, the `<thead>`, and the row
+  template.
 - **Dashboard INVITADOS table shows phone + auth email inside the identity cell** —
+
   the guest table's "Identidad" cell (`identityCell` in `dashboard.js`) renders
   the avatar, the name (inline editor), and a mini meta row with the guest ID
   and the phone (live `identity.phone` wins, then the live record's own `phone`;
@@ -627,7 +680,191 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   6-left / 6-right grid described above. When adding a new layout algorithm,
   keep the NOVIOS-at-center + 6-per-side convention so the couple's mental
   model stays consistent.
+- **Dashboard "Enviar" email channel does NOT require Firebase Auth** — the
+  email send button (`guestCanEmail` in `web/dashboard/src/dashboard.js`) is
+  enabled whenever the guest has a real (non-default-domain) email address,
+  regardless of whether they have a `firebaseEmail` field or a Firebase Auth
+  account. This lets the couple send an invitation to a guest who has a real
+  inbox but hasn't been provisioned an auth account yet. The email address used
+  is resolved by `guestSendEmail`, which reads (in priority order): the raw
+  record's `firebaseEmail`, then the LIVE Firebase Auth user's email from
+  `state.authUsers[guest.id]?.email` (the SAME source the identity column uses
+  to show the auth email — so a guest with an auth account but no `firebaseEmail`
+  field still gets an enabled email button), then `identity.email`/`email`. The
+  WhatsApp channel (`guestCanWhatsapp`) still requires auth AND a phone. When
+  adding a new send channel, update `sendCell`, `openSendInviteModal`, and the
+  `guestCan*` helpers together.
+- **Dashboard "Enviar" email resolves the address from LIVE Firebase Auth** —
+  `guestSendEmail` in `web/dashboard/src/dashboard.js` resolves the email to
+  send to in priority order: the raw record's `firebaseEmail`, then the LIVE
+  Firebase Auth user's email from `state.authUsers[guest.id]?.email` (the SAME
+  source the identity column uses to show the auth email), then
+  `identity.email`/`email`. This means a guest with an auth account but no
+  `firebaseEmail` field still gets a working email button. The Cloud Function
+  `sendInvitation` (in `functions/index.js`) mirrors this resolution server-side:
+  it reads the guest's `firebaseEmail`, then falls back to looking up the guest's
+  Firebase Auth user by uid via `admin.auth().getUser(guestId)` and uses that
+  email. When adding a new email source, update BOTH the dashboard helper and the
+  function so the button's enabled state and the actual send agree.
+- **Invitation URL always uses the prod domain** — the dashboard's
+  `getInviteUrl(guestId)` in `web/dashboard/src/dashboard.js` builds the
+  invitation link as `https://boda-david-y-ayde.web.app/?invite=<guestId>`
+  (the prod hosting domain), NOT `window.location.origin`. This guarantees the
+  link works when the couple sends it from a local dev server or a preview
+  channel. When changing the prod domain, update `getInviteUrl` (and any other
+  place that hardcodes the origin).
+- **`sendInvitation` notifies the couple on Telegram** — the `sendInvitation`
+  Cloud Function posts a Telegram message (via `sendTelegramMessage` in
+  `functions/telegram.js`) whenever an invitation is sent, listing the guest
+  name, channel (WhatsApp/email), and the invite URL. It requires the
+  `TELEGRAM_TOKEN` and `TELEGRAM_CHAT_ID` secrets in its `secrets: [...]`
+  dependency array (verified in the deployed function's
+  `secretEnvironmentVariables`). When adding a new send channel, include the
+  Telegram notification in the function.
+- **Secret Manager values can carry a trailing newline — trim them before use** —
+  `firebase functions:secrets:set` stores the value you paste, and if it ends
+  with a newline (common when pasting from a terminal/editor), the secret
+  includes that `\n`. When the `sendGmail` helper in `functions/index.js` fed
+  `GMAIL_CLIENT_ID.value()` / `GMAIL_CLIENT_SECRET.value()` /
+  `GMAIL_REFRESH_TOKEN.value()` straight into the Google OAuth2 client, the
+  trailing newline made Google reject the client_id with
+  `invalid_client: The OAuth client was not found` (a 500 on the
+  `sendInvitation` callable). The fix: `sendGmail` now trims all four secret
+  values (`GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN`,
+  `GMAIL_FROM`) with `.trim()` before building the OAuth2 client. When adding a
+  new secret-backed credential, always `.trim()` the `.value()` before using it
+  in an API call. **Also ensure the Gmail API is enabled in the project** — if it
+  isn't, `sendGmail` fails with `Gmail API has not been used in project ... before
+  or it is disabled` (enable via `gcloud services enable gmail.googleapis.com`).
 - *(Add new lessons here as you discover them.)*
+
+---
+
+## 6b. Front-end engineering rules (ALWAYS follow)
+
+> These rules govern the invitation and dashboard React apps. See
+> `docs/FRONTEND_ARCHITECTURE.md` (intended architecture) and `docs/FRONTEND_AUDIT.md`
+> (current-state audit).
+
+- **Inspect existing primitives before creating a new component.** Search by name, visual
+  purpose, interaction, and similar markup/CSS. Ask: does this already exist? Can an
+  existing component accept one more variant? Is this a UI primitive or a feature component?
+- **Never duplicate an existing UI primitive.** Do NOT create `Button2`, `CustomButton`,
+  `NewModal`, `GenericCard2`, `BetterTable`, `StyledInputNew`. Extend the existing one.
+- **Pages compose features.** A route/page component should compose `PageLayout`,
+  `PageHeader`, feature toolbars/tables/dialogs — not contain Firestore queries, full form
+  implementations, domain calculations, or hundreds of lines of table/modal rendering.
+- **UI primitives contain no business logic.** `components/ui/` (Button, Input, Dialog,
+  Spinner, EmptyState, Badge, Card, Tooltip, Tabs, Table) hold little/no business logic.
+- **Feature components stay inside their feature.** Do NOT put every component in a global
+  `components/` folder. Feature components live in `features/<feature>/components/`.
+- **Firestore does not belong in presentation components.** React components must NOT import
+  Firestore SDK functions directly (`getDocs`, `getDoc`, `setDoc`, `addDoc`, `updateDoc`,
+  `deleteDoc`, `collection`, `doc`, `query`, `onSnapshot`). Route through
+  repositories → services → hooks. The invitation components are the model (zero direct
+  Firestore calls); the dashboard still has leaks to clean up.
+- **Use semantic design tokens.** Reference the app's token source (invitation:
+  `styles/base.css` + `styles/tokens.css`; dashboard: `styles/_tokens.scss`). Do NOT
+  hardcode colors, spacing, radius, shadows, or breakpoints inside individual components.
+  Avoid random values like `13px`, `17px`, `23px`.
+- **Support loading/error/empty states.** Every asynchronous feature must explicitly handle
+  loading, success, empty, and error. Do not leave blank screens. Use shared primitives
+  (`Spinner`, `Skeleton`, `EmptyState`, `ErrorState`) rather than ad-hoc markup.
+- **Preserve accessibility.** Prefer native HTML semantics before ARIA. Use `<button>` for
+  actions, not clickable `<div>`s. Associate labels with inputs. Provide accessible labels
+  for icon-only controls. Manage focus in dialogs (trap, ESC, restore). Use semantic table
+  headers and form error relationships.
+- **Use one icon system.** Do not mix icon libraries. Do not use text glyphs (✏ ❌ 🗑 📷)
+  as interface icons unless deliberately part of the product style. Icon-only controls need
+  accessible labels/tooltips.
+- **Use one notification/toast strategy.** Do not mix `alert()`, multiple toast libraries,
+  and custom banners. Define when to use toast vs inline validation vs page-level error vs
+  confirmation dialog.
+- **Destructive actions need safeguards.** Delete/archive/reset must be visually and
+  behaviorally clear: destructive styling, confirmation, disabled/loading state, clear
+  consequences. Prefer the app's dialog system over `confirm()`.
+- **Verify responsive behavior.** Audit important pages at mobile, tablet, and desktop.
+  Tables may scroll or switch representation on mobile; do not blindly stack everything.
+- **Run lint/typecheck/tests/build** after changes (`npm run build:all`, `npm test`,
+  `npx eslint`). Use browser verification for important UI changes.
+- **Do not redesign unrelated interfaces during feature implementation.** Structural
+  refactoring and visual redesign are separate tasks unless explicitly combined.
+- **Do not over-abstract.** Prefer three clear components over one configurable component
+  with 37 props. Reusability is valuable only when real reuse exists.
+
+---
+
+## 7. Architecture guardrails (ALWAYS follow)
+
+
+> These rules exist to prevent further architectural degradation. They are the contract
+> every change must respect. See `docs/ARCHITECTURE.md` (intended architecture),
+> `docs/ARCHITECTURE_AUDIT.md` (current-state audit), and `docs/adr/` (decision log).
+
+### 7.1 Inspect before implementing
+- Before changing code, understand the existing architecture and search for an existing
+  abstraction. Do NOT assume how the project is structured.
+- Read `docs/ARCHITECTURE.md` and `docs/ARCHITECTURE_AUDIT.md` before starting a task.
+
+### 7.2 Layer boundaries — no Firestore in UI
+- The dependency flow is: **UI → hooks/use-cases → services → repositories → Firestore**.
+- **React components must NOT import Firestore SDK functions directly** (`getDocs`,
+  `getDoc`, `addDoc`, `updateDoc`, `deleteDoc`, `collection`, `doc`, `query`,
+  `onSnapshot`, `serverTimestamp`). If you find yourself adding one to a component,
+  stop and route it through a repository/service instead.
+- **Repositories** own all Firestore access (paths, queries, CRUD, doc conversion,
+  Firestore errors). They contain NO UI behavior and NO business rules.
+- **Services** own domain logic and business rules. They do NOT touch Firestore.
+- **Hooks/use-cases** orchestrate: call services, hold UI state, manage subscriptions.
+
+### 7.3 Feature-oriented modules
+- Prefer grouping code by domain (`features/guests`, `features/rsvp`, `features/cabins`,
+  `features/music`, `features/travel`, `features/coast`, …) over technical layers.
+- Expose each feature through a public `index.ts` and prefer shallow imports
+  (`import { useGuests } from "features/guests"`), not deep internal paths.
+- Do NOT create folders mechanically — only create a folder when it holds real code.
+
+### 7.4 No god files
+- Do NOT create `utils.js`, `services.js`, `firebase.js` (all behavior), `api.js`, or
+  `helpers.js` containing unrelated functions. Prefer cohesive modules with explicit
+  responsibility.
+- If a component exceeds ~200–300 lines, inspect whether it holds multiple
+  responsibilities and split by responsibility (not by line count).
+
+### 7.5 Single source of truth
+- **Collection names** live ONLY in `web/shared/firestore-paths.js` (`collections.*`).
+  Never hardcode a collection name in a component, service, or repository.
+- **Payloads** are built ONLY via `web/shared/payload-builders.js`. Never spread raw form
+  state into Firestore.
+- **Validation** mirrors the rules via `web/shared/validation.js`. Route ALL writes
+  (including dashboard writes) through it before persisting.
+- **Domain constants** (e.g. `AUTH_EMAIL_DOMAIN`, `RSVP_CONFIRMED_MIN_LEVEL`,
+  `RSVP_ATTENDANCE_DAYS`, `CABIN_NAME_MAP`) must NOT be duplicated across apps. Define
+  once and import.
+- **Guest normalization** must not be duplicated. Use one normalizer shared by both apps.
+
+### 7.6 Reuse before build
+- Search for an existing implementation before creating another abstraction.
+- Prefer extending an existing domain module over creating random global helpers.
+- Reuse existing shared components (carousels, modals) instead of reinventing.
+
+### 7.7 Keep changes scoped & preserve behavior
+- Refactor incrementally, one coherent phase at a time. Do NOT perform a gigantic rewrite.
+- Preserve existing behavior during refactors. Do not mix unrelated UI redesign with
+  architecture refactoring.
+- After each phase: run lint, tests, and a production build (`npm run build:all`), and
+  verify the affected UI.
+
+### 7.8 Dependencies
+- Do not introduce dependencies unnecessarily. Prefer the standard library and existing
+  shared code. If a validation library already exists, use it.
+
+### 7.9 Documentation
+- Update `docs/ARCHITECTURE.md` and add an ADR (`docs/adr/`) when an architectural
+  decision changes.
+- Keep `docs/ARCHITECTURE_AUDIT.md` current as the codebase evolves.
+- Add new operational lessons to this AGENTS.md as you discover them.
+
 
 
 

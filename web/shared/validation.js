@@ -93,26 +93,23 @@ function runChecks(payload, checks) {
 // ── Guests collection validators ────────────────────────────────────────
 // Mirrors `hasValidGuestContactFields()` in firebase/firestore.rules.
 
-// Protected fields that regular guests may NEVER write. This is a BLACKLIST,
-// not a whitelist: any field NOT listed here may be written freely, so adding
-// a new guest-writable field requires no change to this validator or the rules.
-//
-// NOTE: `invitationGroup` is intentionally NOT in this list. The app echoes it
-// back on every guest save (see buildGuestContactPayload / buildGuestPhotoPayload
-// / buildIdentityCheckPayload), so it is legitimately present in guest payloads.
-// The Firestore rules still prevent a guest from CHANGING it via
-// `affectedKeys().hasAny([...])` (which only flags modified keys), but this
-// client validator has no access to the previous document state, so it cannot
-// detect a change — it only blocks fields that are NEVER legitimately written
-// by a guest.
-const GUEST_PROTECTED_FIELDS = [
-  "isAdmin", "hosting", "table", "_deleted",
-  "_source", "_migratedAt", "sent", "modifiedAt", "id", "tagGroup", "message",
+// All fields that may exist in a `guests` document (both client-writable and
+// sheet-synced read-only). Mirrors the `hasOnly()` list in the rules.
+const GUEST_ALLOWED_FIELDS = [
+  "guestId", "identity", "hosting", "idCheckUser", "cloudinaryId", "messageAuthor",
+  "invitationGroup", "updatedBy", "updatedAt", "_deleted", "rsvp", "flightInfo",
 ];
 
 const GUEST_IDENTITY_FIELDS = [
   "age", "cloudinaryId", "firstName", "gender", "middleName", "lastName", "maternalLastName", "lang", "phone",
 ];
+
+// Fields that clients may MODIFY (mirrors the `affectedKeys().hasOnly()` list).
+const GUEST_WRITABLE_FIELDS = [
+  "guestId", "identity", "idCheckUser", "cloudinaryId", "messageAuthor",
+  "invitationGroup", "updatedBy", "updatedAt", "_deleted", "rsvp", "flightInfo",
+];
+
 
 // ── flightInfo (guest flight details for the Travel section) ────────────
 // Mirrors `hasValidFlightInfo()` in firebase/firestore.rules.
@@ -204,21 +201,53 @@ export function validateGuestContactPayload(payload) {
   const checks = [
     // Required fields
     { check: hasAllKeys(payload, ["guestId", "updatedBy", "updatedAt"]), message: "missing required fields: guestId, updatedBy, updatedAt" },
-    // Protected fields may be present (unchanged) but never modified. This is
-    // a BLACKLIST: any field NOT in GUEST_PROTECTED_FIELDS may be written
-    // freely, so adding a new guest-writable field needs no change here.
-    { check: !hasAnyKey(payload, GUEST_PROTECTED_FIELDS), message: `payload attempts to modify protected fields: ${Object.keys(payload).filter((k) => GUEST_PROTECTED_FIELDS.includes(k)).join(", ")}` },
+    // Allowed fields only
+    { check: hasOnlyKeys(payload, GUEST_ALLOWED_FIELDS), message: `payload contains fields not in the allowed schema: ${Object.keys(payload).filter((k) => !GUEST_ALLOWED_FIELDS.includes(k)).join(", ")}` },
+    // Writable fields only (no sheet-synced fields being modified)
+    { check: hasOnlyKeys(payload, GUEST_WRITABLE_FIELDS), message: `payload attempts to modify sheet-synced fields: ${Object.keys(payload).filter((k) => !GUEST_WRITABLE_FIELDS.includes(k)).join(", ")}` },
     // Field types and lengths
     { check: isShortText(payload.guestId, 100) && isNonEmptyString(payload.guestId), message: "guestId must be a non-empty string ≤ 100 chars" },
+    { check: !hasAnyKey(payload, ["invitationGroup"]) || isShortText(payload.invitationGroup, 150), message: "invitationGroup must be a string ≤ 150 chars" },
     { check: isShortText(payload.updatedBy, 100), message: "updatedBy must be a string ≤ 100 chars" },
-    // Nested maps must be maps if present (structure validated client-side).
     { check: !hasAnyKey(payload, ["identity"]) || isObject(payload.identity), message: "identity must be an object" },
+    { check: !hasAnyKey(payload, ["identity"]) || hasOnlyKeys(payload.identity, GUEST_IDENTITY_FIELDS), message: `identity contains unsupported fields: ${Object.keys(payload.identity || {}).filter((k) => !GUEST_IDENTITY_FIELDS.includes(k)).join(", ")}` },
+    // Optional fields
+    { check: !hasAnyKey(payload, ["identity"]) || !hasAnyKey(payload.identity, ["firstName"]) || isShortText(payload.identity.firstName, 100), message: "identity.firstName must be a string ≤ 100 chars" },
+    { check: !hasAnyKey(payload, ["identity"]) || !hasAnyKey(payload.identity, ["middleName"]) || isShortText(payload.identity.middleName, 100), message: "identity.middleName must be a string ≤ 100 chars" },
+    { check: !hasAnyKey(payload, ["identity"]) || !hasAnyKey(payload.identity, ["lastName"]) || isShortText(payload.identity.lastName, 100), message: "identity.lastName must be a string ≤ 100 chars" },
+    { check: !hasAnyKey(payload, ["identity"]) || !hasAnyKey(payload.identity, ["maternalLastName"]) || isShortText(payload.identity.maternalLastName, 100), message: "identity.maternalLastName must be a string ≤ 100 chars" },
+    { check: !hasAnyKey(payload, ["identity"]) || !hasAnyKey(payload.identity, ["gender"]) || isShortText(payload.identity.gender, 30), message: "identity.gender must be a string ≤ 30 chars" },
+    { check: !hasAnyKey(payload, ["identity"]) || !hasAnyKey(payload.identity, ["cloudinaryId"]) || isShortText(payload.identity.cloudinaryId, 200), message: "identity.cloudinaryId must be a string ≤ 200 chars" },
+    { check: !hasAnyKey(payload, ["identity"]) || !hasAnyKey(payload.identity, ["phone"]) || isShortText(payload.identity.phone, 50), message: "identity.phone must be a string ≤ 50 chars" },
+    { check: !hasAnyKey(payload, ["identity"]) || !hasAnyKey(payload.identity, ["lang"]) || isShortText(payload.identity.lang, 20), message: "identity.lang must be a string ≤ 20 chars" },
+    { check: !hasAnyKey(payload, ["identity"]) || !hasAnyKey(payload.identity, ["age"]) || isShortText(payload.identity.age, 50), message: "identity.age must be a string ≤ 50 chars" },
+    { check: !hasAnyKey(payload, ["idCheckUser"]) || isBoolean(payload.idCheckUser), message: "idCheckUser must be a boolean" },
+    { check: !hasAnyKey(payload, ["cloudinaryId"]) || (isString(payload.cloudinaryId) && payload.cloudinaryId.length <= 200), message: "cloudinaryId must be a string ≤ 200 chars" },
+    { check: !hasAnyKey(payload, ["messageAuthor"]) || isShortText(payload.messageAuthor, 200), message: "messageAuthor must be a string ≤ 200 chars" },
+    { check: !hasAnyKey(payload, ["_deleted"]) || isBoolean(payload._deleted), message: "_deleted must be a boolean" },
+    // rsvp.answers map (questionId → int 0–5)
     { check: !hasAnyKey(payload, ["rsvp"]) || isObject(payload.rsvp), message: "rsvp must be an object" },
+    { check: !hasAnyKey(payload, ["rsvp"]) || hasOnlyKeys(payload.rsvp, ["answers"]), message: `rsvp contains unsupported fields: ${Object.keys(payload.rsvp || {}).filter((k) => k !== "answers").join(", ")}` },
+    { check: !hasAnyKey(payload, ["rsvp"]) || !hasAnyKey(payload.rsvp, ["answers"]) || isObject(payload.rsvp.answers), message: "rsvp.answers must be an object" },
+    { check: !hasAnyKey(payload, ["rsvp"]) || !hasAnyKey(payload.rsvp, ["answers"]) || Object.keys(payload.rsvp.answers).length <= 100, message: "rsvp.answers must have ≤ 100 entries" },
+    { check: !hasAnyKey(payload, ["rsvp"]) || !hasAnyKey(payload.rsvp, ["answers"]) || Object.values(payload.rsvp.answers).every((v) => Number.isInteger(v) && v >= 0 && v <= 5), message: "rsvp.answers values must be integers 0–5" },
+    // flightInfo (guest flight details for the Travel section)
     { check: !hasAnyKey(payload, ["flightInfo"]) || isObject(payload.flightInfo), message: "flightInfo must be an object" },
+    { check: !hasAnyKey(payload, ["flightInfo"]) || hasOnlyKeys(payload.flightInfo, FLIGHT_INFO_FIELDS), message: `flightInfo contains unsupported fields: ${Object.keys(payload.flightInfo || {}).filter((k) => !FLIGHT_INFO_FIELDS.includes(k)).join(", ")}` },
+    { check: !hasAnyKey(payload, ["flightInfo"]) || !hasAnyKey(payload.flightInfo, ["origin"]) || isValidAirport(payload.flightInfo.origin), message: "flightInfo.origin must be a valid airport object" },
+    { check: !hasAnyKey(payload, ["flightInfo"]) || !hasAnyKey(payload.flightInfo, ["destination"]) || isValidAirport(payload.flightInfo.destination), message: "flightInfo.destination must be a valid airport object" },
+    { check: !hasAnyKey(payload, ["flightInfo"]) || !hasAnyKey(payload.flightInfo, ["connections"]) || (Array.isArray(payload.flightInfo.connections) && payload.flightInfo.connections.length <= 3 && payload.flightInfo.connections.every(isValidAirport)), message: "flightInfo.connections must be an array of ≤ 3 valid airports" },
+    { check: !hasAnyKey(payload, ["flightInfo"]) || !hasAnyKey(payload.flightInfo, ["legs"]) || (Array.isArray(payload.flightInfo.legs) && payload.flightInfo.legs.length <= 4 && payload.flightInfo.legs.every(isValidLeg)), message: "flightInfo.legs must be an array of ≤ 4 valid legs" },
+    { check: !hasAnyKey(payload, ["flightInfo"]) || !hasAnyKey(payload.flightInfo, ["arrivalDate"]) || isDateString(payload.flightInfo.arrivalDate), message: "flightInfo.arrivalDate must be a YYYY-MM-DD date" },
+    { check: !hasAnyKey(payload, ["flightInfo"]) || !hasAnyKey(payload.flightInfo, ["arrivalTime"]) || isTimeString(payload.flightInfo.arrivalTime), message: "flightInfo.arrivalTime must be a HH:MM time" },
+    { check: !hasAnyKey(payload, ["flightInfo"]) || !hasAnyKey(payload.flightInfo, ["finalFlightNumber"]) || isShortText(payload.flightInfo.finalFlightNumber, 30), message: "flightInfo.finalFlightNumber must be a string ≤ 30 chars" },
+    // flightInfo.departure (return-trip details for the Travel section)
+    { check: !hasAnyKey(payload, ["flightInfo"]) || !hasAnyKey(payload.flightInfo, ["departure"]) || isValidDeparture(payload.flightInfo.departure), message: "flightInfo.departure must be a valid departure object" },
   ];
 
   return runChecks(payload, checks);
 }
+
 
 
 // ── Attendance responses validators ─────────────────────────────────────
@@ -435,3 +464,183 @@ export function validateSongRequestPayload(payload) {
   return runChecks(payload, checks);
 }
 
+
+
+// ── RSVP submissions validators ─────────────────────────────────────────
+
+// Mirrors `hasValidRsvpFields()` in firebase/firestore.rules.
+
+const RSVP_REQUIRED_FIELDS = [
+  "firstName", "lastName", "email", "whatsapp", "attendance",
+  "groupMode", "groupName", "partySize", "adults", "children",
+  "guests", "accommodation", "travelStatus", "arrivalFrom",
+  "arrivalTo", "arrivalDate", "arrivalTime", "arrivalAirline",
+  "arrivalFlight", "departureFrom", "departureTo", "departureDate",
+  "departureTime", "departureAirline", "departureFlight", "route",
+  "notes", "language", "schemaVersion", "createdAt",
+];
+
+const RSVP_ALLOWED_FIELDS = [
+  ...RSVP_REQUIRED_FIELDS,
+  "independentArrival", "sundayMorning", "invitationCode",
+];
+
+/**
+ * Validate a payload intended for the `rsvp_submissions` collection.
+ * Mirrors `hasValidRsvpFields()` in the rules.
+ *
+ * @param {Object} payload  the payload to validate (before addDoc)
+ * @returns {{ valid: boolean, errors: string[] }}
+ */
+export function validateRsvpPayload(payload) {
+  if (!isObject(payload)) {
+    return { valid: false, errors: ["payload must be an object"] };
+  }
+
+  const checks = [
+    // Required fields
+    { check: hasAllKeys(payload, RSVP_REQUIRED_FIELDS), message: "missing required fields" },
+    // Allowed fields only
+    { check: hasOnlyKeys(payload, RSVP_ALLOWED_FIELDS), message: `payload contains fields not in the allowed schema: ${Object.keys(payload).filter((k) => !RSVP_ALLOWED_FIELDS.includes(k)).join(", ")}` },
+    // Field types and lengths
+    { check: isShortText(payload.firstName, 100) && isNonEmptyString(payload.firstName), message: "firstName must be a non-empty string ≤ 100 chars" },
+    { check: isShortText(payload.lastName, 100) && isNonEmptyString(payload.lastName), message: "lastName must be a non-empty string ≤ 100 chars" },
+    { check: isShortText(payload.email, 254) && isNonEmptyString(payload.email), message: "email must be a non-empty string ≤ 254 chars" },
+    { check: isShortText(payload.whatsapp, 50) && isNonEmptyString(payload.whatsapp), message: "whatsapp must be a non-empty string ≤ 50 chars" },
+    { check: isShortText(payload.attendance, 30), message: "attendance must be a string ≤ 30 chars" },
+    { check: isShortText(payload.groupMode, 30), message: "groupMode must be a string ≤ 30 chars" },
+    { check: isShortText(payload.groupName, 150), message: "groupName must be a string ≤ 150 chars" },
+    { check: isShortText(payload.partySize, 2), message: "partySize must be a string ≤ 2 chars" },
+    { check: isShortText(payload.adults, 2), message: "adults must be a string ≤ 2 chars" },
+    { check: isShortText(payload.children, 2), message: "children must be a string ≤ 2 chars" },
+    { check: isShortText(payload.guests, 1000), message: "guests must be a string ≤ 1000 chars" },
+    { check: isShortText(payload.accommodation, 30), message: "accommodation must be a string ≤ 30 chars" },
+    { check: !hasAnyKey(payload, ["independentArrival"]) || isShortText(payload.independentArrival, 30), message: "independentArrival must be a string ≤ 30 chars" },
+    { check: !hasAnyKey(payload, ["sundayMorning"]) || isShortText(payload.sundayMorning, 30), message: "sundayMorning must be a string ≤ 30 chars" },
+    { check: isShortText(payload.travelStatus, 30), message: "travelStatus must be a string ≤ 30 chars" },
+    { check: isShortText(payload.arrivalFrom, 150), message: "arrivalFrom must be a string ≤ 150 chars" },
+    { check: isShortText(payload.arrivalTo, 150), message: "arrivalTo must be a string ≤ 150 chars" },
+    { check: isShortText(payload.arrivalDate, 10), message: "arrivalDate must be a string ≤ 10 chars" },
+    { check: isShortText(payload.arrivalTime, 5), message: "arrivalTime must be a string ≤ 5 chars" },
+    { check: isShortText(payload.arrivalAirline, 100), message: "arrivalAirline must be a string ≤ 100 chars" },
+    { check: isShortText(payload.arrivalFlight, 30), message: "arrivalFlight must be a string ≤ 30 chars" },
+    { check: isShortText(payload.departureFrom, 150), message: "departureFrom must be a string ≤ 150 chars" },
+    { check: isShortText(payload.departureTo, 150), message: "departureTo must be a string ≤ 150 chars" },
+    { check: isShortText(payload.departureDate, 10), message: "departureDate must be a string ≤ 10 chars" },
+    { check: isShortText(payload.departureTime, 5), message: "departureTime must be a string ≤ 5 chars" },
+    { check: isShortText(payload.departureAirline, 100), message: "departureAirline must be a string ≤ 100 chars" },
+    { check: isShortText(payload.departureFlight, 30), message: "departureFlight must be a string ≤ 30 chars" },
+    { check: isShortText(payload.route, 500), message: "route must be a string ≤ 500 chars" },
+    { check: isShortText(payload.notes, 2000), message: "notes must be a string ≤ 2000 chars" },
+    { check: isOneOf(payload.language, ["es", "fr", "en"]), message: "language must be one of: es, fr, en" },
+    { check: payload.schemaVersion === 3, message: "schemaVersion must be 3" },
+  ];
+
+  return runChecks(payload, checks);
+}
+
+// ── Petanque submissions validators ─────────────────────────────────────
+// Mirrors the petanque rules in firebase/firestore.rules.
+
+const PETANQUE_ALLOWED_FIELDS = [
+  "petanqueParticipation", "petanquePartySize", "petanqueNames",
+  "petanqueOwnBoules", "invitationCode", "language",
+  "schemaVersion", "createdAt",
+];
+
+/**
+ * Validate a payload intended for the `petanque_participation` collection.
+ * Mirrors the petanque rules in firebase/firestore.rules.
+ *
+ * @param {Object} payload  the payload to validate (before addDoc)
+ * @returns {{ valid: boolean, errors: string[] }}
+ */
+export function validatePetanquePayload(payload) {
+  if (!isObject(payload)) {
+    return { valid: false, errors: ["payload must be an object"] };
+  }
+
+  const checks = [
+    // Allowed fields only
+    { check: hasOnlyKeys(payload, PETANQUE_ALLOWED_FIELDS), message: `payload contains fields not in the allowed schema: ${Object.keys(payload).filter((k) => !PETANQUE_ALLOWED_FIELDS.includes(k)).join(", ")}` },
+    // Field types and lengths
+    { check: isShortText(payload.petanqueParticipation, 30), message: "petanqueParticipation must be a string ≤ 30 chars" },
+    { check: isShortText(payload.petanquePartySize, 2), message: "petanquePartySize must be a string ≤ 2 chars" },
+    { check: isShortText(payload.petanqueNames, 500), message: "petanqueNames must be a string ≤ 500 chars" },
+    { check: isShortText(payload.petanqueOwnBoules, 30), message: "petanqueOwnBoules must be a string ≤ 30 chars" },
+    { check: isOneOf(payload.language, ["es", "fr", "en"]), message: "language must be one of: es, fr, en" },
+    { check: payload.schemaVersion === 1, message: "schemaVersion must be 1" },
+  ];
+
+  return runChecks(payload, checks);
+}
+
+// ── Coast submissions validators ────────────────────────────────────────
+// Mirrors the coast rules in firebase/firestore.rules.
+
+const COAST_ALLOWED_FIELDS = [
+  "name", "interest", "partySize", "nights", "destination", "style",
+  "note", "invitationCode", "language", "schemaVersion", "createdAt",
+];
+
+/**
+ * Validate a payload intended for the `coast_interest` collection.
+ * Mirrors the coast rules in firebase/firestore.rules.
+ *
+ * @param {Object} payload  the payload to validate (before addDoc)
+ * @returns {{ valid: boolean, errors: string[] }}
+ */
+export function validateCoastPayload(payload) {
+  if (!isObject(payload)) {
+    return { valid: false, errors: ["payload must be an object"] };
+  }
+
+  const checks = [
+    // Allowed fields only
+    { check: hasOnlyKeys(payload, COAST_ALLOWED_FIELDS), message: `payload contains fields not in the allowed schema: ${Object.keys(payload).filter((k) => !COAST_ALLOWED_FIELDS.includes(k)).join(", ")}` },
+    // Field types and lengths
+    { check: isShortText(payload.name, 150) && isNonEmptyString(payload.name), message: "name must be a non-empty string ≤ 150 chars" },
+    { check: isShortText(payload.interest, 50), message: "interest must be a string ≤ 50 chars" },
+    { check: isShortText(payload.partySize, 2), message: "partySize must be a string ≤ 2 chars" },
+    { check: isShortText(payload.nights, 1), message: "nights must be a string ≤ 1 char" },
+    { check: isShortText(payload.destination, 100), message: "destination must be a string ≤ 100 chars" },
+    { check: isShortText(payload.style, 100), message: "style must be a string ≤ 100 chars" },
+    { check: isShortText(payload.note, 2000), message: "note must be a string ≤ 2000 chars" },
+    { check: isOneOf(payload.language, ["es", "fr", "en"]), message: "language must be one of: es, fr, en" },
+    { check: payload.schemaVersion === 1, message: "schemaVersion must be 1" },
+  ];
+
+  return runChecks(payload, checks);
+}
+
+// ── Invitation code validation ──────────────────────────────────────────
+// Mirrors `hasValidInvitationCode()` in firebase/firestore.rules.
+
+const VALID_INVITATION_CODES = [
+  "hortencia_privada_pagada",
+  "cabaña_33_privada_porpagar",
+  "azalea_compartida_porpagar",
+  "sin_cabaña",
+  "cabaña_5_privada_porpagar",
+  "cabaña_34_privada_pagada",
+  "cabaña_4_compartida_pagada",
+  "lavanda_compartida_porpagar",
+  "casona_compartida_pagada",
+  "margarita_compartida_porpagar",
+  "cabaña_6_privada_porpagar",
+  "dalia_compartida_porpagar",
+  "cabaña_31_privada_porpagar",
+  "cabaña_32_privada_porpagar",
+];
+
+/**
+ * Validate an invitation code against the known list.
+ * Mirrors `hasValidInvitationCode()` in the rules.
+ *
+ * @param {string|undefined} code  the invitation code (optional)
+ * @returns {boolean} true if the code is absent or valid
+ */
+export function isValidInvitationCode(code) {
+  if (code === undefined || code === null || code === "") return true;
+  return VALID_INVITATION_CODES.includes(code);
+}

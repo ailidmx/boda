@@ -13,7 +13,14 @@
     "favicons": "node scripts/generate-favicons.mjs",
     "test:rules": "node --test tests/firestore.rules.test.mjs",
     "test:validation": "node --test tests/validation.test.mjs",
-    "test:analytics": "node --test tests/analytics.test.mjs"
+    "test:analytics": "node --test tests/analytics.test.mjs",
+    "test:button": "node --test tests/button.test.mjs",
+    "test:dialog": "node --test tests/dialog.test.mjs",
+    "test:guest-profiles": "node --test tests/guest-profiles.test.mjs",
+    "test:auth-logic": "node --test tests/auth-logic.test.mjs"
+
+
+
   },
   "devDependencies": {
     "@firebase/rules-unit-testing": "^5.0.1",

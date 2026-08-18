@@ -1,9 +1,14 @@
 /**
  * MusicBrainz genre-search provider.
  *
- * Searches the MusicBrainz public genre database (no OAuth) and normalizes the
+ * Searches the MusicBrainz public database (no OAuth) and normalizes the
  * results into the app's internal `GenreSearchResult` shape so the UI and
  * persistence layer never depend on MusicBrainz's raw schema.
+ *
+ * NOTE: MusicBrainz has NO `/ws/2/genre/` endpoint (it returns 501 Not
+ * Implemented). Genres are modelled as TAGS, so we search the `/ws/2/tag/`
+ * endpoint and treat each returned tag as a genre label. This is the standard
+ * way to discover genre-like terms on MusicBrainz.
  *
  * The provider is isolated behind the `GenreSearchService` so it can later be
  * swapped or complemented by another source without touching the UI or the
@@ -22,7 +27,7 @@
  *  - We only fetch a small page (limit 10) and never mirror the catalog.
  */
 
-const MUSICBRAINZ_GENRE_ENDPOINT = "https://musicbrainz.org/ws/2/genre/";
+const MUSICBRAINZ_GENRE_ENDPOINT = "https://musicbrainz.org/ws/2/tag/";
 
 // Identify the app per MusicBrainz policy. Keep it stable and descriptive.
 const USER_AGENT = "BodaInvitation/1.0 (https://github.com/ailidmx/boda)";
@@ -103,7 +108,9 @@ export function createMusicBrainzGenreProvider({ fetchImpl = fetch } = {}) {
       }
 
       const data = await res.json();
-      const genres = Array.isArray(data?.genres) ? data.genres : [];
+      // The /ws/2/tag/ endpoint returns tags under `data.tags` (each tag has a
+      // `name` and a `count`). We treat each tag as a genre label.
+      const genres = Array.isArray(data?.tags) ? data.tags : [];
       return dedupeGenres(genres.map(normalizeGenreResult));
     },
   };

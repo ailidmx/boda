@@ -1,6 +1,7 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { useApp } from "../context/AppContext.jsx";
 import { CoupleNames, LANGUAGE_FLAGS_ONLY } from "./ui.jsx";
+import { Dialog } from "./ui/Dialog.jsx";
 
 // Fills {current} and {preferred} placeholders in a translated string,
 // rendering each language name in bold with its flag emoji in front.
@@ -27,16 +28,6 @@ export function LanguageModal() {
     revertLangPrompt,
   } = useApp();
 
-  // Lock background scroll while the modal is open.
-  useEffect(() => {
-    if (!langPrompt) return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previous;
-    };
-  }, [langPrompt]);
-
   if (!langPrompt) return null;
 
   const { current, preferred } = langPrompt;
@@ -47,48 +38,43 @@ export function LanguageModal() {
   const copy = interfaceText.langPrompt;
 
   return (
-    <div className="lang-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="lang-modal-title">
-      <div className="lang-modal-card">
-        {/* Close (✕) — pinned so its centre sits exactly on the top-right
-            border of the card, attached to the header, not the body. */}
-        <button
-          type="button"
-          className="lang-modal-close"
-          aria-label={copy.title}
-          onClick={dismissLangPrompt}
-        >
-          ✕
-        </button>
-
-        <div className="lang-modal-scroll">
-          <div className="identity-modal-monogram">
-            <CoupleNames variant="identity-swap--modal-names" />
-          </div>
-          <h2 id="lang-modal-title" className="lang-modal-title">
-            {copy.title}
-          </h2>
-          <p className="lang-modal-body">
-            {fill(copy.body, currentName, preferredName)}
-          </p>
-          <div className="lang-modal-actions">
-            <button
-              type="button"
-              className="lang-modal-btn lang-modal-btn--primary"
-              onClick={dismissLangPrompt}
-            >
-              {fill(copy.keep, currentName, preferredName)}
-            </button>
-            <button
-              type="button"
-              className="lang-modal-btn lang-modal-btn--ghost"
-              onClick={revertLangPrompt}
-            >
-              {fill(copy.switch, currentName, preferredName)}
-            </button>
-          </div>
+    <Dialog
+      open={!!langPrompt}
+      onClose={dismissLangPrompt}
+      ariaLabelledBy="lang-modal-title"
+      closeLabel={copy.title}
+      overlayClassName="lang-modal-overlay"
+      cardClassName="lang-modal-card"
+      closeClassName="lang-modal-close"
+    >
+      <div className="lang-modal-scroll">
+        <div className="identity-modal-monogram">
+          <CoupleNames variant="identity-swap--modal-names" />
+        </div>
+        <h2 id="lang-modal-title" className="lang-modal-title">
+          {copy.title}
+        </h2>
+        <p className="lang-modal-body">
+          {fill(copy.body, currentName, preferredName)}
+        </p>
+        <div className="lang-modal-actions">
+          <button
+            type="button"
+            className="lang-modal-btn lang-modal-btn--primary"
+            onClick={dismissLangPrompt}
+          >
+            {fill(copy.keep, currentName, preferredName)}
+          </button>
+          <button
+            type="button"
+            className="lang-modal-btn lang-modal-btn--ghost"
+            onClick={revertLangPrompt}
+          >
+            {fill(copy.switch, currentName, preferredName)}
+          </button>
         </div>
       </div>
-    </div>
+    </Dialog>
   );
 
 }
