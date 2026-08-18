@@ -552,6 +552,42 @@ A `DataTable` primitive should be introduced only when a second genuine `<table>
 site appears (e.g. a new dashboard table that duplicates the `.dashboard-guest-table` +
 `sortTh` pattern). See ADR-0017.
 
+### F8 progress — accessibility & responsive improvements (in progress)
+
+Phase F8 ("Accessibility & responsive improvements") improves semantic HTML, focus
+management, and accessible icon labels WITHOUT changing appearance or behavior. Each fix
+is purely additive (attributes/roles) or a semantics-preserving swap, verified with
+`build:all` + lint + tests and committed separately.
+
+- **Decorative emoji icons marked `aria-hidden` in the user menu** — the signed-in
+  account menu (`web/invitation/src/features/nav/UserMenu.jsx`) renders each action as a
+  `<button>` with a visible text label plus a decorative emoji icon
+  (`.user-menu__item-icon`: 🪪 📷 ✉ 🔑 🎵 ℹ️ 📊 ↪). The accessible name already comes from
+  the visible text, so the emoji is redundant for screen readers. All 8 icon spans now
+  carry `aria-hidden="true"`, so assistive tech no longer announces the emoji glyphs.
+  Purely additive — no markup/class/behavior change, appearance preserved.
+
+**Evaluation of the remaining F8 gaps (deferred — no safe scoped change without a visual
+or behavioral trade-off):**
+- **Dashboard emoji icons** (`guestTable.js`: 🔒 📷 🔑 ❌ 📱 ✉️ ✏️ 🔗 👁️ 🗑️) already carry
+  `title` attributes (e.g. `title="Editar foto de perfil"`). The dashboard is a separate
+  app (per ADR-0014) that builds its table via DOM template literals, not React; upgrading
+  `title` → `aria-label` there is a dashboard-scoped change better handled in a dedicated
+  dashboard pass.
+- **Clickable `<div>`/`<span>` → `<button>`** — the audit's flagged interactive elements
+  are already real `<button>`s in the invitation (the user menu, nav scroll buttons, and
+  modal close buttons are all `<button>`). No safe conversion was found where the CSS
+  already styles a non-button element as a button.
+- **Dialog focus management** — the shared `Dialog` primitive (F2) already owns ESC /
+  overlay-click / scroll-lock behavior; the migrated modals preserve their existing focus
+  behavior. Full focus-trap + focus-restore is a behavioral enhancement that would change
+  modal behavior, so it is deferred rather than mixed into this structural pass.
+- **Table header semantics** — the dashboard's only real `<table>` (`guestTable.js`) uses
+  semantic `<th>` headers (via `sortTh`) and `<thead>`/`<tbody>`. No missing-header gap
+  was found.
+
+See ADR-0018.
+
 ### F10 progress — dead-code & duplication cleanup (in progress)
 
 - **Dashboard legacy-records code removed** — the dashboard no longer loads or renders

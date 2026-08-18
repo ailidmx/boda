@@ -248,7 +248,7 @@ export function UserMenu() {
                 openIdentityPrompt();
               }}
             >
-              <span className="user-menu__item-icon">🪪</span>
+              <span className="user-menu__item-icon" aria-hidden="true">🪪</span>
               {identity.eyebrow}
             </button>
             <button
@@ -260,7 +260,7 @@ export function UserMenu() {
                 openIdentityPrompt();
               }}
             >
-              <span className="user-menu__item-icon">📷</span>
+              <span className="user-menu__item-icon" aria-hidden="true">📷</span>
               {identity.changePhoto}
             </button>
             <button
@@ -269,7 +269,7 @@ export function UserMenu() {
               data-analytics="menu.email"
               onClick={() => openAccountModal("email")}
             >
-              <span className="user-menu__item-icon">✉</span>
+              <span className="user-menu__item-icon" aria-hidden="true">✉</span>
               {nav.changeEmail}
             </button>
 
@@ -279,7 +279,7 @@ export function UserMenu() {
               data-analytics="menu.password"
               onClick={() => openAccountModal("password")}
             >
-              <span className="user-menu__item-icon">🔑</span>
+              <span className="user-menu__item-icon" aria-hidden="true">🔑</span>
               {nav.changePassword}
             </button>
 
@@ -291,7 +291,7 @@ export function UserMenu() {
               data-analytics="menu.music"
               onClick={() => setMusicEnabled(!musicEnabled)}
             >
-              <span className="user-menu__item-icon">🎵</span>
+              <span className="user-menu__item-icon" aria-hidden="true">🎵</span>
               <span className="user-menu__item-label">{nav.music}</span>
               <span
                 className={`user-menu__toggle${musicEnabled ? " is-on" : ""}`}
@@ -310,7 +310,7 @@ export function UserMenu() {
                 setAboutOpen(true);
               }}
             >
-              <span className="user-menu__item-icon">ℹ️</span>
+              <span className="user-menu__item-icon" aria-hidden="true">ℹ️</span>
               {nav.aboutTitle}
             </button>
 
@@ -321,7 +321,7 @@ export function UserMenu() {
                 data-analytics="menu.dashboard"
                 onClick={() => setOpen(false)}
               >
-                <span className="user-menu__item-icon">📊</span>
+                <span className="user-menu__item-icon" aria-hidden="true">📊</span>
                 {nav.dashboard}
               </a>
             )}
@@ -332,7 +332,7 @@ export function UserMenu() {
               data-analytics="menu.logout"
               onClick={handleLogout}
             >
-              <span className="user-menu__item-icon">↪</span>
+              <span className="user-menu__item-icon" aria-hidden="true">↪</span>
               {nav.logout}
             </button>
 
