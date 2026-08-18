@@ -282,7 +282,13 @@
 
 .facility-slideset__track {
   position: relative;
+  /* Let vertical page scrolling work, but hand horizontal drags to the
+     pointer handlers so a swipe advances/retreats the slide. Without this,
+     the browser treats a horizontal touch drag as a scroll gesture and fires
+     pointercancel instead of pointerup, so the swipe never registers. */
+  touch-action: pan-y;
 }
+
 
 /* Each slide is a 3-column grid (one row of three cards). The active slide is
    in normal flow (it defines the container height); inactive slides are
@@ -1057,6 +1063,61 @@
   letter-spacing: 0.08em;
   color: rgb(36 33 25 / 70%);
 }
+
+/* Film-strip gallery: a horizontal strip of small square thumbnails (like
+   film frames) that scrolls horizontally. It sits BELOW the main facility
+   carousel as its own element, so the carousel never nests a slider inside a
+   slide. Clicking a thumbnail opens the shared full-screen lightbox. */
+.roca-filmstrip-wrap {
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+}
+
+.roca-filmstrip {
+  display: flex;
+  gap: 0.6rem;
+  overflow-x: auto;
+  padding: 0.6rem;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+  /* Film-strip frame: a dark band with rounded ends, like a reel of film. */
+  background: rgb(36 33 25 / 92%);
+  border-radius: 0.9rem;
+  box-shadow: 0 0.5rem 1.5rem rgb(36 33 25 / 25%);
+}
+
+.roca-filmstrip-item {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(4.5rem, 9vw, 6.5rem);
+  aspect-ratio: 1 / 1;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 0;
+  border-radius: 0.4rem;
+  background: var(--ink);
+  cursor: pointer;
+  scroll-snap-align: start;
+}
+
+.roca-filmstrip-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 500ms ease;
+}
+
+.roca-filmstrip-item:hover img,
+.roca-filmstrip-item:focus-visible img {
+  transform: scale(1.08);
+}
+
+.roca-filmstrip-item:focus-visible {
+  outline: 2px solid var(--terracotta);
+  outline-offset: 2px;
+}
+
 
 
 /* Elegant navigation links at the bottom of each venue slide */

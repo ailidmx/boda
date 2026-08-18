@@ -199,6 +199,46 @@ export function Guisos() {
     [],
   );
 
+  // Touch drag & drop (mobile) — the native HTML5 drag events don't fire on
+  // touch devices, so we implement a pointer-based fallback. Dragging starts
+  // from the grip handle; the finger position is tracked with elementFromPoint
+  // to find which row is under the finger, then handleDrop() does the move.
+  const touchDrag = useRef(null);
+
+  const handleTouchStart = (index) => (e) => {
+    const touch = e.touches[0];
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    const grip = el && el.closest ? el.closest(".guisos-reorder__grip") : null;
+    if (!grip) return; // only drag from the grip handle
+    touchDrag.current = { index, currentIndex: index };
+    dragIndex.current = index;
+    setDraggingIndex(index);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!touchDrag.current) return;
+    e.preventDefault();
+    const touch = e.touches[0];
+    const el = document.elementFromPoint(touch.clientX, touch.clientY);
+    const li = el && el.closest ? el.closest(".guisos-reorder__item") : null;
+    if (li) {
+      const targetIndex = Number(li.dataset.index);
+      if (!Number.isNaN(targetIndex)) {
+        setDragOverIndex(targetIndex);
+        touchDrag.current.currentIndex = targetIndex;
+      }
+    }
+  };
+
+  const handleTouchEnd = () => {
+    if (!touchDrag.current) return;
+    const { currentIndex } = touchDrag.current;
+    touchDrag.current = null;
+    handleDrop(currentIndex);
+    setDraggingIndex(null);
+    setDragOverIndex(null);
+  };
+
   // When the guest changes a star rating, re-sort the always-visible reorder
   // panel live — but only if they haven't manually reordered anything yet.
   const handleVote = useCallback(
@@ -224,19 +264,11 @@ export function Guisos() {
 
   const selected = useMemo(() => order.slice(0, 9), [order]);
 
-  // Render a 5-star row for a numeric score (0–5). Fractional averages are
-  // rounded to the nearest half star so the general score reads clearly.
-  const renderStars = (value) => {
-    const rounded = Math.round((Number(value) || 0) * 2) / 2;
-    const full = Math.floor(rounded);
-    const half = rounded - full >= 0.5;
-    const stars = [];
-    for (let i = 0; i < 5; i += 1) {
-      if (i < full) stars.push("★");
-      else if (i === full && half) stars.push("⯨");
-      else stars.push("☆");
-    }
-    return stars.join("");
+  // Format a numeric score for display (e.g. 3.4). Whole numbers are shown
+  // without a trailing decimal so "Ton vote" reads as a clean integer.
+  const formatScore = (value) => {
+    const n = Number(value) || 0;
+    return Number.isInteger(n) ? String(n) : n.toFixed(1);
   };
 
 
@@ -338,6 +370,7 @@ export function Guisos() {
         </a>
       </nav>
 
+
       {/* Subsection 2 — reorder panel. Always visible as a normal section
           layout (no toggle button, no collapse). The `#guisos-order` anchor
           sits on the container so the nav link scrolls here. */}
@@ -350,13 +383,19 @@ export function Guisos() {
           )}
           <p className="guisos-reorder__hint">{guisos.reorderHint}</p>
 
-          <ol className="guisos-reorder__list">
+          <ol
+            className="guisos-reorder__list"
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
+          >
             {order.map((name, index) => {
               const inMenu = index < 9;
               return (
                 <li
                   key={name}
+                  data-index={index}
                   draggable
+                  onTouchStart={handleTouchStart(index)}
                   onDragStart={() => {
                     dragIndex.current = index;
                     setDraggingIndex(index);
@@ -387,32 +426,34 @@ export function Guisos() {
                     ⠿
                   </span>
                   <span className="guisos-reorder__rank">{index + 1}</span>
-                  <span className="guisos-reorder__name">{name}</span>
-                  <span className="guisos-reorder__scores">
-                    <span className="guisos-reorder__score guisos-reorder__score--mine">
-                      <span className="guisos-reorder__score-label">
-                        {guisos.reorderMyScore}
+                  <span className="guisos-reorder__content">
+                    <span className="guisos-reorder__name">{name}</span>
+                    <span className="guisos-reorder__scores">
+                      <span className="guisos-reorder__score guisos-reorder__score--mine">
+                        <span className="guisos-reorder__score-label">
+                          {guisos.reorderMyScore}
+                        </span>
+                        <span className="guisos-reorder__score-value">
+                          {formatScore(myRatings[name] || 0)}
+                        </span>
                       </span>
-                      <span className="guisos-reorder__stars" aria-hidden="true">
-                        {renderStars(myRatings[name] || 0)}
+                      <span className="guisos-reorder__score guisos-reorder__score--general">
+                        <span className="guisos-reorder__score-label">
+                          {guisos.reorderGeneralScore}
+                        </span>
+                        <span className="guisos-reorder__score-value">
+                          {formatScore(generalScores[name]?.average || 0)}
+                        </span>
+                        <span className="guisos-reorder__count">
+                          {generalScores[name]?.count
+                            ? `(${generalScores[name].count})`
+                            : ""}
+                        </span>
                       </span>
                     </span>
-                    <span className="guisos-reorder__score guisos-reorder__score--general">
-                      <span className="guisos-reorder__score-label">
-                        {guisos.reorderGeneralScore}
-                      </span>
-                      <span className="guisos-reorder__stars" aria-hidden="true">
-                        {renderStars(generalScores[name]?.average || 0)}
-                      </span>
-                      <span className="guisos-reorder__count">
-                        {generalScores[name]?.count
-                          ? `(${generalScores[name].count})`
-                          : ""}
-                      </span>
+                    <span className="guisos-reorder__status">
+                      {inMenu ? guisos.reorderInMenu : guisos.reorderNotInMenu}
                     </span>
-                  </span>
-                  <span className="guisos-reorder__status">
-                    {inMenu ? guisos.reorderInMenu : guisos.reorderNotInMenu}
                   </span>
                   <span className="guisos-reorder__controls">
 

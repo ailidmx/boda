@@ -1,7 +1,7 @@
 export const songRequest = {
   es: {
     eyebrow: "Pide tu canción",
-    title: "¿Qué canción no puede faltar?",
+    title: "¡Baila, canta o sube al escenario con los músicos!",
     body:
       "Dinos qué canción quieres escuchar, cantar o bailar. Si quieres subir al escenario, elige la opción de karaoke o de banda en vivo y quizá podamos acompañarte.",
     songLabel: "Canción (título y artista)",
@@ -25,15 +25,35 @@ export const songRequest = {
       norteno: "Norteño",
       frenchBand: "Fanfare francesa",
     },
+    assignedGuestLabel: "¿Para quién es la canción?",
+    assignedGuestMe: "Para mí",
+    assignedGuestFor: "Para {name}",
     
     submit: "Enviar mi canción",
+
     success: "¡Gracias! Tu canción está en la lista.",
     error: "No pudimos guardar tu canción. Inténtalo de nuevo.",
     required: "Escribe el título de la canción.",
+    mySongsTitle: "Mis canciones",
+    mySongsEmpty: "Aún no has pedido ninguna canción.",
+    mySongsLoading: "Cargando tus canciones…",
+    mySongsError: "No pudimos cargar tus canciones. Inténtalo de nuevo.",
+    edit: "Editar",
+    delete: "Eliminar",
+    deleteConfirm: "¿Eliminar esta canción de la lista?",
+    deleteSuccess: "Canción eliminada.",
+    deleteError: "No pudimos eliminar la canción. Inténtalo de nuevo.",
+    updateSuccess: "¡Canción actualizada!",
+    updateError: "No pudimos actualizar la canción. Inténtalo de nuevo.",
+    cancelEdit: "Cancelar edición",
+    editing: "Editando tu canción",
+    saveEdit: "Guardar cambios",
   },
+
+
   fr: {
     eyebrow: "Demande ta chanson",
-    title: "Quelle chanson ne peut pas manquer ?",
+    title: "Danse, chante ou monte sur scène avec les musiciens !",
     body:
       "Dis-nous quelle chanson tu veux écouter, chanter ou danser. Si tu veux monter sur scène, choisis l’option karaoké ou fanfare live et nous pourrons peut-être t’accompagner.",
     songLabel: "Chanson (titre et artiste)",
@@ -57,15 +77,35 @@ export const songRequest = {
       norteno: "Norteño",
       frenchBand: "Fanfare française",
     },
+    assignedGuestLabel: "Pour qui est la chanson ?",
+    assignedGuestMe: "Pour moi",
+    assignedGuestFor: "Pour {name}",
     submit: "Envoyer ma chanson",
+
     
     success: "Merci ! Ta chanson est sur la liste.",
     error: "Impossible d’enregistrer ta chanson. Réessaie.",
     required: "Écris le titre de la chanson.",
+    mySongsTitle: "Mes chansons",
+    mySongsEmpty: "Tu n’as encore demandé aucune chanson.",
+    mySongsLoading: "Chargement de tes chansons…",
+    mySongsError: "Impossible de charger tes chansons. Réessaie.",
+    edit: "Modifier",
+    delete: "Supprimer",
+    deleteConfirm: "Supprimer cette chanson de la liste ?",
+    deleteSuccess: "Chanson supprimée.",
+    deleteError: "Impossible de supprimer la chanson. Réessaie.",
+    updateSuccess: "Chanson mise à jour !",
+    updateError: "Impossible de mettre à jour la chanson. Réessaie.",
+    cancelEdit: "Annuler la modification",
+    editing: "Modification de ta chanson",
+    saveEdit: "Enregistrer les modifications",
   },
+
+
   en: {
     eyebrow: "Request your song",
-    title: "Which song can’t be missing?",
+    title: "Dance, sing, or take the stage with the musicians!",
     body:
       "Tell us which song you want to hear, sing, or dance to. If you want to take the stage, choose the karaoke or live band option and we may be able to accompany you.",
     songLabel: "Song (title and artist)",
@@ -89,10 +129,28 @@ export const songRequest = {
       norteno: "Norteño",
       frenchBand: "French band",
     },
+    assignedGuestLabel: "Who is the song for?",
+    assignedGuestMe: "For me",
+    assignedGuestFor: "For {name}",
     submit: "Send my song",
+
     
     success: "Thank you! Your song is on the list.",
     error: "We could not save your song. Please try again.",
     required: "Enter the song title.",
+    mySongsTitle: "My songs",
+    mySongsEmpty: "You haven’t requested any songs yet.",
+    mySongsLoading: "Loading your songs…",
+    mySongsError: "We could not load your songs. Please try again.",
+    edit: "Edit",
+    delete: "Delete",
+    deleteConfirm: "Delete this song from the list?",
+    deleteSuccess: "Song deleted.",
+    deleteError: "We could not delete the song. Please try again.",
+    updateSuccess: "Song updated!",
+    updateError: "We could not update the song. Please try again.",
+    cancelEdit: "Cancel editing",
+    editing: "Editing your song",
+    saveEdit: "Save changes",
   },
 };

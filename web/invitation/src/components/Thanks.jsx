@@ -167,6 +167,13 @@ export function Thanks() {
           </a>
         </div>
       </div>
-    </section>
+    
+      <nav className="section-nav" aria-label="Continue">
+        <a className="section-nav-link" href="#footer">
+          <span>{t.nav.footer}</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </nav>
+</section>
   );
 }

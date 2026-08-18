@@ -190,75 +190,36 @@ function VideoCard({ title, onPlaybackChange }) {
   );
 }
 
-// Small autoplaying photo strip rendered as a card in the facility row, just
-// before the video. Clicking a photo opens the shared full-screen lightbox.
-function RocaGallery({ images, alts, label, onOpen }) {
-
-  const [playing, setPlaying] = useState(true);
-  const [active, setActive] = useState(0);
+// A film-strip style gallery: a horizontal strip of small square thumbnails
+// (like film frames) that scrolls horizontally. Clicking a thumbnail opens the
+// shared full-screen lightbox at that image. It lives OUTSIDE the main
+// facility carousel so we never nest a slider inside a slide.
+function RocaFilmStrip({ images, alts, label, onOpen }) {
   const trackRef = useRef(null);
-  const count = images.length;
-
-  useEffect(() => {
-    if (!playing) return undefined;
-    const id = setInterval(() => {
-      setActive((a) => (a + 1) % count);
-    }, 3000);
-    return () => clearInterval(id);
-  }, [playing, count]);
-
-  // Keep the active photo in view as the strip autoplays. We scroll the
-  // gallery container itself (scrollLeft) rather than using scrollIntoView,
-  // which would also scroll the whole page back to this section.
-  useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
-    const item = track.children[active];
-    if (!item) return;
-    const target = item.offsetLeft - (track.clientWidth - item.clientWidth) / 2;
-    track.scrollTo({ left: target, behavior: "smooth" });
-  }, [active]);
-
   return (
-    <div className="roca-gallery-wrap reveal">
-      <article className="facility-card facility-card--gallery">
-        <div className="roca-gallery" ref={trackRef} aria-label={label}>
-          {images.map((id, index) => (
-            <button
-              key={id}
-              type="button"
-              className="roca-gallery-item"
-              onClick={() => onOpen(index)}
-              aria-label={`${alts[index % alts.length]} — ver en grande`}
-            >
-              <img
-                src={wixUrl(id, 500)}
-                alt={alts[index % alts.length]}
-                loading="lazy"
-                decoding="async"
-              />
-            </button>
-          ))}
-        </div>
-        {/* Play/pause + counter live inside the card so the card keeps the
-            same height as the other cards in the row. */}
-        <div className="roca-gallery-controls">
+    <div className="roca-filmstrip-wrap reveal">
+      <div className="roca-filmstrip" ref={trackRef} aria-label={label}>
+        {images.map((id, index) => (
           <button
+            key={id}
             type="button"
-            className="roca-gallery-toggle"
-            aria-pressed={!playing}
-            onClick={() => setPlaying((p) => !p)}
+            className="roca-filmstrip-item"
+            onClick={() => onOpen(index)}
+            aria-label={`${alts[index % alts.length]} — ver en grande`}
           >
-            {playing ? "❚❚" : "▶"}
+            <img
+              src={wixUrl(id, 300)}
+              alt={alts[index % alts.length]}
+              loading="lazy"
+              decoding="async"
+            />
           </button>
-          <span className="roca-gallery-count">
-            {String(active + 1).padStart(2, "0")} / {String(count).padStart(2, "0")}
-          </span>
-        </div>
-      </article>
+        ))}
+      </div>
     </div>
   );
 }
+
 
 
 
@@ -275,19 +236,37 @@ function FacilitySlideset({ items, playbackPaused = false }) {
   }
   const count = pages.length;
 
-  // Touch swipe support: track the horizontal drag so a swipe advances or
-  // retreats the active page (mirrors the prev/next arrows). A `swiped` flag
-  // suppresses the card's click (which opens the lightbox) right after a
-  // swipe, so a swipe never accidentally opens a photo.
-  const touchStartX = useRef(null);
+  // Swipe support via Pointer Events so the carousel is draggable on BOTH
+  // mobile (touch) and desktop (mouse). We capture the pointer on pointerdown
+  // so we reliably receive pointermove/pointerup even if the finger/mouse
+  // leaves the track mid-drag, and we handle pointercancel too (the browser
+  // fires it instead of pointerup when it decides a touch is a scroll — the
+  // `touch-action: pan-y` on the track prevents that for horizontal drags).
+  // A `swiped` flag suppresses the card's click (which opens the lightbox)
+  // right after a swipe, so a swipe never accidentally opens a photo.
+  const dragStartX = useRef(null);
   const swiped = useRef(false);
-  const onTouchStart = (event) => {
-    touchStartX.current = event.touches[0].clientX;
+  const trackRef = useRef(null);
+  const onPointerDown = (event) => {
+    // Only track the primary pointer (first finger / main mouse button).
+    if (!event.isPrimary) return;
+    dragStartX.current = event.clientX;
+    swiped.current = false;
+    try {
+      trackRef.current?.setPointerCapture?.(event.pointerId);
+    } catch {
+      /* pointer capture can throw if the pointer is already gone */
+    }
   };
-  const onTouchEnd = (event) => {
-    if (touchStartX.current === null) return;
-    const deltaX = event.changedTouches[0].clientX - touchStartX.current;
-    touchStartX.current = null;
+  const onPointerMove = (event) => {
+    // No-op: we only need the start X and the end X. Keeping a move handler
+    // here is not required, but capturing the pointer keeps pointerup firing
+    // on the track even when the drag leaves its bounds.
+  };
+  const onPointerUp = (event) => {
+    if (dragStartX.current === null) return;
+    const deltaX = event.clientX - dragStartX.current;
+    dragStartX.current = null;
     if (Math.abs(deltaX) < 40) return;
     swiped.current = true;
     if (deltaX < 0) {
@@ -296,12 +275,22 @@ function FacilitySlideset({ items, playbackPaused = false }) {
       setActive((a) => (a - 1 + count) % count);
     }
   };
-  const onTrackClick = (event) => {
+  const onPointerCancel = () => {
+    dragStartX.current = null;
+  };
+  // Capture-phase click suppression: after a swipe the browser may still
+  // synthesize a click on the card button (which opens the lightbox). Using
+  // capture phase means this runs BEFORE the button's own onClick, so we can
+  // stop the click from ever reaching the card and opening the lightbox.
+  const onTrackClickCapture = (event) => {
     if (!swiped.current) return;
     swiped.current = false;
     event.preventDefault();
     event.stopPropagation();
   };
+
+
+
 
 
 
@@ -331,11 +320,17 @@ function FacilitySlideset({ items, playbackPaused = false }) {
   return (
     <div className="facility-slideset">
       <div
+        ref={trackRef}
         className="facility-slideset__track"
-        onTouchStart={onTouchStart}
-        onTouchEnd={onTouchEnd}
-        onClick={onTrackClick}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={onPointerCancel}
+        onClickCapture={onTrackClickCapture}
       >
+
+
+
 
         {pages.map((page, i) => (
           <div
@@ -472,6 +467,9 @@ export function Venue() {
     alt: image.alt,
   }));
 
+  // The main facility carousel holds ONLY the photo cards + the video card.
+  // The venue photo gallery is a separate film-strip below (never nested
+  // inside a slide), so the carousel stays a clean, swipeable slideset.
   const facilityItems = [
     ...facilities.groups.map((group, index) => (
       <FacilityCard
@@ -483,19 +481,13 @@ export function Venue() {
         onOpen={(i) => setLightbox({ images: facilitySlides, startIndex: i })}
       />
     )),
-    <RocaGallery
-      key="roca-gallery"
-      images={ROCA_AZUL_GALLERY}
-      alts={facilities.rocaGalleryAlts}
-      label={facilities.rocaGalleryLabel}
-      onOpen={(i) => setLightbox({ images: venueSlides, startIndex: i })}
-    />,
     <VideoCard
       key="venue-video"
       title={facilities.videoTitle}
       onPlaybackChange={setVenueVideoPlaying}
     />,
   ];
+
 
   return (
     <section className="facilities-section section story-bg" ref={sectionRef}>
@@ -525,15 +517,19 @@ export function Venue() {
 
         <FacilitySlideset items={facilityItems} playbackPaused={venueVideoPlaying} />
 
-
-
-
-
-
-
+        {/* The venue photo gallery as a film-strip below the carousel. It is
+            its own element (not a slide), so the main carousel stays a clean
+            swipeable slideset. Clicking a thumbnail opens the lightbox. */}
+        <RocaFilmStrip
+          images={ROCA_AZUL_GALLERY}
+          alts={facilities.rocaGalleryAlts}
+          label={facilities.rocaGalleryLabel}
+          onOpen={(i) => setLightbox({ images: venueSlides, startIndex: i })}
+        />
 
         <a
           className="venue-gallery-source"
+
           href="https://www.clubrocaazul.com/"
           target="_blank"
           rel="noreferrer"

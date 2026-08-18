@@ -590,8 +590,9 @@
   border: 1px solid rgb(169 77 49 / 22%);
   border-radius: 1.25rem;
   background:
-    radial-gradient(120% 140% at 100% 0%, rgb(255 253 248 / 62%), transparent 55%),
-    rgb(255 253 248 / 55%);
+    radial-gradient(120% 140% at 100% 0%, rgb(255 253 248 / 62%), transparent 5%),
+    rgb(255 253 248 / 90%);
+
   box-shadow: 0 0.75rem 2rem rgb(36 33 25 / 8%);
   scroll-margin-top: 1.5rem;
 }

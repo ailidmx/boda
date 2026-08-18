@@ -480,14 +480,23 @@ p {
   text-decoration: underline;
 }
 
-/* Light variant for dark backgrounds (deep green / ink / navy). */
+/* Light variant for dark backgrounds (deep green / ink / navy). The link
+   sits on a much darker translucent pill so the white text stays readable
+   even over a busy, light or animated background. */
 .section-nav--light {
   border-top-color: rgb(255 255 255 / 22%);
 }
 
 .section-nav--light .section-nav-link {
+  padding: 0.55rem 1.1rem;
+  border-radius: 999px;
+  background: rgb(0 0 0 / 62%);
+  box-shadow: 0 0.35rem 1rem rgb(0 0 0 / 28%);
   color: var(--white);
+  backdrop-filter: blur(3px);
 }
+
+
 
 .section-nav--light .section-nav-link:hover,
 .section-nav--light .section-nav-link:focus-visible {

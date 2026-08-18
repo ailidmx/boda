@@ -11,7 +11,9 @@ import { trackNav } from "./nav-links.js";
 export function SideDrawer({ links, activeKey }) {
   const { t } = useApp();
   const [open, setOpen] = useState(false);
+  const [openSub, setOpenSub] = useState(null); // null | parent key (e.g. "food")
   const drawerRef = useRef(null);
+
 
   // Close on Escape and lock body scroll while open.
   useEffect(() => {
@@ -92,39 +94,56 @@ export function SideDrawer({ links, activeKey }) {
                   }
 
                   const { key, href, children } = entry;
+                  const subOpen = openSub === key;
                   return (
                     <div key={key} className="side-drawer__group">
-                      <a
-                        href={href}
-                        data-analytics={`nav.${key}`}
-                        className={`side-drawer__link${key === activeKey ? " is-active" : ""}`}
-                        aria-current={key === activeKey ? "true" : undefined}
-                        onClick={() => {
-                          setOpen(false);
-                          trackNav(key, "side_drawer");
-                        }}
-                      >
-                        {t.nav[key]}
-                      </a>
-                      <div className="side-drawer__sub">
-                        {children.map(([childKey, childHref]) => (
-                          <a
-                            key={childKey}
-                            href={childHref}
-                            data-analytics={`nav.${childKey}`}
-                            className={`side-drawer__sublink${childKey === activeKey ? " is-active" : ""}`}
-                            aria-current={childKey === activeKey ? "true" : undefined}
-                            onClick={() => {
-                              setOpen(false);
-                              trackNav(childKey, "side_drawer");
-                            }}
-                          >
-                            {t.nav[childKey]}
-                          </a>
-                        ))}
+                      <div className="side-drawer__group-head">
+                        <a
+                          href={href}
+                          data-analytics={`nav.${key}`}
+                          className={`side-drawer__link${key === activeKey ? " is-active" : ""}`}
+                          aria-current={key === activeKey ? "true" : undefined}
+                          onClick={() => {
+                            setOpen(false);
+                            trackNav(key, "side_drawer");
+                          }}
+                        >
+                          {t.nav[key]}
+                        </a>
+                        <button
+                          type="button"
+                          className={`side-drawer__sub-toggle${subOpen ? " is-open" : ""}`}
+                          aria-expanded={subOpen}
+                          aria-label={t.nav[key]}
+                          onClick={() => setOpenSub((v) => (v === key ? null : key))}
+                        >
+                          <span className="side-drawer__sub-arrow" aria-hidden="true">
+                            ▸
+                          </span>
+                        </button>
                       </div>
+                      {subOpen && (
+                        <div className="side-drawer__sub">
+                          {children.map(([childKey, childHref]) => (
+                            <a
+                              key={childKey}
+                              href={childHref}
+                              data-analytics={`nav.${childKey}`}
+                              className={`side-drawer__sublink${childKey === activeKey ? " is-active" : ""}`}
+                              aria-current={childKey === activeKey ? "true" : undefined}
+                              onClick={() => {
+                                setOpen(false);
+                                trackNav(childKey, "side_drawer");
+                              }}
+                            >
+                              {t.nav[childKey]}
+                            </a>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   );
+
                 })}
               </nav>
             </div>

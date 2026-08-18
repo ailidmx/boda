@@ -501,10 +501,13 @@ export function buildGuisoRankingPayload({ guestId, ranking, selected, timestamp
  *                                  intent == "band" (marimba | mariachi |
  *                                  norteno | frenchBand). Optional.
  * @param {Object} [input.songMeta] normalized song identity (optional)
+ * @param {string} [input.assignedGuestId] the guest the song is FOR (defaults
+ *                                  to the requesting guest). Lets a guest
+ *                                  request a song on behalf of a group member.
  * @param {*} input.timestamp      e.g. serverTimestamp()
  * @returns {Object} explicit payload for addDoc(...)
  */
-export function buildSongRequestPayload({ guestId, song, intent, bandType, songMeta, timestamp }) {
+export function buildSongRequestPayload({ guestId, song, intent, bandType, songMeta, assignedGuestId, timestamp }) {
   const payload = {
     guestId: String(guestId ?? "").trim(),
     song: String(song ?? "").trim(),
@@ -512,6 +515,11 @@ export function buildSongRequestPayload({ guestId, song, intent, bandType, songM
     updatedBy: String(guestId ?? "").trim(),
     updatedAt: timestamp,
   };
+
+  // The guest the song is FOR. Defaults to the requesting guest so existing
+  // requests (and callers that don't pass it) keep working unchanged.
+  payload.assignedGuestId = String(assignedGuestId ?? guestId ?? "").trim();
+
 
   // Optional band type, only meaningful when the guest wants a live band.
   if (bandType) {

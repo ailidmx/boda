@@ -66,6 +66,130 @@
   color: rgb(90 79 58 / 55%);
 }
 
+/* ── "Who is this song for?" guest picker ────────────────────────────────
+   A custom dropdown (instead of a native select) so each group member can be
+   shown with their avatar photo (or initials fallback) + name. */
+.song-request-guestpicker {
+  position: relative;
+}
+
+.song-request-guestpicker__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  width: 100%;
+  font: inherit;
+  padding: 0.5rem 0.9rem;
+  color: var(--ink, #2b2418);
+  background: var(--cream, #fffdf8);
+  border: 1px solid rgb(198 139 43 / 40%);
+  border-radius: 0.6rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.song-request-guestpicker__trigger:hover:not(:disabled),
+.song-request-guestpicker__trigger:focus-visible {
+  outline: none;
+  border-color: var(--gold, #c68b2b);
+  box-shadow: 0 0 0 3px rgb(198 139 43 / 20%);
+}
+.song-request-guestpicker__trigger:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.song-request-guestpicker__value {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-width: 0;
+}
+
+.song-request-guestpicker__caret {
+  flex: 0 0 auto;
+  color: rgb(90 79 58 / 60%);
+  font-size: 0.8rem;
+  transition: transform 0.15s ease;
+}
+
+.song-request-guestpicker__avatar {
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(198 139 43 / 15%);
+  border: 1px solid rgb(198 139 43 / 30%);
+}
+.song-request-guestpicker__avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.song-request-guestpicker__avatar-fallback {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--gold, #c68b2b);
+}
+
+.song-request-guestpicker__name {
+  font-size: 0.95rem;
+  color: var(--ink, #2b2418);
+  overflow-wrap: anywhere;
+}
+
+.song-request-guestpicker__list {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  list-style: none;
+  margin: 0;
+  padding: 0.35rem;
+  max-height: 16rem;
+  overflow-y: auto;
+  border: 1px solid rgb(198 139 43 / 35%);
+  border-radius: 0.6rem;
+  background: var(--cream, #fffdf8);
+  box-shadow: 0 12px 30px rgb(198 139 43 / 18%);
+}
+
+.song-request-guestpicker__option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  text-align: left;
+  font: inherit;
+  padding: 0.5rem 0.7rem;
+  border: 0;
+  border-radius: 0.45rem;
+  background: transparent;
+  color: var(--ink, #2b2418);
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.song-request-guestpicker__option:hover,
+.song-request-guestpicker__option:focus-visible {
+  background: rgb(198 139 43 / 12%);
+  outline: none;
+}
+.song-request-guestpicker__option.is-selected {
+  background: rgb(198 139 43 / 10%);
+}
+.song-request-guestpicker__option:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+
+
 /* ── Autocomplete ──────────────────────────────────────────────────────── */
 .song-request-autocomplete {
   position: relative;
@@ -264,3 +388,166 @@
   opacity: 0.6;
   cursor: default;
 }
+
+/* ── Form actions (submit + cancel-edit) ───────────────────────────────── */
+.song-request-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.song-request-cancel {
+  font: inherit;
+  font-weight: 600;
+  color: var(--ink, #2b2418);
+  background: transparent;
+  border: 1px solid rgb(198 139 43 / 40%);
+  border-radius: 999px;
+  padding: 0.7rem 1.4rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.song-request-cancel:hover:not(:disabled) {
+  border-color: var(--gold, #c68b2b);
+  background: rgb(198 139 43 / 8%);
+}
+.song-request-cancel:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* ── "My songs" list ───────────────────────────────────────────────────── */
+.song-request-mysongs {
+  max-width: 40rem;
+  margin: 2rem auto 0;
+  margin-bottom: 2.5rem;
+}
+
+
+.song-request-mysongs__title {
+  margin: 0 0 0.9rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--ink, #2b2418);
+}
+
+.song-request-mysongs__status {
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: 0.5rem;
+  font-size: 0.95rem;
+  color: rgb(90 79 58 / 70%);
+  background: rgb(198 139 43 / 6%);
+}
+.song-request-mysongs__status.is-error {
+  color: rgb(169 77 49);
+  background: rgb(169 77 49 / 10%);
+}
+
+.song-request-mysongs__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.song-request-mysongs__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.8rem 1rem;
+  border: 1px solid rgb(198 139 43 / 25%);
+  border-radius: 0.7rem;
+  background: rgb(255 253 248 / 85%);
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.song-request-mysongs__item.is-editing {
+  border-color: var(--gold, #c68b2b);
+  background: rgb(198 139 43 / 10%);
+}
+
+/* The guest avatar shown on the left of each "My songs" item. It wraps the
+   shared guestpicker avatar (2rem circle) and keeps it aligned to the start
+   of the row, with a little breathing room before the song info. */
+.song-request-mysongs__avatar {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.song-request-mysongs__avatar .song-request-guestpicker__avatar {
+  width: 1.75rem;
+  height: 1.75rem;
+}
+
+.song-request-mysongs__info {
+
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.song-request-mysongs__song {
+  font-weight: 600;
+  color: var(--ink, #2b2418);
+  overflow-wrap: anywhere;
+}
+
+.song-request-mysongs__meta {
+  font-size: 0.82rem;
+  color: rgb(90 79 58 / 70%);
+}
+
+.song-request-mysongs__actions {
+  display: flex;
+  gap: 0.4rem;
+  flex: 0 0 auto;
+}
+
+.song-request-mysongs__btn {
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink, #2b2418);
+  background: transparent;
+  border: 1px solid rgb(198 139 43 / 40%);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+.song-request-mysongs__btn:hover:not(:disabled) {
+  border-color: var(--gold, #c68b2b);
+  background: rgb(198 139 43 / 8%);
+}
+.song-request-mysongs__btn.is-danger {
+  color: rgb(169 77 49);
+  border-color: rgb(169 77 49 / 40%);
+}
+.song-request-mysongs__btn.is-danger:hover:not(:disabled) {
+  border-color: rgb(169 77 49);
+  background: rgb(169 77 49 / 8%);
+}
+.song-request-mysongs__btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+@media (max-width: 480px) {
+  .song-request-mysongs__item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .song-request-mysongs__actions {
+    width: 100%;
+  }
+  .song-request-mysongs__btn {
+    flex: 1;
+  }
+}
+
