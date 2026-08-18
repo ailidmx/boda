@@ -17,7 +17,9 @@ import {
   DEFAULT_AUTH_EMAIL_DOMAIN,
   guestFullName,
   guestIdentity,
+  guestRoom,
 } from "./guestDomain.js";
+
 
 // Read the live RSVP answers for a guest from the raw Firestore record.
 export function getLiveRsvpAnswers(guest, liveGuests) {
@@ -207,3 +209,37 @@ export function getFilteredGuests(activeGuests, { filterGroup, filterQuery }) {
 
   return filtered;
 }
+
+// Extract the sortable value for a guest given a column key. The Firebase Auth
+// user map is injected (dependency injection) so this stays a pure function
+// decoupled from the dashboard's mutable `state`. Returns a lowercase string
+// (or a number for boolean-ish columns) so the caller can sort directly.
+export function guestSortValue(guest, key, authUsers = {}) {
+  switch (key) {
+    case "name":
+      return guestFullName(guest).toLowerCase();
+    case "invitationGroup":
+      return (guest.invitationGroup || "").toLowerCase();
+    case "idCheck":
+      return guest.idCheckUser ? 1 : 0;
+    case "hasAuth":
+      return authUsers[guest.id] ? 1 : 0;
+    case "group":
+      return (guest.group || "").toLowerCase();
+    case "lang":
+      return (guest.identity?.lang || guest.lang || "").toLowerCase();
+    case "cabin":
+      return (guest.cabinLabel || guest.unit || "").toLowerCase();
+    case "room":
+      return guestRoom(guest).toLowerCase();
+    case "xtraCabin":
+      return (guest.xtraCabinLabel || guest.xtraCabin || "").toLowerCase();
+    case "xtraRoom":
+      return (guest.xtraRoom || "").toLowerCase();
+    case "status":
+      return 0;
+    default:
+      return "";
+  }
+}
+

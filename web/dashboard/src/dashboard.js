@@ -55,7 +55,9 @@ import {
   getGroupAttendanceCounts as serviceGetGroupAttendanceCounts,
   getUniqueCabins as serviceGetUniqueCabins,
   getFilteredGuests as serviceGetFilteredGuests,
+  guestSortValue as serviceGuestSortValue,
 } from "./guestService.js";
+
 
 
 import { renderGuestManager as renderGuestManagerTable } from "./guestTable.js";
@@ -162,44 +164,14 @@ function showToast(message, type = "info") {
   setTimeout(dismiss, 4000);
 }
 
-// Extract the sortable value for a guest given a column key.
+// Extract the sortable value for a guest given a column key. The derivation
+// lives in `guestService.js` (pure, dependency-injected); this thin adapter
+// binds the dashboard's mutable `state.authUsers` so the rest of the file keeps
+// calling the same short signature.
 function guestSortValue(guest, key) {
-
-  switch (key) {
-    case "name":
-      return guestFullName(guest).toLowerCase();
-    case "invitationGroup":
-      return (guest.invitationGroup || "").toLowerCase();
-    case "idCheck":
-      return guest.idCheckUser ? 1 : 0;
-
-    case "hasAuth":
-      return state.authUsers[guest.id] ? 1 : 0;
-
-
-
-    case "group":
-      return (guest.group || "").toLowerCase();
-    case "lang":
-      return (guest.identity?.lang || guest.lang || "").toLowerCase();
-    case "cabin":
-      return (guest.cabinLabel || guest.unit || "").toLowerCase();
-    case "room":
-      return guestRoom(guest).toLowerCase();
-    case "xtraCabin":
-      return (guest.xtraCabinLabel || guest.xtraCabin || "").toLowerCase();
-    case "xtraRoom":
-      return (guest.xtraRoom || "").toLowerCase();
-    // The legacy `rsvp_submissions` collection is no longer written by the app
-    // (answers live on the `guests` doc), so there is no per-guest RSVP record
-    // to sort by. The status column is derived live from `rsvp.answers`; keep
-    // the sort neutral (0) to preserve prior behavior.
-    case "status":
-      return 0;
-    default:
-      return "";
-  }
+  return serviceGuestSortValue(guest, key, state.authUsers);
 }
+
 
 
 

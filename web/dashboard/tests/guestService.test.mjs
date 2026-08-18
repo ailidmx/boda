@@ -11,7 +11,9 @@ import {
   rsvpLevelChip,
   computeDayConfirmations,
   guestStatusBadge,
+  guestSortValue,
 } from "../src/guestService.js";
+
 import {
   guestFullName,
   guestAvatarUrl,
@@ -252,3 +254,66 @@ test("guestStatusBadge returns pending when there are no answers", () => {
   const badge = guestStatusBadge(noAnswers, [{ id: "x", rsvp: { answers: {} } }]);
   assert.equal(badge.className, "dashboard-badge dashboard-badge-pending");
 });
+
+
+// ── guestSortValue (pure, dependency-injected) ─────────────────────────
+
+test("guestSortValue sorts by name (lowercased full name)", () => {
+  const g = { id: "g1", identity: { firstName: "Ana", lastName: "García" } };
+  assert.equal(guestSortValue(g, "name"), "ana garcía");
+});
+
+test("guestSortValue sorts by invitationGroup (lowercased)", () => {
+  const g = { id: "g1", invitationGroup: "Familia" };
+  assert.equal(guestSortValue(g, "invitationGroup"), "familia");
+});
+
+test("guestSortValue idCheck returns 1 when verified, 0 otherwise", () => {
+  assert.equal(guestSortValue({ id: "g1", idCheckUser: true }, "idCheck"), 1);
+  assert.equal(guestSortValue({ id: "g1" }, "idCheck"), 0);
+});
+
+test("guestSortValue hasAuth reads the injected authUsers map", () => {
+  const authUsers = { g1: { email: "a@example.com" } };
+  assert.equal(guestSortValue({ id: "g1" }, "hasAuth", authUsers), 1);
+  assert.equal(guestSortValue({ id: "g2" }, "hasAuth", authUsers), 0);
+  // Defaults to an empty map when not injected.
+  assert.equal(guestSortValue({ id: "g1" }, "hasAuth"), 0);
+});
+
+test("guestSortValue sorts by group (lowercased)", () => {
+  const g = { id: "g1", group: "Amigos" };
+  assert.equal(guestSortValue(g, "group"), "amigos");
+});
+
+test("guestSortValue sorts by lang from identity or top-level", () => {
+  assert.equal(guestSortValue({ id: "g1", identity: { lang: "FR" } }, "lang"), "fr");
+  assert.equal(guestSortValue({ id: "g1", lang: "ES" }, "lang"), "es");
+});
+
+test("guestSortValue sorts by cabin (cabinLabel or unit)", () => {
+  assert.equal(guestSortValue({ id: "g1", cabinLabel: "CABAÑA 1" }, "cabin"), "cabaña 1");
+  assert.equal(guestSortValue({ id: "g1", unit: "madera_31" }, "cabin"), "madera_31");
+});
+
+test("guestSortValue sorts by room via guestRoom", () => {
+  const g = { id: "g1", hosting: { room: "CABAÑA 1-1" } };
+  assert.equal(guestSortValue(g, "room"), "cabaña 1-1");
+});
+
+test("guestSortValue sorts by xtraCabin and xtraRoom", () => {
+  assert.equal(
+    guestSortValue({ id: "g1", xtraCabinLabel: "Casona" }, "xtraCabin"),
+    "casona",
+  );
+  assert.equal(
+    guestSortValue({ id: "g1", xtraRoom: "Casona-1" }, "xtraRoom"),
+    "casona-1",
+  );
+});
+
+test("guestSortValue status is neutral (0) and unknown keys return empty", () => {
+  assert.equal(guestSortValue({ id: "g1" }, "status"), 0);
+  assert.equal(guestSortValue({ id: "g1" }, "unknown"), "");
+});
+

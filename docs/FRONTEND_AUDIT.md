@@ -671,6 +671,26 @@ its own scoped infrastructure change. See ADR-0019.
   `state.activeTab` (the module now owns that state). Markup/classes are unchanged —
   appearance is preserved.
 
+- **`guestSortValue` extracted into the pure `guestService.js`** — the INVITADOS table's
+  column sort derivation `guestSortValue(guest, key)` was moved out of
+  `web/dashboard/src/dashboard.js` into `web/dashboard/src/guestService.js` as a pure,
+  dependency-injected function `guestSortValue(guest, key, authUsers = {})`. The Firebase
+  Auth user map is now passed in as the third argument instead of being read from the
+  mutable `state.authUsers`, making the function unit-testable in isolation.
+  `dashboard.js` keeps a thin adapter with the same short signature
+  `guestSortValue(guest, key)` that binds `state.authUsers`, so `guestTable.js` (which
+  receives it via `ctx`) is unchanged. No rendered markup or sort order changed.
+
+- **Dashboard test suite wired into `npm test`** — added a `test` script to
+  `web/dashboard/package.json` (`node --test tests/*.test.mjs`) and appended
+  `npm --prefix web/dashboard run test` to the root `test` script. The dashboard's pure
+  modules (`guestDomain.js`, `guestService.js`) are now exercised by the same `npm test`
+  that runs the invitation tests. Ten new tests in
+  `web/dashboard/tests/guestService.test.mjs` cover every `guestSortValue` sort key
+  (name, invitationGroup, idCheck, hasAuth with injected authUsers, group, lang, cabin,
+  room, xtraCabin, xtraRoom, status, unknown). See ADR-0020.
+
+
 
 
 
