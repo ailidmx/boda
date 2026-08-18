@@ -10,6 +10,7 @@ import {
 import { getGroupTag } from "../invitation-profile.js";
 
 import { CoupleNames } from "./ui.jsx";
+import { Dialog } from "./ui/Dialog.jsx";
 import { MemberCard } from "./identity/MemberCard.jsx";
 import { MemberTabs } from "./identity/MemberTabs.jsx";
 
@@ -78,16 +79,6 @@ export function IdentityModal() {
     if (!activeId) return;
     scrollTabToLeft(activeId);
   }, [activeId]);
-
-  // Lock background scroll while the modal is open.
-  useEffect(() => {
-    if (!identityPrompt) return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previous;
-    };
-  }, [identityPrompt]);
 
   // Initialize active member once when the modal is shown.
   useEffect(() => {
@@ -167,23 +158,16 @@ export function IdentityModal() {
 
 
   return (
-    <div
-      className="identity-modal-overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="identity-modal-title"
+    <Dialog
+      open={!!identityPrompt}
+      onClose={dismissIdentityPrompt}
+      ariaLabelledBy="identity-modal-title"
+      closeLabel={identity.cancel}
+      overlayClassName="identity-modal-overlay"
+      cardClassName="identity-modal-card"
+      closeClassName="identity-modal-close"
     >
-      <div className="identity-modal-card">
-        <button
-          type="button"
-          className="identity-modal-close"
-          aria-label={identity.cancel}
-          onClick={dismissIdentityPrompt}
-        >
-          ✕
-        </button>
-
-        {/* Header — always visible, never scrolls */}
+      {/* Header — always visible, never scrolls */}
         <div className="identity-modal-header">
           <div className="identity-modal-monogram">
             <CoupleNames
@@ -271,7 +255,6 @@ export function IdentityModal() {
             </button>
           </div>
         </div>
-      </div>
-    </div>
+    </Dialog>
   );
 }

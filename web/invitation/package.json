@@ -15,6 +15,7 @@
     "test:validation": "node --test tests/validation.test.mjs",
     "test:analytics": "node --test tests/analytics.test.mjs",
     "test:button": "node --test tests/button.test.mjs",
+    "test:dialog": "node --test tests/dialog.test.mjs",
     "test:guest-profiles": "node --test tests/guest-profiles.test.mjs",
     "test:auth-logic": "node --test tests/auth-logic.test.mjs"
 

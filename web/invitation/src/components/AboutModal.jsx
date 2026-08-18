@@ -1,7 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 
 import { useApp } from "../context/AppContext.jsx";
 import { FEATURES } from "../features.js";
+import { Dialog } from "./ui/Dialog.jsx";
 
 // "À propos" popup shown from the user menu. It lists the newest features of
 // the invitation (see features.js) in the guest's active language, so guests
@@ -10,82 +11,56 @@ export function AboutModal({ open, onClose }) {
   const { t, language } = useApp();
   const nav = t.nav || {};
 
-  useEffect(() => {
-    if (!open) return;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-
-    const onEscape = (event) => {
-      if (event.key === "Escape") onClose();
-    };
-    window.addEventListener("keydown", onEscape);
-
-    return () => {
-      document.body.style.overflow = previous;
-      window.removeEventListener("keydown", onEscape);
-    };
-  }, [open, onClose]);
-
   if (!open) return null;
 
   const features = FEATURES[language] || FEATURES.es || [];
 
   return (
-    <div
-      className="user-menu-modal__overlay about-modal__overlay"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="about-modal-title"
-      onClick={onClose}
+    <Dialog
+      open={open}
+      onClose={onClose}
+      ariaLabelledBy="about-modal-title"
+      closeLabel={nav.aboutClose || nav.close}
+      overlayClassName="user-menu-modal__overlay about-modal__overlay"
+      cardClassName="user-menu-modal__card about-modal__card"
+      closeClassName="user-menu-modal__close"
+      closeOnEscape
+      closeOnOverlayClick
     >
-      <div
-        className="user-menu-modal__card about-modal__card"
-        onClick={(event) => event.stopPropagation()}
-      >
+      <h2 className="user-menu-modal__title" id="about-modal-title">
+        {nav.aboutTitle}
+      </h2>
+      {nav.aboutSubtitle && (
+        <p className="about-modal__subtitle">{nav.aboutSubtitle}</p>
+      )}
+
+      <ul className="about-modal__list">
+        {features.map((feature, index) => (
+          <li className="about-modal__item" key={index}>
+            <span className="about-modal__icon" aria-hidden="true">
+              {feature.icon}
+            </span>
+            <div className="about-modal__text">
+              <span className="about-modal__feature-title">
+                {feature.title}
+              </span>
+              <span className="about-modal__feature-body">
+                {feature.body}
+              </span>
+            </div>
+          </li>
+        ))}
+      </ul>
+
+      <div className="about-modal__actions">
         <button
-          className="user-menu-modal__close"
+          className="user-menu-modal__btn user-menu-modal__btn--primary"
           type="button"
-          aria-label={nav.aboutClose || nav.close}
           onClick={onClose}
         >
-          ✕
+          {nav.aboutClose || nav.close}
         </button>
-
-        <h2 className="user-menu-modal__title" id="about-modal-title">
-          {nav.aboutTitle}
-        </h2>
-        {nav.aboutSubtitle && (
-          <p className="about-modal__subtitle">{nav.aboutSubtitle}</p>
-        )}
-
-        <ul className="about-modal__list">
-          {features.map((feature, index) => (
-            <li className="about-modal__item" key={index}>
-              <span className="about-modal__icon" aria-hidden="true">
-                {feature.icon}
-              </span>
-              <div className="about-modal__text">
-                <span className="about-modal__feature-title">
-                  {feature.title}
-                </span>
-                <span className="about-modal__feature-body">
-                  {feature.body}
-                </span>
-              </div>
-            </li>
-          ))}
-        </ul>
-
-        <div className="about-modal__actions">
-          <button
-            className="user-menu-modal__btn user-menu-modal__btn--primary"
-            type="button"
-            onClick={onClose}
-          >
-            {nav.aboutClose || nav.close}
-          </button>
-        </div>
       </div>
-    </div>
+    </Dialog>
   );
 }

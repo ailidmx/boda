@@ -45,6 +45,9 @@ This audit covers the two React applications in this monorepo:
   per section (Hero, Nav, Food, Travel, RSVP, Accommodation, Photos, Music, etc.) plus a
   few shared primitives (`ui.jsx`, `CloudinaryImage.jsx`, `LazySection.jsx`,
   `SwipeCardCarousel.jsx`, `LightboxCarousel.jsx`, `FlipStepCard.jsx`, `PhoneInput.jsx`).
+  A `components/ui/` primitives layer is being introduced incrementally: `Button.jsx`
+  (with `button-classes.js` / `button-state.js`) and `Dialog.jsx` (with `dialog-state.js`).
+  New primitives should live here and be reused rather than re-implemented per feature.
 - **Dashboard**: `web/dashboard/src/` with `dashboard.js` (the shell + most UI) plus
   extracted panels/modals (`guestTable.js`, `guestEditorModal.js`, `guestModals.js`,
   `groupsPanel.js`, `recordsPanel.js`, `cabins.js`, `tables.js`) and data modules
@@ -319,8 +322,28 @@ The first F2 step is landed: a shared `Button` UI primitive for the invitation.
 - `web/invitation/tests/button.test.mjs` — unit tests for class mapping, `as`, `disabled`,
   `loading`, and aria attributes.
 
-Remaining F2 work: introduce the other primitives (Input, Dialog, Spinner, EmptyState,
-Badge) and consolidate design tokens. Do NOT redesign visuals — preserve appearance.
+The second F2 step is landed: a shared `Dialog` UI primitive for the invitation.
+
+- `web/invitation/src/components/ui/Dialog.jsx` — a BEHAVIORAL modal wrapper that renders
+  the overlay + card + close-button structure and owns the shared modal behavior
+  (background scroll-lock, ESC-to-close, overlay-click-to-close, focus management). Each
+  modal keeps its own visual classes via `overlayClassName` / `cardClassName` /
+  `closeClassName`, so migrating preserves each modal's exact appearance — no CSS changed.
+- `web/invitation/src/components/ui/dialog-state.js` — pure, JSX-free helpers:
+  `dialogBehavior` (resolves `closeOnEscape` / `closeOnOverlayClick`, both defaulting to
+  OFF so migration never changes existing behavior) and `dialogClasses` (normalizes the
+  per-modal class names).
+- Migrated the three invitation modals that share the overlay/card/close structure to the
+  primitive without changing rendered markup/classes:
+  - `IdentityModal.jsx` — keeps its existing behavior (no ESC / no overlay-click).
+  - `LanguageModal.jsx` — keeps its existing behavior (no ESC / no overlay-click).
+  - `AboutModal.jsx` — opts into `closeOnEscape` + `closeOnOverlayClick` (it already
+    closed on ESC and overlay-click before migration).
+- `web/invitation/tests/dialog.test.mjs` — unit tests for the behavior defaults and class
+  composition. Wired into `npm test` via `test:dialog`.
+
+Remaining F2 work: introduce the other primitives (Input, Spinner, EmptyState, Badge) and
+consolidate design tokens. Do NOT redesign visuals — preserve appearance.
 
 ### F7 progress — giant component decomposition (in progress)
 
