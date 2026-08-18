@@ -31,15 +31,30 @@ import { loadGuestCardVotes, loadAllCardVotes } from "../card-votes.js";
  * The cards reuse the Food section's swipeable carousel layout
  * (SwipeCardCarousel + flavour-card classes): one card per slide on mobile,
  * and a horizontal scroll-snap carousel showing ~3 cards per view on desktop.
+ *
+ * The section is split into two parts:
+ *
+ *   • Dish cards — the main content, wrapped in an expandable/collapsible
+ *     subsection with an arrow visual that signals it can be expanded.
+ *   • Reorder panel — always visible as a normal section layout (no toggle
+ *     button, no collapse). Its container carries the `#guisos-order` anchor
+ *     so the nav link scrolls straight to it.
  */
+
 export function Guisos() {
   const { t, profile } = useApp();
   const guestId = profile?.guest?.id;
   const guisos = t.guisos || {};
   const dishes = guisos.dishes || [];
 
+  // Expandable/collapsible subsection for the dish cards (the main content,
+  // expanded by default). The reorder panel below is always visible as a
+  // normal section layout.
+  const [dishesOpen, setDishesOpen] = useState(true);
+  const orderInitializedRef = useRef(false);
+
+
   // Reorder panel state.
-  const [reordering, setReordering] = useState(false);
   const [order, setOrder] = useState([]); // array of dish names, index 0 = favourite
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -134,8 +149,13 @@ export function Guisos() {
       .map((d) => d.name);
   }, [dishes, myRatings]);
 
-  // Initialise the order to the pre-sorted list the first time the panel opens.
-  const openReorder = useCallback(() => {
+  // The reorder panel is always visible, so initialise the order to the
+  // pre-sorted list once the guest's ratings are known (unless a saved ranking
+  // was already loaded).
+  useEffect(() => {
+    if (!guestId || orderInitializedRef.current) return;
+    if (!preSortedOrder.length) return;
+    orderInitializedRef.current = true;
     setOrder((prev) => {
       if (prev && prev.length === dishes.length) return prev;
       return preSortedOrder;
@@ -143,13 +163,8 @@ export function Guisos() {
     setManuallyReordered(false);
     setSaved(false);
     setError("");
-    setReordering(true);
-  }, [dishes.length, preSortedOrder]);
+  }, [guestId, preSortedOrder, dishes.length]);
 
-  const closeReorder = useCallback(() => {
-    setReordering(false);
-    setError("");
-  }, []);
 
   const move = useCallback(
     (index, delta) => {
@@ -184,12 +199,12 @@ export function Guisos() {
     [],
   );
 
-  // When the guest changes a star rating, re-sort the open panel live — but
-  // only if they haven't manually reordered anything yet.
+  // When the guest changes a star rating, re-sort the always-visible reorder
+  // panel live — but only if they haven't manually reordered anything yet.
   const handleVote = useCallback(
     ({ cardKey, rating }) => {
       setMyRatings((prev) => ({ ...prev, [cardKey]: rating }));
-      if (reordering && !manuallyReordered) {
+      if (!manuallyReordered) {
         setOrder((prev) => {
           if (prev.length !== dishes.length) return prev;
           const next = [...prev];
@@ -203,8 +218,9 @@ export function Guisos() {
         });
       }
     },
-    [reordering, manuallyReordered, dishes.length, myRatings],
+    [manuallyReordered, dishes.length, myRatings],
   );
+
 
   const selected = useMemo(() => order.slice(0, 9), [order]);
 
@@ -265,169 +281,181 @@ export function Guisos() {
         </p>
       )}
 
-      <SwipeCardCarousel className="guisos-grid" label={guisos.flavoursTitle}>
-        {dishes.map((dish, index) => (
-          <article className="flavour-card reveal" key={index}>
-            {dish.cloudinaryId ? (
-              <div className="flavour-card__media">
-                <img
-                  src={cloudinaryImage(`boda/${dish.cloudinaryId}`)}
-                  alt={dish.name}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </div>
-            ) : (
+      {/* Subsection 1 — dish cards (main content, expanded by default). */}
+      <div className="guisos-subsection guisos-subsection--dishes">
+        <button
+          type="button"
+          className={`guisos-subsection__toggle${dishesOpen ? " is-open" : ""}`}
+          onClick={() => setDishesOpen((v) => !v)}
+          aria-expanded={dishesOpen}
+          aria-controls="guisos-dishes-body"
+        >
+          <span className="guisos-subsection__arrow" aria-hidden="true">▸</span>
+          <span className="guisos-subsection__label">{guisos.flavoursTitle}</span>
+        </button>
 
-              <div className="flavour-card__illustration" aria-hidden="true">
-                <span>{guisos.flavourPlaceholder}</span>
-              </div>
-            )}
-            <div>
-              <h3>{dish.name}</h3>
-              <p>{dish.note}</p>
-            </div>
-            <StarVote cardType="guiso" cardKey={dish.name} onVote={handleVote} />
-          </article>
-        ))}
-      </SwipeCardCarousel>
+        {dishesOpen && (
+          <div id="guisos-dishes-body" className="guisos-subsection__body">
+            <SwipeCardCarousel className="guisos-grid" label={guisos.flavoursTitle}>
+              {dishes.map((dish, index) => (
+                <article className="flavour-card reveal" key={index}>
+                  {dish.cloudinaryId ? (
+                    <div className="flavour-card__media">
+                      <img
+                        src={cloudinaryImage(`boda/${dish.cloudinaryId}`)}
+                        alt={dish.name}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </div>
+                  ) : (
 
-      <p className="experience-note reveal">{guisos.note}</p>
+                    <div className="flavour-card__illustration" aria-hidden="true">
+                      <span>{guisos.flavourPlaceholder}</span>
+                    </div>
+                  )}
+                  <div>
+                    <h3>{dish.name}</h3>
+                    <p>{dish.note}</p>
+                  </div>
+                  <StarVote cardType="guiso" cardKey={dish.name} onVote={handleVote} />
+                </article>
+              ))}
+            </SwipeCardCarousel>
 
-      {/* Reorder panel */}
+            <p className="experience-note reveal">{guisos.note}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Anchor subsection — a "continue" link that scrolls to the reorder
+          panel below. The reorder panel is always visible (no toggle button),
+          so this link is the entry point to it. */}
+      <nav className="section-nav guisos-section-nav" aria-label={guisos.reorderTitle}>
+        <a className="section-nav-link" href="#guisos-order">
+          <span>{guisos.reorderTitle}</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </nav>
+
+      {/* Subsection 2 — reorder panel. Always visible as a normal section
+          layout (no toggle button, no collapse). The `#guisos-order` anchor
+          sits on the container so the nav link scrolls here. */}
       {guestId && (
-        <div className="guisos-reorder reveal">
-          {!reordering ? (
+        <div className="guisos-reorder" id="guisos-order">
+          <h3 className="guisos-reorder__title">{guisos.reorderTitle}</h3>
+          <p className="guisos-reorder__body">{guisos.reorderBody}</p>
+          {guisos.reorderDrag && (
+            <p className="guisos-reorder__drag">{guisos.reorderDrag}</p>
+          )}
+          <p className="guisos-reorder__hint">{guisos.reorderHint}</p>
+
+          <ol className="guisos-reorder__list">
+            {order.map((name, index) => {
+              const inMenu = index < 9;
+              return (
+                <li
+                  key={name}
+                  draggable
+                  onDragStart={() => {
+                    dragIndex.current = index;
+                    setDraggingIndex(index);
+                  }}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setDragOverIndex(index);
+                  }}
+                  onDragLeave={() => {
+                    setDragOverIndex((prev) => (prev === index ? null : prev));
+                  }}
+                  onDrop={() => {
+                    handleDrop(index);
+                    setDraggingIndex(null);
+                    setDragOverIndex(null);
+                  }}
+                  onDragEnd={() => {
+                    dragIndex.current = null;
+                    setDraggingIndex(null);
+                    setDragOverIndex(null);
+                  }}
+                  className={`guisos-reorder__item${inMenu ? " is-in-menu" : " is-out-menu"}${
+                    draggingIndex === index ? " is-dragging" : ""
+                  }${dragOverIndex === index ? " is-drag-over" : ""}`}
+                >
+
+                  <span className="guisos-reorder__grip" aria-hidden="true">
+                    ⠿
+                  </span>
+                  <span className="guisos-reorder__rank">{index + 1}</span>
+                  <span className="guisos-reorder__name">{name}</span>
+                  <span className="guisos-reorder__scores">
+                    <span className="guisos-reorder__score guisos-reorder__score--mine">
+                      <span className="guisos-reorder__score-label">
+                        {guisos.reorderMyScore}
+                      </span>
+                      <span className="guisos-reorder__stars" aria-hidden="true">
+                        {renderStars(myRatings[name] || 0)}
+                      </span>
+                    </span>
+                    <span className="guisos-reorder__score guisos-reorder__score--general">
+                      <span className="guisos-reorder__score-label">
+                        {guisos.reorderGeneralScore}
+                      </span>
+                      <span className="guisos-reorder__stars" aria-hidden="true">
+                        {renderStars(generalScores[name]?.average || 0)}
+                      </span>
+                      <span className="guisos-reorder__count">
+                        {generalScores[name]?.count
+                          ? `(${generalScores[name].count})`
+                          : ""}
+                      </span>
+                    </span>
+                  </span>
+                  <span className="guisos-reorder__status">
+                    {inMenu ? guisos.reorderInMenu : guisos.reorderNotInMenu}
+                  </span>
+                  <span className="guisos-reorder__controls">
+
+                    <button
+                      type="button"
+                      aria-label={`${guisos.reorderUp}: ${name}`}
+                      disabled={index === 0}
+                      onClick={() => move(index, -1)}
+                    >
+                      ↑
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={`${guisos.reorderDown}: ${name}`}
+                      disabled={index === order.length - 1}
+                      onClick={() => move(index, 1)}
+                    >
+                      ↓
+                    </button>
+                  </span>
+                </li>
+              );
+            })}
+          </ol>
+
+          {saved && (
+            <p className="guisos-reorder__saved">{guisos.reorderSaved}</p>
+          )}
+          {error && <p className="guisos-reorder__error">{error}</p>}
+
+          <div className="guisos-reorder__actions">
             <button
               type="button"
-              className="guisos-reorder__toggle"
-              onClick={openReorder}
+              className="guisos-reorder__save"
+              onClick={handleSave}
+              disabled={saving}
             >
-              {guisos.reorderButton}
+              {saving ? "…" : guisos.reorderSave}
             </button>
-          ) : (
-            <div className="guisos-reorder__panel">
-              <h3 className="guisos-reorder__title">{guisos.reorderTitle}</h3>
-              <p className="guisos-reorder__body">{guisos.reorderBody}</p>
-              {guisos.reorderDrag && (
-                <p className="guisos-reorder__drag">{guisos.reorderDrag}</p>
-              )}
-              <p className="guisos-reorder__hint">{guisos.reorderHint}</p>
-
-              <ol className="guisos-reorder__list">
-                {order.map((name, index) => {
-                  const inMenu = index < 9;
-                  return (
-                    <li
-                      key={name}
-                      draggable
-                      onDragStart={() => {
-                        dragIndex.current = index;
-                        setDraggingIndex(index);
-                      }}
-                      onDragOver={(e) => {
-                        e.preventDefault();
-                        setDragOverIndex(index);
-                      }}
-                      onDragLeave={() => {
-                        setDragOverIndex((prev) => (prev === index ? null : prev));
-                      }}
-                      onDrop={() => {
-                        handleDrop(index);
-                        setDraggingIndex(null);
-                        setDragOverIndex(null);
-                      }}
-                      onDragEnd={() => {
-                        dragIndex.current = null;
-                        setDraggingIndex(null);
-                        setDragOverIndex(null);
-                      }}
-                      className={`guisos-reorder__item${inMenu ? " is-in-menu" : " is-out-menu"}${
-                        draggingIndex === index ? " is-dragging" : ""
-                      }${dragOverIndex === index ? " is-drag-over" : ""}`}
-                    >
-
-                      <span className="guisos-reorder__grip" aria-hidden="true">
-                        ⠿
-                      </span>
-                      <span className="guisos-reorder__rank">{index + 1}</span>
-                      <span className="guisos-reorder__name">{name}</span>
-                      <span className="guisos-reorder__scores">
-                        <span className="guisos-reorder__score guisos-reorder__score--mine">
-                          <span className="guisos-reorder__score-label">
-                            {guisos.reorderMyScore}
-                          </span>
-                          <span className="guisos-reorder__stars" aria-hidden="true">
-                            {renderStars(myRatings[name] || 0)}
-                          </span>
-                        </span>
-                        <span className="guisos-reorder__score guisos-reorder__score--general">
-                          <span className="guisos-reorder__score-label">
-                            {guisos.reorderGeneralScore}
-                          </span>
-                          <span className="guisos-reorder__stars" aria-hidden="true">
-                            {renderStars(generalScores[name]?.average || 0)}
-                          </span>
-                          <span className="guisos-reorder__count">
-                            {generalScores[name]?.count
-                              ? `(${generalScores[name].count})`
-                              : ""}
-                          </span>
-                        </span>
-                      </span>
-                      <span className="guisos-reorder__status">
-                        {inMenu ? guisos.reorderInMenu : guisos.reorderNotInMenu}
-                      </span>
-                      <span className="guisos-reorder__controls">
-
-                        <button
-                          type="button"
-                          aria-label={`${guisos.reorderUp}: ${name}`}
-                          disabled={index === 0}
-                          onClick={() => move(index, -1)}
-                        >
-                          ↑
-                        </button>
-                        <button
-                          type="button"
-                          aria-label={`${guisos.reorderDown}: ${name}`}
-                          disabled={index === order.length - 1}
-                          onClick={() => move(index, 1)}
-                        >
-                          ↓
-                        </button>
-                      </span>
-                    </li>
-                  );
-                })}
-              </ol>
-
-              {saved && (
-                <p className="guisos-reorder__saved">{guisos.reorderSaved}</p>
-              )}
-              {error && <p className="guisos-reorder__error">{error}</p>}
-
-              <div className="guisos-reorder__actions">
-                <button
-                  type="button"
-                  className="guisos-reorder__cancel"
-                  onClick={closeReorder}
-                >
-                  {guisos.reorderCancel}
-                </button>
-                <button
-                  type="button"
-                  className="guisos-reorder__save"
-                  onClick={handleSave}
-                  disabled={saving}
-                >
-                  {saving ? "…" : guisos.reorderSave}
-                </button>
-              </div>
-            </div>
-          )}
+          </div>
         </div>
       )}
+
     </section>
   );
 }

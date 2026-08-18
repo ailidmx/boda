@@ -85,44 +85,82 @@
 
 
 
-/* ── Reorder panel (rank the guisos 1–20, top 9 in the menu) ───────────── */
-.guisos-reorder {
+/* ── Expandable/collapsible subsections ──────────────────────────────────
+   The section is split into two subsections (dish cards + reorder panel),
+   each with a toggle header and an arrow visual that signals it can be
+   expanded/collapsed. */
+.guisos-subsection {
   max-width: 46rem;
   margin: 1.6rem auto 0;
-  text-align: center;
 }
 
-.guisos-reorder__toggle {
+/* The dish-cards subsection is full-width (the carousel spans the section),
+   so it does not constrain its width like the reorder panel does. */
+.guisos-subsection--dishes {
+  max-width: none;
+}
+
+.guisos-subsection__toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
   font: inherit;
+  font-family: var(--font-display, serif);
+  font-size: 1.3rem;
   font-weight: 600;
-  color: var(--cream);
-  background: var(--gold, #c68b2b);
+  color: var(--ink, #2b2418);
+  background: transparent;
   border: none;
-  border-radius: 999px;
-  padding: 0.8rem 1.6rem;
+  border-bottom: 1px solid rgb(198 139 43 / 35%);
+  padding: 0.7rem 0.4rem;
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  text-align: center;
+  transition: color 0.15s ease;
 }
-.guisos-reorder__toggle:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 6px 18px rgb(198 139 43 / 35%);
+.guisos-subsection__toggle:hover {
+  color: var(--gold, #c68b2b);
 }
 
-.guisos-reorder__panel {
+.guisos-subsection__arrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  flex: 0 0 auto;
+  color: var(--gold, #c68b2b);
+  font-size: 1rem;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+.guisos-subsection__toggle.is-open .guisos-subsection__arrow {
+  transform: rotate(90deg);
+}
+
+.guisos-subsection__body {
   margin-top: 1.2rem;
-  padding: 1.4rem 1.2rem;
-  border: 1px solid rgb(198 139 43 / 30%);
-  border-radius: 1rem;
-  background: rgb(255 253 248 / 85%);
+}
+
+/* Anchor subsection — a "continue" link that scrolls to the reorder panel.
+   The base `.section-nav` provides the top border + centered link; this just
+   aligns the nav with the reorder panel's column width. */
+.guisos-section-nav {
+  max-width: 46rem;
+  margin: 2.4rem auto 0;
+}
+
+/* ── Reorder panel (rank the guisos 1–20, top 9 in the menu) ─────────────
+   Always visible as a normal section layout — no toggle button, no collapse,
+   no extra padding. */
+.guisos-reorder {
+  max-width: 46rem;
+  margin: 2.4rem auto 0;
   text-align: left;
 }
 
-.guisos-reorder__title {
-  margin: 0 0 0.4rem;
-  font-family: var(--font-display, serif);
-  font-size: 1.4rem;
-  color: var(--ink, #2b2418);
-}
+
 
 .guisos-reorder__body,
 .guisos-reorder__hint,
