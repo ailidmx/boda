@@ -11,7 +11,11 @@
  *
  *   const ref = doc(db, collections.guests, guestId);
  *   const q = query(collection(db, collections.guests), where("invitationGroup", "==", group));
+ *
+ * NOTE: This file is intentionally kept free of business logic. It only maps
+ * collection names and path builders so both apps stay in sync.
  */
+
 
 /** All Firestore collection names used by the application. */
 export const collections = {
