@@ -355,6 +355,13 @@ export function GuestCloud() {
         </div>
       )}
 
-    </section>
+    
+      <nav className="section-nav" aria-label="Continue">
+        <a className="section-nav-link" href="#thanks">
+          <span>{t.nav.thanks}</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </nav>
+</section>
   );
 }

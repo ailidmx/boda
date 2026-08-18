@@ -619,10 +619,13 @@
 .coast-budget-total {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
   gap: 0.25rem;
   padding: 1.25rem 1.5rem;
   border-radius: 1rem;
 }
+
 
 .coast-budget-total span {
   font-size: 0.95rem;

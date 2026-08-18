@@ -20,6 +20,8 @@ export const nav = {
     gift: "Regalos",
     photos: "Fotos",
     thanks: "Gracias",
+    footer: "Fin",
+
     guests: "Invitados",
     rsvp: "Confirmar",
     
@@ -32,7 +34,9 @@ export const nav = {
     musicLive: "Música en vivo",
     musicPlaylist: "Playlist",
     musicTastes: "Tus gustos",
+    songRequest: "PIDE TU CANCIÓN",
     logout: "Cerrar sesión",
+
 
     
     emailWarningTitle: "Atención al cambiar tu correo",
@@ -114,7 +118,9 @@ export const nav = {
     gift: "Cadeaux",
     photos: "Photos",
     thanks: "Merci",
+    footer: "Fin",
     guests: "Invités",
+
     rsvp: "Répondre",
     
     
@@ -126,7 +132,9 @@ export const nav = {
     musicLive: "Musique live",
     musicPlaylist: "Playlist",
     musicTastes: "Tes goûts",
+    songRequest: "DEMANDE TA CHANSON",
     logout: "Se déconnecter",
+
 
     
     emailWarningTitle: "Attention avant de changer l’adresse e-mail",
@@ -208,7 +216,9 @@ export const nav = {
     gift: "Gifts",
     photos: "Photos",
     thanks: "Thanks",
+    footer: "The end",
     guests: "Guests",
+
     rsvp: "RSVP",
     
     
@@ -220,7 +230,9 @@ export const nav = {
     musicLive: "Live music",
     musicPlaylist: "Playlist",
     musicTastes: "Your tastes",
+    songRequest: "REQUEST YOUR SONG",
     logout: "Log out",
+
 
     
     emailWarningTitle: "Before you change your email",

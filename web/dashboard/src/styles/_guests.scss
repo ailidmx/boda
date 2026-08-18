@@ -375,7 +375,7 @@
 }
 
 // Top-left: ID check. When verified it shows a 🔒 LOCK on a green chip; when
-// NOT verified it shows an empty (hollow) chip — no lock icon at all.
+// NOT verified it renders nothing at all (no chip, no lock icon).
 .dashboard-avatar-badge--idcheck {
   top: -0.15rem;
   left: -0.15rem;
@@ -383,10 +383,7 @@
 .dashboard-avatar-badge--idcheck.is-locked {
   background: $status-yes-bg;
 }
-.dashboard-avatar-badge--idcheck.is-unlocked {
-  background: transparent;
-  border-color: rgba(85, 69, 45, 0.35);
-}
+
 
 
 

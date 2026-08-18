@@ -246,10 +246,11 @@ export function Music() {
         aria-label="Continue"
       >
 
-        <a className="section-nav-link" href="#coast">
-          <span>{t.nav.coast}</span>
+        <a className="section-nav-link" href="#song-request">
+          <span>{t.nav.songRequest}</span>
           <span aria-hidden="true">↓</span>
         </a>
+
       </nav>
     </section>
   );

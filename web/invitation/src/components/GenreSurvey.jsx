@@ -24,14 +24,11 @@ export function GenreSurvey({ onVote }) {
   const { t } = useApp();
   const surveyLabel = t?.music?.genreSurvey || {};
 
-  const [expanded, setExpanded] = useState(() => {
-    // Expand the two cultural pillars by default so the survey feels alive.
-    const initial = new Set();
-    GENRES.forEach((cat) => {
-      if (cat.region === "Mexico" || cat.region === "Serbia/Balkans") initial.add(cat.id);
-    });
-    return initial;
-  });
+  // All category cards start COLLAPSED so the survey stays compact when the
+  // section renders (otherwise the full catalog is far too tall). Guests
+  // expand each category with the chevron toggle.
+  const [expanded, setExpanded] = useState(() => new Set());
+
 
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);

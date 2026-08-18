@@ -145,24 +145,82 @@
 
 /* Anchor subsection — a "continue" link that scrolls to the reorder panel.
    The base `.section-nav` provides the top border + centered link; this just
-   aligns the nav with the reorder panel's column width. */
+   aligns the nav with the reorder panel's column width. The link itself is
+   styled as a solid black badge (white text, gold on hover) so it reads as a
+   clear, tappable entry point to the reorder panel below. */
 .guisos-section-nav {
   max-width: 46rem;
   margin: 2.4rem auto 0;
 }
 
-/* ── Reorder panel (rank the guisos 1–20, top 9 in the menu) ─────────────
-   Always visible as a normal section layout — no toggle button, no collapse,
-   no extra padding. */
-.guisos-reorder {
-  max-width: 46rem;
-  margin: 2.4rem auto 0;
-  text-align: left;
+.guisos-section-nav .section-nav-link {
+  padding: 0.6rem 1.3rem;
+  border-radius: 999px;
+  background: #1c1a17;
+  box-shadow: 0 0.4rem 1.1rem rgb(0 0 0 / 30%);
+  color: var(--white);
+  transition: color 250ms ease, transform 250ms ease, box-shadow 250ms ease;
+}
+.guisos-section-nav .section-nav-link:hover,
+.guisos-section-nav .section-nav-link:focus-visible {
+  color: var(--marigold);
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: 0 0.55rem 1.4rem rgb(0 0 0 / 36%);
 }
 
 
+/* ── Reorder panel (rank the guisos 1–20, top 9 in the menu) ─────────────
+   Always visible as a normal section layout — no toggle button, no collapse.
+   Styled as a distinct section/panel (cream card, gold border, soft shadow)
+   so it reads as its own block within the guisos section. */
+.guisos-reorder {
+  max-width: 46rem;
+  margin: 2.4rem auto 0;
+  padding: 1.4rem 1.5rem 1.6rem;
+  text-align: left;
+  background: rgb(255 253 248 / 88%);
+  border: 1px solid rgb(198 139 43 / 35%);
+  border-radius: 0.9rem;
+  box-shadow: 0 8px 24px rgb(198 139 43 / 12%);
+}
+@media (max-width: 640px) {
+  .guisos-reorder {
+    padding: 1.1rem 1rem 1.3rem;
+  }
+}
 
-.guisos-reorder__body,
+/* The reorder panel title uses the shared eyebrow treatment (terracotta,
+   uppercase, letter-spacing, with the little rule above) so it reads as a
+   deliberate chapter marker within the panel. */
+.guisos-reorder__title {
+  position: relative;
+  margin: 0 0 1rem;
+  color: var(--terracotta, #a94d31);
+  font-size: 2rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.guisos-reorder__title::before {
+  content: "";
+  display: block;
+  width: 3.5rem;
+  height: 0.22rem;
+  margin-bottom: 1.25rem;
+  background: var(--terracotta, #a94d31);
+}
+
+/* The reorder panel body is an elegant citation (italic, muted) mirroring the
+   shared `.experience-note` treatment used across the food section. */
+.guisos-reorder__body {
+  margin: 0 0 0.6rem;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: rgb(36 33 25 / 68%);
+  font-style: italic;
+}
+
 .guisos-reorder__hint,
 .guisos-reorder__drag {
   margin: 0 0 0.6rem;
@@ -186,14 +244,14 @@
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
-  max-height: 24rem;
-  overflow-y: auto;
 }
 
 .guisos-reorder__item {
-  display: flex;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto;
+  grid-template-areas: "grip rank content controls";
   align-items: center;
-  gap: 0.6rem;
+  gap: 0.5rem;
   padding: 0.5rem 0.7rem;
   border-radius: 0.6rem;
   border: 1px solid transparent;
@@ -206,6 +264,24 @@
 .guisos-reorder__item.is-out-menu {
   background: rgb(169 77 49 / 10%);
   border-color: rgb(169 77 49 / 30%);
+}
+
+/* COL 1 — position badge (rank). COL 2 — stacked content rows. */
+.guisos-reorder__grip {
+  grid-area: grip;
+}
+.guisos-reorder__rank {
+  grid-area: rank;
+}
+.guisos-reorder__content {
+  grid-area: content;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+.guisos-reorder__controls {
+  grid-area: controls;
 }
 
 /* Drag & drop affordances — the grip hints that a row can be dragged, and the
@@ -227,7 +303,6 @@
 }
 
 .guisos-reorder__grip {
-  flex: 0 0 auto;
   color: rgb(198 139 43 / 70%);
   font-size: 1.1rem;
   line-height: 1;
@@ -235,8 +310,7 @@
 }
 
 .guisos-reorder__rank {
-
-  flex: 0 0 1.8rem;
+  width: 1.8rem;
   height: 1.8rem;
   display: grid;
   place-items: center;
@@ -251,44 +325,42 @@
 }
 
 .guisos-reorder__name {
-  flex: 1 1 auto;
   font-weight: 600;
 }
 
 .guisos-reorder__scores {
-  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   gap: 0.15rem;
-  margin-right: 0.6rem;
-  font-size: 0.72rem;
-  line-height: 1.1;
+  font-size: 0.78rem;
+  line-height: 1.2;
 }
 .guisos-reorder__score {
   display: flex;
   align-items: center;
-  gap: 0.3rem;
+  gap: 0.35rem;
   white-space: nowrap;
 }
 .guisos-reorder__score-label {
   color: var(--ink-soft, #5a4f3a);
   font-weight: 600;
 }
-.guisos-reorder__score--mine .guisos-reorder__stars {
+.guisos-reorder__score-value {
+  font-weight: 700;
+}
+.guisos-reorder__score--mine .guisos-reorder__score-value {
   color: var(--gold, #c68b2b);
 }
-.guisos-reorder__score--general .guisos-reorder__stars {
+.guisos-reorder__score--general .guisos-reorder__score-value {
   color: rgb(46 139 87);
 }
 .guisos-reorder__count {
   color: var(--ink-soft, #5a4f3a);
-  font-size: 0.68rem;
+  font-size: 0.72rem;
 }
 
 .guisos-reorder__status {
-
-  flex: 0 0 auto;
-  font-size: 0.75rem;
+  font-size: 0.72rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -301,7 +373,6 @@
 }
 
 .guisos-reorder__controls {
-  flex: 0 0 auto;
   display: flex;
   gap: 0.3rem;
 }
@@ -321,6 +392,52 @@
 .guisos-reorder__controls button:disabled {
   opacity: 0.35;
   cursor: default;
+}
+
+/* ── Mobile: compact two-column layout, no horizontal scroll ─────────────
+   COL 1 = position badge, COL 2 = stacked rows (name, ton vote, score
+   général, au menu indicator). The grip stays visible as the touch drag
+   handle (HTML5 drag doesn't fire on touch, so dragging is handled via touch
+   events starting on the grip) and the up/down arrows stack vertically in
+   the narrow controls column. */
+@media (max-width: 640px) {
+  .guisos-reorder__item {
+    grid-template-columns: auto auto minmax(0, 1fr) auto;
+    grid-template-areas: "grip rank content controls";
+    gap: 0.5rem;
+    padding: 0.55rem 0.6rem;
+  }
+  .guisos-reorder__grip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    font-size: 1.3rem;
+    touch-action: none;
+  }
+  .guisos-reorder__controls {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  .guisos-reorder__controls button {
+    width: 1.7rem;
+    height: 1.7rem;
+  }
+}
+
+/* ── Desktop: content rows flow inline (name, scores, status) ─────────── */
+@media (min-width: 641px) {
+  .guisos-reorder__content {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.3rem 1rem;
+  }
+  .guisos-reorder__scores {
+    flex-direction: row;
+    gap: 1rem;
+  }
 }
 
 .guisos-reorder__saved {
@@ -364,10 +481,11 @@
 }
 
 
-/* Doña Carmen portrait — a soft, blurred background motif that floats behind
-   the section content as a warm, personal nod to the cook. It sits at
-   z-index 0 (below the content, which is z-index 1) and is heavily blurred
-   and faded so it never competes with the dish cards. */
+/* Doña Carmen portrait — a soft background motif that floats behind the
+   section content as a warm, personal nod to the cook. It sits at z-index 0
+   (below the content, which is z-index 1). The blur is kept light and the
+   opacity moderate so she stays recognisable while still reading as a subtle
+   backdrop rather than competing with the dish cards. */
 .guisos-section__portrait {
   position: absolute;
   z-index: 0;
@@ -376,9 +494,10 @@
   width: clamp(16rem, 34vw, 30rem);
   height: auto;
   border-radius: 50%;
-  opacity: 0.16;
-  filter: blur(14px) saturate(1.1);
+  opacity: 0.5;
+  filter: blur(2px) saturate(1.05);
   transform: rotate(6deg);
   pointer-events: none;
   user-select: none;
 }
+

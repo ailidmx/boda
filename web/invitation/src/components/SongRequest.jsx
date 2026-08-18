@@ -1,8 +1,17 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useApp } from "../context/AppContext.jsx";
-import { saveSongRequest } from "../song-requests.js";
+import {
+  saveSongRequest,
+  loadGuestSongRequests,
+  updateSongRequest,
+  deleteSongRequest,
+} from "../song-requests.js";
 import { createSongSearchService } from "../song-search/song-search-service.js";
 import { MIN_QUERY_LENGTH } from "../song-search/song-search-service.js";
+import { getGroupMembers, resolveGuestName, resolveGuestPhoto } from "../guest-profiles.js";
+import { getActiveGuests } from "../guests.js";
+
+
 
 // Debounce before firing a MusicBrainz request (respects their ~1 req/s rate).
 const SEARCH_DEBOUNCE_MS = 600;
@@ -41,17 +50,37 @@ export function SongRequest() {
   const [open, setOpen] = useState(false);
   const [intent, setIntent] = useState("hear");
   const [bandType, setBandType] = useState("");
+  const [assignedGuestId, setAssignedGuestId] = useState("");
+  const [guestPickerOpen, setGuestPickerOpen] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState("");
 
+  // The guest's group members (including themselves). Lets a guest request a
+  // song on behalf of a group member (e.g. their partner or kids).
+  const groupMembers = useMemo(
+    () => (profile?.guest ? getGroupMembers(profile.guest, getActiveGuests()) : []),
+    [profile?.guest]
+  );
+  // Default the selector to the requesting guest.
+  const effectiveAssignedId = assignedGuestId || guestId || "";
+
+  // "My songs" table state: the guest's own requests, loaded on mount.
+  const [mySongs, setMySongs] = useState([]);
+  const [mySongsLoading, setMySongsLoading] = useState(false);
+  const [mySongsError, setMySongsError] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [tableMsg, setTableMsg] = useState("");
+
   // AbortController for the in-flight search, so a stale response never
   // overwrites a newer one (fast typing / stale-request protection).
   const abortRef = useRef(null);
+
   // Monotonic request id: only the latest search may update the UI.
   const requestIdRef = useRef(0);
   const inputRef = useRef(null);
+  const guestPickerRef = useRef(null);
 
   const intents = sr.intents || {};
 
@@ -95,16 +124,43 @@ export function SongRequest() {
     return () => clearTimeout(timer);
   }, [query]);
 
-  // Close the dropdown when clicking outside the autocomplete.
+  // Close the dropdowns when clicking outside them.
   useEffect(() => {
     function onDocClick(e) {
       if (inputRef.current && !inputRef.current.contains(e.target)) {
         setOpen(false);
       }
+      if (guestPickerRef.current && !guestPickerRef.current.contains(e.target)) {
+        setGuestPickerOpen(false);
+      }
     }
     document.addEventListener("mousedown", onDocClick);
     return () => document.removeEventListener("mousedown", onDocClick);
   }, []);
+
+  // Load the guest's own song requests whenever the guest id is available.
+  useEffect(() => {
+    if (!guestId) return;
+    let cancelled = false;
+    setMySongsLoading(true);
+    setMySongsError(false);
+    loadGuestSongRequests(guestId)
+      .then((requests) => {
+        if (cancelled) return;
+        setMySongs(requests);
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setMySongsError(true);
+      })
+      .finally(() => {
+        if (!cancelled) setMySongsLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [guestId]);
+
 
   const handleSelect = useCallback((result) => {
     const label = result.artist
@@ -147,14 +203,26 @@ export function SongRequest() {
     setError("");
     setSaved(false);
     try {
-      await saveSongRequest({ guestId, song: trimmed, intent, bandType, songMeta });
+      await saveSongRequest({
+        guestId,
+        song: trimmed,
+        intent,
+        bandType,
+        songMeta,
+        assignedGuestId: effectiveAssignedId,
+      });
       setQuery("");
       setSongMeta(null);
       setIntent("hear");
       setBandType("");
+      setAssignedGuestId("");
       setSaved(true);
+      // Refresh the "My songs" list so the newly added song shows up.
+      const updated = await loadGuestSongRequests(guestId);
+      setMySongs(updated);
 
     } catch (err) {
+
       console.warn("[SongRequest] save failed", err);
       setError(sr.error || "Could not save your song.");
     } finally {
@@ -162,9 +230,139 @@ export function SongRequest() {
     }
   };
 
+
+  // Populate the form with an existing request so the guest can edit it.
+  const handleEdit = (request) => {
+    setEditingId(request.id);
+    setQuery(request.song || "");
+    setSongMeta(request.songMeta || null);
+    setIntent(request.intent || "hear");
+    setBandType(request.bandType || "");
+    setAssignedGuestId(request.assignedGuestId || "");
+    setSaved(false);
+    setError("");
+    setTableMsg("");
+    // Scroll the form into view so the guest sees the edit context.
+    document
+      .querySelector(".song-request-form")
+      ?.scrollIntoView({ behavior: "smooth", block: "center" });
+  };
+
+  // Cancel editing and reset the form to a fresh state.
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setQuery("");
+    setSongMeta(null);
+    setIntent("hear");
+    setBandType("");
+    setAssignedGuestId("");
+    setSaved(false);
+    setError("");
+    setTableMsg("");
+  };
+
+
+  // Save the edited request back to Firestore.
+  const handleUpdate = async (event) => {
+    event.preventDefault();
+    if (!guestId || !editingId) return;
+    if (saving) return;
+
+    const trimmed = query.trim();
+    if (!trimmed) {
+      setError(sr.required || "Write the song title.");
+      return;
+    }
+
+    setSaving(true);
+    setError("");
+    setSaved(false);
+    setTableMsg("");
+    try {
+      await updateSongRequest({
+        requestId: editingId,
+        guestId,
+        song: trimmed,
+        intent,
+        bandType,
+        songMeta,
+        assignedGuestId: effectiveAssignedId,
+      });
+      // Refresh the table with the updated request.
+      const updated = await loadGuestSongRequests(guestId);
+      setMySongs(updated);
+      setEditingId(null);
+      setQuery("");
+      setSongMeta(null);
+      setIntent("hear");
+      setBandType("");
+      setAssignedGuestId("");
+      setTableMsg(sr.updateSuccess || "Song updated!");
+
+    } catch (err) {
+      console.warn("[SongRequest] update failed", err);
+      setError(sr.updateError || "Could not update your song.");
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Delete one of the guest's own requests (with a confirmation).
+  const handleDelete = async (request) => {
+    if (!window.confirm(sr.deleteConfirm || "Delete this song from the list?")) {
+      return;
+    }
+    setTableMsg("");
+    try {
+      await deleteSongRequest(request.id);
+      setMySongs((prev) => prev.filter((r) => r.id !== request.id));
+      if (editingId === request.id) handleCancelEdit();
+      setTableMsg(sr.deleteSuccess || "Song deleted.");
+    } catch (err) {
+      console.warn("[SongRequest] delete failed", err);
+      setTableMsg(sr.deleteError || "Could not delete the song.");
+    }
+  };
+
   const showDropdown = open && query.trim().length >= MIN_QUERY_LENGTH;
 
+  // Render a group member's avatar (photo or initials fallback).
+  const renderMemberAvatar = (member) => {
+    const { fullName } = resolveGuestName(member);
+    const photo = resolveGuestPhoto(member);
+    return (
+      <span className="song-request-guestpicker__avatar" aria-hidden="true">
+        {photo ? (
+          <img src={photo} alt="" loading="lazy" decoding="async" />
+        ) : (
+          <span className="song-request-guestpicker__avatar-fallback">
+            {(fullName || "?").charAt(0).toUpperCase()}
+          </span>
+        )}
+      </span>
+    );
+  };
+
+  // Render a group member's display label ("Para mí" / "Para {name}").
+  const renderMemberLabel = (member) => {
+    const { fullName } = resolveGuestName(member);
+    const isSelf = member.id === guestId;
+    return isSelf
+      ? sr.assignedGuestMe || fullName || member.id
+      : (sr.assignedGuestFor || "{name}").replace("{name}", fullName || member.id);
+  };
+
+  // Resolve the group member a saved request belongs to (by assignedGuestId,
+  // falling back to the requesting guest). Used to show the avatar on the
+  // "My songs" list items.
+  const memberForRequest = (request) => {
+    const targetId = request.assignedGuestId || guestId;
+    return groupMembers.find((m) => m.id === targetId) || null;
+  };
+
+
   return (
+
     <section className="song-request-section section story-bg" id="song-request">
       <div className="experience-heading reveal">
         <p className="eyebrow">{sr.eyebrow}</p>
@@ -172,7 +370,11 @@ export function SongRequest() {
         <p className="experience-note">{sr.body}</p>
       </div>
 
-      <form className="song-request-form reveal" onSubmit={handleSubmit}>
+      <form
+        className="song-request-form reveal"
+        onSubmit={editingId ? handleUpdate : handleSubmit}
+      >
+
         <label className="song-request-field">
           <span className="song-request-field__label">{sr.songLabel}</span>
           <div className="song-request-autocomplete" ref={inputRef}>
@@ -243,7 +445,69 @@ export function SongRequest() {
           <span className="song-request-field__hint">{sr.searchHint}</span>
         </label>
 
+        {groupMembers.length > 1 && (
+          <div className="song-request-field">
+            <span className="song-request-field__label">
+              {sr.assignedGuestLabel || "Who is this song for?"}
+            </span>
+            <div className="song-request-guestpicker" ref={guestPickerRef}>
+              <button
+                type="button"
+                className="song-request-guestpicker__trigger"
+                onClick={() => setGuestPickerOpen((v) => !v)}
+                disabled={saving}
+                aria-haspopup="listbox"
+                aria-expanded={guestPickerOpen}
+              >
+                {groupMembers.map((member) => {
+                  if (member.id !== effectiveAssignedId) return null;
+                  return (
+                    <span className="song-request-guestpicker__value" key={member.id}>
+                      {renderMemberAvatar(member)}
+                      <span className="song-request-guestpicker__name">
+                        {renderMemberLabel(member)}
+                      </span>
+                    </span>
+                  );
+                })}
+                <span className="song-request-guestpicker__caret" aria-hidden="true">▾</span>
+              </button>
+
+              {guestPickerOpen && (
+                <ul
+                  className="song-request-guestpicker__list"
+                  role="listbox"
+                  aria-label={sr.assignedGuestLabel || "Who is this song for?"}
+                >
+                  {groupMembers.map((member) => (
+                    <li key={member.id} role="option" aria-selected={member.id === effectiveAssignedId}>
+                      <button
+                        type="button"
+                        className={`song-request-guestpicker__option${
+                          member.id === effectiveAssignedId ? " is-selected" : ""
+                        }`}
+                        onClick={() => {
+                          setAssignedGuestId(member.id);
+                          setGuestPickerOpen(false);
+                        }}
+                        disabled={saving}
+                      >
+                        {renderMemberAvatar(member)}
+                        <span className="song-request-guestpicker__name">
+                          {renderMemberLabel(member)}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          </div>
+        )}
+
+
         <fieldset className="song-request-intents">
+
           <legend className="song-request-intents__label">{sr.intentLabel}</legend>
           <div className="song-request-intents__options">
             {Object.entries(intents).map(([key, label]) => (
@@ -289,14 +553,119 @@ export function SongRequest() {
 
         {error && <p className="song-request-feedback is-error">{error}</p>}
 
-        <button
-          type="submit"
-          className="song-request-submit"
-          disabled={saving || !guestId}
-        >
-          {saving ? "…" : sr.submit}
-        </button>
+        <div className="song-request-actions">
+          <button
+            type="submit"
+            className="song-request-submit"
+            disabled={saving || !guestId}
+          >
+            {saving ? "…" : editingId ? sr.saveEdit || sr.submit : sr.submit}
+
+          </button>
+          {editingId && (
+            <button
+              type="button"
+              className="song-request-cancel"
+              onClick={handleCancelEdit}
+              disabled={saving}
+            >
+              {sr.cancelEdit || "Cancel editing"}
+            </button>
+          )}
+        </div>
       </form>
-    </section>
+
+      {guestId && (
+        <div className="song-request-mysongs reveal">
+          <h3 className="song-request-mysongs__title">
+            {sr.mySongsTitle || "My songs"}
+          </h3>
+
+          {tableMsg && (
+            <p className="song-request-feedback is-success">{tableMsg}</p>
+          )}
+
+          {mySongsLoading && (
+            <p className="song-request-mysongs__status">
+              {sr.mySongsLoading || "Loading your songs…"}
+            </p>
+          )}
+
+          {!mySongsLoading && mySongsError && (
+            <p className="song-request-mysongs__status is-error">
+              {sr.mySongsError || "We could not load your songs."}
+            </p>
+          )}
+
+          {!mySongsLoading && !mySongsError && mySongs.length === 0 && (
+            <p className="song-request-mysongs__status">
+              {sr.mySongsEmpty || "You haven’t requested any songs yet."}
+            </p>
+          )}
+
+          {!mySongsLoading && !mySongsError && mySongs.length > 0 && (
+            <ul className="song-request-mysongs__list">
+              {mySongs.map((request) => {
+                const member = memberForRequest(request);
+                return (
+                  <li
+                    className={`song-request-mysongs__item${
+                      editingId === request.id ? " is-editing" : ""
+                    }`}
+                    key={request.id}
+                  >
+                    {member && (
+                      <span
+                        className="song-request-mysongs__avatar"
+                        aria-hidden="true"
+                      >
+                        {renderMemberAvatar(member)}
+                      </span>
+                    )}
+                    <div className="song-request-mysongs__info">
+                      <span className="song-request-mysongs__song">
+                        {request.song}
+                      </span>
+                      <span className="song-request-mysongs__meta">
+                        {sr.intents?.[request.intent] || request.intent}
+                        {request.bandType
+                          ? ` · ${sr.bandTypes?.[request.bandType] || request.bandType}`
+                          : ""}
+                      </span>
+                    </div>
+                    <div className="song-request-mysongs__actions">
+                      <button
+                        type="button"
+                        className="song-request-mysongs__btn"
+                        onClick={() => handleEdit(request)}
+                        disabled={saving}
+                      >
+                        {sr.edit || "Edit"}
+                      </button>
+                      <button
+                        type="button"
+                        className="song-request-mysongs__btn is-danger"
+                        onClick={() => handleDelete(request)}
+                        disabled={saving}
+                      >
+                        {sr.delete || "Delete"}
+                      </button>
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+
+        </div>
+      )}
+
+      <nav className="section-nav" aria-label="Continue">
+        <a className="section-nav-link" href="#coast">
+          <span>{t.nav.coast}</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      </nav>
+</section>
   );
 }
