@@ -110,7 +110,6 @@ const GUEST_WRITABLE_FIELDS = [
   "invitationGroup", "updatedBy", "updatedAt", "_deleted", "rsvp", "flightInfo",
 ];
 
-
 // ── flightInfo (guest flight details for the Travel section) ────────────
 // Mirrors `hasValidFlightInfo()` in firebase/firestore.rules.
 
