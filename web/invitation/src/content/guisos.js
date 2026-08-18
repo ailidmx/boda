@@ -3,7 +3,8 @@ export const guisos = {
     eyebrow: "¿Qué guisos?",
     title: "Ayúdanos a elegir el menú",
     body:
-      "Queremos que el banquete sepa a casa. Vota por los guisos que más te gusten y los más votados se servirán el día de la boda. Doña Carmen y su equipo le darán un sabor casero a todos nuestros platillos. Lo más difícil: elegir solo 9 guisos entre los 20 que proponemos aquí. ¡Qué rompecabezas, nos los llevaríamos todos! ¿Nos ayudas?",
+      "Doña Carmen y su equipo le darán un sabor casero a todos nuestros platillos. Lo más difícil: elegir solo 9 guisos entre los 20 que proponemos aquí. ¡Qué rompecabezas, nos los llevaríamos todos! ¿Nos ayudas?",
+
     
     flavoursTitle: "¿Qué guisos vamos a probar?",
     flavourPlaceholder: "Guiso",
@@ -145,7 +146,8 @@ export const guisos = {
     eyebrow: "Quels plats mijotés ?",
     title: "Aide-nous à choisir le menu",
     body:
-      "Nous voulons que le banquet ait un goût de maison. Vote pour les plats mijotés que tu préfères, et les plus plébiscités seront servis le jour du mariage. Doña Cármen et son équipe donneront une saveur maison à tous nos plats. Le plus difficile : choisir seulement 9 plats mijotés parmi les 20 proposés ici. Quel casse-tête, on voudrait les prendre tous ! Tu nous aides ?",
+      "Doña Cármen et son équipe donneront une saveur maison à tous nos plats. Le plus difficile : choisir seulement 9 plats mijotés parmi les 20 proposés ici. Quel casse-tête, on voudrait les prendre tous ! Tu nous aides ?",
+
     
     flavoursTitle: "Quels plats mijotés allons-nous goûter ?",
     flavourPlaceholder: "Plat mijoté",
@@ -288,7 +290,8 @@ export const guisos = {
     eyebrow: "Which stews?",
     title: "Help us choose the menu",
     body:
-      "We want the banquet to taste like home. Vote for the stews you love most, and the most popular ones will be served on the wedding day. Doña Carmen and her team will give all our dishes a home-cooked flavour. The hardest part: choosing just 9 stews out of the 20 on offer here. What a puzzle — we'd take them all! Will you help us?",
+      "Doña Carmen and her team will give all our dishes a home-cooked flavour. The hardest part: choosing just 9 stews out of the 20 on offer here. What a puzzle — we'd take them all! Will you help us?",
+
     
     flavoursTitle: "Which stews will we be tasting?",
     flavourPlaceholder: "Stew",
