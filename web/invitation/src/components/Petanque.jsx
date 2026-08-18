@@ -136,6 +136,19 @@ export function Petanque() {
     }
   };
 
+  // Runs before the card advances forward. When leaving the LAST question step
+  // (i.e. entering the recap), persist the answers automatically so the guest
+  // never reaches the recap thinking they saved when they didn't. Always
+  // returns true so the recap is shown with the save result (working/saved/
+  // error) in its reserved message area.
+  const handleBeforeNext = async (currentIndex) => {
+    if (currentIndex === visibleQuestions.length - 1) {
+      await handleSaveAnswers();
+    }
+    return true;
+  };
+
+
   const saveStatusText =
     saveStatus === "working"
       ? interfaceText.submitWorking
@@ -226,24 +239,25 @@ export function Petanque() {
               hideBackOnLast
               hideNextOn={[visibleQuestions.length - 1]}
               countSteps={visibleQuestions.length}
+              onBeforeNext={handleBeforeNext}
               navRight={({ index, next }) => {
                 // On the last question step, replace the "Next" button with the
                 // gold "Save my responses" CTA, on the same line as Back.
+                // Clicking it advances to the recap; `onBeforeNext` persists
+                // the answers first and the result shows in the recap.
                 if (index !== visibleQuestions.length - 1) return null;
                 return (
                   <button
                     className="flip-step-btn flip-step-btn--primary"
                     type="button"
-                    onClick={async () => {
-                      await handleSaveAnswers();
-                      next();
-                    }}
+                    onClick={() => next()}
                     disabled={saveStatus === "working"}
                   >
                     {rsvpMini.button}
                   </button>
                 );
               }}
+
               steps={[
 
                 {
@@ -308,18 +322,25 @@ export function Petanque() {
                           {rsvpMini.modifyButton || rsvpMini.button}
                         </Button>
 
-
-                        {saveStatus === "saved" ? (
-                          <p className="rsvp-confirmation" role="status">
-                            <span aria-hidden="true">✓</span>
-                            {rsvpMini.success}
-                          </p>
-                        ) : saveStatus === "error" ? (
-                          <p className="rsvp-confirmation rsvp-confirmation--error" role="alert">
-                            {rsvpMini.error}
-                          </p>
-                        ) : null}
+                        {/* Dedicated, always-present save-status placeholder.
+                            It reserves space and announces the result
+                            (working / saved / error) via aria-live so the
+                            guest always sees the outcome of the save. */}
+                        <p
+                          className={`rsvp-status${
+                            saveStatus === "saved"
+                              ? " rsvp-status--success"
+                              : saveStatus === "error"
+                                ? " rsvp-status--error"
+                                : ""
+                          }`}
+                          role="status"
+                          aria-live="polite"
+                        >
+                          {saveStatusText}
+                        </p>
                       </div>
+
                     </div>
                   ),
                 },

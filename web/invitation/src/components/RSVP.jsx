@@ -267,6 +267,49 @@ export function RSVP() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [payment.title, profile?.guest, guests]);
 
+  // ── Payment totals ─────────────────────────────────────────────────────
+  // The amounts the signed-in guest and their group must pay across the
+  // primary stay and (when present) the extra stay. When there is nothing to
+  // pay (e.g. the guest declined every stay), we hide the whole
+  // "Participation aux frais" block and its payment-confirmation button.
+  const paymentTotals = useMemo(() => {
+    const primary = computeStayAmounts({
+      activeMember: profile?.guest,
+      groupMembers: guests,
+      getAssignedCabinId,
+      resolveMemberCovered,
+    });
+    const extra = getXtraCabinId(profile?.guest)
+      ? computeStayAmounts({
+          activeMember: profile?.guest,
+          groupMembers: guests,
+          getAssignedCabinId: getXtraCabinId,
+          resolveMemberCovered: resolveXtraCovered,
+        })
+      : null;
+
+    return {
+      perPersonTotal:
+        (primary?.perPersonToPay || 0) + (extra?.perPersonToPay || 0),
+      perPersonOriginal:
+        (primary?.activeCabinPerPerson || 0) +
+        (extra?.activeCabinPerPerson || 0),
+      groupTotal: (primary?.groupToPay || 0) + (extra?.groupToPay || 0),
+      groupOriginal: (primary?.groupTotal || 0) + (extra?.groupTotal || 0),
+      perPersonSale:
+        (primary?.perPersonSale || false) || (extra?.perPersonSale || false),
+      groupSale:
+        (primary?.groupSale || false) || (extra?.groupSale || false),
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [payment.title, profile?.guest, guests]);
+
+  // Whether the guest/group actually owes anything. When false, the whole
+  // "Participation aux frais" block (summary + bank details + confirm button)
+  // is hidden.
+  const hasAmountToPay =
+    paymentTotals.perPersonTotal > 0 || paymentTotals.groupTotal > 0;
+
   // Log the cart once per distinct set of items (avoid re-firing on re-render).
   const loggedCartRef = useRef(null);
   useEffect(() => {
@@ -455,8 +498,10 @@ export function RSVP() {
 
         {/* Read-only "À payer" summary: shows the per-person and per-group
             amounts for the primary cabin and, when present, the extra cabin.
-            Amounts follow the same pricing rules as the Hébergement section. */}
-        {payment.title && (
+            Amounts follow the same pricing rules as the Hébergement section.
+            Hidden entirely when there is nothing to pay (e.g. the guest
+            declined every stay). */}
+        {payment.title && hasAmountToPay && (
           <section className="rsvp-payment" aria-label={payment.title}>
             <h3>{payment.title}</h3>
             <p>{payment.intro}</p>
@@ -487,36 +532,14 @@ export function RSVP() {
 
             {/* Total: sums the primary stay and the extra stay (when present). */}
             {(() => {
-              const primary = computeStayAmounts({
-                activeMember: profile?.guest,
-                groupMembers: guests,
-                getAssignedCabinId,
-                resolveMemberCovered,
-              });
-              const extra = getXtraCabinId(profile?.guest)
-                ? computeStayAmounts({
-                    activeMember: profile?.guest,
-                    groupMembers: guests,
-                    getAssignedCabinId: getXtraCabinId,
-                    resolveMemberCovered: resolveXtraCovered,
-                  })
-                : null;
-
-              const perPersonTotal =
-                (primary?.perPersonToPay || 0) + (extra?.perPersonToPay || 0);
-              const perPersonOriginal =
-                (primary?.activeCabinPerPerson || 0) +
-                (extra?.activeCabinPerPerson || 0);
-              const groupTotal =
-                (primary?.groupToPay || 0) + (extra?.groupToPay || 0);
-              const groupOriginal =
-                (primary?.groupTotal || 0) + (extra?.groupTotal || 0);
-
-              const perPersonSale =
-                (primary?.perPersonSale || false) ||
-                (extra?.perPersonSale || false);
-              const groupSale =
-                (primary?.groupSale || false) || (extra?.groupSale || false);
+              const {
+                perPersonTotal,
+                perPersonOriginal,
+                groupTotal,
+                groupOriginal,
+                perPersonSale,
+                groupSale,
+              } = paymentTotals;
 
               // The per-person label carries a `{name}` placeholder that we
               // fill with the signed-in guest's first name, and we show their
@@ -637,32 +660,34 @@ export function RSVP() {
             guest confirm that they have paid their accommodation contribution.
             The confirmation is written to the `guests` document of the
             signed-in guest AND of every other member of their invitation
-            group. */}
-        <div className="rsvp-submit">
-          {paymentConfirmed ? (
-            <p className="rsvp-confirmation rsvp-confirmation--paid" role="status">
-              <span aria-hidden="true">✓</span>
-              {payment.confirmedNote || interfaceText.submitSuccess}
-            </p>
-          ) : (
-            <Button
-              variant="gold"
-              onClick={handlePaymentConfirm}
-              disabled={paymentStatus === "working"}
-            >
-              {payment.confirmButton || rsvp.button || scale.saveButton}
-            </Button>
-          )}
+            group. Hidden entirely when there is nothing to pay. */}
+        {hasAmountToPay && (
+          <div className="rsvp-submit">
+            {paymentConfirmed ? (
+              <p className="rsvp-confirmation rsvp-confirmation--paid" role="status">
+                <span aria-hidden="true">✓</span>
+                {payment.confirmedNote || interfaceText.submitSuccess}
+              </p>
+            ) : (
+              <Button
+                variant="gold"
+                onClick={handlePaymentConfirm}
+                disabled={paymentStatus === "working"}
+              >
+                {payment.confirmButton || rsvp.button || scale.saveButton}
+              </Button>
+            )}
 
-          {paymentStatus === "error" && (
-            <p className="rsvp-confirmation rsvp-confirmation--error" role="alert">
-              {interfaceText.submitError}
-            </p>
-          )}
-          {paymentStatus === "working" && (
-            <small data-form-status>{interfaceText.submitWorking}</small>
-          )}
-        </div>
+            {paymentStatus === "error" && (
+              <p className="rsvp-confirmation rsvp-confirmation--error" role="alert">
+                {interfaceText.submitError}
+              </p>
+            )}
+            {paymentStatus === "working" && (
+              <small data-form-status>{interfaceText.submitWorking}</small>
+            )}
+          </div>
+        )}
 
 
         {/* Desktop-only bottom nav: leads to the INVITES section. */}

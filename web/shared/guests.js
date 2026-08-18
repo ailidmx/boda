@@ -322,4 +322,51 @@ export function getGuestsByUnit(unit) {
   return GUESTS.filter((g) => g.hasCabin && g.unit === unit);
 }
 
+/**
+ * Normalize a stored phone number to E.164 format for Firebase Phone Auth.
+ * Stored numbers look like "523332017504" (country code "52" for Mexico, no
+ * leading "+"). This strips any non-digit characters and prepends "+" so the
+ * result is a valid E.164 identifier ("+523332017504"). Returns "" when the
+ * input has no digits.
+ * @param {string} [phone]
+ * @returns {string}
+ */
+export function normalizePhoneToE164(phone) {
+  if (!phone) return "";
+  const digits = String(phone).replace(/\D/g, "");
+  return digits ? `+${digits}` : "";
+}
+
+/**
+ * Find a guest by their phone number. The phone is stored on the guest record
+ * as `phone` (and may also live under `identity.phone` on the live Firestore
+ * record). We compare against the E.164-normalized form so "523332017504",
+ * "+52 333 201 7504" and "52-333-201-7504" all match the same guest.
+ * @param {string} phone
+ * @returns {GuestProfile|undefined}
+ */
+export function getGuestByPhone(phone) {
+  const target = normalizePhoneToE164(phone);
+  if (!target) return undefined;
+  return GUESTS.find((g) => {
+    const stored = g?.identity?.phone || g?.phone;
+    return stored && normalizePhoneToE164(stored) === target;
+  });
+}
+
+/**
+ * Resolve a guest from a Firebase Auth uid. Normally the uid IS the guest
+ * document id (e.g. "david_aïli"). When a guest signs in via SMS, Firebase
+ * creates a user whose uid is the phone number (e.g. "+523332017504"), so we
+ * fall back to a phone lookup. This keeps the rest of the app (which resolves
+ * the signed-in guest by uid) working for both login methods.
+ * @param {string} uid
+ * @returns {GuestProfile|undefined}
+ */
+export function getGuestByAuthUid(uid) {
+  if (!uid) return undefined;
+  return getGuest(uid) || getGuestByPhone(uid);
+}
+
 export default GUESTS;
+

@@ -12,9 +12,13 @@ import {
   browserLocalPersistence,
   EmailAuthProvider,
   onAuthStateChanged,
+  PhoneAuthProvider,
+  RecaptchaVerifier,
   reauthenticateWithCredential,
   setPersistence,
+  signInWithCredential,
   signInWithEmailAndPassword,
+  signInWithPhoneNumber,
   signOut as firebaseSignOut,
   updateEmail,
   updatePassword,
@@ -23,7 +27,16 @@ import {
 
 import { auth } from "../firebase.js";
 import { content, SUPPORTED_LANGUAGES } from "../content.js";
-import { AUTH_EMAIL_DOMAIN, getActiveGuests, getGuest } from "../guests.js";
+import {
+  AUTH_EMAIL_DOMAIN,
+  getActiveGuests,
+  getGuest,
+  getGuestByAuthUid,
+  getGuestByPhone,
+  normalizePhoneToE164,
+} from "../guests.js";
+
+
 
 
 import {
@@ -231,10 +244,13 @@ export function AppProvider({ children }) {
         // Auth UIDs are set to the guest ID (from the Google Sheet `ID`
         // column), so the signed-in guest is resolved by UID — not by email.
         // This keeps the link stable even if the user later changes their
-        // auth email.
-        const guest = getGuest(user.uid);
+        // auth email. When a guest signs in via SMS, Firebase creates a user
+        // whose uid is the phone number (e.g. "+523332017504"); `getGuestByAuthUid`
+        // falls back to a phone lookup so SMS sign-in resolves the same guest.
+        const guest = getGuestByAuthUid(user.uid);
         const liveGuest = await loadOwnGuestProfile(user.uid);
         const resolvedGuest = liveGuest ? { ...guest, ...liveGuest } : guest;
+
         const storedUsername =
           window.localStorage.getItem(USERNAME_STORAGE_KEY);
 
@@ -379,6 +395,58 @@ export function AppProvider({ children }) {
     }
   };
 
+  // Start an SMS sign-in for a guest phone number. The phone is normalized to
+  // E.164 (e.g. "523332017504" → "+523332017504") and must match a guest in the
+  // registry, otherwise we refuse to send a code. On success it returns the
+  // Firebase `confirmationResult` so the caller can prompt for the 6-digit code
+  // and call `confirmSmsCode`. The reCAPTCHA verifier is rendered into the
+  // provided container element (the login form) so the challenge appears inline.
+  const signInWithSms = async (phone, recaptchaContainerId) => {
+    setGateError(null);
+    const e164 = normalizePhoneToE164(phone);
+    if (!e164) {
+      setGateError("gateError");
+      return null;
+    }
+    const guest = getGuestByPhone(e164);
+    if (!guest) {
+      console.warn("[auth] no guest matches phone, refusing SMS sign-in:", e164);
+      setGateError("gateNoProfile");
+      return null;
+    }
+    try {
+      await setPersistence(auth, browserLocalPersistence);
+      const verifier = new RecaptchaVerifier(auth, recaptchaContainerId, {
+        size: "invisible",
+      });
+      const confirmationResult = await signInWithPhoneNumber(auth, e164, verifier);
+      return confirmationResult;
+    } catch (error) {
+      console.warn("SMS sign-in failed", error.code || error.message, { e164 });
+      setGateError("gateError");
+      return null;
+    }
+  };
+
+  // Complete an SMS sign-in with the 6-digit code the guest received. The
+  // `confirmationResult` comes from `signInWithSms`. On success, onAuthStateChanged
+  // fires and resolves the guest by the phone-number uid via `getGuestByAuthUid`.
+  const confirmSmsCode = async (confirmationResult, code) => {
+    setGateError(null);
+    try {
+      const credential = PhoneAuthProvider.credential(
+        confirmationResult.verificationId,
+        code,
+      );
+      await signInWithCredential(auth, credential);
+      return true;
+    } catch (error) {
+      console.warn("SMS code rejected", error.code || error.message);
+      setGateError("gateError");
+      return false;
+    }
+  };
+
   const signOut = async () => {
     try {
       await firebaseSignOut(auth);
@@ -388,6 +456,7 @@ export function AppProvider({ children }) {
       console.warn("Sign out failed", error);
     }
   };
+
 
   const changePassword = async (newPassword) => {
     const user = auth.currentUser;
@@ -522,11 +591,14 @@ export function AppProvider({ children }) {
       musicSectionVisible,
       setMusicSectionVisible,
       signIn,
+      signInWithSms,
+      confirmSmsCode,
       signOut,
       changePassword,
       changeEmail,
       reauthenticate,
     }),
+
     [
       language,
       authState,

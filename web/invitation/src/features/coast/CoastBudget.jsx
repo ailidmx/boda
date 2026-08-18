@@ -16,6 +16,11 @@ export function CoastBudget({
 
   if (!budget?.title) return null;
 
+  // When nobody in the group is interested in the beach plan, the estimate is
+  // all zeros — hide the whole "Budget estimé" block rather than showing a
+  // meaningless 0 MXN total.
+  if (interestedCount === 0) return null;
+
   return (
     <div className="coast-budget reveal">
       <div className="section-heading">

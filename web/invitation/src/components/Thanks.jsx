@@ -1,10 +1,12 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+
 import { EVENT } from "../content.js";
 import { useApp } from "../context/AppContext.jsx";
 import { getGuest } from "../guests.js";
 
 import { resolveGuestName, resolveGuestPhoto } from "../guest-profiles.js";
 import { loadThanksCredits } from "../thanks.js";
+
 
 
 
@@ -38,7 +40,22 @@ function resolveCredit(credit) {
   return { name: credit.name, photo: null };
 }
 
+// Fisher–Yates shuffle so the credits roll in a different order on every
+// visit (the "random infinite loop" feel).
+function shuffle(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
 
+// Base auto-scroll speed for the cinema credits roll (px per ms).
+const CREDITS_SCROLL_SPEED = 0.06;
+// How long to keep the auto-scroll paused after the guest stops interacting
+// (mouse leave / wheel / drag) before it resumes.
+const CREDITS_IDLE_MS = 1200;
 
 export function Thanks() {
   const { t, language } = useApp();
@@ -60,6 +77,71 @@ export function Thanks() {
       active = false;
     };
   }, [language]);
+
+  // ── Cinematic auto-scroll credits roll ──────────────────────────────────
+  // The stage auto-scrolls downward like a movie credits roll, but the guest
+  // can take over at any time (hover / drag / wheel). Once they stop
+  // interacting and move the pointer away, the auto-scroll resumes. When the
+  // roll reaches the bottom it loops back to the top (infinite loop).
+  const stageRef = useRef(null);
+  // True while the pointer is over the stage (guest is "watching" it).
+  const hoverRef = useRef(false);
+  // True briefly after a wheel/trackpad/drag so auto-scroll doesn't fight the
+  // guest's own scrolling.
+  const cooldownRef = useRef(false);
+  const cooldownTimerRef = useRef(null);
+
+  const handleStageEnter = () => {
+    hoverRef.current = true;
+  };
+  const handleStageLeave = () => {
+    hoverRef.current = false;
+  };
+  const handleStageWheel = () => {
+    cooldownRef.current = true;
+    window.clearTimeout(cooldownTimerRef.current);
+    cooldownTimerRef.current = window.setTimeout(() => {
+      cooldownRef.current = false;
+    }, CREDITS_IDLE_MS);
+  };
+
+  useEffect(() => {
+    const stage = stageRef.current;
+    if (!stage || credits.length === 0) return undefined;
+
+    let rafId = 0;
+    let lastTs = 0;
+
+    const tick = (ts) => {
+      if (!stage) return;
+      if (!lastTs) lastTs = ts;
+      const dt = ts - lastTs;
+      lastTs = ts;
+
+      // Auto-scroll only when the guest is NOT hovering and NOT in a
+      // post-interaction cooldown.
+      if (!hoverRef.current && !cooldownRef.current) {
+        const maxScroll = stage.scrollHeight - stage.clientHeight;
+        if (maxScroll > 0) {
+          stage.scrollTop += dt * CREDITS_SCROLL_SPEED;
+          // Infinite loop: when we reach the bottom, jump back to the top.
+          if (stage.scrollTop >= maxScroll - 1) {
+            stage.scrollTop = 0;
+          }
+        }
+      }
+
+      rafId = window.requestAnimationFrame(tick);
+    };
+
+    rafId = window.requestAnimationFrame(tick);
+
+    return () => {
+      window.cancelAnimationFrame(rafId);
+      window.clearTimeout(cooldownTimerRef.current);
+    };
+  }, [credits.length]);
+
 
   return (
 
@@ -87,49 +169,53 @@ export function Thanks() {
           <p className="thanks-subtitle">{thanks.subtitle}</p>
         </blockquote>
 
-        {/* Cinematic vertical credits roll: a fixed-height stage with a fade
-            mask, inside which two identical lists scroll up and loop
-            seamlessly (the -50% translate). */}
-        <div className="thanks-credits-stage">
-          <div className="thanks-credits-roll">
-            {[0, 1].map((setIndex) => (
-              <ul
-                className="thanks-credits"
-                key={setIndex}
-                aria-hidden={setIndex === 1}
-              >
-                {credits.map((credit, index) => {
-                  const resolved = resolveCredit(credit);
-                  return (
-                    <li className="thanks-credit" key={index}>
-                      {resolved.photo ? (
-                        <span
-                          className="thanks-avatar thanks-avatar--photo"
-                          aria-hidden="true"
-                        >
-                          <img
-                            src={resolved.photo}
-                            alt=""
-                            loading="lazy"
-                            decoding="async"
-                          />
-                        </span>
-                      ) : (
-                        <span className="thanks-avatar" aria-hidden="true">
-                          {initialsOf(resolved.name)}
-                        </span>
-                      )}
-                      <span className="thanks-credit-text">
-                        <strong className="thanks-name">{resolved.name}</strong>
-                        <span className="thanks-role">{credit.role}</span>
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
-            ))}
-          </div>
+        {/* Cinematic vertical credits list: a tall stage with a fade mask.
+            It auto-scrolls downward like a movie credits roll, but the guest
+            can take over at any time (hover / drag / wheel). Once they stop
+            interacting and move the pointer away, the auto-scroll resumes.
+            The order is shuffled on every visit (random infinite loop). */}
+        <div
+          ref={stageRef}
+          className="thanks-credits-stage"
+          onMouseEnter={handleStageEnter}
+          onMouseLeave={handleStageLeave}
+          onPointerDown={handleStageEnter}
+          onPointerUp={handleStageLeave}
+          onPointerCancel={handleStageLeave}
+          onWheel={handleStageWheel}
+        >
+          <ul className="thanks-credits">
+            {shuffle(credits).map((credit, index) => {
+              const resolved = resolveCredit(credit);
+              return (
+                <li className="thanks-credit" key={index}>
+                  {resolved.photo ? (
+                    <span
+                      className="thanks-avatar thanks-avatar--photo"
+                      aria-hidden="true"
+                    >
+                      <img
+                        src={resolved.photo}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </span>
+                  ) : (
+                    <span className="thanks-avatar" aria-hidden="true">
+                      {initialsOf(resolved.name)}
+                    </span>
+                  )}
+                  <span className="thanks-credit-text">
+                    <strong className="thanks-name">{resolved.name}</strong>
+                    <span className="thanks-role">{credit.role}</span>
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
         </div>
+
 
 
 

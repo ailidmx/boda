@@ -696,11 +696,33 @@
   gap: 1.5rem;
 }
 
+/* Dedicated save-status placeholder on the recap step. It is ALWAYS present
+   (reserving space) so the guest always sees the outcome of the save —
+   working / saved / error — instead of a message that pops in and shifts the
+   layout. The success/error modifiers tint the text to match the outcome. */
+.rsvp-status {
+  min-height: 1.4em;
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgb(255 255 255 / 70%);
+}
+
+.rsvp-status--success {
+  color: #7fd18a;
+}
+
+.rsvp-status--error {
+  color: #ff8a80;
+}
+
 /* The "¡Te animas!" save button sits inside the recap step; make it span the
    full width so it reads as the primary call-to-action. */
 .rsvp-scale-save .button {
   width: 100%;
 }
+
 
 /* Secondary "Modify my answers" action on the recap step. It replaces the
    generic "Back" button on the last step and jumps back to the first question
