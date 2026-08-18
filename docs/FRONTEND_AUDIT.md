@@ -342,8 +342,27 @@ The second F2 step is landed: a shared `Dialog` UI primitive for the invitation.
 - `web/invitation/tests/dialog.test.mjs` — unit tests for the behavior defaults and class
   composition. Wired into `npm test` via `test:dialog`.
 
-Remaining F2 work: introduce the other primitives (Input, Spinner, EmptyState, Badge) and
-consolidate design tokens. Do NOT redesign visuals — preserve appearance.
+Remaining F2 work: consolidate design tokens. Do NOT redesign visuals — preserve appearance.
+
+**F2 primitive evaluation (deferred — no genuine reuse):** The remaining primitives
+listed in the original audit (Input, Spinner, EmptyState, Badge) were evaluated against
+the "do not over-abstract / reuse only when real reuse exists" rule and **intentionally
+deferred**. Research found each is bespoke with its own class and markup, so a shared
+primitive would either change appearance or be a thin pass-through wrapper:
+- **Input** — no shared input class. Each feature styles its own: `.song-request-field__input`
+  (SongRequest), `.phone-input__number` (PhoneInput), bare inputs in AuthGate. No 2+ call
+  sites share a class.
+- **Spinner** — only ONE loader exists (`MatrixLoader.jsx`), a bespoke cinematic full-screen
+  component with its own `matrix-loader.css`. No generic spinner to unify.
+- **EmptyState** — each empty message is bespoke: `.song-request-results__status`,
+  `.airport-autocomplete__status`, `.genre-vote__empty`, `.star-vote__empty`,
+  `.accommodation-room-empty`, `.rsvp-recap-answer--empty`, `.phone-input__empty`. No shared
+  class.
+- **Badge** — bespoke per context: `identity-group-badge`, `identity-member-tag` (invitation),
+  `badgeHtml`/`badgeStyle` chips (dashboard). No shared class across call sites.
+
+These should be introduced only when a second genuine call site appears (e.g. a new search
+feature that needs an empty state, or a second loader). See ADR-0009.
 
 ### F7 progress — giant component decomposition (in progress)
 
