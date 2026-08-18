@@ -5,6 +5,7 @@ import { useApp } from "../context/AppContext.jsx";
 import { SwipeCardCarousel } from "./SwipeCardCarousel.jsx";
 import { StarVote } from "./StarVote.jsx";
 import { GenreSurvey } from "./GenreSurvey.jsx";
+import { SongRequest } from "./SongRequest.jsx";
 
 
 
@@ -186,10 +187,14 @@ export function Music() {
       </SwipeCardCarousel>
       </div>
 
-      <a className="section-nav-link section-nav-link--inline" href="#music-playlist">
-        <span>{t.nav.musicPlaylist}</span>
+      <a className="section-nav-link section-nav-link--inline" href="#song-request">
+        <span>{t.nav.songRequest}</span>
         <span aria-hidden="true">↓</span>
       </a>
+
+      {/* "Pide tu canción" — interactive song-request subsection, placed
+          between the live-music lineup and the playlists. */}
+      <SongRequest />
 
       <div id="music-playlist" className="playlist-section reveal">
 
@@ -246,8 +251,8 @@ export function Music() {
         aria-label="Continue"
       >
 
-        <a className="section-nav-link" href="#song-request">
-          <span>{t.nav.songRequest}</span>
+        <a className="section-nav-link" href="#after">
+          <span>{t.nav.coast}</span>
           <span aria-hidden="true">↓</span>
         </a>
 
