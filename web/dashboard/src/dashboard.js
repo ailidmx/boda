@@ -419,8 +419,33 @@ async function saveGuestInline(guestId, field, value) {
   }
 }
 
+// Update a guest's Firebase Auth login email (their "identifier") via the
+// `updateGuestEmail` Cloud Function. The function updates the Firebase Auth
+// user's email AND the guest's `firebaseEmail` field in Firestore, then
+// notifies the couple on Telegram. On success we refresh the live auth list so
+// the identity column shows the new email immediately.
+async function saveGuestEmail(guestId, email) {
+  const functions = getFunctions();
+  const updateGuestEmail = httpsCallable(functions, "updateGuestEmail");
+  try {
+    await updateGuestEmail({ guestId, email });
+    // Refresh the live auth list so the new email shows in the identity column.
+    const listAuthUsers = httpsCallable(functions, "listAuthUsers");
+    const result = await listAuthUsers();
+    const users = result.data?.users || [];
+    state.authUsers = Object.fromEntries(
+      users.map((u) => [u.uid, { id: u.uid, email: u.email }]),
+    );
+    return true;
+  } catch (err) {
+    console.error("Failed to update guest email", err);
+    return false;
+  }
+}
+
 
 // ── Invitation group column (rename + pick another group) ──────────────
+
 
 // Sorted set of existing invitation group names: the `invitation_groups`
 // collection ids plus every distinct `invitationGroup` value currently used by
@@ -612,8 +637,10 @@ function renderGuestManager() {
     guestSortValue,
     GUEST_SORT_COLUMNS,
     saveGuestInline,
+    saveGuestEmail,
     saveGuestRsvpAnswer,
     openGuestEditor,
+
     openSendInviteModal,
     openDeleteConfirm,
     applyInvitationGroupChange,

@@ -670,7 +670,114 @@ export const listAuthUsers = onCall(
   },
 );
 
+// ── Update a guest's login email (admin dashboard) ─────────────────────────
+
+/**
+ * Update a guest's Firebase Auth login email (their "identifier") and keep the
+ * guest's `firebaseEmail` field in Firestore in sync.
+ *
+ * The guest's auth uid IS their guest doc id, so we update the auth user by
+ * uid. This lets the couple replace a default-domain email
+ * (e.g. `fred_38t@boda-david-y-ayde.web.app`) with the guest's real inbox
+ * (e.g. `fred.lebref@gmail.com`) so the invitation email / password-reset link
+ * actually reaches them.
+ *
+ * Admin-only. Notifies the couple on Telegram.
+ */
+export const updateGuestEmail = onCall(
+  { secrets: [TELEGRAM_TOKEN, TELEGRAM_CHAT_ID] },
+  async (request) => {
+    // Reject unauthenticated callers.
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Debes iniciar sesión.");
+    }
+
+    // Only admins may update a guest's email.
+    const db = getFirestore(DB_ID);
+    const adminSnap = await db.collection("guests").doc(request.auth.uid).get();
+    const admin = adminSnap.exists ? adminSnap.data() : null;
+    if (!admin || admin.isAdmin !== true) {
+      throw new HttpsError("permission-denied", "Solo los administradores pueden actualizar el correo de un invitado.");
+    }
+
+    const { guestId, email } = request.data || {};
+    if (!guestId) {
+      throw new HttpsError("invalid-argument", "Falta el guestId.");
+    }
+    const newEmail = String(email || "").trim().toLowerCase();
+    if (!newEmail) {
+      throw new HttpsError("invalid-argument", "El correo no puede estar vacío.");
+    }
+    // Basic email shape check (must contain an @ and a dot after it).
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+      throw new HttpsError("invalid-argument", "El correo no tiene un formato válido.");
+    }
+
+    // Load the target guest so we can report the old email and resolve the name.
+    const guestSnap = await db.collection("guests").doc(guestId).get();
+    if (!guestSnap.exists) {
+      throw new HttpsError("not-found", "No se encontró al invitado.");
+    }
+    const guest = guestSnap.data();
+    const oldEmail = guest.firebaseEmail || "";
+
+    // Update the Firebase Auth user's email (the auth uid IS the guest doc id).
+    // If the guest has no auth account yet, create one so the email is usable.
+    try {
+      let authUser;
+      try {
+        authUser = await getAuth().getUser(guestId);
+      } catch (e) {
+        if (e.code === "auth/user-not-found") {
+          authUser = await getAuth().createUser({
+            uid: guestId,
+            email: newEmail,
+            password: randomBytes(16).toString("hex"),
+            displayName: guest.identity?.firstName || guest.firstName || guestId,
+          });
+        } else {
+          throw e;
+        }
+      }
+      if (authUser.email !== newEmail) {
+        await getAuth().updateUser(guestId, { email: newEmail });
+      }
+    } catch (e) {
+      // Surface a friendly message for the common "email already in use" case.
+      if (e.code === "auth/email-already-in-use") {
+        throw new HttpsError("already-exists", "Ese correo ya está en uso por otro invitado.");
+      }
+      throw new HttpsError("internal", `No se pudo actualizar el correo de acceso: ${e.message}`);
+    }
+
+    // Keep the guest's `firebaseEmail` field in sync (server-side write bypasses
+    // the client rules).
+    await db.collection("guests").doc(guestId).set(
+      {
+        firebaseEmail: newEmail,
+        updatedBy: request.auth.uid,
+        updatedAt: new Date(),
+      },
+      { merge: true },
+    );
+
+    // Notify the couple on Telegram.
+    const guestName = await resolveGuestName(guestId);
+    const notifyLines = [
+      "✉️ *Correo de acceso actualizado*",
+      kv("Invitado", guestName || guestId),
+      kv("Antes", oldEmail || "—"),
+      kv("Ahora", newEmail),
+      kv("Hora", formatTime(new Date())),
+    ];
+    await notify(notifyLines.filter(Boolean).join("\n"));
+
+    return { ok: true, guestId, email: newEmail };
+  },
+);
+
 // ── Send invitation email (admin dashboard) ────────────────────────────────
+
 
 /**
  * Build the guest-facing invitation URL. The guest's login email is passed as
