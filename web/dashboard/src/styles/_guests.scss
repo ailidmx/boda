@@ -922,6 +922,9 @@
 }
 
 // ── Auth email cell (Firebase Auth account email) ──
+// The auth email is a clickable button that reveals an inline editor to change
+// the guest's login email. Reset the button's default styling and add a hover
+// affordance so it reads as an editable link.
 .dashboard-auth-email {
   display: inline-block;
   max-width: 14rem;
@@ -931,7 +934,19 @@
   vertical-align: middle;
   font-size: 0.78rem;
   color: $ink;
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  text-align: left;
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+  &:hover {
+    color: $accent;
+  }
 }
+
 
 // ── Avatar upload (edit modal) ──
 // Preview thumbnail + "Subir foto" button + status line. The admin picks an
