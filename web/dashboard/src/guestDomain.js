@@ -35,8 +35,9 @@ export const DEFAULT_AUTH_EMAIL_DOMAIN = "boda-david-y-ayde.web.app";
 // phone are NOT standalone columns — they live inside the "Identidad" column.
 export const GUEST_SORT_COLUMNS = [
   "name", "invitationGroup", "idCheck", "hasAuth", "group", "lang", "cabin", "room", "xtraCabin", "xtraRoom",
-  "status",
+  "gender", "age", "message", "status",
 ];
+
 
 // The production invitation origin. Invitation links sent to guests (email
 // body, WhatsApp, and the modal preview) MUST always point here — never to a

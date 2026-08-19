@@ -305,6 +305,72 @@
   }
 }
 
+// ── Gender column ──
+.dashboard-gender-cell {
+  white-space: nowrap;
+}
+
+.dashboard-gender-display {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  background: rgba(85, 69, 45, 0.08);
+  color: $ink;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(85, 69, 45, 0.16);
+  }
+
+  &.is-empty {
+    background: transparent;
+    color: $ink-muted;
+    font-weight: 400;
+    text-transform: none;
+  }
+}
+
+.dashboard-gender-cell .dashboard-inline-select {
+  max-width: 7rem;
+}
+
+// ── Age column ──
+.dashboard-age-cell {
+  white-space: nowrap;
+}
+
+.dashboard-age-display {
+  display: inline-block;
+  min-width: 2.2rem;
+  text-align: center;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.35rem;
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+  color: $ink;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(85, 69, 45, 0.1);
+  }
+
+  &.is-empty {
+    color: $ink-muted;
+  }
+}
+
+.dashboard-age-cell .dashboard-inline-input {
+  min-width: 4rem;
+  width: 4.5rem;
+  text-align: center;
+}
+
 // ── Inline name fields (4 separate inputs) ──
 .dashboard-name-fields {
   display: flex;

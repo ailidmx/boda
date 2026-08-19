@@ -49,7 +49,9 @@ export function renderGuestManager(ctx) {
     guestCanEmail,
     guestHasAuth,
     guestSendEmail,
+    guestAgeGroup,
   } = ctx;
+
 
   let filtered = getFilteredGuests();
 
@@ -226,9 +228,57 @@ export function renderGuestManager(ctx) {
       </div>`;
   };
 
+  // ── Gender cell helper (inline editable) ──
+  // Shows the guest's gender as a clickable display that reveals a small
+  // inline select (M / F / —). Saves via `saveGuestInline("gender", …)`.
+  const genderCell = (guest) => {
+    const gender = guest.identity?.gender || guest.gender || "";
+    const options = ["", "M", "F"].map(
+      (g) => `<option value="${g}" ${gender === g ? "selected" : ""}>${g || "—"}</option>`,
+    ).join("");
+    return `
+      <div class="dashboard-gender-cell" data-gender-cell="${guest.id}">
+        <button type="button" class="dashboard-gender-display" data-gender-display="${guest.id}" title="Editar género">
+          ${gender || "—"}
+        </button>
+        <select class="dashboard-inline-select" data-gender-select="${guest.id}" title="Elegir género" hidden>
+          ${options}
+        </select>
+      </div>`;
+  };
+
+  // ── Age cell helper (inline editable) ──
+  // Shows the guest's age as a clickable display that reveals a small inline
+  // number input. Saves via `saveGuestInline("age", …)`.
+  const ageCell = (guest) => {
+    const age = guest.identity?.age ?? guest.age ?? "";
+    return `
+      <div class="dashboard-age-cell" data-age-cell="${guest.id}">
+        <button type="button" class="dashboard-age-display" data-age-display="${guest.id}" title="Editar edad">
+          ${age || "—"}
+        </button>
+        <input class="dashboard-inline-input" type="number" min="0" max="120" value="${age}" data-age-input="${guest.id}" title="Edad" hidden />
+      </div>`;
+  };
+
+  // ── Message cell helper ──
+  // Shows the guest's written message (messageAuthor) as a truncated badge with
+  // a tooltip. Not inline-editable here (it's a free-text note).
+  const messageCell = (guest) => {
+    const msg = guest.messageAuthor || "";
+    if (!msg) return '<span class="dashboard-badge dashboard-badge-muted">—</span>';
+    const truncated = msg.length > 24 ? `${msg.slice(0, 24)}…` : msg;
+    const safeTitle = msg.split('"').join(String.fromCharCode(38) + "quot;");
+    return `<span class="dashboard-badge" title="${safeTitle}">${truncated}</span>`;
+
+  };
+
+
+
   // ── Group badge nav bar ──
   // Each chip shows the group name plus an "X/Y" attendance summary where
   // X = guests confirmed for SATURDAY (RSVP level ≥ 4) and Y = group size.
+
   const groups = getUniqueGuestGroups();
   const groupCounts = getGroupAttendanceCounts();
   const groupNav = `
@@ -264,10 +314,19 @@ export function renderGuestManager(ctx) {
           value="${state.filterQuery}"
         />
       </div>
+      <div class="dashboard-filter-group">
+        <label for="filter-age-group">Edad</label>
+        <select id="filter-age-group" data-filter-age-group title="Filtrar por grupo de edad">
+          <option value="" ${!state.filterAgeGroup ? "selected" : ""}>Todos</option>
+          <option value="nino" ${state.filterAgeGroup === "nino" ? "selected" : ""}>Niños (<18)</option>
+          <option value="adulto" ${state.filterAgeGroup === "adulto" ? "selected" : ""}>Adultos (18+)</option>
+        </select>
+      </div>
       <div class="dashboard-filter-count">
         <strong>${filtered.length}</strong> de <strong>${getActiveGuests().length}</strong> invitados
       </div>
     </div>
+
     <div class="dashboard-rsvp-legend" title="Escala de asistencia por día">
       <span class="dashboard-rsvp-legend-title">Asistencia (Vie / Sáb / Dom):</span>
       <span class="dashboard-rsvp-legend-item"><span class="dashboard-rsvp-chip dashboard-rsvp-chip-empty">—</span> 0 · sin respuesta</span>
@@ -286,9 +345,13 @@ export function renderGuestManager(ctx) {
 
             ${sortTh("group", "Grupo")}
             ${sortTh("lang", "Idioma")}
+            ${sortTh("gender", "Género")}
+            ${sortTh("age", "Edad")}
+            ${sortTh("message", "Mensaje")}
 
 
             ${sortTh("cabin", "Cabaña")}
+
 
             ${sortTh("room", "Cuarto")}
             ${sortTh("xtraCabin", "Cabaña extra")}
@@ -320,10 +383,12 @@ export function renderGuestManager(ctx) {
 
               <td>${badgeHtml(merged.group)}</td>
               <td>${badgeHtml(merged.identity?.lang || merged.lang || "")}</td>
-
-
+              <td>${genderCell(merged)}</td>
+              <td>${ageCell(merged)}</td>
+              <td>${messageCell(merged)}</td>
 
               <td>${badgeHtml(merged.cabinLabel || merged.unit || "")}</td>
+
               <td>${badgeHtml(guestRoom(merged))}</td>
               <td>${badgeHtml(xtraCabin)}</td>
               <td>${badgeHtml(xtraRoom)}</td>
@@ -361,10 +426,26 @@ export function renderGuestManager(ctx) {
   });
 
   // ── Filter events ──
+  // The search input re-renders the table on every keystroke, which destroys
+  // the input and loses focus. We preserve focus + caret position so the user
+  // can keep typing without interruption.
   container.querySelector("[data-filter-query]")?.addEventListener("input", (e) => {
     state.filterQuery = e.target.value;
+    const caret = e.target.selectionStart;
+    renderGuestManager(ctx);
+    const next = container.querySelector("[data-filter-query]");
+    if (next) {
+      next.focus();
+      next.setSelectionRange(caret, caret);
+    }
+  });
+
+  // ── Age-group filter (Niños / Adultos) ──
+  container.querySelector("[data-filter-age-group]")?.addEventListener("change", (e) => {
+    state.filterAgeGroup = e.target.value;
     renderGuestManager(ctx);
   });
+
 
   // ── Sortable headers ──
   container.querySelectorAll("[data-sort-key]").forEach((th) => {
@@ -430,8 +511,51 @@ export function renderGuestManager(ctx) {
     });
   });
 
+  // ── Gender editor: reveal select on click ──
+  container.querySelectorAll("[data-gender-display]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const guestId = btn.dataset.genderDisplay;
+      const select = container.querySelector(`[data-gender-select="${guestId}"]`);
+      if (!select) return;
+      select.hidden = !select.hidden;
+      if (!select.hidden) select.focus();
+    });
+  });
+
+  // ── Gender editor: save on change ──
+  container.querySelectorAll("[data-gender-select]").forEach((select) => {
+    select.addEventListener("change", async () => {
+      const guestId = select.dataset.genderSelect;
+      const ok = await saveGuestInline(guestId, "gender", select.value);
+      if (ok) renderGuestManager(ctx);
+    });
+  });
+
+  // ── Age editor: reveal input on click ──
+  container.querySelectorAll("[data-age-display]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const guestId = btn.dataset.ageDisplay;
+      const input = container.querySelector(`[data-age-input="${guestId}"]`);
+      if (!input) return;
+      input.hidden = !input.hidden;
+      if (!input.hidden) input.focus();
+    });
+  });
+
+  // ── Age editor: save on change ──
+  container.querySelectorAll("[data-age-input]").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const guestId = input.dataset.ageInput;
+      const val = input.value.trim();
+      const age = val === "" ? null : Number.parseInt(val, 10);
+      const ok = await saveGuestInline(guestId, "age", age);
+      if (ok) renderGuestManager(ctx);
+    });
+  });
+
   // ── Invitation group editor: reveal on click ──
   container.querySelectorAll("[data-invgroup-display]").forEach((btn) => {
+
     btn.addEventListener("click", () => {
       const guestId = btn.dataset.invgroupDisplay;
       const editor = container.querySelector(`[data-invgroup-editor="${guestId}"]`);
