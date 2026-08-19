@@ -27,14 +27,18 @@ const LOADER_BG_IMAGE =
   "https://res.cloudinary.com/k2ajcgxv/image/upload/q_auto,f_auto,w_1600/matrixRed_dnatyn";
 
 // The sources the dashboard loads. Order matters for the HUD list.
+// NOTE: the legacy `invitation_groups` collection no longer exists (guests'
+// own `invitationGroup` values are the source of truth), so it is NOT listed
+// here. If it were, the loader would wait forever for a source that never
+// reports and the overlay would stay stuck on "Grupos".
 const DEFAULT_SOURCES = [
   { name: "guests", label: "Invitados" },
-  { name: "invitation_groups", label: "Grupos" },
   { name: "thanks", label: "Gracias" },
   { name: "rooms", label: "Cuartos" },
   { name: "tables", label: "Mesas" },
   { name: "auth_users", label: "Cuentas" },
 ];
+
 
 function formatBytes(bytes) {
   if (!bytes || bytes <= 0) return "0 B";

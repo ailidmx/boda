@@ -28,9 +28,40 @@ import { validateCardVotePayload } from "../../shared/validation.js";
 /** @type {Map<string, Object>} */
 const voteCache = new Map();
 
+/**
+ * Per-card cache of loaded votes, keyed by `${cardType}::${cardKey}`. This lets
+ * `loadCardVotes()` return from memory on subsequent calls for the same card
+ * instead of hitting Firestore once per rendered `StarVote` widget. Without it,
+ * a section with N cards fires N identical `getDocs` queries on page load.
+ * @type {Map<string, Object[]>}
+ */
+const cardVotesByKey = new Map();
+
+/**
+ * Cache of ALL votes loaded per card type, keyed by `cardType`. Once
+ * `loadAllCardVotes(cardType)` resolves, every card of that type is available
+ * from `cardVotesByKey` and no further per-card queries are needed.
+ * @type {Map<string, Object[]>}
+ */
+const allVotesByType = new Map();
+
+/**
+ * In-flight `loadAllCardVotes(cardType)` promises, keyed by `cardType`. This
+ * dedups concurrent calls so N rendered `StarVote` widgets for the same card
+ * type share a SINGLE `getDocs` query instead of firing N identical queries.
+ * @type {Map<string, Promise<Object[]>>}
+ */
+const allVotesPromiseByType = new Map();
+
+function cardCacheKey(cardType, cardKey) {
+  return `${cardType}::${cardKey}`;
+}
+
+
 function logDb(event, detail) {
   console.log(`[db][card-votes][${event}]`, detail);
 }
+
 
 /**
  * Build the deterministic document ID for a (card, guest) vote.
@@ -55,31 +86,18 @@ export async function loadCardVotes(cardType, cardKey) {
       console.warn("[card-votes] Missing cardType/cardKey; skipping load");
       return [];
     }
-    logDb("read:start", {
-      collection: collections.cardVotes,
-      op: "getDocs",
-      where: { cardType, cardKey },
-    });
-    const q = query(
-      collection(db, collections.cardVotes),
-      where("cardType", "==", cardType),
-      where("cardKey", "==", cardKey),
-    );
-
-    const snapshot = await getDocs(q);
-    const votes = [];
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      voteCache.set(docSnap.id, data);
-      votes.push(data);
-    });
-    logDb("read:success", {
-      collection: collections.cardVotes,
-      op: "getDocs",
-      where: { cardType, cardKey },
-      size: snapshot.size,
-    });
-    return votes;
+    const cacheKey = cardCacheKey(cardType, cardKey);
+    // Return from the per-card cache when already loaded so multiple rendered
+    // `StarVote` widgets for the same card don't each fire a Firestore query.
+    if (cardVotesByKey.has(cacheKey)) {
+      return cardVotesByKey.get(cacheKey);
+    }
+    // Load ALL votes for this card type in a single query. `loadAllCardVotes`
+    // populates the per-card cache for every card of the type, so the first
+    // `StarVote` to mount triggers one `getDocs` and every other card reads
+    // from memory — N cards → 1 query instead of N queries.
+    await loadAllCardVotes(cardType);
+    return cardVotesByKey.get(cacheKey) || [];
   } catch (error) {
     logDb("read:error", {
       collection: collections.cardVotes,
@@ -91,6 +109,8 @@ export async function loadCardVotes(cardType, cardKey) {
     return [];
   }
 }
+
+
 
 /**
  * Load ALL votes for a given card type in a single query.
@@ -103,46 +123,72 @@ export async function loadCardVotes(cardType, cardKey) {
  * @returns {Promise<Object[]>} array of all vote documents of this card type
  */
 export async function loadAllCardVotes(cardType) {
-  try {
-    if (!cardType) {
-      console.warn("[card-votes] Missing cardType; skipping load");
-      return [];
-    }
-    logDb("read:start", {
-      collection: collections.cardVotes,
-      op: "getDocs",
-      where: { cardType },
-    });
-    const q = query(
-      collection(db, collections.cardVotes),
-      where("cardType", "==", cardType),
-    );
-
-    const snapshot = await getDocs(q);
-    const votes = [];
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      voteCache.set(docSnap.id, data);
-      votes.push(data);
-    });
-    logDb("read:success", {
-      collection: collections.cardVotes,
-      op: "getDocs",
-      where: { cardType },
-      size: snapshot.size,
-    });
-    return votes;
-  } catch (error) {
-    logDb("read:error", {
-      collection: collections.cardVotes,
-      op: "getDocs",
-      where: { cardType },
-      error: error.message,
-    });
-    console.warn("[card-votes] Could not load card votes", error.message);
+  if (!cardType) {
+    console.warn("[card-votes] Missing cardType; skipping load");
     return [];
   }
+  // Return from the all-votes cache when already loaded.
+  if (allVotesByType.has(cardType)) {
+    return allVotesByType.get(cardType);
+  }
+  // Dedup concurrent calls: if a load for this cardType is already in flight,
+  // await the SAME promise instead of firing another `getDocs`.
+  if (allVotesPromiseByType.has(cardType)) {
+    return allVotesPromiseByType.get(cardType);
+  }
+  const promise = (async () => {
+    try {
+      logDb("read:start", {
+        collection: collections.cardVotes,
+        op: "getDocs",
+        where: { cardType },
+      });
+      const q = query(
+        collection(db, collections.cardVotes),
+        where("cardType", "==", cardType),
+      );
+
+      const snapshot = await getDocs(q);
+      const votes = [];
+      // Group the loaded votes by card so the per-card cache is populated too.
+      // This way a later `loadCardVotes(cardType, cardKey)` for any of these
+      // cards returns from memory instead of firing another query.
+      const byCard = new Map();
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        voteCache.set(docSnap.id, data);
+        votes.push(data);
+        const key = cardCacheKey(data.cardType, data.cardKey);
+        if (!byCard.has(key)) byCard.set(key, []);
+        byCard.get(key).push(data);
+      });
+      byCard.forEach((cardVotes, key) => cardVotesByKey.set(key, cardVotes));
+      allVotesByType.set(cardType, votes);
+      logDb("read:success", {
+        collection: collections.cardVotes,
+        op: "getDocs",
+        where: { cardType },
+        size: snapshot.size,
+      });
+      return votes;
+    } catch (error) {
+      logDb("read:error", {
+        collection: collections.cardVotes,
+        op: "getDocs",
+        where: { cardType },
+        error: error.message,
+      });
+      console.warn("[card-votes] Could not load card votes", error.message);
+      return [];
+    } finally {
+      // Allow a future reload after a failure (don't cache a rejected promise).
+      allVotesPromiseByType.delete(cardType);
+    }
+  })();
+  allVotesPromiseByType.set(cardType, promise);
+  return promise;
 }
+
 
 /**
  * Load all of a single guest's votes for a given card type.
@@ -155,7 +201,6 @@ export async function loadAllCardVotes(cardType) {
  * @returns {Promise<Object[]>} array of vote documents for this guest
  */
 export async function loadGuestCardVotes(cardType, guestId) {
-
   try {
     if (!cardType || !guestId) {
       console.warn("[card-votes] Missing cardType/guestId; skipping load");
@@ -198,6 +243,7 @@ export async function loadGuestCardVotes(cardType, guestId) {
   }
 }
 
+
 /**
  * Save (create or update) a guest's star rating for a card.
  *
@@ -239,6 +285,12 @@ export async function saveCardVote({ cardType, cardKey, guestId, rating }) {
   try {
     await setDoc(ref, next, { merge: true });
     voteCache.set(docId, { ...next });
+    // Keep the per-card cache in sync so the widget's average/count reflect
+    // the new vote without a re-fetch.
+    const cacheKey = cardCacheKey(cardType, cardKey);
+    const existing = cardVotesByKey.get(cacheKey) || [];
+    const withoutMine = existing.filter((v) => v.guestId !== guestId);
+    cardVotesByKey.set(cacheKey, [...withoutMine, { ...next }]);
     logDb("write:success", {
       collection: collections.cardVotes,
       docId,
@@ -247,6 +299,7 @@ export async function saveCardVote({ cardType, cardKey, guestId, rating }) {
       payload: next,
     });
   } catch (error) {
+
     logDb("write:error", {
       collection: collections.cardVotes,
       docId,

@@ -31,9 +31,37 @@ import { validateGenreRatingPayload } from "../../shared/validation.js";
 /** @type {Map<string, Object>} */
 const ratingCache = new Map();
 
+/**
+ * Per-genre cache of loaded ratings, keyed by `genreId`. This lets
+ * `loadGenreRatings()` return from memory on subsequent calls for the same
+ * genre instead of hitting Firestore once per rendered `GenreVote` widget.
+ * Without it, a survey with N genres fires N identical `getDocs` queries on
+ * page load.
+ * @type {Map<string, Object[]>}
+ */
+const ratingsByGenre = new Map();
+
+/**
+ * Cache of ALL ratings loaded, keyed by `"all"`. Once `loadAllGenreRatings()`
+ * resolves, every genre's ratings are available from `ratingsByGenre` and no
+ * further per-genre queries are needed.
+ * @type {Map<string, Object[]>}
+ */
+const allRatingsByKey = new Map();
+
+/**
+ * In-flight `loadAllGenreRatings()` promise. This dedups concurrent calls so N
+ * rendered `GenreVote` widgets share a SINGLE `getDocs` query instead of firing
+ * N identical queries.
+ * @type {Promise<Object[]> | null}
+ */
+let allRatingsPromise = null;
+
 function logDb(event, detail) {
   console.log(`[db][genre-ratings][${event}]`, detail);
 }
+
+
 
 /**
  * Build the deterministic document ID for a (genre, guest) rating.
@@ -56,30 +84,17 @@ export async function loadGenreRatings(genreId) {
       console.warn("[genre-ratings] Missing genreId; skipping load");
       return [];
     }
-    logDb("read:start", {
-      collection: collections.genreRatings,
-      op: "getDocs",
-      where: { genreId },
-    });
-    const q = query(
-      collection(db, collections.genreRatings),
-      where("genreId", "==", genreId),
-    );
-
-    const snapshot = await getDocs(q);
-    const ratings = [];
-    snapshot.forEach((docSnap) => {
-      const data = docSnap.data();
-      ratingCache.set(docSnap.id, data);
-      ratings.push(data);
-    });
-    logDb("read:success", {
-      collection: collections.genreRatings,
-      op: "getDocs",
-      where: { genreId },
-      size: snapshot.size,
-    });
-    return ratings;
+    // Return from the per-genre cache when already loaded so multiple rendered
+    // `GenreVote` widgets for the same genre don't each fire a Firestore query.
+    if (ratingsByGenre.has(genreId)) {
+      return ratingsByGenre.get(genreId);
+    }
+    // Load ALL ratings in a single query. `loadAllGenreRatings()` populates the
+    // per-genre cache for every genre, so the first `GenreVote` to mount
+    // triggers one `getDocs` and every other genre reads from memory — N genres
+    // → 1 query instead of N queries.
+    await loadAllGenreRatings();
+    return ratingsByGenre.get(genreId) || [];
   } catch (error) {
     logDb("read:error", {
       collection: collections.genreRatings,
@@ -91,6 +106,78 @@ export async function loadGenreRatings(genreId) {
     return [];
   }
 }
+
+/**
+ * Load ALL genre ratings in a single query.
+ *
+ * Populates the per-genre cache (`ratingsByGenre`) for every genre so a later
+ * `loadGenreRatings(genreId)` returns from memory. Concurrent calls share one
+ * in-flight promise so N rendered `GenreVote` widgets fire a single `getDocs`.
+ *
+ * @returns {Promise<Object[]>} array of all rating documents
+ */
+export async function loadAllGenreRatings() {
+  // Return from the all-ratings cache when already loaded.
+  if (allRatingsByKey.has("all")) {
+    return allRatingsByKey.get("all");
+  }
+  // Dedup concurrent calls: if a load is already in flight, await the SAME
+  // promise instead of firing another `getDocs`.
+  if (allRatingsPromise) {
+    return allRatingsPromise;
+  }
+  const promise = (async () => {
+    try {
+      logDb("read:start", {
+        collection: collections.genreRatings,
+        op: "getDocs",
+        where: {},
+      });
+      const q = query(collection(db, collections.genreRatings));
+
+      const snapshot = await getDocs(q);
+      const ratings = [];
+      // Group the loaded ratings by genre so the per-genre cache is populated
+      // too. This way a later `loadGenreRatings(genreId)` for any of these
+      // genres returns from memory instead of firing another query.
+      const byGenre = new Map();
+      snapshot.forEach((docSnap) => {
+        const data = docSnap.data();
+        ratingCache.set(docSnap.id, data);
+        ratings.push(data);
+        const genreId = data.genreId;
+        if (!byGenre.has(genreId)) byGenre.set(genreId, []);
+        byGenre.get(genreId).push(data);
+      });
+      byGenre.forEach((genreRatings, genreId) =>
+        ratingsByGenre.set(genreId, genreRatings),
+      );
+      allRatingsByKey.set("all", ratings);
+      logDb("read:success", {
+        collection: collections.genreRatings,
+        op: "getDocs",
+        where: {},
+        size: snapshot.size,
+      });
+      return ratings;
+    } catch (error) {
+      logDb("read:error", {
+        collection: collections.genreRatings,
+        op: "getDocs",
+        where: {},
+        error: error.message,
+      });
+      console.warn("[genre-ratings] Could not load genre ratings", error.message);
+      return [];
+    } finally {
+      // Allow a future reload after a failure (don't cache a rejected promise).
+      allRatingsPromise = null;
+    }
+  })();
+  allRatingsPromise = promise;
+  return promise;
+}
+
 
 /**
  * Load all of a single guest's genre ratings.
@@ -182,6 +269,11 @@ export async function saveGenreRating({ genreId, genreName, guestId, rating }) {
   try {
     await setDoc(ref, next, { merge: true });
     ratingCache.set(docId, { ...next });
+    // Keep the per-genre cache in sync so the widget's average/count reflect
+    // the new rating without a re-fetch.
+    const existing = ratingsByGenre.get(genreId) || [];
+    const withoutMine = existing.filter((r) => r.guestId !== guestId);
+    ratingsByGenre.set(genreId, [...withoutMine, { ...next }]);
     logDb("write:success", {
       collection: collections.genreRatings,
       docId,
@@ -190,6 +282,7 @@ export async function saveGenreRating({ genreId, genreName, guestId, rating }) {
       payload: next,
     });
   } catch (error) {
+
     logDb("write:error", {
       collection: collections.genreRatings,
       docId,

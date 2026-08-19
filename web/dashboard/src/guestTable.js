@@ -163,18 +163,24 @@ export function renderGuestManager(ctx) {
     const phoneHtml = phoneInfo
       ? `<a class="dashboard-phone" href="${phoneInfo.href}" title="Llamar"><span class="dashboard-phone-flag">${phoneInfo.flag}</span><span class="dashboard-phone-number">${phoneInfo.display}</span></a>`
       : '<span class="dashboard-badge dashboard-badge-muted">—</span>';
-    // The auth email is inline-editable: clicking the display reveals a small
-    // email input that saves via the `updateGuestEmail` Cloud Function (which
-    // updates the Firebase Auth user's email AND the guest's `firebaseEmail`).
-    const authHtml = hasAuth
-      ? `
-        <div class="dashboard-auth-email-cell" data-auth-email-cell="${guest.id}">
-          <button type="button" class="dashboard-auth-email" data-auth-email-display="${guest.id}" title="Editar correo de acceso (Firebase Auth)">
-            ${authEmail || "—"}
-          </button>
-          <input class="dashboard-inline-input" type="email" value="${authEmail}" data-auth-email-input="${guest.id}" title="Correo de acceso" hidden />
-        </div>`
-      : "";
+    // The auth email is inline-editable for EVERY guest (with or without a
+    // Firebase Auth account yet). Clicking the display reveals a small email
+    // input + a clear "Guardar" button. Saving calls the `updateGuestEmail`
+    // Cloud Function (via `saveGuestEmail`), which updates the Firebase Auth
+    // user's email (creating the account if needed) AND the guest's
+    // `firebaseEmail`. View mode and edit mode are mutually exclusive — only
+    // one is visible at a time.
+    const authHtml = `
+      <div class="dashboard-auth-email-cell" data-auth-email-cell="${guest.id}">
+        <button type="button" class="dashboard-auth-email" data-auth-email-display="${guest.id}" title="Editar correo de acceso (Firebase Auth)">
+          ${authEmail || "—"}
+        </button>
+        <span class="dashboard-auth-email-editor" data-auth-email-editor="${guest.id}" hidden>
+          <input class="dashboard-inline-input" type="email" value="${authEmail}" data-auth-email-input="${guest.id}" title="Correo de acceso" placeholder="correo@ejemplo.com" />
+          <button type="button" class="dashboard-link-btn dashboard-auth-email-save" data-auth-email-save="${guest.id}" title="Guardar correo">Guardar</button>
+        </span>
+      </div>`;
+
     return `
       <div class="dashboard-identity-cell">
         ${avatar}
@@ -315,6 +321,32 @@ export function renderGuestManager(ctx) {
 
 
 
+  // ── Column-group filter nav bar ──
+  // The INVITADOS table has many columns, so they are grouped by admin use case.
+  // The "Identidad" column is ALWAYS shown; the rest are shown/hidden by the
+  // active column group. This lets the couple focus on the columns they need
+  // (identity/send, presence & lodging, pétanque, or beach) without scrolling
+  // a huge table.
+  const COLUMN_GROUPS = [
+    { id: "identity", label: "Identidad" },
+    { id: "presencia", label: "Presencia · Alojamiento" },
+    { id: "petanque", label: "Pétanque" },
+    { id: "playa", label: "Playa" },
+  ];
+  const activeColumnGroup = COLUMN_GROUPS.some((g) => g.id === state.columnGroup)
+    ? state.columnGroup
+    : "identity";
+  const columnGroupNav = `
+    <div class="dashboard-column-group-nav" title="Mostrar columnas por caso de uso">
+      ${COLUMN_GROUPS.map(
+        (g) => `
+        <button type="button" class="dashboard-column-group-chip ${activeColumnGroup === g.id ? "dashboard-column-group-chip-active" : ""}" data-column-group="${g.id}">
+          ${g.label}
+        </button>`,
+      ).join("")}
+    </div>
+  `;
+
   // ── Group badge nav bar ──
   // Each chip shows the group name plus an "X/Y" attendance summary where
   // X = guests confirmed for SATURDAY (RSVP level ≥ 4) and Y = group size.
@@ -342,6 +374,7 @@ export function renderGuestManager(ctx) {
   `;
 
   container.innerHTML = `
+    ${columnGroupNav}
     ${groupNav}
     <div class="dashboard-guest-filters">
       <div class="dashboard-filter-group">
@@ -381,34 +414,43 @@ export function renderGuestManager(ctx) {
         <thead>
           <tr>
             ${sortTh("name", "Identidad")}
-            <th title="Enviar invitación (WhatsApp / email)">Enviar</th>
-            <th title="Invitación enviada (marcar manualmente o al enviar)">Enviada</th>
-            ${sortTh("invitationGroup", "Invitación")}
-
-            ${sortTh("group", "Grupo")}
-            ${sortTh("lang", "Idioma")}
-            ${sortTh("gender", "Género")}
-            ${sortTh("age", "Edad")}
-            ${sortTh("message", "Mensaje")}
-            ${sortTh("accommodationConfirm", "Alojamiento")}
-            ${sortTh("petanqueParticipation", "Pétanque")}
-            ${sortTh("petanqueOwnBoules", "Boules")}
-            ${sortTh("playa", "Playa")}
-            ${sortTh("rocaAzul", "Roca Azul")}
-            ${sortTh("travelsByPlane", "Avión")}
-
-
-            ${sortTh("cabin", "Cabaña")}
-
-
-
-            ${sortTh("room", "Cuarto")}
-            ${sortTh("xtraCabin", "Cabaña extra")}
-            ${sortTh("xtraRoom", "Cuarto extra")}
-            <th>Vie</th>
-            <th>Sáb</th>
-            <th>Dom</th>
-            ${sortTh("status", "Estado")}
+            ${activeColumnGroup === "identity"
+              ? `
+                <th title="Enviar invitación (WhatsApp / email)">Enviar</th>
+                <th title="Invitación enviada (marcar manualmente o al enviar)">Enviada</th>
+                ${sortTh("invitationGroup", "Invitación")}
+                ${sortTh("group", "Grupo")}
+                ${sortTh("lang", "Idioma")}
+                ${sortTh("gender", "Género")}
+                ${sortTh("age", "Edad")}
+                ${sortTh("message", "Mensaje")}
+                ${sortTh("travelsByPlane", "Avión")}
+                ${sortTh("status", "Estado")}
+              `
+              : ""}
+            ${activeColumnGroup === "presencia"
+              ? `
+                <th>Vie</th>
+                <th>Sáb</th>
+                <th>Dom</th>
+                ${sortTh("cabin", "Cabaña")}
+                ${sortTh("room", "Cuarto")}
+                ${sortTh("xtraCabin", "Cabaña extra")}
+                ${sortTh("xtraRoom", "Cuarto extra")}
+                ${sortTh("rocaAzul", "Roca Azul")}
+              `
+              : ""}
+            ${activeColumnGroup === "petanque"
+              ? `
+                ${sortTh("petanqueParticipation", "Pétanque")}
+                ${sortTh("petanqueOwnBoules", "Boules")}
+              `
+              : ""}
+            ${activeColumnGroup === "playa"
+              ? `
+                ${sortTh("playa", "Playa")}
+              `
+              : ""}
             <th>Acciones</th>
           </tr>
         </thead>
@@ -423,35 +465,46 @@ export function renderGuestManager(ctx) {
               return `
             <tr class="dashboard-guest-row">
               <td>${identityCell(merged)}</td>
-              <td>${sendCell(merged)}</td>
-              <td>
-                <input type="checkbox" class="dashboard-invite-sent" data-invite-sent="${merged.id}"
-                  ${merged.invitationSent ? "checked" : ""} title="Invitación enviada" />
-              </td>
-              <td>${invitationGroupCell(merged)}</td>
-
-              <td>${badgeHtml(merged.group)}</td>
-              <td>${badgeHtml(merged.identity?.lang || merged.lang || "")}</td>
-              <td>${genderCell(merged)}</td>
-              <td>${ageCell(merged)}</td>
-              <td>${messageCell(merged)}</td>
-              <td>${rsvpBooleanChip(merged, "accommodationConfirm")}</td>
-              <td>${rsvpBooleanChip(merged, "petanqueParticipation")}</td>
-              <td>${rsvpBooleanChip(merged, "petanqueOwnBoules")}</td>
-              <td>${rsvpBooleanChip(merged, "playa")}</td>
-              <td>${rsvpBooleanChip(merged, "rocaAzul")}</td>
-              <td>${travelsByPlaneChip(merged)}</td>
-
-              <td>${badgeHtml(merged.cabinLabel || merged.unit || "")}</td>
-
-
-              <td>${badgeHtml(guestRoom(merged))}</td>
-              <td>${badgeHtml(xtraCabin)}</td>
-              <td>${badgeHtml(xtraRoom)}</td>
-              <td>${rsvpLevelChip(merged, "friday")}</td>
-              <td>${rsvpLevelChip(merged, "saturday")}</td>
-              <td>${rsvpLevelChip(merged, "sunday")}</td>
-              <td data-guest-status="${merged.id}"></td>
+              ${activeColumnGroup === "identity"
+                ? `
+                  <td>${sendCell(merged)}</td>
+                  <td>
+                    <input type="checkbox" class="dashboard-invite-sent" data-invite-sent="${merged.id}"
+                      ${merged.invitationSent ? "checked" : ""} title="Invitación enviada" />
+                  </td>
+                  <td>${invitationGroupCell(merged)}</td>
+                  <td>${badgeHtml(merged.group)}</td>
+                  <td>${badgeHtml(merged.identity?.lang || merged.lang || "")}</td>
+                  <td>${genderCell(merged)}</td>
+                  <td>${ageCell(merged)}</td>
+                  <td>${messageCell(merged)}</td>
+                  <td>${travelsByPlaneChip(merged)}</td>
+                  <td data-guest-status="${merged.id}"></td>
+                `
+                : ""}
+              ${activeColumnGroup === "presencia"
+                ? `
+                  <td>${rsvpLevelChip(merged, "friday")}</td>
+                  <td>${rsvpLevelChip(merged, "saturday")}</td>
+                  <td>${rsvpLevelChip(merged, "sunday")}</td>
+                  <td>${badgeHtml(merged.cabinLabel || merged.unit || "")}</td>
+                  <td>${badgeHtml(guestRoom(merged))}</td>
+                  <td>${badgeHtml(xtraCabin)}</td>
+                  <td>${badgeHtml(xtraRoom)}</td>
+                  <td>${rsvpBooleanChip(merged, "rocaAzul")}</td>
+                `
+                : ""}
+              ${activeColumnGroup === "petanque"
+                ? `
+                  <td>${rsvpBooleanChip(merged, "petanqueParticipation")}</td>
+                  <td>${rsvpBooleanChip(merged, "petanqueOwnBoules")}</td>
+                `
+                : ""}
+              ${activeColumnGroup === "playa"
+                ? `
+                  <td>${rsvpBooleanChip(merged, "playa")}</td>
+                `
+                : ""}
               <td>
                 <button class="dashboard-link-btn" data-edit-guest="${merged.id}" title="Editar todo (modal)">✏️</button>
                 <button class="dashboard-link-btn" data-copy-link="${merged.id}" title="Copiar enlace">🔗</button>
@@ -471,6 +524,14 @@ export function renderGuestManager(ctx) {
   filtered.forEach((guest) => {
     const cell = container.querySelector(`[data-guest-status="${guest.id}"]`);
     if (cell) cell.append(guestStatusBadge(guest));
+  });
+
+  // ── Column-group filter (show/hide columns by admin use case) ──
+  container.querySelectorAll("[data-column-group]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.columnGroup = btn.dataset.columnGroup;
+      renderGuestManager(ctx);
+    });
   });
 
   // ── Group nav filter ──
@@ -613,26 +674,53 @@ export function renderGuestManager(ctx) {
   });
 
 
-  // ── Auth email editor: reveal input on click ──
+  // ── Auth email editor: reveal editor on click ──
   // The auth email (the guest's Firebase Auth login email) is inline-editable.
-  // Clicking the display reveals a small email input; saving calls the
+  // Clicking the display swaps it for a small email input + ✓ save button
+  // (view mode → edit mode, never both at once). Saving calls the
   // `updateGuestEmail` Cloud Function (via `saveGuestEmail`), which updates the
   // Firebase Auth user's email AND the guest's `firebaseEmail` field, then
   // refreshes the live auth list so the new email shows immediately.
+  const setEmailEditorOpen = (guestId, open) => {
+    const display = container.querySelector(`[data-auth-email-display="${guestId}"]`);
+    const editor = container.querySelector(`[data-auth-email-editor="${guestId}"]`);
+    if (display) display.hidden = open;
+    if (editor) editor.hidden = !open;
+    if (open) {
+      const input = container.querySelector(`[data-auth-email-input="${guestId}"]`);
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }
+  };
+
   container.querySelectorAll("[data-auth-email-display]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const guestId = btn.dataset.authEmailDisplay;
+      setEmailEditorOpen(guestId, true);
+    });
+  });
+
+  // ── Auth email editor: save via ✓ button ──
+  container.querySelectorAll("[data-auth-email-save]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const guestId = btn.dataset.authEmailSave;
       const input = container.querySelector(`[data-auth-email-input="${guestId}"]`);
       if (!input) return;
-      input.hidden = !input.hidden;
-      if (!input.hidden) {
-        input.focus();
-        input.select();
+      const email = input.value.trim();
+      if (!email) return;
+      const ok = await saveGuestEmail(guestId, email);
+      if (ok) {
+        renderGuestManager(ctx);
+      } else {
+        input.style.borderColor = "#a0352c";
+        setTimeout(() => (input.style.borderColor = ""), 1000);
       }
     });
   });
 
-  // ── Auth email editor: save on change ──
+  // ── Auth email editor: save on Enter / blur (change) ──
   container.querySelectorAll("[data-auth-email-input]").forEach((input) => {
     input.addEventListener("change", async () => {
       const guestId = input.dataset.authEmailInput;
@@ -647,6 +735,7 @@ export function renderGuestManager(ctx) {
       }
     });
   });
+
 
   // ── Invitation group editor: reveal on click ──
 

@@ -13,7 +13,6 @@
 /** Map URL path segments to internal tab IDs. */
 const PATH_TO_TAB = {
   invitados: "guests",
-  grupos: "groups",
   cabins: "cabins",
   tables: "tables",
   gracias: "thanks",
@@ -22,7 +21,6 @@ const PATH_TO_TAB = {
 /** Map internal tab IDs to URL path segments. */
 const TAB_TO_PATH = {
   guests: "invitados",
-  groups: "grupos",
   cabins: "cabins",
   tables: "tables",
   thanks: "gracias",
@@ -82,7 +80,6 @@ export function navigateToTab(tabId) {
 export function renderTabNavigation() {
   const tabs = [
     { id: "guests", label: "Invitados", icon: "👥" },
-    { id: "groups", label: "Grupos", icon: "🏷️" },
     { id: "cabins", label: "Cabañas", icon: "🏠" },
     { id: "tables", label: "Mesas", icon: "🪑" },
     { id: "thanks", label: "Gracias", icon: "🙏" },

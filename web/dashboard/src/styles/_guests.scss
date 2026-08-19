@@ -799,6 +799,43 @@
 }
 
 
+// ── Column-group nav bar (show/hide columns by admin use case) ──
+// A row of chips above the table that switches which column group is visible.
+// "Identidad" is always shown; the active chip is highlighted with the accent.
+.dashboard-column-group-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.dashboard-column-group-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.85rem;
+  border: 1px solid $border-strong;
+  border-radius: 0.4rem;
+  background: $card-bg;
+  color: $ink;
+  font: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+
+  &:hover {
+    border-color: $accent;
+    background: rgba(138, 106, 54, 0.08);
+  }
+
+  &.dashboard-column-group-chip-active {
+    background: $accent;
+    border-color: $accent;
+    color: $white;
+  }
+}
+
 // ── Group nav bar (flat chips above the table) ──
 
 .dashboard-group-nav {
@@ -946,6 +983,51 @@
     color: $accent;
   }
 }
+
+// ── Auth email editor (view mode ↔ edit mode) ──
+// Clicking the display swaps it for a small email input + ✓ save button. The
+// `[hidden]` attribute must win over any display rule so view and edit modes
+// are never both visible at once.
+.dashboard-auth-email-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+}
+
+.dashboard-auth-email-editor {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+}
+
+.dashboard-auth-email-editor[hidden],
+.dashboard-auth-email[hidden] {
+  display: none;
+}
+
+.dashboard-auth-email-editor .dashboard-inline-input {
+  width: 12rem;
+  max-width: 100%;
+}
+
+// The "Guardar" save button in the auth-email editor. It reuses the link-btn
+// base but is given a solid, clearly-visible treatment so the admin always
+// knows how to persist the new email.
+.dashboard-auth-email-save {
+  font-weight: 600;
+  color: #fff;
+  background: $accent;
+  border-radius: 0.35rem;
+  padding: 0.25rem 0.6rem;
+  white-space: nowrap;
+  &:hover {
+    background: color-mix(in srgb, $accent 85%, #000);
+    color: #fff;
+  }
+}
+
 
 
 // ── Avatar upload (edit modal) ──

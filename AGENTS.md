@@ -230,6 +230,20 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   LIVE-ONLY — see the dashboard bullets below; it does not read the static
   `web/shared/guests.js` snapshot either.)
 
+- **Render-time `getGroupMembers` consumers MUST subscribe to `subscribeGuestsCache`** —
+  The group-scoped `onSnapshot` in `loadGuestProfiles()` is asynchronous: right
+  after sign-in it may deliver only the signed-in guest's record, then a moment
+  later the rest of the invitation group. Any component that computes
+  `getGroupMembers(guest, getActiveGuests())` (or reads `getActiveGuests()` /
+  `getGuest(id)`) at RENDER time will therefore render only the first record and
+  never reveal the other group members (e.g. Karla when Fred signs in) unless it
+  re-renders when the cache updates. The fix is to subscribe to
+  `subscribeGuestsCache(listener)` (exported from `guest-profiles.js`) in a
+  `useEffect` and bump a `cacheTick` state to force a re-render once the full
+  group arrives. `IdentityModal.jsx` and `IdentitySection.jsx` do this. When
+  adding a new component that lists group members (or any live guest data), add
+  the same subscription — do NOT rely on a one-time render.
+
 - **Telegram bot must be a member of the target chat** — The notification
   Cloud Functions (`functions/index.js` + `telegram.js`) post to a Telegram
   group via the `@boda_dya_bot` bot. If the bot is NOT a member of the group,
@@ -558,15 +572,12 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   `web/dashboard/src/repositories/` layer owns ALL Firestore write operations
   for the dashboard. `guestRepository.js` exposes `updateGuest(guestId, payload)`
   (a `setDoc` merge on the `guests` doc) and `softDeleteGuest(guestId)` (a
-  `setDoc` merge writing `{ _deleted: true }`); `groupRepository.js` exposes
-  `createGroup(name)`, `updateGroupField(groupId, field, value)` (merge-write a
-  dotted path like `tag.color` or `customContent.greeting`), and
-  `deleteGroup(groupId)`. `dashboard.js` imports these and NEVER calls
-  `setDoc`/`deleteDoc` directly for guests or invitation groups. When adding a
-  new dashboard write, add it to the appropriate repository (or create a new
-  one) rather than calling Firestore from `dashboard.js`. The dashboard's
-  `onSnapshot` listeners (guests, invitation_groups) remain subscription
-  concerns owned by the dashboard bootstrap, not the repositories.
+  `setDoc` merge writing `{ _deleted: true }`). `dashboard.js` imports these and
+  NEVER calls `setDoc`/`deleteDoc` directly for guests. When adding a new
+  dashboard write, add it to the appropriate repository (or create a new one)
+  rather than calling Firestore from `dashboard.js`. The dashboard's
+  `onSnapshot` listeners (guests, thanks) remain subscription concerns owned by
+  the dashboard bootstrap, not the repositories.
 - **Dashboard cabin edits read `hosting` from the LIVE record** — the remove
 
   ("✕"), drag-and-drop, and "+ Agregar" handlers in `renderCabinAssignments()`
@@ -605,6 +616,34 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   the guest is idle or the tab is hidden — idle/hidden time is NOT counted as
   "time spent" on a section. When adding a new activity signal, extend the
   `ACTIVITY_EVENTS` list and the `type` enum in the rules.
+- **Analytics is a thin, safe wrapper + a set of tracking hooks** — the
+  invitation's analytics lives in `web/invitation/src/analytics.js` (a no-op-safe
+  wrapper around Firebase Analytics `logEvent`) plus four hooks that drive it:
+  `useClickTracking` (a single delegated `document` click listener that logs
+  EVERY click via `trackClick`, resolving a stable id from `data-analytics` →
+  `id` → `tag.class.text` and attaching the enclosing `section_id`),
+  `usePageViewTracking` (an IntersectionObserver that treats each visible
+  `<section id>` as a "page" and logs `page_view` + persists to the `page_views`
+  Firestore collection), `useSectionTime` (accumulates visible seconds per
+  section and logs `section_time`, pausing while idle/hidden), and
+  `useActivityTracker` (logs `user_inactive` + writes `activity_events`). The
+  RSVP funnel logs `funnel_step` / `add_to_cart` / `purchase` via
+  `trackFunnelStep` / `trackCartItem` / `trackPurchase`. When adding a new
+  interactive element, prefer a `data-analytics="<stable.id>"` attribute so the
+  global click tracker gives it a clean id; the `ACTION_TYPES` map in
+  `analytics.js` is the canonical set of action categories.
+- **`invitation_visit` fires once per load from the captured UTM params** — the
+  `trackInvitationVisit` event (guest email, normalised channel source
+  email/whatsapp/other, UTM medium/campaign, and `time_to_answer` computed from
+  `sent_at`) is fired from a `useEffect` in `App.jsx` on mount. It reads the
+  params captured eagerly by `captureInvitationLinkParams()` in `main.jsx`
+  (BEFORE `cleanInvitationLinkUrl()` strips them from the address bar), so the
+  UTM data survives the URL cleanup. It fires for ALL auth states (a guest
+  arriving via an invitation link is tracked even before they sign in) and
+  bails out when there are no invitation-link params (a plain direct visit).
+  When adding a new UTM param to the invitation links, extend
+  `getInvitationLinkParams()` in `invitation-link.js` AND pass it through in the
+  `trackInvitationVisit` call in `App.jsx`.
 - **Dashboard design language is "sharp & airy"** — the dashboard SCSS
   (`web/dashboard/src/styles/*.scss`) uses small border radii (cards/sections
   `0.5rem`, inputs/buttons `0.35rem`, tabs `0.4rem`) and generous padding
@@ -632,8 +671,9 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   shows the guest's `invitationGroup` as a clickable display that reveals an
   inline editor with a free-text rename input and a dropdown to pick another
   existing group. The dropdown options come from `getInvitationGroupOptions()`
-  (the `invitation_groups` collection ids plus every distinct `invitationGroup`
-  value currently used by guests). Renaming or picking a group calls
+  (every distinct `invitationGroup` value currently used by guests — the legacy
+  `invitation_groups` collection was removed, so the guests' own values are the
+  source of truth). Renaming or picking a group calls
   `applyInvitationGroupChange`, which saves the new value to that guest via
   `saveGuestInline` (the `invitationGroup` field is in `GUEST_WRITABLE_FIELDS`)
   and, if the old group was shared by other guests, opens a confirm modal
@@ -831,6 +871,42 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   presentation module — all persistence flows through the injected repository
   + payload-builder + id helpers. When adding a new guest-facing field to the
   create form, update `buildGuestCreatePayload` and the modal together.
+- **The `invitation_groups` collection no longer exists** — the dashboard's
+  Groups panel, its tab, the `onSnapshot` listener, and the dead
+  `groupsPanel.js` + `repositories/groupRepository.js` modules were removed.
+  There is NO `invitation_groups` collection in Firestore and the FE no longer
+  calls `getDoc` on it (the old `loadGroupCustomContent`/`invitation-profile`
+  reads were removed). The guests' own `invitationGroup` field values are the
+  single source of truth for the Invitación column dropdown
+  (`getInvitationGroupOptions()`). If you see
+  `[db][invitation-profile][read:start] {collection: 'invitation_groups'…}` in
+  the console, it's a stale cached build — hard-refresh / redeploy.
+- **The `attendance_responses` collection is no longer used** — RSVP answers
+  live directly on each guest's `guests` doc under `rsvp.answers` (saved via
+  `saveRsvpAnswers`). There is NO `attendance_responses` collection read
+  anymore; the old `loadGuestAttendance`/`guest-attendance` reads were removed.
+  If you see `[db][guest-attendance][read:start] {collection:
+  'attendance_responses'…}` in the console, it's a stale cached build.
+- **Dashboard email inline editor swaps view/edit (never both) + a visible ✓ save button** —
+  the INVITADOS table's email cell (`emailCell` in `dashboard.js`) renders EITHER
+  the read-only email display OR the edit input, never both at the same time.
+  Clicking the ✏️ edit button swaps to the input; the input row shows a visible
+  "✓" save button (`.dashboard-email-save`) and a "✕" cancel button. The save
+  button is REQUIRED so the admin knows how to persist the change — there is no
+  implicit save-on-blur. Saving calls `saveGuestInline(guest.id, "email", value)`
+  (the `email` field is in `GUEST_WRITABLE_FIELDS`). When adding a new inline
+  editor, follow the same swap-not-overlay pattern and always include an explicit
+  save control.
+- **Dashboard INVITADOS table has a column-group filter bar** — the guest table
+  toolbar has a filter nav (`data-colgroup`) that shows/hides columns by use case:
+  **IDENTITY** (always shown: Enviar, Enviada, Invitación, GRUPO, IDIOMA, GÉNERO,
+  EDAD, MENSAJE, AVION, estado), **PRESENCIA** (VIERNES, SÁBADO, DOMINGO,
+  ALOJAMIENTO, CABAÑA, CUARTO, CABAÑA EXTRA, CUARTO EXTRA, ROCA AZUL),
+  **PETANCA** (PETANQUE, BOULES), and **PLAYA** (PLAYA). The active group is
+  stored in `state.colGroup` and the `<thead>`/row template conditionally render
+  each column based on its group. When adding a new column, assign it to a group
+  in the `COLUMN_GROUPS` map and update the filter bar + `<thead>` + row template
+  together.
 - *(Add new lessons here as you discover them.)*
 
 
