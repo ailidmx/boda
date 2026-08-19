@@ -40,10 +40,6 @@ import {
 
 
 import {
-  getCustomContent,
-  loadGroupCustomContent,
-} from "../invitation-profile.js";
-import {
   getGroupMembers,
   loadAllGuests,
   loadGuestProfiles,
@@ -53,7 +49,6 @@ import {
 } from "../guest-profiles.js";
 
 
-import { loadAttendanceResponses } from "../guest-attendance.js";
 import { loadRooms } from "../rooms.js";
 import { loadCabins } from "../cabins.js";
 import {
@@ -259,8 +254,7 @@ export function AppProvider({ children }) {
         // group (matching the Firestore rules). This prevents a guest from
         // receiving other groups' phone, cabin, room, payment, or admin data.
         const invitationGroup = resolveGuestInvitationGroup(resolvedGuest);
-        const [custom] = await Promise.all([
-          loadGroupCustomContent(invitationGroup),
+        await Promise.all([
           loadGuestProfiles(invitationGroup),
           // Load the FULL `guests` collection (not just the signed-in guest's
           // own group) so guest-facing lists like the GUEST CLOUD ("Nos
@@ -269,10 +263,14 @@ export function AppProvider({ children }) {
           // collection; `loadAllGuests` merges only identity/hosting fields so
           // it never clobbers the fresher group-scoped live data.
           loadAllGuests(),
-          loadAttendanceResponses(invitationGroup),
           loadRooms(),
           loadCabins(),
         ]);
+        // Group-level custom content (greeting/message) is no longer read from
+        // the `invitation_groups` collection on the guest side — that collection
+        // is admin-only (dashboard). The guest's own `customContent` lives on
+        // their `guests` doc and is read via `profile.guest.customContent`.
+        const custom = null;
 
 
         const groupMembers = getGroupMembers(resolvedGuest, getActiveGuests());

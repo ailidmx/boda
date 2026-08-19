@@ -6,6 +6,7 @@ import {
   getGroupMembers,
   resolveGuestInvitationGroup,
   saveIdentityCheckPassed,
+  subscribeGuestsCache,
 } from "../guest-profiles.js";
 import { getGroupTag } from "../invitation-profile.js";
 
@@ -39,6 +40,15 @@ export function IdentityModal() {
   const [saving, setSaving] = useState(false);
   const [activeId, setActiveId] = useState(null);
   const [footerMessage, setFooterMessage] = useState(null);
+  // Bumped whenever the live `guests` cache updates while the modal is open.
+  // The group-scoped onSnapshot in loadGuestProfiles() is asynchronous: right
+  // after sign-in it may deliver only the signed-in guest's record, then a
+  // moment later the rest of the group. `members` is computed at render time
+  // from getActiveGuests(), so without this tick the modal would render only
+  // the first record and never show the other group members (e.g. Karla when
+  // Fred signs in). Subscribing to cache updates forces a re-render once the
+  // full group is available.
+  const [cacheTick, setCacheTick] = useState(0);
   // Randomly pick which name order to show on open (David left / Aydé right,
   // or the reverse), then keep it static — no crossing animation.
   const [nameOrder] = useState(() =>
@@ -83,6 +93,19 @@ export function IdentityModal() {
   useEffect(() => {
     if (!identityPrompt || !guest?.id) return;
     setActiveId(guest.id);
+  }, [identityPrompt, guest?.id]);
+
+  // Re-render when the live `guests` cache updates while the modal is open.
+  // The group-scoped onSnapshot in loadGuestProfiles() is asynchronous: right
+  // after sign-in it may deliver only the signed-in guest's record, then a
+  // moment later the rest of the group. `members` is computed at render time
+  // from getActiveGuests(), so without this subscription the modal would show
+  // only the first record and never reveal the other group members (e.g. Karla
+  // when Fred signs in). Bumping `cacheTick` forces a re-render once the full
+  // group is available.
+  useEffect(() => {
+    if (!identityPrompt || !guest?.id) return undefined;
+    return subscribeGuestsCache(() => setCacheTick((t) => t + 1));
   }, [identityPrompt, guest?.id]);
 
   // When the modal opens with several members, the browser can render the

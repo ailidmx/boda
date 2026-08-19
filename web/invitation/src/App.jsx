@@ -12,6 +12,12 @@ import { WinampPlayer } from "./components/WinampPlayer.jsx";
 import { useVersionCheck } from "./hooks/useVersionCheck.js";
 import { useClickTracking } from "./hooks/useClickTracking.js";
 import { usePageViewTracking } from "./hooks/usePageViewTracking.js";
+import { trackInvitationVisit } from "./analytics.js";
+import {
+  getInvitationLinkParams,
+  computeTimeToAnswer,
+  normalizeSource,
+} from "./invitation-link.js";
 import { guestTravelsByPlane } from "./guest-profiles.js";
 
 // Full-load architecture: every section is imported eagerly and mounted up
@@ -64,6 +70,27 @@ function Invitation() {
   // Firestore `page_views` record per guest). Only meaningful once signed in,
   // when the sections are rendered.
   usePageViewTracking({ guestId: profile?.guest?.id });
+
+  // Log an `invitation_visit` event once per page load when the guest arrived
+  // via an invitation link carrying the analytics query params (guest email,
+  // UTM source/medium/campaign, sent_at). This lets us measure which channel
+  // (email / WhatsApp / other) drives logins and how quickly guests answer
+  // after the invitation is sent. Fires for ALL auth states (a guest arriving
+  // via a link is tracked even before they sign in). The params were captured
+  // eagerly in `main.jsx` before the URL was cleaned, so they survive here.
+  useEffect(() => {
+    const params = getInvitationLinkParams();
+    if (!params.guest && !params.source && !params.medium && !params.campaign) {
+      return; // not an invitation-link visit — nothing to track
+    }
+    trackInvitationVisit({
+      guest: params.guest,
+      source: normalizeSource(params.source),
+      medium: params.medium,
+      campaign: params.campaign,
+      timeToAnswer: computeTimeToAnswer(params.sentAt),
+    });
+  }, []);
 
   // On first load (direct visit, refresh, or a shared link with a hash like
   // `#thanks`), clear any hash from the URL. The sections are gated behind
