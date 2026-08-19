@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useApp } from "../context/AppContext.jsx";
 import { getActiveGuests } from "../guests.js";
 import {
@@ -9,6 +9,7 @@ import {
   saveGuestName,
   saveGuestPhoto,
   saveGuestContact,
+  subscribeGuestsCache,
 } from "../guest-profiles.js";
 import { uploadAvatar, validateAvatarFile } from "../cloudinary-upload.js";
 import { PhoneInput } from "./PhoneInput.jsx";
@@ -252,6 +253,20 @@ export function IdentitySection() {
   const identity = t.identity || {};
   const guest = profile?.guest;
   const [refreshKey, setRefreshKey] = useState(0);
+  // Bumped whenever the live `guests` cache updates. The group-scoped
+  // onSnapshot in loadGuestProfiles() is asynchronous: right after sign-in it
+  // may deliver only the signed-in guest's record, then a moment later the rest
+  // of the group. `members` is computed at render time from getActiveGuests(),
+  // so without this tick the section would render only the first record and
+  // never reveal the other group members (e.g. Karla when Fred signs in).
+  const [cacheTick, setCacheTick] = useState(0);
+
+  // Re-render when the live `guests` cache updates so the full group appears
+  // once the async snapshot delivers all members.
+  useEffect(() => {
+    if (!guest?.id) return undefined;
+    return subscribeGuestsCache(() => setCacheTick((t) => t + 1));
+  }, [guest?.id]);
 
   if (!guest) return null;
 

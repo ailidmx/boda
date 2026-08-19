@@ -230,6 +230,20 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   LIVE-ONLY — see the dashboard bullets below; it does not read the static
   `web/shared/guests.js` snapshot either.)
 
+- **Render-time `getGroupMembers` consumers MUST subscribe to `subscribeGuestsCache`** —
+  The group-scoped `onSnapshot` in `loadGuestProfiles()` is asynchronous: right
+  after sign-in it may deliver only the signed-in guest's record, then a moment
+  later the rest of the invitation group. Any component that computes
+  `getGroupMembers(guest, getActiveGuests())` (or reads `getActiveGuests()` /
+  `getGuest(id)`) at RENDER time will therefore render only the first record and
+  never reveal the other group members (e.g. Karla when Fred signs in) unless it
+  re-renders when the cache updates. The fix is to subscribe to
+  `subscribeGuestsCache(listener)` (exported from `guest-profiles.js`) in a
+  `useEffect` and bump a `cacheTick` state to force a re-render once the full
+  group arrives. `IdentityModal.jsx` and `IdentitySection.jsx` do this. When
+  adding a new component that lists group members (or any live guest data), add
+  the same subscription — do NOT rely on a one-time render.
+
 - **Telegram bot must be a member of the target chat** — The notification
   Cloud Functions (`functions/index.js` + `telegram.js`) post to a Telegram
   group via the `@boda_dya_bot` bot. If the bot is NOT a member of the group,
