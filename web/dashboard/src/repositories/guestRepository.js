@@ -23,6 +23,20 @@ import { db } from "../firebase.js";
 import { collections } from "../../../shared/firestore-paths.js";
 
 /**
+ * Create a NEW guest document. The doc id is the guest's login username AND the
+ * Firebase Auth uid (auth uid IS the guest doc id), so it must be unique and
+ * decided BEFORE any auth account is created. Uses `setDoc` WITHOUT merge so an
+ * accidental duplicate id fails loudly instead of silently overwriting.
+ *
+ * @param {string} guestId — the new guest's id (slug from name, unique).
+ * @param {object} payload — already built by a shared payload-builder.
+ * @returns {Promise<void>}
+ */
+export async function createGuest(guestId, payload) {
+  await setDoc(doc(db, collections.guests, guestId), payload);
+}
+
+/**
  * Merge-write a payload onto a guest document.
  * @param {string} guestId
  * @param {object} payload — already built by a shared payload-builder.
@@ -31,6 +45,7 @@ import { collections } from "../../../shared/firestore-paths.js";
 export async function updateGuest(guestId, payload) {
   await setDoc(doc(db, collections.guests, guestId), payload, { merge: true });
 }
+
 
 /**
  * Soft-delete a guest by setting `_deleted: true` (merge). The doc is kept so

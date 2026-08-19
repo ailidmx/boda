@@ -36,8 +36,10 @@ export function renderGuestManager(ctx) {
     saveGuestRsvpAnswer,
     openGuestEditor,
 
+    openCreateGuestModal,
     openSendInviteModal,
     openDeleteConfirm,
+
     applyInvitationGroupChange,
     getInvitationGroupOptions,
     invitationGroupCell,
@@ -363,7 +365,9 @@ export function renderGuestManager(ctx) {
       <div class="dashboard-filter-count">
         <strong>${filtered.length}</strong> de <strong>${getActiveGuests().length}</strong> invitados
       </div>
+      <button class="dashboard-button" type="button" data-add-guest title="Agregar un nuevo invitado">+ Agregar invitado</button>
     </div>
+
 
     <div class="dashboard-rsvp-legend" title="Escala de asistencia por día">
       <span class="dashboard-rsvp-legend-title">Asistencia (Vie / Sáb / Dom):</span>
@@ -498,8 +502,13 @@ export function renderGuestManager(ctx) {
     renderGuestManager(ctx);
   });
 
+  // ── Add guest (opens the "Agregar invitado" modal) ──
+  container.querySelector("[data-add-guest]")?.addEventListener("click", () => {
+    openCreateGuestModal();
+  });
 
   // ── Sortable headers ──
+
   container.querySelectorAll("[data-sort-key]").forEach((th) => {
     th.addEventListener("click", () => {
       const key = th.dataset.sortKey;

@@ -37,7 +37,10 @@ import {
   getInviteUrl,
   badgeStyle,
   badgeHtml,
+  buildGuestId,
+  uniqueGuestId,
 } from "./guestDomain.js";
+
 
 import {
   getLiveRsvpAnswers as serviceGetLiveRsvpAnswers,
@@ -69,6 +72,8 @@ import { renderGuestManager as renderGuestManagerTable } from "./guestTable.js";
 import { openGuestEditor as openGuestEditorModal } from "./guestEditorModal.js";
 import { renderGroupsPanel as renderGroupsPanelModule, openCreateGroupModal as openCreateGroupModalModule } from "./groupsPanel.js";
 import { openDeleteConfirm as openDeleteConfirmModule, openSendInviteModal as openSendInviteModalModule } from "./guestModals.js";
+import { openCreateGuestModal as openCreateGuestModalModule } from "./guestCreateModal.js";
+
 import { renderSummary } from "./summary.js";
 import { renderCabinAssignments as renderCabinAssignmentsPanel } from "./cabinsPanel.js";
 import { renderThanksPanel as renderThanksPanelModule } from "./thanksPanel.js";
@@ -79,7 +84,8 @@ import {
   renderTabNavigation,
 } from "./tabNav.js";
 
-import { updateGuest, softDeleteGuest } from "./repositories/guestRepository.js";
+import { updateGuest, softDeleteGuest, createGuest } from "./repositories/guestRepository.js";
+
 import { createGroup, updateGroupField, deleteGroup } from "./repositories/groupRepository.js";
 import { createThanks, updateThanks, deleteThanks } from "./repositories/thanksRepository.js";
 
@@ -88,7 +94,9 @@ import {
   buildDashboardGuestInlinePayload,
   buildGuestRsvpPayload,
   buildDashboardGuestHostingPayload,
+  buildGuestCreatePayload,
 } from "../../shared/payload-builders.js";
+
 
 
 import { auth } from "./firebase.js";
@@ -616,7 +624,25 @@ function openSendInviteModal(guest, channel = null) {
   });
 }
 
+// ── Create Guest Modal ─────────────────────────────────────────────────
+
+// The "Agregar invitado" modal (form rendering + create flow) lives in
+// `guestCreateModal.js`. This thin adapter injects the dashboard's module-scope
+// dependencies (repository + payload-builder + id helpers + live cache) so the
+// modal stays a pure presentation module that never touches Firestore directly.
+function openCreateGuestModal() {
+  openCreateGuestModalModule({
+    createGuest,
+    buildGuestCreatePayload,
+    buildGuestId,
+    uniqueGuestId,
+    getActiveGuests,
+    renderGuestManager,
+  });
+}
+
 // ── Create Group Modal ─────────────────────────────────────────────────
+
 
 // The "create group" modal and the invitation groups panel live in
 // `groupsPanel.js`. These thin adapters inject the dashboard's module-scope
@@ -688,8 +714,10 @@ function renderGuestManager() {
     saveGuestRsvpAnswer,
     openGuestEditor,
 
+    openCreateGuestModal,
     openSendInviteModal,
     openDeleteConfirm,
+
     applyInvitationGroupChange,
     getInvitationGroupOptions,
     invitationGroupCell,
