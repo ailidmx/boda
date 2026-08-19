@@ -29,8 +29,10 @@ export function renderGuestManager(ctx) {
     guestSortValue,
     GUEST_SORT_COLUMNS,
     saveGuestInline,
+    saveGuestEmail,
     saveGuestRsvpAnswer,
     openGuestEditor,
+
     openSendInviteModal,
     openDeleteConfirm,
     applyInvitationGroupChange,
@@ -156,8 +158,17 @@ export function renderGuestManager(ctx) {
     const phoneHtml = phoneInfo
       ? `<a class="dashboard-phone" href="${phoneInfo.href}" title="Llamar"><span class="dashboard-phone-flag">${phoneInfo.flag}</span><span class="dashboard-phone-number">${phoneInfo.display}</span></a>`
       : '<span class="dashboard-badge dashboard-badge-muted">—</span>';
-    const authHtml = hasAuth && authEmail
-      ? `<span class="dashboard-auth-email" title="Cuenta de Firebase Auth">${authEmail}</span>`
+    // The auth email is inline-editable: clicking the display reveals a small
+    // email input that saves via the `updateGuestEmail` Cloud Function (which
+    // updates the Firebase Auth user's email AND the guest's `firebaseEmail`).
+    const authHtml = hasAuth
+      ? `
+        <div class="dashboard-auth-email-cell" data-auth-email-cell="${guest.id}">
+          <button type="button" class="dashboard-auth-email" data-auth-email-display="${guest.id}" title="Editar correo de acceso (Firebase Auth)">
+            ${authEmail || "—"}
+          </button>
+          <input class="dashboard-inline-input" type="email" value="${authEmail}" data-auth-email-input="${guest.id}" title="Correo de acceso" hidden />
+        </div>`
       : "";
     return `
       <div class="dashboard-identity-cell">
@@ -172,6 +183,7 @@ export function renderGuestManager(ctx) {
         </div>
       </div>`;
   };
+
 
   // ── Send-invite cell helper (dedicated "Enviar" column) ──
   // Renders the WhatsApp + Email send buttons. Each is disabled when the
@@ -553,7 +565,43 @@ export function renderGuestManager(ctx) {
     });
   });
 
+  // ── Auth email editor: reveal input on click ──
+  // The auth email (the guest's Firebase Auth login email) is inline-editable.
+  // Clicking the display reveals a small email input; saving calls the
+  // `updateGuestEmail` Cloud Function (via `saveGuestEmail`), which updates the
+  // Firebase Auth user's email AND the guest's `firebaseEmail` field, then
+  // refreshes the live auth list so the new email shows immediately.
+  container.querySelectorAll("[data-auth-email-display]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const guestId = btn.dataset.authEmailDisplay;
+      const input = container.querySelector(`[data-auth-email-input="${guestId}"]`);
+      if (!input) return;
+      input.hidden = !input.hidden;
+      if (!input.hidden) {
+        input.focus();
+        input.select();
+      }
+    });
+  });
+
+  // ── Auth email editor: save on change ──
+  container.querySelectorAll("[data-auth-email-input]").forEach((input) => {
+    input.addEventListener("change", async () => {
+      const guestId = input.dataset.authEmailInput;
+      const email = input.value.trim();
+      if (!email) return;
+      const ok = await saveGuestEmail(guestId, email);
+      if (ok) {
+        renderGuestManager(ctx);
+      } else {
+        input.style.borderColor = "#a0352c";
+        setTimeout(() => (input.style.borderColor = ""), 1000);
+      }
+    });
+  });
+
   // ── Invitation group editor: reveal on click ──
+
   container.querySelectorAll("[data-invgroup-display]").forEach((btn) => {
 
     btn.addEventListener("click", () => {
