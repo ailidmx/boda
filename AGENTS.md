@@ -572,15 +572,12 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   `web/dashboard/src/repositories/` layer owns ALL Firestore write operations
   for the dashboard. `guestRepository.js` exposes `updateGuest(guestId, payload)`
   (a `setDoc` merge on the `guests` doc) and `softDeleteGuest(guestId)` (a
-  `setDoc` merge writing `{ _deleted: true }`); `groupRepository.js` exposes
-  `createGroup(name)`, `updateGroupField(groupId, field, value)` (merge-write a
-  dotted path like `tag.color` or `customContent.greeting`), and
-  `deleteGroup(groupId)`. `dashboard.js` imports these and NEVER calls
-  `setDoc`/`deleteDoc` directly for guests or invitation groups. When adding a
-  new dashboard write, add it to the appropriate repository (or create a new
-  one) rather than calling Firestore from `dashboard.js`. The dashboard's
-  `onSnapshot` listeners (guests, invitation_groups) remain subscription
-  concerns owned by the dashboard bootstrap, not the repositories.
+  `setDoc` merge writing `{ _deleted: true }`). `dashboard.js` imports these and
+  NEVER calls `setDoc`/`deleteDoc` directly for guests. When adding a new
+  dashboard write, add it to the appropriate repository (or create a new one)
+  rather than calling Firestore from `dashboard.js`. The dashboard's
+  `onSnapshot` listeners (guests, thanks) remain subscription concerns owned by
+  the dashboard bootstrap, not the repositories.
 - **Dashboard cabin edits read `hosting` from the LIVE record** — the remove
 
   ("✕"), drag-and-drop, and "+ Agregar" handlers in `renderCabinAssignments()`
@@ -674,8 +671,9 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   shows the guest's `invitationGroup` as a clickable display that reveals an
   inline editor with a free-text rename input and a dropdown to pick another
   existing group. The dropdown options come from `getInvitationGroupOptions()`
-  (the `invitation_groups` collection ids plus every distinct `invitationGroup`
-  value currently used by guests). Renaming or picking a group calls
+  (every distinct `invitationGroup` value currently used by guests — the legacy
+  `invitation_groups` collection was removed, so the guests' own values are the
+  source of truth). Renaming or picking a group calls
   `applyInvitationGroupChange`, which saves the new value to that guest via
   `saveGuestInline` (the `invitationGroup` field is in `GUEST_WRITABLE_FIELDS`)
   and, if the old group was shared by other guests, opens a confirm modal
@@ -873,6 +871,42 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   presentation module — all persistence flows through the injected repository
   + payload-builder + id helpers. When adding a new guest-facing field to the
   create form, update `buildGuestCreatePayload` and the modal together.
+- **The `invitation_groups` collection no longer exists** — the dashboard's
+  Groups panel, its tab, the `onSnapshot` listener, and the dead
+  `groupsPanel.js` + `repositories/groupRepository.js` modules were removed.
+  There is NO `invitation_groups` collection in Firestore and the FE no longer
+  calls `getDoc` on it (the old `loadGroupCustomContent`/`invitation-profile`
+  reads were removed). The guests' own `invitationGroup` field values are the
+  single source of truth for the Invitación column dropdown
+  (`getInvitationGroupOptions()`). If you see
+  `[db][invitation-profile][read:start] {collection: 'invitation_groups'…}` in
+  the console, it's a stale cached build — hard-refresh / redeploy.
+- **The `attendance_responses` collection is no longer used** — RSVP answers
+  live directly on each guest's `guests` doc under `rsvp.answers` (saved via
+  `saveRsvpAnswers`). There is NO `attendance_responses` collection read
+  anymore; the old `loadGuestAttendance`/`guest-attendance` reads were removed.
+  If you see `[db][guest-attendance][read:start] {collection:
+  'attendance_responses'…}` in the console, it's a stale cached build.
+- **Dashboard email inline editor swaps view/edit (never both) + a visible ✓ save button** —
+  the INVITADOS table's email cell (`emailCell` in `dashboard.js`) renders EITHER
+  the read-only email display OR the edit input, never both at the same time.
+  Clicking the ✏️ edit button swaps to the input; the input row shows a visible
+  "✓" save button (`.dashboard-email-save`) and a "✕" cancel button. The save
+  button is REQUIRED so the admin knows how to persist the change — there is no
+  implicit save-on-blur. Saving calls `saveGuestInline(guest.id, "email", value)`
+  (the `email` field is in `GUEST_WRITABLE_FIELDS`). When adding a new inline
+  editor, follow the same swap-not-overlay pattern and always include an explicit
+  save control.
+- **Dashboard INVITADOS table has a column-group filter bar** — the guest table
+  toolbar has a filter nav (`data-colgroup`) that shows/hides columns by use case:
+  **IDENTITY** (always shown: Enviar, Enviada, Invitación, GRUPO, IDIOMA, GÉNERO,
+  EDAD, MENSAJE, AVION, estado), **PRESENCIA** (VIERNES, SÁBADO, DOMINGO,
+  ALOJAMIENTO, CABAÑA, CUARTO, CABAÑA EXTRA, CUARTO EXTRA, ROCA AZUL),
+  **PETANCA** (PETANQUE, BOULES), and **PLAYA** (PLAYA). The active group is
+  stored in `state.colGroup` and the `<thead>`/row template conditionally render
+  each column based on its group. When adding a new column, assign it to a group
+  in the `COLUMN_GROUPS` map and update the filter bar + `<thead>` + row template
+  together.
 - *(Add new lessons here as you discover them.)*
 
 
