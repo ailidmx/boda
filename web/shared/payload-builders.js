@@ -614,17 +614,28 @@ export function buildDashboardGuestEditPayload({
 }) {
   const normalizedMaternalLastName = normalizeTitleCase(maternalLastName);
   const normalizedPhone = normalizeDbPhone(phone);
+  const identity = {
+    firstName: normalizeTitleCase(firstName),
+    middleName: normalizeTitleCase(middleName),
+    lastName: normalizeTitleCase(lastName),
+    maternalLastName: normalizedMaternalLastName,
+    gender: String(gender ?? "").trim(),
+    cloudinaryId: String(cloudinaryId ?? "").trim(),
+    phone: normalizedPhone,
+  };
+  // `age` stores ONLY "Adulto" or "Niño" (a string, not a number). Firestore
+  // rejects `undefined` values (throws "Unsupported field value: undefined"),
+  // so only include `age` when it's one of the allowed values; otherwise omit
+  // the field entirely so the existing value is preserved (merge) rather than
+  // overwritten with an invalid value.
+  const normalizedAge = String(age ?? "").trim();
+  if (normalizedAge === "Adulto" || normalizedAge === "Niño") {
+    identity.age = normalizedAge;
+  }
+
+
   return {
-    identity: {
-      firstName: normalizeTitleCase(firstName),
-      middleName: normalizeTitleCase(middleName),
-      lastName: normalizeTitleCase(lastName),
-      maternalLastName: normalizedMaternalLastName,
-      gender: String(gender ?? "").trim(),
-      age: Number.parseInt(String(age ?? ""), 10) || undefined,
-      cloudinaryId: String(cloudinaryId ?? "").trim(),
-      phone: normalizedPhone,
-    },
+    identity,
 
     invitationGroup: String(invitationGroup ?? "").trim(),
     idCheckUser: idCheckUser === true,
@@ -635,6 +646,7 @@ export function buildDashboardGuestEditPayload({
     updatedAt: timestamp,
   };
 }
+
 
 
 
@@ -668,14 +680,26 @@ export function buildDashboardGuestInlinePayload(guestId, field, value, invitati
     const normalizedValue = ["firstName", "middleName", "lastName", "maternalLastName"].includes(field)
       ? normalizeTitleCase(value)
       : field === "age"
-        ? Number.parseInt(String(value ?? ""), 10) || undefined
+        ? Number.parseInt(String(value ?? ""), 10)
         : String(value ?? "").trim();
+
+    // Firestore rejects `undefined` values. For `age`, only include the field
+    // when it parses to a valid number; otherwise omit it entirely so the
+    // existing value is preserved (merge) rather than overwritten with an
+    // invalid value.
+    if (field === "age") {
+      if (Number.isFinite(normalizedValue)) {
+        payload.identity = { age: normalizedValue };
+      }
+      return payload;
+    }
 
     payload.identity = {
       [field]: normalizedValue,
     };
     return payload;
   }
+
 
 
   payload[field] = value;

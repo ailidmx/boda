@@ -972,9 +972,11 @@ function invitationEmailBody(lang, guest, inviteUrl, email, resetLink) {
  * @param {object} guest  the guest document
  * @param {string} inviteUrl  the invitation URL (pre-fills the login email)
  * @param {string} email  the guest's login email
+ * @param {string|null} resetLink  Firebase password-reset link (may be null)
  * @returns {string}  the plain-text message body
  */
-function buildWhatsAppMessage(lang, guest, inviteUrl, email) {
+function buildWhatsAppMessage(lang, guest, inviteUrl, email, resetLink) {
+
   const name = guest.identity?.firstName || guest.firstName || guest.guestId || "";
 
   const copy = {
@@ -1018,6 +1020,11 @@ function buildWhatsAppMessage(lang, guest, inviteUrl, email) {
 
   const t = copy[lang] || copy.es;
 
+  // The reset link is the primary way the guest sets their password. If it
+  // could not be generated, fall back to the invitation link so the message
+  // still works (the guest can contact the couple for access).
+  const resetHref = resetLink || inviteUrl;
+
   return [
     `${t.title} 🎉`,
     ``,
@@ -1031,6 +1038,7 @@ function buildWhatsAppMessage(lang, guest, inviteUrl, email) {
     `${t.login}`,
     `${t.emailLabel}: ${email}`,
     `${t.setPassword}`,
+    resetHref,
     t.setPasswordNote,
     ``,
     `${t.help}`,
@@ -1039,6 +1047,7 @@ function buildWhatsAppMessage(lang, guest, inviteUrl, email) {
     t.signoff,
   ].join("\n");
 }
+
 
 
 
@@ -1175,36 +1184,15 @@ export const sendInvitation = onCall(
     const inviteUrl = buildInvitationUrl(guest, channel, email, channel === "whatsapp");
     const sentAt = new Date().toISOString();
 
-    // For the WhatsApp channel we build a `wa.me` deep link that opens the
-    // guest's chat with the invitation message pre-filled. The admin reviews
-    // and sends it themselves in WhatsApp — nothing is auto-sent. The phone is
-    // read from the live guest record (identity.phone wins, then phone).
-    let waLink = null;
-    if (channel === "whatsapp") {
-      const phone = guest.identity?.phone || guest.phone || "";
-      if (!phone) {
-        throw new HttpsError("failed-precondition", "El invitado no tiene teléfono para WhatsApp.");
-      }
-      // Normalise the phone to digits only (strip spaces, dashes, +, parens).
-      const digits = String(phone).replace(/[^\d]/g, "");
-      const message = buildWhatsAppMessage(lang, guest, inviteUrl, email);
-      waLink = `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
-    }
-
-    if (channel === "email") {
-
-      const subject = lang === "fr"
-        ? "Votre invitation au mariage de David & Aydé"
-        : lang === "en"
-          ? "Your invitation to David & Aydé's wedding"
-          : "Tu invitación a la boda de David & Aydé";
-
-      // Generate a Firebase password-reset link so the guest can set their own
-      // password. If the guest has no auth account yet, create one with a
-      // random password (never shown or stored) so the reset link works. If we
-      // can't generate a link for any reason, fall back to the invitation link
-      // so the email still goes out (the guest can contact the couple).
-      let resetLink = null;
+    // Generate a Firebase password-reset link so the guest can set their own
+    // password. This is used by BOTH channels: the email embeds it as a button,
+    // and the WhatsApp message includes it as a clickable link. If the guest has
+    // no auth account yet, create one with a random password (never shown or
+    // stored) so the reset link works. If we can't generate a link for any
+    // reason, leave it null — the message/email falls back to the invitation
+    // link so it still goes out (the guest can contact the couple).
+    let resetLink = null;
+    if (email) {
       try {
         let authUser;
         try {
@@ -1223,11 +1211,37 @@ export const sendInvitation = onCall(
         }
         resetLink = await getAuth().generatePasswordResetLink(email);
       } catch (e) {
-        // Leave resetLink null — the email falls back to the invitation link.
+        // Leave resetLink null — the message/email falls back to the invitation link.
       }
+    }
+
+    // For the WhatsApp channel we build a `wa.me` deep link that opens the
+    // guest's chat with the invitation message pre-filled. The admin reviews
+    // and sends it themselves in WhatsApp — nothing is auto-sent. The phone is
+    // read from the live guest record (identity.phone wins, then phone).
+    let waLink = null;
+    if (channel === "whatsapp") {
+      const phone = guest.identity?.phone || guest.phone || "";
+      if (!phone) {
+        throw new HttpsError("failed-precondition", "El invitado no tiene teléfono para WhatsApp.");
+      }
+      // Normalise the phone to digits only (strip spaces, dashes, +, parens).
+      const digits = String(phone).replace(/[^\d]/g, "");
+      const message = buildWhatsAppMessage(lang, guest, inviteUrl, email, resetLink);
+      waLink = `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
+    }
+
+    if (channel === "email") {
+
+      const subject = lang === "fr"
+        ? "Votre invitation au mariage de David & Aydé"
+        : lang === "en"
+          ? "Your invitation to David & Aydé's wedding"
+          : "Tu invitación a la boda de David & Aydé";
 
       await sendGmail({ to: email, subject, body: invitationEmailBody(lang, guest, inviteUrl, email, resetLink) });
     }
+
 
     // Mark the guest as invited so the dashboard's "Enviada" checkbox reflects
     // it automatically. This write happens server-side (via the Admin SDK, which
