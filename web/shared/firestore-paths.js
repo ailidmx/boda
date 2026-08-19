@@ -48,8 +48,15 @@ export const collections = {
   loginEvents: "login_events",
   /** Table inventory + seating assignments (admin-only planning). */
   tables: "tables",
+  /** Guest inactivity events (written by the invitation's activity tracker). */
+  activityEvents: "activity_events",
+  /** Page-view analytics events (written by the invitation). */
+  pageViews: "page_views",
+  /** Wedding budget / expenses (admin-only planning). */
+  budget: "budget",
 
 };
+
 
 
 
