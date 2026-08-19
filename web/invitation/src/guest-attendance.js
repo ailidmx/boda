@@ -123,15 +123,8 @@ export async function saveGuestAttendance(guest, attendance, editorGuestId, lang
   const ref = doc(db, collections.attendanceResponses, guest.id);
   const existing = attendanceCache.get(guest.id) || {};
   const invitationGroup = resolveGuestInvitationGroup(guest);
-  if (!invitationGroup) {
-    logDb("write:blocked", {
-      collection: collections.attendanceResponses,
-      docId: guest.id,
-      reason: "missing-invitation-group",
-    });
-    throw new Error("Guest invitation group is missing in Firestore.");
-  }
   const next = buildAttendancePayload({
+
     guestId: guest.id,
     attendance,
     invitationGroup,

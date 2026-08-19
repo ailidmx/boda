@@ -16,6 +16,7 @@ const PATH_TO_TAB = {
   grupos: "groups",
   cabins: "cabins",
   tables: "tables",
+  gracias: "thanks",
 };
 
 /** Map internal tab IDs to URL path segments. */
@@ -24,6 +25,7 @@ const TAB_TO_PATH = {
   groups: "grupos",
   cabins: "cabins",
   tables: "tables",
+  thanks: "gracias",
 };
 
 /** The currently active tab id. */
@@ -83,6 +85,7 @@ export function renderTabNavigation() {
     { id: "groups", label: "Grupos", icon: "🏷️" },
     { id: "cabins", label: "Cabañas", icon: "🏠" },
     { id: "tables", label: "Mesas", icon: "🪑" },
+    { id: "thanks", label: "Gracias", icon: "🙏" },
   ];
 
   const nav = document.querySelector("[data-dashboard-tabs]");

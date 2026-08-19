@@ -132,18 +132,14 @@ function requireLiveGuestWriteContext(guest) {
     throw new Error("Guest Firestore profile is not loaded yet.");
   }
 
-  if (!invitationGroup) {
-    logDb("write:blocked", {
-      collection: collections.guests,
-      docId: guest.id,
-      reason: "missing-invitation-group",
-      record,
-    });
-    throw new Error("Guest invitation group is missing in Firestore.");
-  }
-
+  // NOTE: `invitationGroup` is OPTIONAL. A guest may have no invitation group
+  // (e.g. a single guest not part of any group) and must still be able to write
+  // to their own document. The Firestore rules use the SIMPLE model
+  // (`canWrite() = request.auth != null`), so no group is required to write.
+  // The payload builders normalize an empty group to "".
   return { invitationGroup, record };
 }
+
 
 export async function loadOwnGuestProfile(guestId) {
   if (!guestId) return null;
