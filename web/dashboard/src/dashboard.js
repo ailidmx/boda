@@ -21,6 +21,7 @@ import {
 } from "./rooms.js";
 import { getCabinPhotos, cabinPhotoUrl } from "./cabins.js";
 import { loadTables, renderTablesManager } from "./tables.js";
+import { createMatrixLoader } from "./matrixLoader.js";
 import { collections } from "../../shared/firestore-paths.js";
 import {
   RSVP_CONFIRMED_MIN_LEVEL,
@@ -116,10 +117,34 @@ const state = {
   sortDir: "asc",
 };
 
+// ── Matrix-style loading overlay ───────────────────────────────────────
+// A cinematic full-screen loader (RED rain + HUD with real metrics) shown while
+// the dashboard boots. Each data source reports its real record count + byte
+// size as it resolves; the overlay fades out once every source has reported.
+// The controller lives in `matrixLoader.js` (vanilla JS, no Firestore access).
+const matrixLoader = createMatrixLoader();
 
+// Rough byte estimate for a Firestore record (JSON.stringify of the data).
+function estimateBytes(records) {
+  if (!Array.isArray(records)) return 0;
+  return records.reduce((sum, r) => {
+    try {
+      return sum + JSON.stringify(r).length;
+    } catch {
+      return sum;
+    }
+  }, 0);
+}
 
-
-
+// Report a data source to the matrix loader (records + bytes + done).
+function reportSource(name, records) {
+  matrixLoader.reportSource({
+    name,
+    records: Array.isArray(records) ? records.length : 0,
+    bytes: estimateBytes(records),
+    done: true,
+  });
+}
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
@@ -902,23 +927,37 @@ function renderDashboard(app) {
   switchTab(initialTab);
 
 
+  // ── Mount the matrix-style loading overlay ──
+  // Shows a cinematic full-screen loader while the dashboard boots and loads
+  // its data. Each data source reports its real metrics (records + bytes) as
+  // it resolves; the overlay fades out once every source has reported.
+  matrixLoader.mount();
+  // Kick off the finish sequence. `finish()` retries every 150ms until EVERY
+  // source has reported done (or the minimum display time has elapsed), then
+  // runs the reveal animation and hides the overlay.
+  matrixLoader.finish();
+
   // ── Real-time listener for invitation_groups ──
   const groupsUnsub = onSnapshot(
     query(collection(db, collections.invitationGroups), limit(DASHBOARD_QUERY_LIMIT)),
     (snapshot) => {
-
-
-    state.invitationGroups = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-    // Re-render guest manager and groups panel if they exist
-    renderGuestManager();
-    renderGroupsPanel();
-  });
+      const records = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      state.invitationGroups = records;
+      // Report the invitation groups to the matrix loader.
+      reportSource("invitation_groups", records);
+      // Re-render guest manager and groups panel if they exist
+      renderGuestManager();
+      renderGroupsPanel();
+    });
 
   // ── Real-time listener for thanks ──
   const thanksUnsub = onSnapshot(
     query(collection(db, collections.thanks), limit(DASHBOARD_QUERY_LIMIT)),
     (snapshot) => {
-      state.thanks = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      const records = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      state.thanks = records;
+      // Report the thanks to the matrix loader.
+      reportSource("thanks", records);
       renderThanksPanel();
     },
     (error) => {
@@ -933,14 +972,19 @@ function renderDashboard(app) {
   renderThanksPanel();
 
   // ── Load rooms from Firestore (source of truth) ──
-  loadRooms().then(() => {
+  loadRooms().then((rooms) => {
+    // Report the rooms inventory to the matrix loader.
+    reportSource("rooms", rooms || []);
     // Re-render cabin assignments now that room data is available
     renderCabinAssignments();
   });
 
   // ── Load tables from Firestore (source of truth for the seating canvas) ──
-  loadTables().then(() => {
-    // Re-render the tables panel now that table data is available
+  // `loadTables` uses an internal `onSnapshot` listener and reports the tables
+  // via the `onLoad` callback (it does not resolve with the array), so we pass
+  // the callback here to report the real table count to the matrix loader.
+  loadTables((tables) => {
+    reportSource("tables", tables || []);
     renderTableAssignments();
   });
 
@@ -1057,6 +1101,8 @@ export function startDashboard(app) {
       // Keep the raw records too — the INVITADOS table reads live `rsvp.answers`
       // and `hosting` (incl. xtraCabin/xtraRoom) straight from these.
       state.liveGuests = records;
+      // Report the live guests to the matrix loader.
+      reportSource("guests", records);
       console.log("[dashboard:auth] guests listener fired", {
         count: records.length,
         sample: records.slice(0, 3).map((r) => ({
@@ -1096,6 +1142,8 @@ export function startDashboard(app) {
       state.authUsers = Object.fromEntries(
         users.map((u) => [u.uid, { id: u.uid, email: u.email }]),
       );
+      // Report the live Firebase Auth user list to the matrix loader.
+      reportSource("auth_users", users);
       console.log("[dashboard:auth] listAuthUsers loaded", { count: users.length });
       renderGuestManager();
     })
