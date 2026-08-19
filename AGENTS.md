@@ -619,6 +619,34 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   the guest is idle or the tab is hidden — idle/hidden time is NOT counted as
   "time spent" on a section. When adding a new activity signal, extend the
   `ACTIVITY_EVENTS` list and the `type` enum in the rules.
+- **Analytics is a thin, safe wrapper + a set of tracking hooks** — the
+  invitation's analytics lives in `web/invitation/src/analytics.js` (a no-op-safe
+  wrapper around Firebase Analytics `logEvent`) plus four hooks that drive it:
+  `useClickTracking` (a single delegated `document` click listener that logs
+  EVERY click via `trackClick`, resolving a stable id from `data-analytics` →
+  `id` → `tag.class.text` and attaching the enclosing `section_id`),
+  `usePageViewTracking` (an IntersectionObserver that treats each visible
+  `<section id>` as a "page" and logs `page_view` + persists to the `page_views`
+  Firestore collection), `useSectionTime` (accumulates visible seconds per
+  section and logs `section_time`, pausing while idle/hidden), and
+  `useActivityTracker` (logs `user_inactive` + writes `activity_events`). The
+  RSVP funnel logs `funnel_step` / `add_to_cart` / `purchase` via
+  `trackFunnelStep` / `trackCartItem` / `trackPurchase`. When adding a new
+  interactive element, prefer a `data-analytics="<stable.id>"` attribute so the
+  global click tracker gives it a clean id; the `ACTION_TYPES` map in
+  `analytics.js` is the canonical set of action categories.
+- **`invitation_visit` fires once per load from the captured UTM params** — the
+  `trackInvitationVisit` event (guest email, normalised channel source
+  email/whatsapp/other, UTM medium/campaign, and `time_to_answer` computed from
+  `sent_at`) is fired from a `useEffect` in `App.jsx` on mount. It reads the
+  params captured eagerly by `captureInvitationLinkParams()` in `main.jsx`
+  (BEFORE `cleanInvitationLinkUrl()` strips them from the address bar), so the
+  UTM data survives the URL cleanup. It fires for ALL auth states (a guest
+  arriving via an invitation link is tracked even before they sign in) and
+  bails out when there are no invitation-link params (a plain direct visit).
+  When adding a new UTM param to the invitation links, extend
+  `getInvitationLinkParams()` in `invitation-link.js` AND pass it through in the
+  `trackInvitationVisit` call in `App.jsx`.
 - **Dashboard design language is "sharp & airy"** — the dashboard SCSS
   (`web/dashboard/src/styles/*.scss`) uses small border radii (cards/sections
   `0.5rem`, inputs/buttons `0.35rem`, tabs `0.4rem`) and generous padding

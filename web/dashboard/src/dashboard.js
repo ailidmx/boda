@@ -71,7 +71,6 @@ import {
 
 import { renderGuestManager as renderGuestManagerTable } from "./guestTable.js";
 import { openGuestEditor as openGuestEditorModal } from "./guestEditorModal.js";
-import { renderGroupsPanel as renderGroupsPanelModule, openCreateGroupModal as openCreateGroupModalModule } from "./groupsPanel.js";
 import { openDeleteConfirm as openDeleteConfirmModule, openSendInviteModal as openSendInviteModalModule } from "./guestModals.js";
 import { openCreateGuestModal as openCreateGuestModalModule } from "./guestCreateModal.js";
 
@@ -87,7 +86,6 @@ import {
 
 import { updateGuest, softDeleteGuest, createGuest } from "./repositories/guestRepository.js";
 
-import { createGroup, updateGroupField, deleteGroup } from "./repositories/groupRepository.js";
 import { createThanks, updateThanks, deleteThanks } from "./repositories/thanksRepository.js";
 
 import {
@@ -106,13 +104,13 @@ import { getFunctions, httpsCallable } from "firebase/functions";
 
 
 const state = {
-  invitationGroups: [], // from Firestore collection "invitation_groups"
   liveGuests: [], // raw Firestore `guests` records (source of truth)
   authUsers: {}, // uid → { email } LIVE Firebase Auth user list (via listAuthUsers callable)
   thanks: [], // from Firestore collection "thanks" (guest + es/fr/en)
   filterGroup: "",
   filterQuery: "",
   filterAgeGroup: "",
+  columnGroup: "identity", // which column group is visible in the INVITADOS table
   sortKey: "name",
   sortDir: "asc",
 };
@@ -501,14 +499,12 @@ async function saveGuestEmail(guestId, email) {
 // ── Invitation group column (rename + pick another group) ──────────────
 
 
-// Sorted set of existing invitation group names: the `invitation_groups`
-// collection ids plus every distinct `invitationGroup` value currently used by
-// guests. Used to populate the "pick another group" dropdown.
+// Sorted set of existing invitation group names: every distinct
+// `invitationGroup` value currently used by guests. Used to populate the "pick
+// another group" dropdown. (The legacy `invitation_groups` collection was
+// removed — the guests' own `invitationGroup` values are the source of truth.)
 function getInvitationGroupOptions() {
   const names = new Set();
-  state.invitationGroups.forEach((g) => {
-    if (g.id) names.add(g.id);
-  });
   getActiveGuests().forEach((g) => {
     if (g.invitationGroup) names.add(g.invitationGroup);
   });
@@ -663,30 +659,6 @@ function openCreateGuestModal() {
     uniqueGuestId,
     getActiveGuests,
     renderGuestManager,
-  });
-}
-
-// ── Create Group Modal ─────────────────────────────────────────────────
-
-
-// The "create group" modal and the invitation groups panel live in
-// `groupsPanel.js`. These thin adapters inject the dashboard's module-scope
-// dependencies (state + group repository functions) so the panel stays a pure
-// presentation module that never touches Firestore directly.
-function openCreateGroupModal(callback) {
-  openCreateGroupModalModule(callback, {
-    createGroup,
-  });
-}
-
-// ── Groups Panel ────────────────────────────────────────────────────────
-
-function renderGroupsPanel() {
-  renderGroupsPanelModule({
-    state,
-    createGroup,
-    updateGroupField,
-    deleteGroup,
   });
 }
 
@@ -858,19 +830,6 @@ function renderDashboard(app) {
         </div>
       </section>
 
-      <!-- ── Panel: Groups ── -->
-      <section class="dashboard-panel" data-dashboard-panel="groups">
-        <div class="dashboard-section">
-          <div class="dashboard-section-heading">
-            <div>
-              <p class="dashboard-eyebrow">Contenido personalizado por grupo</p>
-              <h2>Grupos de invitación</h2>
-            </div>
-          </div>
-          <div data-groups-manager></div>
-        </div>
-      </section>
-
       <!-- ── Panel: Cabins ── -->
       <section class="dashboard-panel" data-dashboard-panel="cabins">
         <div class="dashboard-section">
@@ -937,19 +896,6 @@ function renderDashboard(app) {
   // runs the reveal animation and hides the overlay.
   matrixLoader.finish();
 
-  // ── Real-time listener for invitation_groups ──
-  const groupsUnsub = onSnapshot(
-    query(collection(db, collections.invitationGroups), limit(DASHBOARD_QUERY_LIMIT)),
-    (snapshot) => {
-      const records = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
-      state.invitationGroups = records;
-      // Report the invitation groups to the matrix loader.
-      reportSource("invitation_groups", records);
-      // Re-render guest manager and groups panel if they exist
-      renderGuestManager();
-      renderGroupsPanel();
-    });
-
   // ── Real-time listener for thanks ──
   const thanksUnsub = onSnapshot(
     query(collection(db, collections.thanks), limit(DASHBOARD_QUERY_LIMIT)),
@@ -968,7 +914,6 @@ function renderDashboard(app) {
   renderTabNavigation();
   renderGuestManager();
   renderCabinAssignments();
-  renderGroupsPanel();
   renderThanksPanel();
 
   // ── Load rooms from Firestore (source of truth) ──
@@ -1007,7 +952,6 @@ function renderDashboard(app) {
   });
 
   // Store unsubs for cleanup
-  app._groupsUnsub = groupsUnsub;
   app._thanksUnsub = thanksUnsub;
 }
 
