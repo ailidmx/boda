@@ -104,11 +104,11 @@ export function TeAnimas() {
   const lastQuestionIndex = questions.length - 1;
 
   const steps = [
-    ...questions.map((q, i) => {
-      const isLastQuestion = i === lastQuestionIndex;
+    ...questions.map((q) => {
       return {
         id: q.id,
         label: q.title,
+
         render: () => (
           <div className="rsvp-recap-step">
             <RsvpQuestion
@@ -119,20 +119,9 @@ export function TeAnimas() {
               answers={answers[q.id] || {}}
               onChange={(guestId, level) => handleAnswerChange(q.id, guestId, level)}
             />
-
-            {/* The success/error confirmation appears right here on the last
-                question step after "Enregistrer mes réponses" is pressed. */}
-            {isLastQuestion &&
-            (saveStatus === "saved" || saveStatus === "error") ? (
-              <small
-                data-form-status={saveStatus === "saved" ? "success" : "error"}
-              >
-                {saveStatusText}
-              </small>
-            ) : null}
-
           </div>
         ),
+
       };
     }),
     {

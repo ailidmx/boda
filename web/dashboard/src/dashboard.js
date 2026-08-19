@@ -68,6 +68,7 @@ import { renderGroupsPanel as renderGroupsPanelModule, openCreateGroupModal as o
 import { openDeleteConfirm as openDeleteConfirmModule, openSendInviteModal as openSendInviteModalModule } from "./guestModals.js";
 import { renderSummary } from "./summary.js";
 import { renderCabinAssignments as renderCabinAssignmentsPanel } from "./cabinsPanel.js";
+import { renderThanksPanel as renderThanksPanelModule } from "./thanksPanel.js";
 import {
   getTabFromPath,
   navigateToTab,
@@ -77,6 +78,7 @@ import {
 
 import { updateGuest, softDeleteGuest } from "./repositories/guestRepository.js";
 import { createGroup, updateGroupField, deleteGroup } from "./repositories/groupRepository.js";
+import { createThanks, updateThanks, deleteThanks } from "./repositories/thanksRepository.js";
 
 import {
   buildDashboardGuestEditPayload,
@@ -95,6 +97,7 @@ const state = {
   invitationGroups: [], // from Firestore collection "invitation_groups"
   liveGuests: [], // raw Firestore `guests` records (source of truth)
   authUsers: {}, // uid → { email } LIVE Firebase Auth user list (via listAuthUsers callable)
+  thanks: [], // from Firestore collection "thanks" (guest + es/fr/en)
   filterGroup: "",
   filterQuery: "",
   filterAgeGroup: "",
@@ -618,6 +621,29 @@ function renderGroupsPanel() {
   });
 }
 
+// ── Thanks Panel ────────────────────────────────────────────────────────
+
+// The "Gracias" CRUD panel (table + searchable guest selector + create/edit
+// modal) lives in `thanksPanel.js`. This thin adapter injects the dashboard's
+// module-scope dependencies (live guest cache + thanks repository functions) so
+// the panel stays a pure presentation module that never touches Firestore
+// directly.
+function renderThanksPanel() {
+  const container = document.querySelector("[data-thanks-manager]");
+  if (!container) return;
+  renderThanksPanelModule({
+    container,
+    thanks: state.thanks,
+    guests: getActiveGuests(),
+    guestFullName,
+    guestAvatarUrl,
+    guestInitials,
+    createThanks,
+    updateThanks,
+    deleteThanks,
+  });
+}
+
 // ── Guest Manager (flat, live, inline editable) ────────────────────────
 
 function renderGuestManager() {
@@ -797,6 +823,19 @@ function renderDashboard(app) {
         </div>
       </section>
 
+      <!-- ── Panel: Thanks ── -->
+      <section class="dashboard-panel" data-dashboard-panel="thanks">
+        <div class="dashboard-section">
+          <div class="dashboard-section-heading">
+            <div>
+              <p class="dashboard-eyebrow">Agradecimientos personalizados</p>
+              <h2>Gracias</h2>
+            </div>
+          </div>
+          <div data-thanks-manager></div>
+        </div>
+      </section>
+
     </main>
   `;
 
@@ -826,10 +865,23 @@ function renderDashboard(app) {
     renderGroupsPanel();
   });
 
+  // ── Real-time listener for thanks ──
+  const thanksUnsub = onSnapshot(
+    query(collection(db, collections.thanks), limit(DASHBOARD_QUERY_LIMIT)),
+    (snapshot) => {
+      state.thanks = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+      renderThanksPanel();
+    },
+    (error) => {
+      console.error("[dashboard:thanks] Failed to load thanks", error);
+    },
+  );
+
   renderTabNavigation();
   renderGuestManager();
   renderCabinAssignments();
   renderGroupsPanel();
+  renderThanksPanel();
 
   // ── Load rooms from Firestore (source of truth) ──
   loadRooms().then(() => {
@@ -861,8 +913,9 @@ function renderDashboard(app) {
     window.location.href = invitationHref();
   });
 
-  // Store unsub for cleanup
+  // Store unsubs for cleanup
   app._groupsUnsub = groupsUnsub;
+  app._thanksUnsub = thanksUnsub;
 }
 
 export function startDashboard(app) {

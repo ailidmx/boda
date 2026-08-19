@@ -19,7 +19,8 @@ import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 import { db } from "./firebase.js";
 import { collections } from "../../shared/firestore-paths.js";
-import { getGroupMembers, resolveGuestInvitationGroup, resolveLiveGuest } from "./guest-profiles.js";
+import { getGroupMembers, resolveLiveGuest } from "./guest-profiles.js";
+
 import { getActiveGuests } from "./guests.js";
 
 import { buildGuestPaymentConfirmedPayload, buildGuestRsvpPayload } from "../../shared/payload-builders.js";
@@ -150,17 +151,9 @@ export function computeInitialStepIndex(questions, guests, answers, questionGues
 export async function saveRsvpAnswers(guest, answers, editorGuestId) {
   if (!guest?.id) throw new Error("No guest id");
   const ref = doc(db, collections.guests, guest.id);
-  const invitationGroup = resolveGuestInvitationGroup(guest);
-  if (!invitationGroup) {
-    logDb("write:blocked", {
-      collection: collections.guests,
-      docId: guest.id,
-      reason: "missing-invitation-group",
-    });
-    throw new Error("Guest invitation group is missing in Firestore.");
-  }
 
   const next = buildGuestRsvpPayload({
+
     guestId: guest.id,
     answers,
     editorGuestId,
