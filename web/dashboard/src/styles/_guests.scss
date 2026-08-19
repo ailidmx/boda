@@ -947,6 +947,35 @@
   }
 }
 
+// ── Auth email editor (view mode ↔ edit mode) ──
+// Clicking the display swaps it for a small email input + ✓ save button. The
+// `[hidden]` attribute must win over any display rule so view and edit modes
+// are never both visible at once.
+.dashboard-auth-email-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+}
+
+.dashboard-auth-email-editor {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+}
+
+.dashboard-auth-email-editor[hidden],
+.dashboard-auth-email[hidden] {
+  display: none;
+}
+
+.dashboard-auth-email-editor .dashboard-inline-input {
+  width: 12rem;
+  max-width: 100%;
+}
+
+
 
 // ── Avatar upload (edit modal) ──
 // Preview thumbnail + "Subir foto" button + status line. The admin picks an

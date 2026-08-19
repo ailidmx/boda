@@ -172,9 +172,13 @@ export function renderGuestManager(ctx) {
           <button type="button" class="dashboard-auth-email" data-auth-email-display="${guest.id}" title="Editar correo de acceso (Firebase Auth)">
             ${authEmail || "—"}
           </button>
-          <input class="dashboard-inline-input" type="email" value="${authEmail}" data-auth-email-input="${guest.id}" title="Correo de acceso" hidden />
+          <span class="dashboard-auth-email-editor" data-auth-email-editor="${guest.id}" hidden>
+            <input class="dashboard-inline-input" type="email" value="${authEmail}" data-auth-email-input="${guest.id}" title="Correo de acceso" />
+            <button type="button" class="dashboard-link-btn" data-auth-email-save="${guest.id}" title="Guardar correo">✓</button>
+          </span>
         </div>`
       : "";
+
     return `
       <div class="dashboard-identity-cell">
         ${avatar}
@@ -613,26 +617,53 @@ export function renderGuestManager(ctx) {
   });
 
 
-  // ── Auth email editor: reveal input on click ──
+  // ── Auth email editor: reveal editor on click ──
   // The auth email (the guest's Firebase Auth login email) is inline-editable.
-  // Clicking the display reveals a small email input; saving calls the
+  // Clicking the display swaps it for a small email input + ✓ save button
+  // (view mode → edit mode, never both at once). Saving calls the
   // `updateGuestEmail` Cloud Function (via `saveGuestEmail`), which updates the
   // Firebase Auth user's email AND the guest's `firebaseEmail` field, then
   // refreshes the live auth list so the new email shows immediately.
+  const setEmailEditorOpen = (guestId, open) => {
+    const display = container.querySelector(`[data-auth-email-display="${guestId}"]`);
+    const editor = container.querySelector(`[data-auth-email-editor="${guestId}"]`);
+    if (display) display.hidden = open;
+    if (editor) editor.hidden = !open;
+    if (open) {
+      const input = container.querySelector(`[data-auth-email-input="${guestId}"]`);
+      if (input) {
+        input.focus();
+        input.select();
+      }
+    }
+  };
+
   container.querySelectorAll("[data-auth-email-display]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const guestId = btn.dataset.authEmailDisplay;
+      setEmailEditorOpen(guestId, true);
+    });
+  });
+
+  // ── Auth email editor: save via ✓ button ──
+  container.querySelectorAll("[data-auth-email-save]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const guestId = btn.dataset.authEmailSave;
       const input = container.querySelector(`[data-auth-email-input="${guestId}"]`);
       if (!input) return;
-      input.hidden = !input.hidden;
-      if (!input.hidden) {
-        input.focus();
-        input.select();
+      const email = input.value.trim();
+      if (!email) return;
+      const ok = await saveGuestEmail(guestId, email);
+      if (ok) {
+        renderGuestManager(ctx);
+      } else {
+        input.style.borderColor = "#a0352c";
+        setTimeout(() => (input.style.borderColor = ""), 1000);
       }
     });
   });
 
-  // ── Auth email editor: save on change ──
+  // ── Auth email editor: save on Enter / blur (change) ──
   container.querySelectorAll("[data-auth-email-input]").forEach((input) => {
     input.addEventListener("change", async () => {
       const guestId = input.dataset.authEmailInput;
@@ -647,6 +678,7 @@ export function renderGuestManager(ctx) {
       }
     });
   });
+
 
   // ── Invitation group editor: reveal on click ──
 
