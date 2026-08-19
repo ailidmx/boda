@@ -334,7 +334,7 @@ export function renderTablesManager(container) {
 
 // ── Data loading ────────────────────────────────────────────────────────
 
-export async function loadTables() {
+export async function loadTables(onLoad) {
   if (unsub) unsub();
   unsub = onSnapshot(
     query(collection(db, collections.tables), limit(100)),
@@ -343,6 +343,9 @@ export async function loadTables() {
       // Re-render the tables panel if it exists.
       const container = document.querySelector("[data-table-assignments]");
       if (container) renderTablesManager(container);
+      // Notify the caller (e.g. the dashboard matrix loader) with the tables.
+      if (typeof onLoad === "function") onLoad(tables);
     },
   );
 }
+

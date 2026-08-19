@@ -1,0 +1,160 @@
+// ── Dashboard Matrix-style loading overlay ─────────────────────────────
+// Cinematic full-screen loading overlay (see matrixLoader.js). Draws Matrix
+// digital rain on a canvas and shows a HUD with real loading metrics:
+// chunk sizes, getDocs figures, data size, and record counts.
+//
+// The dashboard's loader is RED (the invitation's stays green). A Cloudinary
+// background image (`matrixRed_dnatyn`) sits behind the rain canvas.
+
+.dashboard-ml {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #000;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.45s ease;
+}
+
+.dashboard-ml.is-done {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Full-screen Cloudinary backdrop behind the rain canvas. */
+.dashboard-ml__bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.dashboard-ml__canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Scanlines overlay (CSS layer on top of the canvas). */
+.dashboard-ml__scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 3px,
+    rgba(255, 70, 70, 0.06) 4px
+  );
+  animation: dashboard-ml-scan 5s linear infinite;
+}
+
+@keyframes dashboard-ml-scan {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 100%;
+  }
+}
+
+/* HUD: label + progress bar + stats. */
+.dashboard-ml__hud {
+  position: absolute;
+  left: 50%;
+  bottom: 10%;
+  transform: translateX(-50%);
+  width: min(460px, 88vw);
+  text-align: center;
+  font-family: "Courier New", ui-monospace, monospace;
+  color: #ff9d9d;
+  text-shadow: 0 0 8px rgba(255, 70, 70, 0.6);
+  z-index: 2;
+}
+
+.dashboard-ml__label {
+  font-size: 0.72rem;
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  margin-bottom: 0.6rem;
+  opacity: 0.9;
+}
+
+.dashboard-ml__bar {
+  height: 3px;
+  background: rgba(255, 70, 70, 0.15);
+  border: 1px solid rgba(255, 70, 70, 0.35);
+  overflow: hidden;
+}
+
+.dashboard-ml__bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #f00, #ff9d9d);
+  box-shadow: 0 0 12px rgba(255, 70, 70, 0.8);
+  transition: width 0.2s linear;
+}
+
+.dashboard-ml__stats {
+  margin-top: 0.7rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-align: left;
+}
+
+.dashboard-ml-summary {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.35rem 0.5rem;
+  margin-bottom: 0.35rem;
+  border: 1px solid rgba(255, 70, 70, 0.25);
+  background: rgba(255, 70, 70, 0.06);
+  font-weight: 700;
+}
+
+.dashboard-ml-row {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.22rem 0.5rem;
+  border-bottom: 1px solid rgba(255, 70, 70, 0.12);
+}
+
+.dashboard-ml-row__name {
+  opacity: 0.95;
+}
+
+.dashboard-ml-row__count,
+.dashboard-ml-row__bytes {
+  opacity: 0.75;
+}
+
+.dashboard-ml-row__status {
+  font-weight: 700;
+  color: #ff9d9d;
+}
+
+.dashboard-ml__pct {
+  margin-top: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+/* Respect reduced-motion: skip the animated scanlines + reveal flourish. */
+@media (prefers-reduced-motion: reduce) {
+  .dashboard-ml__scanlines {
+    animation: none;
+  }
+  .dashboard-ml__bar-fill {
+    transition: none;
+  }
+}
