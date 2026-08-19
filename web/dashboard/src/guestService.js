@@ -117,8 +117,38 @@ export function rsvpLevelChip(guest, day, liveGuests) {
   return `<select class="${cls}" data-rsvp-chip="${guest.id}" data-rsvp-day="${day}" title="Nivel de asistencia (0 = sin respuesta, 4–5 = confirmado)">${options}</select>`;
 }
 
+// Read a boolean-map RSVP answer for a guest (e.g. `rsvp.answers.petanqueParticipation[guest.id]`).
+// These questions store a per-guest map of `{ guestId → level }` where level is
+// 1 (yes) or 2 (no). Returns 0 when the guest has no answer.
+export function getRsvpBooleanAnswer(guest, questionId, liveGuests) {
+  const answers = getLiveRsvpAnswers(guest, liveGuests);
+  const map = answers[questionId] || {};
+  const level = Number(map[guest.id]);
+  return level === 1 || level === 2 ? level : 0;
+}
+
+// Badge chip for a boolean-map RSVP answer (Sí / No / —). Mirrors the scale
+// chip styling but for the yes/no questions (accommodationConfirm, petanque,
+// playa, rocaAzul).
+export function rsvpBooleanChip(guest, questionId, liveGuests) {
+  const level = getRsvpBooleanAnswer(guest, questionId, liveGuests);
+  if (level === 1) return '<span class="dashboard-badge dashboard-badge-yes">Sí</span>';
+  if (level === 2) return '<span class="dashboard-badge dashboard-badge-no">No</span>';
+  return '<span class="dashboard-badge dashboard-badge-muted">—</span>';
+}
+
+// Badge chip for the `travelsByPlane` boolean (true = flies in). Shows
+// "Sí" / "No" / "—" (unknown).
+export function travelsByPlaneChip(guest) {
+  const v = guest?.travelsByPlane;
+  if (v === true) return '<span class="dashboard-badge dashboard-badge-yes">Sí</span>';
+  if (v === false) return '<span class="dashboard-badge dashboard-badge-no">No</span>';
+  return '<span class="dashboard-badge dashboard-badge-muted">—</span>';
+}
+
 // Aggregate confirmed counts per attendance day from the live guests.
 export function computeDayConfirmations(activeGuests, liveGuests) {
+
   const counts = { friday: 0, saturday: 0, sunday: 0 };
   activeGuests.forEach((guest) => {
     const answers = getLiveRsvpAnswers(guest, liveGuests);
@@ -231,8 +261,9 @@ export function getFilteredGuests(activeGuests, { filterGroup, filterQuery, filt
 // user map is injected (dependency injection) so this stays a pure function
 // decoupled from the dashboard's mutable `state`. Returns a lowercase string
 // (or a number for boolean-ish columns) so the caller can sort directly.
-export function guestSortValue(guest, key, authUsers = {}) {
+export function guestSortValue(guest, key, authUsers = {}, liveGuests = []) {
   switch (key) {
+
     case "name":
       return guestFullName(guest).toLowerCase();
     case "invitationGroup":
@@ -259,8 +290,17 @@ export function guestSortValue(guest, key, authUsers = {}) {
       return Number.parseInt(String(guestIdentity(guest).age || guest.age || ""), 10) || 0;
     case "message":
       return (guestIdentity(guest).messageAuthor || guest.messageAuthor || "").toLowerCase();
+    case "accommodationConfirm":
+    case "petanqueParticipation":
+    case "petanqueOwnBoules":
+    case "playa":
+    case "rocaAzul":
+      return getRsvpBooleanAnswer(guest, key, liveGuests);
+    case "travelsByPlane":
+      return guest?.travelsByPlane === true ? 1 : 0;
     case "status":
       return 0;
+
     default:
       return "";
   }

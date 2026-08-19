@@ -26,8 +26,11 @@ export function renderGuestManager(ctx) {
     getMergedGuest,
     guestStatusBadge,
     rsvpLevelChip,
+    rsvpBooleanChip,
+    travelsByPlaneChip,
     guestSortValue,
     GUEST_SORT_COLUMNS,
+
     saveGuestInline,
     saveGuestEmail,
     saveGuestRsvpAnswer,
@@ -242,16 +245,24 @@ export function renderGuestManager(ctx) {
 
   // ── Gender cell helper (inline editable) ──
   // Shows the guest's gender as a clickable display that reveals a small
-  // inline select (M / F / —). Saves via `saveGuestInline("gender", …)`.
+  // inline select (M = Mujer / H = Hombre / —). This matches the values used by
+  // the guest editor modal (M / H), NOT the old M / F. Saves via
+  // `saveGuestInline("gender", …)`.
+  const GENDER_OPTIONS = [
+    { value: "", label: "—" },
+    { value: "M", label: "Mujer" },
+    { value: "H", label: "Hombre" },
+  ];
   const genderCell = (guest) => {
     const gender = guest.identity?.gender || guest.gender || "";
-    const options = ["", "M", "F"].map(
-      (g) => `<option value="${g}" ${gender === g ? "selected" : ""}>${g || "—"}</option>`,
+    const options = GENDER_OPTIONS.map(
+      (g) => `<option value="${g.value}" ${gender === g.value ? "selected" : ""}>${g.label}</option>`,
     ).join("");
+    const displayLabel = GENDER_OPTIONS.find((g) => g.value === gender)?.label || "—";
     return `
       <div class="dashboard-gender-cell" data-gender-cell="${guest.id}">
         <button type="button" class="dashboard-gender-display" data-gender-display="${guest.id}" title="Editar género">
-          ${gender || "—"}
+          ${displayLabel}
         </button>
         <select class="dashboard-inline-select" data-gender-select="${guest.id}" title="Elegir género" hidden>
           ${options}
@@ -259,19 +270,34 @@ export function renderGuestManager(ctx) {
       </div>`;
   };
 
+
   // ── Age cell helper (inline editable) ──
-  // Shows the guest's age as a clickable display that reveals a small inline
-  // number input. Saves via `saveGuestInline("age", …)`.
+  // Shows the guest's age group as a clickable display that reveals a small
+  // inline select (Adulto / Niño / —). This matches the values used by the
+  // guest editor modal (Adulto / Niño), NOT a raw number input. Saves via
+  // `saveGuestInline("age", …)`.
+  const AGE_OPTIONS = [
+    { value: "", label: "—" },
+    { value: "Adulto", label: "Adulto" },
+    { value: "Niño", label: "Niño" },
+  ];
   const ageCell = (guest) => {
     const age = guest.identity?.age ?? guest.age ?? "";
+    const options = AGE_OPTIONS.map(
+      (a) => `<option value="${a.value}" ${age === a.value ? "selected" : ""}>${a.label}</option>`,
+    ).join("");
+    const displayLabel = AGE_OPTIONS.find((a) => a.value === age)?.label || "—";
     return `
       <div class="dashboard-age-cell" data-age-cell="${guest.id}">
         <button type="button" class="dashboard-age-display" data-age-display="${guest.id}" title="Editar edad">
-          ${age || "—"}
+          ${displayLabel}
         </button>
-        <input class="dashboard-inline-input" type="number" min="0" max="120" value="${age}" data-age-input="${guest.id}" title="Edad" hidden />
+        <select class="dashboard-inline-select" data-age-select="${guest.id}" title="Elegir edad" hidden>
+          ${options}
+        </select>
       </div>`;
   };
+
 
   // ── Message cell helper ──
   // Shows the guest's written message (messageAuthor) as a truncated badge with
@@ -360,9 +386,16 @@ export function renderGuestManager(ctx) {
             ${sortTh("gender", "Género")}
             ${sortTh("age", "Edad")}
             ${sortTh("message", "Mensaje")}
+            ${sortTh("accommodationConfirm", "Alojamiento")}
+            ${sortTh("petanqueParticipation", "Pétanque")}
+            ${sortTh("petanqueOwnBoules", "Boules")}
+            ${sortTh("playa", "Playa")}
+            ${sortTh("rocaAzul", "Roca Azul")}
+            ${sortTh("travelsByPlane", "Avión")}
 
 
             ${sortTh("cabin", "Cabaña")}
+
 
 
             ${sortTh("room", "Cuarto")}
@@ -398,8 +431,15 @@ export function renderGuestManager(ctx) {
               <td>${genderCell(merged)}</td>
               <td>${ageCell(merged)}</td>
               <td>${messageCell(merged)}</td>
+              <td>${rsvpBooleanChip(merged, "accommodationConfirm")}</td>
+              <td>${rsvpBooleanChip(merged, "petanqueParticipation")}</td>
+              <td>${rsvpBooleanChip(merged, "petanqueOwnBoules")}</td>
+              <td>${rsvpBooleanChip(merged, "playa")}</td>
+              <td>${rsvpBooleanChip(merged, "rocaAzul")}</td>
+              <td>${travelsByPlaneChip(merged)}</td>
 
               <td>${badgeHtml(merged.cabinLabel || merged.unit || "")}</td>
+
 
               <td>${badgeHtml(guestRoom(merged))}</td>
               <td>${badgeHtml(xtraCabin)}</td>
@@ -543,27 +583,26 @@ export function renderGuestManager(ctx) {
     });
   });
 
-  // ── Age editor: reveal input on click ──
+  // ── Age editor: reveal select on click ──
   container.querySelectorAll("[data-age-display]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const guestId = btn.dataset.ageDisplay;
-      const input = container.querySelector(`[data-age-input="${guestId}"]`);
-      if (!input) return;
-      input.hidden = !input.hidden;
-      if (!input.hidden) input.focus();
+      const select = container.querySelector(`[data-age-select="${guestId}"]`);
+      if (!select) return;
+      select.hidden = !select.hidden;
+      if (!select.hidden) select.focus();
     });
   });
 
   // ── Age editor: save on change ──
-  container.querySelectorAll("[data-age-input]").forEach((input) => {
-    input.addEventListener("change", async () => {
-      const guestId = input.dataset.ageInput;
-      const val = input.value.trim();
-      const age = val === "" ? null : Number.parseInt(val, 10);
-      const ok = await saveGuestInline(guestId, "age", age);
+  container.querySelectorAll("[data-age-select]").forEach((select) => {
+    select.addEventListener("change", async () => {
+      const guestId = select.dataset.ageSelect;
+      const ok = await saveGuestInline(guestId, "age", select.value);
       if (ok) renderGuestManager(ctx);
     });
   });
+
 
   // ── Auth email editor: reveal input on click ──
   // The auth email (the guest's Firebase Auth login email) is inline-editable.

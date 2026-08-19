@@ -422,11 +422,19 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   colored badges for grupo/cabaña/cuarto/cabaña-extra/cuarto-extra
   (`badgeHtml` → deterministic pastel `badgeStyle`), per-day RSVP chips
   (`rsvpLevelChip`: gray "—" = no answer, amber = level 1–3, green = level 4–5),
-  and the status badge. The status badge (`guestStatusBadge`) is derived from
-  the LIVE `rsvp.answers` (confirmed = any day ≥ 4, partial = answered but not
-  confirmed, pending = no answers), NOT the legacy `rsvp_submissions`. When
-  adding a column, update the `<thead>`, the row template, and the group-header
-  `colspan` (currently 12).
+  boolean-answer chips for the yes/no RSVP questions and the flight flag
+  (`rsvpBooleanChip` for `accommodationConfirm` / `petanqueParticipation` /
+  `petanqueOwnBoules` / `playa` / `rocaAzul`, and `travelsByPlaneChip` for the
+  `travelsByPlane` boolean — each shows "Sí" / "No" / "—"), and the status
+  badge. The status badge (`guestStatusBadge`) is derived from the LIVE
+  `rsvp.answers` (confirmed = any day ≥ 4, partial = answered but not
+  confirmed, pending = no answers), NOT the legacy `rsvp_submissions`. The
+  gender cell uses an inline select with values `M` (Mujer) / `H` (Hombre) / `—`
+  (matching the guest editor modal, NOT the old M/F), and the age cell uses an
+  inline select with `Adulto` / `Niño` / `—` (NOT a raw number). When adding a
+  column, update the `<thead>`, the row template, and the group-header
+  `colspan` (currently 18).
+
   The avatar is wrapped in `.dashboard-avatar-wrap` with three corner badges:
   top-left = ID check (`idCheckUser`): a 🔒 LOCK on a green chip when verified,
   or an EMPTY hollow chip (no lock icon) when not; top-right = a 📷 button
