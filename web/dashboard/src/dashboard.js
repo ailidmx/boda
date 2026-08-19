@@ -56,7 +56,9 @@ import {
   getUniqueCabins as serviceGetUniqueCabins,
   getFilteredGuests as serviceGetFilteredGuests,
   guestSortValue as serviceGuestSortValue,
+  guestAgeGroup as serviceGuestAgeGroup,
 } from "./guestService.js";
+
 
 
 
@@ -95,9 +97,11 @@ const state = {
   authUsers: {}, // uid → { email } LIVE Firebase Auth user list (via listAuthUsers callable)
   filterGroup: "",
   filterQuery: "",
+  filterAgeGroup: "",
   sortKey: "name",
   sortDir: "asc",
 };
+
 
 
 
@@ -246,8 +250,10 @@ function getFilteredGuests() {
   return serviceGetFilteredGuests(getActiveGuests(), {
     filterGroup: state.filterGroup,
     filterQuery: state.filterQuery,
+    filterAgeGroup: state.filterAgeGroup,
   });
 }
+
 
 
 // ── Live RSVP scale (source of truth: guest's `rsvp.answers`) ──────────
@@ -372,8 +378,9 @@ function openGuestEditor(guest) {
 // edited there, not in Firestore.
 const GUEST_WRITABLE_FIELDS = new Set([
   "firstName", "middleName", "lastName", "maternalLastName", "phone", "idCheckUser", "cloudinaryId",
-  "messageAuthor", "invitationGroup", "invitationSent", "_deleted",
+  "gender", "age", "messageAuthor", "invitationGroup", "invitationSent", "_deleted",
 ]);
+
 
 
 
@@ -399,11 +406,12 @@ async function saveGuestInline(guestId, field, value) {
     // Also update the in-memory guest
 
     if (guest) {
-      if (["firstName", "middleName", "lastName", "maternalLastName", "phone"].includes(field)) {
+      if (["firstName", "middleName", "lastName", "maternalLastName", "phone", "gender", "age"].includes(field)) {
         guest.identity = { ...(guest.identity || {}), [field]: value };
       }
       guest[field] = value;
     }
+
     return true;
   } catch (err) {
     console.error("Failed to save guest inline", err);
@@ -624,8 +632,10 @@ function renderGuestManager() {
     guestCanEmail,
     guestHasAuth,
     guestSendEmail,
+    guestAgeGroup: serviceGuestAgeGroup,
   });
 }
+
 
 
 // ── Cabin Assignments ──────────────────────────────────────────────────

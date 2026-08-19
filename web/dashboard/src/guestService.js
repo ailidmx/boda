@@ -185,13 +185,26 @@ export function getUniqueCabins(activeGuests) {
   return cabins.sort();
 }
 
-// Filter the active guests by the current group + free-text query. The filter
-// state is passed in as a plain `{ filterGroup, filterQuery }` object.
-export function getFilteredGuests(activeGuests, { filterGroup, filterQuery }) {
+// Age-group buckets used by the NINO/ADULTO filter. A guest is a "NINO" when
+// their `identity.age` parses to a number < 18; "ADULTO" otherwise (18+ or
+// unknown). The filter is a simple three-state toggle: "" (all), "nino", "adulto".
+export function guestAgeGroup(guest) {
+  const age = Number.parseInt(String(guestIdentity(guest).age || guest.age || ""), 10);
+  if (Number.isNaN(age)) return "adulto"; // unknown age → treat as adult
+  return age < 18 ? "nino" : "adulto";
+}
+
+// Filter the active guests by the current group + free-text query + age group.
+// The filter state is passed in as a plain
+// `{ filterGroup, filterQuery, filterAgeGroup }` object.
+export function getFilteredGuests(activeGuests, { filterGroup, filterQuery, filterAgeGroup }) {
   let filtered = activeGuests;
 
   if (filterGroup) {
     filtered = filtered.filter((g) => g.group === filterGroup);
+  }
+  if (filterAgeGroup) {
+    filtered = filtered.filter((g) => guestAgeGroup(g) === filterAgeGroup);
   }
   if (filterQuery) {
     const q = filterQuery.toLowerCase();
@@ -203,12 +216,16 @@ export function getFilteredGuests(activeGuests, { filterGroup, filterQuery }) {
         String(guestIdentity(g).middleName || g.middleName || "").toLowerCase().includes(q) ||
         String(guestIdentity(g).lastName || g.lastName || "").toLowerCase().includes(q) ||
         String(guestIdentity(g).maternalLastName || g.maternalLastName || "").toLowerCase().includes(q) ||
+        String(guestIdentity(g).gender || g.gender || "").toLowerCase().includes(q) ||
+        String(guestIdentity(g).age || g.age || "").toLowerCase().includes(q) ||
+        String(guestIdentity(g).messageAuthor || g.messageAuthor || "").toLowerCase().includes(q) ||
         g.group.toLowerCase().includes(q),
     );
   }
 
   return filtered;
 }
+
 
 // Extract the sortable value for a guest given a column key. The Firebase Auth
 // user map is injected (dependency injection) so this stays a pure function
@@ -236,10 +253,17 @@ export function guestSortValue(guest, key, authUsers = {}) {
       return (guest.xtraCabinLabel || guest.xtraCabin || "").toLowerCase();
     case "xtraRoom":
       return (guest.xtraRoom || "").toLowerCase();
+    case "gender":
+      return (guestIdentity(guest).gender || guest.gender || "").toLowerCase();
+    case "age":
+      return Number.parseInt(String(guestIdentity(guest).age || guest.age || ""), 10) || 0;
+    case "message":
+      return (guestIdentity(guest).messageAuthor || guest.messageAuthor || "").toLowerCase();
     case "status":
       return 0;
     default:
       return "";
   }
 }
+
 

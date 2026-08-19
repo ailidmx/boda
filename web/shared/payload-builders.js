@@ -604,6 +604,7 @@ export function buildDashboardGuestEditPayload({
   lastName,
   maternalLastName,
   gender,
+  age,
   invitationGroup,
   phone,
   idCheckUser,
@@ -620,9 +621,11 @@ export function buildDashboardGuestEditPayload({
       lastName: normalizeTitleCase(lastName),
       maternalLastName: normalizedMaternalLastName,
       gender: String(gender ?? "").trim(),
+      age: Number.parseInt(String(age ?? ""), 10) || undefined,
       cloudinaryId: String(cloudinaryId ?? "").trim(),
       phone: normalizedPhone,
     },
+
     invitationGroup: String(invitationGroup ?? "").trim(),
     idCheckUser: idCheckUser === true,
     cloudinaryId: String(cloudinaryId ?? "").trim(),
@@ -647,7 +650,7 @@ export function buildDashboardGuestEditPayload({
  */
 export function buildDashboardGuestInlinePayload(guestId, field, value, invitationGroup, timestamp) {
   const GUEST_WRITABLE_FIELDS = new Set([
-    "firstName", "middleName", "lastName", "maternalLastName", "gender", "cloudinaryId", "phone", "idCheckUser",
+    "firstName", "middleName", "lastName", "maternalLastName", "gender", "age", "cloudinaryId", "phone", "idCheckUser",
     "messageAuthor", "invitationGroup", "invitationSent", "_deleted",
   ]);
 
@@ -661,16 +664,19 @@ export function buildDashboardGuestInlinePayload(guestId, field, value, invitati
     updatedAt: timestamp,
   };
 
-  if (["firstName", "middleName", "lastName", "maternalLastName", "gender", "cloudinaryId", "phone"].includes(field)) {
+  if (["firstName", "middleName", "lastName", "maternalLastName", "gender", "age", "cloudinaryId", "phone"].includes(field)) {
     const normalizedValue = ["firstName", "middleName", "lastName", "maternalLastName"].includes(field)
       ? normalizeTitleCase(value)
-      : String(value ?? "").trim();
+      : field === "age"
+        ? Number.parseInt(String(value ?? ""), 10) || undefined
+        : String(value ?? "").trim();
 
     payload.identity = {
       [field]: normalizedValue,
     };
     return payload;
   }
+
 
   payload[field] = value;
   return {
