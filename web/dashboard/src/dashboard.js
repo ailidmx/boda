@@ -49,7 +49,10 @@ import {
   guestCanEmail as serviceGuestCanEmail,
   guestCanWhatsapp as serviceGuestCanWhatsapp,
   rsvpLevelChip as serviceRsvpLevelChip,
+  rsvpBooleanChip as serviceRsvpBooleanChip,
+  travelsByPlaneChip as serviceTravelsByPlaneChip,
   computeDayConfirmations as serviceComputeDayConfirmations,
+
   guestStatusBadge as serviceGuestStatusBadge,
   getUniqueGuestGroups as serviceGetUniqueGuestGroups,
   getGroupAttendanceCounts as serviceGetGroupAttendanceCounts,
@@ -176,8 +179,9 @@ function showToast(message, type = "info") {
 // binds the dashboard's mutable `state.authUsers` so the rest of the file keeps
 // calling the same short signature.
 function guestSortValue(guest, key) {
-  return serviceGuestSortValue(guest, key, state.authUsers);
+  return serviceGuestSortValue(guest, key, state.authUsers, state.liveGuests);
 }
+
 
 
 
@@ -320,10 +324,24 @@ function rsvpLevelChip(guest, day) {
   return serviceRsvpLevelChip(guest, day, state.liveGuests);
 }
 
+// Badge chip for a boolean-map RSVP answer (Sí / No / —) — e.g.
+// accommodationConfirm, petanqueParticipation, petanqueOwnBoules, playa,
+// rocaAzul. Reads the guest's `rsvp.answers.<questionId>[guest.id]` from the
+// live record.
+function rsvpBooleanChip(guest, questionId) {
+  return serviceRsvpBooleanChip(guest, questionId, state.liveGuests);
+}
+
+// Badge chip for the `travelsByPlane` boolean (Sí / No / —).
+function travelsByPlaneChip(guest) {
+  return serviceTravelsByPlaneChip(guest);
+}
+
 // Aggregate confirmed counts per attendance day from the live guests.
 function computeDayConfirmations() {
   return serviceComputeDayConfirmations(getActiveGuests(), state.liveGuests);
 }
+
 
 
 // Persist a guest's RSVP scale level for one attendance day via the shared
@@ -660,8 +678,11 @@ function renderGuestManager() {
     getMergedGuest,
     guestStatusBadge,
     rsvpLevelChip,
+    rsvpBooleanChip,
+    travelsByPlaneChip,
     guestSortValue,
     GUEST_SORT_COLUMNS,
+
     saveGuestInline,
     saveGuestEmail,
     saveGuestRsvpAnswer,
