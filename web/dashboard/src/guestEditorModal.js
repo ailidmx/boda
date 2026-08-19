@@ -56,7 +56,14 @@ export function openGuestEditor(guest, ctx) {
     getGuest,
   } = ctx;
 
+  // Gender stores "M" (Mujer) or "H" (Hombre); age stores "Adulto" or "Niño".
+  // The dropdowns show friendly labels (with emoji for gender) but the payload
+  // sends the real stored values.
+  const gender = guest.identity?.gender || guest.gender || "";
+  const age = guest.identity?.age || guest.age || "";
+
   const overlay = document.createElement("div");
+
   overlay.className = "dashboard-modal-overlay";
   overlay.innerHTML = `
     <div class="dashboard-modal">
@@ -89,8 +96,22 @@ export function openGuestEditor(guest, ctx) {
 
         <div class="dashboard-modal-field">
           <label for="edit-gender">Género</label>
-          <input id="edit-gender" name="gender" value="${guest.identity?.gender || guest.gender || ""}" placeholder="Ej: H, M" />
+          <select id="edit-gender" name="gender">
+            <option value="" ${!gender ? "selected" : ""}>—</option>
+            <option value="M" ${gender === "M" ? "selected" : ""}>👩 Mujer</option>
+            <option value="H" ${gender === "H" ? "selected" : ""}>👨 Hombre</option>
+          </select>
         </div>
+
+        <div class="dashboard-modal-field">
+          <label for="edit-age">Edad</label>
+          <select id="edit-age" name="age">
+            <option value="" ${!age ? "selected" : ""}>—</option>
+            <option value="Adulto" ${age === "Adulto" ? "selected" : ""}>Adulto</option>
+            <option value="Niño" ${age === "Niño" ? "selected" : ""}>Niño</option>
+          </select>
+        </div>
+
 
         <div class="dashboard-modal-field">
           <label>Foto de perfil</label>
@@ -207,7 +228,9 @@ export function openGuestEditor(guest, ctx) {
       lastName: data.get("lastName") || "",
       maternalLastName: data.get("maternalLastName") || "",
       gender: data.get("gender") || "",
+      age: data.get("age") || "",
       invitationGroup: data.get("invitationGroup") || "",
+
       phone: data.get("phone") || "",
       idCheckUser: data.get("idCheckUser") === "true",
       cloudinaryId: data.get("identityCloudinaryId") || data.get("cloudinaryId") || "",
