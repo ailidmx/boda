@@ -776,7 +776,116 @@ export const updateGuestEmail = onCall(
   },
 );
 
+// ── Create a guest's Firebase Auth account (admin dashboard) ───────────────
+
+/**
+ * Create (or ensure) a Firebase Auth account for a guest, with the auth uid
+ * equal to the guest's Firestore doc id. This is the "Add Guest" companion to
+ * `updateGuestEmail`: the dashboard first creates the guest doc (via the
+ * `createGuest` repository), then calls this function to provision the login
+ * account so the guest can sign in to the invitation.
+ *
+ * The auth uid IS the guest doc id, so the account is created with
+ * `uid: guestId`. If the account already exists, its email is updated to the
+ * requested one. The guest's `firebaseEmail` field is kept in sync (server-side
+ * write bypasses the client rules).
+ *
+ * Access control: only admins (guests whose `guests` doc has `isAdmin: true`)
+ * may call it. The caller's auth `uid` IS their guest doc id, so we look the
+ * guest up by uid and check `isAdmin`.
+ */
+export const createGuestAuth = onCall(
+  { secrets: [TELEGRAM_TOKEN, TELEGRAM_CHAT_ID] },
+  async (request) => {
+    // Reject unauthenticated callers.
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Debes iniciar sesión.");
+    }
+
+    // Only admins may create a guest's auth account.
+    const db = getFirestore(DB_ID);
+    const adminSnap = await db.collection("guests").doc(request.auth.uid).get();
+    const admin = adminSnap.exists ? adminSnap.data() : null;
+    if (!admin || admin.isAdmin !== true) {
+      throw new HttpsError("permission-denied", "Solo los administradores pueden crear la cuenta de acceso de un invitado.");
+    }
+
+    const { guestId, email } = request.data || {};
+    if (!guestId) {
+      throw new HttpsError("invalid-argument", "Falta el guestId.");
+    }
+    const newEmail = String(email || "").trim().toLowerCase();
+    if (!newEmail) {
+      throw new HttpsError("invalid-argument", "El correo no puede estar vacío.");
+    }
+    // Basic email shape check (must contain an @ and a dot after it).
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+      throw new HttpsError("invalid-argument", "El correo no tiene un formato válido.");
+    }
+
+    // Load the target guest so we can resolve the name for the notification.
+    const guestSnap = await db.collection("guests").doc(guestId).get();
+    if (!guestSnap.exists) {
+      throw new HttpsError("not-found", "No se encontró al invitado.");
+    }
+    const guest = guestSnap.data();
+
+    // Create the Firebase Auth account with uid == guest doc id. If it already
+    // exists, just update its email to the requested one.
+    try {
+      let authUser;
+      try {
+        authUser = await getAuth().getUser(guestId);
+      } catch (e) {
+        if (e.code === "auth/user-not-found") {
+          authUser = await getAuth().createUser({
+            uid: guestId,
+            email: newEmail,
+            password: randomBytes(16).toString("hex"),
+            displayName: guest.identity?.firstName || guest.firstName || guestId,
+          });
+        } else {
+          throw e;
+        }
+      }
+      if (authUser.email !== newEmail) {
+        await getAuth().updateUser(guestId, { email: newEmail });
+      }
+    } catch (e) {
+      // Surface a friendly message for the common "email already in use" case.
+      if (e.code === "auth/email-already-in-use") {
+        throw new HttpsError("already-exists", "Ese correo ya está en uso por otro invitado.");
+      }
+      throw new HttpsError("internal", `No se pudo crear la cuenta de acceso: ${e.message}`);
+    }
+
+    // Keep the guest's `firebaseEmail` field in sync (server-side write bypasses
+    // the client rules).
+    await db.collection("guests").doc(guestId).set(
+      {
+        firebaseEmail: newEmail,
+        updatedBy: request.auth.uid,
+        updatedAt: new Date(),
+      },
+      { merge: true },
+    );
+
+    // Notify the couple on Telegram.
+    const guestName = await resolveGuestName(guestId);
+    const notifyLines = [
+      "🔑 *Cuenta de acceso creada*",
+      kv("Invitado", guestName || guestId),
+      kv("Correo", newEmail),
+      kv("Hora", formatTime(new Date())),
+    ];
+    await notify(notifyLines.filter(Boolean).join("\n"));
+
+    return { ok: true, guestId, email: newEmail };
+  },
+);
+
 // ── Send invitation email (admin dashboard) ────────────────────────────────
+
 
 
 /**

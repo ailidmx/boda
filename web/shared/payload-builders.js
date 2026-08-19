@@ -647,6 +647,79 @@ export function buildDashboardGuestEditPayload({
   };
 }
 
+/**
+ * Build a payload for CREATING a brand-new guest from the dashboard. Mirrors
+ * `buildDashboardGuestEditPayload` but is designed for a fresh doc: it includes
+ * the language (`lang`), the internal group (`tagGroup`), and a `createdAt`
+ * audit field. The doc id (`guestId`) is the guest's login username AND the
+ * Firebase Auth uid, so it must be unique and decided before any auth account
+ * is created.
+ *
+ * @param {Object} input
+ * @param {string} input.guestId — the new guest's id (slug from name, unique).
+ * @param {string} input.firstName
+ * @param {string} input.middleName
+ * @param {string} input.lastName
+ * @param {string} input.maternalLastName
+ * @param {string} input.gender — "M" | "H" | ""
+ * @param {string} input.age — "Adulto" | "Niño" | ""
+ * @param {string} input.lang — "es" | "fr" | "en"
+ * @param {string} input.invitationGroup
+ * @param {string} input.tagGroup — internal group (e.g. "PetanclubGDL").
+ * @param {string} input.phone
+ * @param {string} input.cloudinaryId
+ * @param {*} input.timestamp — a Firestore serverTimestamp() sentinel.
+ * @returns {Object} explicit payload for setDoc (no merge).
+ */
+export function buildGuestCreatePayload({
+  guestId,
+  firstName,
+  middleName,
+  lastName,
+  maternalLastName,
+  gender,
+  age,
+  lang,
+  invitationGroup,
+  tagGroup,
+  phone,
+  cloudinaryId,
+  timestamp,
+}) {
+  const identity = {
+    firstName: normalizeTitleCase(firstName),
+    middleName: normalizeTitleCase(middleName),
+    lastName: normalizeTitleCase(lastName),
+    maternalLastName: normalizeTitleCase(maternalLastName),
+    gender: String(gender ?? "").trim(),
+    cloudinaryId: String(cloudinaryId ?? "").trim(),
+    phone: normalizeDbPhone(phone),
+  };
+  // `age` stores ONLY "Adulto" or "Niño" (a string, not a number). Firestore
+  // rejects `undefined` values, so only include it when it's one of the allowed
+  // values; otherwise omit the field entirely.
+  const normalizedAge = String(age ?? "").trim();
+  if (normalizedAge === "Adulto" || normalizedAge === "Niño") {
+    identity.age = normalizedAge;
+  }
+  // `lang` stores ONLY "es" | "fr" | "en". Omit when not one of them.
+  const normalizedLang = String(lang ?? "").trim().toLowerCase();
+  const langPayload = ["es", "fr", "en"].includes(normalizedLang) ? normalizedLang : "";
+
+  return {
+    identity,
+    lang: langPayload,
+    invitationGroup: String(invitationGroup ?? "").trim(),
+    tagGroup: String(tagGroup ?? "").trim(),
+    cloudinaryId: String(cloudinaryId ?? "").trim(),
+    guestId,
+    createdAt: timestamp,
+    updatedBy: guestId,
+    updatedAt: timestamp,
+  };
+}
+
+
 
 
 

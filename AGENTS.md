@@ -817,7 +817,22 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   `rgb(255 253 248 / 85%)`), NOT red. Rules tests in
   `web/invitation/tests/firestore.rules.test.mjs` prove a guest can write
   `paymentConfirmed` + `rsvp.answers` on their own and on a group member's doc.
+- **Dashboard "Agregar invitado" modal creates a guest + optional auth account** —
+  the INVITADOS table toolbar has a "+ Agregar invitado" button
+  (`data-add-guest`) that opens the create-guest modal
+  (`web/dashboard/src/guestCreateModal.js`, `openCreateGuestModal`). The modal
+  derives a unique guest id from the name via `buildGuestId` + `uniqueGuestId`
+  (in `guestDomain.js`), builds the payload via `buildGuestCreatePayload` (in
+  `web/shared/payload-builders.js`), and creates the doc via the `createGuest`
+  repository function (`setDoc` WITHOUT merge so a duplicate id fails loudly).
+  If an email is provided, it calls the `createGuestAuth` Cloud Function
+  (`functions/index.js`) to provision the guest's Firebase Auth account
+  (uid == guest doc id) and keep `firebaseEmail` in sync. The modal is a pure
+  presentation module — all persistence flows through the injected repository
+  + payload-builder + id helpers. When adding a new guest-facing field to the
+  create form, update `buildGuestCreatePayload` and the modal together.
 - *(Add new lessons here as you discover them.)*
+
 
 ---
 

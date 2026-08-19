@@ -89,6 +89,57 @@ export function guestInitials(guest) {
   return (first + last).toUpperCase();
 }
 
+// ── Guest id generation (for the "Add Guest" flow) ─────────────────────
+
+/**
+ * Build a guest id (the doc id == login username == Firebase Auth uid) from a
+ * guest's name, following the existing convention: lowercase, spaces → "_",
+ * accents preserved (e.g. "Aydé Juárez Guadalupe" → "aydé_juárez_guadalupe").
+ * Uses the first name + last name (or maternal last name when no last name).
+ *
+ * @param {object} input  { firstName, lastName, maternalLastName }
+ * @returns {string}  the base slug (may collide — caller must dedupe).
+ */
+export function buildGuestId({ firstName, lastName, maternalLastName }) {
+  const first = String(firstName || "").trim().toLowerCase();
+  const last = String(lastName || maternalLastName || "").trim().toLowerCase();
+  const parts = [first, last].filter(Boolean);
+  if (parts.length === 0) return "";
+  return parts.join("_").replace(/\s+/g, "_");
+}
+
+/**
+ * Dedupe a base guest id against the set of existing guest ids by appending a
+ * numeric suffix when needed (e.g. "maria_lopez" → "maria_lopez_2"). The
+ * existing ids are passed in as an iterable of strings.
+ *
+ * @param {string} baseId  the base slug from `buildGuestId`.
+ * @param {Iterable<string>} existingIds  all current guest doc ids.
+ * @returns {string}  a unique guest id.
+ */
+export function uniqueGuestId(baseId, existingIds) {
+  const taken = new Set(existingIds);
+  if (!baseId) {
+    // Fallback when the name produced no slug.
+    let n = 1;
+    let id = `invitado_${n}`;
+    while (taken.has(id)) {
+      n += 1;
+      id = `invitado_${n}`;
+    }
+    return id;
+  }
+  if (!taken.has(baseId)) return baseId;
+  let n = 2;
+  let id = `${baseId}_${n}`;
+  while (taken.has(id)) {
+    n += 1;
+    id = `${baseId}_${n}`;
+  }
+  return id;
+}
+
+
 // ── Access control ─────────────────────────────────────────────────────
 
 // There is no dedicated admin login. The dashboard reuses the same Firebase
