@@ -5,17 +5,23 @@
 
 .winamp-banner {
   position: fixed;
-  left: 0;
+  /* Stick to the top-right, right below the sticky menu bar. The header is
+     sticky at top: 0 with height var(--header-height), so anchoring here puts
+     the thin bar just under it. When opened (LARGE format) it grows downward
+     from this top anchor. */
+  top: var(--header-height, 5rem);
   right: 0;
-  bottom: 0;
+  left: auto;
   z-index: 1190;
+  width: min(26rem, 100vw);
   height: 1.5rem;
   overflow: hidden;
   border-top: 2px solid #0a0a0a;
+  border-left: 2px solid #0a0a0a;
   background: #101010;
   color: #e4b968;
   cursor: pointer;
-  box-shadow: 0 -2px 0 #e4b968;
+  box-shadow: -2px 2px 0 #e4b968;
   image-rendering: pixelated;
   font-family: "Bitcount Grid Single", monospace;
   font-size: 0.8rem;
@@ -24,30 +30,43 @@
   white-space: nowrap;
 }
 
-/* When "open", the banner grows into a taller strip with controls. */
+/* When "open", the banner grows into a taller strip with controls. The
+   content is laid out in a column with left/right padding so everything fits
+   inside the banner width — no horizontal scroll. */
 .winamp-banner.is-open {
   height: auto;
   min-height: 4.5rem;
   display: flex;
   flex-direction: column;
+  padding: 0.5rem 0.75rem;
+  box-sizing: border-box;
   font-size: 0.95rem;
 }
 
 
+/* Seamless infinite marquee: the track is always at least 2× the banner width
+   and each text copy flexes to fill half of it, so the -50% translate loops
+   forever with no gap, regardless of how short the title is. */
 .winamp-banner-track {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  width: max-content;
+  min-width: 200%;
   height: 100%;
   animation: winamp-scroll 18s linear infinite;
   will-change: transform;
 }
 
 .winamp-banner-text {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 0 auto;
   padding: 0 2rem;
   line-height: 1.5rem;
   text-shadow: 1px 1px 0 #000;
 }
+
 
 .winamp-banner.is-open .winamp-banner-text {
   line-height: 2.25rem;
@@ -74,8 +93,9 @@
   align-items: center;
   justify-content: center;
   gap: 0.35rem;
-  padding: 0.15rem 0.5rem;
+  padding: 0.15rem 0;
 }
+
 
 .winamp-banner.is-open .winamp-controls {
   display: flex;
@@ -132,7 +152,7 @@
 
 .winamp-copyright {
   display: none;
-  padding: 0 0.5rem 0.35rem;
+  padding: 0 0 0.35rem;
   font-family: "Bitcount Grid Single", monospace;
   font-size: 0.65rem;
   letter-spacing: 0.06em;
@@ -140,6 +160,7 @@
   text-shadow: 1px 1px 0 #000;
   white-space: nowrap;
 }
+
 
 .winamp-banner.is-open .winamp-copyright {
   display: block;
@@ -152,7 +173,7 @@
   display: none;
   align-items: center;
   gap: 0.3rem;
-  padding: 0 0.5rem;
+  padding: 0;
   font-family: "Bitcount Grid Single", monospace;
   font-size: 0.7rem;
   letter-spacing: 0.06em;
@@ -160,6 +181,7 @@
   text-shadow: 1px 1px 0 #000;
   white-space: nowrap;
 }
+
 
 .winamp-banner.is-open .winamp-time {
   display: flex;
@@ -179,13 +201,14 @@
   display: none;
   position: relative;
   height: 0.45rem;
-  margin: 0 0.5rem 0.35rem;
+  margin: 0.25rem 0 0.35rem;
   border: 1px solid #0a0a0a;
   background: #1a1a1a;
   cursor: pointer;
   box-shadow: inset 0 1px 2px rgb(0 0 0 / 60%);
   image-rendering: pixelated;
 }
+
 
 .winamp-banner.is-open .winamp-progress {
   display: block;
@@ -215,11 +238,11 @@
 
 .winamp-error {
   position: fixed;
-  left: 50%;
-  bottom: 3.5rem;
+  right: 0.5rem;
+  /* Clear the banner (which sits below the sticky header). */
+  top: calc(var(--header-height, 5rem) + 2rem);
   z-index: 1210;
   max-width: min(90vw, 24rem);
-  transform: translateX(-50%);
   border: 2px solid #0a0a0a;
   background: #2a0f0f;
   color: #ffd9d9;
