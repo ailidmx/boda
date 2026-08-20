@@ -591,7 +591,16 @@ export function RSVP() {
                         duplicate the per-person amount. */}
                     {guests.length > 1 && (
                       <div className="rsvp-payment-row">
-                        <dt>{payment.perGroup}</dt>
+                        <dt>
+                          <span className="rsvp-payment-label-text">
+                            {payment.perGroup}
+                          </span>
+                          <span className="rsvp-payment-label-avatar rsvp-payment-label-avatar--stack">
+                            {guests.map((member) => (
+                              <Avatar key={member.id} guest={member} size={28} />
+                            ))}
+                          </span>
+                        </dt>
                         <dd
                           className={`rsvp-payment-value${groupSale ? " is-sale" : ""}`}
                         >

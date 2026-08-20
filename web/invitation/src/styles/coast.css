@@ -574,8 +574,16 @@
 /* The budget intro is a citation (blockquote): a large display quote with a
    golden left rule and quotation marks, echoing the suggestions citation and
    the travel citation. It sits on the dark translucent panel, so it uses a
-   light, clear cream-gold text for good contrast. */
-.coast-budget-intro {
+   light, clear cream-gold text for good contrast.
+
+   NOTE: this element is a <p> that is the LAST CHILD of a `.section-heading`,
+   so the shared `.section-heading p:last-child` rule (base.css) also applies
+   to it and would paint it dark ink (invisible on the dark panel). That rule
+   has specificity (0,1,1), higher than a bare `.coast-budget-intro` (0,1,0),
+   so source order alone cannot win. We scope this selector under
+   `.coast-budget` to raise its specificity to (0,2,0) and guarantee it wins
+   over the shared rule regardless of import order. */
+.coast-budget .coast-budget-intro {
   position: relative;
   margin: 0;
   max-width: 46rem;
@@ -587,7 +595,7 @@
   color: var(--white);
 }
 
-.coast-budget-intro::before {
+.coast-budget .coast-budget-intro::before {
   content: "“";
   position: absolute;
   top: -0.55em;
