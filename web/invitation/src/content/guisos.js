@@ -8,6 +8,7 @@ export const guisos = {
     
     flavoursTitle: "¿Qué guisos vamos a probar?",
     flavourPlaceholder: "Guiso",
+    openPhoto: "Ver foto",
     voteLabel: "Tu voto",
     note:
       "Puedes votar por todos los que quieras. Los más votados se sumarán al menú.",
@@ -151,6 +152,7 @@ export const guisos = {
     
     flavoursTitle: "Quels plats mijotés allons-nous goûter ?",
     flavourPlaceholder: "Plat mijoté",
+    openPhoto: "Voir la photo",
     voteLabel: "Ton vote",
     
     note:
@@ -295,6 +297,7 @@ export const guisos = {
     
     flavoursTitle: "Which stews will we be tasting?",
     flavourPlaceholder: "Stew",
+    openPhoto: "View photo",
     voteLabel: "Your vote",
     
     note:

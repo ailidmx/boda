@@ -86,63 +86,124 @@
 
 
 
-/* ── Expandable/collapsible subsections ──────────────────────────────────
-   The section is split into two subsections (dish cards + reorder panel),
-   each with a toggle header and an arrow visual that signals it can be
-   expanded/collapsed. */
-.guisos-subsection {
-  max-width: 46rem;
-  margin: 1.6rem auto 0;
-}
-
-/* The dish-cards subsection is full-width (the carousel spans the section),
-   so it does not constrain its width like the reorder panel does. */
-.guisos-subsection--dishes {
-  max-width: none;
-}
-
-.guisos-subsection__toggle {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  font: inherit;
-  font-family: var(--font-display, serif);
-  font-size: 1.3rem;
-  font-weight: 600;
-  color: var(--ink, #2b2418);
-  background: transparent;
-  border: none;
-  border-bottom: 1px solid rgb(198 139 43 / 35%);
-  padding: 0.7rem 0.4rem;
-  cursor: pointer;
-  text-align: center;
-  transition: color 0.15s ease;
-}
-.guisos-subsection__toggle:hover {
-  color: var(--gold, #c68b2b);
-}
-
-.guisos-subsection__arrow {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 1.4rem;
-  height: 1.4rem;
-  flex: 0 0 auto;
-  color: var(--gold, #c68b2b);
-  font-size: 1rem;
-  line-height: 1;
-  transition: transform 0.2s ease;
-}
-.guisos-subsection__toggle.is-open .guisos-subsection__arrow {
-  transform: rotate(90deg);
-}
-
+/* ── Dish cards body ─────────────────────────────────────────────────────
+   The dish cards are always visible as a normal section layout (no toggle
+   button, no collapse) so the swipeable carousel keeps its full swipe
+   gesture. This just adds a little breathing room above the carousel. */
 .guisos-subsection__body {
   margin-top: 1.2rem;
 }
+
+
+/* ── Guisos dish cards: photo-as-background with a legibility overlay ────
+   Each guisos card is a full-bleed photo card: the dish photo fills the whole
+   card as a background, and a dark gradient overlay sits on top so the title,
+   note and star vote stay readable. This overrides the generic `.flavour-card`
+   layout (photo strip on top + parchment body below) ONLY for the guisos
+   section — the Food section keeps its original look. */
+.guisos-card {
+  position: relative;
+  overflow: hidden;
+  background: #1c1a17;
+  border-color: rgb(198 139 43 / 45%);
+}
+
+/* The photo is the full-bleed background layer. It stays in normal flow so
+   the card's height follows the image's natural aspect ratio (`auto`), and
+   the title/note/star vote overlay on top of it. */
+.guisos-card .flavour-card__media {
+  position: relative;
+  z-index: 0;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
+}
+
+.guisos-card .flavour-card__media img {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: auto;
+  object-fit: cover;
+}
+
+/* The illustration fallback (no photo) also fills the card as a backdrop. */
+.guisos-card .flavour-card__illustration {
+  position: relative;
+  z-index: 0;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+}
+
+/* Legibility overlay — a dark gradient from the bottom (where the text sits)
+   up to a lighter scrim at the top, so the title/note/star vote pop against
+   any photo. */
+.guisos-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgb(20 16 10 / 18%) 0%,
+    rgb(20 16 10 / 42%) 45%,
+    rgb(20 16 10 / 82%) 100%
+  );
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* The inner gold hairline frame stays above the overlay. */
+.guisos-card::before {
+  z-index: 3;
+}
+
+/* The card body (title + note) overlays the bottom of the photo, above the
+   legibility scrim. It reserves bottom padding so the star vote (positioned
+   at the very bottom) never overlaps the text. */
+.guisos-card .guisos-card__body {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  flex: 0 0 auto;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  padding: clamp(1.4rem, 3vw, 2rem) clamp(1.4rem, 3vw, 2rem) 5.5rem;
+  color: var(--white);
+}
+
+.guisos-card h3 {
+  color: var(--white);
+  text-shadow: 0 1px 3px rgb(0 0 0 / 45%);
+}
+
+.guisos-card h3::after {
+  background: linear-gradient(90deg, var(--marigold), rgb(198 139 43 / 0%));
+}
+
+.guisos-card .guisos-card__body p {
+  color: rgb(255 253 248 / 92%);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 45%);
+}
+
+/* The star vote overlays the very bottom of the photo (below the body text),
+   above the legibility scrim, so it stays tappable and visible. */
+.guisos-card .star-vote {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 0 clamp(1.4rem, 3vw, 2rem) clamp(1.4rem, 3vw, 2rem);
+}
+
+
 
 /* Anchor subsection — a "continue" link that scrolls to the reorder panel.
    The base `.section-nav` provides the top border + centered link; this just
@@ -248,6 +309,7 @@
 }
 
 .guisos-reorder__item {
+  position: relative;
   display: grid;
   grid-template-columns: auto auto minmax(0, 1fr) auto;
   grid-template-areas: "grip rank content controls";
@@ -257,15 +319,50 @@
   border-radius: 0.6rem;
   border: 1px solid transparent;
   font-size: 0.95rem;
+  overflow: hidden;
+  background-color: #1c1a17;
+  background-size: cover;
+  background-position: center;
+  color: var(--white);
 }
-.guisos-reorder__item.is-in-menu {
-  background: rgb(46 139 87 / 12%);
-  border-color: rgb(46 139 87 / 35%);
+/* Legibility overlay — a dark scrim over the guisado photo so the name,
+   scores and status stay readable against any dish image. The in/out-menu
+   tint is layered on top so the green/red coding is preserved. */
+.guisos-reorder__item::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    90deg,
+    rgb(20 16 10 / 88%) 0%,
+    rgb(20 16 10 / 62%) 55%,
+    rgb(20 16 10 / 40%) 100%
+  );
+  pointer-events: none;
 }
-.guisos-reorder__item.is-out-menu {
-  background: rgb(169 77 49 / 10%);
-  border-color: rgb(169 77 49 / 30%);
+.guisos-reorder__item.is-in-menu::before {
+  background: linear-gradient(
+    90deg,
+    rgb(20 16 10 / 88%) 0%,
+    rgb(20 16 10 / 62%) 55%,
+    rgb(20 16 10 / 40%) 100%
+  );
 }
+.guisos-reorder__item.is-out-menu::before {
+  background: linear-gradient(
+    90deg,
+    rgb(20 16 10 / 88%) 0%,
+    rgb(20 16 10 / 62%) 55%,
+    rgb(20 16 10 / 40%) 100%
+  );
+}
+/* The item's children sit above the overlay. */
+.guisos-reorder__item > * {
+  position: relative;
+  z-index: 1;
+}
+
 
 /* COL 1 — position badge (rank). COL 2 — stacked content rows. */
 .guisos-reorder__grip {
@@ -304,11 +401,13 @@
 }
 
 .guisos-reorder__grip {
-  color: rgb(198 139 43 / 70%);
+  color: rgb(240 192 96 / 90%);
   font-size: 1.1rem;
   line-height: 1;
   user-select: none;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 45%);
 }
+
 
 .guisos-reorder__rank {
   width: 1.8rem;
@@ -327,6 +426,8 @@
 
 .guisos-reorder__name {
   font-weight: 600;
+  color: var(--white);
+  text-shadow: 0 1px 3px rgb(0 0 0 / 55%);
 }
 
 .guisos-reorder__scores {
@@ -343,21 +444,24 @@
   white-space: nowrap;
 }
 .guisos-reorder__score-label {
-  color: var(--ink-soft, #5a4f3a);
+  color: rgb(255 253 248 / 82%);
   font-weight: 600;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 45%);
 }
 .guisos-reorder__score-value {
   font-weight: 700;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 45%);
 }
 .guisos-reorder__score--mine .guisos-reorder__score-value {
-  color: var(--gold, #c68b2b);
+  color: rgb(240 192 96);
 }
 .guisos-reorder__score--general .guisos-reorder__score-value {
-  color: rgb(46 139 87);
+  color: rgb(120 220 160);
 }
 .guisos-reorder__count {
-  color: var(--ink-soft, #5a4f3a);
+  color: rgb(255 253 248 / 72%);
   font-size: 0.72rem;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 45%);
 }
 
 .guisos-reorder__status {
@@ -365,13 +469,15 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 45%);
 }
 .guisos-reorder__item.is-in-menu .guisos-reorder__status {
-  color: rgb(46 139 87);
+  color: rgb(120 220 160);
 }
 .guisos-reorder__item.is-out-menu .guisos-reorder__status {
-  color: rgb(169 77 49);
+  color: rgb(255 150 120);
 }
+
 
 .guisos-reorder__controls {
   display: flex;
@@ -501,4 +607,3 @@
   pointer-events: none;
   user-select: none;
 }
-
