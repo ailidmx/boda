@@ -190,27 +190,32 @@ export function computeDayDistributions(activeGuests, liveGuests) {
 
 // Per-day list of CONFIRMED guests (RSVP level ≥ RSVP_CONFIRMED_MIN_LEVEL).
 // Returns an object keyed by attendance day, each holding an array of guest
-// summaries `{ id, name, group, avatar, initials }` used to render the
+// summaries `{ id, name, group, avatar, initials, level }` used to render the
 // clickable stacked-avatar strip on each day card and the full-screen modal
-// that lists the confirmed guests grouped by group tag.
+// that lists the confirmed guests grouped by group tag. `level` is the guest's
+// RSVP scale answer (0–5) for that specific day, so the modal can show exactly
+// how strongly each guest confirmed.
 export function computeDayConfirmedGuests(activeGuests, liveGuests) {
   const byDay = { friday: [], saturday: [], sunday: [] };
   activeGuests.forEach((guest) => {
     const answers = getLiveRsvpAnswers(guest, liveGuests);
     RSVP_ATTENDANCE_DAYS.forEach((day) => {
-      if ((answers[day] || 0) >= RSVP_CONFIRMED_MIN_LEVEL) {
+      const level = Number(answers[day]) || 0;
+      if (level >= RSVP_CONFIRMED_MIN_LEVEL) {
         byDay[day].push({
           id: guest.id,
           name: guestFullName(guest),
           group: guest.group || "Sin grupo",
           avatar: guestAvatarUrl(guest),
           initials: guestInitials(guest),
+          level,
         });
       }
     });
   });
   return byDay;
 }
+
 
 
 

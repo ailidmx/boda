@@ -28,13 +28,14 @@ function make(tag, className, text) {
 // The RSVP scale levels, in display order. Level 0 = no answer.
 const LEVELS = [0, 1, 2, 3, 4, 5];
 
-// CSS class suffix per level so the segmented bar reads intuitively:
-// gray = no answer, amber = partial (1–3), green = confirmed (4–5).
+// CSS class suffix per level so the segmented bar reads intuitively. Each level
+// gets its OWN distinct color so the admin can tell at a glance whether a guest
+// answered 0, 1, 2, 3, 4 or 5 — not just "none / partial / confirmed".
+//   gray = 0 (no answer), amber ramp = 1–3 (partial), green ramp = 4–5 (confirmed).
 function levelClass(level) {
-  if (level === 0) return "lvl0";
-  if (level >= 4) return "lvl45";
-  return "lvl13";
+  return `lvl${level}`;
 }
+
 
 // Build the small segmented distribution bar for one attendance day. Each
 // segment's width is proportional to its share of the total guests; a tooltip
@@ -202,9 +203,13 @@ function openConfirmedModal(guests, label) {
       const list = make("ul", "dashboard-confirmed-list");
       members.forEach((g) => {
         const li = make("li", "dashboard-confirmed-item");
-        li.append(avatarEl(g), make("span", "", g.name));
+        // Level badge shows exactly how strongly this guest confirmed (4 or 5).
+        const level = make("span", `dashboard-confirmed-level ${levelClass(g.level)}`, String(g.level));
+        level.title = `Nivel ${g.level} de asistencia`;
+        li.append(avatarEl(g), make("span", "", g.name), level);
         list.append(li);
       });
+
       details.append(summary, list);
       body.append(details);
     });
