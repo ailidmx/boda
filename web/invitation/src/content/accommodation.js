@@ -31,8 +31,11 @@ export const accommodation = {
               "Esta es la opción registrada para tu perfil. Te confirmaremos directamente cualquier ajuste.",
             onSiteCoveredBody:
               "Tu estancia está cubierta por los novios: no tendrás que pagar nada.",
+            onSiteBreakfastNote:
+              "Cada noche incluye su desayuno buffet en el restaurante del club.",
             onSitePayBody:
               "Tu estancia no está cubierta por los novios: pagarás tu parte.",
+
             independentTitle: "Alojamiento por tu cuenta",
             independentBody:
               "Te recomendamos buscar un hotel o un Airbnb en los alrededores.",
@@ -283,9 +286,12 @@ export const accommodation = {
               "Voici l’option que nous avons prévu pour toi, nous esperons qu’elle te plaira",
             onSiteCoveredBody:
               "Ton séjour est pris en charge par les mariés : tu n’auras rien à payer!",
+            onSiteBreakfastNote:
+              "Chaque nuit comprend son petit-déjeuner buffet au restaurant du club.",
     
             onSitePayBody:
               "Ton séjour n’est pas pris en charge par les mariés : tu paieras ta part.",
+
             independentTitle: "Hébergement de ton côté",
             independentBody:
               "Nous te recommandons de chercher un hôtel ou un Airbnb dans les environs.",

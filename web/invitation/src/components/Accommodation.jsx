@@ -808,9 +808,15 @@ export function Accommodation() {
                 <strong>{option.onSiteCoveredBody}</strong>
               </p>
             )}
+            {option.onSiteBreakfastNote && (
+              <p className="accommodation-breakfast-note">
+                {option.onSiteBreakfastNote}
+              </p>
+            )}
             {cabinName && (
               <p className="accommodation-cabin-badge">{cabinName}</p>
             )}
+
           </>
         )}
 

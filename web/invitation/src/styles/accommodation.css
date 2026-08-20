@@ -202,6 +202,21 @@
   font-weight: 700;
 }
 
+/* Buffet breakfast note — a quiet, muted line under the covered note telling
+   guests that every night includes its buffet breakfast at the club
+   restaurant. */
+.accommodation-breakfast-note {
+  max-width: 44rem;
+  margin: 0.85rem 0 0;
+  padding: 0.7rem 1.1rem;
+  border-left: 3px solid var(--sage);
+  background: color-mix(in srgb, var(--sage) 10%, var(--white));
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 1.7vw, 1.15rem);
+  line-height: 1.35;
+}
+
+
 /* Cabin name badge — a golden, metallic pill echoing the hero's group label.
    Used for BOTH the primary cabin (Hébergement) and the extra cabin
    ("Et après ?" / Coast). A subtle gold gradient + a moving sheen give it a
@@ -653,6 +668,9 @@
 }
 
 .accommodation-plan-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
   color: rgb(36 33 25 / 60%);
   font-size: 0.65rem;
   font-weight: 600;
@@ -660,6 +678,13 @@
   line-height: 1.3;
   text-transform: uppercase;
 }
+
+/* The plan-card label text sits on its own line, with the avatar(s) rendered
+   on a new line below it (mirrors the details-list price labels). */
+.accommodation-plan-label-text {
+  display: block;
+}
+
 
 .accommodation-plan-price {
   display: inline-flex;

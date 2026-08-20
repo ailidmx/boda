@@ -184,7 +184,12 @@ export function StayPlanCard({
         {activeCabinPerPerson > 0 && (
           <div className="accommodation-plan-row">
             <span className="accommodation-plan-label">
-              {option.planCardPerPerson.replace("{name}", activeFirstName || "")}
+              <span className="accommodation-plan-label-text">
+                {option.planCardPerPerson.replace("{name}", activeFirstName || "")}
+              </span>
+              <span className="accommodation-plan-label-avatar">
+                <Avatar guest={liveActive} size={28} />
+              </span>
             </span>
             <PlanPrice
               original={activeCabinPerPerson}
@@ -199,7 +204,14 @@ export function StayPlanCard({
         {groupMembers.length > 1 && (
           <div className="accommodation-plan-row">
             <span className="accommodation-plan-label">
-              {option.planCardGroupTotal}
+              <span className="accommodation-plan-label-text">
+                {option.planCardGroupTotal}
+              </span>
+              <span className="accommodation-plan-label-avatar accommodation-plan-label-avatar--stack">
+                {groupMembers.map((member) => (
+                  <Avatar key={member.id} guest={member} size={28} />
+                ))}
+              </span>
             </span>
             <PlanPrice
               original={groupTotal}
@@ -210,6 +222,7 @@ export function StayPlanCard({
             {anyCovered && <em>{option.planCardSaleLabel}</em>}
           </div>
         )}
+
 
         <p className="accommodation-plan-disclaimer">
           {option.planCardEurDisclaimer} · {option.planCardEstimate}
