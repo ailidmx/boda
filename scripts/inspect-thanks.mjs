@@ -222,7 +222,25 @@ const CORRECTIONS = {
   "manuel_amezcua__wedding_planner": {
     fr: "Pour être notre Wedding planner",
   },
+
+  // ── dimitar — es/en were MISSING; fr had accent typo "a" → "à" ────────
+  NiteTOOMIpckQbBVQWoJ: {
+    es: "Por ser el primero en comprar tu boleto de avión",
+    fr: "Pour le premier à avoir acheté ton billet d'avion",
+    en: "For being the first to buy your plane ticket",
+  },
+  // ── stéphane_aïli — es/en were MISSING ────────────────────────────────
+  RONSFywpUJhw4JGAK5MX: {
+    es: "Por tener la paciencia de probar esta página",
+    en: "For having the patience to test this page",
+  },
+  // ── eduardo.esparza — fr/en were MISSING ──────────────────────────────
+  jxyagoH7c4EheQEH9KLG: {
+    fr: "Pour les esquites",
+    en: "For the esquites",
+  },
 };
+
 
 
 
