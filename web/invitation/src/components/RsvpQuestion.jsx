@@ -269,42 +269,41 @@ export function RsvpQuestion({
         })}
       </ul>
 
-      {/* Mobile legend modal + FAB (scale variant only). */}
-      {!isBoolean && (
-        <>
-          <div
-            className={`rsvp-legend-modal${
-              legendOpen ? " is-mobile-open" : ""
-            }`}
-            role={legendOpen ? "dialog" : undefined}
-            aria-modal={legendOpen ? "true" : undefined}
-            aria-label={legendOpen ? SCALE_LEGEND_LABEL : undefined}
-            onMouseDown={(event) => {
-              if (legendOpen && event.target === event.currentTarget) {
-                setLegendOpen(false);
-              }
-            }}
-          >
-            <div className="rsvp-legend-panel" ref={legendPanelRef}>
-              <button
-                ref={legendCloseRef}
-                className="rsvp-legend-close"
-                type="button"
-                aria-label="Close"
-                onClick={() => setLegendOpen(false)}
-              >
-                ×
-              </button>
-              <h4 className="rsvp-legend-title">{SCALE_LEGEND_LABEL}</h4>
-              {renderLegend()}
+      {/* Legend modal + FAB (scale variant only). Both are portaled to <body>
+          so they escape the flip card's `perspective` ancestor. Without this,
+          `position: fixed` would be resolved against that transformed ancestor
+          and the modal/FAB would stick to the section instead of the viewport. */}
+      {!isBoolean &&
+        createPortal(
+          <>
+            <div
+              className={`rsvp-legend-modal${
+                legendOpen ? " is-open" : ""
+              }`}
+              role={legendOpen ? "dialog" : undefined}
+              aria-modal={legendOpen ? "true" : undefined}
+              aria-label={legendOpen ? SCALE_LEGEND_LABEL : undefined}
+              onMouseDown={(event) => {
+                if (legendOpen && event.target === event.currentTarget) {
+                  setLegendOpen(false);
+                }
+              }}
+            >
+              <div className="rsvp-legend-panel" ref={legendPanelRef}>
+                <button
+                  ref={legendCloseRef}
+                  className="rsvp-legend-close"
+                  type="button"
+                  aria-label="Close"
+                  onClick={() => setLegendOpen(false)}
+                >
+                  ×
+                </button>
+                <h4 className="rsvp-legend-title">{SCALE_LEGEND_LABEL}</h4>
+                {renderLegend()}
+              </div>
             </div>
-          </div>
 
-          {/* The FAB is portaled to <body> so it escapes the flip card's
-              `perspective` ancestor. Without this, `position: fixed` would be
-              resolved against that transformed ancestor and the FAB would
-              stick to the section instead of floating over the viewport. */}
-          {createPortal(
             <button
               ref={legendFabRef}
               className={`rsvp-legend-fab${
@@ -316,15 +315,14 @@ export function RsvpQuestion({
               data-analytics="fab.rsvp.legend"
               onClick={() => setLegendOpen(true)}
             >
-
               <span className="rsvp-legend-fab-icon" aria-hidden="true">
                 ?
               </span>
-            </button>,
-            document.body,
-          )}
-        </>
-      )}
+            </button>
+          </>,
+          document.body,
+        )}
+
     </div>
   );
 }

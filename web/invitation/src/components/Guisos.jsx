@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { useApp } from "../context/AppContext.jsx";
 import { StarVote } from "./StarVote.jsx";
 import { SwipeCardCarousel } from "./SwipeCardCarousel.jsx";
+import { LightboxCarousel } from "./LightboxCarousel.jsx";
 import { cloudinaryImage } from "../cloudinary.js";
 import { loadGuisoRanking, saveGuisoRanking } from "../guiso-rankings.js";
 import { loadGuestCardVotes, loadAllCardVotes } from "../card-votes.js";
@@ -34,12 +35,14 @@ import { loadGuestCardVotes, loadAllCardVotes } from "../card-votes.js";
  *
  * The section is split into two parts:
  *
- *   • Dish cards — the main content, wrapped in an expandable/collapsible
- *     subsection with an arrow visual that signals it can be expanded.
+ *   • Dish cards — the main content, always visible as a normal section
+ *     layout (no toggle button, no collapse) so the swipeable carousel keeps
+ *     its full swipe gesture.
  *   • Reorder panel — always visible as a normal section layout (no toggle
  *     button, no collapse). Its container carries the `#guisos-order` anchor
  *     so the nav link scrolls straight to it.
  */
+
 
 export function Guisos() {
   const { t, profile } = useApp();
@@ -47,11 +50,8 @@ export function Guisos() {
   const guisos = t.guisos || {};
   const dishes = guisos.dishes || [];
 
-  // Expandable/collapsible subsection for the dish cards (the main content,
-  // expanded by default). The reorder panel below is always visible as a
-  // normal section layout.
-  const [dishesOpen, setDishesOpen] = useState(true);
   const orderInitializedRef = useRef(false);
+
 
 
   // Reorder panel state.
@@ -69,6 +69,10 @@ export function Guisos() {
   const dragIndex = useRef(null);
   const [draggingIndex, setDraggingIndex] = useState(null);
   const [dragOverIndex, setDragOverIndex] = useState(null);
+
+  // Full-screen lightbox for the dish photos. `lightbox` holds { startIndex }
+  // or null; clicking a dish card's photo opens it at that index.
+  const [lightbox, setLightbox] = useState(null);
 
 
   // Load the guest's existing ranking (if any) once the guest is known.
@@ -264,6 +268,30 @@ export function Guisos() {
 
   const selected = useMemo(() => order.slice(0, 9), [order]);
 
+  // Lookup dish by name so each reorder row can show its guisado photo as a
+  // legibility-overlaid background (mirrors the dish cards' photo treatment).
+  const dishByKey = useMemo(() => {
+    const map = {};
+    dishes.forEach((d) => {
+      if (d && d.name) map[d.name] = d;
+    });
+    return map;
+  }, [dishes]);
+
+  // Slides for the full-screen lightbox: one per dish that has a photo, so
+  // clicking a dish card's photo opens the shared swipeable LightboxCarousel.
+  const guisoSlides = useMemo(
+    () =>
+      dishes
+        .filter((d) => d && d.cloudinaryId)
+        .map((d) => ({
+          src: cloudinaryImage(`boda/${d.cloudinaryId}`),
+          alt: d.name,
+        })),
+    [dishes],
+  );
+
+
   // Format a numeric score for display (e.g. 3.4). Whole numbers are shown
   // without a trailing decimal so "Ton vote" reads as a clean integer.
   const formatScore = (value) => {
@@ -313,52 +341,46 @@ export function Guisos() {
         </p>
       )}
 
-      {/* Subsection 1 — dish cards (main content, expanded by default). */}
-      <div className="guisos-subsection guisos-subsection--dishes">
-        <button
-          type="button"
-          className={`guisos-subsection__toggle${dishesOpen ? " is-open" : ""}`}
-          onClick={() => setDishesOpen((v) => !v)}
-          aria-expanded={dishesOpen}
-          aria-controls="guisos-dishes-body"
-        >
-          <span className="guisos-subsection__arrow" aria-hidden="true">▸</span>
-          <span className="guisos-subsection__label">{guisos.flavoursTitle}</span>
-        </button>
+      {/* Dish cards — the main content, always visible as a normal section
+          layout (no toggle button, no collapse) so the swipeable carousel
+          keeps its full swipe gesture. */}
+      <div id="guisos-dishes-body" className="guisos-subsection__body">
+        <SwipeCardCarousel className="guisos-grid" label={guisos.flavoursTitle}>
+          {dishes.map((dish, index) => (
+            <article className="flavour-card guisos-card reveal" key={index}>
+              {dish.cloudinaryId ? (
+                <button
+                  type="button"
+                  className="flavour-card__media guisos-card__photo"
+                  aria-label={`${guisos.openPhoto || "Ver foto"}: ${dish.name}`}
+                  onClick={() => setLightbox({ startIndex: index })}
+                >
+                  <img
+                    src={cloudinaryImage(`boda/${dish.cloudinaryId}`)}
+                    alt={dish.name}
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </button>
+              ) : (
 
-        {dishesOpen && (
-          <div id="guisos-dishes-body" className="guisos-subsection__body">
-            <SwipeCardCarousel className="guisos-grid" label={guisos.flavoursTitle}>
-              {dishes.map((dish, index) => (
-                <article className="flavour-card reveal" key={index}>
-                  {dish.cloudinaryId ? (
-                    <div className="flavour-card__media">
-                      <img
-                        src={cloudinaryImage(`boda/${dish.cloudinaryId}`)}
-                        alt={dish.name}
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </div>
-                  ) : (
+                <div className="flavour-card__illustration" aria-hidden="true">
+                  <span>{guisos.flavourPlaceholder}</span>
+                </div>
+              )}
+              <div className="guisos-card__body">
+                <h3>{dish.name}</h3>
+                <p>{dish.note}</p>
+              </div>
+              <StarVote cardType="guiso" cardKey={dish.name} onVote={handleVote} />
+            </article>
+          ))}
 
-                    <div className="flavour-card__illustration" aria-hidden="true">
-                      <span>{guisos.flavourPlaceholder}</span>
-                    </div>
-                  )}
-                  <div>
-                    <h3>{dish.name}</h3>
-                    <p>{dish.note}</p>
-                  </div>
-                  <StarVote cardType="guiso" cardKey={dish.name} onVote={handleVote} />
-                </article>
-              ))}
-            </SwipeCardCarousel>
+        </SwipeCardCarousel>
 
-            <p className="experience-note reveal">{guisos.note}</p>
-          </div>
-        )}
+        <p className="experience-note reveal">{guisos.note}</p>
       </div>
+
 
       {/* Anchor subsection — a "continue" link that scrolls to the reorder
           panel below. The reorder panel is always visible (no toggle button),
@@ -390,11 +412,17 @@ export function Guisos() {
           >
             {order.map((name, index) => {
               const inMenu = index < 9;
+              const dish = dishByKey[name];
+              const bgImage = dish?.cloudinaryId
+                ? `url(${cloudinaryImage(`boda/${dish.cloudinaryId}`)})`
+                : undefined;
               return (
                 <li
                   key={name}
                   data-index={index}
                   draggable
+                  style={bgImage ? { backgroundImage: bgImage } : undefined}
+
                   onTouchStart={handleTouchStart(index)}
                   onDragStart={() => {
                     dragIndex.current = index;
@@ -495,6 +523,22 @@ export function Guisos() {
             </button>
           </div>
         </div>
+      )}
+
+      {/* Full-screen swipeable lightbox for the dish photos. The start index
+          is resolved against the filtered `guisoSlides` array (dishes without
+          a photo are skipped), so the opened photo matches the clicked card. */}
+      {lightbox && guisoSlides.length > 0 && (
+        <LightboxCarousel
+          open
+          images={guisoSlides}
+          startIndex={Math.min(
+            lightbox.startIndex,
+            guisoSlides.length - 1,
+          )}
+          label={guisos.flavoursTitle}
+          onClose={() => setLightbox(null)}
+        />
       )}
 
     </section>
