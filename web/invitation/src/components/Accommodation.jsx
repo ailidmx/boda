@@ -30,6 +30,8 @@ import {
   HOTEL_SUGGESTIONS,
 } from "./accommodation-data.js";
 import { Button } from "./ui/Button.jsx";
+import { LightboxCarousel } from "./LightboxCarousel.jsx";
+
 
 
 function getAssignedRoom(candidate) {
@@ -90,9 +92,15 @@ export function Accommodation() {
   const cabinPhotos = cloudinaryIdList.map((id) =>
     cloudinaryImage(`boda/${id}`, { width: 1200 }),
   );
-
+  // Slide set for the cabin photo lightbox (same src for thumbnail and full).
+  const cabinSlides = cabinPhotos.map((photo) => ({
+    src: photo,
+    full: photo,
+    alt: cabinName,
+  }));
 
   const cabinRooms = getRoomsByCabin(cabin?.id || room?.cabin || cabinId);
+
 
   const roomOccupants = cabinRooms.map((cabinRoom) => ({
     room: cabinRoom,
@@ -263,7 +271,11 @@ export function Accommodation() {
   const anyCovered = groupMembers.some(resolveMemberCovered);
 
   const [noteOpen, setNoteOpen] = useState(false);
+  // Full-screen lightbox for the cabin photo carousel. `cabinLightbox` holds
+  // { startIndex } or null.
+  const [cabinLightbox, setCabinLightbox] = useState(null);
   const [sectionActive, setSectionActive] = useState(false);
+
   const sectionRef = useRef(null);
   const noteFabRef = useRef(null);
   const noteCloseRef = useRef(null);
@@ -807,7 +819,13 @@ export function Accommodation() {
         {!hasNoCabin && cabinPhotos.length > 0 && (
           <div className="accommodation-photo-carousel" aria-label={cabinName}>
             {cabinPhotos.map((photo, index) => (
-              <figure className="accommodation-photo" key={index}>
+              <button
+                className="accommodation-photo"
+                type="button"
+                key={index}
+                onClick={() => setCabinLightbox({ startIndex: index })}
+                aria-label={`${cabinName} — ver en grande`}
+              >
                 <img
                   src={photo}
                   alt=""
@@ -821,10 +839,11 @@ export function Accommodation() {
                     {String(cabinPhotos.length).padStart(2, "0")}
                   </small>
                 </figcaption>
-              </figure>
+              </button>
             ))}
           </div>
         )}
+
 
         {!hasNoCabin && cabin && roomOccupants.length > 0 && (
 
@@ -951,8 +970,18 @@ export function Accommodation() {
           <span aria-hidden="true">↓</span>
         </a>
       </nav>
+
+      {/* Shared full-screen lightbox for the cabin photo carousel */}
+      <LightboxCarousel
+        open={!!cabinLightbox}
+        onClose={() => setCabinLightbox(null)}
+        images={cabinSlides}
+        startIndex={cabinLightbox ? cabinLightbox.startIndex : 0}
+        label={cabinName}
+      />
     </section>
   );
 }
+
 
 

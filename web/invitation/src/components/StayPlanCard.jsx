@@ -3,6 +3,8 @@ import { getActiveGuests } from "../guests.js";
 import { resolveLiveGuest, resolveGuestName } from "../guest-profiles.js";
 import { getCabin } from "../cabins.js";
 import { getRoom, getRoomDescription } from "../rooms.js";
+import { Avatar } from "../features/identity/Avatar.jsx";
+
 
 const MXN_PER_EUR = 20;
 
@@ -270,7 +272,14 @@ export function StayPlanCard({
         )}
         {activeCabinPerPerson > 0 && (
           <div>
-            <dt>{option.personPriceLabel}</dt>
+            <dt>
+              <span className="accommodation-price-label-text">
+                {option.personPriceLabel}
+              </span>
+              <span className="accommodation-price-label-avatar">
+                <Avatar guest={liveActive} size={28} />
+              </span>
+            </dt>
             <AccommodationPrice
               original={activeCabinPerPerson}
               toPay={paidByCouple ? 0 : activeCabinPerPerson}
@@ -282,7 +291,16 @@ export function StayPlanCard({
         )}
         {groupMembers.length > 1 && groupTotal > 0 && (
           <div>
-            <dt>{option.groupPriceLabel}</dt>
+            <dt>
+              <span className="accommodation-price-label-text">
+                {option.groupPriceLabel}
+              </span>
+              <span className="accommodation-price-label-avatar accommodation-price-label-avatar--stack">
+                {groupMembers.map((member) => (
+                  <Avatar key={member.id} guest={member} size={28} />
+                ))}
+              </span>
+            </dt>
 
             <AccommodationPrice
               original={groupTotal}
@@ -294,6 +312,7 @@ export function StayPlanCard({
             />
           </div>
         )}
+
         {showExtraCabinRow && extraCabin && (
           <div>
             <dt>{option.extraCabinLabel}</dt>

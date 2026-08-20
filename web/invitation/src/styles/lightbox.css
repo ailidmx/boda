@@ -42,18 +42,19 @@
 
 .lightbox-arrow {
   display: grid;
-  width: 3rem;
-  height: 3rem;
+  width: 3.75rem;
+  height: 3.75rem;
   place-items: center;
-  border: 1px solid rgb(255 255 255 / 40%);
+  border: 1px solid rgb(255 255 255 / 45%);
   border-radius: 50%;
-  background: rgb(0 0 0 / 40%);
+  background: rgb(0 0 0 / 45%);
   color: var(--white);
   cursor: pointer;
-  font-size: 1.6rem;
+  font-size: 2.4rem;
   line-height: 1;
   transition: background 200ms ease, transform 200ms ease;
 }
+
 
 .lightbox-arrow:hover {
   background: rgb(0 0 0 / 65%);

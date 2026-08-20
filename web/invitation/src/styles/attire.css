@@ -199,11 +199,22 @@
 .oaxaca-tile {
   width: 100%;
   aspect-ratio: 1 / 1;
-  object-fit: cover;
   display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  overflow: hidden;
   border-radius: 0.25rem;
   filter: saturate(0.95);
   transition: transform 0.4s ease, filter 0.4s ease;
+}
+
+.oaxaca-tile__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .oaxaca-tile:hover {
