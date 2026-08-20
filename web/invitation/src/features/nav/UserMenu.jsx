@@ -3,9 +3,11 @@ import React, { useEffect, useRef, useState } from "react";
 import { useApp } from "../../context/AppContext.jsx";
 import { LANGUAGE_FLAGS, LANGUAGE_FLAGS_ONLY } from "../../components/ui.jsx";
 import { AboutModal } from "../../components/AboutModal.jsx";
+import { usePwaInstall } from "../../hooks/usePwaInstall.js";
 
 import { SUPPORTED_LANGUAGES } from "../../content.js";
 import { resolveGuestName, resolveGuestPhoto } from "../../guest-profiles.js";
+
 
 // The signed-in guest's account menu: avatar + name + language switcher, plus
 // identity/photo/email/password actions, a music toggle, an About link, an
@@ -30,6 +32,9 @@ export function UserMenu() {
   const [open, setOpen] = useState(false);
   const [accountModal, setAccountModal] = useState(null); // null | "email" | "password"
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [installOpen, setInstallOpen] = useState(false);
+  const pwa = usePwaInstall();
+
   const [password, setPassword] = useState("");
   const [draftEmail, setDraftEmail] = useState("");
   const [reauthPassword, setReauthPassword] = useState("");
@@ -326,6 +331,25 @@ export function UserMenu() {
               </a>
             )}
 
+            {!pwa.isStandalone && (
+              <button
+                className="user-menu__item"
+                type="button"
+                data-analytics="menu.install"
+                onClick={() => {
+                  setOpen(false);
+                  if (pwa.canInstall) {
+                    pwa.install();
+                  } else {
+                    setInstallOpen(true);
+                  }
+                }}
+              >
+                <span className="user-menu__item-icon" aria-hidden="true">📲</span>
+                <span className="user-menu__item-label">{nav.installApp}</span>
+              </button>
+            )}
+
             <button
               className="user-menu__item user-menu__item--danger"
               type="button"
@@ -335,6 +359,7 @@ export function UserMenu() {
               <span className="user-menu__item-icon" aria-hidden="true">↪</span>
               {nav.logout}
             </button>
+
 
             {menuStatus && (
               <p
@@ -492,9 +517,59 @@ export function UserMenu() {
         </div>
       )}
 
+      {installOpen && (
+        <div
+          className="user-menu-modal__overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="install-modal-title"
+          onClick={() => setInstallOpen(false)}
+        >
+          <div
+            className="user-menu-modal__card user-menu-modal__card--install"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <button
+              className="user-menu-modal__close"
+              type="button"
+              aria-label={nav.installClose}
+              onClick={() => setInstallOpen(false)}
+            >
+              ✕
+            </button>
+
+            <h3 id="install-modal-title" className="user-menu-modal__title">
+              {pwa.isIOS ? nav.installIosTitle : nav.installDesktopTitle}
+            </h3>
+
+            <div className="user-menu-install">
+              <p className="user-menu-install__body">
+                {pwa.isIOS ? nav.installIosBody : nav.installDesktopBody}
+              </p>
+              <ol className="user-menu-install__steps">
+                <li>{pwa.isIOS ? nav.installIosStep1 : nav.installDesktopStep1}</li>
+                <li>{pwa.isIOS ? nav.installIosStep2 : nav.installDesktopStep2}</li>
+                {pwa.isIOS && <li>{nav.installIosStep3}</li>}
+              </ol>
+            </div>
+
+            <div className="user-menu-modal__actions">
+              <button
+                className="user-menu-modal__btn user-menu-modal__btn--primary"
+                type="button"
+                onClick={() => setInstallOpen(false)}
+              >
+                {nav.installClose}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <AboutModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
     </div>
   );
 }
+
 
 export default UserMenu;
