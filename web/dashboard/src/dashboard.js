@@ -56,8 +56,13 @@ import {
   rsvpBooleanChip as serviceRsvpBooleanChip,
   travelsByPlaneChip as serviceTravelsByPlaneChip,
   computeDayConfirmations as serviceComputeDayConfirmations,
+  computeInvitationStats as serviceComputeInvitationStats,
+  computeDayDistributions as serviceComputeDayDistributions,
+  computeDayConfirmedGuests as serviceComputeDayConfirmedGuests,
+
 
   guestStatusBadge as serviceGuestStatusBadge,
+
   getUniqueGuestGroups as serviceGetUniqueGuestGroups,
   getGroupAttendanceCounts as serviceGetGroupAttendanceCounts,
   getUniqueCabins as serviceGetUniqueCabins,
@@ -372,6 +377,24 @@ function travelsByPlaneChip(guest) {
 function computeDayConfirmations() {
   return serviceComputeDayConfirmations(getActiveGuests(), state.liveGuests);
 }
+
+// Invitation-send stats (sent / total / percentage) for the summary card.
+function computeInvitationStats() {
+  return serviceComputeInvitationStats(getActiveGuests());
+}
+
+// Per-day RSVP scale distribution (0–5) for the summary cards.
+function computeDayDistributions() {
+  return serviceComputeDayDistributions(getActiveGuests(), state.liveGuests);
+}
+
+// Per-day list of CONFIRMED guests (RSVP level ≥ 4) for the clickable stacked
+// avatars + full-screen modal on each day summary card.
+function computeDayConfirmedGuests() {
+  return serviceComputeDayConfirmedGuests(getActiveGuests(), state.liveGuests);
+}
+
+
 
 
 
@@ -1062,7 +1085,14 @@ export function startDashboard(app) {
       renderGuestManager();
       renderCabinAssignments();
       // Re-render the attendance summary cards from the live guests.
-      renderSummary({ computeDayConfirmations });
+      renderSummary({
+        computeDayConfirmations,
+        computeInvitationStats,
+        computeDayDistributions,
+        computeDayConfirmedGuests,
+      });
+
+
     },
     (error) => {
       console.error("[dashboard:auth] Failed to load live guests", error);

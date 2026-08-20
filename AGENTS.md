@@ -421,6 +421,18 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   The helper `computeDayConfirmations()` aggregates these. When adding a new
   attendance day or changing the confirmation threshold, update
   `RSVP_ATTENDANCE_DAYS` / `RSVP_CONFIRMED_MIN_LEVEL` and the summary cards.
+- **Dashboard day cards have a clickable stacked-avatar strip + confirmed-guests modal** —
+  each attendance day card (Viernes/Sábado/Domingo) in `web/dashboard/src/summary.js`
+  renders a clickable row of overlapping avatars (`.dashboard-avatars`, up to
+  `MAX_VISIBLE = 8`, overflow collapses into a `+N` badge). Clicking opens a
+  full-screen modal (`.dashboard-confirmed-overlay` + `.dashboard-confirmed-modal`)
+  listing the day's confirmed guests grouped by group tag (largest group first,
+  A→Z within each group). The per-day confirmed list comes from
+  `computeDayConfirmedGuests()` in `guestService.js` (returns
+  `{ id, name, group, avatar, initials }` per day), injected into `renderSummary`
+  via the `dashboard.js` adapter. When adding a new attendance day, update
+  `computeDayConfirmedGuests` and the `dayCard` calls together.
+
 - **Dashboard is LIVE-ONLY — there is NO static guest registry** — the
   dashboard (`web/dashboard/src/guests.js` + `dashboard.js`) reads ONLY the
   live Firestore `guests` collection. `web/shared/guests.js` is NOT imported

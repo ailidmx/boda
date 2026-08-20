@@ -18,7 +18,10 @@ import {
   guestFullName,
   guestIdentity,
   guestRoom,
+  guestAvatarUrl,
+  guestInitials,
 } from "./guestDomain.js";
+
 
 
 // Read the live RSVP answers for a guest from the raw Firestore record.
@@ -158,6 +161,58 @@ export function computeDayConfirmations(activeGuests, liveGuests) {
   });
   return counts;
 }
+
+// Invitation-send stats for the summary card. `total` = all active guests,
+// `sent` = those with `invitationSent === true`, `pct` = rounded percentage.
+export function computeInvitationStats(activeGuests) {
+  const total = activeGuests.length;
+  const sent = activeGuests.filter((g) => g.invitationSent === true).length;
+  const pct = total > 0 ? Math.round((sent / total) * 100) : 0;
+  return { total, sent, pct };
+}
+
+// Per-day distribution of the RSVP scale levels (0–5). Returns an object keyed
+// by attendance day, each holding an array of 6 counts indexed by level
+// (index 0 = no answer, 5 = fully confirmed). Used to render the small
+// segmented distribution bar inside each day summary card.
+export function computeDayDistributions(activeGuests, liveGuests) {
+  const dist = { friday: [0, 0, 0, 0, 0, 0], saturday: [0, 0, 0, 0, 0, 0], sunday: [0, 0, 0, 0, 0, 0] };
+  activeGuests.forEach((guest) => {
+    const answers = getLiveRsvpAnswers(guest, liveGuests);
+    RSVP_ATTENDANCE_DAYS.forEach((day) => {
+      const level = Number(answers[day]) || 0;
+      const idx = Math.min(Math.max(level, 0), 5);
+      dist[day][idx] += 1;
+    });
+  });
+  return dist;
+}
+
+// Per-day list of CONFIRMED guests (RSVP level ≥ RSVP_CONFIRMED_MIN_LEVEL).
+// Returns an object keyed by attendance day, each holding an array of guest
+// summaries `{ id, name, group, avatar, initials }` used to render the
+// clickable stacked-avatar strip on each day card and the full-screen modal
+// that lists the confirmed guests grouped by group tag.
+export function computeDayConfirmedGuests(activeGuests, liveGuests) {
+  const byDay = { friday: [], saturday: [], sunday: [] };
+  activeGuests.forEach((guest) => {
+    const answers = getLiveRsvpAnswers(guest, liveGuests);
+    RSVP_ATTENDANCE_DAYS.forEach((day) => {
+      if ((answers[day] || 0) >= RSVP_CONFIRMED_MIN_LEVEL) {
+        byDay[day].push({
+          id: guest.id,
+          name: guestFullName(guest),
+          group: guest.group || "Sin grupo",
+          avatar: guestAvatarUrl(guest),
+          initials: guestInitials(guest),
+        });
+      }
+    });
+  });
+  return byDay;
+}
+
+
 
 // Status badge derived from the LIVE `rsvp.answers` (confirmed = any day ≥ 4,
 // partial = answered but not confirmed, pending = no answers). Returns a plain

@@ -104,7 +104,281 @@
   }
 }
 
+// ── Invitations summary card (full-width) ─────────────────────────────
+// Spans the whole summary row above the three attendance day cards. Shows the
+// sent/total count, a progress bar, and the percentage.
+.dashboard-summary-card--invitations {
+  grid-column: 1 / -1;
+  gap: 0.6rem;
+}
+
+.dashboard-inv-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+
+  strong {
+    font-size: 1.6rem;
+  }
+}
+
+.dashboard-inv-progress {
+  height: 0.6rem;
+  border-radius: 999px;
+  background: $border-light;
+  overflow: hidden;
+}
+
+.dashboard-inv-progress-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: $accent;
+  transition: width 0.4s ease;
+}
+
+.dashboard-inv-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+
+  small {
+    color: #766c5f;
+  }
+}
+
+.dashboard-inv-pct {
+  font-family: $font-display;
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: $accent;
+}
+
+// ── RSVP scale distribution bar (inside each day card) ────────────────
+// A thin segmented bar showing how many guests sit at each RSVP level (0–5).
+// Gray = no answer, amber = partial (1–3), green = confirmed (4–5).
+.dashboard-dist-bar {
+  display: flex;
+  height: 0.5rem;
+  margin-top: 0.5rem;
+  border-radius: 999px;
+  background: $border-light;
+  overflow: hidden;
+}
+
+.dashboard-dist-seg {
+  display: block;
+  height: 100%;
+  min-width: 2px;
+}
+
+.dashboard-dist-seg.lvl0 {
+  background: #c9c2b4;
+}
+
+.dashboard-dist-seg.lvl13 {
+  background: #d9a441;
+}
+
+.dashboard-dist-seg.lvl45 {
+  background: #4c9a5f;
+}
+
+.dashboard-dist-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 0.9rem;
+  margin-top: 0.4rem;
+}
+
+.dashboard-dist-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  color: #766c5f;
+}
+
+.dashboard-dist-dot {
+  display: inline-block;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 999px;
+}
+
+.dashboard-dist-dot.lvl0 {
+  background: #c9c2b4;
+}
+
+.dashboard-dist-dot.lvl13 {
+  background: #d9a441;
+}
+
+.dashboard-dist-dot.lvl45 {
+  background: #4c9a5f;
+}
+
+// ── Clickable stacked avatars (inside each day card) ───────────────────
+// A row of overlapping avatar circles. Clicking opens the full-screen modal
+// with the whole confirmed list grouped by group tag.
+.dashboard-avatars {
+  display: inline-flex;
+  align-items: center;
+  margin-top: 0.6rem;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.dashboard-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-left: -0.5rem;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: #e7e0d2;
+  color: #55452d;
+  font-size: 0.7rem;
+  font-weight: 600;
+  overflow: hidden;
+  flex: 0 0 auto;
+
+  &:first-child {
+    margin-left: 0;
+  }
+}
+
+.dashboard-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.dashboard-avatars-more {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin-left: -0.5rem;
+  border: 2px solid #fff;
+  border-radius: 999px;
+  background: $accent;
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 600;
+  flex: 0 0 auto;
+}
+
+// ── Full-screen confirmed-guests modal ─────────────────────────────────
+// A near-fullscreen overlay listing the confirmed guests for one day, grouped
+// by group tag (largest group first), A→Z within each group.
+.dashboard-confirmed-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.dashboard-confirmed-modal {
+  display: flex;
+  flex-direction: column;
+  width: min(46rem, 100%);
+  max-height: 90vh;
+  border-radius: 0.5rem;
+  background: #fff;
+  box-shadow: 0 1.5rem 4rem rgb(0 0 0 / 0.35);
+  overflow: hidden;
+}
+
+.dashboard-confirmed-head {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid $border-light;
+
+  h3 {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+
+  .dashboard-confirmed-count {
+    color: #766c5f;
+    font-size: 0.85rem;
+  }
+
+  .dashboard-modal-close {
+    margin-left: auto;
+  }
+}
+
+.dashboard-confirmed-body {
+  padding: 1.25rem;
+  overflow-y: auto;
+}
+
+.dashboard-confirmed-empty {
+  color: #766c5f;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.dashboard-confirmed-group {
+  margin-bottom: 1.25rem;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.dashboard-confirmed-group-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+  padding-bottom: 0.35rem;
+  border-bottom: 1px solid $border-light;
+
+  strong {
+    font-size: 1rem;
+  }
+
+  span {
+    color: #766c5f;
+    font-size: 0.8rem;
+  }
+}
+
+.dashboard-confirmed-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 0.35rem 1rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.dashboard-confirmed-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  font-size: 0.9rem;
+  color: #3a2f1f;
+}
+
+
 .dashboard-section {
+
   margin-top: 1.25rem;
   padding: clamp(1.5rem, 3vw, 2.25rem);
   border-radius: 0.75rem;
