@@ -942,7 +942,20 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   each column based on its group. When adding a new column, assign it to a group
   in the `COLUMN_GROUPS` map and update the filter bar + `<thead>` + row template
   together.
+- **Never replace a nested map with `update({ map: {...} })` — use dot-notation to merge** —
+  Firestore `update()` with a nested object value (e.g. `update({ identity: { age, isAdult } })`)
+  REPLACES the entire `identity` map, wiping every other field inside it
+  (firstName/lastName/phone/cloudinaryId/gender/lang/...). To set fields inside a
+  nested map while preserving the rest, use dot-notation keys
+  (`update({ "identity.age": ..., "identity.isAdult": ... })`). This bit us in
+  `scripts/backfill-guest-isAdult.mjs`, which wiped the identity of all 263 guests;
+  it was fixed to dot-notation and a restore script
+  (`scripts/restore-guest-identity.mjs`) was added that rebuilds `identity` from the
+  `pre-tables-guestids-2026-08-16T15-35-11-541Z` backup using dot-notation updates.
+  When writing any script that touches a nested Firestore map, prefer dot-notation
+  and always run a dry-run + verify a sample before `--execute`.
 - *(Add new lessons here as you discover them.)*
+
 
 
 ---
