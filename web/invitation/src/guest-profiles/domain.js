@@ -22,12 +22,16 @@ import { cloudinaryImage } from "../cloudinary.js";
  * @param {Object} [data={}]  raw Firestore record
  * @returns {Object}
  */
-export function normalizeGuestRecord(data = {}) {
+export function normalizeGuestRecord(data = {}, docId) {
   const identity = data.identity || {};
   const hosting = data.hosting || {};
   const maternalLastName = identity.maternalLastName ?? data.maternalLastName;
   return {
     ...data,
+    // The guest id is the Firestore doc id. Prefer the explicit `id` field,
+    // then the caller-provided doc id, then `guestId` — so a record is never
+    // left without an `id` (which breaks saveGuestName/saveGuestPhoto).
+    id: data.id ?? docId ?? data.guestId,
     identity,
     hosting,
     firstName: identity.firstName ?? data.firstName,
