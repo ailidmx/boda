@@ -211,8 +211,7 @@
   .facility-slideset__toggle,
   .roca-gallery-toggle,
   .map-carousel-arrow,
-  .map-carousel-toggle,
-  .lightbox-arrow {
+  .map-carousel-toggle {
     width: 1.5rem;
     height: 1.5rem;
     padding: 0;
@@ -224,6 +223,7 @@
     font-weight: 400;
     line-height: 1;
   }
+
 
   .fun-fact-arrow:hover,
   .fun-fact-arrow:focus-visible,
@@ -242,14 +242,13 @@
   .map-carousel-arrow:hover,
   .map-carousel-arrow:focus-visible,
   .map-carousel-toggle:hover,
-  .map-carousel-toggle:focus-visible,
-  .lightbox-arrow:hover,
-  .lightbox-arrow:focus-visible {
+  .map-carousel-toggle:focus-visible {
     border: 0;
     background: transparent;
     box-shadow: none;
     transform: none;
   }
+
 }
 
 /* ── THEMATIQUE citation on small screens ───────────────────────────────

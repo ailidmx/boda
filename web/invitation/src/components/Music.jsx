@@ -206,7 +206,13 @@ export function Music() {
         </div>
         <SwipeCardCarousel className="playlist-grid" label={music.playlists.title}>
           {playlists.map(([playlist, url], index) => (
-            <article className="playlist-card" key={playlist}>
+            <a
+              className="playlist-card"
+              href={url}
+              target="_blank"
+              rel="noreferrer"
+              key={playlist}
+            >
               <span className="playlist-number">0{index + 1}</span>
               <div className="spotify-mark" aria-hidden="true">
                 <i />
@@ -215,16 +221,12 @@ export function Music() {
               </div>
               <h4>{music.playlists[playlist]?.title}</h4>
               <p>{music.playlists[playlist]?.body}</p>
-              <a
-                className="text-link"
-                href={url}
-                target="_blank"
-                rel="noreferrer"
-              >
+              <span className="text-link">
                 {music.playlists[playlist]?.button} ↗
-              </a>
-            </article>
+              </span>
+            </a>
           ))}
+
         </SwipeCardCarousel>
       </div>
 

@@ -1,4 +1,6 @@
 import React, { useEffect, useCallback, useRef, useState } from "react";
+import { createPortal } from "react-dom";
+
 
 
 /**
@@ -59,7 +61,13 @@ export function LightboxCarousel({ open, onClose, images, startIndex = 0, label 
 
   const current = images[index];
 
-  return (
+  // Render through a portal directly into <body> so the overlay is ALWAYS a
+  // full-viewport modal. Rendering it inline inside a section would trap it
+  // inside that section's stacking context / overflow clipping (the `story-bg`
+  // sections use `overflow: hidden` + `isolation: isolate`), which is what made
+  // the lightbox "stick to" and get clipped by its section instead of covering
+  // the whole screen.
+  return createPortal(
     <div
       className="lightbox"
       role="dialog"
@@ -141,6 +149,8 @@ export function LightboxCarousel({ open, onClose, images, startIndex = 0, label 
           />
         ))}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
+

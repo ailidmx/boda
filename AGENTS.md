@@ -186,6 +186,17 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   photo carousel (`accommodation-photo-carousel`), and the `CabinOccupancy`
   modal. Reuse these existing classes/components rather than building a new
   layout. The extra cabin's photos come from the same `cloudinaryIds` field.
+- **Photo galleries open a swipeable `LightboxCarousel`** — every photo strip
+  (accommodation `accommodation-photo-carousel`, the extra-cabin carousel in
+  `ExtraStayCard.jsx`, the Barra de Navidad `barra-carousel` in `Coast.jsx`,
+  and the Oaxaca/Huichol grids in `Attire.jsx`) renders each photo as a
+  `<button className="…-photo">` (or `…-tile`) that opens the shared
+  `LightboxCarousel` (`components/LightboxCarousel.jsx`) at that index. The
+  lightbox itself is swipeable (touch, arrows, dots). The `.accommodation-photo`
+  CSS already resets the button chrome (border/padding/background) and has a
+  `:focus-visible` rule; `.barra-photo` and the attire tiles got the same
+  resets. When adding a new photo gallery, reuse `LightboxCarousel` + the
+  button-based tile pattern instead of a plain `<figure>`/`<img>`.
 - **Cabin photo storage convention** — a cabin's `cloudinaryIds` are stored
   **relative to the `boda/` prefix**; the app renders them as
   `cloudinaryImage(\`boda/${id}\`)`. So a photo at `boda/cabin/casona/foo` is

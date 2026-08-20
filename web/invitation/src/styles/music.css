@@ -448,6 +448,7 @@
 
 .playlist-card {
   position: relative;
+  display: block;
   min-height: 22rem;
   padding: 2rem;
   overflow: hidden;
@@ -455,7 +456,18 @@
     radial-gradient(120% 90% at 100% 0%, color-mix(in srgb, var(--music-accent) 12%, transparent), transparent 55%),
     var(--music-card-bg);
   color: var(--music-ink);
+  text-decoration: none;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
+
+/* The whole playlist card is a link (opens the Spotify playlist). Give it a
+   subtle lift on hover so it reads as interactive, without changing the
+   inner text-link affordance. */
+.playlist-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgb(0 0 0 / 0.18);
+}
+
 
 /* The playlist number is a large, stylised display numeral that sits behind
    the card content as a subtle background watermark. */

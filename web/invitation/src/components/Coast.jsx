@@ -5,6 +5,7 @@ import { RsvpQuestion } from "./RsvpQuestion.jsx";
 import { RsvpRecap } from "./RsvpRecap.jsx";
 import { FlipStepCard } from "./FlipStepCard.jsx";
 import { BARRA_PHOTOS } from "../barraGallery.js";
+import { LightboxCarousel } from "./LightboxCarousel.jsx";
 import {
   getGroupMembers,
   resolveGuestName,
@@ -206,6 +207,10 @@ export function Coast() {
 
   const [saveStatus, setSaveStatus] = useState("idle"); // idle | working | saved | error
 
+  // Full-screen lightbox for the Barra de Navidad photo strip. `barraLightbox`
+  // holds the start index or null. The lightbox itself is swipeable.
+  const [barraLightbox, setBarraLightbox] = useState(null);
+
   // ── Barra de Navidad budget estimate ─────────────────────────────────────
   // A hotel night in Barra de Navidad runs ~1,200–2,500 MXN per person. The
   // beach plan (Plan 2 · La plage) is 4 nights (Tue–Sat). We estimate the
@@ -330,14 +335,20 @@ export function Coast() {
         <div className="barra-carousel" aria-label={coast.barraPhotosLabel}>
           <div className="barra-photos" ref={barraRef}>
             {BARRA_PHOTOS.map((photo, index) => (
-              <figure className="barra-photo" key={index}>
+              <button
+                className="barra-photo"
+                type="button"
+                key={index}
+                onClick={() => setBarraLightbox(index)}
+                aria-label={`${coast.barraPhotosLabel} · ${index + 1} — ver en grande`}
+              >
                 <img
                   src={photo.src}
                   alt={`${coast.barraPhotosLabel} · ${index + 1}`}
                   loading="lazy"
                   decoding="async"
                 />
-              </figure>
+              </button>
             ))}
           </div>
           <div className="barra-carousel__nav" aria-label={`${coast.barraPhotosLabel} navigation`}>
@@ -521,6 +532,16 @@ export function Coast() {
           <span aria-hidden="true">↓</span>
         </a>
       </nav>
+
+      {/* Full-screen lightbox for the Barra de Navidad photo strip. The
+          lightbox itself is swipeable (touch, arrows, dots). */}
+      <LightboxCarousel
+        open={barraLightbox !== null}
+        onClose={() => setBarraLightbox(null)}
+        images={BARRA_PHOTOS}
+        startIndex={barraLightbox ?? 0}
+        label={coast.barraPhotosLabel}
+      />
     </section>
   );
 }

@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 
 import { resolveGuestName, resolveGuestPhoto } from "../../guest-profiles.js";
 import { CabinOccupancy } from "../../components/CabinOccupancy.jsx";
 import { PaymentSummary } from "../../components/PaymentSummary.jsx";
+import { LightboxCarousel } from "../../components/LightboxCarousel.jsx";
 import { getInitials } from "./data.js";
 
 // Extra stay (Plan 1 · stay at Roca Azul, Sunday→Tuesday) — shown only when
@@ -31,6 +32,13 @@ export function ExtraStayCard({
   payment,
   coveredLabel,
 }) {
+  // Full-screen lightbox for the extra cabin's photo carousel. `photoLightbox`
+  // holds the start index or null. The lightbox itself is swipeable.
+  const [photoLightbox, setPhotoLightbox] = useState(null);
+
+  // The lightbox slide set (same src for thumbnail and full view).
+  const photoSlides = extraCabinPhotos.map((src) => ({ src, full: src }));
+
   return (
     <div className="coast-extra-stay reveal">
       <p className="eyebrow">{extraStay?.eyebrow}</p>
@@ -94,7 +102,13 @@ export function ExtraStayCard({
           aria-label={extraCabinName}
         >
           {extraCabinPhotos.map((photo, index) => (
-            <figure className="accommodation-photo" key={index}>
+            <button
+              className="accommodation-photo"
+              type="button"
+              key={index}
+              onClick={() => setPhotoLightbox(index)}
+              aria-label={`${extraCabinName} · ${index + 1} — ver en grande`}
+            >
               <img src={photo} alt="" loading="lazy" decoding="async" />
               <figcaption>
                 <span>{extraCabinName}</span>
@@ -103,7 +117,7 @@ export function ExtraStayCard({
                   {String(extraCabinPhotos.length).padStart(2, "0")}
                 </small>
               </figcaption>
-            </figure>
+            </button>
           ))}
         </div>
       )}
@@ -128,6 +142,16 @@ export function ExtraStayCard({
         language={language}
         payment={payment}
         coveredLabel={coveredLabel}
+      />
+
+      {/* Full-screen lightbox for the extra cabin's photo carousel. The
+          lightbox itself is swipeable (touch, arrows, dots). */}
+      <LightboxCarousel
+        open={photoLightbox !== null}
+        onClose={() => setPhotoLightbox(null)}
+        images={photoSlides}
+        startIndex={photoLightbox ?? 0}
+        label={extraCabinName}
       />
     </div>
   );

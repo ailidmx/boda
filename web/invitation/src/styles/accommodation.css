@@ -491,12 +491,36 @@
 }
 
 .accommodation-option-details dt {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
   color: rgb(36 33 25 / 60%);
   font-size: 0.65rem;
   font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
 }
+
+/* The per-person / per-group price label text sits on its own line, with the
+   avatar(s) rendered on a new line below it. */
+.accommodation-price-label-text {
+  display: block;
+}
+
+/* The per-person label shows the guest's avatar below the label text. The
+   stacked variant (per-group row) overlaps the group members' avatars. */
+.accommodation-price-label-avatar {
+  display: inline-flex;
+  align-items: center;
+}
+
+.accommodation-price-label-avatar--stack > * {
+  margin-right: -0.35rem;
+  border: 2px solid var(--cream);
+  border-radius: 50%;
+}
+
 
 .accommodation-option-details dd {
   margin: 0;
@@ -535,7 +559,22 @@
   background: color-mix(in srgb, var(--sage) 12%, var(--white));
   box-shadow: 0 0.4rem 1rem rgb(36 33 25 / 10%);
   scroll-snap-align: start;
+  /* The photo is a <button> that opens the full-screen lightbox. Reset the
+     default button chrome so it renders exactly like the old <figure>. */
+  border: 0;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  background: none;
+  cursor: pointer;
 }
+
+.accommodation-photo:focus-visible {
+  outline: 2px solid var(--marigold);
+  outline-offset: 2px;
+}
+
 
 
 
