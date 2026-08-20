@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { EVENT } from "../content.js";
 import { MEDIA } from "../media.js";
 import { useApp } from "../context/AppContext.jsx";
+import { LightboxCarousel } from "./LightboxCarousel.jsx";
+
 
 // The PHOTOS section is a single merged section: it opens with the "Notre
 // chemin" gallery (dark) and continues into the "PARTAGEZ VOS PHOTOS" upload
@@ -12,10 +14,21 @@ export function Photos() {
   const photos = t.photos || {};
   const galleryPhotos = MEDIA.gallery || [];
 
+  // Full-screen lightbox state. `lightbox` holds { startIndex } or null.
+  const [lightbox, setLightbox] = useState(null);
+
+  // Build the slide set (same src for thumbnail and full view).
+  const gallerySlides = galleryPhotos.map((src, index) => ({
+    src,
+    full: src,
+    alt: gallery.alts[index % gallery.alts.length],
+  }));
+
   // The "after the wedding" album stays locked until the wedding date passes.
   const [isMarried, setIsMarried] = useState(
     () => Date.now() >= new Date(EVENT.weddingDate).getTime()
   );
+
 
   useEffect(() => {
     const check = () =>
@@ -37,11 +50,11 @@ export function Photos() {
 
         <div className="photo-gallery">
           {galleryPhotos.map((src, index) => (
-            <a
+            <button
               className="gallery-item"
-              href={src}
-              target="_blank"
-              rel="noreferrer"
+              type="button"
+              onClick={() => setLightbox({ startIndex: index })}
+              aria-label={`${gallery.alts[index % gallery.alts.length]} — ver en grande`}
               key={index}
             >
               <img
@@ -50,10 +63,11 @@ export function Photos() {
                 loading="lazy"
                 decoding="async"
               />
-            </a>
+            </button>
           ))}
         </div>
       </div>
+
 
       <div className="photos-upload-block">
 
@@ -119,6 +133,15 @@ export function Photos() {
         </a>
       </nav>
 
+      {/* Shared full-screen lightbox carousel */}
+      <LightboxCarousel
+        open={!!lightbox}
+        onClose={() => setLightbox(null)}
+        images={gallerySlides}
+        startIndex={lightbox ? lightbox.startIndex : 0}
+        label={gallery.title}
+      />
     </section>
   );
 }
+

@@ -1008,9 +1008,22 @@
 }
 
 .rsvp-payment-row dt {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.4rem;
   color: rgb(255 253 248 / 75%);
   font-size: 0.9rem;
 }
+
+/* The per-person / per-group label text sits on its own line, with the
+   avatar(s) rendered on a new line below it. */
+.rsvp-payment-label-text {
+  display: block;
+}
+
+
+
 
 /* The per-person label shows the guest's avatar next to the label text. The
    avatar wrapper is an inline-flex so the round thumbnail aligns with the
@@ -1062,6 +1075,7 @@
   font-weight: 400;
 }
 
+
 /* Struck-through original price, muted, shown next to the discounted price
    when a stay is covered by the couple (e-commerce "on sale" pattern). */
 .rsvp-payment-original {
@@ -1089,6 +1103,7 @@
 .rsvp-payment-value.is-sale .rsvp-payment-line > small {
   color: rgb(255 253 248 / 85%);
 }
+
 
 /* "Covered by the couple" banner: a small gold tag next to the price. */
 .rsvp-payment-value em {
@@ -1119,6 +1134,7 @@
   line-height: 1.35;
   text-align: right;
 }
+
 
 .rsvp-payment-cabinroom-list {
   display: grid;

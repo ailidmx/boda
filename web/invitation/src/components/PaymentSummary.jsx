@@ -223,10 +223,12 @@ export function PaymentSummary({
       <dl className="rsvp-payment-rows">
         <div className="rsvp-payment-row">
           <dt>
+            <span className="rsvp-payment-label-text">
+              {payment.perPerson.replace("{name}", activeFirstName || "")}
+            </span>
             <span className="rsvp-payment-label-avatar">
               <Avatar guest={amounts.liveActive} size={28} />
             </span>
-            {payment.perPerson.replace("{name}", activeFirstName || "")}
           </dt>
           <dd className={`rsvp-payment-value${perPersonSale ? " is-sale" : ""}`}>
             {activeLabel && (
@@ -247,12 +249,12 @@ export function PaymentSummary({
         {groupMembers.length > 1 && (
           <div className="rsvp-payment-row">
             <dt>
+              <span className="rsvp-payment-label-text">{payment.perGroup}</span>
               <span className="rsvp-payment-label-avatar rsvp-payment-label-avatar--stack">
                 {groupMembers.map((member) => (
                   <Avatar key={member.id} guest={member} size={28} />
                 ))}
               </span>
-              {payment.perGroup}
             </dt>
             <dd className={`rsvp-payment-value${groupSale ? " is-sale" : ""}`}>
               {groupLabels.length > 0 && (
@@ -274,6 +276,7 @@ export function PaymentSummary({
             </dd>
           </div>
         )}
+
 
       </dl>
     </div>

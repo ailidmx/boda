@@ -1,6 +1,7 @@
-import React from "react";
+import React, { useState } from "react";
 import { MEDIA } from "../media.js";
 import { useApp } from "../context/AppContext.jsx";
+import { LightboxCarousel } from "./LightboxCarousel.jsx";
 
 
 
@@ -10,6 +11,18 @@ import { useApp } from "../context/AppContext.jsx";
 export function Attire() {
   const { t } = useApp();
   const attire = t.attire || {};
+
+  // Full-screen lightbox state. `lightbox` holds { source, startIndex } or
+  // null, where `source` is "oaxaca" | "wixarica" so each montage opens its
+  // own slide set.
+  const [lightbox, setLightbox] = useState(null);
+
+  // Build the slide sets (same src for thumbnail and full view).
+  const oaxacaSlides = MEDIA.oaxaca.map((src) => ({ src, full: src }));
+  const wixaricaSlides = MEDIA.wixarica.map((src) => ({ src, full: src }));
+
+  const activeSlides =
+    lightbox?.source === "wixarica" ? wixaricaSlides : oaxacaSlides;
 
   return (
     <section className="attire-section attire-section--tematica section story-bg">
@@ -25,15 +38,22 @@ export function Attire() {
         <h2 className="attire-title reveal">{attire.title}</h2>
         <div className="oaxaca-grid" aria-label={attire.eyebrow}>
           {MEDIA.oaxaca.map((src, i) => (
-            <img
+            <button
               className="oaxaca-tile"
-              src={src}
-              alt=""
-              loading="lazy"
-              decoding="async"
+              type="button"
+              onClick={() => setLightbox({ source: "oaxaca", startIndex: i })}
+              aria-label={`${attire.eyebrow} · ${i + 1} — ver en grande`}
               style={{ "--tile-index": i }}
               key={i}
-            />
+            >
+              <img
+                className="oaxaca-tile__img"
+                src={src}
+                alt=""
+                loading="lazy"
+                decoding="async"
+              />
+            </button>
           ))}
         </div>
         <div className="attire-copy reveal">
@@ -46,15 +66,22 @@ export function Attire() {
           montage above, shown as an additional full-width strip. */}
       <div className="wixarica-grid" aria-label="Wixárika">
         {MEDIA.wixarica.map((src, i) => (
-          <img
+          <button
             className="oaxaca-tile"
-            src={src}
-            alt=""
-            loading="lazy"
-            decoding="async"
+            type="button"
+            onClick={() => setLightbox({ source: "wixarica", startIndex: i })}
+            aria-label={`Wixárika · ${i + 1} — ver en grande`}
             style={{ "--tile-index": i }}
             key={i}
-          />
+          >
+            <img
+              className="oaxaca-tile__img"
+              src={src}
+              alt=""
+              loading="lazy"
+              decoding="async"
+            />
+          </button>
         ))}
       </div>
 
@@ -65,6 +92,16 @@ export function Attire() {
           <span aria-hidden="true">↓</span>
         </a>
       </nav>
+
+      {/* Shared full-screen lightbox carousel for the Oaxaca + Wixárika
+          montages. The lightbox itself is swipeable (touch, arrows, dots). */}
+      <LightboxCarousel
+        open={!!lightbox}
+        onClose={() => setLightbox(null)}
+        images={activeSlides}
+        startIndex={lightbox ? lightbox.startIndex : 0}
+        label={lightbox?.source === "wixarica" ? "Wixárika" : attire.eyebrow}
+      />
     </section>
   );
 }
@@ -106,4 +143,3 @@ export function DressCode() {
     </section>
   );
 }
-

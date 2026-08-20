@@ -259,6 +259,10 @@
   width: 100%;
   aspect-ratio: 1 / 1;
   margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
   overflow: hidden;
   border-radius: 0.5rem;
   scroll-snap-align: start;
