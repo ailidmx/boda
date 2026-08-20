@@ -183,9 +183,21 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   section renders the extra cabin (`xtraCabin`/`xtraRoom`) with the same
   treatment as the primary cabin in Hébergement: covered note
   (`accommodation-covered-note`), cabin badge (`accommodation-cabin-badge`),
-  photo carousel (`accommodation-photo-carousel`), and the `CabinOccupancy`
-  modal. Reuse these existing classes/components rather than building a new
-  layout. The extra cabin's photos come from the same `cloudinaryIds` field.
+  photo carousel (`accommodation-photo-carousel`), the `CabinOccupancy`
+  modal, AND the full pricing/details block. The extra stay's payment block
+  (`ExtraStayCard` in `web/invitation/src/features/coast/ExtraStayCard.jsx`)
+  reuses the SAME `StayPlanCard` as the primary Hébergement section (NOT
+  `PaymentSummary`), so it renders the plan card plus the complete
+  `accommodation-option-details` dl (Gîte, Capacité, Modalité, Chambre,
+  Paiement, Prix cabane, Prix par personne, Prix par groupe) driven by the
+  extra-cabin resolvers. `Coast.jsx` passes `getXtraCabinId`/`getXtraRoomId`
+  (→ `getAssignedCabinId`/`getAssignedRoomId`), `resolveXtraCovered` (→
+  `resolveMemberCovered`, reads `isXtraCabinPaidByNovios`), and
+  `resolveXtraPaid` (→ `resolveMemberPaid`, reads `isXtraCabinPaid`).
+  `showExtraCabinRow` stays false because this IS the extra stay. Reuse these
+  existing classes/components rather than building a new layout. The extra
+  cabin's photos come from the same `cloudinaryIds` field.
+
 - **Photo galleries open a swipeable `LightboxCarousel`** — every photo strip
   (accommodation `accommodation-photo-carousel`, the extra-cabin carousel in
   `ExtraStayCard.jsx`, the Barra de Navidad `barra-carousel` in `Coast.jsx`,

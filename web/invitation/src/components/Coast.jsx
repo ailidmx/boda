@@ -74,6 +74,14 @@ export function Coast() {
     return source?.hosting?.isXtraCabinPaidByNovios ?? source?.isXtraCabinPaidByNovios;
   };
 
+  // Whether a member's extra stay is already paid (mirrors the primary stay's
+  // `resolveMemberPaid`, but reads the extra-cabin payment flag).
+  const resolveXtraPaid = (member) => {
+    const source = resolveLiveGuest(member);
+    return source?.hosting?.isXtraCabinPaid ?? source?.isXtraCabinPaid;
+  };
+
+
   // The active member shown in the extra-stay card. Defaults to the signed-in
 
   // guest; the guest selector (member tabs) lets the user switch between the
@@ -317,7 +325,10 @@ export function Coast() {
         <span className="coast-scene__beach" />
       </div>
 
-      <div className="coast-copy reveal">
+      {/* Screen 1 · "Prolonger le plaisir ?" — the intro: the two "Et après ?"
+          plans. The Barra de Navidad photo strip lives on its own screen
+          (Screen 3) with the accommodation suggestions. */}
+      <div id="after-intro" className="coast-copy reveal">
         <div className="section-heading">
           <p className="eyebrow">{coast.eyebrow}</p>
           <h2>{coast.title}</h2>
@@ -332,6 +343,67 @@ export function Coast() {
           ))}
         </div>
         <p className="coast-note">{coast.note}</p>
+      </div>
+
+      {/* Inline nav: from the intro to the extra-stay plan (Screen 2), or
+          straight to Barra de Navidad (Screen 3) when the guest has no extra
+          cabin assigned. */}
+      <a
+        className="section-nav-link section-nav-link--inline"
+        href={hasExtraCabin ? "#after-plan" : "#after-barra"}
+      >
+        <span>{t.nav[hasExtraCabin ? "coastPlan" : "coastBarra"]}</span>
+        <span aria-hidden="true">↓</span>
+      </a>
+
+      {/* Screen 2 · "El plan para ti" — the extra stay (Plan 1 · stay at Roca
+          Azul, Sunday→Tuesday). Shown only when the active guest has an extra
+          cabin assigned for the second stay. Reuses the same StayPlanCard as
+          the Hébergement section so the pricing, "paid by the couple" banner,
+          and on-sale styling match. */}
+      {hasExtraCabin && extraCabin && (
+        <div id="after-plan" className="coast-plan">
+          <ExtraStayCard
+            guests={guests}
+            activeMember={activeMember}
+            profileGuest={profile?.guest}
+            liveActive={liveActive}
+            extraCabin={extraCabin}
+            extraCabinName={extraCabinName}
+            extraCabinPhotos={extraCabinPhotos}
+            extraPaidByCouple={extraPaidByCouple}
+            extraRoomOccupants={extraRoomOccupants}
+            extraRoom={extraRoom}
+            extraStay={extraStay}
+            option={option}
+            language={language}
+            getXtraCabinId={getXtraCabinId}
+            getXtraRoomId={getXtraRoomId}
+            resolveXtraCovered={resolveXtraCovered}
+            resolveXtraPaid={resolveXtraPaid}
+            onSelectMember={setActiveMemberId}
+            payment={extraPayment}
+            coveredLabel={extraCoveredLabel}
+          />
+
+        </div>
+      )}
+
+      {/* Inline nav: from the extra-stay plan to Barra de Navidad (Screen 3). */}
+      {hasExtraCabin && extraCabin && (
+        <a
+          className="section-nav-link section-nav-link--inline"
+          href="#after-barra"
+        >
+          <span>{t.nav.coastBarra}</span>
+          <span aria-hidden="true">↓</span>
+        </a>
+      )}
+
+      {/* Screen 3 · "Barra de Navidad" — the photo strip of Barra de Navidad
+          plus the accommodation suggestions (mirrors the Accommodation "no
+          cabin" pattern: an Airbnb section and a hotel section). */}
+      <div id="after-barra" className="coast-barra">
         <div className="barra-carousel" aria-label={coast.barraPhotosLabel}>
           <div className="barra-photos" ref={barraRef}>
             {BARRA_PHOTOS.map((photo, index) => (
@@ -370,47 +442,25 @@ export function Coast() {
             </button>
           </div>
         </div>
+
+        <CoastSuggestions suggestions={suggestions} language={language} />
       </div>
 
-      {/* Extra stay (Plan 1 · stay at Roca Azul, Sunday→Tuesday) — shown only
-          when the active guest has an extra cabin assigned for the second
-          stay. Reuses the same StayPlanCard as the Hébergement section so the
-          pricing, "paid by the couple" banner, and on-sale styling match. */}
-      {hasExtraCabin && extraCabin && (
-        <ExtraStayCard
-          guests={guests}
-          activeMember={activeMember}
-          profileGuest={profile?.guest}
-          liveActive={liveActive}
-          extraCabin={extraCabin}
-          extraCabinName={extraCabinName}
-          extraCabinPhotos={extraCabinPhotos}
-          extraPaidByCouple={extraPaidByCouple}
-          extraRoomOccupants={extraRoomOccupants}
-          extraRoom={extraRoom}
-          extraStay={extraStay}
-          option={option}
-          language={language}
-          getXtraCabinId={getXtraCabinId}
-          getXtraRoomId={getXtraRoomId}
-          resolveXtraCovered={resolveXtraCovered}
-          onSelectMember={setActiveMemberId}
-          payment={extraPayment}
-          coveredLabel={extraCoveredLabel}
-        />
+      {/* Inline nav: from Barra de Navidad to the mini RSVP (Screen 4). */}
+      <a
+        className="section-nav-link section-nav-link--inline"
+        href="#after-rsvp"
+      >
+        <span>{t.nav.coastRsvp}</span>
+        <span aria-hidden="true">↓</span>
+      </a>
 
-      )}
-
-      {/* Coast accommodation suggestions — mirrors the Accommodation "no
-          cabin" pattern: an Airbnb section (one listing per group size) and a
-          hotel section (a short selection ordered by price). */}
-      <CoastSuggestions suggestions={suggestions} language={language} />
-
-      {/* Mini RSVP — a 3-step flipable card (like "¡Te animas!" and pétanque):
-          Step 1 = stay at Roca Azul, Step 2 = the beach plan, Step 3 = summary.
-          Each guest rates how likely they are to join each "Et après ?" plan
-          (0–5). Answers are saved per guest to Firestore via saveRsvpAnswers. */}
-      <div className="coast-rsvp-mini reveal" ref={rsvpRef}>
+      {/* Screen 4 · "Te apuntas?" — the mini RSVP, a 3-step flipable card
+          (like "¡Te animas!" and pétanque): Step 1 = stay at Roca Azul,
+          Step 2 = the beach plan, Step 3 = summary. Each guest rates how
+          likely they are to join each "Et après ?" plan (0–5). Answers are
+          saved per guest to Firestore via saveRsvpAnswers. */}
+      <div id="after-rsvp" className="coast-rsvp-mini reveal" ref={rsvpRef}>
         <div className="coast-rsvp-mini-head">
           <p className="eyebrow">{rsvpMini.eyebrow}</p>
           <h3>{rsvpMini.title}</h3>
@@ -512,17 +562,29 @@ export function Coast() {
         />
       </div>
 
-      {/* Barra de Navidad budget estimate — a "budget to plan" block that
-          turns the per-night per-person rate (1,200–2,500 MXN) into a group
-          total for the 4 beach nights, based on how many group members rated
-          the beach plan as interested (level ≥ 3). */}
-      <CoastBudget
-        budget={budget}
-        language={language}
-        barraMinTotal={barraMinTotal}
-        barraMaxTotal={barraMaxTotal}
-        interestedCount={interestedCount}
-      />
+      {/* Inline nav: from the mini RSVP to the beach budget (Screen 5). */}
+      <a
+        className="section-nav-link section-nav-link--inline"
+        href="#after-budget"
+      >
+        <span>{t.nav.coastBudget}</span>
+        <span aria-hidden="true">↓</span>
+      </a>
+
+      {/* Screen 5 · "Presupuesto playa" — the Barra de Navidad budget
+          estimate, a "budget to plan" block that turns the per-night
+          per-person rate (1,200–2,500 MXN) into a group total for the 4 beach
+          nights, based on how many group members rated the beach plan as
+          interested (level ≥ 3). */}
+      <div id="after-budget" className="coast-budget">
+        <CoastBudget
+          budget={budget}
+          language={language}
+          barraMinTotal={barraMinTotal}
+          barraMaxTotal={barraMaxTotal}
+          interestedCount={interestedCount}
+        />
+      </div>
 
 
       {/* Desktop-only bottom nav: leads to the photos section. */}
