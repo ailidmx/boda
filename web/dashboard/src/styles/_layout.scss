@@ -261,7 +261,9 @@
   border: 0;
   background: transparent;
   cursor: pointer;
+  overflow: hidden;
 }
+
 
 .dashboard-avatar {
   display: inline-flex;
