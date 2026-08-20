@@ -64,7 +64,21 @@ export const NAV_LINKS = [
     ],
   },
 
-  ["coast", "#after"],
+  // COAST ("Et après ?") groups the intro, the extra-stay plan, the Barra de
+  // Navidad suggestions, the mini RSVP and the beach budget under one dropdown,
+  // in the order they appear on the page.
+  {
+    key: "coast",
+    href: "#after",
+    children: [
+      ["coastIntro", "#after-intro"],
+      ["coastPlan", "#after-plan"],
+      ["coastBarra", "#after-barra"],
+      ["coastRsvp", "#after-rsvp"],
+      ["coastBudget", "#after-budget"],
+    ],
+  },
+
   ["rsvp", "#rsvp"],
   ["gift", "#gift"],
   ["photos", "#photos"],

@@ -420,6 +420,28 @@
 
 
 
+/* ── Screen 3 · "Barra de Navidad" ──────────────────────────────────────────
+   The Barra de Navidad photo strip plus the accommodation suggestions. This
+   wrapper spans both columns and hosts the photo strip on the same dark
+   translucent panel the intro (`.coast-copy`) uses, so the strip stays
+   legible over the bright beach backdrop. The nested `.coast-suggestions`
+   keeps its own panel below the strip. */
+.coast-barra {
+  grid-column: 1 / -1;
+  min-width: 0;
+  margin-top: clamp(3rem, 6vw, 5rem);
+  padding: clamp(1.5rem, 3vw, 2.5rem);
+  border-radius: 1.25rem;
+  background: rgb(15 40 50 / 42%);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+/* The photo strip inside the wrapper must stay inside its grid track. */
+.coast-barra .barra-carousel {
+  margin-top: 0;
+}
+
 /* ── Coast accommodation suggestions ────────────────────────────────────────
    The coast section is a two-column grid; the suggestions block spans both
    columns and reuses the Accommodation "no cabin" card pattern. */
@@ -726,13 +748,14 @@
   }
 }
 
-/* ── Extra stay (Plan 1 · stay at Roca Azul, Sunday→Tuesday) ────────────────
+/* ── Screen 2 · "El plan para ti" (extra stay, Plan 1 · stay at Roca Azul,
+   Sunday→Tuesday) ───────────────────────────────────────────────────────────
    Shown only when the active guest has an extra cabin assigned for the second
    stay. Spans both columns and reuses the shared StayPlanCard (plan card +
-   details list). To match the Hébergement block exactly, the container uses
-   the same light cream panel as `.accommodation-form-wrap` and we do NOT
-   override the StayPlanCard's native light-background styles. */
-.coast-extra-stay {
+   details list). To match the Hébergement block exactly, the wrapper uses the
+   same light cream panel as `.accommodation-form-wrap` and we do NOT override
+   the StayPlanCard's native light-background styles. */
+.coast-plan {
 
   grid-column: 1 / -1;
   min-width: 0;
@@ -743,6 +766,13 @@
   box-shadow: 0 1.5rem 4rem rgb(36 33 25 / 9%);
   backdrop-filter: blur(0.4rem);
   -webkit-backdrop-filter: blur(0.4rem);
+}
+
+/* The inner ExtraStayCard no longer needs its own panel — the `.coast-plan`
+   wrapper provides the light cream surface. It only needs to keep its
+   horizontal content contained. */
+.coast-extra-stay {
+  min-width: 0;
 }
 
 /* The heading sits on the light cream panel, so it uses the default dark ink
@@ -775,6 +805,43 @@
   color: var(--ink, #241f16);
 }
 
+/* The payment block title sits on the light cream panel (inside
+   `.coast-plan`), so it must use dark ink instead of the default white it
+   inherits from the shared RSVP payment styles (which assume a dark panel). */
+.coast-plan .rsvp-payment-block-title {
+  color: var(--ink, #241f16);
+}
+
+/* The whole PaymentSummary block sits on the light cream `.coast-plan`
+   panel, but the shared RSVP payment styles assume a dark panel and paint
+   every text element in a whiteish tone. Those light tones are invisible on
+   the cream surface, so we override the whole block to dark ink — matching
+   the title override above. The row's white-tinted border/background are
+   also swapped for a subtle dark hairline so the rows stay visible. */
+.coast-plan .rsvp-payment-row {
+  border-color: rgb(36 33 25 / 12%);
+  background: rgb(36 33 25 / 3%);
+}
+
+.coast-plan .rsvp-payment-row dt {
+  color: var(--ink, #241f16);
+}
+
+.coast-plan .rsvp-payment-line strong,
+.coast-plan .rsvp-payment-value.is-sale .rsvp-payment-line > strong {
+  color: var(--ink, #241f16);
+}
+
+.coast-plan .rsvp-payment-line small,
+.coast-plan .rsvp-payment-value.is-sale .rsvp-payment-line > small {
+  color: rgb(36 33 25 / 70%);
+}
+
+.coast-plan .rsvp-payment-cabinroom {
+  color: rgb(36 33 25 / 62%);
+}
+
+
 @media (max-width: 899px) {
   .coast-extra-stay {
     grid-column: 1 / -1;
@@ -793,6 +860,8 @@
   }
 
   .coast-copy,
+  .coast-plan,
+  .coast-barra,
   .coast-rsvp-mini {
     min-width: 0;
     overflow: hidden;
