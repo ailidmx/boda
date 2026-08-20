@@ -1097,6 +1097,15 @@ branch. Never commit directly to `master` or `develop`.
 - Deploy checks (`deploy-development`, `deploy-production`, `deploy-functions`)
   are skipped on PRs and run on the merged branch — a green PR does not mean a
   deploy happened yet.
+- **Docs-only PRs must still run `validate-pull-request`.** The required
+  `validate-pull-request` check lives in `deploy-invitation.yml`, whose
+  `pull_request` trigger has path filters. If a PR only touches files NOT in
+  those filters (e.g. `docs/**` or `AGENTS.md`), the workflow never runs and the
+  required check stays "queued" forever — the PR can never be merged. The
+  `pull_request` paths therefore include `docs/**` and `AGENTS.md` so docs-only
+  PRs still run the required check. The deploy jobs only run on `push`, so this
+  does not trigger spurious deploys. If you add a new required check, make sure
+  its workflow's `pull_request` path filters cover the file types it must gate.
 
 
 
