@@ -1060,6 +1060,45 @@ npm run test:rules  # Firestore rules tests (uses emulators)
 - Keep `docs/ARCHITECTURE_AUDIT.md` current as the codebase evolves.
 - Add new operational lessons to this AGENTS.md as you discover them.
 
+---
+
+## 8. Git workflow (ALWAYS follow this)
+
+The repo uses a **feature → develop → master** promotion flow. `master` is the
+default branch and is what deploys to production; `develop` is the integration
+branch. Never commit directly to `master` or `develop`.
+
+### Branching
+- Create a feature branch off `develop` for each task:
+  `git checkout develop && git pull && git checkout -b <type>/<short-slug>`
+  (e.g. `fix/winamp-mobile-safe-area`, `feat/coast-subsections`).
+- Commit only the files relevant to the task. Leave scratch/inspection scripts
+  (e.g. `scripts/_inspect_*.mjs`) untracked — do NOT stage them.
+
+### Promotion flow
+1. Push the feature branch: `git push -u origin <branch>`.
+2. Open a PR from the feature branch → `develop` (base `develop`).
+3. **Wait for CI checks to pass before merging.** The required check is
+   `validate-pull-request`; `lint`, `build`, and `test` also run. If the merge
+   API returns `405 Required status check "validate-pull-request" is queued`,
+   poll `get_check_runs` until it reports `conclusion: success`, then merge.
+   Merging is done with **squash**.
+4. After the feature PR merges to `develop`, open a second PR `develop` → `master`
+   (base `master`) to promote to production, wait for its checks, and squash-merge.
+5. Update the local repo: `git fetch origin && git checkout develop && git pull
+   origin develop`, then delete the local feature branch
+   (`git branch -d <branch>`). The remote branch can be deleted after the PR merges.
+
+### Notes
+- The GitHub MCP server (`github.com/github/github-mcp-server`) is available for
+  PR creation/merging and check polling. Repo is `ailidmx/boda`.
+- Squash-merge keeps `develop`/`master` history linear and each PR becomes one
+  commit. Use a descriptive `commit_title` that references the PR number.
+- Deploy checks (`deploy-development`, `deploy-production`, `deploy-functions`)
+  are skipped on PRs and run on the merged branch — a green PR does not mean a
+  deploy happened yet.
+
+
 
 
 
