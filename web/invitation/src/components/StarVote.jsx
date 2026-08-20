@@ -52,18 +52,21 @@ export function StarVote({ cardType, cardKey, onVote }) {
 
   // Render a 5-star row for a numeric score (0–5). Fractional averages are
   // rounded to the nearest half star so the general score reads clearly.
+  // Returns an array of star states (1 = full, 0.5 = half, 0 = empty) so the
+  // caller can render each star with full control — no reliance on font glyphs
+  // (the old "⯨" half-star character is not supported on every platform).
   const renderStars = (value) => {
     const rounded = Math.round((Number(value) || 0) * 2) / 2;
-    const full = Math.floor(rounded);
-    const half = rounded - full >= 0.5;
-    const stars = [];
+    const states = [];
     for (let i = 0; i < 5; i += 1) {
-      if (i < full) stars.push("★");
-      else if (i === full && half) stars.push("⯨");
-      else stars.push("☆");
+      const remaining = rounded - i;
+      if (remaining >= 1) states.push(1);
+      else if (remaining >= 0.5) states.push(0.5);
+      else states.push(0);
     }
-    return stars.join("");
+    return states;
   };
+
 
   const handleRate = useCallback(
     async (rating) => {
@@ -122,9 +125,23 @@ export function StarVote({ cardType, cardKey, onVote }) {
 
       <div className="star-vote__meta">
         {count > 0 ? (
-          <span className="star-vote__average">
-            <span className="star-vote__stars-row" aria-hidden="true">
-              {renderStars(average)}
+          <span className="star-vote__average" data-value={average}>
+            <span className="star-vote__stars-row" aria-hidden="true" data-value={average}>
+              {renderStars(average).map((state, i) => (
+                <span
+                  key={i}
+                  className={`star-vote__avg-star is-${state === 1 ? "full" : state === 0.5 ? "half" : "empty"}`}
+                >
+                  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M12 2l2.9 6.26 6.6.72-4.9 4.5 1.32 6.52L12 16.9 6.08 20l1.32-6.52-4.9-4.5 6.6-.72z" />
+                  </svg>
+                  {state === 0.5 && (
+                    <svg className="star-vote__avg-star-half" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                      <path d="M12 2l2.9 6.26 6.6.72-4.9 4.5 1.32 6.52L12 16.9 6.08 20l1.32-6.52-4.9-4.5 6.6-.72z" />
+                    </svg>
+                  )}
+                </span>
+              ))}
             </span>
             <span className="star-vote__count">
               ({count} {count === 1 ? voteLabel.vote : voteLabel.votes})
@@ -133,6 +150,7 @@ export function StarVote({ cardType, cardKey, onVote }) {
         ) : (
           <span className="star-vote__empty">{voteLabel.empty || "Be the first to rate"}</span>
         )}
+
         {myRating > 0 && (
           <span className="star-vote__mine">
             {voteLabel.yourRating || "Your rating"}: {myRating}

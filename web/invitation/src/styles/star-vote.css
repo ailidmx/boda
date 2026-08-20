@@ -67,15 +67,40 @@
   color: rgb(36 33 25 / 78%);
 }
 
-/* The general score rendered as a row of star glyphs (filled + empty).
-   Filled stars are gold; empty stars stay muted. */
+/* The general score rendered as a row of SVG stars (empty / half / full) so
+   we can represent 0, 0.5, 1, 1.5 … 5 without relying on font glyphs. Filled
+   stars are gold; empty stars stay muted. */
 .star-vote__stars-row {
-  letter-spacing: 0.08em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.08em;
+}
+
+.star-vote__avg-star {
+  position: relative;
+  display: inline-block;
+  width: 1.1rem;
+  height: 1.1rem;
   color: rgb(36 33 25 / 22%);
 }
-.star-vote__stars-row::first-letter {
+.star-vote__avg-star svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+.star-vote__avg-star.is-full {
   color: var(--marigold);
 }
+/* Half star: the base star stays muted and a gold overlay is clipped to the
+   left half so it reads as a proper half-filled star. */
+.star-vote__avg-star.is-half .star-vote__avg-star-half {
+  position: absolute;
+  inset: 0;
+  color: var(--marigold);
+  clip-path: inset(0 50% 0 0);
+}
+
 
 .star-vote__count {
   font-weight: 400;
@@ -117,12 +142,14 @@
   color: rgb(255 253 248 / 88%);
 }
 
-.music-act .star-vote__stars-row {
+.music-act .star-vote__avg-star {
   color: rgb(255 255 255 / 26%);
 }
-.music-act .star-vote__stars-row::first-letter {
+.music-act .star-vote__avg-star.is-full,
+.music-act .star-vote__avg-star.is-half .star-vote__avg-star-half {
   color: var(--marigold);
 }
+
 
 .music-act .star-vote__count,
 .music-act .star-vote__empty {
