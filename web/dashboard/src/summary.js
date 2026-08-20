@@ -162,8 +162,10 @@ function groupConfirmedGuests(guests) {
 }
 
 // Full-screen modal listing the confirmed guests for one day, grouped by group
-// tag (largest group first), A→Z within each group. Closes on ✕, on the
-// backdrop, or on Escape.
+// tag (largest group first), A→Z within each group. Each group is a collapsible
+// <details> block, collapsed by default. Closes on ✕, on the backdrop, or on
+// Escape. While open, background scrolling is locked (the modal scrolls
+// independently).
 function openConfirmedModal(guests, label) {
   const overlay = make("div", "dashboard-modal-overlay dashboard-confirmed-overlay");
   overlay.setAttribute("role", "dialog");
@@ -190,9 +192,10 @@ function openConfirmedModal(guests, label) {
     body.append(make("p", "dashboard-confirmed-empty", "Aún no hay confirmados para este día."));
   } else {
     groups.forEach(({ group, members }) => {
-      const section = make("section", "dashboard-confirmed-group");
-      const groupHead = make("div", "dashboard-confirmed-group-head");
-      groupHead.append(
+      // Collapsible group block. No `open` attribute → collapsed by default.
+      const details = make("details", "dashboard-confirmed-group");
+      const summary = make("summary", "dashboard-confirmed-group-head");
+      summary.append(
         make("strong", "", group),
         make("span", "", `${members.length} invitado${members.length === 1 ? "" : "s"}`),
       );
@@ -202,8 +205,8 @@ function openConfirmedModal(guests, label) {
         li.append(avatarEl(g), make("span", "", g.name));
         list.append(li);
       });
-      section.append(groupHead, list);
-      body.append(section);
+      details.append(summary, list);
+      body.append(details);
     });
   }
 
@@ -211,7 +214,12 @@ function openConfirmedModal(guests, label) {
   overlay.append(modal);
   document.body.appendChild(overlay);
 
+  // Lock background scrolling while the modal is open; restore on close.
+  const previousOverflow = document.body.style.overflow;
+  document.body.style.overflow = "hidden";
+
   function closeModal() {
+    document.body.style.overflow = previousOverflow;
     overlay.remove();
     document.removeEventListener("keydown", onKey);
   }
@@ -227,6 +235,7 @@ function openConfirmedModal(guests, label) {
   const closeBtn = modal.querySelector(".dashboard-modal-close");
   if (closeBtn) closeBtn.focus();
 }
+
 
 // A single attendance day card: confirmed count + distribution bar + legend +
 // clickable stacked avatars.

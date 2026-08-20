@@ -331,11 +331,22 @@
   padding: 2rem 0;
 }
 
+// Each group is a collapsible <details> block, collapsed by default. The
+// <summary> is the clickable header; the list only shows when expanded.
 .dashboard-confirmed-group {
   margin-bottom: 1.25rem;
 
   &:last-child {
     margin-bottom: 0;
+  }
+
+  // Hide the native disclosure triangle; we draw our own chevron.
+  summary {
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
   }
 }
 
@@ -344,9 +355,24 @@
   align-items: baseline;
   justify-content: space-between;
   gap: 0.75rem;
-  margin-bottom: 0.5rem;
-  padding-bottom: 0.35rem;
+  padding: 0.5rem 0.25rem;
   border-bottom: 1px solid $border-light;
+  cursor: pointer;
+  user-select: none;
+
+  // Chevron that rotates when the group is expanded.
+  &::before {
+    content: "";
+    align-self: center;
+    width: 0.55rem;
+    height: 0.55rem;
+    margin-right: 0.25rem;
+    border-right: 2px solid #766c5f;
+    border-bottom: 2px solid #766c5f;
+    transform: rotate(-45deg);
+    transition: transform 0.15s ease;
+    flex: 0 0 auto;
+  }
 
   strong {
     font-size: 1rem;
@@ -357,6 +383,17 @@
     font-size: 0.8rem;
   }
 }
+
+// When expanded, rotate the chevron to point up.
+.dashboard-confirmed-group[open] .dashboard-confirmed-group-head::before {
+  transform: rotate(135deg);
+}
+
+// The list only shows when its group is expanded.
+.dashboard-confirmed-group .dashboard-confirmed-list {
+  margin-top: 0.5rem;
+}
+
 
 .dashboard-confirmed-list {
   display: grid;
