@@ -736,7 +736,7 @@ export function buildGuestCreatePayload({
 export function buildDashboardGuestInlinePayload(guestId, field, value, invitationGroup, timestamp) {
   const GUEST_WRITABLE_FIELDS = new Set([
     "firstName", "middleName", "lastName", "maternalLastName", "gender", "age", "cloudinaryId", "phone", "idCheckUser",
-    "messageAuthor", "invitationGroup", "invitationSent", "_deleted",
+    "messageAuthor", "invitationGroup", "invitationSent", "_deleted", "travelsByPlane",
   ]);
 
 
@@ -773,7 +773,20 @@ export function buildDashboardGuestInlinePayload(guestId, field, value, invitati
     return payload;
   }
 
-
+  // `travelsByPlane` is a top-level boolean. The inline editor sends
+  // "true" / "false" / "" (empty = unknown). Normalize to a real boolean, or
+  // to `null` when empty so the field is explicitly cleared (Firestore rejects
+  // `undefined`, and merge won't remove an existing value).
+  if (field === "travelsByPlane") {
+    if (value === true || value === "true") {
+      payload.travelsByPlane = true;
+    } else if (value === false || value === "false") {
+      payload.travelsByPlane = false;
+    } else {
+      payload.travelsByPlane = null;
+    }
+    return payload;
+  }
 
   payload[field] = value;
   return {

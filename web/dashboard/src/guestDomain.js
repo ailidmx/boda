@@ -36,7 +36,8 @@ export const DEFAULT_AUTH_EMAIL_DOMAIN = "boda-david-y-ayde.web.app";
 export const GUEST_SORT_COLUMNS = [
   "name", "invitationGroup", "idCheck", "hasAuth", "group", "lang", "cabin", "room", "xtraCabin", "xtraRoom",
   "gender", "age", "message", "status",
-  "accommodationConfirm", "petanqueParticipation", "petanqueOwnBoules", "playa", "rocaAzul", "travelsByPlane",
+  "accommodationConfirm", "cabinWaitingList", "paymentConfirmed",
+  "petanqueParticipation", "petanqueOwnBoules", "playa", "rocaAzul", "travelsByPlane",
 ];
 
 

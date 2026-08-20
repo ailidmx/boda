@@ -371,7 +371,39 @@
   text-align: center;
 }
 
+// ── Travels-by-plane column ──
+.dashboard-travels-cell {
+  white-space: nowrap;
+}
+
+.dashboard-travels-display {
+  display: inline-block;
+  min-width: 2.2rem;
+  text-align: center;
+  padding: 0.15rem 0.4rem;
+  border-radius: 0.35rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $ink;
+  cursor: pointer;
+  transition: background 0.15s;
+
+  &:hover {
+    background: rgba(85, 69, 45, 0.1);
+  }
+
+  &.is-empty {
+    color: $ink-muted;
+    font-weight: 400;
+  }
+}
+
+.dashboard-travels-cell .dashboard-inline-select {
+  max-width: 6rem;
+}
+
 // ── Inline name fields (4 separate inputs) ──
+
 .dashboard-name-fields {
   display: flex;
   flex-wrap: wrap;

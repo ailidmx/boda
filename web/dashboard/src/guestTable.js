@@ -27,7 +27,8 @@ export function renderGuestManager(ctx) {
     guestStatusBadge,
     rsvpLevelChip,
     rsvpBooleanChip,
-    travelsByPlaneChip,
+    rsvpScaleChip,
+    paymentConfirmedChip,
     guestSortValue,
     GUEST_SORT_COLUMNS,
 
@@ -307,6 +308,36 @@ export function renderGuestManager(ctx) {
   };
 
 
+  // ── Travels-by-plane cell helper (inline editable) ──
+  // Shows whether the guest flies in (`travelsByPlane` boolean) as a clickable
+  // display that reveals a small inline select (Sí / No / —). Saves via
+  // `saveGuestInline("travelsByPlane", …)` — the payload builder converts the
+  // select value ("true" / "false" / "") into a real top-level boolean.
+  const TRAVELS_OPTIONS = [
+    { value: "", label: "—" },
+    { value: "true", label: "Sí" },
+    { value: "false", label: "No" },
+  ];
+  const travelsByPlaneCell = (guest) => {
+    const v = guest.travelsByPlane;
+    const current = v === true ? "true" : v === false ? "false" : "";
+    const options = TRAVELS_OPTIONS.map(
+      (t) => `<option value="${t.value}" ${current === t.value ? "selected" : ""}>${t.label}</option>`,
+    ).join("");
+    const displayLabel = TRAVELS_OPTIONS.find((t) => t.value === current)?.label || "—";
+    return `
+      <div class="dashboard-travels-cell" data-travels-cell="${guest.id}">
+        <button type="button" class="dashboard-travels-display" data-travels-display="${guest.id}" title="Editar si viaja en avión">
+          ${displayLabel}
+        </button>
+        <select class="dashboard-inline-select" data-travels-select="${guest.id}" title="¿Viaja en avión?" hidden>
+          ${options}
+        </select>
+      </div>`;
+  };
+
+
+
   // ── Message cell helper ──
   // Shows the guest's written message (messageAuthor) as a truncated badge with
   // a tooltip. Not inline-editable here (it's a free-text note).
@@ -433,13 +464,17 @@ export function renderGuestManager(ctx) {
                 <th>Vie</th>
                 <th>Sáb</th>
                 <th>Dom</th>
+                ${sortTh("accommodationConfirm", "Alojamiento")}
+                ${sortTh("cabinWaitingList", "Lista espera")}
                 ${sortTh("cabin", "Cabaña")}
                 ${sortTh("room", "Cuarto")}
                 ${sortTh("xtraCabin", "Cabaña extra")}
                 ${sortTh("xtraRoom", "Cuarto extra")}
                 ${sortTh("rocaAzul", "Roca Azul")}
+                ${sortTh("paymentConfirmed", "Pago")}
               `
               : ""}
+
             ${activeColumnGroup === "petanque"
               ? `
                 ${sortTh("petanqueParticipation", "Pétanque")}
@@ -478,8 +513,9 @@ export function renderGuestManager(ctx) {
                   <td>${genderCell(merged)}</td>
                   <td>${ageCell(merged)}</td>
                   <td>${messageCell(merged)}</td>
-                  <td>${travelsByPlaneChip(merged)}</td>
+                  <td>${travelsByPlaneCell(merged)}</td>
                   <td data-guest-status="${merged.id}"></td>
+
                 `
                 : ""}
               ${activeColumnGroup === "presencia"
@@ -487,11 +523,14 @@ export function renderGuestManager(ctx) {
                   <td>${rsvpLevelChip(merged, "friday")}</td>
                   <td>${rsvpLevelChip(merged, "saturday")}</td>
                   <td>${rsvpLevelChip(merged, "sunday")}</td>
+                  <td>${rsvpBooleanChip(merged, "accommodationConfirm")}</td>
+                  <td>${rsvpBooleanChip(merged, "cabinWaitingList")}</td>
                   <td>${badgeHtml(merged.cabinLabel || merged.unit || "")}</td>
                   <td>${badgeHtml(guestRoom(merged))}</td>
                   <td>${badgeHtml(xtraCabin)}</td>
                   <td>${badgeHtml(xtraRoom)}</td>
-                  <td>${rsvpBooleanChip(merged, "rocaAzul")}</td>
+                  <td>${rsvpScaleChip(merged, "rocaAzul")}</td>
+                  <td>${paymentConfirmedChip(merged)}</td>
                 `
                 : ""}
               ${activeColumnGroup === "petanque"
@@ -502,9 +541,10 @@ export function renderGuestManager(ctx) {
                 : ""}
               ${activeColumnGroup === "playa"
                 ? `
-                  <td>${rsvpBooleanChip(merged, "playa")}</td>
+                  <td>${rsvpScaleChip(merged, "playa")}</td>
                 `
                 : ""}
+
               <td>
                 <button class="dashboard-link-btn" data-edit-guest="${merged.id}" title="Editar todo (modal)">✏️</button>
                 <button class="dashboard-link-btn" data-copy-link="${merged.id}" title="Copiar enlace">🔗</button>
@@ -673,8 +713,29 @@ export function renderGuestManager(ctx) {
     });
   });
 
+  // ── Travels-by-plane editor: reveal select on click ──
+  container.querySelectorAll("[data-travels-display]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const guestId = btn.dataset.travelsDisplay;
+      const select = container.querySelector(`[data-travels-select="${guestId}"]`);
+      if (!select) return;
+      select.hidden = !select.hidden;
+      if (!select.hidden) select.focus();
+    });
+  });
+
+  // ── Travels-by-plane editor: save on change ──
+  container.querySelectorAll("[data-travels-select]").forEach((select) => {
+    select.addEventListener("change", async () => {
+      const guestId = select.dataset.travelsSelect;
+      const ok = await saveGuestInline(guestId, "travelsByPlane", select.value);
+      if (ok) renderGuestManager(ctx);
+    });
+  });
+
 
   // ── Auth email editor: reveal editor on click ──
+
   // The auth email (the guest's Firebase Auth login email) is inline-editable.
   // Clicking the display swaps it for a small email input + ✓ save button
   // (view mode → edit mode, never both at once). Saving calls the

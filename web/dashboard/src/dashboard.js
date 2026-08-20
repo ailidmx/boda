@@ -54,8 +54,9 @@ import {
   guestCanWhatsapp as serviceGuestCanWhatsapp,
   rsvpLevelChip as serviceRsvpLevelChip,
   rsvpBooleanChip as serviceRsvpBooleanChip,
+  rsvpScaleChip as serviceRsvpScaleChip,
+  paymentConfirmedChip as servicePaymentConfirmedChip,
   computeDayConfirmations as serviceComputeDayConfirmations,
-
   computeInvitationStats as serviceComputeInvitationStats,
   computeDayDistributions as serviceComputeDayDistributions,
   computeDayConfirmedGuests as serviceComputeDayConfirmedGuests,
@@ -362,13 +363,26 @@ function rsvpLevelChip(guest, day) {
   return serviceRsvpLevelChip(guest, day, state.liveGuests);
 }
 
-// Badge chip for a boolean-map RSVP answer (Sí / No / —) — e.g.
-// accommodationConfirm, petanqueParticipation, petanqueOwnBoules, playa,
-// rocaAzul. Reads the guest's `rsvp.answers.<questionId>[guest.id]` from the
-// live record.
+// Badge chip for a boolean RSVP answer (Sí / No / —) — e.g.
+// accommodationConfirm, cabinWaitingList, petanqueParticipation,
+// petanqueOwnBoules. Reads the guest's `rsvp.answers.<questionId>` (a plain
+// 1/2 number) from the live record.
 function rsvpBooleanChip(guest, questionId) {
   return serviceRsvpBooleanChip(guest, questionId, state.liveGuests);
 }
+
+// Badge chip for a SCALE RSVP answer (0–5) — used for the coast plans
+// (`playa`, `rocaAzul`), which are 0–5 likelihood questions, NOT yes/no.
+function rsvpScaleChip(guest, questionId) {
+  return serviceRsvpScaleChip(guest, questionId, state.liveGuests);
+}
+
+// Badge chip for the top-level `paymentConfirmed` boolean on the guest doc
+// (Sí / No / —).
+function paymentConfirmedChip(guest) {
+  return servicePaymentConfirmedChip(guest);
+}
+
 
 // Aggregate confirmed counts per attendance day from the live guests.
 
@@ -742,10 +756,10 @@ function renderGuestManager() {
     guestStatusBadge,
     rsvpLevelChip,
     rsvpBooleanChip,
+    rsvpScaleChip,
+    paymentConfirmedChip,
     guestSortValue,
     GUEST_SORT_COLUMNS,
-
-
     saveGuestInline,
     saveGuestEmail,
     saveGuestRsvpAnswer,

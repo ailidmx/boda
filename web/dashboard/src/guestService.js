@@ -120,25 +120,65 @@ export function rsvpLevelChip(guest, day, liveGuests) {
   return `<select class="${cls}" data-rsvp-chip="${guest.id}" data-rsvp-day="${day}" title="Nivel de asistencia (0 = sin respuesta, 4–5 = confirmado)">${options}</select>`;
 }
 
-// Read a boolean-map RSVP answer for a guest (e.g. `rsvp.answers.petanqueParticipation[guest.id]`).
-// These questions store a per-guest map of `{ guestId → level }` where level is
-// 1 (yes) or 2 (no). Returns 0 when the guest has no answer.
+// Read a boolean RSVP answer for a guest (e.g. `rsvp.answers.petanqueParticipation`).
+// These questions store a plain number per guest doc: 1 (yes) or 2 (no) — the
+// SAME shape the invitation front-end writes via `saveRsvpAnswers` →
+// `buildGuestRsvpPayload` (`rsvp.answers.<questionId> = level`). Returns 0 when
+// the guest has no answer.
 export function getRsvpBooleanAnswer(guest, questionId, liveGuests) {
   const answers = getLiveRsvpAnswers(guest, liveGuests);
-  const map = answers[questionId] || {};
-  const level = Number(map[guest.id]);
+  const level = Number(answers[questionId]);
   return level === 1 || level === 2 ? level : 0;
 }
 
-// Badge chip for a boolean-map RSVP answer (Sí / No / —). Mirrors the scale
-// chip styling but for the yes/no questions (accommodationConfirm, petanque,
-// playa, rocaAzul).
+
+// Badge chip for a boolean RSVP answer (Sí / No / —). Mirrors the scale chip
+// styling but for the yes/no questions (accommodationConfirm, cabinWaitingList,
+// petanqueParticipation, petanqueOwnBoules).
 export function rsvpBooleanChip(guest, questionId, liveGuests) {
   const level = getRsvpBooleanAnswer(guest, questionId, liveGuests);
   if (level === 1) return '<span class="dashboard-badge dashboard-badge-yes">Sí</span>';
   if (level === 2) return '<span class="dashboard-badge dashboard-badge-no">No</span>';
   return '<span class="dashboard-badge dashboard-badge-muted">—</span>';
 }
+
+// Read a SCALE RSVP answer (0–5) for a guest (e.g. `rsvp.answers.playa`). These
+// questions store a plain int 0–5 per guest doc, the same shape as the
+// attendance days. Returns 0 when the guest has no answer.
+export function getRsvpScaleAnswer(guest, questionId, liveGuests) {
+  const answers = getLiveRsvpAnswers(guest, liveGuests);
+  const level = Number(answers[questionId]);
+  return Number.isInteger(level) && level > 0 ? level : 0;
+}
+
+// Badge chip for a SCALE RSVP answer (0–5) — used for the coast plans
+// (`playa`, `rocaAzul`), which are 0–5 likelihood questions, NOT yes/no. Shows
+// the numeric level with the same confirmed/partial/empty coloring as the
+// attendance days.
+export function rsvpScaleChip(guest, questionId, liveGuests) {
+  const level = getRsvpScaleAnswer(guest, questionId, liveGuests);
+  const cls = level >= RSVP_CONFIRMED_MIN_LEVEL
+    ? "dashboard-badge dashboard-badge-yes"
+    : level > 0
+      ? "dashboard-badge dashboard-badge-maybe"
+      : "dashboard-badge dashboard-badge-muted";
+  const text = level > 0 ? String(level) : "—";
+  return `<span class="${cls}">${text}</span>`;
+}
+
+// Badge chip for the top-level `paymentConfirmed` boolean on the guest doc
+// (Sí / No / —). This is the "payment done" flag the invitation writes via
+// `savePaymentConfirmed` → `buildGuestPaymentConfirmedPayload`.
+export function paymentConfirmedChip(guest) {
+  if (guest.paymentConfirmed === true) {
+    return '<span class="dashboard-badge dashboard-badge-yes">Sí</span>';
+  }
+  if (guest.paymentConfirmed === false) {
+    return '<span class="dashboard-badge dashboard-badge-no">No</span>';
+  }
+  return '<span class="dashboard-badge dashboard-badge-muted">—</span>';
+}
+
 
 // Aggregate confirmed counts per attendance day from the live guests.
 
@@ -374,11 +414,15 @@ export function guestSortValue(guest, key, authUsers = {}, liveGuests = []) {
     case "message":
       return (guestIdentity(guest).messageAuthor || guest.messageAuthor || "").toLowerCase();
     case "accommodationConfirm":
+    case "cabinWaitingList":
     case "petanqueParticipation":
     case "petanqueOwnBoules":
+      return getRsvpBooleanAnswer(guest, key, liveGuests);
     case "playa":
     case "rocaAzul":
-      return getRsvpBooleanAnswer(guest, key, liveGuests);
+      return getRsvpScaleAnswer(guest, key, liveGuests);
+    case "paymentConfirmed":
+      return guest?.paymentConfirmed === true ? 1 : 0;
     case "travelsByPlane":
       return guest?.travelsByPlane === true ? 1 : 0;
     case "status":
