@@ -338,13 +338,13 @@ export function getUniqueCabins(activeGuests) {
   return cabins.sort();
 }
 
-// Age-group buckets used by the NINO/ADULTO filter. A guest is a "NINO" when
-// their `identity.age` parses to a number < 18; "ADULTO" otherwise (18+ or
-// unknown). The filter is a simple three-state toggle: "" (all), "nino", "adulto".
+// Age-group bucket used by the NINO/ADULTO filter. The `age` field is now a
+// STRING ("Adulto" / "Niño" / ""), matching the guest editor modal — NOT a raw
+// number. A guest is a "NINO" when their `identity.age` (or top-level `age`)
+// equals "Niño"; everything else (including unknown/empty) is "adulto".
 export function guestAgeGroup(guest) {
-  const age = Number.parseInt(String(guestIdentity(guest).age || guest.age || ""), 10);
-  if (Number.isNaN(age)) return "adulto"; // unknown age → treat as adult
-  return age < 18 ? "nino" : "adulto";
+  const age = String(guestIdentity(guest).age ?? guest.age ?? "").trim();
+  return age === "Niño" ? "nino" : "adulto";
 }
 
 // Filter the active guests by the current group + free-text query + age group.
@@ -360,6 +360,7 @@ export function getFilteredGuests(activeGuests, { filterGroup, filterQuery, filt
     filtered = filtered.filter((g) => guestAgeGroup(g) === filterAgeGroup);
   }
   if (filterQuery) {
+
     const q = filterQuery.toLowerCase();
     filtered = filtered.filter(
       (g) =>

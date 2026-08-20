@@ -252,11 +252,12 @@ export function renderGuestManager(ctx) {
       </div>`;
   };
 
-  // ── Gender cell helper (inline editable) ──
-  // Shows the guest's gender as a clickable display that reveals a small
-  // inline select (M = Mujer / H = Hombre / —). This matches the values used by
-  // the guest editor modal (M / H), NOT the old M / F. Saves via
-  // `saveGuestInline("gender", …)`.
+  // ── Gender cell helper (inline editable, toggle mode) ──
+  // Shows the guest's gender as a clickable display. Clicking it enters EDIT
+  // mode: the display is hidden and a small inline select (M = Mujer / H =
+  // Hombre / —) appears with a ✓ confirm and ✕ cancel button. The display and
+  // editor are NEVER both visible at once. Confirm saves via
+  // `saveGuestInline("gender", …)`; cancel reverts without saving.
   const GENDER_OPTIONS = [
     { value: "", label: "—" },
     { value: "M", label: "Mujer" },
@@ -273,18 +274,23 @@ export function renderGuestManager(ctx) {
         <button type="button" class="dashboard-gender-display" data-gender-display="${guest.id}" title="Editar género">
           ${displayLabel}
         </button>
-        <select class="dashboard-inline-select" data-gender-select="${guest.id}" title="Elegir género" hidden>
-          ${options}
-        </select>
+        <span class="dashboard-inline-editor" data-gender-editor="${guest.id}" hidden>
+          <select class="dashboard-inline-select" data-gender-select="${guest.id}" title="Elegir género">${options}</select>
+          <button type="button" class="dashboard-link-btn" data-gender-confirm="${guest.id}" title="Guardar">✓</button>
+          <button type="button" class="dashboard-link-btn" data-gender-cancel="${guest.id}" title="Cancelar">✕</button>
+        </span>
       </div>`;
   };
 
 
-  // ── Age cell helper (inline editable) ──
-  // Shows the guest's age group as a clickable display that reveals a small
-  // inline select (Adulto / Niño / —). This matches the values used by the
-  // guest editor modal (Adulto / Niño), NOT a raw number input. Saves via
-  // `saveGuestInline("age", …)`.
+
+  // ── Age cell helper (inline editable, toggle mode) ──
+  // Shows the guest's age group as a clickable display. Clicking it enters
+  // EDIT mode: the display is hidden and a small inline select (Adulto / Niño
+  // / —) appears with a ✓ confirm and ✕ cancel button. The display and editor
+  // are NEVER both visible at once. Confirm saves via
+  // `saveGuestInline("age", …)`; cancel reverts without saving. Matches the
+  // values used by the guest editor modal (Adulto / Niño), NOT a raw number.
   const AGE_OPTIONS = [
     { value: "", label: "—" },
     { value: "Adulto", label: "Adulto" },
@@ -301,40 +307,32 @@ export function renderGuestManager(ctx) {
         <button type="button" class="dashboard-age-display" data-age-display="${guest.id}" title="Editar edad">
           ${displayLabel}
         </button>
-        <select class="dashboard-inline-select" data-age-select="${guest.id}" title="Elegir edad" hidden>
-          ${options}
-        </select>
+        <span class="dashboard-inline-editor" data-age-editor="${guest.id}" hidden>
+          <select class="dashboard-inline-select" data-age-select="${guest.id}" title="Elegir edad">${options}</select>
+          <button type="button" class="dashboard-link-btn" data-age-confirm="${guest.id}" title="Guardar">✓</button>
+          <button type="button" class="dashboard-link-btn" data-age-cancel="${guest.id}" title="Cancelar">✕</button>
+        </span>
       </div>`;
   };
 
 
-  // ── Travels-by-plane cell helper (inline editable) ──
-  // Shows whether the guest flies in (`travelsByPlane` boolean) as a clickable
-  // display that reveals a small inline select (Sí / No / —). Saves via
-  // `saveGuestInline("travelsByPlane", …)` — the payload builder converts the
-  // select value ("true" / "false" / "") into a real top-level boolean.
-  const TRAVELS_OPTIONS = [
-    { value: "", label: "—" },
-    { value: "true", label: "Sí" },
-    { value: "false", label: "No" },
-  ];
+
+  // ── Travels-by-plane cell helper (simple checkbox) ──
+  // Shows whether the guest flies in (`travelsByPlane` boolean) as a plain
+  // checkbox. Checking it saves `true`, unchecking saves `false` — there is no
+  // "unknown" state, so the checkbox is the single source of truth. Saves via
+  // `saveGuestInline("travelsByPlane", …)`.
   const travelsByPlaneCell = (guest) => {
-    const v = guest.travelsByPlane;
-    const current = v === true ? "true" : v === false ? "false" : "";
-    const options = TRAVELS_OPTIONS.map(
-      (t) => `<option value="${t.value}" ${current === t.value ? "selected" : ""}>${t.label}</option>`,
-    ).join("");
-    const displayLabel = TRAVELS_OPTIONS.find((t) => t.value === current)?.label || "—";
+    const v = guest.travelsByPlane === true;
     return `
       <div class="dashboard-travels-cell" data-travels-cell="${guest.id}">
-        <button type="button" class="dashboard-travels-display" data-travels-display="${guest.id}" title="Editar si viaja en avión">
-          ${displayLabel}
-        </button>
-        <select class="dashboard-inline-select" data-travels-select="${guest.id}" title="¿Viaja en avión?" hidden>
-          ${options}
-        </select>
+        <label class="dashboard-checkbox-cell" title="¿Viaja en avión?">
+          <input type="checkbox" class="dashboard-travels-checkbox" data-travels-checkbox="${guest.id}" ${v ? "checked" : ""} />
+          <span>${v ? "Sí" : "No"}</span>
+        </label>
       </div>`;
   };
+
 
 
 
@@ -419,13 +417,12 @@ export function renderGuestManager(ctx) {
         />
       </div>
       <div class="dashboard-filter-group">
-        <label for="filter-age-group">Edad</label>
-        <select id="filter-age-group" data-filter-age-group title="Filtrar por grupo de edad">
-          <option value="" ${!state.filterAgeGroup ? "selected" : ""}>Todos</option>
-          <option value="nino" ${state.filterAgeGroup === "nino" ? "selected" : ""}>Niños (<18)</option>
-          <option value="adulto" ${state.filterAgeGroup === "adulto" ? "selected" : ""}>Adultos (18+)</option>
-        </select>
+        <label class="dashboard-checkbox-cell" for="filter-age-group" title="Mostrar solo niños">
+          <input type="checkbox" id="filter-age-group" data-filter-age-group ${state.filterAgeGroup === "nino" ? "checked" : ""} />
+          <span>Solo niños</span>
+        </label>
       </div>
+
       <div class="dashboard-filter-count">
         <strong>${filtered.length}</strong> de <strong>${getActiveGuests().length}</strong> invitados
       </div>
@@ -597,11 +594,15 @@ export function renderGuestManager(ctx) {
     }
   });
 
-  // ── Age-group filter (Niños / Adultos) ──
+  // ── Age-group filter (toggle checkbox: "Solo niños") ──
+  // Checking the box filters to children only (`filterAgeGroup = "nino"`);
+  // unchecking clears the filter. There is no "adultos only" mode — the
+  // checkbox is a simple on/off toggle.
   container.querySelector("[data-filter-age-group]")?.addEventListener("change", (e) => {
-    state.filterAgeGroup = e.target.value;
+    state.filterAgeGroup = e.target.checked ? "nino" : "";
     renderGuestManager(ctx);
   });
+
 
   // ── Add guest (opens the "Agregar invitado" modal) ──
   container.querySelector("[data-add-guest]")?.addEventListener("click", () => {
@@ -673,65 +674,94 @@ export function renderGuestManager(ctx) {
     });
   });
 
-  // ── Gender editor: reveal select on click ──
+  // ── Gender editor: toggle mode (display ⇄ editor, never both) ──
+  // Clicking the display hides it and reveals the inline select + ✓/✕ buttons.
+  // The ✓ confirm saves the selected value; the ✕ cancel hides the editor and
+  // restores the display without saving.
+  const setGenderEditorOpen = (guestId, open) => {
+    const display = container.querySelector(`[data-gender-display="${guestId}"]`);
+    const editor = container.querySelector(`[data-gender-editor="${guestId}"]`);
+    if (display) display.hidden = open;
+    if (editor) editor.hidden = !open;
+    if (open) {
+      const select = container.querySelector(`[data-gender-select="${guestId}"]`);
+      if (select) select.focus();
+    }
+  };
+
   container.querySelectorAll("[data-gender-display]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const guestId = btn.dataset.genderDisplay;
+      setGenderEditorOpen(btn.dataset.genderDisplay, true);
+    });
+  });
+
+  // ── Gender editor: confirm (✓) saves ──
+  container.querySelectorAll("[data-gender-confirm]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const guestId = btn.dataset.genderConfirm;
       const select = container.querySelector(`[data-gender-select="${guestId}"]`);
       if (!select) return;
-      select.hidden = !select.hidden;
-      if (!select.hidden) select.focus();
-    });
-  });
-
-  // ── Gender editor: save on change ──
-  container.querySelectorAll("[data-gender-select]").forEach((select) => {
-    select.addEventListener("change", async () => {
-      const guestId = select.dataset.genderSelect;
       const ok = await saveGuestInline(guestId, "gender", select.value);
       if (ok) renderGuestManager(ctx);
+      else setGenderEditorOpen(guestId, false);
     });
   });
 
-  // ── Age editor: reveal select on click ──
+  // ── Gender editor: cancel (✕) reverts without saving ──
+  container.querySelectorAll("[data-gender-cancel]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setGenderEditorOpen(btn.dataset.genderCancel, false);
+    });
+  });
+
+  // ── Age editor: toggle mode (display ⇄ editor, never both) ──
+  const setAgeEditorOpen = (guestId, open) => {
+    const display = container.querySelector(`[data-age-display="${guestId}"]`);
+    const editor = container.querySelector(`[data-age-editor="${guestId}"]`);
+    if (display) display.hidden = open;
+    if (editor) editor.hidden = !open;
+    if (open) {
+      const select = container.querySelector(`[data-age-select="${guestId}"]`);
+      if (select) select.focus();
+    }
+  };
+
   container.querySelectorAll("[data-age-display]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const guestId = btn.dataset.ageDisplay;
+      setAgeEditorOpen(btn.dataset.ageDisplay, true);
+    });
+  });
+
+  // ── Age editor: confirm (✓) saves ──
+  container.querySelectorAll("[data-age-confirm]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const guestId = btn.dataset.ageConfirm;
       const select = container.querySelector(`[data-age-select="${guestId}"]`);
       if (!select) return;
-      select.hidden = !select.hidden;
-      if (!select.hidden) select.focus();
-    });
-  });
-
-  // ── Age editor: save on change ──
-  container.querySelectorAll("[data-age-select]").forEach((select) => {
-    select.addEventListener("change", async () => {
-      const guestId = select.dataset.ageSelect;
       const ok = await saveGuestInline(guestId, "age", select.value);
       if (ok) renderGuestManager(ctx);
+      else setAgeEditorOpen(guestId, false);
     });
   });
 
-  // ── Travels-by-plane editor: reveal select on click ──
-  container.querySelectorAll("[data-travels-display]").forEach((btn) => {
+  // ── Age editor: cancel (✕) reverts without saving ──
+  container.querySelectorAll("[data-age-cancel]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const guestId = btn.dataset.travelsDisplay;
-      const select = container.querySelector(`[data-travels-select="${guestId}"]`);
-      if (!select) return;
-      select.hidden = !select.hidden;
-      if (!select.hidden) select.focus();
+      setAgeEditorOpen(btn.dataset.ageCancel, false);
     });
   });
 
-  // ── Travels-by-plane editor: save on change ──
-  container.querySelectorAll("[data-travels-select]").forEach((select) => {
-    select.addEventListener("change", async () => {
-      const guestId = select.dataset.travelsSelect;
-      const ok = await saveGuestInline(guestId, "travelsByPlane", select.value);
-      if (ok) renderGuestManager(ctx);
+  // ── Travels-by-plane: simple checkbox toggle ──
+  // Checking saves `true`, unchecking saves `false`. On failure the checkbox
+  // reverts to its previous state.
+  container.querySelectorAll("[data-travels-checkbox]").forEach((checkbox) => {
+    checkbox.addEventListener("change", async () => {
+      const guestId = checkbox.dataset.travelsCheckbox;
+      const ok = await saveGuestInline(guestId, "travelsByPlane", checkbox.checked);
+      if (!ok) checkbox.checked = !checkbox.checked; // revert on failure
     });
   });
+
 
 
   // ── Auth email editor: reveal editor on click ──

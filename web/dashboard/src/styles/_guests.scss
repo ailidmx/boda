@@ -305,7 +305,10 @@
   }
 }
 
-// ── Gender column ──
+// ── Gender column (toggle mode: display ⇄ editor, never both) ──
+// The display is a clickable pill. Clicking it hides the pill and reveals a
+// small inline select + ✓ confirm / ✕ cancel buttons. The `[hidden]` attribute
+// must win over any display rule so view and edit modes are never both visible.
 .dashboard-gender-cell {
   white-space: nowrap;
 }
@@ -333,13 +336,34 @@
     font-weight: 400;
     text-transform: none;
   }
+
+  &[hidden] {
+    display: none;
+  }
 }
 
-.dashboard-gender-cell .dashboard-inline-select {
-  max-width: 7rem;
+// Shared inline editor (select + ✓/✕) used by the gender and age cells.
+.dashboard-inline-editor {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  white-space: nowrap;
+
+  &[hidden] {
+    display: none;
+  }
+
+  .dashboard-inline-select {
+    max-width: 7rem;
+  }
+
+  .dashboard-link-btn {
+    font-size: 1rem;
+    line-height: 1;
+  }
 }
 
-// ── Age column ──
+// ── Age column (toggle mode: display ⇄ editor, never both) ──
 .dashboard-age-cell {
   white-space: nowrap;
 }
@@ -363,44 +387,37 @@
   &.is-empty {
     color: $ink-muted;
   }
+
+  &[hidden] {
+    display: none;
+  }
 }
 
-.dashboard-age-cell .dashboard-inline-input {
-  min-width: 4rem;
-  width: 4.5rem;
-  text-align: center;
-}
-
-// ── Travels-by-plane column ──
+// ── Travels-by-plane column (simple checkbox) ──
+// A plain checkbox with a "Sí"/"No" label. Checking saves `true`, unchecking
+// saves `false` — there is no "unknown" state.
 .dashboard-travels-cell {
   white-space: nowrap;
 }
 
-.dashboard-travels-display {
-  display: inline-block;
-  min-width: 2.2rem;
-  text-align: center;
-  padding: 0.15rem 0.4rem;
-  border-radius: 0.35rem;
-  font-size: 0.82rem;
-  font-weight: 600;
+// Shared checkbox cell (used by the travels column and the "Solo niños" filter).
+.dashboard-checkbox-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
   color: $ink;
   cursor: pointer;
-  transition: background 0.15s;
+  white-space: nowrap;
 
-  &:hover {
-    background: rgba(85, 69, 45, 0.1);
-  }
-
-  &.is-empty {
-    color: $ink-muted;
-    font-weight: 400;
+  input[type="checkbox"] {
+    width: 1rem;
+    height: 1rem;
+    accent-color: $accent;
+    cursor: pointer;
   }
 }
 
-.dashboard-travels-cell .dashboard-inline-select {
-  max-width: 6rem;
-}
 
 // ── Inline name fields (4 separate inputs) ──
 
