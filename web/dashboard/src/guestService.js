@@ -140,16 +140,8 @@ export function rsvpBooleanChip(guest, questionId, liveGuests) {
   return '<span class="dashboard-badge dashboard-badge-muted">—</span>';
 }
 
-// Badge chip for the `travelsByPlane` boolean (true = flies in). Shows
-// "Sí" / "No" / "—" (unknown).
-export function travelsByPlaneChip(guest) {
-  const v = guest?.travelsByPlane;
-  if (v === true) return '<span class="dashboard-badge dashboard-badge-yes">Sí</span>';
-  if (v === false) return '<span class="dashboard-badge dashboard-badge-no">No</span>';
-  return '<span class="dashboard-badge dashboard-badge-muted">—</span>';
-}
-
 // Aggregate confirmed counts per attendance day from the live guests.
+
 export function computeDayConfirmations(activeGuests, liveGuests) {
 
   const counts = { friday: 0, saturday: 0, sunday: 0 };
@@ -215,6 +207,37 @@ export function computeDayConfirmedGuests(activeGuests, liveGuests) {
   });
   return byDay;
 }
+
+// Per-day, per-level list of guests for EVERY RSVP level (0–5), not just the
+// confirmed ones. Returns an object keyed by attendance day, each holding an
+// array of 6 arrays indexed by level (0 = no answer, 5 = fully confirmed).
+// Each guest summary is `{ id, name, group, avatar, initials, level }`. Used to
+// make each segment of the distribution bar clickable so the admin can open a
+// modal listing exactly who answered 0, 1, 2, 3, 4 or 5 for that day.
+export function computeDayLevelGuests(activeGuests, liveGuests) {
+  const byDay = {
+    friday: [[], [], [], [], [], []],
+    saturday: [[], [], [], [], [], []],
+    sunday: [[], [], [], [], [], []],
+  };
+  activeGuests.forEach((guest) => {
+    const answers = getLiveRsvpAnswers(guest, liveGuests);
+    RSVP_ATTENDANCE_DAYS.forEach((day) => {
+      const level = Number(answers[day]) || 0;
+      const idx = Math.min(Math.max(level, 0), 5);
+      byDay[day][idx].push({
+        id: guest.id,
+        name: guestFullName(guest),
+        group: guest.group || "Sin grupo",
+        avatar: guestAvatarUrl(guest),
+        initials: guestInitials(guest),
+        level: idx,
+      });
+    });
+  });
+  return byDay;
+}
+
 
 
 

@@ -54,11 +54,13 @@ import {
   guestCanWhatsapp as serviceGuestCanWhatsapp,
   rsvpLevelChip as serviceRsvpLevelChip,
   rsvpBooleanChip as serviceRsvpBooleanChip,
-  travelsByPlaneChip as serviceTravelsByPlaneChip,
   computeDayConfirmations as serviceComputeDayConfirmations,
+
   computeInvitationStats as serviceComputeInvitationStats,
   computeDayDistributions as serviceComputeDayDistributions,
   computeDayConfirmedGuests as serviceComputeDayConfirmedGuests,
+  computeDayLevelGuests as serviceComputeDayLevelGuests,
+
 
 
   guestStatusBadge as serviceGuestStatusBadge,
@@ -368,12 +370,8 @@ function rsvpBooleanChip(guest, questionId) {
   return serviceRsvpBooleanChip(guest, questionId, state.liveGuests);
 }
 
-// Badge chip for the `travelsByPlane` boolean (Sí / No / —).
-function travelsByPlaneChip(guest) {
-  return serviceTravelsByPlaneChip(guest);
-}
-
 // Aggregate confirmed counts per attendance day from the live guests.
+
 function computeDayConfirmations() {
   return serviceComputeDayConfirmations(getActiveGuests(), state.liveGuests);
 }
@@ -393,6 +391,14 @@ function computeDayDistributions() {
 function computeDayConfirmedGuests() {
   return serviceComputeDayConfirmedGuests(getActiveGuests(), state.liveGuests);
 }
+
+// Per-day, per-level list of guests for EVERY RSVP level (0–5). Used to make
+// each segment of the distribution bar clickable so the admin can open a modal
+// listing exactly who answered 0, 1, 2, 3, 4 or 5 for that day.
+function computeDayLevelGuests() {
+  return serviceComputeDayLevelGuests(getActiveGuests(), state.liveGuests);
+}
+
 
 
 
@@ -453,8 +459,9 @@ function openGuestEditor(guest) {
 // edited there, not in Firestore.
 const GUEST_WRITABLE_FIELDS = new Set([
   "firstName", "middleName", "lastName", "maternalLastName", "phone", "idCheckUser", "cloudinaryId",
-  "gender", "age", "messageAuthor", "invitationGroup", "invitationSent", "_deleted",
+  "gender", "age", "messageAuthor", "invitationGroup", "invitationSent", "_deleted", "travelsByPlane",
 ]);
+
 
 
 
@@ -484,8 +491,18 @@ async function saveGuestInline(guestId, field, value) {
       if (["firstName", "middleName", "lastName", "maternalLastName", "phone", "gender", "age"].includes(field)) {
         guest.identity = { ...(guest.identity || {}), [field]: value };
       }
-      guest[field] = value;
+      // `travelsByPlane` is a top-level boolean; the inline editor sends
+      // "true" / "false" / "" (empty = unknown). Normalize to a real boolean
+      // (or undefined when empty) so the in-memory guest matches Firestore.
+      if (field === "travelsByPlane") {
+        if (value === true || value === "true") guest.travelsByPlane = true;
+        else if (value === false || value === "false") guest.travelsByPlane = false;
+        else guest.travelsByPlane = undefined;
+      } else {
+        guest[field] = value;
+      }
     }
+
 
     return true;
   } catch (err) {
@@ -725,9 +742,9 @@ function renderGuestManager() {
     guestStatusBadge,
     rsvpLevelChip,
     rsvpBooleanChip,
-    travelsByPlaneChip,
     guestSortValue,
     GUEST_SORT_COLUMNS,
+
 
     saveGuestInline,
     saveGuestEmail,
@@ -1090,7 +1107,9 @@ export function startDashboard(app) {
         computeInvitationStats,
         computeDayDistributions,
         computeDayConfirmedGuests,
+        computeDayLevelGuests,
       });
+
 
 
     },
