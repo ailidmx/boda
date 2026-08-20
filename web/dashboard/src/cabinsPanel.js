@@ -211,15 +211,18 @@ export function renderCabinAssignments({
       // `hosting.room`, not `room`, so passing the raw list would miss them.
       const roomBlocks = c.rooms
         .map((room) => {
-          const occ = getRoomOccupancy(room.id, c.guests);
-          const roomGuests = occ
-            ? occ.guests
-            : c.guests.filter((g) => g[roomField] === room.id);
-          const capacity = occ ? occ.capacity : room.capacity || 0;
+          // Match guests to this room by the ACTIVE period's room field
+          // (`room` for the primary period, `xtraRoom` for the coast period).
+          // We filter directly on the normalized guest's field rather than
+          // `getRoomOccupancy`, which reads the PRIMARY `room` field and would
+          // therefore miss the coast-period (xtraRoom) assignments entirely.
+          const roomGuests = c.guests.filter((g) => g[roomField] === room.id);
+          const capacity = room.capacity || 0;
           const roomLabel = room.name || room.id;
           const roomDesc = getRoomDescription(room, "es");
           const roomMeta = `${roomGuests.length}/${capacity}`;
           const full = roomGuests.length >= capacity;
+
           return `
             <div class="dashboard-cabin-room" data-room-id="${room.id}" data-cabin-unit="${c.unit}">
               <div class="dashboard-cabin-room-heading">
