@@ -27,6 +27,8 @@ on:
       - "firebase.json"
       - ".firebaserc"
       - ".github/workflows/deploy-invitation.yml"
+      - "docs/**"
+      - "AGENTS.md"
   workflow_dispatch:
     inputs:
       environment:
