@@ -40,7 +40,12 @@ function levelClass(level) {
 // Build the small segmented distribution bar for one attendance day. Each
 // segment's width is proportional to its share of the total guests; a tooltip
 // shows "Nivel X: N invitados". Segments with 0 guests are skipped.
-function distributionBar(distribution, total) {
+//
+// Each segment is a clickable <button> that opens the full-screen modal listing
+// exactly the guests who answered that level (0–5) for this day — not just the
+// confirmed (≥ 4) list. `levelGuests` is the per-day array of 6 arrays (indexed
+// by level) of guest summaries; `label` is the day name used in the modal title.
+function distributionBar(distribution, total, levelGuests, label) {
   const bar = make("div", "dashboard-dist-bar");
   bar.setAttribute("role", "img");
   bar.setAttribute(
@@ -51,13 +56,22 @@ function distributionBar(distribution, total) {
   LEVELS.forEach((level) => {
     const count = distribution[level];
     if (!count) return;
-    const seg = make("span", `dashboard-dist-seg ${levelClass(level)}`);
+    const seg = make("button", `dashboard-dist-seg ${levelClass(level)}`);
+    seg.type = "button";
     seg.style.width = `${(count / total) * 100}%`;
-    seg.title = `Nivel ${level}: ${count} invitado${count === 1 ? "" : "s"}`;
+    seg.title = `Nivel ${level}: ${count} invitado${count === 1 ? "" : "s"} — clic para ver`;
+    seg.setAttribute(
+      "aria-label",
+      `Ver los ${count} invitados de nivel ${level} de ${label}`,
+    );
+    seg.addEventListener("click", () =>
+      openLevelModal(levelGuests[level] || [], label, level),
+    );
     bar.append(seg);
   });
   return bar;
 }
+
 
 // Small legend row under the bar: one dot + count per level that has guests.
 function distributionLegend(distribution) {
@@ -241,21 +255,104 @@ function openConfirmedModal(guests, label) {
   if (closeBtn) closeBtn.focus();
 }
 
+// Full-screen modal listing the guests who answered a SPECIFIC RSVP level
+// (0–5) for one day. Reuses the same modal chrome as `openConfirmedModal` but
+// with a level-specific title and empty-state message. Level 0 = no answer.
+function openLevelModal(guests, label, level) {
+  const overlay = make("div", "dashboard-modal-overlay dashboard-confirmed-overlay");
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-label", `Nivel ${level} de ${label}`);
+
+  const modal = make("div", "dashboard-confirmed-modal");
+  const head = make("div", "dashboard-confirmed-head");
+  head.append(
+    make("h3", "", `Nivel ${level} · ${label}`),
+    make("span", "dashboard-confirmed-count", `${guests.length} invitados`),
+    (() => {
+      const close = make("button", "dashboard-modal-close", "✕");
+      close.type = "button";
+      close.setAttribute("aria-label", "Cerrar");
+      close.addEventListener("click", closeModal);
+      return close;
+    })(),
+  );
+
+  const body = make("div", "dashboard-confirmed-body");
+  const groups = groupConfirmedGuests(guests);
+  if (groups.length === 0) {
+    body.append(
+      make(
+        "p",
+        "dashboard-confirmed-empty",
+        level === 0
+          ? "Nadie sin respuesta para este día."
+          : `Nadie respondió nivel ${level} para este día.`,
+      ),
+    );
+  } else {
+    groups.forEach(({ group, members }) => {
+      const details = make("details", "dashboard-confirmed-group");
+      const summary = make("summary", "dashboard-confirmed-group-head");
+      summary.append(
+        make("strong", "", group),
+        make("span", "", `${members.length} invitado${members.length === 1 ? "" : "s"}`),
+      );
+      const list = make("ul", "dashboard-confirmed-list");
+      members.forEach((g) => {
+        const li = make("li", "dashboard-confirmed-item");
+        const lvl = make("span", `dashboard-confirmed-level ${levelClass(g.level)}`, String(g.level));
+        lvl.title = `Nivel ${g.level} de asistencia`;
+        li.append(avatarEl(g), make("span", "", g.name), lvl);
+        list.append(li);
+      });
+      details.append(summary, list);
+      body.append(details);
+    });
+  }
+
+  modal.append(head, body);
+  overlay.append(modal);
+  document.body.appendChild(overlay);
+
+  const previousOverflow = document.body.style.overflow;
+  document.body.style.overflow = "hidden";
+
+  function closeModal() {
+    document.body.style.overflow = previousOverflow;
+    overlay.remove();
+    document.removeEventListener("keydown", onKey);
+  }
+  function onKey(e) {
+    if (e.key === "Escape") closeModal();
+  }
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) closeModal();
+  });
+  document.addEventListener("keydown", onKey);
+
+  const closeBtn = modal.querySelector(".dashboard-modal-close");
+  if (closeBtn) closeBtn.focus();
+}
+
 
 // A single attendance day card: confirmed count + distribution bar + legend +
-// clickable stacked avatars.
-function dayCard(label, confirmed, distribution, total, confirmedGuests) {
+// clickable stacked avatars. `levelGuests` is the per-day array of 6 arrays
+// (indexed by level) of guest summaries, used to make each bar segment open a
+// modal listing exactly who answered that level.
+function dayCard(label, confirmed, distribution, total, confirmedGuests, levelGuests) {
   const article = make("article", "dashboard-summary-card");
   article.append(
     make("span", "", label),
     make("strong", "", String(confirmed)),
     make("small", "", "Confirmados (nivel ≥ 4)"),
     stackedAvatars(confirmedGuests, label),
-    distributionBar(distribution, total),
+    distributionBar(distribution, total, levelGuests, label),
     distributionLegend(distribution),
   );
   return article;
 }
+
 
 /**
  * Re-render the summary cards from the live `guests` collection.
@@ -270,6 +367,10 @@ function dayCard(label, confirmed, distribution, total, confirmedGuests) {
  * @param {() => {friday: object[], saturday: object[], sunday: object[]}} ctx.computeDayConfirmedGuests
  *   Live-derived helper returning per-day arrays of confirmed guest summaries
  *   `{ id, name, group, avatar, initials }`.
+ * @param {() => {friday: object[][], saturday: object[][], sunday: object[][]}} ctx.computeDayLevelGuests
+ *   Live-derived helper returning per-day arrays of 6 arrays (indexed by level
+ *   0–5) of guest summaries, used to make each distribution-bar segment open a
+ *   modal listing exactly who answered that level.
  */
 export function renderSummary(ctx) {
   const {
@@ -277,6 +378,7 @@ export function renderSummary(ctx) {
     computeInvitationStats,
     computeDayDistributions,
     computeDayConfirmedGuests,
+    computeDayLevelGuests,
   } = ctx;
   const summary = document.querySelector("[data-dashboard-summary]");
   if (!summary) return;
@@ -285,12 +387,14 @@ export function renderSummary(ctx) {
   const invitationStats = computeInvitationStats();
   const distributions = computeDayDistributions();
   const confirmedByDay = computeDayConfirmedGuests();
+  const levelGuestsByDay = computeDayLevelGuests();
   const total = invitationStats.total;
 
   summary.replaceChildren(
     invitationsCard(invitationStats),
-    dayCard("Viernes", dayCounts.friday, distributions.friday, total, confirmedByDay.friday),
-    dayCard("Sábado", dayCounts.saturday, distributions.saturday, total, confirmedByDay.saturday),
-    dayCard("Domingo", dayCounts.sunday, distributions.sunday, total, confirmedByDay.sunday),
+    dayCard("Viernes", dayCounts.friday, distributions.friday, total, confirmedByDay.friday, levelGuestsByDay.friday),
+    dayCard("Sábado", dayCounts.saturday, distributions.saturday, total, confirmedByDay.saturday, levelGuestsByDay.saturday),
+    dayCard("Domingo", dayCounts.sunday, distributions.sunday, total, confirmedByDay.sunday, levelGuestsByDay.sunday),
   );
 }
+
