@@ -28,7 +28,8 @@ import {
  *   to begin.
  * - A very thin, pixelated banner scrolls the artist + song name horizontally.
  *
- * The banner is only rendered while the Music section is in view. The component
+ * The banner is stuck to the top-right, right below the sticky menu bar, so it
+ * stays visible on every section while the player is enabled. The component
  * stays mounted while the player is enabled so the audio keeps playing (or
  * stays muted) even when the guest scrolls to another section.
  *
@@ -37,8 +38,8 @@ import {
  * error UI).
  */
 export function WinampPlayer() {
-  const { authState, musicEnabled, setMusicPlaying, musicSectionVisible } =
-    useApp();
+  const { authState, musicEnabled, setMusicPlaying } = useApp();
+
 
   // idle | connecting | ready | error
   const [status, setStatus] = useState("idle");
@@ -192,21 +193,32 @@ export function WinampPlayer() {
 
   return (
     <>
-      {/* Thin pixelated scrolling banner + controls. Only rendered while the
-          Music section is in view; the audio keeps playing (or stays muted)
-          based on `musicEnabled` regardless of which section is on screen. */}
-      {musicSectionVisible && (
-        <div
-          className={`winamp-banner${bannerOpen ? " is-open" : ""}`}
-          onClick={() => setBannerOpen((o) => !o)}
-          role="button"
-          tabIndex={0}
-          aria-label="Mostrar u ocultar la canción actual"
-        >
-          <div className="winamp-banner-track">
+      {/* Thin pixelated scrolling banner + controls. Stuck to the top-right,
+          right below the sticky menu bar, so it stays visible on every
+          section while the player is enabled. The audio keeps playing (or
+          stays muted) based on `musicEnabled` regardless of which section is
+          on screen. */}
+      <div
+        className={`winamp-banner${bannerOpen ? " is-open" : ""}`}
+        onClick={() => setBannerOpen((o) => !o)}
+        role="button"
+        tabIndex={0}
+        aria-label="Mostrar u ocultar la canción actual"
+      >
+
+          {/* Keying the track on the open/closed state remounts it whenever the
+              banner toggles, which restarts the marquee animation from its
+              starting position (translateX(0)). This re-activates the auto
+              scroll when returning to ultra-thin mode and shows the scrolling
+              info at its start when opening the LARGE format. */}
+          <div
+            key={bannerOpen ? "open" : "closed"}
+            className="winamp-banner-track"
+          >
             <span className="winamp-banner-text">{bannerText}</span>
             <span className="winamp-banner-text" aria-hidden="true">{bannerText}</span>
           </div>
+
 
           {/* Winamp-style transport controls */}
           <div className="winamp-controls" onClick={(e) => e.stopPropagation()}>
@@ -279,8 +291,7 @@ export function WinampPlayer() {
           >
             <div className="winamp-progress-fill" style={{ width: `${progressPct}%` }} />
           </div>
-        </div>
-      )}
+      </div>
     </>
   );
 }
