@@ -210,18 +210,6 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   The save button must live on the recap step, never on an intermediate
   question step. The recap step's `render` receives `{ goToStart }` from
   `FlipStepCard`.
-- **RSVP legend modal + FAB are BOTH portaled to `<body>`** — In
-  `RsvpQuestion.jsx`, the scale legend modal and its FAB are rendered via
-  `createPortal(..., document.body)`. They MUST be portaled because the flip
-  card's `.flip-step-body` has `perspective: 1200px`, which makes any
-  `position: fixed` descendant resolve against that transformed ancestor
-  instead of the viewport — the modal/FAB would stick to the section and
-  break. The modal is a real modal (full-screen overlay, centered cream panel,
-  background scroll locked, Escape + focus trap) and its styles live at ALL
-  widths in `rsvp.css`; only the FAB is mobile-only (`@media (max-width:
-  899px)` hides the inline legend and shows the FAB). When adding a new
-  fixed-position element inside a flip card, portal it to `<body>`.
-
 - **Per-group price row is hidden for single-guest groups** — In the RSVP
   "À payer" summary (`PaymentSummary.jsx`) and the Total block (`RSVP.jsx`),
   the "par le groupe" (per group) row is only rendered when the group has more

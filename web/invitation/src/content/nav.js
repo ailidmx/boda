@@ -37,24 +37,6 @@ export const nav = {
     songRequest: "PIDE TU CANCIÓN",
     logout: "Cerrar sesión",
 
-    installApp: "Instalar la app",
-    installAppHint: "Guarda la invitación en tu pantalla de inicio",
-    installIosTitle: "Instala la invitación en tu iPhone/iPad",
-    installIosBody:
-      "Para tener la invitación como una app en tu pantalla de inicio:",
-    installIosStep1: "Toca el botón Compartir (el cuadrado con la flecha hacia arriba).",
-    installIosStep2: "Desliza hacia abajo y elige «Añadir a pantalla de inicio».",
-    installIosStep3: "Toca «Añadir» y listo. La encontrarás como una app.",
-    installDesktopTitle: "Instala la invitación en tu equipo",
-    installDesktopBody:
-      "Para crear un acceso directo a la invitación en tu escritorio:",
-    installDesktopStep1:
-      "Abre el menú del navegador (⋮ en Chrome/Edge, o el menú Safari).",
-    installDesktopStep2:
-      "Elige «Instalar aplicación» / «Instalar David & Aydé» (Chrome/Edge) o «Añadir al Dock» (Safari).",
-    installDone: "¡Listo! La invitación quedó instalada.",
-    installClose: "Cerrar",
-
 
     
     emailWarningTitle: "Atención al cambiar tu correo",
@@ -153,24 +135,6 @@ export const nav = {
     songRequest: "DEMANDE TA CHANSON",
     logout: "Se déconnecter",
 
-    installApp: "Installer l’app",
-    installAppHint: "Garde l’invitation sur ton écran d’accueil",
-    installIosTitle: "Installe l’invitation sur ton iPhone/iPad",
-    installIosBody:
-      "Pour avoir l’invitation comme une app sur ton écran d’accueil :",
-    installIosStep1: "Touche le bouton Partager (le carré avec la flèche vers le haut).",
-    installIosStep2: "Fais défiler vers le bas et choisis « Ajouter à l’écran d’accueil ».",
-    installIosStep3: "Touche « Ajouter » et c’est tout. Tu la trouveras comme une app.",
-    installDesktopTitle: "Installe l’invitation sur ton ordinateur",
-    installDesktopBody:
-      "Pour créer un raccourci vers l’invitation sur ton bureau :",
-    installDesktopStep1:
-      "Ouvre le menu du navigateur (⋮ dans Chrome/Edge, ou le menu Safari).",
-    installDesktopStep2:
-      "Choisis « Installer l’application » / « Installer David & Aydé » (Chrome/Edge) ou « Ajouter au Dock » (Safari).",
-    installDone: "C’est fait ! L’invitation est installée.",
-    installClose: "Fermer",
-
 
     
     emailWarningTitle: "Attention avant de changer l’adresse e-mail",
@@ -268,24 +232,6 @@ export const nav = {
     musicTastes: "Your tastes",
     songRequest: "REQUEST YOUR SONG",
     logout: "Log out",
-
-    installApp: "Install the app",
-    installAppHint: "Keep the invitation on your home screen",
-    installIosTitle: "Install the invitation on your iPhone/iPad",
-    installIosBody:
-      "To have the invitation as an app on your home screen:",
-    installIosStep1: "Tap the Share button (the square with the up arrow).",
-    installIosStep2: "Scroll down and choose “Add to Home Screen”.",
-    installIosStep3: "Tap “Add” and you’re done. You’ll find it as an app.",
-    installDesktopTitle: "Install the invitation on your computer",
-    installDesktopBody:
-      "To create a shortcut to the invitation on your desktop:",
-    installDesktopStep1:
-      "Open the browser menu (⋮ in Chrome/Edge, or the Safari menu).",
-    installDesktopStep2:
-      "Choose “Install app” / “Install David & Aydé” (Chrome/Edge) or “Add to Dock” (Safari).",
-    installDone: "Done! The invitation is now installed.",
-    installClose: "Close",
 
 
     
