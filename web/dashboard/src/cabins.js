@@ -95,3 +95,16 @@ export function cabinPhotoUrl(publicId) {
   return `https://res.cloudinary.com/k2ajcgxv/image/upload/q_auto,f_auto,c_fill,g_auto,w_1200,h_800/${fullId}`;
 }
 
+
+/**
+ * Get all cabin display names from the `cabins` collection.
+ *
+ * Used by the cabins panel to show cabins that have NO guests assigned in a
+ * given period (so the admin can open them for rental). Returns the cabin
+ * `id` (the canonical display name, e.g. "VILLA AZALEA"), falling back to
+ * `name` when `id` is missing.
+ * @returns {string[]}
+ */
+export function getAllCabinNames() {
+  return CABINS.map((c) => c.id || c.name).filter(Boolean);
+}

@@ -19,7 +19,7 @@ import {
   getRoomOccupancy,
   getRoomDescription,
 } from "./rooms.js";
-import { getCabinPhotos, cabinPhotoUrl, loadCabins } from "./cabins.js";
+import { getCabinPhotos, cabinPhotoUrl, loadCabins, getAllCabinNames } from "./cabins.js";
 import { loadTables, renderTablesManager } from "./tables.js";
 import { createMatrixLoader } from "./matrixLoader.js";
 import { collections } from "../../shared/firestore-paths.js";
@@ -869,6 +869,7 @@ function renderCabinAssignments() {
     getRoomOccupancy,
     getRoomDescription,
     getCabinPhotos,
+    getAllCabinNames,
     cabinPhotoUrl,
     guestAvatarUrl,
     guestFullName,

@@ -46,6 +46,7 @@ let selectedCabins = new Set();
  * @param {(roomId: string, guests: Object[]) => Object|null} deps.getRoomOccupancy — occupancy for a room.
  * @param {(room: Object, lang: string) => string} deps.getRoomDescription — room description text.
  * @param {(displayName: string) => string[]} deps.getCabinPhotos — cabin showcase photo ids.
+ * @param {() => string[]} deps.getAllCabinNames — all cabin display names from the `cabins` collection.
  * @param {(publicId: string) => string} deps.cabinPhotoUrl — Cloudinary URL for a cabin photo.
  * @param {(guest: Object) => string} deps.guestAvatarUrl — Cloudinary URL for a guest avatar.
  * @param {(guest: Object) => string} deps.guestFullName — full display name for a guest.
@@ -68,6 +69,7 @@ export function renderCabinAssignments({
   getRoomOccupancy,
   getRoomDescription,
   getCabinPhotos,
+  getAllCabinNames,
   cabinPhotoUrl,
   guestAvatarUrl,
   guestFullName,
@@ -110,14 +112,17 @@ export function renderCabinAssignments({
 
   const cabins = [...byCabin.keys()].sort();
 
+
   // Build a per-cabin summary: label, actual occupancy (guests assigned) and
   // calculated occupancy (sum of room capacities from the room inventory).
   const cabinStats = cabins.map((unit) => {
     const guests = byCabin.get(unit);
-    const cabinGuest = guests[0];
-    // The live-normalized guest has no `cabinLabel` (that's a static-registry
-    // field), so fall back to the friendly display name from the unit code.
-    const label = cabinGuest?.cabinLabel || getCabinDisplayName(unit);
+    // The label must reflect the ACTIVE period.s unit code. The guest.s
+    // `cabinLabel` field is a PRIMARY-period concept (it holds the guest.s
+    // main-weekend cabin), so it is WRONG for the extra (coast) period.
+    // Always derive the label from the active period.s unit via
+    // getCabinDisplayName(unit) so both periods show the correct cabin name.
+    const label = getCabinDisplayName(unit);
     const displayName = getCabinDisplayName(unit);
 
     const rooms = getRoomsByCabin(displayName);
@@ -125,6 +130,33 @@ export function renderCabinAssignments({
     const actual = guests.length;
     return { unit, label, displayName, rooms, guests, actual, calculated };
   });
+
+  // ── Unassigned cabins from the `cabins` collection ──
+  // Some cabins may not be rented at all in the active period (no guest has
+  // them in `hosting.cabin` / `hosting.xtraCabin`). We still want to show them
+  // so the admin can OPEN them for rental: they appear at the END of the list
+  // with 0/CAPACITY and a light (dimmed) look, are still clickable, show an
+  // empty guest list, and their "+ Agregar" button works to assign guests.
+  // We match by display name so a cabin already assigned in this period is not
+  // duplicated.
+  const assignedNames = new Set(cabinStats.map((c) => c.displayName.toLocaleUpperCase()));
+  const allCabinNames = getAllCabinNames();
+  for (const name of allCabinNames) {
+    if (assignedNames.has(name.toLocaleUpperCase())) continue;
+    const displayName = getCabinDisplayName(name);
+    const rooms = getRoomsByCabin(displayName);
+    const calculated = rooms.reduce((sum, room) => sum + (room.capacity || 0), 0);
+    cabinStats.push({
+      unit: name,
+      label: displayName,
+      displayName,
+      rooms,
+      guests: [],
+      actual: 0,
+      calculated,
+      isUnassigned: true,
+    });
+  }
 
   const totalActual = cabinStats.reduce((sum, c) => sum + c.actual, 0);
   const totalCalculated = cabinStats.reduce((sum, c) => sum + c.calculated, 0);
@@ -150,7 +182,7 @@ export function renderCabinAssignments({
   const navBadges = cabinStats
     .map(
       (c) => `
-      <button type="button" class="dashboard-cabin-nav-btn${selectedCabins.has(c.unit) ? " is-active" : ""}" data-cabin-nav="${c.unit}" title="Filtrar: ${c.label}">
+      <button type="button" class="dashboard-cabin-nav-btn${selectedCabins.has(c.unit) ? " is-active" : ""}${c.isUnassigned ? " is-unassigned" : ""}" data-cabin-nav="${c.unit}" title="Filtrar: ${c.label}">
         <span class="dashboard-cabin-nav-label">${c.label}</span>
         <span class="dashboard-cabin-nav-occ">${c.actual}/${c.calculated}</span>
       </button>`,
@@ -274,7 +306,7 @@ export function renderCabinAssignments({
         .join("");
 
       return `
-        <div class="dashboard-cabin-card" id="cabin-${c.unit}" data-cabin-card="${c.unit}">
+        <div class="dashboard-cabin-card${c.isUnassigned ? " is-unassigned" : ""}" id="cabin-${c.unit}" data-cabin-card="${c.unit}">
           <div class="dashboard-cabin-heading">
             <strong>${c.label}</strong>
             <span class="dashboard-cabin-meta">${occupancy === "privada" ? "Privada" : "Compartida"} · ${payment === "pagada" ? "Pagada" : "Por pagar"} · ${c.actual}/${c.calculated}</span>
@@ -312,6 +344,7 @@ export function renderCabinAssignments({
         getRoomOccupancy,
         getRoomDescription,
         getCabinPhotos,
+        getAllCabinNames,
         cabinPhotoUrl,
         guestAvatarUrl,
         guestFullName,
@@ -346,6 +379,7 @@ export function renderCabinAssignments({
         getRoomOccupancy,
         getRoomDescription,
         getCabinPhotos,
+        getAllCabinNames,
         cabinPhotoUrl,
         guestAvatarUrl,
         guestFullName,
@@ -475,6 +509,7 @@ export function renderCabinAssignments({
           getRoomOccupancy,
           getRoomDescription,
           getCabinPhotos,
+        getAllCabinNames,
           cabinPhotoUrl,
           guestAvatarUrl,
           guestFullName,
@@ -548,6 +583,7 @@ export function renderCabinAssignments({
           getRoomOccupancy,
           getRoomDescription,
           getCabinPhotos,
+        getAllCabinNames,
           cabinPhotoUrl,
           guestAvatarUrl,
           guestFullName,
@@ -678,6 +714,7 @@ export function renderCabinAssignments({
               getRoomOccupancy,
               getRoomDescription,
               getCabinPhotos,
+        getAllCabinNames,
               cabinPhotoUrl,
               guestAvatarUrl,
               guestFullName,

@@ -662,3 +662,40 @@
   }
 }
 
+
+// ── Unassigned cabins (from the `cabins` collection, not rented this period) ──
+// Cabins with no guests assigned in the active period appear at the END of the
+// list with 0/CAPACITY and a light (dimmed) look so the admin can spot them and
+// OPEN them for rental. They stay fully interactive: the nav badge is still
+// clickable, the card shows its photo gallery + empty rooms, and "+ Agregar"
+// works to assign guests.
+.dashboard-cabin-card.is-unassigned {
+  border-style: dashed;
+  border-color: rgba(85, 69, 45, 0.35);
+  background: rgba(85, 69, 45, 0.03);
+
+  .dashboard-cabin-heading {
+    background: rgba(85, 69, 45, 0.55);
+  }
+
+  .dashboard-cabin-carousel {
+    background: rgba(85, 69, 45, 0.03);
+  }
+}
+
+.dashboard-cabin-nav-btn.is-unassigned {
+  border-style: dashed;
+  border-color: rgba(85, 69, 45, 0.35);
+  background: rgba(85, 69, 45, 0.04);
+  color: $ink-muted;
+
+  .dashboard-cabin-nav-occ {
+    background: rgba(85, 69, 45, 0.06);
+    color: $ink-muted;
+  }
+
+  &:hover {
+    border-color: $accent;
+    color: $ink;
+  }
+}
