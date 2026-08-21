@@ -160,9 +160,9 @@ export function openGuestEditor(guest, ctx) {
         </div>
 
         <div class="dashboard-modal-field">
-          <label for="edit-messageAuthor">Autor del mensaje</label>
+          <label for="edit-message">Autor del mensaje</label>
 
-          <input id="edit-messageAuthor" name="messageAuthor" value="${guest.messageAuthor || ""}"
+          <input id="edit-message" name="message" value="${guest.message || guest.identity?.message || guest.messageAuthor || ""}"
             placeholder="Ej: David y Aydé" />
         </div>
 
@@ -234,7 +234,7 @@ export function openGuestEditor(guest, ctx) {
       phone: data.get("phone") || "",
       idCheckUser: data.get("idCheckUser") === "true",
       cloudinaryId: data.get("identityCloudinaryId") || data.get("cloudinaryId") || "",
-      messageAuthor: data.get("messageAuthor") || "",
+      message: data.get("message") || "",
       timestamp: new Date(),
     });
 
@@ -260,7 +260,8 @@ export function openGuestEditor(guest, ctx) {
         g.phone = updated.identity?.phone || g.phone;
         g.idCheckUser = updated.idCheckUser;
         g.cloudinaryId = updated.identity?.cloudinaryId || updated.cloudinaryId;
-        g.messageAuthor = updated.messageAuthor;
+        // The guest's written message lives at the TOP LEVEL (`message`).
+        g.message = updated.message || "";
       }
 
 

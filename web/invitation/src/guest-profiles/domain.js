@@ -197,15 +197,16 @@ export function resolveGuestEmail(guest) {
 
 /**
  * Resolve the author of the guest's message. Stored on the `guests` collection
- * as `identity.message` (the source of truth for guest records). Empty string
- * when not yet set.
+ * as the TOP-LEVEL `message` field (the source of truth for guest records),
+ * with `identity.message` kept as a legacy fallback. Empty string when not yet
+ * set.
  * @param {Object} guest  static guest from guests.js
  * @param {Object} [record]  live Firestore record for the guest (from the cache)
  * @returns {string}
  */
 export function resolveGuestMessageAuthor(guest, record) {
   if (!guest) return "";
-  return record?.identity?.message || "";
+  return record?.message || record?.identity?.message || "";
 }
 
 

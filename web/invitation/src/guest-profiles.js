@@ -516,23 +516,24 @@ export async function saveGuestContact(guest, contact, editorGuestId) {
 }
 
 /**
- * Save the author of the guest's message. The authenticated user must be the
- * guest themselves or a member of the same invitation group (enforced by
- * rules). Stored on the `guests` collection as `messageAuthor`.
+ * Save the guest's written message. The authenticated user must be the guest
+ * themselves or a member of the same invitation group (enforced by rules).
+ * Stored on the `guests` collection at the TOP LEVEL as `message` (the field
+ * the invitation reads and the dashboard's MENSAJE column shows).
  *
  * @param {Object} guest  static guest from guests.js
- * @param {string} messageAuthor  the author of the guest's message
+ * @param {string} message  the guest's written message
  * @param {string} editorGuestId  the signed-in guest id performing the edit
  * @returns {Promise<void>}
  */
-export async function saveGuestMessageAuthor(guest, messageAuthor, editorGuestId) {
+export async function saveGuestMessageAuthor(guest, message, editorGuestId) {
   const { invitationGroup } = requireLiveGuestWriteContext(guest);
   const ref = doc(db, collections.guests, guest.id);
   const existing = guestsCache.get(guest.id) || {};
   // NOTE: no `...existing` spread — see saveGuestName for why.
   const next = buildGuestMessageAuthorPayload({
     guestId: guest.id,
-    messageAuthor,
+    message,
     invitationGroup,
     editorGuestId,
     timestamp: serverTimestamp(),

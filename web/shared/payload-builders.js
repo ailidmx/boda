@@ -137,9 +137,10 @@ export function buildGuestContactPayload({ guestId, phone, invitationGroup, edit
 export function buildGuestMessageAuthorPayload({ guestId, message, invitationGroup, editorGuestId, timestamp }) {
   return {
     guestId,
-    identity: {
-      message: String(message ?? "").trim(),
-    },
+    // The guest's written message lives at the TOP LEVEL (`message`), not
+    // inside `identity`. This is the field the invitation reads and the
+    // dashboard's MENSAJE column shows.
+    message: String(message ?? "").trim(),
     invitationGroup: String(invitationGroup ?? "").trim(),
     updatedBy: String(editorGuestId ?? "").trim(),
     updatedAt: timestamp,
@@ -626,7 +627,6 @@ export function buildDashboardGuestEditPayload({
     gender: String(gender ?? "").trim(),
     cloudinaryId: String(cloudinaryId ?? "").trim(),
     phone: normalizedPhone,
-    message: String(message ?? "").trim(),
   };
 
   // `age` stores ONLY "Adulto" or "Niño" (a string, not a number). Firestore
@@ -643,6 +643,10 @@ export function buildDashboardGuestEditPayload({
   return {
     identity,
 
+    // The guest's written message lives at the TOP LEVEL (`message`), not
+    // inside `identity`. This is the field the invitation reads and the
+    // dashboard's MENSAJE column shows.
+    message: String(message ?? "").trim(),
     invitationGroup: String(invitationGroup ?? "").trim(),
     idCheckUser: idCheckUser === true,
     cloudinaryId: String(cloudinaryId ?? "").trim(),
@@ -755,12 +759,10 @@ export function buildDashboardGuestInlinePayload(guestId, field, value, invitati
     updatedAt: timestamp,
   };
 
-  // `message` (the guest's written message) lives inside the `identity` map,
-  // not at the top level. Normalize it as a trimmed string.
+  // `message` (the guest's written message) lives at the TOP LEVEL, not inside
+  // `identity`. Normalize it as a trimmed string.
   if (field === "message") {
-    payload.identity = {
-      message: String(value ?? "").trim(),
-    };
+    payload.message = String(value ?? "").trim();
     return payload;
   }
 

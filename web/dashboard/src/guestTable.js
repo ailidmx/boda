@@ -339,10 +339,11 @@ export function renderGuestManager(ctx) {
 
 
   // ── Message cell helper ──
-  // Shows the guest's written message (identity.message) as a truncated badge
-  // with a tooltip. Not inline-editable here (it's a free-text note).
+  // Shows the guest's written message (top-level `message` field) as a
+  // truncated badge with a tooltip. Not inline-editable here (it's a free-text
+  // note; edit it via the ✏️ modal).
   const messageCell = (guest) => {
-    const msg = guest.identity?.message || guest.messageAuthor || "";
+    const msg = guest.message || guest.identity?.message || "";
 
     if (!msg) return '<span class="dashboard-badge dashboard-badge-muted">—</span>';
     const truncated = msg.length > 24 ? `${msg.slice(0, 24)}…` : msg;
