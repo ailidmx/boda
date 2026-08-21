@@ -170,16 +170,18 @@ export function Accommodation() {
 
   // ── Dynamic per-person pricing ─────────────────────────────────────────
   // The per-person price is no longer stored: it is derived from the cabin's
-  // total price for two nights divided by the number of occupants. When the
-  // cabin is under capacity, the price is split among the actual occupants
-  // (e.g. 10 people in a 12-person cabin each pay total/10). When the cabin is
-  // at or over capacity, the price is split by the max capacity (e.g. 12 or 20
-  // people in a 12-person cabin each pay total/12).
+  // total price for two nights divided by the ACTUAL number of occupants. This
+  // guarantees the full price is always exactly covered by the guests — whether
+  // the cabin is under capacity (10 people in a 12-person cabin each pay
+  // total/10) or over capacity (14 people in a 12-person cabin each pay
+  // total/14). We NEVER cap the divisor at capacity: capping it would make the
+  // guests collectively pay MORE than the cabin's real price (e.g. 14 × total/12
+  // = 1.17 × total).
   const cabinPerPersonPrice = (cabinObj, occupantCount) => {
     if (!cabinObj?.totalPrice2Nights) return 0;
     const capacity = cabinObj.capacity || 1;
-    const divisor = Math.min(occupantCount, capacity);
-    return divisor > 0 ? cabinObj.totalPrice2Nights / divisor : 0;
+    const divisor = occupantCount > 0 ? occupantCount : 1;
+    return cabinObj.totalPrice2Nights / divisor;
   };
 
   // Number of active guests assigned to a given cabin (across all rooms).

@@ -72,8 +72,8 @@ export function computeStayAmounts({
   const cabinPerPersonPrice = (cabinObj, occupantCount) => {
     if (!cabinObj?.totalPrice2Nights) return 0;
     const capacity = cabinObj.capacity || 1;
-    const divisor = Math.min(occupantCount, capacity);
-    return divisor > 0 ? cabinObj.totalPrice2Nights / divisor : 0;
+    const divisor = occupantCount > 0 ? occupantCount : 1;
+    return cabinObj.totalPrice2Nights / divisor;
   };
 
   // Number of active guests assigned to a given cabin for this stay.
