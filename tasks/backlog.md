@@ -70,3 +70,4 @@ Prioridad: `P1` | `P2` | `P3`
 | T-063 | Validar overview trilingue de comidas, postres, musica en vivo y escena abierta | David + Ayde | 2026-08-20 | P2 | doing | T-058 |
 | T-064 | Validar y activar sondeo post-boda Costalegre (destino, noches, formato y presupuesto) | David + Ayde + Copilot | 2026-08-25 | P2 | doing | T-061 |
 | T-065 | Implementar gate serverless con clave compartida, cookie segura y limite de intentos | Copilot + David | 2026-09-01 | P1 | todo | T-005, T-061 |
+| T-066 | Corregir en DB los `cloudinaryIds` de la coleccion `cabins` para que guarden el public id COMPLETO con prefijo `boda/` (ej. `boda/cabin-margarita-06`). Hoy el back office aplica un TRICK temporal en `web/dashboard/src/cabins.js` (`cabinPhotoUrl`) que antepone `boda/` solo en el dashboard. Al corregir la DB, quitar el trick y verificar que la invitacion (front-end) tambien renderice las fotos sin prefijo extra. | Copilot + David | 2026-09-15 | P2 | todo | T-035 |

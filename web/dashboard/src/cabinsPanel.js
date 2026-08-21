@@ -28,6 +28,11 @@ const CABIN_PERIODS = [
 // re-render without the dashboard needing to track it.
 let activePeriod = "primary";
 
+// Multi-select cabin filter. When non-empty, only the cabins whose unit is in
+// this set are shown. Clicking a nav badge toggles membership; an empty set
+// shows ALL cabins. This lets the admin focus on one cabin or a few at a time.
+let selectedCabins = new Set();
+
 /**
  * Render the cabin-assignment panel into the `[data-cabin-assignments]` container.
  * @param {Object} deps
@@ -138,10 +143,14 @@ export function renderCabinAssignments({
   `;
 
   // ── Nav badge bar: one button per cabin showing actual/calculated ──
+  // Each badge doubles as a multi-select FILTER: clicking toggles that cabin's
+  // visibility. An active badge (is-active) means the cabin is selected; when
+  // nothing is selected, all cabins are shown. Clicking a selected badge again
+  // deselects it.
   const navBadges = cabinStats
     .map(
       (c) => `
-      <button type="button" class="dashboard-cabin-nav-btn" data-cabin-nav="${c.unit}" title="Ir a ${c.label}">
+      <button type="button" class="dashboard-cabin-nav-btn${selectedCabins.has(c.unit) ? " is-active" : ""}" data-cabin-nav="${c.unit}" title="Filtrar: ${c.label}">
         <span class="dashboard-cabin-nav-label">${c.label}</span>
         <span class="dashboard-cabin-nav-occ">${c.actual}/${c.calculated}</span>
       </button>`,
@@ -171,38 +180,47 @@ export function renderCabinAssignments({
   `;
 
   // ── Cabin cards, each grouping guests by ROOM ──
-  const cards = cabinStats
+  // When the multi-select filter is active (selectedCabins non-empty), only
+  // the selected cabins are rendered. An empty selection shows all cabins.
+  const visibleStats = selectedCabins.size
+    ? cabinStats.filter((c) => selectedCabins.has(c.unit))
+    : cabinStats;
+
+  const cards = visibleStats
     .map((c) => {
       const occupancy = c.guests[0]?.occupancy || "";
       const payment = c.guests[0]?.payment || "";
 
       // Showcase photos for this cabin (from the Firestore `cabins`
-      // collection, matched by display name). Rendered as a one-photo-per-slide
-      // carousel at the top of the card.
+      // collection, matched by display name). Rendered as a short 4:3 ratio
+      // gallery strip at the top of the card — several photos visible in a
+      // horizontal scroll, mirroring the invitation's accommodation photo
+      // carousel. Each photo is a <button> that opens the shared lightbox at
+      // that index (same full-screen modal gallery as the invitation).
       const photoIds = getCabinPhotos(c.displayName);
       const photoUrls = photoIds.map((id) => cabinPhotoUrl(id)).filter(Boolean);
       const photoCarousel = photoUrls.length
         ? `
-          <div class="dashboard-cabin-carousel" data-cabin-carousel>
-            <div class="dashboard-cabin-carousel-track" data-carousel-track>
-              ${photoUrls
-                .map(
-                  (url, i) => `
-                  <div class="dashboard-cabin-carousel-slide${i === 0 ? " is-active" : ""}" data-carousel-slide>
-                    <img src="${url}" alt="${c.label} — foto ${i + 1}" loading="lazy" />
-                  </div>`,
-                )
-                .join("")}
-            </div>
-            ${photoUrls.length > 1 ? `
-              <button type="button" class="dashboard-cabin-carousel-arrow is-prev" data-carousel-prev aria-label="Foto anterior">‹</button>
-              <button type="button" class="dashboard-cabin-carousel-arrow is-next" data-carousel-next aria-label="Foto siguiente">›</button>
-              <div class="dashboard-cabin-carousel-dots" data-carousel-dots>
-                ${photoUrls.map((_, i) => `<button type="button" class="dashboard-cabin-carousel-dot${i === 0 ? " is-active" : ""}" data-carousel-dot="${i}" aria-label="Foto ${i + 1}"></button>`).join("")}
-              </div>
-            ` : ""}
+          <div class="dashboard-cabin-carousel" data-cabin-carousel aria-label="${c.label}">
+            ${photoUrls
+              .map(
+                (url, i) => `
+                <button
+                  type="button"
+                  class="dashboard-cabin-photo"
+                  data-cabin-photo="${i}"
+                  aria-label="${c.label} — ver en grande"
+                >
+                  <img src="${url}" alt="${c.label} — foto ${i + 1}" loading="lazy" decoding="async" />
+                  <span class="dashboard-cabin-photo-count">
+                    ${String(i + 1).padStart(2, "0")} / ${String(photoUrls.length).padStart(2, "0")}
+                  </span>
+                </button>`,
+              )
+              .join("")}
           </div>`
         : "";
+
 
       // Group the cabin's guests by room id, preserving the room inventory
       // order so empty rooms still show up. We pass the cabin's MERGED guests
@@ -308,12 +326,37 @@ export function renderCabinAssignments({
     });
   });
 
-  // ── Nav badge click → scroll to the cabin card ──
+  // ── Nav badge click → toggle the multi-select cabin filter ──
+  // Clicking a badge toggles that cabin in `selectedCabins` and re-renders.
+  // With nothing selected, all cabins are shown; selecting one or more shows
+  // only those. Clicking a selected badge again deselects it.
   container.querySelectorAll("[data-cabin-nav]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const unit = btn.dataset.cabinNav;
-      const card = container.querySelector(`[data-cabin-card="${unit}"]`);
-      if (card) card.scrollIntoView({ behavior: "smooth", block: "start" });
+      if (selectedCabins.has(unit)) selectedCabins.delete(unit);
+      else selectedCabins.add(unit);
+      renderCabinAssignments({
+        container,
+        getActiveGuests,
+        getGuest,
+        getMergedGuest,
+        getLiveHosting,
+        getCabinDisplayName,
+        getRoomsByCabin,
+        getRoomOccupancy,
+        getRoomDescription,
+        getCabinPhotos,
+        cabinPhotoUrl,
+        guestAvatarUrl,
+        guestFullName,
+        getInviteUrl,
+        buildHostingPayload,
+        updateGuest,
+        getCurrentUserId,
+        serverTimestamp,
+        traceFirebase,
+        showToast,
+      });
     });
   });
 
@@ -329,33 +372,23 @@ export function renderCabinAssignments({
     });
   });
 
-  // ── Cabin photo carousel navigation ──
-  // Each cabin card with photos gets a one-photo-per-slide carousel. The
-  // prev/next arrows and the dots update the active slide. Only one slide is
-  // visible at a time (see .dashboard-cabin-carousel-slide in _cabins.scss).
-  container.querySelectorAll("[data-cabin-carousel]").forEach((carousel) => {
-    const slides = [...carousel.querySelectorAll("[data-carousel-slide]")];
-    const dots = [...carousel.querySelectorAll("[data-carousel-dot]")];
-    if (slides.length === 0) return;
-
-    const showSlide = (index) => {
-      const next = (index + slides.length) % slides.length;
-      slides.forEach((slide, i) => slide.classList.toggle("is-active", i === next));
-      dots.forEach((dot, i) => dot.classList.toggle("is-active", i === next));
-    };
-
-    carousel.querySelector("[data-carousel-prev]")?.addEventListener("click", () => {
-      const current = slides.findIndex((s) => s.classList.contains("is-active"));
-      showSlide(current - 1);
-    });
-    carousel.querySelector("[data-carousel-next]")?.addEventListener("click", () => {
-      const current = slides.findIndex((s) => s.classList.contains("is-active"));
-      showSlide(current + 1);
-    });
-    dots.forEach((dot, i) => {
-      dot.addEventListener("click", () => showSlide(i));
+  // ── Cabin photo gallery → lightbox ──
+  // Each cabin card's photo strip is a short 4:3 gallery. Clicking any photo
+  // opens a full-screen lightbox (the SAME modal gallery as the invitation's
+  // LightboxCarousel): opaque overlay, swipeable, prev/next arrows, dots and a
+  // counter, Escape to close, body scroll lock. The lightbox is built in
+  // vanilla JS because the dashboard is not a React app.
+  container.querySelectorAll("[data-cabin-photo]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const carousel = btn.closest("[data-cabin-carousel]");
+      if (!carousel) return;
+      const photos = [...carousel.querySelectorAll("[data-cabin-photo]")];
+      const urls = photos.map((p) => p.querySelector("img")?.getAttribute("src")).filter(Boolean);
+      const startIndex = Number(btn.dataset.cabinPhoto) || 0;
+      openCabinLightbox(urls, startIndex);
     });
   });
+
 
   // ── Drag-and-drop reassignment ──
 
@@ -666,3 +699,111 @@ export function renderCabinAssignments({
     });
   });
 }
+
+/**
+ * Open a full-screen lightbox gallery for a set of cabin photos.
+ *
+ * This mirrors the invitation's `LightboxCarousel` (web/invitation/src/
+ * components/LightboxCarousel.jsx) so the dashboard and the invitation share
+ * the same modal-gallery experience: an opaque full-viewport overlay, a large
+ * image with a counter, prev/next arrows, dots, swipe support, Escape to close
+ * and body scroll lock. It is implemented in vanilla JS because the dashboard
+ * is not a React app.
+ *
+ * @param {string[]} urls — the photo URLs to browse.
+ * @param {number} startIndex — which photo to open on (default 0).
+ */
+function openCabinLightbox(urls, startIndex = 0) {
+  if (!urls || urls.length === 0) return;
+
+  const count = urls.length;
+  let index = ((startIndex % count) + count) % count;
+  let direction = "next";
+  let touchStartX = null;
+
+  const overlay = document.createElement("div");
+  overlay.className = "dashboard-cabin-lightbox";
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-label", "Galería de cabaña");
+
+  const render = () => {
+    const current = urls[index];
+    overlay.innerHTML = `
+      <button type="button" class="dashboard-cabin-lightbox-close" data-lb-close aria-label="Cerrar">✕</button>
+      <button type="button" class="dashboard-cabin-lightbox-arrow is-prev" data-lb-prev aria-label="Anterior">‹</button>
+      <figure class="dashboard-cabin-lightbox-stage is-${direction}">
+        <img src="${current}" alt="Foto ${index + 1} de ${count}" decoding="async" />
+        <figcaption>${String(index + 1).padStart(2, "0")} / ${String(count).padStart(2, "0")}</figcaption>
+      </figure>
+      <button type="button" class="dashboard-cabin-lightbox-arrow is-next" data-lb-next aria-label="Siguiente">›</button>
+      <div class="dashboard-cabin-lightbox-dots">
+        ${urls
+          .map(
+            (_, i) =>
+              `<button type="button" class="dashboard-cabin-lightbox-dot${i === index ? " is-active" : ""}" data-lb-dot="${i}" aria-label="Foto ${i + 1}"></button>`,
+          )
+          .join("")}
+      </div>
+    `;
+
+    overlay.querySelector("[data-lb-close]").addEventListener("click", close);
+    overlay.querySelector("[data-lb-prev]").addEventListener("click", (e) => {
+      e.stopPropagation();
+      goTo(index - 1);
+    });
+    overlay.querySelector("[data-lb-next]").addEventListener("click", (e) => {
+      e.stopPropagation();
+      goTo(index + 1);
+    });
+    overlay.querySelectorAll("[data-lb-dot]").forEach((dot) => {
+      dot.addEventListener("click", (e) => {
+        e.stopPropagation();
+        goTo(Number(dot.dataset.lbDot));
+      });
+    });
+  };
+
+  const goTo = (next) => {
+    const target = ((next % count) + count) % count;
+    direction = target > index ? "next" : "prev";
+    index = target;
+    render();
+  };
+
+  const close = () => {
+    document.removeEventListener("keydown", onKey);
+    document.body.style.overflow = "";
+    overlay.remove();
+  };
+
+  const onKey = (e) => {
+    if (e.key === "Escape") close();
+    if (e.key === "ArrowRight") goTo(index + 1);
+    if (e.key === "ArrowLeft") goTo(index - 1);
+  };
+
+  // Close on backdrop click (but not when clicking the image/controls).
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) close();
+  });
+
+  // Swipe support: left → next, right → previous.
+  overlay.addEventListener("touchstart", (e) => {
+    touchStartX = e.touches[0].clientX;
+  });
+  overlay.addEventListener("touchend", (e) => {
+    if (touchStartX === null) return;
+    const deltaX = e.changedTouches[0].clientX - touchStartX;
+    touchStartX = null;
+    if (Math.abs(deltaX) < 50) return;
+    if (deltaX < 0) goTo(index + 1);
+    else goTo(index - 1);
+  });
+
+  document.addEventListener("keydown", onKey);
+  document.body.style.overflow = "hidden";
+  document.body.appendChild(overlay);
+  render();
+}
+

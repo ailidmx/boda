@@ -19,7 +19,7 @@ import {
   getRoomOccupancy,
   getRoomDescription,
 } from "./rooms.js";
-import { getCabinPhotos, cabinPhotoUrl } from "./cabins.js";
+import { getCabinPhotos, cabinPhotoUrl, loadCabins } from "./cabins.js";
 import { loadTables, renderTablesManager } from "./tables.js";
 import { createMatrixLoader } from "./matrixLoader.js";
 import { collections } from "../../shared/firestore-paths.js";
@@ -1063,6 +1063,15 @@ function renderDashboard(app) {
     // Report the rooms inventory to the matrix loader.
     reportSource("rooms", rooms || []);
     // Re-render cabin assignments now that room data is available
+    renderCabinAssignments();
+  });
+
+  // ── Load cabins from Firestore (source of truth for the showcase photos) ──
+  // The cabin cards' photo gallery reads `getCabinPhotos()` from the `cabins`
+  // collection. Without this call the `CABINS` cache stays empty and no photos
+  // render, so we load them and re-render the cabin assignments once ready.
+  loadCabins().then((cabins) => {
+    reportSource("cabins", cabins || []);
     renderCabinAssignments();
   });
 

@@ -76,13 +76,22 @@ export function getCabinPhotos(displayName) {
 
 /**
  * Build a Cloudinary URL for a cabin showcase photo from its public id.
- * The id is the full public id (e.g. `cabin/casona/foo`), so we render it
- * directly without any extra prefix. Returns "" when the id is empty.
+ *
+ * TRICK (back office only): the `cabins` collection stores the showcase photo
+ * public ids WITHOUT the `boda/` prefix (e.g. `cabin-margarita-06`), but the
+ * actual Cloudinary assets live under the `boda/` folder (e.g.
+ * `boda/cabin-margarita-06`). So we prepend `boda/` here so the dashboard
+ * renders the correct images.
+ *
+ * NOTE: This is a temporary workaround applied ONLY to the back office. The
+ * real fix is to store the FULL public id (with the `boda/` prefix) in the
+ * `cabins` collection. See the todo list file for the follow-up.
  * @param {string} publicId
  * @returns {string}
  */
 export function cabinPhotoUrl(publicId) {
   if (!publicId) return "";
-  return `https://res.cloudinary.com/k2ajcgxv/image/upload/q_auto,f_auto,c_fill,g_auto,w_1200,h_800/${publicId}`;
+  const fullId = publicId.startsWith("boda/") ? publicId : `boda/${publicId}`;
+  return `https://res.cloudinary.com/k2ajcgxv/image/upload/q_auto,f_auto,c_fill,g_auto,w_1200,h_800/${fullId}`;
 }
 

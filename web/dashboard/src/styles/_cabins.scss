@@ -66,207 +66,265 @@
   overflow: hidden;
 }
 
-// ── Cabin photo carousel ───────────────────────────────────────────────
-// Compact strip: a single short row of square thumbnails so it takes very
-// little vertical space and doesn't dominate the card. The number of photos
-// per slide adapts to what's available (few photos all fit in one slide, many
-// paginate). Only the active slide is visible; the track holds all slides
-// side-by-side and the active one is shown via opacity/position.
+// ── Cabin photo gallery strip ─────────────────────────────────────────
+// A short 4:3 ratio gallery at the top of each cabin card, mirroring the
+// invitation's accommodation photo carousel. Several photos are visible at
+// once in a horizontal scroll (snap), so it takes little vertical space but
+// still shows the cabin's showcase. Each photo is a <button> that opens the
+// full-screen lightbox at that index.
 .dashboard-cabin-carousel {
-  position: relative;
-  height: 5rem;
-  background: rgba(85, 69, 45, 0.06);
-  overflow: hidden;
-}
-
-.dashboard-cabin-carousel-track {
-  position: absolute;
-  inset: 0;
-}
-
-.dashboard-cabin-carousel-slide {
-  position: absolute;
-  inset: 0;
   display: flex;
-  gap: 2px;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
+  gap: 0.35rem;
+  padding: 0.6rem 1.15rem;
+  background: rgba(85, 69, 45, 0.06);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  -webkit-overflow-scrolling: touch;
+}
 
-  &.is-active {
-    opacity: 1;
-    visibility: visible;
-  }
+.dashboard-cabin-photo {
+  position: relative;
+  flex: 0 0 auto;
+  width: 9.5rem;
+  aspect-ratio: 4 / 3;
+  padding: 0;
+  border: 0;
+  border-radius: 0.4rem;
+  background: rgba(85, 69, 45, 0.08);
+  overflow: hidden;
+  cursor: zoom-in;
+  scroll-snap-align: start;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 
   img {
-    height: 100%;
-    aspect-ratio: 1 / 1;
-    object-fit: cover;
     display: block;
-    flex: 0 0 auto;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0.4rem 1rem rgba(0, 0, 0, 0.18);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $accent;
+    outline-offset: 2px;
   }
 }
 
-
-
-
-.dashboard-cabin-carousel-arrow {
+// Small "01 / 05" counter badge on each thumbnail.
+.dashboard-cabin-photo-count {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 2;
-  width: 2rem;
-  height: 2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.35);
+  right: 0.35rem;
+  bottom: 0.35rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 0.25rem;
+  background: rgba(0, 0, 0, 0.55);
   color: $white;
-  font-size: 1.2rem;
-  line-height: 1;
+  font-size: 0.68rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.04em;
+  pointer-events: none;
+}
+
+
+// ── Cabin photo lightbox (full-screen modal gallery) ─────────────────
+// Clicking a cabin photo opens a full-screen lightbox that mirrors the
+// invitation's `LightboxCarousel` (web/invitation/src/styles/lightbox.css):
+// an opaque full-viewport overlay, a large image with a counter, prev/next
+// arrows, dots, swipe support, Escape to close and body scroll lock. The
+// markup is produced by `openCabinLightbox()` in cabinsPanel.js.
+.dashboard-cabin-lightbox {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: 1fr auto;
+  align-items: center;
+  gap: 1rem;
+  padding: clamp(1rem, 3vw, 2.5rem);
+  background: #0d100d;
+  color: $white;
+}
+
+.dashboard-cabin-lightbox-close {
+  position: absolute;
+  z-index: 2;
+  top: clamp(1rem, 3vw, 2rem);
+  right: clamp(1rem, 3vw, 2rem);
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  color: $white;
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  font-size: 1.1rem;
+  line-height: 1;
+  transition: background 200ms ease, transform 200ms ease;
 
   &:hover {
-    background: rgba(0, 0, 0, 0.55);
+    background: rgba(0, 0, 0, 0.65);
+    transform: scale(1.06);
+  }
+}
+
+.dashboard-cabin-lightbox-arrow {
+  display: grid;
+  width: 3.75rem;
+  height: 3.75rem;
+  place-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45);
+  color: $white;
+  cursor: pointer;
+  font-size: 2.4rem;
+  line-height: 1;
+  transition: background 200ms ease, transform 200ms ease;
+
+  &:hover {
+    background: rgba(0, 0, 0, 0.65);
+    transform: scale(1.06);
   }
 
   &.is-prev {
-    left: 0.6rem;
+    grid-column: 1;
+    grid-row: 1;
   }
 
   &.is-next {
-    right: 0.6rem;
+    grid-column: 3;
+    grid-row: 1;
   }
 }
 
-.dashboard-cabin-carousel-dots {
-  position: absolute;
-  bottom: 0.6rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 2;
+.dashboard-cabin-lightbox-stage {
+  grid-column: 2;
+  grid-row: 1;
   display: flex;
-  gap: 0.4rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 0;
+  min-width: 0;
+  max-height: 100%;
+
+  // Swipeable-card feel: the active image slides in from the side matching
+  // the direction of the change (next → from the right, prev → from the left).
+  &.is-next {
+    animation: cabin-lightbox-slide-in-right 0.28s ease;
+  }
+
+  &.is-prev {
+    animation: cabin-lightbox-slide-in-left 0.28s ease;
+  }
+
+  img {
+    display: block;
+    max-width: 100%;
+    max-height: calc(100svh - 8rem);
+    object-fit: contain;
+    border-radius: 0.5rem;
+    box-shadow: 0 2rem 6rem rgba(0, 0, 0, 0.55);
+  }
+
+  figcaption {
+    font-family: $font-display;
+    font-size: 0.9rem;
+    letter-spacing: 0.12em;
+    color: rgba(255, 255, 255, 0.75);
+  }
 }
 
-.dashboard-cabin-carousel-dot {
-  width: 0.5rem;
-  height: 0.5rem;
+@keyframes cabin-lightbox-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(4%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes cabin-lightbox-slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-4%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.dashboard-cabin-lightbox-dots {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.dashboard-cabin-lightbox-dot {
+  width: 0.55rem;
+  height: 0.55rem;
   padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.6);
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.35);
+  background: transparent;
   cursor: pointer;
-  transition: background-color 0.15s ease;
+  transition: background 200ms ease, transform 200ms ease;
+
+  &:hover {
+    transform: scale(1.2);
+  }
 
   &.is-active {
     background: $white;
   }
 }
 
-// ── Cabin photo lightbox (full-screen view) ──
-// Clicking a cabin photo thumbnail opens a full-screen overlay showing the
-// photo large, with prev/next arrows, a close button and a counter. The
-// overlay reuses the shared .dashboard-modal-overlay backdrop (dark, centered)
-// but the stage is a full-viewport flex container so the image can be as large
-// as the screen allows.
-.dashboard-cabin-lightbox {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 1.5rem;
-}
+@media (max-width: 640px) {
+  .dashboard-cabin-lightbox {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
 
-.dashboard-cabin-lightbox-stage {
-  position: relative;
-  max-width: 100%;
-  max-height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+  .dashboard-cabin-lightbox-arrow.is-prev {
+    grid-column: 1;
+    grid-row: 3;
+    justify-self: start;
+  }
 
-.dashboard-cabin-lightbox-img {
-  max-width: 100%;
-  max-height: 90vh;
-  border-radius: 0.5rem;
-  box-shadow: 0 1.5rem 4rem rgba(0, 0, 0, 0.6);
-  object-fit: contain;
-  background: #000;
-}
+  .dashboard-cabin-lightbox-arrow.is-next {
+    grid-column: 1;
+    grid-row: 3;
+    justify-self: end;
+  }
 
-.dashboard-cabin-lightbox-close {
-  position: absolute;
-  top: -2.75rem;
-  right: 0;
-  z-index: 3;
-  width: 2.25rem;
-  height: 2.25rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.45);
-  color: $white;
-  font-size: 1.1rem;
-  line-height: 1;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
+  .dashboard-cabin-lightbox-stage {
+    grid-column: 1;
+    grid-row: 2;
+  }
 
-  &:hover {
-    background: rgba(0, 0, 0, 0.7);
+  .dashboard-cabin-lightbox-dots {
+    grid-column: 1;
+    grid-row: 3;
   }
 }
 
-.dashboard-cabin-lightbox-arrow {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  z-index: 3;
-  width: 2.75rem;
-  height: 2.75rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.45);
-  color: $white;
-  font-size: 1.6rem;
-  line-height: 1;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-
-  &:hover {
-    background: rgba(0, 0, 0, 0.7);
-  }
-
-  &.is-prev {
-    left: -3.5rem;
-  }
-
-  &.is-next {
-    right: -3.5rem;
-  }
-}
-
-.dashboard-cabin-lightbox-counter {
-  position: absolute;
-  bottom: -2.5rem;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 3;
-  padding: 0.25rem 0.75rem;
-  border-radius: 0.35rem;
-  background: rgba(0, 0, 0, 0.55);
-  color: $white;
-  font-size: 0.85rem;
-  letter-spacing: 0.05em;
-}
 
 
 .dashboard-cabin-heading {
@@ -320,7 +378,9 @@
 
 // ── Nav badge bar ──────────────────────────────────────────────────────
 // One button per cabin showing its label + actual/calculated occupancy.
-// Clicking a badge scrolls to the matching cabin card.
+// Each badge doubles as a multi-select FILTER: clicking toggles that cabin's
+// visibility. An active badge (is-active) means the cabin is selected; when
+// nothing is selected, all cabins are shown.
 .dashboard-cabin-nav {
   display: flex;
   flex-wrap: wrap;
@@ -344,6 +404,19 @@
   &:hover {
     border-color: $accent;
     background: rgba(85, 69, 45, 0.04);
+  }
+
+  // Selected (filtered-in) state: filled with the accent so the admin can see
+  // at a glance which cabins are currently shown.
+  &.is-active {
+    border-color: $accent;
+    background: $accent;
+    color: $white;
+
+    .dashboard-cabin-nav-occ {
+      background: rgba(255, 255, 255, 0.22);
+      color: $white;
+    }
   }
 }
 
