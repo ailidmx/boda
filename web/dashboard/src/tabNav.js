@@ -13,6 +13,7 @@
 /** Map URL path segments to internal tab IDs. */
 const PATH_TO_TAB = {
   invitados: "guests",
+  charts: "charts",
   cabins: "cabins",
   tables: "tables",
   gracias: "thanks",
@@ -21,10 +22,12 @@ const PATH_TO_TAB = {
 /** Map internal tab IDs to URL path segments. */
 const TAB_TO_PATH = {
   guests: "invitados",
+  charts: "charts",
   cabins: "cabins",
   tables: "tables",
   thanks: "gracias",
 };
+
 
 /** The currently active tab id. */
 let activeTab = "guests";
@@ -50,7 +53,10 @@ export function getTabFromPath() {
 
 /**
  * Toggle the active tab + panel classes in the DOM and update the internal
- * active-tab state.
+ * active-tab state. After the DOM classes are toggled, a `dashboard:tabchange`
+ * custom event is dispatched on `window` so the dashboard can react to the tab
+ * becoming visible (e.g. re-render ECharts panels that were initialized while
+ * hidden). The event carries the newly active tab id in `event.detail.tab`.
  */
 export function switchTab(tab) {
   activeTab = tab;
@@ -60,7 +66,9 @@ export function switchTab(tab) {
   document.querySelectorAll("[data-dashboard-panel]").forEach((panel) => {
     panel.classList.toggle("dashboard-panel-active", panel.dataset.dashboardPanel === tab);
   });
+  window.dispatchEvent(new CustomEvent("dashboard:tabchange", { detail: { tab } }));
 }
+
 
 /**
  * Navigate to a sub-page tab without full page reload.
@@ -80,10 +88,12 @@ export function navigateToTab(tabId) {
 export function renderTabNavigation() {
   const tabs = [
     { id: "guests", label: "Invitados", icon: "👥" },
+    { id: "charts", label: "Gráficas", icon: "📊" },
     { id: "cabins", label: "Cabañas", icon: "🏠" },
     { id: "tables", label: "Mesas", icon: "🪑" },
     { id: "thanks", label: "Gracias", icon: "🙏" },
   ];
+
 
   const nav = document.querySelector("[data-dashboard-tabs]");
   if (!nav) return;

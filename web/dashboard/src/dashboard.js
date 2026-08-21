@@ -68,7 +68,9 @@ import {
 
   getUniqueGuestGroups as serviceGetUniqueGuestGroups,
   getGroupAttendanceCounts as serviceGetGroupAttendanceCounts,
+  getGroupInvitationBreakdown as serviceGetGroupInvitationBreakdown,
   getUniqueCabins as serviceGetUniqueCabins,
+
   getFilteredGuests as serviceGetFilteredGuests,
   guestSortValue as serviceGuestSortValue,
   guestAgeGroup as serviceGuestAgeGroup,
@@ -89,6 +91,8 @@ import { openCreateGuestModal as openCreateGuestModalModule } from "./guestCreat
 import { renderSummary } from "./summary.js";
 import { renderCabinAssignments as renderCabinAssignmentsPanel } from "./cabinsPanel.js";
 import { renderThanksPanel as renderThanksPanelModule } from "./thanksPanel.js";
+import { renderChartsPanel as renderChartsPanelModule } from "./chartsPanel.js";
+
 import {
   getTabFromPath,
   navigateToTab,
@@ -769,9 +773,30 @@ function renderThanksPanel() {
   });
 }
 
+// ── Charts Panel ───────────────────────────────────────────────────────
+
+// The "Gráficas" panel (ECharts visualizations of attendance, RSVP levels,
+// per-group confirmations, and identity readiness) lives in `chartsPanel.js`.
+// This thin adapter injects the LIVE data derived from the guest cache so the
+// panel stays a pure presentation module that never touches Firestore.
+function renderChartsPanel() {
+  const container = document.querySelector("[data-charts-panel]");
+  if (!container) return;
+  const readiness = computeReadiness();
+  renderChartsPanelModule({
+    groupInvitation: serviceGetGroupInvitationBreakdown(getActiveGuests(), state.liveGuests),
+    dayConfirmations: computeDayConfirmations(),
+    dayDistributions: computeDayDistributions(),
+    readiness: readiness._all || readiness,
+    groups: getUniqueGuestGroups(),
+  });
+}
+
+
 // ── Guest Manager (flat, live, inline editable) ────────────────────────
 
 function renderGuestManager() {
+
   const container = document.querySelector("[data-guest-manager]");
   if (!container) return;
   renderGuestManagerTable({
@@ -918,7 +943,21 @@ function renderDashboard(app) {
         </div>
       </section>
 
+      <!-- ── Panel: Charts ── -->
+      <section class="dashboard-panel" data-dashboard-panel="charts">
+        <div class="dashboard-section">
+          <div class="dashboard-section-heading">
+            <div>
+              <p class="dashboard-eyebrow">Visualización de datos</p>
+              <h2>Gráficas</h2>
+            </div>
+          </div>
+          <div data-charts-panel></div>
+        </div>
+      </section>
+
       <!-- ── Panel: Cabins ── -->
+
       <section class="dashboard-panel" data-dashboard-panel="cabins">
         <div class="dashboard-section">
           <div class="dashboard-section-heading">
@@ -1003,6 +1042,21 @@ function renderDashboard(app) {
   renderGuestManager();
   renderCabinAssignments();
   renderThanksPanel();
+  renderChartsPanel();
+
+  // ── Re-render the charts panel when the "Gráficas" tab becomes visible ──
+  // ECharts initializes with the container's current size. If the charts panel
+  // is hidden (display:none) when `renderChartsPanel()` first runs (the default
+  // tab is "guests"), the charts initialize at 0×0 and stay empty. Re-render
+  // them whenever the charts tab is activated so they size to the now-visible
+  // container. `switchTab` dispatches `dashboard:tabchange` on every tab switch.
+  const onTabChange = (event) => {
+    if (event.detail?.tab === "charts") renderChartsPanel();
+  };
+  window.addEventListener("dashboard:tabchange", onTabChange);
+  app._onTabChange = onTabChange;
+
+
 
   // ── Load rooms from Firestore (source of truth) ──
   loadRooms().then((rooms) => {

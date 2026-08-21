@@ -326,8 +326,39 @@ export function getGroupAttendanceCounts(activeGuests, liveGuests) {
   return counts;
 }
 
+// Per-group invitation + RSVP breakdown for the charts panel. For each group
+// returns:
+//   - `total`        = number of guests in the group
+//   - `notSent`      = guests whose invitation has NOT been sent yet
+//   - `sentByLevel`  = array of 6 counts (indexed by RSVP level 0–5) of guests
+//                      whose invitation HAS been sent, bucketed by their RSVP
+//                      answer for the given `day` (default "saturday").
+// This powers the stacked "Confirmados por grupo" bar: the full bar is the
+// group size, split into "not sent" (one color) vs "sent" (subdivided into the
+// 6 RSVP levels).
+export function getGroupInvitationBreakdown(activeGuests, liveGuests, day = "saturday") {
+  const breakdown = {};
+  activeGuests.forEach((guest) => {
+    const group = guest.group || "Sin grupo";
+    if (!breakdown[group]) {
+      breakdown[group] = { total: 0, notSent: 0, sentByLevel: [0, 0, 0, 0, 0, 0] };
+    }
+    const entry = breakdown[group];
+    entry.total += 1;
+    if (guest.invitationSent === true) {
+      const level = Number(getLiveRsvpAnswers(guest, liveGuests)[day]) || 0;
+      const idx = Math.min(Math.max(level, 0), 5);
+      entry.sentByLevel[idx] += 1;
+    } else {
+      entry.notSent += 1;
+    }
+  });
+  return breakdown;
+}
+
 // Unique cabin units among active guests that have a cabin assigned, sorted.
 export function getUniqueCabins(activeGuests) {
+
   const cabins = [
     ...new Set(
       activeGuests
