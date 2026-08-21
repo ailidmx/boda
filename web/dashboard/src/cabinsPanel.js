@@ -393,7 +393,7 @@ export function renderCabinAssignments({
   const formatMXN = (n) => {
     const v = Number(n);
     if (!Number.isFinite(v) || v <= 0) return "";
-    return "$" + v.toLocaleString("es-MX");
+    return "$" + Math.round(v).toLocaleString("es-MX");
   };
 
   const cards = visibleStats
