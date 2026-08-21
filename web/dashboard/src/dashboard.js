@@ -19,7 +19,7 @@ import {
   getRoomOccupancy,
   getRoomDescription,
 } from "./rooms.js";
-import { getCabinPhotos, cabinPhotoUrl, loadCabins, getAllCabinNames } from "./cabins.js";
+import { getCabinPhotos, getCabinByDisplayName, cabinPhotoUrl, loadCabins, getAllCabinNames } from "./cabins.js";
 import { loadTables, renderTablesManager } from "./tables.js";
 import { createMatrixLoader } from "./matrixLoader.js";
 import { collections } from "../../shared/firestore-paths.js";
@@ -56,6 +56,7 @@ import {
   rsvpBooleanChip as serviceRsvpBooleanChip,
   rsvpScaleChip as serviceRsvpScaleChip,
   paymentConfirmedChip as servicePaymentConfirmedChip,
+  paymentConfirmedIcon as servicePaymentConfirmedIcon,
   computeDayConfirmations as serviceComputeDayConfirmations,
   computeInvitationStats as serviceComputeInvitationStats,
   computeDayDistributions as serviceComputeDayDistributions,
@@ -415,6 +416,13 @@ function rsvpScaleChip(guest, questionId) {
 // (Sí / No / —).
 function paymentConfirmedChip(guest) {
   return servicePaymentConfirmedChip(guest);
+}
+
+// Compact money-icon badge (💰 / 🚫 / 💸) for the cabin-assignment guest rows.
+// Unlike the text "Sí/No/—" chip used in the INVITADOS table, the cabins panel
+// uses an explicit emoji so the admin can scan payment status at a glance.
+function paymentConfirmedIcon(guest) {
+  return servicePaymentConfirmedIcon(guest);
 }
 
 
@@ -869,11 +877,17 @@ function renderCabinAssignments() {
     getRoomOccupancy,
     getRoomDescription,
     getCabinPhotos,
+    getCabinByDisplayName,
     getAllCabinNames,
     cabinPhotoUrl,
     guestAvatarUrl,
     guestFullName,
     getInviteUrl,
+    getRsvpAnswers: getLiveRsvpAnswers,
+    BOOLEAN_YES: 1,
+    BOOLEAN_NO: 2,
+    RSVP_CONFIRMED_MIN_LEVEL,
+    paymentConfirmedIcon,
     buildHostingPayload: buildDashboardGuestHostingPayload,
     updateGuest,
     getCurrentUserId,
@@ -882,6 +896,7 @@ function renderCabinAssignments() {
     showToast,
   });
 }
+
 
 // ── Table Assignments (real-life 30m × 6m canvas) ──────────────────────
 

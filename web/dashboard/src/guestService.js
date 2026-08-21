@@ -179,6 +179,22 @@ export function paymentConfirmedChip(guest) {
   return '<span class="dashboard-badge dashboard-badge-muted">—</span>';
 }
 
+// Compact money-icon badge for the cabin-assignment guest rows. Unlike the
+// text "Sí/No/—" chip used in the INVITADOS table, the cabins panel uses an
+// explicit emoji so the admin can scan payment status at a glance:
+//   - 💰 (green) when the guest confirmed payment.
+//   - 🚫 (red) when the guest explicitly has NOT confirmed payment.
+//   - 💸 (muted) when there is no payment answer yet.
+export function paymentConfirmedIcon(guest) {
+  if (guest.paymentConfirmed === true) {
+    return '<span class="dashboard-badge dashboard-badge-yes" title="Pago confirmado">💰</span>';
+  }
+  if (guest.paymentConfirmed === false) {
+    return '<span class="dashboard-badge dashboard-badge-no" title="Pago no confirmado">🚫</span>';
+  }
+  return '<span class="dashboard-badge dashboard-badge-muted" title="Sin respuesta de pago">💸</span>';
+}
+
 
 // Aggregate confirmed counts per attendance day from the live guests.
 

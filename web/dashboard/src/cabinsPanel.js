@@ -34,7 +34,67 @@ let activePeriod = "primary";
 let selectedCabins = new Set();
 
 /**
+ * Determine whether a guest's cabin assignment contradicts their RSVP answer
+ * for the ACTIVE period, and return a human-readable warning (or "" when the
+ * assignment is consistent).
+ *
+ * Primary period (Viernes → Domingo): a guest with a cabin (`hosting.cabin`)
+ * who answered `accommodationConfirm` = NO (2) is wrongly assigned; a guest who
+ * answered YES (1) but has no cabin is missing one.
+ *
+ * Extra period (Domingo → Martes): a guest with an extra cabin
+ * (`hosting.xtraCabin`) whose `rocaAzul` level is below the confirmed threshold
+ * is wrongly assigned; a guest whose `rocaAzul` level is at/above the threshold
+ * but has no extra cabin is missing one.
+ *
+ * @param {Object} guest — a normalized/merged guest.
+ * @param {Object} answers — the guest's LIVE `rsvp.answers` map.
+ * @param {string} period — "primary" or "extra".
+ * @param {number} BOOLEAN_YES — the "yes" value for boolean answers (1).
+ * @param {number} BOOLEAN_NO — the "no" value for boolean answers (2).
+ * @param {number} RSVP_CONFIRMED_MIN_LEVEL — the scale level that counts as confirmed (4).
+ * @returns {{ kind: string, message: string }|null} the mismatch, or null.
+ */
+function getCabinMismatch(guest, answers, period, BOOLEAN_YES, BOOLEAN_NO, RSVP_CONFIRMED_MIN_LEVEL) {
+  const hasCabin = Boolean(guest.cabin || guest.xtraCabin);
+  if (period === "extra") {
+    const level = Number(answers.rocaAzul) || 0;
+    const accepted = level >= RSVP_CONFIRMED_MIN_LEVEL;
+    if (hasCabin && !accepted) {
+      return {
+        kind: "wrong",
+        message: `Dijo que NO se queda en Roca Azul (nivel ${level}) pero tiene cabaña extra.`,
+      };
+    }
+    if (!hasCabin && accepted) {
+      return {
+        kind: "missing",
+        message: `Confirmó quedarse en Roca Azul (nivel ${level}) pero no tiene cabaña extra.`,
+      };
+    }
+    return null;
+  }
+
+  // Primary period.
+  const confirm = Number(answers.accommodationConfirm);
+  if (hasCabin && confirm === BOOLEAN_NO) {
+    return {
+      kind: "wrong",
+      message: "Dijo que NO se aloja en el fin de semana pero tiene cabaña asignada.",
+    };
+  }
+  if (!hasCabin && confirm === BOOLEAN_YES) {
+    return {
+      kind: "missing",
+      message: "Confirmó alojamiento en el fin de semana pero no tiene cabaña asignada.",
+    };
+  }
+  return null;
+}
+
+/**
  * Render the cabin-assignment panel into the `[data-cabin-assignments]` container.
+
  * @param {Object} deps
  * @param {HTMLElement} deps.container — the `[data-cabin-assignments]` element.
  * @param {() => Object[]} deps.getActiveGuests — returns the normalized live guest cache.
@@ -46,11 +106,17 @@ let selectedCabins = new Set();
  * @param {(roomId: string, guests: Object[]) => Object|null} deps.getRoomOccupancy — occupancy for a room.
  * @param {(room: Object, lang: string) => string} deps.getRoomDescription — room description text.
  * @param {(displayName: string) => string[]} deps.getCabinPhotos — cabin showcase photo ids.
+ * @param {(displayName: string) => Object|null} deps.getCabinByDisplayName — full cabin object (incl. pricing fields) by display name.
  * @param {() => string[]} deps.getAllCabinNames — all cabin display names from the `cabins` collection.
  * @param {(publicId: string) => string} deps.cabinPhotoUrl — Cloudinary URL for a cabin photo.
  * @param {(guest: Object) => string} deps.guestAvatarUrl — Cloudinary URL for a guest avatar.
  * @param {(guest: Object) => string} deps.guestFullName — full display name for a guest.
  * @param {(guestId: string) => string} deps.getInviteUrl — builds the invite URL for a guest.
+ * @param {(guest: Object) => Object} deps.getRsvpAnswers — returns the LIVE `rsvp.answers` map for a guest.
+ * @param {number} deps.BOOLEAN_YES — the "yes" value for boolean RSVP answers (1).
+ * @param {number} deps.BOOLEAN_NO — the "no" value for boolean RSVP answers (2).
+ * @param {number} deps.RSVP_CONFIRMED_MIN_LEVEL — the scale level (0–5) that counts as "confirmed" (4).
+ * @param {(guest: Object) => string} deps.paymentConfirmedIcon — renders the "Pago" money-icon badge (💰/🚫/💸) for a guest.
  * @param {(params: Object) => Object} deps.buildHostingPayload — builds the `guests` write payload.
  * @param {(guestId: string, payload: Object) => Promise<void>} deps.updateGuest — repository write.
  * @param {() => string} deps.getCurrentUserId — returns the admin's uid (or "dashboard").
@@ -69,11 +135,17 @@ export function renderCabinAssignments({
   getRoomOccupancy,
   getRoomDescription,
   getCabinPhotos,
+  getCabinByDisplayName,
   getAllCabinNames,
   cabinPhotoUrl,
   guestAvatarUrl,
   guestFullName,
   getInviteUrl,
+  getRsvpAnswers,
+  BOOLEAN_YES,
+  BOOLEAN_NO,
+  RSVP_CONFIRMED_MIN_LEVEL,
+  paymentConfirmedIcon,
   buildHostingPayload,
   updateGuest,
   getCurrentUserId,
@@ -81,11 +153,110 @@ export function renderCabinAssignments({
   traceFirebase,
   showToast,
 }) {
+
   if (!container) return;
+
+  // Capture the full dependency set so every internal re-render (period tab,
+  // nav filter, drag-and-drop, remove, add) passes the SAME deps — including
+  // the RSVP-answer helpers used by the lodging-status badge. Without this,
+  // a re-render would drop `getRsvpAnswers`/`BOOLEAN_YES`/`BOOLEAN_NO`/
+  // `RSVP_CONFIRMED_MIN_LEVEL` and crash when rendering the status badge.
+  const deps = {
+    container,
+    getActiveGuests,
+    getGuest,
+    getMergedGuest,
+    getLiveHosting,
+    getCabinDisplayName,
+    getRoomsByCabin,
+    getRoomOccupancy,
+    getRoomDescription,
+    getCabinPhotos,
+    getCabinByDisplayName,
+    getAllCabinNames,
+    cabinPhotoUrl,
+    guestAvatarUrl,
+    guestFullName,
+    getInviteUrl,
+    getRsvpAnswers,
+    BOOLEAN_YES,
+    BOOLEAN_NO,
+    RSVP_CONFIRMED_MIN_LEVEL,
+    paymentConfirmedIcon,
+    buildHostingPayload,
+    updateGuest,
+    getCurrentUserId,
+    serverTimestamp,
+    traceFirebase,
+    showToast,
+  };
 
   const period = activePeriod;
 
+
+  // ── Lodging-plan status for the add-guest modal ──
+  // Each guest in the "+ Agregar" modal shows a small badge indicating whether
+  // they've accepted the lodging plan for the ACTIVE period. The field differs
+  // per period (the couple's warning):
+  //   - Primary period (Viernes → Domingo): `accommodationConfirm` — a boolean
+  //     answer (1 = yes, 2 = no).
+  //   - Extra period (Domingo → Martes): `rocaAzul` — a 0–5 scale answer,
+  //     where a level ≥ RSVP_CONFIRMED_MIN_LEVEL (4) counts as "accepted".
+  // Returns `{ kind, icon, title }` where kind is "yes" | "no" | "unknown".
+  const getLodgingStatus = (guest, p) => {
+    const answers = getRsvpAnswers(guest) || {};
+    if (p === "extra") {
+      const level = Number(answers.rocaAzul) || 0;
+      if (level >= RSVP_CONFIRMED_MIN_LEVEL) {
+        return { kind: "yes", icon: "✓", title: "Confirmó quedarse en Roca Azul" };
+      }
+      if (level > 0) {
+        return { kind: "no", icon: "✕", title: `No confirmó Roca Azul (nivel ${level})` };
+      }
+      return { kind: "unknown", icon: "?", title: "Sin respuesta de Roca Azul" };
+    }
+    // Primary period.
+    const confirm = Number(answers.accommodationConfirm);
+    if (confirm === BOOLEAN_YES) {
+      return { kind: "yes", icon: "✓", title: "Confirmó alojamiento en el fin de semana" };
+    }
+    if (confirm === BOOLEAN_NO) {
+      return { kind: "no", icon: "✕", title: "Dijo que NO se aloja en el fin de semana" };
+    }
+    return { kind: "unknown", icon: "?", title: "Sin respuesta de alojamiento" };
+  };
+
+  // ── Friday / Saturday / Sunday colored presence scale ──
+  // Renders the guest's attendance level for each day as three small read-only
+  // chips (V / S / D) using the SAME color language as the INVITADOS table:
+  // gray = no answer (0), amber = partial (1–3), green = confirmed (4–5). This
+  // lets the admin see at a glance how each guest answered the presence scale
+  // right inside the cabin cards and the "+ Agregar" modal.
+  const RSVP_DAYS = [
+    { key: "friday", label: "V", full: "Viernes" },
+    { key: "saturday", label: "S", full: "Sábado" },
+    { key: "sunday", label: "D", full: "Domingo" },
+  ];
+  const presenceScaleHtml = (guest) => {
+    const answers = getRsvpAnswers(guest) || {};
+    return `
+      <span class="dashboard-cabin-presence" title="Asistencia: Viernes · Sábado · Domingo (0 = sin respuesta, 4–5 = confirmado)">
+        ${RSVP_DAYS.map(({ key, label, full }) => {
+          const level = Number(answers[key]) || 0;
+          const cls =
+            level >= RSVP_CONFIRMED_MIN_LEVEL
+              ? "dashboard-rsvp-chip dashboard-rsvp-chip-confirmed"
+              : level > 0
+                ? "dashboard-rsvp-chip dashboard-rsvp-chip-partial"
+                : "dashboard-rsvp-chip dashboard-rsvp-chip-empty";
+          return `<span class="${cls} dashboard-cabin-presence-day" title="${full}: ${level === 0 ? "sin respuesta" : `nivel ${level}`}">${label}</span>`;
+        }).join("")}
+      </span>`;
+  };
+
+
   // The cabins panel mirrors the invitation front-end: it reads the LIVE
+
   // Firestore `guests` collection as the single source of truth. There is NO
   // static registry anymore — `getActiveGuests()` returns the normalized live
   // cache (populated by `setLiveGuests` from the `onSnapshot` listener).
@@ -218,10 +389,27 @@ export function renderCabinAssignments({
     ? cabinStats.filter((c) => selectedCabins.has(c.unit))
     : cabinStats;
 
+  // Format a number as MXN currency (e.g. "$1,250").
+  const formatMXN = (n) => {
+    const v = Number(n);
+    if (!Number.isFinite(v) || v <= 0) return "";
+    return "$" + v.toLocaleString("es-MX");
+  };
+
   const cards = visibleStats
     .map((c) => {
       const occupancy = c.guests[0]?.occupancy || "";
       const payment = c.guests[0]?.payment || "";
+
+      // Full cabin object (incl. pricing fields) for this card. Used to show
+      // the global 2-night price and the per-person price in the header, and
+      // to compute each guest's share in the rows below.
+      const cabinInfo = getCabinByDisplayName(c.displayName) || {};
+      const totalPrice = formatMXN(cabinInfo.totalPrice2Nights);
+      const perPersonPrice = formatMXN(cabinInfo.pricePerPerson2Nights);
+      const priceStat = totalPrice
+        ? `<span class="dashboard-cabin-stat"><b>PRECIO</b> ${totalPrice}${perPersonPrice ? ` · ${perPersonPrice}/p` : ""}</span>`
+        : "";
 
       // Showcase photos for this cabin (from the Firestore `cabins`
       // collection, matched by display name). Rendered as a short 4:3 ratio
@@ -289,32 +477,70 @@ export function renderCabinAssignments({
                           const avatarHtml = avatarUrl
                             ? `<img class="dashboard-avatar dashboard-avatar-sm" src="${avatarUrl}" alt="" loading="lazy" />`
                             : '<span class="dashboard-avatar dashboard-avatar-sm dashboard-avatar-fallback" aria-hidden="true">👤</span>';
+                          const status = getLodgingStatus(g, period);
+                          // Per-person price for this guest's stay (from the
+                          // cabin's pricing fields). Shown as a small muted
+                          // amount next to the name.
+                          const guestPrice = perPersonPrice
+                            ? `<span class="dashboard-cabin-guest-price" title="Precio por persona (2 noches)">${perPersonPrice}</span>`
+                            : "";
+                          // "Paid by the couple" flag for the ACTIVE period.
+                          // Primary: `hosting.isCabinPaidByNovios`; extra:
+                          // `hosting.isXtraCabinPaidByNovios`. When true, the
+                          // couple covers this guest's stay.
+                          const hosting = g.hosting || {};
+                          const paidByNovios = period === "extra"
+                            ? hosting.isXtraCabinPaidByNovios ?? g.isXtraCabinPaidByNovios
+                            : hosting.isCabinPaidByNovios ?? g.isCabinPaidByNovios;
+                          const paidBadge = paidByNovios
+                            ? '<span class="dashboard-cabin-paid-novios" title="Lo pagan los novios">💝</span>'
+                            : "";
                           return `
                       <li class="dashboard-cabin-guest" draggable="true" data-guest-id="${g.id}">
                         ${avatarHtml}
                         <span>${guestFullName(g)}</span>
+                        ${guestPrice}
+                        ${presenceScaleHtml(g)}
+                        <span class="dashboard-cabin-add-status is-${status.kind}" title="${status.title}" aria-label="${status.title}">${status.icon}</span>
+                        ${paidBadge}
+                        ${paymentConfirmedIcon(g)}
                         <button class="dashboard-link-btn" data-copy-guest="${g.id}" title="Copiar enlace">🔗</button>
                         <button class="dashboard-link-btn dashboard-cabin-remove" data-remove-guest="${g.id}" title="Quitar de esta cabaña">✕</button>
                       </li>`;
+
                         },
                       )
                       .join("")
                   : '<li class="dashboard-cabin-empty">—</li>'}
+
               </ul>
             </div>`;
         })
         .join("");
 
+      // Occupation percentage for the header stat (guests / capacity).
+      const occupationPct = c.calculated ? Math.round((c.actual / c.calculated) * 100) : 0;
+
       return `
         <div class="dashboard-cabin-card${c.isUnassigned ? " is-unassigned" : ""}" id="cabin-${c.unit}" data-cabin-card="${c.unit}">
           <div class="dashboard-cabin-heading">
-            <strong>${c.label}</strong>
-            <span class="dashboard-cabin-meta">${occupancy === "privada" ? "Privada" : "Compartida"} · ${payment === "pagada" ? "Pagada" : "Por pagar"} · ${c.actual}/${c.calculated}</span>
+            <div class="dashboard-cabin-heading-main">
+              <strong>${c.label}</strong>
+              <span class="dashboard-cabin-meta">${occupancy === "privada" ? "Privada" : "Compartida"} · ${payment === "pagada" ? "Pagada" : "Por pagar"}</span>
+            </div>
+            <div class="dashboard-cabin-heading-stats">
+              <span class="dashboard-cabin-stat"><b>ROOM</b> ${c.rooms.length}</span>
+              <span class="dashboard-cabin-stat"><b>CAPACITY</b> ${c.calculated}</span>
+              <span class="dashboard-cabin-stat"><b>OCCUPANCY</b> ${c.actual}</span>
+              <span class="dashboard-cabin-stat"><b>OCCUPATION</b> ${occupationPct}%</span>
+              ${priceStat}
+            </div>
             <button type="button" class="dashboard-cabin-add-btn" data-add-guest="${c.unit}" title="Agregar invitado a ${c.label}">+ Agregar</button>
           </div>
           ${photoCarousel}
           ${roomBlocks}
         </div>`;
+
     })
     .join("");
 
@@ -333,30 +559,9 @@ export function renderCabinAssignments({
   container.querySelectorAll("[data-cabin-period]").forEach((btn) => {
     btn.addEventListener("click", () => {
       activePeriod = btn.dataset.cabinPeriod;
-      renderCabinAssignments({
-        container,
-        getActiveGuests,
-        getGuest,
-        getMergedGuest,
-        getLiveHosting,
-        getCabinDisplayName,
-        getRoomsByCabin,
-        getRoomOccupancy,
-        getRoomDescription,
-        getCabinPhotos,
-        getAllCabinNames,
-        cabinPhotoUrl,
-        guestAvatarUrl,
-        guestFullName,
-        getInviteUrl,
-        buildHostingPayload,
-        updateGuest,
-        getCurrentUserId,
-        serverTimestamp,
-        traceFirebase,
-        showToast,
-      });
+      renderCabinAssignments(deps);
     });
+
   });
 
   // ── Nav badge click → toggle the multi-select cabin filter ──
@@ -368,31 +573,10 @@ export function renderCabinAssignments({
       const unit = btn.dataset.cabinNav;
       if (selectedCabins.has(unit)) selectedCabins.delete(unit);
       else selectedCabins.add(unit);
-      renderCabinAssignments({
-        container,
-        getActiveGuests,
-        getGuest,
-        getMergedGuest,
-        getLiveHosting,
-        getCabinDisplayName,
-        getRoomsByCabin,
-        getRoomOccupancy,
-        getRoomDescription,
-        getCabinPhotos,
-        getAllCabinNames,
-        cabinPhotoUrl,
-        guestAvatarUrl,
-        guestFullName,
-        getInviteUrl,
-        buildHostingPayload,
-        updateGuest,
-        getCurrentUserId,
-        serverTimestamp,
-        traceFirebase,
-        showToast,
-      });
+      renderCabinAssignments(deps);
     });
   });
+
 
   // ── Copy guest link buttons ──
   container.querySelectorAll("[data-copy-guest]").forEach((btn) => {
@@ -498,31 +682,10 @@ export function renderCabinAssignments({
         // Update the in-memory guest so the re-render reflects the change
         // immediately (the live onSnapshot listener will also refresh it).
         if (guest) guest.hosting = { ...(guest.hosting || {}), ...hosting };
-        renderCabinAssignments({
-          container,
-          getActiveGuests,
-          getGuest,
-          getMergedGuest,
-          getLiveHosting,
-          getCabinDisplayName,
-          getRoomsByCabin,
-          getRoomOccupancy,
-          getRoomDescription,
-          getCabinPhotos,
-        getAllCabinNames,
-          cabinPhotoUrl,
-          guestAvatarUrl,
-          guestFullName,
-          getInviteUrl,
-          buildHostingPayload,
-          updateGuest,
-          getCurrentUserId,
-          serverTimestamp,
-          traceFirebase,
-          showToast,
-        });
+        renderCabinAssignments(deps);
       } catch (err) {
         console.error("Failed to reassign guest", err);
+
         traceFirebase("cabin.assign.error", { guestId, code: err?.code, message: err?.message });
         showToast("No se pudo reasignar. Revisa permisos.", "error");
       }
@@ -572,30 +735,9 @@ export function renderCabinAssignments({
         // Update the in-memory guest so the re-render reflects the change
         // immediately (the live onSnapshot listener will also refresh it).
         if (guest) guest.hosting = { ...(guest.hosting || {}), ...hosting };
-        renderCabinAssignments({
-          container,
-          getActiveGuests,
-          getGuest,
-          getMergedGuest,
-          getLiveHosting,
-          getCabinDisplayName,
-          getRoomsByCabin,
-          getRoomOccupancy,
-          getRoomDescription,
-          getCabinPhotos,
-        getAllCabinNames,
-          cabinPhotoUrl,
-          guestAvatarUrl,
-          guestFullName,
-          getInviteUrl,
-          buildHostingPayload,
-          updateGuest,
-          getCurrentUserId,
-          serverTimestamp,
-          traceFirebase,
-          showToast,
-        });
+        renderCabinAssignments(deps);
         showToast("Invitado quitado de la cabaña.", "success");
+
       } catch (err) {
         console.error("Failed to remove guest from cabin", err);
         traceFirebase("cabin.remove.error", { guestId, code: err?.code, message: err?.message });
@@ -635,29 +777,73 @@ export function renderCabinAssignments({
             </p>
             ${unassigned.length === 0
               ? '<p class="dashboard-cabin-empty">No hay invitados sin asignar en este periodo.</p>'
-              : `<ul class="dashboard-cabin-add-list">
+              : `
+                <label class="dashboard-cabin-add-search">
+                  <span class="dashboard-cabin-add-search-label">Buscar por nombre</span>
+                  <input
+                    type="search"
+                    class="dashboard-cabin-add-search-input"
+                    data-cabin-add-search
+                    placeholder="Escribe un nombre…"
+                    autocomplete="off"
+                  />
+                </label>
+                <ul class="dashboard-cabin-add-list" data-cabin-add-list>
                   ${unassigned
                     .map((g) => {
                       const avatarUrl = guestAvatarUrl(g);
                       const avatarHtml = avatarUrl
                         ? `<img class="dashboard-avatar dashboard-avatar-sm" src="${avatarUrl}" alt="" loading="lazy" />`
                         : '<span class="dashboard-avatar dashboard-avatar-sm dashboard-avatar-fallback" aria-hidden="true">👤</span>';
+                      const status = getLodgingStatus(g, period);
                       return `
-                        <li>
+                        <li data-cabin-add-item="${g.id}">
                           <button type="button" class="dashboard-cabin-add-option" data-pick-guest="${g.id}">
                             ${avatarHtml}
                             <span>${guestFullName(g)}</span>
+                            ${presenceScaleHtml(g)}
                             <code class="dashboard-cabin-code">${g.id}</code>
+                            <span class="dashboard-cabin-add-status is-${status.kind}" title="${status.title}" aria-label="${status.title}">${status.icon}</span>
                           </button>
+
                         </li>`;
                     })
                     .join("")}
                 </ul>`}
+
           </div>
         </div>
       `;
 
       document.body.appendChild(overlay);
+
+      // ── Name filter: hide guest rows that don't match the typed query ──
+      // The search input filters the unassigned guest list by name (case- and
+      // accent-insensitive) as the admin types. Rows that don't match are
+      // hidden; the hint count updates to reflect the filtered total.
+      const searchInput = overlay.querySelector("[data-cabin-add-search]");
+      const listEl = overlay.querySelector("[data-cabin-add-list]");
+      const hintEl = overlay.querySelector(".dashboard-cabin-add-hint");
+      if (searchInput && listEl) {
+        const normalize = (s) =>
+          (s || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+        searchInput.addEventListener("input", () => {
+          const q = normalize(searchInput.value.trim());
+          let visible = 0;
+          listEl.querySelectorAll("[data-cabin-add-item]").forEach((li) => {
+            const name = normalize(li.querySelector("span")?.textContent || "");
+            const match = !q || name.includes(q);
+            li.style.display = match ? "" : "none";
+            if (match) visible += 1;
+          });
+          if (hintEl) {
+            hintEl.textContent = q
+              ? `Invitados sin cabaña en este periodo (${visible} de ${unassigned.length}).`
+              : `Invitados sin cabaña en este periodo (${unassigned.length}).`;
+          }
+        });
+      }
+
 
       overlay.querySelectorAll("[data-modal-close]").forEach((closeBtn) => {
         closeBtn.addEventListener("click", () => overlay.remove());
@@ -703,29 +889,8 @@ export function renderCabinAssignments({
             traceFirebase("cabin.add.ok", { guestId, cabinKey: hostingCabinKey, targetUnit, roomKey: hostingRoomKey, targetRoomId, hosting });
             if (guest) guest.hosting = { ...(guest.hosting || {}), ...hosting };
             overlay.remove();
-            renderCabinAssignments({
-              container,
-              getActiveGuests,
-              getGuest,
-              getMergedGuest,
-              getLiveHosting,
-              getCabinDisplayName,
-              getRoomsByCabin,
-              getRoomOccupancy,
-              getRoomDescription,
-              getCabinPhotos,
-        getAllCabinNames,
-              cabinPhotoUrl,
-              guestAvatarUrl,
-              guestFullName,
-              getInviteUrl,
-              buildHostingPayload,
-              updateGuest,
-              getCurrentUserId,
-              serverTimestamp,
-              traceFirebase,
-              showToast,
-            });
+            renderCabinAssignments(deps);
+
           } catch (err) {
             console.error("Failed to add guest to cabin", err);
             traceFirebase("cabin.add.error", { guestId, code: err?.code, message: err?.message });

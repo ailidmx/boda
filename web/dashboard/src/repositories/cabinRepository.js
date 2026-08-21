@@ -20,21 +20,30 @@ import { collections } from "../../../shared/firestore-paths.js";
 
 /**
  * Convert a Firestore `cabins` doc into the internal Cabin shape.
+ *
+ * Besides the showcase photos, we also carry the operational pricing fields
+ * (`capacity`, `totalPrice2Nights`, `pricePerPerson2Nights`, `isPrivate`) so
+ * the cabins panel can show the global cabin cost and the per-person cost for
+ * each assigned guest — mirroring the invitation's Accommodation pricing.
  * @param {import("firebase/firestore").DocumentSnapshot} doc
- * @returns {{ id: string, name: string, cloudinaryIds: string|string[]|undefined }}
+ * @returns {{ id: string, name: string, capacity: number, totalPrice2Nights: number, pricePerPerson2Nights: number, isPrivate: boolean, cloudinaryIds: string|string[]|undefined }}
  */
 function cabinFromDoc(doc) {
   const data = doc.data();
   return {
     id: data.id || doc.id,
     name: data.name,
+    capacity: data.capacity,
+    totalPrice2Nights: data.totalPrice2Nights,
+    pricePerPerson2Nights: data.pricePerPerson2Nights,
+    isPrivate: data.isPrivate,
     cloudinaryIds: data.cloudinaryIds,
   };
 }
 
 /**
  * Load all cabins from the Firestore `cabins` collection.
- * @returns {Promise<Array<{ id: string, name: string, cloudinaryIds: string|string[]|undefined }>>}
+ * @returns {Promise<Array<{ id: string, name: string, capacity: number, totalPrice2Nights: number, pricePerPerson2Nights: number, isPrivate: boolean, cloudinaryIds: string|string[]|undefined }>>}
  */
 export async function fetchCabins() {
   const snapshot = await getDocs(collection(db, collections.cabins));

@@ -329,8 +329,7 @@
 
 .dashboard-cabin-heading {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 0.5rem;
   padding: 0.9rem 1.15rem;
   background: $dark;
@@ -343,11 +342,48 @@
   }
 }
 
+// Top row of the heading: cabin name + meta on the left, "+ Agregar" on the
+// right. The stats row sits below it.
+.dashboard-cabin-heading-main {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
 .dashboard-cabin-meta {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.85);
   white-space: nowrap;
 }
+
+// Stats row in the heading: ROOM / CAPACITY / OCCUPANCY / OCCUPATION.
+// Each stat is a small chip with a muted label and a bold value.
+.dashboard-cabin-heading-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.dashboard-cabin-stat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 0.35rem;
+  background: rgba(255, 255, 255, 0.12);
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-variant-numeric: tabular-nums;
+
+  b {
+    font-size: 0.66rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    color: rgba(255, 255, 255, 0.6);
+  }
+}
+
 
 .dashboard-cabin-guests {
   display: grid;
@@ -607,6 +643,34 @@
   }
 }
 
+// ── Per-person price on each guest row ────────────────────────────────
+// A small muted amount next to the guest's name showing their share of the
+// cabin's 2-night price. Must NOT stretch (the generic
+// `.dashboard-cabin-guest > span` rule gives spans flex-grow).
+.dashboard-cabin-guest-price {
+  flex: 0 0 auto;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  color: $ink-muted;
+  white-space: nowrap;
+}
+
+// ── "Paid by the couple" badge on each guest row ──────────────────────
+// A small heart chip shown when the couple covers this guest's stay in the
+// active period (hosting.isCabinPaidByNovios / isXtraCabinPaidByNovios).
+.dashboard-cabin-paid-novios {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 0.35rem;
+  background: rgba(85, 69, 45, 0.08);
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
 // ── Add-guest modal (pick an unassigned guest) ────────────────────────
 .dashboard-cabin-add-modal {
   width: min(100%, 30rem);
@@ -618,7 +682,43 @@
   color: $ink-muted;
 }
 
+.dashboard-cabin-add-search {
+  display: block;
+  margin: 0.75rem 0 0.6rem;
+}
+
+.dashboard-cabin-add-search-label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: $ink-muted;
+}
+
+.dashboard-cabin-add-search-input {
+  width: 100%;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid $border;
+  border-radius: 0.35rem;
+  background: $white;
+  color: $ink;
+  font: inherit;
+  font-size: 0.9rem;
+
+  &::placeholder {
+    color: $ink-muted;
+    opacity: 0.8;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: $accent;
+    box-shadow: 0 0 0 2px rgba(85, 69, 45, 0.12);
+  }
+}
+
 .dashboard-cabin-add-list {
+
   display: grid;
   gap: 0.35rem;
   margin: 0;
@@ -661,6 +761,108 @@
     background: rgba(85, 69, 45, 0.04);
   }
 }
+
+// Lodging-plan status badge in the add-guest modal AND on each guest row of
+// the cabin assignment cards. Each guest shows a small indicator of whether
+// they've accepted the lodging plan for the ACTIVE period:
+//   - is-yes (green ✓)  → confirmed the plan (accommodationConfirm = yes, or
+//     rocaAzul level ≥ RSVP_CONFIRMED_MIN_LEVEL).
+//   - is-no (red ✕)     → declined the plan (accommodationConfirm = no, or a
+//     rocaAzul level below the confirmed threshold).
+//   - is-unknown (gray ?) → no answer yet.
+//
+// The badge has a SQUARE footprint (equal width/height) with a small rounded
+// corner — not a circle — so it reads as a crisp chip.
+.dashboard-cabin-add-status {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1;
+  color: $white;
+
+  &.is-yes {
+    background: #2e7d32;
+  }
+
+  &.is-no {
+    background: #c62828;
+  }
+
+  &.is-unknown {
+    background: #9e9e9e;
+  }
+}
+
+// Inside a cabin-card guest row the badge must NOT stretch to fill the row
+// (the generic `.dashboard-cabin-guest > span` rule gives spans flex-grow).
+.dashboard-cabin-guest .dashboard-cabin-add-status {
+  flex: 0 0 auto;
+}
+
+// ── Friday / Saturday / Sunday presence scale ─────────────────────────
+// Three small read-only chips (V / S / D) showing the guest's attendance level
+// per day, using the SAME color language as the INVITADOS table (gray = no
+// answer, amber = partial 1–3, green = confirmed 4–5). Rendered inside the
+// cabin-card guest rows and the "+ Agregar" modal so the admin can see at a
+// glance how each guest answered the presence scale.
+//
+// The three chips sit in a horizontal row (V / S / D) as a single block. The
+// wrapper is a direct child <span> of the guest row, so it inherits the
+// generic `.dashboard-cabin-guest > span` rule (flex: 1 1 auto) and stretches
+// to fill the row; `justify-content: flex-end` pushes the chips to the right
+// edge so they sit next to and aligned with the other right-side controls
+// (status badge, copy, remove). The day chips override the base
+// `.dashboard-rsvp-chip` sizing (which is tuned for the interactive <select>
+// dropdowns) to be compact read-only squares with the letter centered.
+//
+// The guest NAME span must NOT stretch (flex: 0 0 auto) so the presence block
+// is the only flex-grow element and its chips land at the far right, grouped
+// with the status/copy/remove controls. The status badge keeps its own
+// `flex: 0 0 auto` override below. The same applies inside the "+ Agregar"
+// modal option (`.dashboard-cabin-add-option`), which renders the same
+// presence block.
+.dashboard-cabin-guest > span:not(.dashboard-cabin-presence):not(.dashboard-cabin-add-status),
+.dashboard-cabin-add-option > span:not(.dashboard-cabin-presence):not(.dashboard-cabin-add-status) {
+  flex: 0 0 auto;
+}
+
+.dashboard-cabin-presence {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.2rem;
+}
+
+
+
+
+.dashboard-cabin-presence-day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  min-width: 1.35rem;
+  height: 1.35rem;
+  padding: 0;
+  border-radius: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  cursor: default;
+  pointer-events: none;
+}
+
+
+
+
+
 
 
 // ── Unassigned cabins (from the `cabins` collection, not rented this period) ──

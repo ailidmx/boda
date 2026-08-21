@@ -10,13 +10,17 @@
  * AGREED SCHEMA (English field names only):
  *   - id            (string) — unique cabin ID (e.g. "VILLA AZALEA")
  *   - name          (string) — display name (e.g. "VILLA AZALEA - 12p")
+ *   - capacity      (number) — max persons
+ *   - totalPrice2Nights (number) — internal price for 2 nights (MXN)
+ *   - pricePerPerson2Nights (number) — internal price per person (MXN)
+ *   - isPrivate     (boolean) — whether the cabin is a private unit
  *   - cloudinaryIds (string|string[]) — showcase photo public IDs
  */
 
 import { fetchCabins } from "./repositories/cabinRepository.js";
 
 
-/** @type {Array<{ id: string, name: string, cloudinaryIds: string[] }>} */
+/** @type {Array<{ id: string, name: string, capacity: number, totalPrice2Nights: number, pricePerPerson2Nights: number, isPrivate: boolean, cloudinaryIds: string[] }>} */
 let CABINS = [];
 
 /** @type {boolean} */
@@ -24,7 +28,7 @@ let cabinsLoaded = false;
 
 /**
  * Load the cabin inventory from the Firestore `cabins` collection.
- * @returns {Promise<Array<{ id: string, name: string, cloudinaryIds: string[] }>>}
+ * @returns {Promise<Array<{ id: string, name: string, capacity: number, totalPrice2Nights: number, pricePerPerson2Nights: number, isPrivate: boolean, cloudinaryIds: string[] }>>}
  */
 export async function loadCabins() {
   if (cabinsLoaded) return CABINS;
@@ -72,6 +76,30 @@ export function getCabinPhotos(displayName) {
   );
   if (!cabin) return [];
   return normalizeCloudinaryIds(cabin.cloudinaryIds);
+}
+
+/**
+ * Get the FULL cabin object by its display name (e.g. "VILLA AZALEA"),
+ * including the operational pricing fields (`capacity`, `totalPrice2Nights`,
+ * `pricePerPerson2Nights`, `isPrivate`). Returns `null` when the cabin is not
+ * in the `cabins` collection.
+ *
+ * Used by the cabins panel to show the global cabin cost in the card header
+ * and to compute the per-person cost for each assigned guest (mirroring the
+ * invitation's Accommodation pricing rule).
+ * @param {string} displayName — cabin display name (e.g. "VILLA AZALEA")
+ * @returns {{ id: string, name: string, capacity: number, totalPrice2Nights: number, pricePerPerson2Nights: number, isPrivate: boolean, cloudinaryIds: string[] }|null}
+ */
+export function getCabinByDisplayName(displayName) {
+  if (!displayName) return null;
+  const normalized = displayName.trim().toLocaleUpperCase();
+  return (
+    CABINS.find(
+      (c) =>
+        c.id?.toLocaleUpperCase() === normalized ||
+        c.name?.toLocaleUpperCase() === normalized,
+    ) || null
+  );
 }
 
 /**
