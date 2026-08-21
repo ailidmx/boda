@@ -1067,7 +1067,24 @@ function renderDashboard(app) {
   // them whenever the charts tab is activated so they size to the now-visible
   // container. `switchTab` dispatches `dashboard:tabchange` on every tab switch.
   const onTabChange = (event) => {
-    if (event.detail?.tab === "charts") renderChartsPanel();
+    const tab = event.detail?.tab;
+    // Reset the INVITADOS filters when leaving the guests view so the summary
+    // cards (Viernes/Sábado/Domingo) always reflect ALL guests, not a filtered
+    // subset. The filters are only meaningful while the INVITADOS table is
+    // shown; once the admin navigates away, they should not leak into the
+    // attendance summary.
+    if (tab && tab !== "guests") {
+      state.filterGroup = "";
+      state.filterQuery = "";
+      state.filterAgeGroup = "";
+      state.filterPhone = "";
+      state.filterEmail = "";
+      state.filterPhoto = "";
+      state.filterName = "";
+      state.filterContact = "";
+      state.columnGroup = "identity";
+    }
+    if (tab === "charts") renderChartsPanel();
   };
   window.addEventListener("dashboard:tabchange", onTabChange);
   app._onTabChange = onTabChange;
