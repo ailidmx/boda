@@ -404,12 +404,26 @@ export function renderCabinAssignments({
       // Full cabin object (incl. pricing fields) for this card. Used to show
       // the global 2-night price and the per-person price in the header, and
       // to compute each guest's share in the rows below.
+      //
+      // The per-person price is computed DYNAMICALLY from the actual occupancy
+      // (totalPrice2Nights / min(actualGuests, capacity)), mirroring the
+      // invitation front-end (`cabinPerPersonPrice` in Accommodation.jsx /
+      // PaymentSummary.jsx / StayPlanCard.jsx). We do NOT read the stored
+      // `pricePerPerson2Nights` field: that is a static snapshot (typically
+      // computed for 2 occupants) and would be wrong for a cabin that is fully
+      // occupied — e.g. a 4-person cabin at 5310 with 4 guests should show
+      // 5310/4 = 1327.5/person, not 5310/2 = 2655/person.
       const cabinInfo = getCabinByDisplayName(c.displayName) || {};
       const totalPrice = formatMXN(cabinInfo.totalPrice2Nights);
-      const perPersonPrice = formatMXN(cabinInfo.pricePerPerson2Nights);
+      const capacity = cabinInfo.capacity || 1;
+      const divisor = Math.min(c.actual, capacity);
+      const perPersonPrice = formatMXN(
+        divisor > 0 ? cabinInfo.totalPrice2Nights / divisor : 0,
+      );
       const priceStat = totalPrice
         ? `<span class="dashboard-cabin-stat"><b>PRECIO</b> ${totalPrice}${perPersonPrice ? ` · ${perPersonPrice}/p` : ""}</span>`
         : "";
+
 
       // Showcase photos for this cabin (from the Firestore `cabins`
       // collection, matched by display name). Rendered as a short 4:3 ratio
