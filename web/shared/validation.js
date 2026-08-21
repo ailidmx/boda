@@ -109,7 +109,7 @@ const GUEST_WRITABLE_FIELDS = [
 ];
 
 const GUEST_IDENTITY_FIELDS = [
-  "age", "cloudinaryId", "firstName", "gender", "middleName", "lastName", "maternalLastName", "lang", "phone",
+  "age", "cloudinaryId", "firstName", "gender", "middleName", "lastName", "maternalLastName", "lang", "phone", "message",
 ];
 
 
@@ -223,6 +223,7 @@ export function validateGuestContactPayload(payload) {
     { check: !hasAnyKey(payload, ["identity"]) || !hasAnyKey(payload.identity, ["phone"]) || isShortText(payload.identity.phone, 50), message: "identity.phone must be a string ≤ 50 chars" },
     { check: !hasAnyKey(payload, ["identity"]) || !hasAnyKey(payload.identity, ["lang"]) || isShortText(payload.identity.lang, 20), message: "identity.lang must be a string ≤ 20 chars" },
     { check: !hasAnyKey(payload, ["identity"]) || !hasAnyKey(payload.identity, ["age"]) || isShortText(payload.identity.age, 50), message: "identity.age must be a string ≤ 50 chars" },
+    { check: !hasAnyKey(payload, ["identity"]) || !hasAnyKey(payload.identity, ["message"]) || isShortText(payload.identity.message, 200), message: "identity.message must be a string ≤ 200 chars" },
     { check: !hasAnyKey(payload, ["idCheckUser"]) || isBoolean(payload.idCheckUser), message: "idCheckUser must be a boolean" },
     { check: !hasAnyKey(payload, ["cloudinaryId"]) || (isString(payload.cloudinaryId) && payload.cloudinaryId.length <= 200), message: "cloudinaryId must be a string ≤ 200 chars" },
     { check: !hasAnyKey(payload, ["messageAuthor"]) || isShortText(payload.messageAuthor, 200), message: "messageAuthor must be a string ≤ 200 chars" },

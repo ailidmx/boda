@@ -197,7 +197,7 @@ export function resolveGuestEmail(guest) {
 
 /**
  * Resolve the author of the guest's message. Stored on the `guests` collection
- * as `messageAuthor` (the source of truth for guest records). Empty string
+ * as `identity.message` (the source of truth for guest records). Empty string
  * when not yet set.
  * @param {Object} guest  static guest from guests.js
  * @param {Object} [record]  live Firestore record for the guest (from the cache)
@@ -205,8 +205,9 @@ export function resolveGuestEmail(guest) {
  */
 export function resolveGuestMessageAuthor(guest, record) {
   if (!guest) return "";
-  return record?.messageAuthor || "";
+  return record?.identity?.message || "";
 }
+
 
 /**
  * Resolve whether the guest has acknowledged the identity check (clicked OK on

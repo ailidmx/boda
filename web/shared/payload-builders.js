@@ -129,20 +129,23 @@ export function buildGuestContactPayload({ guestId, phone, invitationGroup, edit
  *
  * @param {Object} input
  * @param {string} input.guestId
- * @param {string} input.messageAuthor
+ * @param {string} input.message
  * @param {string} input.invitationGroup
  * @param {string} input.editorGuestId
  * @returns {Object} explicit payload for setDoc(..., { merge: true })
  */
-export function buildGuestMessageAuthorPayload({ guestId, messageAuthor, invitationGroup, editorGuestId, timestamp }) {
+export function buildGuestMessageAuthorPayload({ guestId, message, invitationGroup, editorGuestId, timestamp }) {
   return {
     guestId,
-    messageAuthor: String(messageAuthor ?? "").trim(),
+    identity: {
+      message: String(message ?? "").trim(),
+    },
     invitationGroup: String(invitationGroup ?? "").trim(),
     updatedBy: String(editorGuestId ?? "").trim(),
     updatedAt: timestamp,
   };
 }
+
 
 
 /**
@@ -594,10 +597,11 @@ export function buildCreateGroupPayload(groupName) {
  * @param {string} input.phone
  * @param {boolean} input.idCheckUser
  * @param {string} input.cloudinaryId
- * @param {string} input.messageAuthor
+ * @param {string} input.message
  * @returns {Object} explicit payload for setDoc(..., { merge: true })
  */
 export function buildDashboardGuestEditPayload({
+
   guestId,
   firstName,
   middleName,
@@ -609,7 +613,7 @@ export function buildDashboardGuestEditPayload({
   phone,
   idCheckUser,
   cloudinaryId,
-  messageAuthor,
+  message,
   timestamp,
 }) {
   const normalizedMaternalLastName = normalizeTitleCase(maternalLastName);
@@ -622,7 +626,9 @@ export function buildDashboardGuestEditPayload({
     gender: String(gender ?? "").trim(),
     cloudinaryId: String(cloudinaryId ?? "").trim(),
     phone: normalizedPhone,
+    message: String(message ?? "").trim(),
   };
+
   // `age` stores ONLY "Adulto" or "Niño" (a string, not a number). Firestore
   // rejects `undefined` values (throws "Unsupported field value: undefined"),
   // so only include `age` when it's one of the allowed values; otherwise omit
@@ -640,12 +646,12 @@ export function buildDashboardGuestEditPayload({
     invitationGroup: String(invitationGroup ?? "").trim(),
     idCheckUser: idCheckUser === true,
     cloudinaryId: String(cloudinaryId ?? "").trim(),
-    messageAuthor: String(messageAuthor ?? "").trim(),
     guestId,
     updatedBy: guestId,
     updatedAt: timestamp,
   };
 }
+
 
 /**
  * Build a payload for CREATING a brand-new guest from the dashboard. Mirrors
@@ -736,7 +742,7 @@ export function buildGuestCreatePayload({
 export function buildDashboardGuestInlinePayload(guestId, field, value, invitationGroup, timestamp) {
   const GUEST_WRITABLE_FIELDS = new Set([
     "firstName", "middleName", "lastName", "maternalLastName", "gender", "age", "cloudinaryId", "phone", "idCheckUser",
-    "messageAuthor", "invitationGroup", "invitationSent", "_deleted", "travelsByPlane",
+    "message", "invitationGroup", "invitationSent", "_deleted", "travelsByPlane",
   ]);
 
 
@@ -749,7 +755,17 @@ export function buildDashboardGuestInlinePayload(guestId, field, value, invitati
     updatedAt: timestamp,
   };
 
+  // `message` (the guest's written message) lives inside the `identity` map,
+  // not at the top level. Normalize it as a trimmed string.
+  if (field === "message") {
+    payload.identity = {
+      message: String(value ?? "").trim(),
+    };
+    return payload;
+  }
+
   if (["firstName", "middleName", "lastName", "maternalLastName", "gender", "age", "cloudinaryId", "phone"].includes(field)) {
+
     const normalizedValue = ["firstName", "middleName", "lastName", "maternalLastName"].includes(field)
       ? normalizeTitleCase(value)
       : field === "age"

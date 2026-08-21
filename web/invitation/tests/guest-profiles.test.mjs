@@ -143,8 +143,8 @@ test("resolveGuestEmail always returns an empty string (email lives in Auth)", (
 
 // ── resolveGuestMessageAuthor ────────────────────────────────────────────
 
-test("resolveGuestMessageAuthor reads the live record messageAuthor", () => {
-  assert.equal(resolveGuestMessageAuthor({}, { messageAuthor: "Ana" }), "Ana");
+test("resolveGuestMessageAuthor reads the live record identity.message", () => {
+  assert.equal(resolveGuestMessageAuthor({}, { identity: { message: "Ana" } }), "Ana");
   assert.equal(resolveGuestMessageAuthor({}), "");
 });
 

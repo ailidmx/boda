@@ -537,7 +537,7 @@ export function getFilteredGuests(
         String(guestIdentity(g).maternalLastName || g.maternalLastName || "").toLowerCase().includes(q) ||
         String(guestIdentity(g).gender || g.gender || "").toLowerCase().includes(q) ||
         String(guestIdentity(g).age || g.age || "").toLowerCase().includes(q) ||
-        String(guestIdentity(g).messageAuthor || g.messageAuthor || "").toLowerCase().includes(q) ||
+        String(guestIdentity(g).message || g.messageAuthor || "").toLowerCase().includes(q) ||
         g.group.toLowerCase().includes(q),
     );
   }
@@ -578,7 +578,7 @@ export function guestSortValue(guest, key, authUsers = {}, liveGuests = []) {
     case "age":
       return Number.parseInt(String(guestIdentity(guest).age || guest.age || ""), 10) || 0;
     case "message":
-      return (guestIdentity(guest).messageAuthor || guest.messageAuthor || "").toLowerCase();
+      return (guestIdentity(guest).message || guest.messageAuthor || "").toLowerCase();
     case "accommodationConfirm":
     case "cabinWaitingList":
     case "petanqueParticipation":

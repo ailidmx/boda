@@ -515,8 +515,9 @@ function openGuestEditor(guest) {
 // edited there, not in Firestore.
 const GUEST_WRITABLE_FIELDS = new Set([
   "firstName", "middleName", "lastName", "maternalLastName", "phone", "idCheckUser", "cloudinaryId",
-  "gender", "age", "messageAuthor", "invitationGroup", "invitationSent", "_deleted", "travelsByPlane",
+  "gender", "age", "message", "invitationGroup", "invitationSent", "_deleted", "travelsByPlane",
 ]);
+
 
 
 
@@ -544,9 +545,10 @@ async function saveGuestInline(guestId, field, value) {
     // Also update the in-memory guest
 
     if (guest) {
-      if (["firstName", "middleName", "lastName", "maternalLastName", "phone", "gender", "age"].includes(field)) {
+      if (["firstName", "middleName", "lastName", "maternalLastName", "phone", "gender", "age", "message"].includes(field)) {
         guest.identity = { ...(guest.identity || {}), [field]: value };
       }
+
       // `travelsByPlane` is a top-level boolean; the inline editor sends
       // "true" / "false" / "" (empty = unknown). Normalize to a real boolean
       // (or undefined when empty) so the in-memory guest matches Firestore.
