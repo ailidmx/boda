@@ -72,7 +72,11 @@ import {
   getFilteredGuests as serviceGetFilteredGuests,
   guestSortValue as serviceGuestSortValue,
   guestAgeGroup as serviceGuestAgeGroup,
+  guestHasPhone as serviceGuestHasPhone,
+  guestHasPhoto as serviceGuestHasPhoto,
+  computeReadiness as serviceComputeReadiness,
 } from "./guestService.js";
+
 
 
 
@@ -118,7 +122,13 @@ const state = {
   filterGroup: "",
   filterQuery: "",
   filterAgeGroup: "",
+  filterPhone: "", // "" = all, "with" = has phone, "without" = no phone
+  filterEmail: "", // "" = all, "with" = real email, "without" = no real email
+  filterPhoto: "", // "" = all, "with" = has photo, "without" = no photo
+  filterName: "", // "" = all, "complete" = complete name, "incomplete" = incomplete name
+  filterContact: "", // "" = all, "without" = auth user without email/phone
   columnGroup: "identity", // which column group is visible in the INVITADOS table
+
   sortKey: "name",
   sortDir: "asc",
 };
@@ -293,16 +303,36 @@ function getUniqueCabins() {
 }
 
 function getFilteredGuests() {
-  return serviceGetFilteredGuests(getActiveGuests(), {
-    filterGroup: state.filterGroup,
-    filterQuery: state.filterQuery,
-    filterAgeGroup: state.filterAgeGroup,
-  });
+  return serviceGetFilteredGuests(
+    getActiveGuests(),
+    {
+      filterGroup: state.filterGroup,
+      filterQuery: state.filterQuery,
+      filterAgeGroup: state.filterAgeGroup,
+      filterPhone: state.filterPhone,
+      filterEmail: state.filterEmail,
+      filterPhoto: state.filterPhoto,
+      filterName: state.filterName,
+      filterContact: state.filterContact,
+    },
+    state.liveGuests,
+    state.authUsers,
+  );
 }
 
 
 
-// ── Live RSVP scale (source of truth: guest's `rsvp.answers`) ──────────
+
+// Readiness breakdown for the summary card (per-group counts of guests missing
+// each identity piece). The derivation lives in `guestService.js`; this thin
+// adapter binds the dashboard.s live guest cache + auth user map.
+function computeReadiness() {
+  return serviceComputeReadiness(getActiveGuests(), state.liveGuests, state.authUsers);
+}
+
+
+
+// ── Live RSVP scale (source of truth: guest.s `rsvp.answers`) ──────────
 
 // The derivation logic lives in `guestService.js` (pure, dependency-injected).
 // These thin adapters bind the dashboard's mutable `state` (liveGuests /
@@ -786,8 +816,12 @@ function renderGuestManager() {
     guestHasAuth,
     guestSendEmail,
     guestAgeGroup: serviceGuestAgeGroup,
+    guestHasPhone: serviceGuestHasPhone,
+    guestHasPhoto: serviceGuestHasPhoto,
+    computeReadiness,
   });
 }
+
 
 
 

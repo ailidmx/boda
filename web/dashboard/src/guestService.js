@@ -347,10 +347,95 @@ export function guestAgeGroup(guest) {
   return age === "Niño" ? "nino" : "adulto";
 }
 
-// Filter the active guests by the current group + free-text query + age group.
-// The filter state is passed in as a plain
-// `{ filterGroup, filterQuery, filterAgeGroup }` object.
-export function getFilteredGuests(activeGuests, { filterGroup, filterQuery, filterAgeGroup }) {
+// A guest "has a cell phone" when they carry a non-empty phone number on their
+// identity (or top-level `phone`). Used by the "Con/Sin teléfono" filter.
+export function guestHasPhone(guest) {
+  return Boolean(String(guest.identity?.phone || guest.phone || "").trim());
+}
+
+// A guest "has a photo" when they carry a Cloudinary avatar id on their
+// identity (or top-level `cloudinaryId`). Used by the "Sin foto" filter and the
+// readiness card.
+export function guestHasPhoto(guest) {
+  return Boolean(guestIdentity(guest).cloudinaryId || guest.cloudinaryId || "");
+}
+
+// A guest's name is "complete" when they have at least 2 of the 4 name fields
+// filled AND at least one first name AND at least one last name (last or
+// maternal). Used by the "ID incompleto" filter and the readiness card.
+export function guestNameComplete(guest) {
+  const id = guestIdentity(guest);
+  const first = String(id.firstName || guest.firstName || "").trim();
+  const middle = String(id.middleName || guest.middleName || "").trim();
+  const last = String(id.lastName || guest.lastName || "").trim();
+  const maternal = String(id.maternalLastName || guest.maternalLastName || "").trim();
+  const filled = [first, middle, last, maternal].filter(Boolean).length;
+  return filled >= 2 && Boolean(first) && Boolean(last || maternal);
+}
+
+// A guest's identity is "ready" when they have a complete name, a photo, and —
+// IF they have a Firebase Auth account — a way to contact them (a real email or
+// a phone). A guest with NO auth account is fine without contact info: the
+// couple may not have a phone/email for them yet. An auth user, however, needs
+// at least one reachable channel (email or phone) so they can log in / be
+// reached. Used by the readiness card.
+export function guestReady(guest, liveGuests, authUsers) {
+  if (!guestNameComplete(guest)) return false;
+  if (!guestHasPhoto(guest)) return false;
+  const hasAuth = guestHasAuth(guest, liveGuests, authUsers);
+  if (hasAuth) {
+    const hasEmail = guestCanEmail(guest, liveGuests, authUsers);
+    const hasPhone = guestHasPhone(guest);
+    if (!hasEmail && !hasPhone) return false;
+  }
+  return true;
+}
+
+// Readiness breakdown for the summary card. Returns per-group counts of how
+// many guests are missing each identity piece, plus how many are fully ready.
+// Each count is keyed by group tag (including "Sin grupo") so the card can
+// filter each row by group. Shape:
+//   { total, ready, missingName, missingPhoto, missingContact }
+// where each of the latter four is `{ [group]: count }` plus a `_all` total.
+export function computeReadiness(activeGuests, liveGuests, authUsers) {
+  const result = { total: 0, ready: {}, missingName: {}, missingPhoto: {}, missingContact: {} };
+  const bump = (bucket, group) => {
+    bucket[group] = (bucket[group] || 0) + 1;
+    bucket._all = (bucket._all || 0) + 1;
+  };
+
+  activeGuests.forEach((guest) => {
+    const group = guest.group || "Sin grupo";
+    result.total += 1;
+    if (guestReady(guest, liveGuests, authUsers)) {
+      bump(result.ready, group);
+    } else {
+      if (!guestNameComplete(guest)) bump(result.missingName, group);
+      if (!guestHasPhoto(guest)) bump(result.missingPhoto, group);
+      const hasAuth = guestHasAuth(guest, liveGuests, authUsers);
+      if (hasAuth && !guestCanEmail(guest, liveGuests, authUsers) && !guestHasPhone(guest)) {
+        bump(result.missingContact, group);
+      }
+    }
+  });
+
+  return result;
+}
+
+// Filter the active guests by the current group + free-text query + age group +
+// phone presence + email presence + photo presence + name completeness. The
+// filter state is passed in as a plain
+// `{ filterGroup, filterQuery, filterAgeGroup, filterPhone, filterEmail,
+//    filterPhoto, filterName }` object. The email filter needs the LIVE guest
+// records + auth user map to decide whether a guest has a REAL
+// (non-default-domain) email, so those are passed as extra args (mirroring
+// `guestCanEmail`).
+export function getFilteredGuests(
+  activeGuests,
+  { filterGroup, filterQuery, filterAgeGroup, filterPhone, filterEmail, filterPhoto, filterName, filterContact },
+  liveGuests = [],
+  authUsers = {},
+) {
   let filtered = activeGuests;
 
   if (filterGroup) {
@@ -359,7 +444,40 @@ export function getFilteredGuests(activeGuests, { filterGroup, filterQuery, filt
   if (filterAgeGroup) {
     filtered = filtered.filter((g) => guestAgeGroup(g) === filterAgeGroup);
   }
+  if (filterPhone === "with") {
+    filtered = filtered.filter((g) => guestHasPhone(g));
+  } else if (filterPhone === "without") {
+    filtered = filtered.filter((g) => !guestHasPhone(g));
+  }
+  if (filterEmail === "with") {
+    filtered = filtered.filter((g) => guestCanEmail(g, liveGuests, authUsers));
+  } else if (filterEmail === "without") {
+    filtered = filtered.filter((g) => !guestCanEmail(g, liveGuests, authUsers));
+  }
+  if (filterPhoto === "with") {
+    filtered = filtered.filter((g) => guestHasPhoto(g));
+  } else if (filterPhoto === "without") {
+    filtered = filtered.filter((g) => !guestHasPhoto(g));
+  }
+  if (filterName === "complete") {
+    filtered = filtered.filter((g) => guestNameComplete(g));
+  } else if (filterName === "incomplete") {
+    filtered = filtered.filter((g) => !guestNameComplete(g));
+  }
+  if (filterContact === "without") {
+    // Auth users who have NO reachable channel (no real email AND no phone).
+    // Guests without an auth account are NOT flagged here — they may simply
+    // not have contact info yet, which is acceptable.
+    filtered = filtered.filter(
+      (g) =>
+        guestHasAuth(g, liveGuests, authUsers) &&
+        !guestCanEmail(g, liveGuests, authUsers) &&
+        !guestHasPhone(g),
+    );
+  }
   if (filterQuery) {
+
+
 
     const q = filterQuery.toLowerCase();
     filtered = filtered.filter(

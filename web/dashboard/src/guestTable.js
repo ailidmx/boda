@@ -58,6 +58,8 @@ export function renderGuestManager(ctx) {
     guestHasAuth,
     guestSendEmail,
     guestAgeGroup,
+    guestHasPhoto,
+    computeReadiness,
   } = ctx;
 
 
@@ -402,9 +404,57 @@ export function renderGuestManager(ctx) {
     </div>
   `;
 
+  // ── Readiness card ──
+  // A global summary of how much identity work remains for the guests. A guest
+  // is "ready" when they have a complete name (≥2 of 4 fields AND at least one
+  // first name AND one last/maternal name), a photo, and — IF they have a
+  // Firebase Auth account — at least one reachable channel (a real email or a
+  // phone). Guests without an auth account are fine without contact info. The
+  // counts follow the active group filter so the couple can see the remaining
+  // work per group.
+  const readiness = computeReadiness();
+  const groupKey = state.filterGroup || "_all";
+  const readyCount = readiness.ready[groupKey] || 0;
+  const totalCount = readiness.total;
+  const pct = totalCount ? Math.round((readyCount / totalCount) * 100) : 0;
+  const readinessCard = `
+    <div class="dashboard-readiness-card">
+      <div class="dashboard-readiness-head">
+        <h3 class="dashboard-readiness-title">Identidad de invitados</h3>
+        <span class="dashboard-readiness-pct">${pct}%</span>
+      </div>
+      <div class="dashboard-readiness-bar" title="${readyCount} de ${totalCount} listos">
+        <span class="dashboard-readiness-bar-fill" style="width:${pct}%"></span>
+      </div>
+      <div class="dashboard-readiness-rows">
+        <button type="button" class="dashboard-readiness-row ${state.filterName === "incomplete" ? "is-active" : ""}" data-readiness-filter="name" title="Filtrar por nombre incompleto">
+          <span>Nombre incompleto</span>
+          <span class="dashboard-readiness-count">${readiness.missingName[groupKey] || 0}</span>
+        </button>
+        <button type="button" class="dashboard-readiness-row ${state.filterPhoto === "without" ? "is-active" : ""}" data-readiness-filter="photo" title="Filtrar por sin foto">
+          <span>Sin foto</span>
+          <span class="dashboard-readiness-count">${readiness.missingPhoto[groupKey] || 0}</span>
+        </button>
+        <button type="button" class="dashboard-readiness-row ${state.filterContact === "without" ? "is-active" : ""}" data-readiness-filter="contact" title="Filtrar por sin contacto (auth sin correo ni teléfono)">
+          <span>Sin contacto</span>
+          <span class="dashboard-readiness-count">${readiness.missingContact[groupKey] || 0}</span>
+        </button>
+      </div>
+    </div>
+  `;
+
+  // ── Filter dropdown active-count badge ──
+  const filterCount =
+    (state.filterAgeGroup ? 1 : 0) +
+    (state.filterPhone ? 1 : 0) +
+    (state.filterEmail ? 1 : 0) +
+    (state.filterPhoto ? 1 : 0) +
+    (state.filterName ? 1 : 0);
+
   container.innerHTML = `
     ${columnGroupNav}
     ${groupNav}
+    ${readinessCard}
     <div class="dashboard-guest-filters">
       <div class="dashboard-filter-group">
         <label for="filter-query">Buscar</label>
@@ -417,10 +467,35 @@ export function renderGuestManager(ctx) {
         />
       </div>
       <div class="dashboard-filter-group">
-        <label class="dashboard-checkbox-cell" for="filter-age-group" title="Mostrar solo niños">
-          <input type="checkbox" id="filter-age-group" data-filter-age-group ${state.filterAgeGroup === "nino" ? "checked" : ""} />
-          <span>Solo niños</span>
-        </label>
+        <div class="dashboard-filter-dropdown">
+          <button type="button" class="dashboard-filter-dropdown-toggle" data-filter-dropdown-toggle title="Filtrar por atributos de identidad">
+            <span>Filtros</span>
+            <span class="dashboard-filter-dropdown-count" data-filter-dropdown-count>${filterCount}</span>
+            <span class="dashboard-filter-dropdown-caret">▾</span>
+          </button>
+          <div class="dashboard-filter-dropdown-menu" data-filter-dropdown-menu hidden>
+            <label class="dashboard-checkbox-cell" title="Mostrar solo niños">
+              <input type="checkbox" data-filter-age-group ${state.filterAgeGroup === "nino" ? "checked" : ""} />
+              <span>Niños</span>
+            </label>
+            <label class="dashboard-checkbox-cell" title="Mostrar solo invitados sin teléfono">
+              <input type="checkbox" data-filter-phone ${state.filterPhone === "without" ? "checked" : ""} />
+              <span>Sin teléfono</span>
+            </label>
+            <label class="dashboard-checkbox-cell" title="Mostrar solo invitados sin correo real">
+              <input type="checkbox" data-filter-email ${state.filterEmail === "without" ? "checked" : ""} />
+              <span>Sin correo</span>
+            </label>
+            <label class="dashboard-checkbox-cell" title="Mostrar solo invitados sin foto">
+              <input type="checkbox" data-filter-photo ${state.filterPhoto === "without" ? "checked" : ""} />
+              <span>Sin foto</span>
+            </label>
+            <label class="dashboard-checkbox-cell" title="Mostrar solo invitados con nombre incompleto (menos de 2 nombres o sin apellido)">
+              <input type="checkbox" data-filter-name ${state.filterName === "incomplete" ? "checked" : ""} />
+              <span>ID incompleto</span>
+            </label>
+          </div>
+        </div>
       </div>
 
       <div class="dashboard-filter-count">
@@ -594,13 +669,58 @@ export function renderGuestManager(ctx) {
     }
   });
 
-  // ── Age-group filter (toggle checkbox: "Solo niños") ──
-  // Checking the box filters to children only (`filterAgeGroup = "nino"`);
-  // unchecking clears the filter. There is no "adultos only" mode — the
-  // checkbox is a simple on/off toggle.
-  container.querySelector("[data-filter-age-group]")?.addEventListener("change", (e) => {
-    state.filterAgeGroup = e.target.checked ? "nino" : "";
+  // ── Filter dropdown (checkbox group) ──
+  // The "Filtros" button toggles a dropdown of identity-attribute checkboxes
+  // (Niños, Sin teléfono, Sin correo, Sin foto, ID incompleto). Each checkbox
+  // toggles its corresponding filter state and re-renders. The dropdown closes
+  // when a checkbox is toggled or when clicking outside.
+  const dropdownToggle = container.querySelector("[data-filter-dropdown-toggle]");
+  const dropdownMenu = container.querySelector("[data-filter-dropdown-menu]");
+  dropdownToggle?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const open = dropdownMenu.hidden;
+    dropdownMenu.hidden = !open;
+  });
+  document.addEventListener("click", (e) => {
+    if (dropdownMenu && !dropdownMenu.hidden && !dropdownMenu.contains(e.target) && !dropdownToggle.contains(e.target)) {
+      dropdownMenu.hidden = true;
+    }
+  });
+
+  const toggleFilter = (key, value) => {
+    state[key] = value;
     renderGuestManager(ctx);
+  };
+
+  container.querySelector("[data-filter-age-group]")?.addEventListener("change", (e) => {
+    toggleFilter("filterAgeGroup", e.target.checked ? "nino" : "");
+  });
+  container.querySelector("[data-filter-phone]")?.addEventListener("change", (e) => {
+    toggleFilter("filterPhone", e.target.checked ? "without" : "");
+  });
+  container.querySelector("[data-filter-email]")?.addEventListener("change", (e) => {
+    toggleFilter("filterEmail", e.target.checked ? "without" : "");
+  });
+  container.querySelector("[data-filter-photo]")?.addEventListener("change", (e) => {
+    toggleFilter("filterPhoto", e.target.checked ? "without" : "");
+  });
+  container.querySelector("[data-filter-name]")?.addEventListener("change", (e) => {
+    toggleFilter("filterName", e.target.checked ? "incomplete" : "");
+  });
+
+  // ── Readiness card rows (click to filter by the missing identity piece) ──
+  container.querySelectorAll("[data-readiness-filter]").forEach((row) => {
+    row.addEventListener("click", () => {
+      const kind = row.dataset.readinessFilter;
+      if (kind === "name") {
+        state.filterName = state.filterName === "incomplete" ? "" : "incomplete";
+      } else if (kind === "photo") {
+        state.filterPhoto = state.filterPhoto === "without" ? "" : "without";
+      } else if (kind === "contact") {
+        state.filterContact = state.filterContact === "without" ? "" : "without";
+      }
+      renderGuestManager(ctx);
+    });
   });
 
 

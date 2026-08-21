@@ -942,6 +942,31 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   each column based on its group. When adding a new column, assign it to a group
   in the `COLUMN_GROUPS` map and update the filter bar + `<thead>` + row template
   together.
+- **Dashboard INVITADOS has a readiness card + grouped checkbox filter dropdown** —
+  the guest table toolbar (`web/dashboard/src/guestTable.js`) renders a readiness
+  card (`.dashboard-readiness-card`) showing how many guests are fully "ready"
+  (X de Y listos + a % bar) and three clickable rows that filter the table:
+  "Sin nombre completo" (`filterName`), "Sin foto" (`filterPhoto`), and
+  "Sin contacto" (`filterContact`). The counts come from `computeReadiness()` in
+  `guestService.js`, which returns `{ total, ready, missingName, missingPhoto,
+  missingContact }` each keyed by group tag (plus `_all`). A guest is "ready"
+  (`guestReady`) when they have a complete name (≥2 of 4 name fields AND at least
+  one first name AND one last/maternal name), a photo, and — IF they have a
+  Firebase Auth account — at least one reachable channel (a real email or a
+  phone). A guest with NO auth account is fine without contact info. The toolbar
+  also has a grouped checkbox filter dropdown (`data-filter-dropdown-toggle` /
+  `data-filter-dropdown-menu`) that groups the checkbox filters (niños, sin
+  teléfono, sin correo, sin foto, ID incompleto) into one menu with an active-count
+  badge (`data-filter-dropdown-count`), plus a colored-badge group select
+  (`data-filter-group-select`) that filters by group tag. The readiness card
+  FOLLOWS the active group filter: when a group is selected it shows that
+  group's counts (via `readiness.<bucket>[groupKey]` where `groupKey =
+  state.filterGroup || "_all"`), and the "X de Y listos" total is the number of
+  guests in that group (`getActiveGuests().filter(g => g.group ===
+  state.filterGroup).length`) — NOT a sum of the missing buckets, since a
+  non-ready guest can be missing several pieces and would be double-counted.
+  When adding a new checkbox filter, add it to the dropdown menu, wire its
+  `data-filter-*` listener, and include it in the `filterCount` computation.
 - **Never replace a nested map with `update({ map: {...} })` — use dot-notation to merge** —
   Firestore `update()` with a nested object value (e.g. `update({ identity: { age, isAdult } })`)
   REPLACES the entire `identity` map, wiping every other field inside it

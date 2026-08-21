@@ -1130,3 +1130,180 @@
 
 
 
+
+
+// ── Readiness card (guest identity completeness) ──
+.dashboard-readiness-card {
+  display: grid;
+  gap: 0.9rem;
+  padding: 1.15rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid $border-strong;
+  border-radius: 0.5rem;
+  background: $card-bg;
+}
+
+.dashboard-readiness-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dashboard-readiness-title {
+  margin: 0.15rem 0 0;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: $ink;
+}
+
+.dashboard-readiness-pct {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: $accent;
+  line-height: 1;
+}
+
+.dashboard-readiness-bar {
+  height: 0.5rem;
+  border-radius: 999px;
+  background: rgba(85, 69, 45, 0.12);
+  overflow: hidden;
+}
+
+.dashboard-readiness-bar-fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: $accent;
+  transition: width 0.3s ease;
+}
+
+.dashboard-readiness-rows {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.5rem;
+}
+
+.dashboard-readiness-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border: 1px solid $border-strong;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: $ink;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+
+  &:hover {
+    border-color: $accent;
+    background: rgba(138, 106, 54, 0.08);
+  }
+
+  &.is-active {
+    background: $accent;
+    border-color: $accent;
+    color: $white;
+  }
+}
+
+.dashboard-readiness-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.5rem;
+  height: 1.5rem;
+  padding: 0 0.4rem;
+  border-radius: 0.35rem;
+  background: rgba(85, 69, 45, 0.1);
+  font-size: 0.75rem;
+  font-weight: 700;
+
+  .dashboard-readiness-row.is-active & {
+    background: rgba(255, 255, 255, 0.25);
+  }
+}
+
+// ── Group filter select (colored badge dropdown) ──
+.dashboard-group-select {
+  min-width: 12rem;
+}
+
+// ── Filter dropdown (checkbox group) ──
+.dashboard-filter-dropdown {
+  position: relative;
+}
+
+.dashboard-filter-dropdown-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid $border-strong;
+  border-radius: 0.35rem;
+  background: $card-bg;
+  color: $ink;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: $accent;
+  }
+}
+
+.dashboard-filter-dropdown-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.3rem;
+  height: 1.3rem;
+  padding: 0 0.3rem;
+  border-radius: 0.35rem;
+  background: $accent;
+  color: $white;
+  font-size: 0.7rem;
+  font-weight: 700;
+}
+
+.dashboard-filter-dropdown-caret {
+  font-size: 0.7rem;
+  color: $ink-muted;
+}
+
+.dashboard-filter-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  z-index: 30;
+  display: grid;
+  gap: 0.15rem;
+  min-width: 13rem;
+  padding: 0.5rem;
+  border: 1px solid $border-strong;
+  border-radius: 0.4rem;
+  background: $card-bg;
+  box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.12);
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.dashboard-filter-dropdown-menu .dashboard-checkbox-cell {
+  padding: 0.45rem 0.55rem;
+  border-radius: 0.35rem;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(138, 106, 54, 0.08);
+  }
+}
