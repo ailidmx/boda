@@ -499,7 +499,17 @@
   }
 }
 
+// ── Special "attention" cards (primary period) ─────────────────────────
+// Three cards (Lista de espera / Sin asistencia pero con cabaña / Confirmó
+// pero rechazó alojamiento) that reuse the main-view `.dashboard-summary-card`
+// style. The `.dashboard-summary` grid already lays them out in 3 columns; we
+// only add a bottom margin so they sit apart from the cabin grid below.
+.dashboard-cabin-special {
+  margin-bottom: 1rem;
+}
+
 // ── Room blocks inside each cabin card ─────────────────────────────────
+
 .dashboard-cabin-room {
   border-top: 1px solid $border;
 

@@ -17,7 +17,10 @@
  * `buildDashboardGuestHostingPayload` builder.
  */
 
+import { openGuestListModal } from "./summary.js";
+
 // The two cabin periods. The primary period is the main weekend (Viernes →
+
 // Domingo); the extra period is the coast escape (Domingo → Martes).
 const CABIN_PERIODS = [
   { id: "primary", label: "Viernes → Domingo", sub: "Cabañas principales" },
@@ -382,7 +385,133 @@ export function renderCabinAssignments({
     </div>
   `;
 
+  // ── Special cards (primary period only) ──
+  // Three "attention" cards that reuse the main-view summary-card style
+  // (dashboard-summary-card + clickable stacked-avatar strip opening a
+  // full-screen modal). They surface edge cases the couple needs to resolve
+  // for the PRIMARY weekend (Viernes → Domingo):
+  //   1. Lista de espera — guests who asked to be on the waiting list for a
+  //      freed cabin (`cabinWaitingList` = YES).
+  //   2. Sin asistencia pero con cabaña — guests who did NOT confirm any day
+  //      (all three days below the confirmed threshold) yet still have a
+  //      cabin/room assigned.
+  //   3. Confirmó pero rechazó alojamiento — guests with a cabin assigned who
+  //      confirmed at least one day but answered `accommodationConfirm` = NO.
+  //
+  // These are only meaningful for the primary period (the extra/coast period
+  // uses `rocaAzul` instead), so they are hidden when the "Domingo → Martes"
+  // tab is active.
+  //
+  // Builds the three special-card guest lists + their HTML. Each card reuses
+  // the main-view summary-card style: a `dashboard-summary-card` with a label,
+  // a big count, a caption, and a clickable stacked-avatar strip
+  // (`dashboard-avatars` + `dashboard-avatars-more`) that opens the shared
+  // full-screen guest-list modal (`openGuestListModal` from summary.js).
+  // The computed lists are stored in `specialLists` so the click handlers below
+  // can open the modal with the exact same guests without recomputing them.
+  const specialLists = {};
+  const buildSpecialCards = () => {
+
+    // Convert a merged guest into the summary shape `openGuestListModal`
+    // expects: `{ id, name, group, avatar, initials }`.
+    const toSummary = (g) => {
+      const name = guestFullName(g);
+      const initials = name
+        .split(/\s+/)
+        .filter(Boolean)
+        .slice(0, 2)
+        .map((w) => w[0].toUpperCase())
+        .join("");
+      return {
+        id: g.id,
+        name,
+        group: g.group || "Sin grupo",
+        avatar: guestAvatarUrl(g),
+        initials,
+      };
+    };
+
+    // 1. Lista de espera — guests who asked to be on the waiting list for a
+    //    freed cabin (`cabinWaitingList` = YES).
+    specialLists.waiting = allGuests
+      .map((g) => getMergedGuest(g))
+      .filter((g) => Number(getRsvpAnswers(g)?.cabinWaitingList) === BOOLEAN_YES)
+      .map(toSummary);
+
+    // 2. Sin asistencia pero con cabaña — guests who did NOT confirm any day
+    //    (all three days below the confirmed threshold) yet still have a
+    //    cabin/room assigned in the primary period.
+    specialLists.noAttendance = allGuests
+      .map((g) => getMergedGuest(g))
+      .filter((g) => {
+        const answers = getRsvpAnswers(g) || {};
+        const days = ["friday", "saturday", "sunday"];
+        const anyConfirmed = days.some(
+          (d) => Number(answers[d]) >= RSVP_CONFIRMED_MIN_LEVEL,
+        );
+        if (anyConfirmed) return false;
+        const hasAssignment = Boolean(g.cabin || g.room || g.xtraCabin || g.xtraRoom);
+        return hasAssignment;
+      })
+      .map(toSummary);
+
+    // 3. Confirmó pero rechazó alojamiento — guests with a cabin assigned who
+    //    confirmed at least one day but answered `accommodationConfirm` = NO.
+    specialLists.declinedHosting = allGuests
+      .map((g) => getMergedGuest(g))
+      .filter((g) => {
+        const answers = getRsvpAnswers(g) || {};
+        const days = ["friday", "saturday", "sunday"];
+        const anyConfirmed = days.some(
+          (d) => Number(answers[d]) >= RSVP_CONFIRMED_MIN_LEVEL,
+        );
+        if (!anyConfirmed) return false;
+        if (!g.cabin) return false;
+        return Number(answers.accommodationConfirm) === BOOLEAN_NO;
+      })
+      .map(toSummary);
+
+
+    // Render one special card: label, big count, caption, and a clickable
+    // stacked-avatar strip (up to 8 avatars, overflow collapses into +N).
+    const MAX_VISIBLE = 8;
+    const specialCardHtml = (label, caption, guests, dataAttr) => {
+      const visible = guests.slice(0, MAX_VISIBLE);
+      const overflow = guests.length - visible.length;
+      const avatars = visible
+        .map(
+          (g) => `
+            <span class="dashboard-avatar" title="${g.name}">
+              ${g.avatar ? `<img class="dashboard-avatar-img" src="${g.avatar}" alt="${g.name}" />` : (g.initials || "?")}
+            </span>`,
+        )
+        .join("");
+      const more = overflow > 0 ? `<span class="dashboard-avatars-more">+${overflow}</span>` : "";
+      return `
+        <article class="dashboard-summary-card">
+          <span>${label}</span>
+          <strong>${guests.length}</strong>
+          <small>${caption}</small>
+          <button type="button" class="dashboard-avatars" data-special-card="${dataAttr}" aria-label="Ver ${guests.length} invitados de ${label}" title="Ver ${guests.length} invitados de ${label}">
+            ${avatars}${more}
+          </button>
+        </article>`;
+    };
+
+    return `
+      <div class="dashboard-summary dashboard-cabin-special">
+        ${specialCardHtml("Lista de espera", "Quieren una cabaña si se libera", specialLists.waiting, "waiting")}
+        ${specialCardHtml("Sin asistencia pero con cabaña", "No confirmaron ningún día pero tienen cabaña", specialLists.noAttendance, "no-attendance")}
+        ${specialCardHtml("Confirmó pero rechazó alojamiento", "Confirmaron asistencia pero dijeron NO al alojamiento", specialLists.declinedHosting, "declined-hosting")}
+      </div>`;
+  };
+
+
+  const specialCards = period === "primary" ? buildSpecialCards() : "";
+
+
   // ── Cabin cards, each grouping guests by ROOM ──
+
   // When the multi-select filter is active (selectedCabins non-empty), only
   // the selected cabins are rendered. An empty selection shows all cabins.
   const visibleStats = selectedCabins.size
@@ -569,10 +698,12 @@ export function renderCabinAssignments({
       ${navBadges}
     </div>
     ${summaryCard}
+    ${specialCards}
     <div class="dashboard-cabin-grid">
       ${cards}
     </div>
   `;
+
 
   // ── Period tab click → re-render with the selected period ──
   container.querySelectorAll("[data-cabin-period]").forEach((btn) => {
@@ -597,8 +728,28 @@ export function renderCabinAssignments({
   });
 
 
+  // ── Special-card avatar strip click → open the guest-list modal ──
+  // Each special card's stacked-avatar strip opens the shared full-screen
+  // modal (`openGuestListModal` from summary.js) listing the exact guests in
+  // that list. The lists were computed in `buildSpecialCards` and stored in
+  // `specialLists`, keyed by the card's `data-special-card` value.
+  const SPECIAL_CARD_TITLES = {
+    waiting: "Lista de espera",
+    "no-attendance": "Sin asistencia pero con cabaña",
+    "declined-hosting": "Confirmó pero rechazó alojamiento",
+  };
+  container.querySelectorAll("[data-special-card]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const key = btn.dataset.specialCard;
+      const guests = specialLists[key] || [];
+      const title = SPECIAL_CARD_TITLES[key] || "Invitados";
+      openGuestListModal(guests, title);
+    });
+  });
+
   // ── Copy guest link buttons ──
   container.querySelectorAll("[data-copy-guest]").forEach((btn) => {
+
     btn.addEventListener("click", () => {
       const guestId = btn.dataset.copyGuest;
       const url = getInviteUrl(guestId);

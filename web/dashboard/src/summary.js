@@ -255,7 +255,86 @@ function openConfirmedModal(guests, label) {
   if (closeBtn) closeBtn.focus();
 }
 
+/**
+ * Full-screen modal listing an arbitrary set of guests, grouped by group tag
+ * (largest group first, A→Z within each group). Reuses the SAME modal chrome as
+ * `openConfirmedModal` but with a custom title and NO level badge — the guests
+ * in these lists are not tied to a single RSVP level (e.g. the cabins panel's
+ * "special cards": waiting list, no-attendance-but-assigned, confirmed-but-
+ * declined-hosting). Exported so other dashboard panels can reuse it.
+ *
+ * @param {Array<{id: string, name: string, group?: string, avatar?: string, initials?: string}>} guests
+ * @param {string} title — the modal heading (e.g. "Lista de espera").
+ */
+export function openGuestListModal(guests, title) {
+  const overlay = make("div", "dashboard-modal-overlay dashboard-confirmed-overlay");
+  overlay.setAttribute("role", "dialog");
+  overlay.setAttribute("aria-modal", "true");
+  overlay.setAttribute("aria-label", title);
+
+  const modal = make("div", "dashboard-confirmed-modal");
+  const head = make("div", "dashboard-confirmed-head");
+  head.append(
+    make("h3", "", title),
+    make("span", "dashboard-confirmed-count", `${guests.length} invitados`),
+    (() => {
+      const close = make("button", "dashboard-modal-close", "✕");
+      close.type = "button";
+      close.setAttribute("aria-label", "Cerrar");
+      close.addEventListener("click", closeModal);
+      return close;
+    })(),
+  );
+
+  const body = make("div", "dashboard-confirmed-body");
+  const groups = groupConfirmedGuests(guests);
+  if (groups.length === 0) {
+    body.append(make("p", "dashboard-confirmed-empty", "No hay invitados en esta lista."));
+  } else {
+    groups.forEach(({ group, members }) => {
+      const details = make("details", "dashboard-confirmed-group");
+      const summary = make("summary", "dashboard-confirmed-group-head");
+      summary.append(
+        make("strong", "", group),
+        make("span", "", `${members.length} invitado${members.length === 1 ? "" : "s"}`),
+      );
+      const list = make("ul", "dashboard-confirmed-list");
+      members.forEach((g) => {
+        const li = make("li", "dashboard-confirmed-item");
+        li.append(avatarEl(g), make("span", "", g.name));
+        list.append(li);
+      });
+      details.append(summary, list);
+      body.append(details);
+    });
+  }
+
+  modal.append(head, body);
+  overlay.append(modal);
+  document.body.appendChild(overlay);
+
+  const previousOverflow = document.body.style.overflow;
+  document.body.style.overflow = "hidden";
+
+  function closeModal() {
+    document.body.style.overflow = previousOverflow;
+    overlay.remove();
+    document.removeEventListener("keydown", onKey);
+  }
+  function onKey(e) {
+    if (e.key === "Escape") closeModal();
+  }
+  overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) closeModal();
+  });
+  document.addEventListener("keydown", onKey);
+
+  const closeBtn = modal.querySelector(".dashboard-modal-close");
+  if (closeBtn) closeBtn.focus();
+}
+
 // Full-screen modal listing the guests who answered a SPECIFIC RSVP level
+
 // (0–5) for one day. Reuses the same modal chrome as `openConfirmedModal` but
 // with a level-specific title and empty-state message. Level 0 = no answer.
 function openLevelModal(guests, label, level) {
