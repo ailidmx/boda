@@ -41,7 +41,13 @@
 }
 
 // Dark hero band behind the dashboard title for contrast with white text.
+// It is sticky: it stays pinned to the top of the viewport while the couple
+// scrolls the dashboard. When scrolled down it collapses into a thin bar
+// (`.is-scrolled`) so it doesn't eat vertical space.
 .dashboard-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
   margin: -2rem 0 0;
   padding: 2.75rem 2.5rem;
   border-radius: 0.75rem;
@@ -49,11 +55,35 @@
     radial-gradient(circle at 85% 20%, rgba(163, 125, 64, 0.35), transparent 22rem),
     linear-gradient(135deg, $dark-deep, $dark);
   color: $white;
+  flex-wrap: wrap;
+  transition: padding 0.25s ease, border-radius 0.25s ease, box-shadow 0.25s ease;
+
 
   p:last-child {
     color: $gold;
   }
+
+  // Collapsed "thin bar" state applied via JS when the user scrolls down.
+  &.is-scrolled {
+    padding: 0.7rem 1.5rem;
+    border-radius: 0 0 0.75rem 0.75rem;
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+
+    h1 {
+      font-size: clamp(1.15rem, 3vw, 1.6rem);
+      margin-top: 0;
+    }
+
+    .dashboard-eyebrow {
+      display: none;
+    }
+
+    .dashboard-header-actions {
+      gap: 0.5rem;
+    }
+  }
 }
+
 
 
 .dashboard-header-actions {
@@ -63,6 +93,24 @@
   justify-content: flex-end;
   gap: 0.65rem;
 }
+
+// ── Header nav row ─────────────────────────────────────────────────────
+// The tab navigation (left) and the global group filter (right) sit on the
+// same line inside the dark sticky header. The nav wraps onto its own line on
+// narrow screens (see `_responsive.scss`).
+.dashboard-header-navrow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-basis: 100%;
+  margin-top: 1.25rem;
+}
+
+.dashboard-header-filter {
+  flex: 0 0 auto;
+}
+
 
 .dashboard-button-secondary {
   color: $dark;

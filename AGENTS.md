@@ -492,6 +492,18 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   has a Firebase Auth account, ❌ on red when they don't. The ID check and auth
   are NOT standalone columns — they live as badges on the avatar.
 
+- **Dashboard INVITADOS columns are sortable via `sortTh`** — every column
+  header in the guest table is a clickable `sortTh(key, label)` that toggles
+  ascending/descending on `state.sortKey`/`state.sortDir`. The **Identidad**
+  column sorts by the guest's FULL NAME (`sortTh("name", "Identidad")` →
+  `guestSortValue` `case "name"` → `guestFullName(guest).toLowerCase()`), and
+  the **Idioma** column sorts by language (`sortTh("lang", "Idioma")` →
+  `case "lang"` → `guest.identity?.lang || guest.lang`). The set of sortable
+  keys lives in `GUEST_SORT_COLUMNS` (`guestDomain.js`); `guestSortValue`
+  (`guestService.js`) maps each key to a comparable value. When adding a new
+  sortable column, add its key to `GUEST_SORT_COLUMNS`, add a `case` in
+  `guestSortValue`, and wrap the `<th>` in `sortTh(key, label)`.
+
 - **Dashboard edit modal can upload a guest avatar to Cloudinary** — the
   "✏️ Editar" modal (`openGuestEditor` in `dashboard.js`) has a photo section
   with a preview thumbnail, a "📷 Subir foto" file input, and a text input for

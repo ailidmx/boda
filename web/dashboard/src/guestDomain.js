@@ -35,10 +35,13 @@ export const DEFAULT_AUTH_EMAIL_DOMAIN = "boda-david-y-ayde.web.app";
 // phone are NOT standalone columns — they live inside the "Identidad" column.
 export const GUEST_SORT_COLUMNS = [
   "name", "invitationGroup", "idCheck", "hasAuth", "group", "lang", "cabin", "room", "xtraCabin", "xtraRoom",
-  "gender", "age", "message", "status",
+  "gender", "age", "message", "status", "invitationSent", "send", "actions",
+  "friday", "saturday", "sunday",
   "accommodationConfirm", "cabinWaitingList", "paymentConfirmed",
   "petanqueParticipation", "petanqueOwnBoules", "playa", "rocaAzul", "travelsByPlane",
 ];
+
+
 
 
 

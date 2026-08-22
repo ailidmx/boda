@@ -18,6 +18,7 @@ import {
   getRoomsByCabin,
   getRoomOccupancy,
   getRoomDescription,
+  getCabinNames,
 } from "./rooms.js";
 import { getCabinPhotos, getCabinByDisplayName, cabinPhotoUrl, loadCabins, getAllCabinNames } from "./cabins.js";
 import { loadTables, renderTablesManager } from "./tables.js";
@@ -55,6 +56,9 @@ import {
   rsvpLevelChip as serviceRsvpLevelChip,
   rsvpBooleanChip as serviceRsvpBooleanChip,
   rsvpScaleChip as serviceRsvpScaleChip,
+  getRsvpBooleanAnswer as serviceGetRsvpBooleanAnswer,
+  getRsvpScaleAnswer as serviceGetRsvpScaleAnswer,
+
   paymentConfirmedChip as servicePaymentConfirmedChip,
   paymentConfirmedIcon as servicePaymentConfirmedIcon,
   computeDayConfirmations as serviceComputeDayConfirmations,
@@ -412,6 +416,21 @@ function rsvpScaleChip(guest, questionId) {
   return serviceRsvpScaleChip(guest, questionId, state.liveGuests);
 }
 
+// Raw numeric value of a boolean RSVP answer (1 = Sí, 2 = No, 0 = none) read
+// from the live record. Used by the inline editable selects in the INVITADOS
+// table so the current value is pre-selected.
+function rsvpBooleanValue(guest, questionId) {
+  return serviceGetRsvpBooleanAnswer(guest, questionId, state.liveGuests);
+}
+
+// Raw numeric value of a SCALE RSVP answer (0–5) read from the live record.
+// Used by the inline editable selects in the INVITADOS table.
+function rsvpScaleValue(guest, questionId) {
+  return serviceGetRsvpScaleAnswer(guest, questionId, state.liveGuests);
+}
+
+
+
 // Badge chip for the top-level `paymentConfirmed` boolean on the guest doc
 // (Sí / No / —).
 function paymentConfirmedChip(guest) {
@@ -426,34 +445,45 @@ function paymentConfirmedIcon(guest) {
 }
 
 
+// The active guests filtered by the GLOBAL group filter (state.filterGroup).
+// The group filter lives in the dashboard header and applies to BOTH the
+// attendance summary cards and the INVITADOS table, so every consumer derives
+// its guest list from this single filtered source.
+function getFilteredActiveGuests() {
+  const all = getActiveGuests();
+  if (!state.filterGroup) return all;
+  return all.filter((g) => g.group === state.filterGroup);
+}
+
 // Aggregate confirmed counts per attendance day from the live guests.
 
 function computeDayConfirmations() {
-  return serviceComputeDayConfirmations(getActiveGuests(), state.liveGuests);
+  return serviceComputeDayConfirmations(getFilteredActiveGuests(), state.liveGuests);
 }
 
 // Invitation-send stats (sent / total / percentage) for the summary card.
 function computeInvitationStats() {
-  return serviceComputeInvitationStats(getActiveGuests());
+  return serviceComputeInvitationStats(getFilteredActiveGuests());
 }
 
 // Per-day RSVP scale distribution (0–5) for the summary cards.
 function computeDayDistributions() {
-  return serviceComputeDayDistributions(getActiveGuests(), state.liveGuests);
+  return serviceComputeDayDistributions(getFilteredActiveGuests(), state.liveGuests);
 }
 
 // Per-day list of CONFIRMED guests (RSVP level ≥ 4) for the clickable stacked
 // avatars + full-screen modal on each day summary card.
 function computeDayConfirmedGuests() {
-  return serviceComputeDayConfirmedGuests(getActiveGuests(), state.liveGuests);
+  return serviceComputeDayConfirmedGuests(getFilteredActiveGuests(), state.liveGuests);
 }
 
 // Per-day, per-level list of guests for EVERY RSVP level (0–5). Used to make
 // each segment of the distribution bar clickable so the admin can open a modal
 // listing exactly who answered 0, 1, 2, 3, 4 or 5 for that day.
 function computeDayLevelGuests() {
-  return serviceComputeDayLevelGuests(getActiveGuests(), state.liveGuests);
+  return serviceComputeDayLevelGuests(getFilteredActiveGuests(), state.liveGuests);
 }
+
 
 
 
@@ -475,6 +505,42 @@ async function saveGuestRsvpAnswer(guestId, day, level) {
 
   } catch (err) {
     console.error("Failed to save RSVP answer", err);
+    return false;
+  }
+}
+
+// Persist a guest's cabin/room assignment for one period via the shared
+// hosting payload builder (writes `hosting.cabin`/`hosting.room` for the
+// primary period, or `hosting.xtraCabin`/`hosting.xtraRoom` for the extra
+// coast period). Reads the CURRENT hosting from the LIVE record so the other
+// period's fields and the payment flags are preserved. `cabinUnit` is the
+// internal unit code (e.g. "madera_33"); `roomId` is the room id (e.g.
+// "CABAÑA 3-1"). Passing an empty string clears that field (sets it to null).
+async function saveGuestHosting(guestId, period, cabinUnit, roomId) {
+  try {
+    const isExtra = period === "extra";
+    const cabinKey = isExtra ? "xtraCabin" : "cabin";
+    const roomKey = isExtra ? "xtraRoom" : "room";
+    const currentHosting = getLiveHosting(guestId);
+    const hosting = {
+      ...currentHosting,
+      [cabinKey]: cabinUnit || null,
+      [roomKey]: roomId || null,
+    };
+    const payload = buildDashboardGuestHostingPayload({
+      guestId,
+      hosting,
+      editorGuestId: getCurrentUserId(),
+      timestamp: serverTimestamp(),
+    });
+    await updateGuest(guestId, payload);
+    // Update the in-memory guest so the re-render reflects the change
+    // immediately (the live onSnapshot listener will also refresh it).
+    const guest = getGuest(guestId);
+    if (guest) guest.hosting = { ...(guest.hosting || {}), ...hosting };
+    return true;
+  } catch (err) {
+    console.error("Failed to save guest hosting", err);
     return false;
   }
 }
@@ -516,7 +582,10 @@ function openGuestEditor(guest) {
 const GUEST_WRITABLE_FIELDS = new Set([
   "firstName", "middleName", "lastName", "maternalLastName", "phone", "idCheckUser", "cloudinaryId",
   "gender", "age", "message", "invitationGroup", "invitationSent", "_deleted", "travelsByPlane",
+  "group", "tagGroup", "lang", "paymentConfirmed",
 ]);
+
+
 
 
 
@@ -545,7 +614,7 @@ async function saveGuestInline(guestId, field, value) {
     // Also update the in-memory guest
 
     if (guest) {
-      if (["firstName", "middleName", "lastName", "maternalLastName", "phone", "gender", "age", "message"].includes(field)) {
+      if (["firstName", "middleName", "lastName", "maternalLastName", "phone", "gender", "age", "message", "lang"].includes(field)) {
         guest.identity = { ...(guest.identity || {}), [field]: value };
       }
 
@@ -556,10 +625,18 @@ async function saveGuestInline(guestId, field, value) {
         if (value === true || value === "true") guest.travelsByPlane = true;
         else if (value === false || value === "false") guest.travelsByPlane = false;
         else guest.travelsByPlane = undefined;
+      } else if (field === "paymentConfirmed") {
+        // `paymentConfirmed` is a top-level boolean. Normalize the inline
+        // editor's "true"/"false"/"" to a real boolean (or undefined when
+        // empty) so the in-memory guest matches Firestore.
+        if (value === true || value === "true") guest.paymentConfirmed = true;
+        else if (value === false || value === "false") guest.paymentConfirmed = false;
+        else guest.paymentConfirmed = undefined;
       } else {
         guest[field] = value;
       }
     }
+
 
 
     return true;
@@ -686,32 +763,118 @@ async function applyInvitationGroupChange(guestId, oldName, newName) {
   renderGuestManager();
 }
 
-// Cell for the "Invitación" column: shows the guest's invitation group as a
-// clickable display that reveals an inline editor with a rename input and a
-// dropdown to pick another existing group.
+// Deterministic pastel color for a group badge. Hashes the group name so the
+// same group always gets the same soft background + readable dark text.
+function groupBadgeStyle(name) {
+  const key = String(name || "").toLowerCase();
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) {
+    hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+  }
+  const hue = hash % 360;
+  return `background: hsl(${hue} 55% 88%); color: hsl(${hue} 45% 22%); border-color: hsl(${hue} 45% 72%);`;
+}
+
+// Shared markup for a group tag cell: a colored badge showing the current value
+// plus a compact dropdown to change it. The dropdown lists every existing group
+// plus a "＋ Nuevo grupo…" option that reveals a small free-text input to create
+// a brand-new group. `data-*` attributes are keyed by guest id so the event
+// handlers in `guestTable.js` can wire them up.
+function groupTagCell(guest, { current, options, badgeAttr, selectAttr, newAttr, cellAttr, title }) {
+  const selectOptions = [
+    `<option value="">— Sin grupo —</option>`,
+    ...options.map((o) => `<option value="${o}" ${o === current ? "selected" : ""}>${o}</option>`),
+    `<option value="__new__">＋ Nuevo grupo…</option>`,
+  ].join("");
+  return `
+    <div class="dashboard-group-cell" data-${cellAttr}="${guest.id}">
+      <span class="dashboard-group-badge" data-${badgeAttr}="${guest.id}" style="${groupBadgeStyle(current)}">${current || "—"}</span>
+      <select class="dashboard-group-select" data-${selectAttr}="${guest.id}" title="${title}">
+        ${selectOptions}
+      </select>
+      <input class="dashboard-group-new" data-${newAttr}="${guest.id}" type="text" placeholder="Nuevo grupo…" hidden />
+    </div>`;
+}
+
+// Cell for the "Invitación" column: a colored badge + dropdown to change the
+// guest's invitation group (rename or pick another existing group).
 const invitationGroupCell = (guest) => {
   const current = guest.invitationGroup || "";
-  const options = getInvitationGroupOptions();
-  const selectOptions = options
-    .map((o) => `<option value="${o}" ${o === current ? "selected" : ""}>${o}</option>`)
-    .join("");
-  return `
-    <div class="dashboard-invgroup-cell" data-invgroup-cell="${guest.id}">
-      <button type="button" class="dashboard-invgroup-display" data-invgroup-display="${guest.id}" title="Editar grupo de invitación">
-        ${current || "—"}
-      </button>
-      <div class="dashboard-invgroup-editor" data-invgroup-editor="${guest.id}" hidden>
-        <input class="dashboard-inline-input" type="text" value="${current}" data-invgroup-rename="${guest.id}" placeholder="Renombrar grupo…" />
-        <select class="dashboard-inline-select" data-invgroup-select="${guest.id}" title="Elegir otro grupo de invitación">
-          <option value="">— Elegir grupo —</option>
-          ${selectOptions}
-        </select>
-        <button type="button" class="dashboard-link-btn" data-invgroup-done="${guest.id}" title="Listo">✓</button>
-      </div>
-    </div>`;
+  return groupTagCell(guest, {
+    current,
+    options: getInvitationGroupOptions(),
+    badgeAttr: "invgroup-badge",
+    selectAttr: "invgroup-select",
+    newAttr: "invgroup-new",
+    cellAttr: "invgroup-cell",
+    title: "Cambiar grupo de invitación",
+  });
 };
 
+
+// ── GRUPO column (internal group / tagGroup) ──────────────────────────
+
+// Distinct internal group values currently used by guests (the source of truth
+// for the GRUPO column dropdown). Mirrors `getInvitationGroupOptions`.
+function getGroupOptions() {
+  const names = new Set();
+  getActiveGuests().forEach((g) => {
+    if (g.group) names.add(g.group);
+  });
+  return [...names].sort((a, b) => a.localeCompare(b));
+}
+
+// Change a guest's internal group (`tagGroup`). Saves the new value to this
+// guest first, then — if the old group was shared by other guests — asks
+// whether to apply the same change to all of them. Mirrors
+// `applyInvitationGroupChange`.
+async function applyGroupChange(guestId, oldName, newName) {
+  const trimmedOld = String(oldName || "").trim();
+  const trimmedNew = String(newName || "").trim();
+  if (!trimmedNew || trimmedOld === trimmedNew) return;
+
+  const ok = await saveGuestInline(guestId, "tagGroup", trimmedNew);
+  if (!ok) return;
+
+  const affected = getActiveGuests().filter(
+    (g) => g.id !== guestId && (g.group || "").trim() === trimmedOld,
+  );
+
+  if (trimmedOld && affected.length > 0) {
+    openConfirmModal({
+      title: "Aplicar a todo el grupo",
+      message: `¿Quieres actualizar también a los <strong>${affected.length}</strong> invitados que tenían el grupo "<strong>${trimmedOld}</strong>"?`,
+      confirmLabel: "Sí, actualizar todos",
+      cancelLabel: "Solo este invitado",
+      onConfirm: async () => {
+        for (const g of affected) {
+          await saveGuestInline(g.id, "tagGroup", trimmedNew);
+        }
+        renderGuestManager();
+      },
+    });
+  }
+  renderGuestManager();
+}
+
+// Cell for the "GRUPO" column: a colored badge + dropdown to change the guest's
+// internal group (`tagGroup`). Mirrors `invitationGroupCell`.
+const groupCell = (guest) => {
+  const current = guest.group || "";
+  return groupTagCell(guest, {
+    current,
+    options: getGroupOptions(),
+    badgeAttr: "group-badge",
+    selectAttr: "group-select",
+    newAttr: "group-new",
+    cellAttr: "group-cell",
+    title: "Cambiar grupo",
+  });
+};
+
+
 // ── Delete confirm modal ───────────────────────────────────────────────
+
 
 // The "Eliminar invitado" and "Enviar invitación" modals live in
 // `guestModals.js`. These thin adapters inject the dashboard's module-scope
@@ -822,12 +985,19 @@ function renderGuestManager() {
     rsvpLevelChip,
     rsvpBooleanChip,
     rsvpScaleChip,
+    rsvpBooleanValue,
+    rsvpScaleValue,
     paymentConfirmedChip,
     guestSortValue,
+
     GUEST_SORT_COLUMNS,
     saveGuestInline,
     saveGuestEmail,
     saveGuestRsvpAnswer,
+    saveGuestHosting,
+    getCabinNames,
+    getCabinDisplayName,
+    getRoomsByCabin,
     openGuestEditor,
 
     openCreateGuestModal,
@@ -837,7 +1007,11 @@ function renderGuestManager() {
     applyInvitationGroupChange,
     getInvitationGroupOptions,
     invitationGroupCell,
+    applyGroupChange,
+    getGroupOptions,
+    groupCell,
     guestAvatarUrl,
+
     guestInitials,
     guestFullName,
     guestIdentity,
@@ -923,7 +1097,112 @@ function renderTableAssignments() {
 // guests) 1000 is generous; it also protects against runaway growth.
 const DASHBOARD_QUERY_LIMIT = 1000;
 
+// ── Global group filter (header) ───────────────────────────────────────
+
+// Render the group filter as a custom SELECT-style dropdown into the header's
+// `[data-group-filter]` container. The filter is GLOBAL: it applies to BOTH the
+// attendance summary cards and the INVITADOS table. The trigger shows the active
+// group (or "Todos") with a caret; the opened menu lists every group with its
+// confirmed-Saturday / size counts ("X/Y" via `getGroupAttendanceCounts`).
+// Selecting an option sets `state.filterGroup` and dispatches
+// `dashboard:groupchange` so the summary + guest manager re-render. A leading
+// "Todos" option clears the filter.
+function renderGroupFilter() {
+  const container = document.querySelector("[data-group-filter]");
+  if (!container) return;
+
+  const groups = getUniqueGuestGroups();
+  const counts = getGroupAttendanceCounts();
+  const active = state.filterGroup;
+
+  const activeLabel = active || "Todos";
+  const activeStats = active && counts[active]
+    ? `${counts[active].confirmedSaturday}/${counts[active].size}`
+    : "";
+
+  container.innerHTML = `
+    <div class="dashboard-group-select">
+      <button
+        class="dashboard-group-select-trigger"
+        data-group-select-trigger
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded="false"
+      >
+        <span class="dashboard-group-select-trigger-label" data-group-select-trigger-label>${activeLabel}</span>
+        <span class="dashboard-group-select-caret" aria-hidden="true">▾</span>
+      </button>
+
+      <div class="dashboard-group-select-menu" role="listbox" aria-label="Filtrar por grupo">
+        <button
+          class="dashboard-group-select-option ${active ? "" : "is-active"}"
+          data-group-select-option=""
+          role="option"
+          aria-selected="${active ? "false" : "true"}"
+          type="button"
+        >
+          <span class="dashboard-group-select-option-name">Todos</span>
+          <span class="dashboard-group-select-option-stats"></span>
+        </button>
+        ${groups
+          .map(
+            (group) => `
+          <button
+            class="dashboard-group-select-option ${active === group ? "is-active" : ""}"
+            data-group-select-option="${group}"
+            role="option"
+            aria-selected="${active === group ? "true" : "false"}"
+            type="button"
+          >
+            <span class="dashboard-group-select-option-name">${group}</span>
+            <span class="dashboard-group-select-option-stats">${counts[group] ? `${counts[group].confirmedSaturday}/${counts[group].size}` : ""}</span>
+          </button>
+        `,
+          )
+          .join("")}
+      </div>
+    </div>
+  `;
+
+  const select = container.querySelector(".dashboard-group-select");
+  const trigger = container.querySelector("[data-group-select-trigger]");
+  const menu = container.querySelector(".dashboard-group-select-menu");
+
+  // Toggle the dropdown open/closed.
+  const closeMenu = () => {
+    select.classList.remove("is-open");
+    trigger.setAttribute("aria-expanded", "false");
+  };
+  trigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const willOpen = !select.classList.contains("is-open");
+    select.classList.toggle("is-open", willOpen);
+    trigger.setAttribute("aria-expanded", willOpen ? "true" : "false");
+  });
+
+  // Close when clicking outside the dropdown.
+  document.addEventListener("click", (e) => {
+    if (select && !select.contains(e.target)) closeMenu();
+  });
+
+  // Close on Escape.
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeMenu();
+  });
+
+  // Selecting an option applies the filter and closes the menu.
+  menu.querySelectorAll("[data-group-select-option]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.filterGroup = btn.dataset.groupSelectOption || "";
+      renderGroupFilter();
+      window.dispatchEvent(new CustomEvent("dashboard:groupchange"));
+    });
+  });
+}
+
+
 // ── Main dashboard render ──────────────────────────────────────────────
+
 
 function renderDashboard(app) {
   document.title = "Panel de los novios · David & Aydé";
@@ -939,14 +1218,20 @@ function renderDashboard(app) {
           <button class="dashboard-button dashboard-button-secondary" type="button" data-sign-out>Salir</button>
         </div>
 
+        <!-- ── Nav (left) + global group filter (right) on the same line ── -->
+        <div class="dashboard-header-navrow">
+          <nav class="dashboard-tabs" data-dashboard-tabs aria-label="Secciones del panel"></nav>
+          <div class="dashboard-header-filter" data-group-filter aria-label="Filtrar por grupo"></div>
+        </div>
+
       </header>
+
+
 
       <p class="dashboard-status" data-dashboard-status></p>
 
       <section class="dashboard-summary" data-dashboard-summary aria-label="Resumen"></section>
 
-      <!-- ── Tab Navigation ── -->
-      <nav class="dashboard-tabs" data-dashboard-tabs aria-label="Secciones del panel"></nav>
 
       <!-- ── Panel: Guests ── -->
       <section class="dashboard-panel" data-dashboard-panel="guests">
@@ -1017,7 +1302,22 @@ function renderDashboard(app) {
     </main>
   `;
 
+  // ── Sticky header: collapse to a thin bar on scroll ──
+  // The "Panel de los novios" header is sticky (see `_layout.scss`). When the
+  // user scrolls down we add `.is-scrolled`, which shrinks the hero band into a
+  // slim bar (smaller title, hidden eyebrow, tighter padding + shadow). Scrolling
+  // back to the top removes the class and restores the full hero.
+  const headerEl = app.querySelector(".dashboard-header");
+  const onScroll = () => {
+    if (!headerEl) return;
+    headerEl.classList.toggle("is-scrolled", window.scrollY > 10);
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll(); // set the correct initial state (e.g. on a deep-linked reload)
+  app._onHeaderScroll = onScroll;
+
   // ── Set initial tab from URL path ──
+
   const initialTab = getTabFromPath();
   // If at /dashboard (no sub-path), redirect to /dashboard/invitados
   const currentPath = window.location.pathname.replace(/\/+$/u, "");
@@ -1057,10 +1357,12 @@ function renderDashboard(app) {
   );
 
   renderTabNavigation();
+  renderGroupFilter();
   renderGuestManager();
   renderCabinAssignments();
   renderThanksPanel();
   renderChartsPanel();
+
 
   // ── Re-render the charts panel when the "Gráficas" tab becomes visible ──
   // ECharts initializes with the container's current size. If the charts panel
@@ -1070,13 +1372,12 @@ function renderDashboard(app) {
   // container. `switchTab` dispatches `dashboard:tabchange` on every tab switch.
   const onTabChange = (event) => {
     const tab = event.detail?.tab;
-    // Reset the INVITADOS filters when leaving the guests view so the summary
-    // cards (Viernes/Sábado/Domingo) always reflect ALL guests, not a filtered
-    // subset. The filters are only meaningful while the INVITADOS table is
-    // shown; once the admin navigates away, they should not leak into the
-    // attendance summary.
+    // Reset the INVITADOS table filters (query / age / phone / email / photo /
+    // name / contact / column group) when leaving the guests view. The GLOBAL
+    // group filter (`state.filterGroup`) is intentionally NOT reset here — it
+    // lives in the header and applies to BOTH the attendance summary cards and
+    // the INVITADOS table, so it persists across tabs.
     if (tab && tab !== "guests") {
-      state.filterGroup = "";
       state.filterQuery = "";
       state.filterAgeGroup = "";
       state.filterPhone = "";
@@ -1090,6 +1391,25 @@ function renderDashboard(app) {
   };
   window.addEventListener("dashboard:tabchange", onTabChange);
   app._onTabChange = onTabChange;
+
+  // ── Global group filter: re-render the summary + guest manager ──
+  // The group filter chips live in the header and dispatch `dashboard:groupchange`
+  // when clicked. Re-render the attendance summary cards (which now read the
+  // filtered guest list via `getFilteredActiveGuests`) and the INVITADOS table
+  // (which already filters by `state.filterGroup`).
+  const onGroupChange = () => {
+    renderSummary({
+      computeDayConfirmations,
+      computeInvitationStats,
+      computeDayDistributions,
+      computeDayConfirmedGuests,
+      computeDayLevelGuests,
+    });
+    renderGuestManager();
+  };
+  window.addEventListener("dashboard:groupchange", onGroupChange);
+  app._onGroupChange = onGroupChange;
+
 
 
 

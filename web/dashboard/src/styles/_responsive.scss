@@ -27,11 +27,29 @@
     flex-direction: column;
   }
 
-  .dashboard-tab {
-    padding: 0.5rem 0.75rem;
+  // On mobile the nav row stacks: the tab buttons wrap on their own line and
+  // the group filter dropdown sits below, stretching full-width so it's easy
+  // to tap.
+  .dashboard-header-navrow {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
   }
 
-  .dashboard-tab-label {
-    display: none;
+  .dashboard-tabs {
+    justify-content: flex-start;
   }
+
+  .dashboard-group-select-trigger {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .dashboard-group-select-menu {
+    left: 0;
+    right: 0;
+    min-width: 0;
+  }
+
 }
+

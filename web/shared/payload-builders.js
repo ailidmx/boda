@@ -747,8 +747,8 @@ export function buildDashboardGuestInlinePayload(guestId, field, value, invitati
   const GUEST_WRITABLE_FIELDS = new Set([
     "firstName", "middleName", "lastName", "maternalLastName", "gender", "age", "cloudinaryId", "phone", "idCheckUser",
     "message", "invitationGroup", "invitationSent", "_deleted", "travelsByPlane",
+    "group", "tagGroup", "lang", "paymentConfirmed",
   ]);
-
 
   if (!GUEST_WRITABLE_FIELDS.has(field)) return null;
 
@@ -758,6 +758,14 @@ export function buildDashboardGuestInlinePayload(guestId, field, value, invitati
     updatedBy: guestId,
     updatedAt: timestamp,
   };
+
+  // `tagGroup` (the guest's internal group, e.g. "PetanclubGDL") lives at the
+  // TOP LEVEL. The dashboard's GRUPO column edits it directly.
+  if (field === "tagGroup") {
+    payload.tagGroup = String(value ?? "").trim();
+    return payload;
+  }
+
 
   // `message` (the guest's written message) lives at the TOP LEVEL, not inside
   // `identity`. Normalize it as a trimmed string.
@@ -806,11 +814,36 @@ export function buildDashboardGuestInlinePayload(guestId, field, value, invitati
     return payload;
   }
 
+  // `lang` (the guest's interface language) lives inside `identity`, not at the
+  // top level. Only accept the three supported codes; otherwise omit the field
+  // so the existing value is preserved (merge).
+  if (field === "lang") {
+    const normalizedLang = String(value ?? "").trim().toLowerCase();
+    if (["es", "fr", "en"].includes(normalizedLang)) {
+      payload.identity = { lang: normalizedLang };
+    }
+    return payload;
+  }
+
+  // `paymentConfirmed` is a top-level boolean. Normalize to a real boolean, or
+  // to `null` when empty so the field is explicitly cleared.
+  if (field === "paymentConfirmed") {
+    if (value === true || value === "true") {
+      payload.paymentConfirmed = true;
+    } else if (value === false || value === "false") {
+      payload.paymentConfirmed = false;
+    } else {
+      payload.paymentConfirmed = null;
+    }
+    return payload;
+  }
+
   payload[field] = value;
   return {
     ...payload,
   };
 }
+
 
 /**
  * Build a payload for the dashboard's cabin-assignment writes (drag-and-drop,

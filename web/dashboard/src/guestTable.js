@@ -21,9 +21,8 @@ export function renderGuestManager(ctx) {
     getActiveGuests,
     getGuest,
     getFilteredGuests,
-    getUniqueGuestGroups,
-    getGroupAttendanceCounts,
     getMergedGuest,
+
     guestStatusBadge,
     rsvpLevelChip,
     rsvpBooleanChip,
@@ -35,6 +34,10 @@ export function renderGuestManager(ctx) {
     saveGuestInline,
     saveGuestEmail,
     saveGuestRsvpAnswer,
+    saveGuestHosting,
+    getCabinNames,
+    getCabinDisplayName,
+    getRoomsByCabin,
     openGuestEditor,
 
     openCreateGuestModal,
@@ -44,7 +47,11 @@ export function renderGuestManager(ctx) {
     applyInvitationGroupChange,
     getInvitationGroupOptions,
     invitationGroupCell,
+    applyGroupChange,
+    getGroupOptions,
+    groupCell,
     guestAvatarUrl,
+
     guestInitials,
     guestFullName,
     guestIdentity,
@@ -325,12 +332,48 @@ export function renderGuestManager(ctx) {
 
 
 
+  // ── Language cell helper (inline editable, toggle mode) ──
+  // Shows the guest's interface language as a clickable display (flag emoji +
+  // name). Clicking it enters EDIT mode: the display is hidden and a small
+  // inline select (🇪🇸 Español / 🇫🇷 Français / 🇬🇧 English / —) appears with a
+  // ✓ confirm and ✕ cancel button. The display and editor are NEVER both
+  // visible at once. Confirm saves the RAW code ("es" / "fr" / "en" / "") via
+  // `saveGuestInline("lang", …)`; cancel reverts without saving. Matches the
+  // three languages the invitation supports.
+  const LANG_OPTIONS = [
+    { value: "", label: "—", emoji: "" },
+    { value: "es", label: "Español", emoji: "🇪🇸" },
+    { value: "fr", label: "Français", emoji: "🇫🇷" },
+    { value: "en", label: "English", emoji: "🇬🇧" },
+  ];
+  const langCell = (guest) => {
+    const lang = guest.identity?.lang || guest.lang || "";
+    const options = LANG_OPTIONS.map(
+      (l) => `<option value="${l.value}" ${lang === l.value ? "selected" : ""}>${l.emoji ? `${l.emoji} ` : ""}${l.label}</option>`,
+    ).join("");
+    const opt = LANG_OPTIONS.find((l) => l.value === lang);
+    const displayLabel = opt?.label || "—";
+    const displayEmoji = opt?.emoji || "";
+    return `
+      <div class="dashboard-lang-cell" data-lang-cell="${guest.id}">
+        <button type="button" class="dashboard-lang-display ${lang ? "" : "is-empty"}" data-lang-display="${guest.id}" title="Editar idioma">
+          ${displayEmoji ? `<span class="dashboard-emoji">${displayEmoji}</span>` : ""}${displayLabel}
+        </button>
+        <span class="dashboard-inline-editor" data-lang-editor="${guest.id}" hidden>
+          <select class="dashboard-inline-select" data-lang-select="${guest.id}" title="Elegir idioma">${options}</select>
+          <button type="button" class="dashboard-link-btn" data-lang-confirm="${guest.id}" title="Guardar">✓</button>
+          <button type="button" class="dashboard-link-btn" data-lang-cancel="${guest.id}" title="Cancelar">✕</button>
+        </span>
+      </div>`;
+  };
+
   // ── Travels-by-plane cell helper (simple checkbox) ──
   // Shows whether the guest flies in (`travelsByPlane` boolean) as a plain
   // checkbox. Checking it saves `true`, unchecking saves `false` — there is no
   // "unknown" state, so the checkbox is the single source of truth. Saves via
   // `saveGuestInline("travelsByPlane", …)`.
   const travelsByPlaneCell = (guest) => {
+
     const v = guest.travelsByPlane === true;
     return `
       <div class="dashboard-travels-cell" data-travels-cell="${guest.id}">
@@ -343,6 +386,187 @@ export function renderGuestManager(ctx) {
 
 
 
+
+  // ── RSVP scale cell helper (inline editable, 0–5) ──
+  // Shows the guest's attendance level for one day (friday/saturday/sunday) as
+  // a clickable chip. Clicking it swaps to a small inline select (0–5) with a
+  // ✓ confirm and ✕ cancel. The display and editor are NEVER both visible at
+  // once. Confirm saves via `saveGuestRsvpAnswer(guestId, day, level)`; cancel
+  // reverts without saving. The chip styling mirrors `rsvpLevelChip`.
+  const rsvpScaleCell = (guest, day) => {
+    const level = rsvpScaleValue(guest, day);
+    const chipClass =
+      level >= 4 ? "dashboard-rsvp-chip dashboard-rsvp-chip-confirmed"
+      : level >= 1 ? "dashboard-rsvp-chip dashboard-rsvp-chip-partial"
+      : "dashboard-rsvp-chip dashboard-rsvp-chip-empty";
+    const options = [0, 1, 2, 3, 4, 5]
+      .map((n) => `<option value="${n}" ${level === n ? "selected" : ""}>${n}</option>`)
+      .join("");
+    return `
+      <div class="dashboard-rsvp-cell" data-rsvp-cell="${guest.id}" data-rsvp-day="${day}">
+        <button type="button" class="${chipClass}" data-rsvp-display="${guest.id}" data-rsvp-day="${day}" title="Editar asistencia (0–5)">${level}</button>
+        <span class="dashboard-inline-editor" data-rsvp-editor="${guest.id}" data-rsvp-day="${day}" hidden>
+          <select class="dashboard-inline-select" data-rsvp-select="${guest.id}" data-rsvp-day="${day}" title="Nivel de asistencia (0–5)">${options}</select>
+          <button type="button" class="dashboard-link-btn" data-rsvp-confirm="${guest.id}" data-rsvp-day="${day}" title="Guardar">✓</button>
+          <button type="button" class="dashboard-link-btn" data-rsvp-cancel="${guest.id}" data-rsvp-day="${day}" title="Cancelar">✕</button>
+        </span>
+      </div>`;
+  };
+
+  // ── Boolean RSVP cell helper (inline editable, Sí/No/—) ──
+  // Shows a yes/no RSVP answer (accommodationConfirm, cabinWaitingList,
+  // petanqueParticipation, petanqueOwnBoules) as a clickable chip. Clicking it
+  // swaps to a small inline select (— / Sí / No) with ✓/✕. Confirm saves via
+  // `saveGuestRsvpAnswer(guestId, questionId, level)` where level is 1 (Sí),
+  // 2 (No), or 0 (—). The chip styling mirrors `rsvpBooleanChip`.
+  const rsvpBooleanCell = (guest, questionId) => {
+    const value = rsvpBooleanValue(guest, questionId);
+    const label = value === 1 ? "Sí" : value === 2 ? "No" : "—";
+    const chipClass = value === 1
+      ? "dashboard-badge dashboard-badge-yes"
+      : value === 2
+        ? "dashboard-badge dashboard-badge-no"
+        : "dashboard-badge dashboard-badge-muted";
+    const options = [
+      { v: 0, l: "—" },
+      { v: 1, l: "Sí" },
+      { v: 2, l: "No" },
+    ]
+      .map((o) => `<option value="${o.v}" ${value === o.v ? "selected" : ""}>${o.l}</option>`)
+      .join("");
+    return `
+      <div class="dashboard-rsvp-cell" data-rsvp-cell="${guest.id}" data-rsvp-question="${questionId}">
+        <button type="button" class="${chipClass}" data-rsvp-boolean-display="${guest.id}" data-rsvp-question="${questionId}" title="Editar respuesta">${label}</button>
+        <span class="dashboard-inline-editor" data-rsvp-boolean-editor="${guest.id}" data-rsvp-question="${questionId}" hidden>
+          <select class="dashboard-inline-select" data-rsvp-boolean-select="${guest.id}" data-rsvp-question="${questionId}" title="Sí / No / —">${options}</select>
+          <button type="button" class="dashboard-link-btn" data-rsvp-boolean-confirm="${guest.id}" data-rsvp-question="${questionId}" title="Guardar">✓</button>
+          <button type="button" class="dashboard-link-btn" data-rsvp-boolean-cancel="${guest.id}" data-rsvp-question="${questionId}" title="Cancelar">✕</button>
+        </span>
+      </div>`;
+  };
+
+  // ── Scale RSVP cell helper (inline editable, 0–5) ──
+  // Shows a SCALE RSVP answer (rocaAzul, playa — 0–5 likelihood) as a clickable
+  // chip. Clicking it swaps to a small inline select (0–5) with ✓/✕. Confirm
+  // saves via `saveGuestRsvpAnswer(guestId, questionId, level)`. The chip
+  // styling mirrors `rsvpScaleChip`.
+  const rsvpScaleQuestionCell = (guest, questionId) => {
+    const value = rsvpScaleValue(guest, questionId);
+    const chipClass = value >= 4
+      ? "dashboard-rsvp-chip dashboard-rsvp-chip-confirmed"
+      : value >= 1
+        ? "dashboard-rsvp-chip dashboard-rsvp-chip-partial"
+        : "dashboard-rsvp-chip dashboard-rsvp-chip-empty";
+    const options = [0, 1, 2, 3, 4, 5]
+      .map((n) => `<option value="${n}" ${value === n ? "selected" : ""}>${n}</option>`)
+      .join("");
+    return `
+      <div class="dashboard-rsvp-cell" data-rsvp-cell="${guest.id}" data-rsvp-question="${questionId}">
+        <button type="button" class="${chipClass}" data-rsvp-scale-display="${guest.id}" data-rsvp-question="${questionId}" title="Editar (0–5)">${value}</button>
+        <span class="dashboard-inline-editor" data-rsvp-scale-editor="${guest.id}" data-rsvp-question="${questionId}" hidden>
+          <select class="dashboard-inline-select" data-rsvp-scale-select="${guest.id}" data-rsvp-question="${questionId}" title="Nivel (0–5)">${options}</select>
+          <button type="button" class="dashboard-link-btn" data-rsvp-scale-confirm="${guest.id}" data-rsvp-question="${questionId}" title="Guardar">✓</button>
+          <button type="button" class="dashboard-link-btn" data-rsvp-scale-cancel="${guest.id}" data-rsvp-question="${questionId}" title="Cancelar">✕</button>
+        </span>
+      </div>`;
+  };
+
+  // ── Payment-confirmed cell helper (inline editable, Sí/No/—) ──
+  // Shows the top-level `paymentConfirmed` boolean as a clickable chip. Clicking
+  // it swaps to a small inline select (— / Sí / No) with ✓/✕. Confirm saves via
+  // `saveGuestInline(guestId, "paymentConfirmed", value)`.
+  const paymentConfirmedCell = (guest) => {
+    const value = guest.paymentConfirmed;
+    const label = value === true ? "Sí" : value === false ? "No" : "—";
+    const chipClass = value === true
+      ? "dashboard-badge dashboard-badge-yes"
+      : value === false
+        ? "dashboard-badge dashboard-badge-no"
+        : "dashboard-badge dashboard-badge-muted";
+    const options = [
+      { v: "", l: "—" },
+      { v: "1", l: "Sí" },
+      { v: "2", l: "No" },
+    ]
+      .map((o) => `<option value="${o.v}" ${(value === true && o.v === "1") || (value === false && o.v === "2") || (value == null && o.v === "") ? "selected" : ""}>${o.l}</option>`)
+      .join("");
+    return `
+      <div class="dashboard-rsvp-cell" data-payment-cell="${guest.id}">
+        <button type="button" class="${chipClass}" data-payment-display="${guest.id}" title="Editar pago confirmado">${label}</button>
+        <span class="dashboard-inline-editor" data-payment-editor="${guest.id}" hidden>
+          <select class="dashboard-inline-select" data-payment-select="${guest.id}" title="Pago confirmado">${options}</select>
+          <button type="button" class="dashboard-link-btn" data-payment-confirm="${guest.id}" title="Guardar">✓</button>
+          <button type="button" class="dashboard-link-btn" data-payment-cancel="${guest.id}" title="Cancelar">✕</button>
+        </span>
+      </div>`;
+  };
+
+  // ── Cabin cell helper (inline editable, picker) ──
+  // Shows the guest's cabin assignment for one period (primary `cabin` or extra
+  // `xtraCabin`) as a clickable badge. Clicking it swaps to a small inline
+  // select of all cabins (from `getCabinNames()`) with ✓/✕. Confirm saves via
+  // `saveGuestHosting(guestId, period, cabinUnit, roomId)`. The cabin select
+  // stores the DISPLAY name; on save we resolve it back to the internal unit
+  // code via `getCabinDisplayName`'s inverse (the map is 1:1 for the values we
+  // write). When a cabin is picked, the room is cleared (the admin assigns the
+  // room separately via the room cell).
+  const cabinCell = (guest, period) => {
+    const isExtra = period === "extra";
+    const cabinKey = isExtra ? "xtraCabin" : "cabin";
+    const roomKey = isExtra ? "xtraRoom" : "room";
+    const hosting = guest.hosting || {};
+    const currentUnit = hosting[cabinKey] || "";
+    const currentDisplay = currentUnit ? getCabinDisplayName(currentUnit) : "";
+    const cabinNames = getCabinNames();
+    const options = [
+      `<option value="">—</option>`,
+      ...cabinNames.map(
+        (name) => `<option value="${name}" ${name === currentDisplay ? "selected" : ""}>${name}</option>`,
+      ),
+    ].join("");
+    return `
+      <div class="dashboard-rsvp-cell" data-cabin-cell="${guest.id}" data-cabin-period="${period}">
+        <button type="button" class="dashboard-badge ${currentDisplay ? "" : "dashboard-badge-muted"}" data-cabin-display="${guest.id}" data-cabin-period="${period}" title="Editar cabaña">${currentDisplay || "—"}</button>
+        <span class="dashboard-inline-editor" data-cabin-editor="${guest.id}" data-cabin-period="${period}" hidden>
+          <select class="dashboard-inline-select" data-cabin-select="${guest.id}" data-cabin-period="${period}" title="Elegir cabaña">${options}</select>
+          <button type="button" class="dashboard-link-btn" data-cabin-confirm="${guest.id}" data-cabin-period="${period}" title="Guardar">✓</button>
+          <button type="button" class="dashboard-link-btn" data-cabin-cancel="${guest.id}" data-cabin-period="${period}" title="Cancelar">✕</button>
+        </span>
+      </div>`;
+  };
+
+  // ── Room cell helper (inline editable, picker) ──
+  // Shows the guest's room assignment for one period (primary `room` or extra
+  // `xtraRoom`) as a clickable badge. Clicking it swaps to a small inline
+  // select of the rooms in the guest's CURRENT cabin (from `getRoomsByCabin`)
+  // with ✓/✕. Confirm saves via `saveGuestHosting(guestId, period, cabinUnit,
+  // roomId)`. If the guest has no cabin assigned yet, the room select is empty
+  // (assign a cabin first).
+  const roomCell = (guest, period) => {
+    const isExtra = period === "extra";
+    const cabinKey = isExtra ? "xtraCabin" : "cabin";
+    const roomKey = isExtra ? "xtraRoom" : "room";
+    const hosting = guest.hosting || {};
+    const currentUnit = hosting[cabinKey] || "";
+    const currentRoom = hosting[roomKey] || "";
+    const cabinDisplay = currentUnit ? getCabinDisplayName(currentUnit) : "";
+    const rooms = cabinDisplay ? getRoomsByCabin(cabinDisplay) : [];
+    const options = [
+      `<option value="">—</option>`,
+      ...rooms.map(
+        (r) => `<option value="${r.id}" ${r.id === currentRoom ? "selected" : ""}>${r.id}</option>`,
+      ),
+    ].join("");
+    return `
+      <div class="dashboard-rsvp-cell" data-room-cell="${guest.id}" data-room-period="${period}">
+        <button type="button" class="dashboard-badge ${currentRoom ? "" : "dashboard-badge-muted"}" data-room-display="${guest.id}" data-room-period="${period}" title="Editar cuarto">${currentRoom || "—"}</button>
+        <span class="dashboard-inline-editor" data-room-editor="${guest.id}" data-room-period="${period}" hidden>
+          <select class="dashboard-inline-select" data-room-select="${guest.id}" data-room-period="${period}" title="Elegir cuarto">${options}</select>
+          <button type="button" class="dashboard-link-btn" data-room-confirm="${guest.id}" data-room-period="${period}" title="Guardar">✓</button>
+          <button type="button" class="dashboard-link-btn" data-room-cancel="${guest.id}" data-room-period="${period}" title="Cancelar">✕</button>
+        </span>
+      </div>`;
+  };
 
   // ── Message cell helper ──
   // Shows the guest's written message (top-level `message` field) as a
@@ -386,33 +610,8 @@ export function renderGuestManager(ctx) {
     </div>
   `;
 
-  // ── Group badge nav bar ──
-  // Each chip shows the group name plus an "X/Y" attendance summary where
-  // X = guests confirmed for SATURDAY (RSVP level ≥ 4) and Y = group size.
-
-  const groups = getUniqueGuestGroups();
-  const groupCounts = getGroupAttendanceCounts();
-  const groupNav = `
-    <div class="dashboard-group-nav">
-      <button type="button" class="dashboard-group-nav-chip ${!state.filterGroup ? "dashboard-group-nav-chip-active" : ""}" data-group-nav="">
-        Todos
-      </button>
-      ${groups
-        .map(
-          (g) => {
-            const c = groupCounts[g] || { confirmedSaturday: 0, size: 0 };
-            return `
-        <button type="button" class="dashboard-group-nav-chip ${state.filterGroup === g ? "dashboard-group-nav-chip-active" : ""}" data-group-nav="${g}" style="background:${badgeStyle(g)};color:#3a2f1e;" title="${c.confirmedSaturday} de ${c.size} confirmados para el sábado">
-          ${g}
-          <span class="dashboard-group-nav-count">${c.confirmedSaturday}/${c.size}</span>
-        </button>`;
-          },
-        )
-        .join("")}
-    </div>
-  `;
-
   // ── Readiness card ──
+
   // A global summary of how much identity work remains for the guests. A guest
   // is "ready" when they have a complete name (≥2 of 4 fields AND at least one
   // first name AND one last/maternal name), a photo, and — IF they have a
@@ -461,8 +660,8 @@ export function renderGuestManager(ctx) {
 
   container.innerHTML = `
     ${columnGroupNav}
-    ${groupNav}
     ${readinessCard}
+
     <div class="dashboard-guest-filters">
       <div class="dashboard-filter-group">
         <label for="filter-query">Buscar</label>
@@ -524,11 +723,14 @@ export function renderGuestManager(ctx) {
       <table class="dashboard-guest-table">
         <thead>
           <tr>
+            ${sortTh("actions", "Acciones")}
             ${sortTh("name", "Identidad")}
             ${activeColumnGroup === "identity"
               ? `
-                <th title="Enviar invitación (WhatsApp / email)">Enviar</th>
-                <th title="Invitación enviada (marcar manualmente o al enviar)">Enviada</th>
+                ${sortTh("send", "Enviar")}
+                ${sortTh("invitationSent", "Enviada")}
+
+
                 ${sortTh("invitationGroup", "Invitación")}
                 ${sortTh("group", "Grupo")}
                 ${sortTh("lang", "Idioma")}
@@ -541,9 +743,10 @@ export function renderGuestManager(ctx) {
               : ""}
             ${activeColumnGroup === "presencia"
               ? `
-                <th>Vie</th>
-                <th>Sáb</th>
-                <th>Dom</th>
+                ${sortTh("friday", "Viernes")}
+                ${sortTh("saturday", "Sábado")}
+                ${sortTh("sunday", "Domingo")}
+
                 ${sortTh("accommodationConfirm", "Alojamiento")}
                 ${sortTh("cabinWaitingList", "Lista espera")}
                 ${sortTh("cabin", "Cabaña")}
@@ -566,7 +769,7 @@ export function renderGuestManager(ctx) {
                 ${sortTh("playa", "Playa")}
               `
               : ""}
-            <th>Acciones</th>
+
           </tr>
         </thead>
 
@@ -579,6 +782,12 @@ export function renderGuestManager(ctx) {
               const xtraRoom = hosting.xtraRoom || merged.xtraRoom || "";
               return `
             <tr class="dashboard-guest-row">
+              <td>
+                <button class="dashboard-link-btn" data-edit-guest="${merged.id}" title="Editar todo (modal)">✏️</button>
+                <button class="dashboard-link-btn" data-copy-link="${merged.id}" title="Copiar enlace">🔗</button>
+                <button class="dashboard-link-btn" data-preview-link="${merged.id}" title="Vista previa">👁️</button>
+                <button class="dashboard-link-btn" data-delete-guest="${merged.id}" title="Eliminar" style="color:#a0352c;">🗑️</button>
+              </td>
               <td>${identityCell(merged)}</td>
               ${activeColumnGroup === "identity"
                 ? `
@@ -588,8 +797,9 @@ export function renderGuestManager(ctx) {
                       ${merged.invitationSent ? "checked" : ""} title="Invitación enviada" />
                   </td>
                   <td>${invitationGroupCell(merged)}</td>
-                  <td>${badgeHtml(merged.group)}</td>
-                  <td>${badgeHtml(merged.identity?.lang || merged.lang || "")}</td>
+                  <td>${groupCell(merged)}</td>
+                  <td>${langCell(merged)}</td>
+
                   <td>${genderCell(merged)}</td>
                   <td>${ageCell(merged)}</td>
                   <td>${messageCell(merged)}</td>
@@ -600,37 +810,31 @@ export function renderGuestManager(ctx) {
                 : ""}
               ${activeColumnGroup === "presencia"
                 ? `
-                  <td>${rsvpLevelChip(merged, "friday")}</td>
-                  <td>${rsvpLevelChip(merged, "saturday")}</td>
-                  <td>${rsvpLevelChip(merged, "sunday")}</td>
-                  <td>${rsvpBooleanChip(merged, "accommodationConfirm")}</td>
-                  <td>${rsvpBooleanChip(merged, "cabinWaitingList")}</td>
-                  <td>${badgeHtml(merged.cabinLabel || merged.unit || "")}</td>
-                  <td>${badgeHtml(guestRoom(merged))}</td>
-                  <td>${badgeHtml(xtraCabin)}</td>
-                  <td>${badgeHtml(xtraRoom)}</td>
-                  <td>${rsvpScaleChip(merged, "rocaAzul")}</td>
-                  <td>${paymentConfirmedChip(merged)}</td>
+                  <td>${rsvpScaleCell(merged, "friday")}</td>
+                  <td>${rsvpScaleCell(merged, "saturday")}</td>
+                  <td>${rsvpScaleCell(merged, "sunday")}</td>
+                  <td>${rsvpBooleanCell(merged, "accommodationConfirm")}</td>
+                  <td>${rsvpBooleanCell(merged, "cabinWaitingList")}</td>
+                  <td>${cabinCell(merged, "primary")}</td>
+                  <td>${roomCell(merged, "primary")}</td>
+                  <td>${cabinCell(merged, "extra")}</td>
+                  <td>${roomCell(merged, "extra")}</td>
+                  <td>${rsvpScaleQuestionCell(merged, "rocaAzul")}</td>
+                  <td>${paymentConfirmedCell(merged)}</td>
                 `
                 : ""}
               ${activeColumnGroup === "petanque"
                 ? `
-                  <td>${rsvpBooleanChip(merged, "petanqueParticipation")}</td>
-                  <td>${rsvpBooleanChip(merged, "petanqueOwnBoules")}</td>
+                  <td>${rsvpBooleanCell(merged, "petanqueParticipation")}</td>
+                  <td>${rsvpBooleanCell(merged, "petanqueOwnBoules")}</td>
                 `
                 : ""}
               ${activeColumnGroup === "playa"
                 ? `
-                  <td>${rsvpScaleChip(merged, "playa")}</td>
+                  <td>${rsvpScaleQuestionCell(merged, "playa")}</td>
                 `
                 : ""}
 
-              <td>
-                <button class="dashboard-link-btn" data-edit-guest="${merged.id}" title="Editar todo (modal)">✏️</button>
-                <button class="dashboard-link-btn" data-copy-link="${merged.id}" title="Copiar enlace">🔗</button>
-                <button class="dashboard-link-btn" data-preview-link="${merged.id}" title="Vista previa">👁️</button>
-                <button class="dashboard-link-btn" data-delete-guest="${merged.id}" title="Eliminar" style="color:#a0352c;">🗑️</button>
-              </td>
             </tr>`;
             })
             .join("")}
@@ -654,15 +858,8 @@ export function renderGuestManager(ctx) {
     });
   });
 
-  // ── Group nav filter ──
-  container.querySelectorAll("[data-group-nav]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      state.filterGroup = btn.dataset.groupNav;
-      renderGuestManager(ctx);
-    });
-  });
-
   // ── Filter events ──
+
   // The search input re-renders the table on every keystroke, which destroys
   // the input and loses focus. We preserve focus + caret position so the user
   // can keep typing without interruption.
@@ -752,14 +949,252 @@ export function renderGuestManager(ctx) {
     });
   });
 
-  // ── RSVP dropdown: save the selected level (0–5) on change ──
-  container.querySelectorAll("[data-rsvp-chip]").forEach((chip) => {
-    chip.addEventListener("change", async () => {
-      const guestId = chip.dataset.rsvpChip;
-      const day = chip.dataset.rsvpDay;
-      const level = Number.parseInt(chip.value, 10);
+  // ── RSVP scale editor (per-day attendance, 0–5): toggle mode ──
+  // Clicking the chip hides it and reveals the inline select + ✓/✕ buttons.
+  // The ✓ confirm saves the selected level via `saveGuestRsvpAnswer`; the ✕
+  // cancel hides the editor and restores the display without saving.
+  const setRsvpEditorOpen = (guestId, day, open) => {
+    const display = container.querySelector(`[data-rsvp-display="${guestId}"][data-rsvp-day="${day}"]`);
+    const editor = container.querySelector(`[data-rsvp-editor="${guestId}"][data-rsvp-day="${day}"]`);
+    if (display) display.hidden = open;
+    if (editor) editor.hidden = !open;
+    if (open) {
+      const select = container.querySelector(`[data-rsvp-select="${guestId}"][data-rsvp-day="${day}"]`);
+      if (select) select.focus();
+    }
+  };
+
+  container.querySelectorAll("[data-rsvp-display]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setRsvpEditorOpen(btn.dataset.rsvpDisplay, btn.dataset.rsvpDay, true);
+    });
+  });
+
+  container.querySelectorAll("[data-rsvp-confirm]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const guestId = btn.dataset.rsvpConfirm;
+      const day = btn.dataset.rsvpDay;
+      const select = container.querySelector(`[data-rsvp-select="${guestId}"][data-rsvp-day="${day}"]`);
+      if (!select) return;
+      const level = Number.parseInt(select.value, 10);
       const ok = await saveGuestRsvpAnswer(guestId, day, level);
       if (ok) renderGuestManager(ctx);
+      else setRsvpEditorOpen(guestId, day, false);
+    });
+  });
+
+  container.querySelectorAll("[data-rsvp-cancel]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setRsvpEditorOpen(btn.dataset.rsvpCancel, btn.dataset.rsvpDay, false);
+    });
+  });
+
+  // ── Boolean RSVP editor (Sí/No/—): toggle mode ──
+  // Used by the yes/no questions (accommodationConfirm, cabinWaitingList,
+  // petanqueParticipation, petanqueOwnBoules). The stored value is 1 (Sí),
+  // 2 (No), or 0 (—), the same shape `saveRsvpAnswers` writes.
+  const setRsvpBooleanEditorOpen = (guestId, questionId, open) => {
+    const display = container.querySelector(`[data-rsvp-boolean-display="${guestId}"][data-rsvp-question="${questionId}"]`);
+    const editor = container.querySelector(`[data-rsvp-boolean-editor="${guestId}"][data-rsvp-question="${questionId}"]`);
+    if (display) display.hidden = open;
+    if (editor) editor.hidden = !open;
+    if (open) {
+      const select = container.querySelector(`[data-rsvp-boolean-select="${guestId}"][data-rsvp-question="${questionId}"]`);
+      if (select) select.focus();
+    }
+  };
+
+  container.querySelectorAll("[data-rsvp-boolean-display]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setRsvpBooleanEditorOpen(btn.dataset.rsvpBooleanDisplay, btn.dataset.rsvpQuestion, true);
+    });
+  });
+
+  container.querySelectorAll("[data-rsvp-boolean-confirm]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const guestId = btn.dataset.rsvpBooleanConfirm;
+      const questionId = btn.dataset.rsvpQuestion;
+      const select = container.querySelector(`[data-rsvp-boolean-select="${guestId}"][data-rsvp-question="${questionId}"]`);
+      if (!select) return;
+      const level = Number.parseInt(select.value, 10);
+      const ok = await saveGuestRsvpAnswer(guestId, questionId, level);
+      if (ok) renderGuestManager(ctx);
+      else setRsvpBooleanEditorOpen(guestId, questionId, false);
+    });
+  });
+
+  container.querySelectorAll("[data-rsvp-boolean-cancel]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setRsvpBooleanEditorOpen(btn.dataset.rsvpBooleanCancel, btn.dataset.rsvpQuestion, false);
+    });
+  });
+
+  // ── Scale RSVP editor (0–5): toggle mode ──
+  // Used by the coast likelihood questions (rocaAzul, playa).
+  const setRsvpScaleEditorOpen = (guestId, questionId, open) => {
+    const display = container.querySelector(`[data-rsvp-scale-display="${guestId}"][data-rsvp-question="${questionId}"]`);
+    const editor = container.querySelector(`[data-rsvp-scale-editor="${guestId}"][data-rsvp-question="${questionId}"]`);
+    if (display) display.hidden = open;
+    if (editor) editor.hidden = !open;
+    if (open) {
+      const select = container.querySelector(`[data-rsvp-scale-select="${guestId}"][data-rsvp-question="${questionId}"]`);
+      if (select) select.focus();
+    }
+  };
+
+  container.querySelectorAll("[data-rsvp-scale-display]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setRsvpScaleEditorOpen(btn.dataset.rsvpScaleDisplay, btn.dataset.rsvpQuestion, true);
+    });
+  });
+
+  container.querySelectorAll("[data-rsvp-scale-confirm]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const guestId = btn.dataset.rsvpScaleConfirm;
+      const questionId = btn.dataset.rsvpQuestion;
+      const select = container.querySelector(`[data-rsvp-scale-select="${guestId}"][data-rsvp-question="${questionId}"]`);
+      if (!select) return;
+      const level = Number.parseInt(select.value, 10);
+      const ok = await saveGuestRsvpAnswer(guestId, questionId, level);
+      if (ok) renderGuestManager(ctx);
+      else setRsvpScaleEditorOpen(guestId, questionId, false);
+    });
+  });
+
+  container.querySelectorAll("[data-rsvp-scale-cancel]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setRsvpScaleEditorOpen(btn.dataset.rsvpScaleCancel, btn.dataset.rsvpQuestion, false);
+    });
+  });
+
+  // ── Payment-confirmed editor (Sí/No/—): toggle mode ──
+  const setPaymentEditorOpen = (guestId, open) => {
+    const display = container.querySelector(`[data-payment-display="${guestId}"]`);
+    const editor = container.querySelector(`[data-payment-editor="${guestId}"]`);
+    if (display) display.hidden = open;
+    if (editor) editor.hidden = !open;
+    if (open) {
+      const select = container.querySelector(`[data-payment-select="${guestId}"]`);
+      if (select) select.focus();
+    }
+  };
+
+  container.querySelectorAll("[data-payment-display]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setPaymentEditorOpen(btn.dataset.paymentDisplay, true);
+    });
+  });
+
+  container.querySelectorAll("[data-payment-confirm]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const guestId = btn.dataset.paymentConfirm;
+      const select = container.querySelector(`[data-payment-select="${guestId}"]`);
+      if (!select) return;
+      const value = select.value === "1" ? true : select.value === "2" ? false : null;
+      const ok = await saveGuestInline(guestId, "paymentConfirmed", value);
+      if (ok) renderGuestManager(ctx);
+      else setPaymentEditorOpen(guestId, false);
+    });
+  });
+
+  container.querySelectorAll("[data-payment-cancel]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setPaymentEditorOpen(btn.dataset.paymentCancel, false);
+    });
+  });
+
+  // ── Cabin editor (picker): toggle mode ──
+  // Clicking the badge hides it and reveals the inline cabin select + ✓/✕.
+  // The ✓ confirm saves the cabin (and clears the room) via
+  // `saveGuestHosting(guestId, period, cabinUnit, roomId)`; the ✕ cancel hides
+  // the editor and restores the display without saving. The select stores the
+  // DISPLAY name; we resolve it back to the internal unit code via the
+  // `CABIN_NAME_MAP` inverse (the map is 1:1 for the values we write).
+  const setCabinEditorOpen = (guestId, period, open) => {
+    const display = container.querySelector(`[data-cabin-display="${guestId}"][data-cabin-period="${period}"]`);
+    const editor = container.querySelector(`[data-cabin-editor="${guestId}"][data-cabin-period="${period}"]`);
+    if (display) display.hidden = open;
+    if (editor) editor.hidden = !open;
+    if (open) {
+      const select = container.querySelector(`[data-cabin-select="${guestId}"][data-cabin-period="${period}"]`);
+      if (select) select.focus();
+    }
+  };
+
+  container.querySelectorAll("[data-cabin-display]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setCabinEditorOpen(btn.dataset.cabinDisplay, btn.dataset.cabinPeriod, true);
+    });
+  });
+
+  container.querySelectorAll("[data-cabin-confirm]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const guestId = btn.dataset.cabinConfirm;
+      const period = btn.dataset.cabinPeriod;
+      const select = container.querySelector(`[data-cabin-select="${guestId}"][data-cabin-period="${period}"]`);
+      if (!select) return;
+      const displayName = select.value;
+      // Resolve the display name back to the internal unit code. The map is
+      // 1:1 for the values we write (e.g. "CABAÑA 3" → "madera_33").
+      const unitCode = Object.keys(CABIN_NAME_MAP).find(
+        (k) => CABIN_NAME_MAP[k] === displayName,
+      ) || displayName;
+      const ok = await saveGuestHosting(guestId, period, unitCode, "");
+      if (ok) renderGuestManager(ctx);
+      else setCabinEditorOpen(guestId, period, false);
+    });
+  });
+
+  container.querySelectorAll("[data-cabin-cancel]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setCabinEditorOpen(btn.dataset.cabinCancel, btn.dataset.cabinPeriod, false);
+    });
+  });
+
+  // ── Room editor (picker): toggle mode ──
+  // Clicking the badge hides it and reveals the inline room select + ✓/✕.
+  // The ✓ confirm saves the room (keeping the current cabin) via
+  // `saveGuestHosting(guestId, period, cabinUnit, roomId)`; the ✕ cancel hides
+  // the editor and restores the display without saving.
+  const setRoomEditorOpen = (guestId, period, open) => {
+    const display = container.querySelector(`[data-room-display="${guestId}"][data-room-period="${period}"]`);
+    const editor = container.querySelector(`[data-room-editor="${guestId}"][data-room-period="${period}"]`);
+    if (display) display.hidden = open;
+    if (editor) editor.hidden = !open;
+    if (open) {
+      const select = container.querySelector(`[data-room-select="${guestId}"][data-room-period="${period}"]`);
+      if (select) select.focus();
+    }
+  };
+
+  container.querySelectorAll("[data-room-display]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setRoomEditorOpen(btn.dataset.roomDisplay, btn.dataset.roomPeriod, true);
+    });
+  });
+
+  container.querySelectorAll("[data-room-confirm]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const guestId = btn.dataset.roomConfirm;
+      const period = btn.dataset.roomPeriod;
+      const select = container.querySelector(`[data-room-select="${guestId}"][data-room-period="${period}"]`);
+      if (!select) return;
+      const roomId = select.value;
+      const isExtra = period === "extra";
+      const cabinKey = isExtra ? "xtraCabin" : "cabin";
+      const roomKey = isExtra ? "xtraRoom" : "room";
+      const guest = getGuest(guestId);
+      const hosting = guest?.hosting || {};
+      const currentUnit = hosting[cabinKey] || "";
+      const ok = await saveGuestHosting(guestId, period, currentUnit, roomId);
+      if (ok) renderGuestManager(ctx);
+      else setRoomEditorOpen(guestId, period, false);
+    });
+  });
+
+  container.querySelectorAll("[data-room-cancel]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setRoomEditorOpen(btn.dataset.roomCancel, btn.dataset.roomPeriod, false);
     });
   });
 
@@ -879,7 +1314,45 @@ export function renderGuestManager(ctx) {
     });
   });
 
+  // ── Language editor: toggle mode (display ⇄ editor, never both) ──
+  const setLangEditorOpen = (guestId, open) => {
+    const display = container.querySelector(`[data-lang-display="${guestId}"]`);
+    const editor = container.querySelector(`[data-lang-editor="${guestId}"]`);
+    if (display) display.hidden = open;
+    if (editor) editor.hidden = !open;
+    if (open) {
+      const select = container.querySelector(`[data-lang-select="${guestId}"]`);
+      if (select) select.focus();
+    }
+  };
+
+  container.querySelectorAll("[data-lang-display]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setLangEditorOpen(btn.dataset.langDisplay, true);
+    });
+  });
+
+  // ── Language editor: confirm (✓) saves ──
+  container.querySelectorAll("[data-lang-confirm]").forEach((btn) => {
+    btn.addEventListener("click", async () => {
+      const guestId = btn.dataset.langConfirm;
+      const select = container.querySelector(`[data-lang-select="${guestId}"]`);
+      if (!select) return;
+      const ok = await saveGuestInline(guestId, "lang", select.value);
+      if (ok) renderGuestManager(ctx);
+      else setLangEditorOpen(guestId, false);
+    });
+  });
+
+  // ── Language editor: cancel (✕) reverts without saving ──
+  container.querySelectorAll("[data-lang-cancel]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      setLangEditorOpen(btn.dataset.langCancel, false);
+    });
+  });
+
   // ── Travels-by-plane: simple checkbox toggle ──
+
   // Checking saves `true`, unchecking saves `false`. On failure the checkbox
   // reverts to its previous state.
   container.querySelectorAll("[data-travels-checkbox]").forEach((checkbox) => {
@@ -956,59 +1429,77 @@ export function renderGuestManager(ctx) {
   });
 
 
-  // ── Invitation group editor: reveal on click ──
+  // ── Group tag dropdowns (Invitación + GRUPO) ──
+  // Each group cell renders a colored badge + a compact <select> dropdown. The
+  // dropdown lists every existing group plus a "＋ Nuevo grupo…" option that
+  // reveals a small free-text input to create a brand-new group. Selecting an
+  // existing group (or clearing) applies the change immediately; choosing
+  // "Nuevo grupo…" reveals the input and focuses it.
+  //
+  // Both the Invitación column (`data-invgroup-*`) and the GRUPO column
+  // (`data-group-*`) share the same behavior, so we wire them with a small
+  // helper that resolves the right apply function + current value.
 
-  container.querySelectorAll("[data-invgroup-display]").forEach((btn) => {
-
-    btn.addEventListener("click", () => {
-      const guestId = btn.dataset.invgroupDisplay;
-      const editor = container.querySelector(`[data-invgroup-editor="${guestId}"]`);
-      if (!editor) return;
-      editor.hidden = !editor.hidden;
-      if (!editor.hidden) {
-        const rename = editor.querySelector(`[data-invgroup-rename="${guestId}"]`);
-        if (rename) rename.focus();
-      }
+  const wireGroupSelect = (selectAttr, newAttr, applyFn, getCurrent) => {
+    container.querySelectorAll(`[data-${selectAttr}]`).forEach((select) => {
+      select.addEventListener("change", async () => {
+        const guestId = select.dataset[selectAttr];
+        const newInput = container.querySelector(`[data-${newAttr}="${guestId}"]`);
+        if (select.value === "__new__") {
+          // Reveal the free-text input to create a brand-new group.
+          if (newInput) {
+            newInput.hidden = false;
+            newInput.focus();
+          }
+          return;
+        }
+        const oldName = getCurrent(guestId);
+        const newName = select.value.trim();
+        if (newName === oldName) return;
+        await applyFn(guestId, oldName, newName);
+      });
     });
-  });
 
-  // ── Invitation group: rename (free text) ──
-  container.querySelectorAll("[data-invgroup-rename]").forEach((input) => {
-    input.addEventListener("change", async () => {
-      const guestId = input.dataset.invgroupRename;
-      const oldName = getGuest(guestId)?.invitationGroup || "";
-      const newName = input.value.trim();
-      if (!newName || newName === oldName) return;
-      await applyInvitationGroupChange(guestId, oldName, newName);
+    container.querySelectorAll(`[data-${newAttr}]`).forEach((input) => {
+      const commit = async () => {
+        const guestId = input.dataset[newAttr];
+        const oldName = getCurrent(guestId);
+        const newName = input.value.trim();
+        if (!newName || newName === oldName) return;
+        await applyFn(guestId, oldName, newName);
+      };
+      input.addEventListener("change", commit);
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          commit();
+        } else if (e.key === "Escape") {
+          input.hidden = true;
+          input.value = "";
+        }
+      });
     });
-  });
+  };
 
-  // ── Invitation group: pick another existing group ──
-  container.querySelectorAll("[data-invgroup-select]").forEach((select) => {
-    select.addEventListener("change", async () => {
-      const guestId = select.dataset.invgroupSelect;
-      const oldName = getGuest(guestId)?.invitationGroup || "";
-      const newName = select.value.trim();
-      if (!newName || newName === oldName) return;
-      await applyInvitationGroupChange(guestId, oldName, newName);
-    });
-  });
+  // Invitación column.
+  wireGroupSelect(
+    "invgroup-select",
+    "invgroup-new",
+    applyInvitationGroupChange,
+    (guestId) => getGuest(guestId)?.invitationGroup || "",
+  );
 
-  // ── Invitation group: done button ──
-  container.querySelectorAll("[data-invgroup-done]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const guestId = btn.dataset.invgroupDone;
-      const editor = container.querySelector(`[data-invgroup-editor="${guestId}"]`);
-      const display = container.querySelector(`[data-invgroup-display="${guestId}"]`);
-      if (editor) editor.hidden = true;
-      if (display) {
-        const guest = getGuest(guestId);
-        if (guest) display.textContent = guest.invitationGroup || "—";
-      }
-    });
-  });
+  // GRUPO column (internal group / tagGroup).
+  wireGroupSelect(
+    "group-select",
+    "group-new",
+    applyGroupChange,
+    (guestId) => getGuest(guestId)?.group || "",
+  );
+
 
   // ── Edit guest (modal) ──
+
   container.querySelectorAll("[data-edit-guest]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const guestId = btn.dataset.editGuest;

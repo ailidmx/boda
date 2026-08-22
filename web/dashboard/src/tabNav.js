@@ -8,6 +8,10 @@
  * The module keeps its own `activeTab` state (instead of reading the dashboard's
  * `state` object) so it is self-contained and testable. `dashboard.js` reads the
  * current tab via `getActiveTab()` when it needs it.
+ *
+ * The tab bar is rendered as a row of BUTTONS (one per section). The active
+ * button gets the `dashboard-tab-active` class so it stands out. Each button
+ * shows an icon + label.
  */
 
 /** Map URL path segments to internal tab IDs. */
@@ -28,6 +32,14 @@ const TAB_TO_PATH = {
   thanks: "gracias",
 };
 
+/** The tab definitions: id, label, and icon. */
+const TABS = [
+  { id: "guests", label: "Invitados", icon: "👥" },
+  { id: "charts", label: "Gráficas", icon: "📊" },
+  { id: "cabins", label: "Cabañas", icon: "🏠" },
+  { id: "tables", label: "Mesas", icon: "🪑" },
+  { id: "thanks", label: "Gracias", icon: "🙏" },
+];
 
 /** The currently active tab id. */
 let activeTab = "guests";
@@ -66,9 +78,9 @@ export function switchTab(tab) {
   document.querySelectorAll("[data-dashboard-panel]").forEach((panel) => {
     panel.classList.toggle("dashboard-panel-active", panel.dataset.dashboardPanel === tab);
   });
+
   window.dispatchEvent(new CustomEvent("dashboard:tabchange", { detail: { tab } }));
 }
-
 
 /**
  * Navigate to a sub-page tab without full page reload.
@@ -84,36 +96,31 @@ export function navigateToTab(tabId) {
 
 /**
  * Render the tab bar into `[data-dashboard-tabs]` and wire the click handlers.
+ * Renders a row of BUTTONS (one per section), each with an icon + label. The
+ * active button gets the `dashboard-tab-active` class.
  */
 export function renderTabNavigation() {
-  const tabs = [
-    { id: "guests", label: "Invitados", icon: "👥" },
-    { id: "charts", label: "Gráficas", icon: "📊" },
-    { id: "cabins", label: "Cabañas", icon: "🏠" },
-    { id: "tables", label: "Mesas", icon: "🪑" },
-    { id: "thanks", label: "Gracias", icon: "🙏" },
-  ];
-
-
   const nav = document.querySelector("[data-dashboard-tabs]");
   if (!nav) return;
 
-  nav.innerHTML = tabs
-    .map(
-      (tab) => `
+  nav.innerHTML = TABS.map(
+    (tab) => `
       <button
         class="dashboard-tab ${tab.id === activeTab ? "dashboard-tab-active" : ""}"
         data-dashboard-tab="${tab.id}"
         type="button"
+        aria-pressed="${tab.id === activeTab ? "true" : "false"}"
       >
         <span class="dashboard-tab-icon">${tab.icon}</span>
-        <span class="dashboard-tab-label">${tab.id === activeTab ? tab.label : ""}</span>
+        <span class="dashboard-tab-label">${tab.label}</span>
       </button>
     `,
-    )
+  )
     .join("");
 
   nav.querySelectorAll("[data-dashboard-tab]").forEach((btn) => {
-    btn.addEventListener("click", () => navigateToTab(btn.dataset.dashboardTab));
+    btn.addEventListener("click", () => {
+      navigateToTab(btn.dataset.dashboardTab);
+    });
   });
 }

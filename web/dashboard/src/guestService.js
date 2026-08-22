@@ -132,14 +132,24 @@ export function getRsvpBooleanAnswer(guest, questionId, liveGuests) {
 }
 
 
-// Badge chip for a boolean RSVP answer (Sí / No / —). Mirrors the scale chip
-// styling but for the yes/no questions (accommodationConfirm, cabinWaitingList,
-// petanqueParticipation, petanqueOwnBoules).
+// Editable select for a boolean RSVP answer (Sí / No / —). Mirrors the scale
+// chip styling but for the yes/no questions (accommodationConfirm,
+// cabinWaitingList, petanqueParticipation, petanqueOwnBoules). The select lets
+// the admin pick Sí (1), No (2), or — (0) directly and saves on change via the
+// `data-rsvp-boolean` handler in guestTable.js.
 export function rsvpBooleanChip(guest, questionId, liveGuests) {
   const level = getRsvpBooleanAnswer(guest, questionId, liveGuests);
-  if (level === 1) return '<span class="dashboard-badge dashboard-badge-yes">Sí</span>';
-  if (level === 2) return '<span class="dashboard-badge dashboard-badge-no">No</span>';
-  return '<span class="dashboard-badge dashboard-badge-muted">—</span>';
+  const cls = level === 1
+    ? "dashboard-rsvp-chip dashboard-rsvp-chip-confirmed"
+    : level === 2
+      ? "dashboard-rsvp-chip dashboard-rsvp-chip-partial"
+      : "dashboard-rsvp-chip dashboard-rsvp-chip-empty";
+  const options = [
+    `<option value="0" ${level === 0 ? "selected" : ""}>—</option>`,
+    `<option value="1" ${level === 1 ? "selected" : ""}>Sí</option>`,
+    `<option value="2" ${level === 2 ? "selected" : ""}>No</option>`,
+  ].join("");
+  return `<select class="${cls}" data-rsvp-boolean="${guest.id}" data-rsvp-question="${questionId}" title="Sí / No / —">${options}</select>`;
 }
 
 // Read a SCALE RSVP answer (0–5) for a guest (e.g. `rsvp.answers.playa`). These
@@ -151,32 +161,45 @@ export function getRsvpScaleAnswer(guest, questionId, liveGuests) {
   return Number.isInteger(level) && level > 0 ? level : 0;
 }
 
-// Badge chip for a SCALE RSVP answer (0–5) — used for the coast plans
-// (`playa`, `rocaAzul`), which are 0–5 likelihood questions, NOT yes/no. Shows
-// the numeric level with the same confirmed/partial/empty coloring as the
-// attendance days.
+// Editable select for a SCALE RSVP answer (0–5) — used for the coast plans
+// (`playa`, `rocaAzul`), which are 0–5 likelihood questions, NOT yes/no. The
+// select lets the admin pick any level directly and saves on change via the
+// `data-rsvp-scale` handler in guestTable.js. The select's background reflects
+// the level: gray = 0 (no answer), amber = 1–3, green = 4–5.
 export function rsvpScaleChip(guest, questionId, liveGuests) {
   const level = getRsvpScaleAnswer(guest, questionId, liveGuests);
   const cls = level >= RSVP_CONFIRMED_MIN_LEVEL
-    ? "dashboard-badge dashboard-badge-yes"
+    ? "dashboard-rsvp-chip dashboard-rsvp-chip-confirmed"
     : level > 0
-      ? "dashboard-badge dashboard-badge-maybe"
-      : "dashboard-badge dashboard-badge-muted";
-  const text = level > 0 ? String(level) : "—";
-  return `<span class="${cls}">${text}</span>`;
+      ? "dashboard-rsvp-chip dashboard-rsvp-chip-partial"
+      : "dashboard-rsvp-chip dashboard-rsvp-chip-empty";
+  const options = [0, 1, 2, 3, 4, 5]
+    .map(
+      (n) =>
+        `<option value="${n}" ${n === level ? "selected" : ""}>${n === 0 ? "—" : n}</option>`,
+    )
+    .join("");
+  return `<select class="${cls}" data-rsvp-scale="${guest.id}" data-rsvp-question="${questionId}" title="Nivel (0 = sin respuesta, 4–5 = confirmado)">${options}</select>`;
 }
 
-// Badge chip for the top-level `paymentConfirmed` boolean on the guest doc
+// Editable select for the top-level `paymentConfirmed` boolean on the guest doc
 // (Sí / No / —). This is the "payment done" flag the invitation writes via
-// `savePaymentConfirmed` → `buildGuestPaymentConfirmedPayload`.
+// `savePaymentConfirmed` → `buildGuestPaymentConfirmedPayload`. The select lets
+// the admin set Sí / No / — directly and saves on change via the
+// `data-payment-confirmed` handler in guestTable.js.
 export function paymentConfirmedChip(guest) {
-  if (guest.paymentConfirmed === true) {
-    return '<span class="dashboard-badge dashboard-badge-yes">Sí</span>';
-  }
-  if (guest.paymentConfirmed === false) {
-    return '<span class="dashboard-badge dashboard-badge-no">No</span>';
-  }
-  return '<span class="dashboard-badge dashboard-badge-muted">—</span>';
+  const value = guest.paymentConfirmed === true ? "1" : guest.paymentConfirmed === false ? "2" : "0";
+  const cls = value === "1"
+    ? "dashboard-rsvp-chip dashboard-rsvp-chip-confirmed"
+    : value === "2"
+      ? "dashboard-rsvp-chip dashboard-rsvp-chip-partial"
+      : "dashboard-rsvp-chip dashboard-rsvp-chip-empty";
+  const options = [
+    `<option value="0" ${value === "0" ? "selected" : ""}>—</option>`,
+    `<option value="1" ${value === "1" ? "selected" : ""}>Sí</option>`,
+    `<option value="2" ${value === "2" ? "selected" : ""}>No</option>`,
+  ].join("");
+  return `<select class="${cls}" data-payment-confirmed="${guest.id}" title="Pago confirmado (Sí / No / —)">${options}</select>`;
 }
 
 // Compact money-icon badge for the cabin-assignment guest rows. Unlike the
@@ -579,7 +602,25 @@ export function guestSortValue(guest, key, authUsers = {}, liveGuests = []) {
       return Number.parseInt(String(guestIdentity(guest).age || guest.age || ""), 10) || 0;
     case "message":
       return (guest.message || guestIdentity(guest).message || guest.messageAuthor || "").toLowerCase();
+    case "invitationSent":
+      return guest?.invitationSent === true ? 1 : 0;
+    case "send":
+      // Number of available send channels (0–2): WhatsApp + email. Lets the
+      // admin sort by "who can I reach right now".
+      return (guestCanWhatsapp(guest, liveGuests, authUsers) ? 1 : 0) +
+             (guestCanEmail(guest, liveGuests, authUsers) ? 1 : 0);
+    case "actions":
+      // The "Acciones" column renders identical buttons (✏️ 🔗 👁️ 🗑️) for
+      // every row, so there is no data to sort by — this is a no-op that keeps
+      // the header clickable for consistency.
+      return 0;
+    case "friday":
+    case "saturday":
+    case "sunday":
+      return getLiveRsvpAnswers(guest, liveGuests)[key] || 0;
     case "accommodationConfirm":
+
+
     case "cabinWaitingList":
     case "petanqueParticipation":
     case "petanqueOwnBoules":
@@ -592,11 +633,20 @@ export function guestSortValue(guest, key, authUsers = {}, liveGuests = []) {
     case "travelsByPlane":
       return guest?.travelsByPlane === true ? 1 : 0;
     case "status":
-      return 0;
+      // Sort by the derived RSVP status (mirrors `guestStatusBadge`):
+      // 2 = Confirmado (any day ≥ 4), 1 = Parcial (answered but not confirmed),
+      // 0 = Pendiente (no answers). Lets the admin sort the "Estado" column.
+      {
+        const answers = getLiveRsvpAnswers(guest, liveGuests);
+        const confirmed = RSVP_ATTENDANCE_DAYS.some(
+          (day) => (answers[day] || 0) >= RSVP_CONFIRMED_MIN_LEVEL,
+        );
+        if (confirmed) return 2;
+        const hasAny = RSVP_ATTENDANCE_DAYS.some((day) => (answers[day] || 0) > 0);
+        return hasAny ? 1 : 0;
+      }
 
     default:
       return "";
   }
 }
-
-
