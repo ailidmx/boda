@@ -1460,11 +1460,11 @@ export function renderGuestManager(ctx) {
   // (`data-group-*`) share the same behavior, so we wire them with a small
   // helper that resolves the right apply function + current value.
 
-  const wireGroupSelect = (selectAttr, newAttr, applyFn, getCurrent) => {
+  const wireGroupSelect = (badgeAttr, selectAttr, newAttr, applyFn, getCurrent) => {
     // Toggle a group cell between VIEW (badge only) and EDIT (select +
     // confirm/cancel). The badge is a button; clicking it opens the editor.
     const openEditor = (cell) => {
-      const badge = cell.querySelector(`[data-${selectAttr}-badge]`);
+      const badge = cell.querySelector(`[data-${badgeAttr}]`);
       const editor = cell.querySelector(`[data-${selectAttr}-editor]`);
       if (badge) badge.hidden = true;
       if (editor) {
@@ -1474,7 +1474,7 @@ export function renderGuestManager(ctx) {
       }
     };
     const closeEditor = (cell) => {
-      const badge = cell.querySelector(`[data-${selectAttr}-badge]`);
+      const badge = cell.querySelector(`[data-${badgeAttr}]`);
       const editor = cell.querySelector(`[data-${selectAttr}-editor]`);
       if (badge) badge.hidden = false;
       if (editor) {
@@ -1488,12 +1488,13 @@ export function renderGuestManager(ctx) {
     };
 
     // Clicking the badge opens the editor.
-    container.querySelectorAll(`[data-${selectAttr}-badge]`).forEach((badge) => {
+    container.querySelectorAll(`[data-${badgeAttr}]`).forEach((badge) => {
       badge.addEventListener("click", () => {
         const cell = badge.closest(".dashboard-group-cell");
         if (cell) openEditor(cell);
       });
     });
+
 
     // Cancel closes the editor without saving.
     container.querySelectorAll(`[data-${selectAttr}-cancel]`).forEach((btn) => {
@@ -1556,6 +1557,7 @@ export function renderGuestManager(ctx) {
 
   // Invitación column.
   wireGroupSelect(
+    "invgroup-badge",
     "invgroup-select",
     "invgroup-new",
     applyInvitationGroupChange,
@@ -1564,11 +1566,13 @@ export function renderGuestManager(ctx) {
 
   // GRUPO column (internal group / tagGroup).
   wireGroupSelect(
+    "group-badge",
     "group-select",
     "group-new",
     applyGroupChange,
     (guestId) => getGuest(guestId)?.group || "",
   );
+
 
 
   // ── Edit guest (modal) ──

@@ -81,27 +81,28 @@
 }
 
 // ── Trigger (the "selected" pill) ─────────────────────────────────────
-// Shows the active tab with a cool colored gradient effect so the current
-// section is obvious at a glance.
+// Shows the active tab with a cool colored effect so the current section is
+// obvious at a glance. The effect is applied to the text + a soft colored
+// border/glow (NOT a heavy filled background) so it stays airy and elegant.
 .dashboard-tab-select-trigger {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   padding: 0.55rem 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(163, 125, 64, 0.55);
   border-radius: 0.5rem;
-  background: linear-gradient(135deg, rgba(163, 125, 64, 0.55), rgba(85, 69, 45, 0.35));
-  color: $white;
+  background: transparent;
+  color: $gold;
   cursor: pointer;
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+  box-shadow: 0 0 0 1px rgba(163, 125, 64, 0.12), 0 4px 14px rgba(163, 125, 64, 0.18);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
 
   &:hover {
-    background: linear-gradient(135deg, rgba(163, 125, 64, 0.7), rgba(85, 69, 45, 0.45));
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+    border-color: rgba(163, 125, 64, 0.8);
+    box-shadow: 0 0 0 1px rgba(163, 125, 64, 0.2), 0 6px 18px rgba(163, 125, 64, 0.28);
   }
 
   &:focus-visible {
@@ -109,6 +110,7 @@
     outline-offset: 2px;
   }
 }
+
 
 .dashboard-tab-select-trigger-icon {
   font-size: 1rem;
@@ -233,27 +235,29 @@
 
 
 // ── Trigger (the "selected" pill) ─────────────────────────────────────
-// Shows the active group with a cool colored gradient effect so the current
-// filter is obvious at a glance.
+// Shows the active group with a cool colored effect so the current filter is
+// obvious at a glance. Light footprint: transparent background, a single light
+// border, and a fixed width so the largest group name always fits.
 .dashboard-group-select-trigger {
   display: inline-flex;
   align-items: center;
+  justify-content: space-between;
   gap: 0.6rem;
+  width: 13rem;
   padding: 0.55rem 1rem;
-  border: 1px solid rgba(255, 255, 255, 0.18);
+  border: 1px solid rgba(163, 125, 64, 0.4);
   border-radius: 0.5rem;
-  background: linear-gradient(135deg, rgba(163, 125, 64, 0.55), rgba(85, 69, 45, 0.35));
-  color: $white;
+  background: rgba(255, 255, 255, 0.04);
+  color: $gold;
   cursor: pointer;
   font-size: 0.85rem;
   font-weight: 600;
   letter-spacing: 0.02em;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
-  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+  transition: border-color 0.2s ease, background 0.2s ease;
 
   &:hover {
-    background: linear-gradient(135deg, rgba(163, 125, 64, 0.7), rgba(85, 69, 45, 0.45));
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+    border-color: rgba(163, 125, 64, 0.7);
+    background: rgba(255, 255, 255, 0.08);
   }
 
   &:focus-visible {
@@ -261,6 +265,8 @@
     outline-offset: 2px;
   }
 }
+
+
 
 .dashboard-group-select-trigger-label {
   font-size: 0.85rem;

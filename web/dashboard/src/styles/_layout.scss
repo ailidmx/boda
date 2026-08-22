@@ -74,7 +74,11 @@
 .dashboard-account-menu {
   position: relative;
   flex: 0 0 auto;
+  // Keep the account trigger above the group/tab dropdown menus (z-index 60)
+  // so it is always clickable and shows the pointer cursor.
+  z-index: 70;
 }
+
 
 .dashboard-account-trigger {
   display: inline-flex;
