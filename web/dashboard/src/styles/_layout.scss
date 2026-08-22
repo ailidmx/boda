@@ -50,7 +50,12 @@
   z-index: 50;
   margin: -2rem 0 0;
   padding: 2.75rem 2.5rem;
+  // Force a tighter bottom gap under the header content (nav row + filter).
+  // Declared after the `padding` shorthand so it wins in the cascade without
+  // needing !important.
+  padding-bottom: 1rem;
   border-radius: 0.75rem;
+
   background:
     radial-gradient(circle at 85% 20%, rgba(163, 125, 64, 0.35), transparent 22rem),
     linear-gradient(135deg, $dark-deep, $dark);
