@@ -791,7 +791,7 @@ function groupTagCell(guest, { current, options, badgeAttr, selectAttr, newAttr,
     <div class="dashboard-group-cell" data-${cellAttr}="${guest.id}">
       <button type="button" class="dashboard-group-badge" data-${badgeAttr}="${guest.id}" style="${groupBadgeStyle(current)}" title="${title}">${current || "—"}</button>
       <span class="dashboard-group-editor" data-${selectAttr}-editor="${guest.id}" hidden>
-        <select class="dashboard-group-select" data-${selectAttr}="${guest.id}" title="${title}">
+        <select class="dashboard-group-inline-select" data-${selectAttr}="${guest.id}" title="${title}">
           ${selectOptions}
         </select>
         <button type="button" class="dashboard-link-btn" data-${selectAttr}-confirm="${guest.id}" title="Guardar">✓</button>

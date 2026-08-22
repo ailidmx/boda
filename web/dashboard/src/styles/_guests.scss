@@ -864,10 +864,14 @@
   text-overflow: ellipsis;
 }
 
-// The compact dropdown. Sits right next to the badge; the native select arrow
+// The compact dropdown inside the INVITADOS/GRUPO group-cell editor. Renamed
+// from `.dashboard-group-select` to avoid colliding with the header filter
+// wrapper (`renderGroupFilter` also uses `.dashboard-group-select`) — the
+// collision made the header trigger inherit this whitish select styling
+// (borders/background). Sits right next to the badge; the native select arrow
 // is kept so the admin knows it's editable. On hover/focus it gets a subtle
 // accent border.
-.dashboard-group-select {
+.dashboard-group-inline-select {
   max-width: 8.5rem;
   padding: 0.22rem 0.35rem;
   border: 1px solid $border-strong;
