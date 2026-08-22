@@ -71,7 +71,18 @@
 // confirmed-Saturday / size counts ("X/Y").
 .dashboard-group-select {
   position: relative;
+  /* max-width: 8.5rem; */
+  /* padding: 0.22rem 0.35rem; */
+  /* border: 1px solid rgba(85, 69, 45, 0.2); */
+  border-radius: 0.35rem;
+  background: #fffdf9;
+  font: inherit;
+  font-size: 0.78rem;
+  color: #29251f;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
 }
+
 
 // ── Trigger (the "selected" pill) ─────────────────────────────────────
 // Shows the active group with a cool colored gradient effect so the current
