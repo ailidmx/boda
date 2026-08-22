@@ -17,6 +17,7 @@ export function htmlCellRenderer(html) {
   return class HtmlCellRenderer {
     init(params) {
       this.eGui = document.createElement("div");
+      this.eGui.className = "dashboard-cell-render";
       this.eGui.innerHTML = html(params);
     }
     getGui() {

@@ -277,6 +277,19 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+
+  // The selected group is rendered as a colored badge (reusing the same pastel
+  // palette as the INVITADOS group cells) so the active filter reads at a
+  // glance. The inline style supplies the background/color/border-color.
+  &.dashboard-group-trigger-badge {
+    display: inline-flex;
+    align-items: center;
+    max-width: 11rem;
+    padding: 0.15rem 0.6rem;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+    line-height: 1.35;
+  }
 }
 
 .dashboard-group-select-caret {

@@ -134,27 +134,20 @@ function avatarEl(guest) {
   return el;
 }
 
-// The clickable stacked-avatar strip. Shows up to MAX_VISIBLE avatars
-// overlapping; any overflow collapses into a "+N" badge. Clicking opens the
-// full-screen modal with the whole confirmed list grouped by group tag.
-const MAX_VISIBLE = 8;
-
+// The clickable avatar strip. Shows EVERY confirmed guest in A→Z order; when
+// the list overflows the card width it scrolls horizontally (the "+N" collapse
+// was removed). Clicking opens the full-screen modal with the whole list
+// grouped by group tag.
 function stackedAvatars(guests, label) {
+  const sorted = [...guests].sort((a, b) => a.name.localeCompare(b.name));
   const wrap = make("button", "dashboard-avatars", "");
   wrap.type = "button";
-  wrap.setAttribute("aria-label", `Ver ${guests.length} confirmados de ${label}`);
-  wrap.title = `Ver ${guests.length} confirmados de ${label}`;
+  wrap.setAttribute("aria-label", `Ver ${sorted.length} confirmados de ${label}`);
+  wrap.title = `Ver ${sorted.length} confirmados de ${label}`;
 
-  const visible = guests.slice(0, MAX_VISIBLE);
-  visible.forEach((g) => wrap.append(avatarEl(g)));
+  sorted.forEach((g) => wrap.append(avatarEl(g)));
 
-  const overflow = guests.length - visible.length;
-  if (overflow > 0) {
-    const badge = make("span", "dashboard-avatars-more", `+${overflow}`);
-    wrap.append(badge);
-  }
-
-  wrap.addEventListener("click", () => openConfirmedModal(guests, label));
+  wrap.addEventListener("click", () => openConfirmedModal(sorted, label));
   return wrap;
 }
 

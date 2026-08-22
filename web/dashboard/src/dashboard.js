@@ -137,6 +137,7 @@ const state = {
   filterPhoto: "", // "" = all, "with" = has photo, "without" = no photo
   filterName: "", // "" = all, "complete" = complete name, "incomplete" = incomplete name
   filterContact: "", // "" = all, "without" = auth user without email/phone
+  filterSent: "", // "" = all, "sent" = invitation has been sent
   columnGroup: "identity", // which column group is visible in the INVITADOS table
 
   sortKey: "name",
@@ -324,6 +325,7 @@ function getFilteredGuests() {
       filterPhoto: state.filterPhoto,
       filterName: state.filterName,
       filterContact: state.filterContact,
+      filterSent: state.filterSent,
     },
     state.liveGuests,
     state.authUsers,
@@ -1125,6 +1127,7 @@ function renderGroupFilter() {
   const activeStats = active && counts[active]
     ? `${counts[active].confirmedSaturday}/${counts[active].size}`
     : "";
+  const activeBadgeStyle = active ? groupBadgeStyle(active) : "";
 
   container.innerHTML = `
     <div class="dashboard-group-select">
@@ -1135,7 +1138,7 @@ function renderGroupFilter() {
         aria-haspopup="listbox"
         aria-expanded="false"
       >
-        <span class="dashboard-group-select-trigger-label" data-group-select-trigger-label>${activeLabel}</span>
+        <span class="dashboard-group-select-trigger-label ${activeBadgeStyle ? "dashboard-group-trigger-badge" : ""}" data-group-select-trigger-label style="${activeBadgeStyle}" title="${activeLabel}">${activeLabel}</span>
         <span class="dashboard-group-select-caret" aria-hidden="true">▾</span>
       </button>
 
@@ -1250,11 +1253,12 @@ function renderDashboard(app) {
       <!-- ── Panel: Guests ── -->
       <section class="dashboard-panel" data-dashboard-panel="guests">
         <div class="dashboard-section">
-          <div class="dashboard-section-heading">
-            <div>
+          <div class="dashboard-section-heading dashboard-section-heading--sticky">
+            <div class="dashboard-section-heading-title">
               <p class="dashboard-eyebrow">Gestión de invitados</p>
               <h2>Invitados</h2>
             </div>
+            <div class="dashboard-column-group-nav" data-column-group-nav></div>
           </div>
           <div data-guest-manager></div>
         </div>
@@ -1329,6 +1333,17 @@ function renderDashboard(app) {
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll(); // set the correct initial state (e.g. on a deep-linked reload)
   app._onHeaderScroll = onScroll;
+
+  // Expose the sticky header's height as a CSS variable so section-level
+  // sticky toolbars (the column-group nav) can offset below it reliably
+  // regardless of the thin/collapsed header state on scroll.
+  const setHeaderH = () => {
+    const h = headerEl ? headerEl.getBoundingClientRect().height : 0;
+    document.documentElement.style.setProperty("--dashboard-header-h", `${Math.ceil(h)}px`);
+  };
+  setHeaderH();
+  window.addEventListener("resize", setHeaderH);
+  app._onHeaderResize = setHeaderH;
 
   // ── Account menu (Ver invitación + Salir) toggle ──
   // The "Cuenta" trigger in the header opens a small dropdown with the

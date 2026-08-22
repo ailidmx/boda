@@ -15,6 +15,32 @@
   gap: 1.5rem;
 }
 
+// The guests section heading doubles as a sticky toolbar: on desktop the
+// "Invitados" title sits on the flex-left and the column-group nav on the
+// flex-right, and the whole bar pins just below the main sticky nav (offset by
+// the measured header height exposed as `--dashboard-header-h`).
+.dashboard-section-heading--sticky {
+  position: sticky;
+  top: var(--dashboard-header-h, 4.25rem);
+  z-index: 40;
+  align-items: center;
+  margin: -0.5rem -0.5rem 1rem;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid $border;
+  border-radius: 0.5rem;
+  background: $card-bg-solid;
+  box-shadow: 0 0.4rem 1.1rem rgba(65, 50, 28, 0.08);
+}
+
+.dashboard-section-heading-title {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.dashboard-section-heading--sticky .dashboard-eyebrow {
+  margin: 0.1rem 0 0.15rem;
+}
+
 // ── Thin sticky navbar ─────────────────────────────────────────────────
 // The "Panel de los novios" header is a single-line sticky navbar: small title
 // on the left, the tab navigation + global group filter in the middle, and an
@@ -348,14 +374,18 @@
 // A row of overlapping avatar circles. Clicking opens the full-screen modal
 // with the whole confirmed list grouped by group tag.
 .dashboard-avatars {
-  display: inline-flex;
+  display: flex;
   align-items: center;
+  gap: 0;
+  width: 100%;
   margin-top: 0.6rem;
-  padding: 0;
+  padding: 0.1rem 0;
   border: 0;
   background: transparent;
   cursor: pointer;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
 }
 
 
