@@ -979,6 +979,15 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   non-ready guest can be missing several pieces and would be double-counted.
   When adding a new checkbox filter, add it to the dropdown menu, wire its
   `data-filter-*` listener, and include it in the `filterCount` computation.
+- **`[hidden]` must always win over `display` for toggle cells** — the dashboard's
+  inline editors toggle view ⇄ edit by setting the `hidden` attribute, but any
+  view button whose CSS sets `display: inline-flex`/`inline-block` (e.g.
+  `.dashboard-group-badge`, `.dashboard-badge`, `.dashboard-rsvp-chip`) overrides
+  the UA `[hidden]{display:none}` and shows BOTH modes at once. The global
+  `[hidden] { display: none !important; }` rule in `styles/_base.scss` fixes this
+  for every cell at once. Do NOT remove it, and when adding a new toggle cell
+  whose "view" element sets `display:*`, rely on that global rule rather than
+  copying per-component `&[hidden]` overrides.
 - **Never replace a nested map with `update({ map: {...} })` — use dot-notation to merge** —
   Firestore `update()` with a nested object value (e.g. `update({ identity: { age, isAdult } })`)
   REPLACES the entire `identity` map, wiping every other field inside it

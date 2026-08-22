@@ -21,6 +21,17 @@ a {
   font: inherit;
 }
 
+// The `hidden` attribute must ALWAYS win over any component `display:*` rule.
+// Many inline editors toggle view ⇄ edit by setting `hidden`; if a view button
+// also sets `display: inline-flex/inline-block` (e.g. `.dashboard-group-badge`,
+// `.dashboard-badge`, `.dashboard-rsvp-chip`), the UA `[hidden]{display:none}`
+// is overridden and BOTH modes show at once. This one rule makes any element
+// with `hidden` disappear regardless of specificity, fixing view/edit toggle
+// everywhere and preventing regressions.
+[hidden] {
+  display: none !important;
+}
+
 .dashboard,
 .dashboard-login {
   min-height: 100vh;
