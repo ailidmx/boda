@@ -502,7 +502,7 @@ export function computeReadiness(activeGuests, liveGuests, authUsers) {
 // `guestCanEmail`).
 export function getFilteredGuests(
   activeGuests,
-  { filterGroup, filterQuery, filterAgeGroup, filterPhone, filterEmail, filterPhoto, filterName, filterContact },
+  { filterGroup, filterQuery, filterAgeGroup, filterPhone, filterEmail, filterPhoto, filterName, filterContact, filterSent },
   liveGuests = [],
   authUsers = {},
 ) {
@@ -544,6 +544,11 @@ export function getFilteredGuests(
         !guestCanEmail(g, liveGuests, authUsers) &&
         !guestHasPhone(g),
     );
+  }
+  if (filterSent === "sent") {
+    filtered = filtered.filter((g) => g.invitationSent === true);
+  } else if (filterSent === "notSent") {
+    filtered = filtered.filter((g) => g.invitationSent !== true);
   }
   if (filterQuery) {
 

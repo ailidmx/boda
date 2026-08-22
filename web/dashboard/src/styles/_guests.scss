@@ -444,6 +444,60 @@
   }
 }
 
+// ── Message column (toggle mode: display ⇄ editor, never both) ──
+.dashboard-message-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  max-width: 100%;
+}
+
+.dashboard-message-display {
+  display: inline-block;
+  max-width: 11rem;
+  padding: 0.22rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 0.35rem;
+  background: transparent;
+  color: $ink;
+  font-size: 0.78rem;
+  text-align: left;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: $border-strong;
+    background: rgba(255, 253, 249, 0.6);
+  }
+
+  &.is-empty {
+    color: $ink-muted;
+  }
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.dashboard-message-editor {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  max-width: 100%;
+
+  &[hidden] {
+    display: none;
+  }
+
+  .dashboard-inline-input {
+    width: 11rem;
+    max-width: 100%;
+  }
+}
+
 // ── Travels-by-plane column (simple checkbox) ──
 // A plain checkbox with a "Sí"/"No" label. Checking saves `true`, unchecking
 // saves `false` — there is no "unknown" state.
@@ -917,6 +971,12 @@
   flex-wrap: wrap;
   gap: 0.5rem;
   margin-bottom: 0.75rem;
+
+  // Inside the sticky guests heading the nav shares the flex line with the
+  // title, so it must not add its own bottom margin.
+  .dashboard-section-heading & {
+    margin-bottom: 0;
+  }
 }
 
 .dashboard-column-group-chip {

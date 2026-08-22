@@ -21,6 +21,15 @@
 import { createAppDataGrid } from "./data-grid/AppDataGrid.js";
 import { dataHtmlRenderer } from "./data-grid/gridRenderers.js";
 
+// Column use-case groups shown as chips in the guests section HEADING. Mirrors
+// the pre-migration header group nav; the active chip reveals that column set.
+const COLUMN_GROUPS = [
+  { id: "identity", label: "Identidad" },
+  { id: "presencia", label: "Presencia · Alojamiento" },
+  { id: "petanque", label: "Pétanque" },
+  { id: "playa", label: "Playa" },
+];
+
 export function renderGuestManager(ctx) {
   const {
     container,
@@ -436,10 +445,23 @@ export function renderGuestManager(ctx) {
 
   const messageCell = (guest) => {
     const msg = guest.message || guest.identity?.message || "";
-    if (!msg) return '<span class="dashboard-badge dashboard-badge-muted">—</span>';
+    const escAttr = (s) =>
+      String(s).replace(/[&<>"]/g, (ch) => {
+        if (ch === "&") return "&amp;";
+        if (ch === "<") return "&lt;";
+        if (ch === ">") return "&gt;";
+        return "&quot;";
+      });
     const truncated = msg.length > 24 ? `${msg.slice(0, 24)}…` : msg;
-    const safeTitle = msg.split('"').join("&quot;");
-    return `<span class="dashboard-badge" title="${safeTitle}">${truncated}</span>`;
+    return `
+      <div class="dashboard-message-cell" data-message-cell="${guest.id}">
+        <button type="button" class="dashboard-message-display ${msg ? "" : "is-empty"}" data-message-display="${guest.id}" title="${escAttr(msg)}">${msg ? escAttr(truncated) : "—"}</button>
+        <span class="dashboard-message-editor" data-message-editor="${guest.id}" hidden>
+          <input class="dashboard-inline-input" type="text" value="${escAttr(msg)}" data-message-input="${guest.id}" placeholder="Mensaje…" />
+          <button type="button" class="dashboard-link-btn" data-message-save="${guest.id}" title="Guardar">✓</button>
+          <button type="button" class="dashboard-link-btn" data-message-cancel="${guest.id}" title="Cancelar">✕</button>
+        </span>
+      </div>`;
   };
 
   const actionsCell = (guest) => `
@@ -476,13 +498,6 @@ export function renderGuestManager(ctx) {
     cellClass: opts.cellClass ?? "dashboard-grid-cell",
   });
 
-  // ── Column groups (mirrors the pre-migration header group nav) ──
-  const COLUMN_GROUPS = [
-    { id: "identity", label: "Identidad" },
-    { id: "presencia", label: "Presencia · Alojamiento" },
-    { id: "petanque", label: "Pétanque" },
-    { id: "playa", label: "Playa" },
-  ];
   const activeColumnGroup = COLUMN_GROUPS.some((g) => g.id === state.columnGroup)
     ? state.columnGroup
     : "identity";
@@ -543,17 +558,11 @@ export function renderGuestManager(ctx) {
   const toolbarEl = container.querySelector("[data-guest-toolbar]");
   const gridEl = container.querySelector("[data-guest-grid]");
 
+  // ── Column-group nav (rendered into the guests section HEADING so it sits
+  // inline with the "Invitados" title on desktop) ──
+  renderColumnGroupNav(activeColumnGroup, ctx);
+
   // ── Toolbar rendering ──
-  const columnGroupNav = `
-    <div class="dashboard-column-group-nav" title="Mostrar columnas por caso de uso">
-      ${COLUMN_GROUPS.map(
-        (g) => `
-        <button type="button" class="dashboard-column-group-chip ${activeColumnGroup === g.id ? "dashboard-column-group-chip-active" : ""}" data-column-group="${g.id}">
-          ${g.label}
-        </button>`,
-      ).join("")}
-    </div>
-  `;
 
   const readiness = computeReadiness();
   const groupKey = state.filterGroup || "_all";
@@ -582,6 +591,10 @@ export function renderGuestManager(ctx) {
           <span>Sin contacto</span>
           <span class="dashboard-readiness-count">${readiness.missingContact[groupKey] || 0}</span>
         </button>
+        <button type="button" class="dashboard-readiness-row ${state.filterSent === "sent" ? "is-active" : ""}" data-readiness-filter="sent" title="Filtrar por invitación ya enviada">
+          <span>Enviado</span>
+          <span class="dashboard-readiness-count">${state.filterSent === "sent" ? "✓" : ""}</span>
+        </button>
       </div>
     </div>
   `;
@@ -591,10 +604,10 @@ export function renderGuestManager(ctx) {
     (state.filterPhone ? 1 : 0) +
     (state.filterEmail ? 1 : 0) +
     (state.filterPhoto ? 1 : 0) +
-    (state.filterName ? 1 : 0);
+    (state.filterName ? 1 : 0) +
+    (state.filterSent ? 1 : 0);
 
   toolbarEl.innerHTML = `
-    ${columnGroupNav}
     ${readinessCard}
 
     <div class="dashboard-guest-filters">
@@ -635,6 +648,10 @@ export function renderGuestManager(ctx) {
             <label class="dashboard-checkbox-cell" title="Mostrar solo invitados con nombre incompleto (menos de 2 nombres o sin apellido)">
               <input type="checkbox" data-filter-name ${state.filterName === "incomplete" ? "checked" : ""} />
               <span>ID incompleto</span>
+            </label>
+            <label class="dashboard-checkbox-cell" title="Mostrar solo invitados con invitación ya enviada">
+              <input type="checkbox" data-filter-sent ${state.filterSent === "sent" ? "checked" : ""} />
+              <span>Enviado</span>
             </label>
           </div>
         </div>
@@ -681,15 +698,30 @@ export function renderGuestManager(ctx) {
 
 // ───────────────────────────────────────────────────────────────────────
 
-function wireToolbar(toolbarEl, container, ctx) {
-  const { state } = ctx;
-
-  toolbarEl.querySelectorAll("[data-column-group]").forEach((btn) => {
+// Render the column-group chips into the guests section heading and wire them.
+// The heading lives OUTSIDE the guest-manager container (it shares the flex
+// line with the "Invitados" title on desktop and is sticky below the main nav),
+// so we target it via `[data-column-group-nav]` rather than the toolbar.
+function renderColumnGroupNav(activeColumnGroup, ctx) {
+  const nav = document.querySelector("[data-column-group-nav]");
+  if (!nav) return;
+  nav.title = "Mostrar columnas por caso de uso";
+  nav.innerHTML = COLUMN_GROUPS.map(
+    (g) => `
+    <button type="button" class="dashboard-column-group-chip ${activeColumnGroup === g.id ? "dashboard-column-group-chip-active" : ""}" data-column-group="${g.id}">
+      ${g.label}
+    </button>`,
+  ).join("");
+  nav.querySelectorAll("[data-column-group]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      state.columnGroup = btn.dataset.columnGroup;
+      ctx.state.columnGroup = btn.dataset.columnGroup;
       ctx.renderGuestManager ? ctx.renderGuestManager() : renderGuestManager(ctx);
     });
   });
+}
+
+function wireToolbar(toolbarEl, container, ctx) {
+  const { state } = ctx;
 
   const query = toolbarEl.querySelector("[data-filter-query]");
   query?.addEventListener("input", (e) => {
@@ -737,6 +769,9 @@ function wireToolbar(toolbarEl, container, ctx) {
   toolbarEl.querySelector("[data-filter-name]")?.addEventListener("change", (e) => {
     toggleFilter("filterName", e.target.checked ? "incomplete" : "");
   });
+  toolbarEl.querySelector("[data-filter-sent]")?.addEventListener("change", (e) => {
+    toggleFilter("filterSent", e.target.checked ? "sent" : "");
+  });
 
   toolbarEl.querySelectorAll("[data-readiness-filter]").forEach((row) => {
     row.addEventListener("click", () => {
@@ -747,6 +782,8 @@ function wireToolbar(toolbarEl, container, ctx) {
         state.filterPhoto = state.filterPhoto === "without" ? "" : "without";
       } else if (kind === "contact") {
         state.filterContact = state.filterContact === "without" ? "" : "without";
+      } else if (kind === "sent") {
+        state.filterSent = state.filterSent === "sent" ? "" : "sent";
       }
       renderGuestManager(ctx);
     });
@@ -969,6 +1006,17 @@ function wireGridEvents(gridEl, ctx) {
         const g = getGuest(target.dataset.nameDone);
         if (g) display.textContent = guestFullName(g) || "—";
       }
+    } else if (target?.dataset.messageDisplay) {
+      toggle(target, `[data-message-display="${target.dataset.messageDisplay}"]`, `[data-message-editor="${target.dataset.messageDisplay}"]`, true);
+      target.closest(".ag-cell")?.querySelector(`[data-message-input="${target.dataset.messageDisplay}"]`)?.focus();
+    } else if (target?.dataset.messageSave) {
+      const guestId = target.dataset.messageSave;
+      const input = target.closest(".ag-cell")?.querySelector(`[data-message-input="${guestId}"]`);
+      if (!input) return;
+      const ok = await saveGuestInline(guestId, "message", input.value.trim());
+      if (ok) rerender();
+    } else if (target?.dataset.messageCancel) {
+      toggle(target, `[data-message-display="${target.dataset.messageCancel}"]`, `[data-message-editor="${target.dataset.messageCancel}"]`, false);
     } else if (target?.dataset.genderDisplay) {
       toggle(target, `[data-gender-display="${target.dataset.genderDisplay}"]`, `[data-gender-editor="${target.dataset.genderDisplay}"]`, true);
     } else if (target?.dataset.genderConfirm) {
@@ -1084,8 +1132,18 @@ function wireGridEvents(gridEl, ctx) {
   });
 
   // Enter/Escape handling for the free-text "new group" inputs.
-  gridEl.addEventListener("keydown", (e) => {
+  gridEl.addEventListener("keydown", async (e) => {
     const t = e.target;
+    if (t.matches("[data-message-input]")) {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        const ok = await saveGuestInline(t.dataset.messageInput, "message", t.value.trim());
+        if (ok) rerender();
+      } else if (e.key === "Escape") {
+        toggle(t, `[data-message-display="${t.dataset.messageInput}"]`, `[data-message-editor="${t.dataset.messageInput}"]`, false);
+      }
+      return;
+    }
     if (!t.matches("[data-invgroup-new], [data-group-new]")) return;
     if (e.key === "Enter") {
       e.preventDefault();
