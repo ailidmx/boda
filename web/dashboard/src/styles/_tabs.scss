@@ -65,6 +65,158 @@
   }
 }
 
+// ── Tab navigation (select dropdown) ──────────────────────────────────
+// The tab nav is rendered as a custom SELECT-style dropdown (mirroring the
+// group filter) so it stays compact inside the thin sticky navbar. The trigger
+// shows the ACTIVE tab (icon + label) with a cool colored gradient effect; the
+// opened menu lists every section (icon + label) and the active one is
+// highlighted.
+.dashboard-tab-select {
+  position: relative;
+  background: transparent;
+  font: inherit;
+  font-size: 0.78rem;
+  color: #29251f;
+  cursor: pointer;
+}
+
+// ── Trigger (the "selected" pill) ─────────────────────────────────────
+// Shows the active tab with a cool colored gradient effect so the current
+// section is obvious at a glance.
+.dashboard-tab-select-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, rgba(163, 125, 64, 0.55), rgba(85, 69, 45, 0.35));
+  color: $white;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.1s ease;
+
+  &:hover {
+    background: linear-gradient(135deg, rgba(163, 125, 64, 0.7), rgba(85, 69, 45, 0.45));
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.3);
+  }
+
+  &:focus-visible {
+    outline: 2px solid $gold;
+    outline-offset: 2px;
+  }
+}
+
+.dashboard-tab-select-trigger-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.dashboard-tab-select-trigger-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.dashboard-tab-select-caret {
+  margin-left: 0.25rem;
+  font-size: 0.7rem;
+  color: $gold;
+  transition: transform 0.2s ease;
+}
+
+// Rotate the caret when the menu is open.
+.dashboard-tab-select.is-open .dashboard-tab-select-caret {
+  transform: rotate(180deg);
+}
+
+// ── Menu (the opened dropdown) ────────────────────────────────────────
+// A light floating panel listing every section. Each option shows the section
+// icon + name.
+.dashboard-tab-select-menu {
+  position: absolute;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  z-index: 60;
+  min-width: 13rem;
+  max-height: 18rem;
+  padding: 0.4rem;
+  border: 1px solid $border;
+  border-radius: 0.5rem;
+  background: $card-bg-solid;
+  box-shadow: $shadow-modal;
+  overflow-y: auto;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-6px);
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s;
+}
+
+.dashboard-tab-select.is-open .dashboard-tab-select-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+// ── Option (each item in the opened dropdown) ─────────────────────────
+.dashboard-tab-select-option {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  border: 0;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: $ink;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  &:hover {
+    background: $accent-bg;
+  }
+
+  &:focus-visible {
+    outline: 2px solid $accent;
+    outline-offset: -2px;
+  }
+}
+
+.dashboard-tab-select-option-icon {
+  font-size: 1rem;
+  line-height: 1;
+  flex: 0 0 auto;
+}
+
+.dashboard-tab-select-option-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: $ink;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// The active option gets the same cool colored gradient effect as the trigger,
+// with white text so it stands out from the rest of the list.
+.dashboard-tab-select-option.is-active {
+  background: linear-gradient(135deg, $accent, $dark);
+  color: $white;
+
+  .dashboard-tab-select-option-name {
+    color: $white;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, $accent, $dark);
+  }
+}
+
+
 // ── Group filter (select dropdown) ────────────────────────────────────
 // A custom SELECT-style dropdown. The trigger shows the active group (or
 // "Todos") with a caret; the opened menu lists every group with its

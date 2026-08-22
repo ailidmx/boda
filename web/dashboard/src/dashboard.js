@@ -788,11 +788,15 @@ function groupTagCell(guest, { current, options, badgeAttr, selectAttr, newAttr,
   ].join("");
   return `
     <div class="dashboard-group-cell" data-${cellAttr}="${guest.id}">
-      <span class="dashboard-group-badge" data-${badgeAttr}="${guest.id}" style="${groupBadgeStyle(current)}">${current || "—"}</span>
-      <select class="dashboard-group-select" data-${selectAttr}="${guest.id}" title="${title}">
-        ${selectOptions}
-      </select>
-      <input class="dashboard-group-new" data-${newAttr}="${guest.id}" type="text" placeholder="Nuevo grupo…" hidden />
+      <button type="button" class="dashboard-group-badge" data-${badgeAttr}="${guest.id}" style="${groupBadgeStyle(current)}" title="${title}">${current || "—"}</button>
+      <span class="dashboard-group-editor" data-${selectAttr}-editor="${guest.id}" hidden>
+        <select class="dashboard-group-select" data-${selectAttr}="${guest.id}" title="${title}">
+          ${selectOptions}
+        </select>
+        <button type="button" class="dashboard-link-btn" data-${selectAttr}-confirm="${guest.id}" title="Guardar">✓</button>
+        <button type="button" class="dashboard-link-btn" data-${selectAttr}-cancel="${guest.id}" title="Cancelar">✕</button>
+        <input class="dashboard-group-new" data-${newAttr}="${guest.id}" type="text" placeholder="Nuevo grupo…" hidden />
+      </span>
     </div>`;
 }
 
@@ -1209,22 +1213,30 @@ function renderDashboard(app) {
   app.innerHTML = `
     <main class="dashboard">
       <header class="dashboard-header">
-        <div>
-          <p class="dashboard-eyebrow">David & Aydé · 20 febrero 2027</p>
+        <div class="dashboard-header-title">
           <h1>Panel de los novios</h1>
         </div>
-        <div class="dashboard-header-actions">
-          <a class="dashboard-link" href="${invitationHref()}">Ver invitación</a>
-          <button class="dashboard-button dashboard-button-secondary" type="button" data-sign-out>Salir</button>
-        </div>
 
-        <!-- ── Nav (left) + global group filter (right) on the same line ── -->
+        <!-- ── Nav (links) + global group filter on the same line ── -->
         <div class="dashboard-header-navrow">
           <nav class="dashboard-tabs" data-dashboard-tabs aria-label="Secciones del panel"></nav>
           <div class="dashboard-header-filter" data-group-filter aria-label="Filtrar por grupo"></div>
         </div>
 
+        <!-- ── Account menu: Ver invitación + Salir ── -->
+        <div class="dashboard-account-menu" data-account-menu>
+          <button class="dashboard-account-trigger" type="button" data-account-trigger aria-haspopup="true" aria-expanded="false" title="Opciones de cuenta">
+            <span class="dashboard-account-trigger-label">Cuenta</span>
+            <span class="dashboard-account-caret">▾</span>
+          </button>
+          <div class="dashboard-account-menu-panel" data-account-menu-panel hidden>
+            <a class="dashboard-account-item" href="${invitationHref()}">Ver invitación</a>
+            <button class="dashboard-account-item" type="button" data-sign-out>Salir</button>
+          </div>
+        </div>
+
       </header>
+
 
 
 
@@ -1315,6 +1327,31 @@ function renderDashboard(app) {
   window.addEventListener("scroll", onScroll, { passive: true });
   onScroll(); // set the correct initial state (e.g. on a deep-linked reload)
   app._onHeaderScroll = onScroll;
+
+  // ── Account menu (Ver invitación + Salir) toggle ──
+  // The "Cuenta" trigger in the header opens a small dropdown with the
+  // "Ver invitación" link and the "Salir" button. Clicking the trigger toggles
+  // it; clicking outside or pressing Escape closes it.
+  const accountMenu = app.querySelector("[data-account-menu]");
+  const accountTrigger = app.querySelector("[data-account-trigger]");
+  const accountPanel = app.querySelector("[data-account-menu-panel]");
+  const closeAccountMenu = () => {
+    accountMenu?.classList.remove("is-open");
+    accountTrigger?.setAttribute("aria-expanded", "false");
+  };
+  accountTrigger?.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const willOpen = !accountMenu.classList.contains("is-open");
+    accountMenu.classList.toggle("is-open", willOpen);
+    accountTrigger.setAttribute("aria-expanded", willOpen ? "true" : "false");
+  });
+  document.addEventListener("click", (e) => {
+    if (accountMenu && !accountMenu.contains(e.target)) closeAccountMenu();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeAccountMenu();
+  });
+
 
   // ── Set initial tab from URL path ──
 

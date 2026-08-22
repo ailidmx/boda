@@ -270,8 +270,8 @@ export function renderGuestManager(ctx) {
   // reverts without saving.
   const GENDER_OPTIONS = [
     { value: "", label: "—", emoji: "" },
-    { value: "M", label: "Mujer", emoji: "👩" },
-    { value: "H", label: "Hombre", emoji: "👨" },
+    { value: "M", label: "Mujer", emoji: "👩🏽" },
+    { value: "H", label: "Hombre", emoji: "👨🏽" },
   ];
   const genderCell = (guest) => {
     const gender = guest.identity?.gender || guest.gender || "";
@@ -279,12 +279,11 @@ export function renderGuestManager(ctx) {
       (g) => `<option value="${g.value}" ${gender === g.value ? "selected" : ""}>${g.emoji ? `${g.emoji} ` : ""}${g.label}</option>`,
     ).join("");
     const opt = GENDER_OPTIONS.find((g) => g.value === gender);
-    const displayLabel = opt?.label || "—";
     const displayEmoji = opt?.emoji || "";
     return `
       <div class="dashboard-gender-cell" data-gender-cell="${guest.id}">
         <button type="button" class="dashboard-gender-display ${gender ? "" : "is-empty"}" data-gender-display="${guest.id}" title="Editar género">
-          ${displayEmoji ? `<span class="dashboard-emoji">${displayEmoji}</span>` : ""}${displayLabel}
+          ${displayEmoji ? `<span class="dashboard-emoji">${displayEmoji}</span>` : "—"}
         </button>
         <span class="dashboard-inline-editor" data-gender-editor="${guest.id}" hidden>
           <select class="dashboard-inline-select" data-gender-select="${guest.id}" title="Elegir género">${options}</select>
@@ -299,28 +298,49 @@ export function renderGuestManager(ctx) {
   // ── Age cell helper (inline editable, toggle mode) ──
   // Shows the guest's age group as a clickable display (emoji + label).
   // Clicking it enters EDIT mode: the display is hidden and a small inline
-  // select (🧑 Adulto / 🧒 Niño / —) appears with a ✓ confirm and ✕ cancel
-  // button. The display and editor are NEVER both visible at once. Confirm
-  // saves the RAW value ("Adulto" / "Niño" / "") via
-  // `saveGuestInline("age", …)`; cancel reverts without saving. Matches the
-  // values used by the guest editor modal (Adulto / Niño), NOT a raw number.
+  // select (Adulto / Niño / —) appears with a ✓ confirm and ✕ cancel button.
+  // The display and editor are NEVER both visible at once. Confirm saves the
+  // RAW value ("Adulto" / "Niño" / "") via `saveGuestInline("age", …)`;
+  // cancel reverts without saving. Matches the values used by the guest editor
+  // modal (Adulto / Niño), NOT a raw number.
+  //
+  // The DISPLAY emoji depends on the guest's GENDER so adults and children are
+  // visually distinct at a glance:
+  //   - Adulto + Mujer  → 👵 (old woman)
+  //   - Adulto + Hombre → 👴 (old man)
+  //   - Niño  + Mujer   → 👧 (child girl)
+  //   - Niño  + Hombre  → 👦 (child boy)
+  //   - unknown gender  → neutral 🧑 / 🧒
   const AGE_OPTIONS = [
     { value: "", label: "—", emoji: "" },
-    { value: "Adulto", label: "Adulto", emoji: "🧑" },
-    { value: "Niño", label: "Niño", emoji: "🧒" },
+    { value: "Adulto", label: "Adulto", emoji: "🧑🏽" },
+    { value: "Niño", label: "Niño", emoji: "🧒🏽" },
   ];
+  // Map (age, gender) → display emoji. Gender is "M" (Mujer) or "H" (Hombre).
+  const ageEmoji = (age, gender) => {
+    if (age === "Adulto") {
+      if (gender === "M") return "👵🏽";
+      if (gender === "H") return "👴🏽";
+      return "🧑🏽";
+    }
+    if (age === "Niño") {
+      if (gender === "M") return "👧🏽";
+      if (gender === "H") return "👦🏽";
+      return "🧒🏽";
+    }
+    return "";
+  };
   const ageCell = (guest) => {
     const age = guest.identity?.age ?? guest.age ?? "";
+    const gender = guest.identity?.gender || guest.gender || "";
     const options = AGE_OPTIONS.map(
       (a) => `<option value="${a.value}" ${age === a.value ? "selected" : ""}>${a.emoji ? `${a.emoji} ` : ""}${a.label}</option>`,
     ).join("");
-    const opt = AGE_OPTIONS.find((a) => a.value === age);
-    const displayLabel = opt?.label || "—";
-    const displayEmoji = opt?.emoji || "";
+    const displayEmoji = ageEmoji(age, gender);
     return `
       <div class="dashboard-age-cell" data-age-cell="${guest.id}">
         <button type="button" class="dashboard-age-display ${age ? "" : "is-empty"}" data-age-display="${guest.id}" title="Editar edad">
-          ${displayEmoji ? `<span class="dashboard-emoji">${displayEmoji}</span>` : ""}${displayLabel}
+          ${displayEmoji ? `<span class="dashboard-emoji">${displayEmoji}</span>` : "—"}
         </button>
         <span class="dashboard-inline-editor" data-age-editor="${guest.id}" hidden>
           <select class="dashboard-inline-select" data-age-select="${guest.id}" title="Elegir edad">${options}</select>
@@ -329,6 +349,7 @@ export function renderGuestManager(ctx) {
         </span>
       </div>`;
   };
+
 
 
 
@@ -352,12 +373,11 @@ export function renderGuestManager(ctx) {
       (l) => `<option value="${l.value}" ${lang === l.value ? "selected" : ""}>${l.emoji ? `${l.emoji} ` : ""}${l.label}</option>`,
     ).join("");
     const opt = LANG_OPTIONS.find((l) => l.value === lang);
-    const displayLabel = opt?.label || "—";
     const displayEmoji = opt?.emoji || "";
     return `
       <div class="dashboard-lang-cell" data-lang-cell="${guest.id}">
         <button type="button" class="dashboard-lang-display ${lang ? "" : "is-empty"}" data-lang-display="${guest.id}" title="Editar idioma">
-          ${displayEmoji ? `<span class="dashboard-emoji">${displayEmoji}</span>` : ""}${displayLabel}
+          ${displayEmoji ? `<span class="dashboard-emoji">${displayEmoji}</span>` : "—"}
         </button>
         <span class="dashboard-inline-editor" data-lang-editor="${guest.id}" hidden>
           <select class="dashboard-inline-select" data-lang-select="${guest.id}" title="Elegir idioma">${options}</select>
@@ -1441,10 +1461,57 @@ export function renderGuestManager(ctx) {
   // helper that resolves the right apply function + current value.
 
   const wireGroupSelect = (selectAttr, newAttr, applyFn, getCurrent) => {
-    container.querySelectorAll(`[data-${selectAttr}]`).forEach((select) => {
-      select.addEventListener("change", async () => {
+    // Toggle a group cell between VIEW (badge only) and EDIT (select +
+    // confirm/cancel). The badge is a button; clicking it opens the editor.
+    const openEditor = (cell) => {
+      const badge = cell.querySelector(`[data-${selectAttr}-badge]`);
+      const editor = cell.querySelector(`[data-${selectAttr}-editor]`);
+      if (badge) badge.hidden = true;
+      if (editor) {
+        editor.hidden = false;
+        const select = editor.querySelector(`[data-${selectAttr}]`);
+        if (select) select.focus();
+      }
+    };
+    const closeEditor = (cell) => {
+      const badge = cell.querySelector(`[data-${selectAttr}-badge]`);
+      const editor = cell.querySelector(`[data-${selectAttr}-editor]`);
+      if (badge) badge.hidden = false;
+      if (editor) {
+        editor.hidden = true;
+        const newInput = editor.querySelector(`[data-${newAttr}]`);
+        if (newInput) {
+          newInput.hidden = true;
+          newInput.value = "";
+        }
+      }
+    };
+
+    // Clicking the badge opens the editor.
+    container.querySelectorAll(`[data-${selectAttr}-badge]`).forEach((badge) => {
+      badge.addEventListener("click", () => {
+        const cell = badge.closest(".dashboard-group-cell");
+        if (cell) openEditor(cell);
+      });
+    });
+
+    // Cancel closes the editor without saving.
+    container.querySelectorAll(`[data-${selectAttr}-cancel]`).forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const cell = btn.closest(".dashboard-group-cell");
+        if (cell) closeEditor(cell);
+      });
+    });
+
+    // Confirm applies the change (handling the "＋ Nuevo grupo…" option) and
+    // closes the editor.
+    container.querySelectorAll(`[data-${selectAttr}-confirm]`).forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const cell = btn.closest(".dashboard-group-cell");
+        if (!cell) return;
+        const select = cell.querySelector(`[data-${selectAttr}]`);
         const guestId = select.dataset[selectAttr];
-        const newInput = container.querySelector(`[data-${newAttr}="${guestId}"]`);
+        const newInput = cell.querySelector(`[data-${newAttr}]`);
         if (select.value === "__new__") {
           // Reveal the free-text input to create a brand-new group.
           if (newInput) {
@@ -1455,18 +1522,25 @@ export function renderGuestManager(ctx) {
         }
         const oldName = getCurrent(guestId);
         const newName = select.value.trim();
-        if (newName === oldName) return;
+        if (newName === oldName) {
+          closeEditor(cell);
+          return;
+        }
         await applyFn(guestId, oldName, newName);
+        closeEditor(cell);
       });
     });
 
+    // The free-text input commits on Enter / change and cancels on Escape.
     container.querySelectorAll(`[data-${newAttr}]`).forEach((input) => {
       const commit = async () => {
+        const cell = input.closest(".dashboard-group-cell");
         const guestId = input.dataset[newAttr];
         const oldName = getCurrent(guestId);
         const newName = input.value.trim();
         if (!newName || newName === oldName) return;
         await applyFn(guestId, oldName, newName);
+        if (cell) closeEditor(cell);
       };
       input.addEventListener("change", commit);
       input.addEventListener("keydown", (e) => {
@@ -1474,8 +1548,7 @@ export function renderGuestManager(ctx) {
           e.preventDefault();
           commit();
         } else if (e.key === "Escape") {
-          input.hidden = true;
-          input.value = "";
+          if (input.closest(".dashboard-group-cell")) closeEditor(input.closest(".dashboard-group-cell"));
         }
       });
     });

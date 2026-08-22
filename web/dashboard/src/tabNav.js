@@ -95,32 +95,81 @@ export function navigateToTab(tabId) {
 }
 
 /**
- * Render the tab bar into `[data-dashboard-tabs]` and wire the click handlers.
- * Renders a row of BUTTONS (one per section), each with an icon + label. The
- * active button gets the `dashboard-tab-active` class.
+ * Render the tab navigation into `[data-dashboard-tabs]` and wire the handlers.
+ *
+ * The nav is rendered as a custom SELECT-style dropdown (mirroring the group
+ * filter in the header) so it stays compact inside the thin sticky navbar. The
+ * trigger shows the ACTIVE tab (icon + label) with a cool colored gradient
+ * effect; the opened menu lists every section (icon + label) and the active one
+ * is highlighted. Selecting an option navigates to that tab.
  */
 export function renderTabNavigation() {
   const nav = document.querySelector("[data-dashboard-tabs]");
   if (!nav) return;
 
-  nav.innerHTML = TABS.map(
-    (tab) => `
-      <button
-        class="dashboard-tab ${tab.id === activeTab ? "dashboard-tab-active" : ""}"
-        data-dashboard-tab="${tab.id}"
-        type="button"
-        aria-pressed="${tab.id === activeTab ? "true" : "false"}"
-      >
-        <span class="dashboard-tab-icon">${tab.icon}</span>
-        <span class="dashboard-tab-label">${tab.label}</span>
-      </button>
-    `,
-  )
-    .join("");
+  const active = TABS.find((t) => t.id === activeTab) || TABS[0];
 
-  nav.querySelectorAll("[data-dashboard-tab]").forEach((btn) => {
+  nav.innerHTML = `
+    <div class="dashboard-tab-select">
+      <button
+        class="dashboard-tab-select-trigger"
+        data-tab-select-trigger
+        type="button"
+        aria-haspopup="listbox"
+        aria-expanded="false"
+      >
+        <span class="dashboard-tab-select-trigger-icon">${active.icon}</span>
+        <span class="dashboard-tab-select-trigger-label">${active.label}</span>
+        <span class="dashboard-tab-select-caret" aria-hidden="true">▾</span>
+      </button>
+
+      <div class="dashboard-tab-select-menu" role="listbox" aria-label="Secciones del panel">
+        ${TABS.map(
+          (tab) => `
+          <button
+            class="dashboard-tab-select-option ${tab.id === activeTab ? "is-active" : ""}"
+            data-tab-select-option="${tab.id}"
+            role="option"
+            aria-selected="${tab.id === activeTab ? "true" : "false"}"
+            type="button"
+          >
+            <span class="dashboard-tab-select-option-icon">${tab.icon}</span>
+            <span class="dashboard-tab-select-option-name">${tab.label}</span>
+          </button>
+        `,
+        ).join("")}
+      </div>
+    </div>
+  `;
+
+  const select = nav.querySelector(".dashboard-tab-select");
+  const trigger = nav.querySelector("[data-tab-select-trigger]");
+  const menu = nav.querySelector(".dashboard-tab-select-menu");
+
+  const closeMenu = () => {
+    select.classList.remove("is-open");
+    trigger.setAttribute("aria-expanded", "false");
+  };
+  trigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const willOpen = !select.classList.contains("is-open");
+    select.classList.toggle("is-open", willOpen);
+    trigger.setAttribute("aria-expanded", willOpen ? "true" : "false");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (select && !select.contains(e.target)) closeMenu();
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeMenu();
+  });
+
+  menu.querySelectorAll("[data-tab-select-option]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      navigateToTab(btn.dataset.dashboardTab);
+      navigateToTab(btn.dataset.tabSelectOption);
+      closeMenu();
     });
   });
 }
+

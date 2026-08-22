@@ -333,26 +333,20 @@
 
 .dashboard-gender-display {
   display: inline-block;
-  padding: 0.15rem 0.5rem;
-  border-radius: 0.35rem;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  background: rgba(85, 69, 45, 0.08);
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: $ink;
   cursor: pointer;
-  transition: background 0.15s;
+  line-height: 1;
+  transition: transform 0.15s;
 
   &:hover {
-    background: rgba(85, 69, 45, 0.16);
+    transform: scale(1.12);
   }
 
   &.is-empty {
-    background: transparent;
     color: $ink-muted;
-    font-weight: 400;
-    text-transform: none;
   }
 
   &[hidden] {
@@ -381,13 +375,12 @@
   }
 }
 
-// Emoji shown inside the gender/age display pills (e.g. 👩 Mujer, 🧑 Adulto).
-// Keeps the emoji optically aligned with the label and prevents it from
-// stretching the pill's line-height.
+// Emoji shown inside the gender/age/lang display buttons (e.g. 👩 Mujer,
+// 🧑 Adulto, 🇪🇸 Español). The display is emoji-only (no text label), so the
+// emoji is the primary content and is rendered a touch larger for legibility.
 .dashboard-emoji {
   display: inline-block;
-  margin-right: 0.25rem;
-  font-size: 0.95rem;
+  font-size: 1.05rem;
   line-height: 1;
   vertical-align: -0.08em;
 }
@@ -399,18 +392,16 @@
 
 .dashboard-age-display {
   display: inline-block;
-  min-width: 2.2rem;
-  text-align: center;
-  padding: 0.15rem 0.4rem;
-  border-radius: 0.35rem;
-  font-size: 0.82rem;
-  font-variant-numeric: tabular-nums;
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: $ink;
   cursor: pointer;
-  transition: background 0.15s;
+  line-height: 1;
+  transition: transform 0.15s;
 
   &:hover {
-    background: rgba(85, 69, 45, 0.1);
+    transform: scale(1.12);
   }
 
   &.is-empty {
@@ -432,26 +423,20 @@
 
 .dashboard-lang-display {
   display: inline-block;
-  padding: 0.15rem 0.5rem;
-  border-radius: 0.35rem;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  background: rgba(85, 69, 45, 0.08);
+  padding: 0;
+  border: 0;
+  background: transparent;
   color: $ink;
   cursor: pointer;
-  transition: background 0.15s;
+  line-height: 1;
+  transition: transform 0.15s;
 
   &:hover {
-    background: rgba(85, 69, 45, 0.16);
+    transform: scale(1.12);
   }
 
   &.is-empty {
-    background: transparent;
     color: $ink-muted;
-    font-weight: 400;
-    text-transform: none;
   }
 
   &[hidden] {
