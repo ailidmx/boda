@@ -15,6 +15,7 @@ import {
 import {
   loadRooms,
   getCabinDisplayName,
+  getCabinUnitCode,
   getRoomsByCabin,
   getRoomOccupancy,
   getRoomDescription,
@@ -1001,6 +1002,7 @@ function renderGuestManager() {
     saveGuestHosting,
     getCabinNames,
     getCabinDisplayName,
+    getCabinUnitCode,
     getRoomsByCabin,
     openGuestEditor,
 

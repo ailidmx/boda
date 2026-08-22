@@ -1051,6 +1051,51 @@ npm run test:rules  # Firestore rules tests (uses emulators)
 
 ---
 
+## 6c. AG Grid Development Rules (ALWAYS follow)
+
+**All dashboard data grids use AG Grid Community** unless explicitly documented
+otherwise. The migration record lives in `docs/data-grid-migration/`.
+
+- **Never install or import `ag-grid-enterprise`** (or `LicenseManager`,
+  `AllEnterpriseModule`, a license key, or any Enterprise module). The dashboard
+  is Community-only (`ag-grid-community@36.x`), $0 licensing.
+- **The dashboard is vanilla JS** — use the vanilla API (`createGrid`), NOT
+  `ag-grid-react`, and build grids via the shared factory
+  `web/dashboard/src/data-grid/AppDataGrid.js` (`createAppDataGrid`).
+- **Before implementing AG Grid behavior:**
+  1. inspect the shared grid architecture (`web/dashboard/src/data-grid/` and
+     `docs/data-grid-migration/ARCHITECTURE.md`);
+  2. query the AG Grid MCP (`ag-mcp`, tools `search_docs`/`detect_version`) for
+     version-specific docs rather than trusting model memory;
+  3. verify the feature is Community (not Enterprise) — if Enterprise-only,
+     record a decision in `docs/data-grid-migration/DECISIONS.md` and prefer a
+     small free implementation;
+  4. keep the project's Firestore/service architecture — AG Grid is the UI, not
+     the data layer; single-cell edits must go through the existing
+     repositories/payload-builders (`updateGuest`, `saveGuestInline`,
+     `saveGuestRsvpAnswer`, `saveGuestHosting`, etc.), never a direct
+     `setDoc`/`deleteDoc` inside a cell renderer.
+- **Do not build a new hand-rolled HTML/CSS table** (custom `<table>`, manual
+  sort/filter/sticky headers) when the shared AG Grid infrastructure satisfies
+  the requirement. Describe data + columns + business behavior; let AG Grid
+  handle the grid mechanics (sort/filter/pin/resize/virtualization/row identity).
+- **Row identity = Firestore document id** (`getRowId: p => p.data.id`); never
+  use array indexes.
+- **Refer to `docs/data-grid-migration/ARCHITECTURE.md`** for how to create a
+  grid, define columns, add filters/pinning/row actions, persist edits, and test.
+- **Update migration docs** (`STATUS.md`, `SESSION_HANDOFF.md`,
+  `TEST_MATRIX.md`, `DECISIONS.md`) whenever grid work is performed.
+
+### If continuing the AG Grid migration after context loss
+
+If `docs/data-grid-migration/STATUS.md` exists and the user asks to continue the
+AG Grid migration, **do not start from memory**. Read, in order:
+`STATUS.md`, `SESSION_HANDOFF.md`, `MASTER_PLAN.md`, the relevant `INVENTORY.md`
+entries, and the relevant `DECISIONS.md` entries — then check `git status` before
+editing anything.
+
+---
+
 ## 7. Architecture guardrails (ALWAYS follow)
 
 

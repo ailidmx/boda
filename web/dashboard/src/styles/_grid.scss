@@ -1,0 +1,66 @@
+// ── Shared AG Grid styling ─────────────────────────────────────────────
+// Themes every AG Grid Community instance via the `.dashboard-data-grid` class
+// (applied together with `ag-theme-quartz` by the AppDataGrid factory). Uses the
+// ScSS design tokens so the grid matches the dashboard's "sharp & airy" look
+// (small radii, generous spacing, warm ink/cream palette) without hardcoding
+// colors in component code.
+
+@use "tokens";
+
+.dashboard-data-grid {
+  // Base type + palette (override the Quartz theme CSS vars).
+  font-family: tokens.$font-body;
+  --ag-foreground-color: #{tokens.$ink};
+  --ag-background-color: #{tokens.$card-bg-solid};
+  --ag-header-background-color: #{tokens.$cream-light};
+  --ag-header-foreground-color: #{tokens.$dark-deep};
+  --ag-border-color: #{tokens.$border};
+  --ag-row-border-color: #{tokens.$border-faint};
+  --ag-odd-row-background-color: #{tokens.$cream-light};
+  --ag-selected-row-background-color: #{tokens.$accent-bg};
+  --ag-header-column-separator-color: #{tokens.$border-light};
+  --ag-range-selection-border-color: #{tokens.$accent};
+  --ag-input-focus-border-color: #{tokens.$accent};
+
+  // Sharp & airy: small radii, generous vertical rhythm.
+  --ag-border-radius: 0.35rem;
+  --ag-card-radius: 0.5rem;
+  --ag-grid-size: 6px;
+  --ag-cell-horizontal-padding: 0.7rem;
+  --ag-row-height: 42px;
+  --ag-header-height: 40px;
+
+  height: 100%;
+  width: 100%;
+  border: 1px solid tokens.$border-light;
+  border-radius: 0.5rem;
+  overflow: hidden;
+
+  // Headers: clear, legible, subtly branded.
+  .ag-header-cell-text {
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+  }
+
+  // Keep action/identity cells from clipping the small inline controls.
+  .ag-cell {
+    overflow: visible;
+  }
+
+  // Empty-state overlay matches the dashboard empty text.
+  &.ag-overlay-no-rows-wrapper {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    color: tokens.$ink-muted;
+  }
+}
+
+// The shared empty-state label shown by gridDefaults.
+.dashboard-grid-empty {
+  color: tokens.$ink-muted;
+  font: inherit;
+  padding: 1rem;
+}

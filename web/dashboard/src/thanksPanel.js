@@ -1,21 +1,25 @@
-// ── Thanks Manager panel (CRUD) ─────────────────────────────────────────
+// ── Thanks Manager panel (CRUD) — AG Grid Community ────────────────────
 //
-// This module owns the "Gracias" panel: it renders the CRUD table of `thanks`
-// documents (guest + localized es/fr/en text), the "create/edit" modal with a
-// searchable guest selector (avatar list, debounced full-name search), and the
-// delete handler. It is a presentation module — it never touches Firestore
-// directly. All persistence flows through the injected `createThanks` /
-// `updateThanks` / `deleteThanks` repository functions.
+// This module owns the "Gracias" panel: the CRUD table of `thanks` documents
+// (guest + localized es/fr/en text), the "create/edit" modal with a searchable
+// guest selector (avatar list, debounced full-name search), and the delete
+// handler. It is a presentation module — it never touches Firestore directly.
+// All persistence flows through the injected `createThanks` / `updateThanks` /
+// `deleteThanks` repository functions.
 //
-// The guest selector is a text input that filters the guest list by full name
-// with a debounce (~250ms). The matching guests render as a dropdown list with
-// their avatar + full name; picking one fills the hidden `guest` id and shows
-// the selected guest's avatar preview (`.dashboard-thanks-guest-row`).
+// The table is rendered by AG Grid Community via the shared `createAppDataGrid`
+// factory (G-002). AG Grid owns sorting, filtering, pinned columns and the
+// empty-state overlay; the guest + actions cells use custom renderers, and the
+// create/edit/delete handlers are wired once via delegated listeners on the
+// stable grid container.
+
+import { createAppDataGrid } from "./data-grid/AppDataGrid.js";
+import { dataHtmlRenderer } from "./data-grid/gridRenderers.js";
 
 const LANGS = ["es", "fr", "en"];
 const LANG_LABELS = { es: "Español", fr: "Francés", en: "Inglés" };
 
-// Escape HTML in user-provided text so it renders safely in the table/modal.
+// Escape HTML in user-provided text so it renders safely in the modal.
 // The entity strings are built via concatenation so the literal `"` /
 // `&#39;` sequences survive the build (they are NOT HTML-decoded here).
 function esc(value) {
@@ -230,7 +234,7 @@ export function openThanksModal(opts) {
 }
 
 /**
- * Render the thanks manager panel into `[data-thanks-manager]`.
+ * Render the thanks manager into `[data-thanks-manager]`.
  *
  * @param {object} ctx Injected dependencies (see dashboard.js adapter).
  */
@@ -249,64 +253,116 @@ export function renderThanksPanel(ctx) {
 
   if (!container) return;
 
-  const guestById = new Map(guests.map((g) => [g.id, g]));
+  // Pre-compute per-guest display data (name / avatar / initials) once.
+  const guestById = new Map(
+    guests.map((g) => [g.id, g]),
+  );
+  const guestName = (guestId) => {
+    const g = guestById.get(guestId);
+    return g ? guestFullName(g) : guestId;
+  };
 
-  container.innerHTML = `
+  // ── Cell HTML generators ──
+  const guestCell = (credit) => {
+    const g = guestById.get(credit.guest);
+    const name = g ? guestFullName(g) : credit.guest;
+    const avatar = g ? guestAvatarUrl(g) : "";
+    const initials = g ? guestInitials(g) : "?";
+    return `
+      <div style="display:flex;align-items:center;gap:0.6rem;">
+        <span class="dashboard-thanks-avatar" style="width:2.2rem;height:2.2rem;font-size:0.9rem;">
+          ${avatar ? `<img class="dashboard-avatar" src="${avatar}" alt="" />` : esc(initials)}
+        </span>
+        <div>
+          <strong>${esc(name)}</strong>
+          <div style="font-size:0.75rem;color:#8a7a5c;">${esc(credit.guest)}</div>
+        </div>
+      </div>`;
+  };
+
+  const actionsCell = (credit) => `
+    <div class="dashboard-thanks-actions">
+      <button class="dashboard-link-btn" type="button" data-thanks-edit="${esc(credit.id)}" title="Editar">✏️</button>
+      <button class="dashboard-link-btn" type="button" data-thanks-delete="${esc(credit.id)}" title="Eliminar">🗑️</button>
+    </div>`;
+
+  // Text columns render raw (AG Grid escapes by default); show "—" when empty.
+  const langColumn = (lang, label) => ({
+    headerName: label,
+    colId: lang,
+    valueGetter: (p) => p.data?.[lang] || "",
+    valueFormatter: (p) => (p.value ? p.value : "—"),
+    flex: 1,
+    minWidth: 160,
+    wrapText: true,
+    autoHeight: true,
+  });
+
+  const columnDefs = [
+    {
+      headerName: "Destinatario",
+      colId: "guest",
+      pinned: "left",
+      lockPinned: true,
+      width: 260,
+      minWidth: 220,
+      cellRenderer: dataHtmlRenderer(guestCell),
+      valueGetter: (p) => guestName(p.data.guest),
+      comparator: (vA, vB) => (vA < vB ? -1 : vA > vB ? 1 : 0),
+    },
+    langColumn("es", "Español"),
+    langColumn("fr", "Francés"),
+    langColumn("en", "Inglés"),
+    {
+      headerName: "Acciones",
+      colId: "actions",
+      pinned: "right",
+      width: 120,
+      minWidth: 110,
+      cellRenderer: dataHtmlRenderer(actionsCell),
+      filter: false,
+      sortable: false,
+      suppressHeaderMenuButton: false,
+    },
+  ];
+
+  // ── Stable DOM structure (toolbar + grid element persist across renders) ──
+  if (!container.dataset.gridReady) {
+    container.innerHTML = `
+      <div data-thanks-toolbar></div>
+      <div data-thanks-grid></div>
+    `;
+    container.dataset.gridReady = "1";
+  }
+  const toolbarEl = container.querySelector("[data-thanks-toolbar]");
+  const gridEl = container.querySelector("[data-thanks-grid]");
+
+  toolbarEl.innerHTML = `
     <div style="margin-bottom:1rem;">
       <button class="dashboard-button" type="button" data-thanks-create>+ Nuevo agradecimiento</button>
     </div>
-    ${thanks.length === 0
-      ? '<p class="dashboard-empty">No hay agradecimientos todavía. Crea uno para que aparezca en la sección "Gracias" de la invitación.</p>'
-      : `
-      <div class="dashboard-guest-table-wrap">
-        <table class="dashboard-guest-table" data-thanks-manager>
-          <thead>
-            <tr>
-              <th>Destinatario</th>
-              <th>Español</th>
-              <th>Francés</th>
-              <th>Inglés</th>
-              <th>Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${thanks
-              .map((credit) => {
-                const guest = guestById.get(credit.guest);
-                const name = guest ? guestFullName(guest) : credit.guest;
-                const avatar = guest ? guestAvatarUrl(guest) : "";
-                const initials = guest ? guestInitials(guest) : "?";
-                return `
-                  <tr data-thanks-row="${esc(credit.id)}">
-                    <td>
-                      <div style="display:flex;align-items:center;gap:0.6rem;">
-                        <span class="dashboard-thanks-avatar" style="width:2.2rem;height:2.2rem;font-size:0.9rem;">
-                          ${avatar ? `<img class="dashboard-avatar" src="${avatar}" alt="" />` : esc(initials)}
-                        </span>
-                        <div>
-                          <strong>${esc(name)}</strong>
-                          <div style="font-size:0.75rem;color:#8a7a5c;">${esc(credit.guest)}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td>${esc(credit.es || "—")}</td>
-                    <td>${esc(credit.fr || "—")}</td>
-                    <td>${esc(credit.en || "—")}</td>
-                    <td>
-                      <button class="dashboard-link-btn" type="button" data-thanks-edit="${esc(credit.id)}" title="Editar">✏️</button>
-                      <button class="dashboard-link-btn" type="button" data-thanks-delete="${esc(credit.id)}" title="Eliminar">🗑️</button>
-                    </td>
-                  </tr>`;
-              })
-              .join("")}
-          </tbody>
-        </table>
-      </div>`
-    }
   `;
 
-  // ── Create ──
-  container.querySelector("[data-thanks-create]")?.addEventListener("click", () => {
+  // ── Create / update the grid (reuse on re-render) ──
+  let grid = container._thanksGrid;
+  if (!grid) {
+    grid = createAppDataGrid({
+      container: gridEl,
+      columnDefs,
+      rowData: thanks,
+      getRowId: (p) => p.data.id,
+      overrides: {
+        overlayNoRowsTemplate:
+          '<span class="dashboard-grid-empty">No hay agradecimientos todavía. Crea uno para que aparezca en la sección "Gracias" de la invitación.</span>',
+      },
+    });
+    container._thanksGrid = grid;
+  } else {
+    grid.setRowData(thanks);
+  }
+
+  // ── Toolbar: create ──
+  toolbarEl.querySelector("[data-thanks-create]")?.addEventListener("click", () => {
     openThanksModal({
       credit: null,
       guests,
@@ -319,39 +375,39 @@ export function renderThanksPanel(ctx) {
     });
   });
 
-  // ── Edit ──
-  container.querySelectorAll("[data-thanks-edit]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const credit = thanks.find((t) => t.id === btn.dataset.thanksEdit);
-      if (!credit) return;
-      openThanksModal({
-        credit,
-        guests,
-        guestFullName,
-        guestAvatarUrl,
-        guestInitials,
-        createThanks,
-        updateThanks,
-        onSaved: () => renderThanksPanel(ctx),
-      });
-    });
-  });
+  // ── Grid events (delegated, wired once) ──
+  if (!container.dataset.gridWired) {
+    container.dataset.gridWired = "1";
+    gridEl.addEventListener("click", (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
 
-  // ── Delete ──
-  container.querySelectorAll("[data-thanks-delete]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const credit = thanks.find((t) => t.id === btn.dataset.thanksDelete);
-      if (!credit) return;
-      const guest = guestById.get(credit.guest);
-      const name = guest ? guestFullName(guest) : credit.guest;
-      if (confirm(`¿Eliminar el agradecimiento de "${name}"? Se quitará de la sección "Gracias" de la invitación.`)) {
-        deleteThanks(credit.id)
-          .then(() => renderThanksPanel(ctx))
-          .catch((err) => {
-            console.error("Failed to delete thanks", err);
-            alert("Error al eliminar el agradecimiento.");
-          });
+      if (btn.dataset.thanksEdit) {
+        const credit = thanks.find((t) => t.id === btn.dataset.thanksEdit);
+        if (!credit) return;
+        openThanksModal({
+          credit,
+          guests,
+          guestFullName,
+          guestAvatarUrl,
+          guestInitials,
+          createThanks,
+          updateThanks,
+          onSaved: () => renderThanksPanel(ctx),
+        });
+      } else if (btn.dataset.thanksDelete) {
+        const credit = thanks.find((t) => t.id === btn.dataset.thanksDelete);
+        if (!credit) return;
+        const name = guestName(credit.guest);
+        if (confirm(`¿Eliminar el agradecimiento de "${name}"? Se quitará de la sección "Gracias" de la invitación.`)) {
+          deleteThanks(credit.id)
+            .then(() => renderThanksPanel(ctx))
+            .catch((err) => {
+              console.error("Failed to delete thanks", err);
+              alert("Error al eliminar el agradecimiento.");
+            });
+        }
       }
     });
-  });
+  }
 }

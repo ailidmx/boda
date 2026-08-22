@@ -11,6 +11,7 @@
     "test": "node --test tests/*.test.mjs"
   },
   "dependencies": {
+    "ag-grid-community": "^36.1.0",
     "echarts": "^6.1.0",
     "firebase": "^12.17.0"
   },

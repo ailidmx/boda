@@ -161,6 +161,26 @@ export function getCabinDisplayName(unitCode) {
   return CABIN_NAME_MAP[unitCode] || unitCode;
 }
 
+/**
+ * Resolve a cabin DISPLAY name back to its internal unit code (the inverse of
+ * `getCabinDisplayName`). When the display name has no known unit code it is
+ * returned as-is. Used by the INVITADOS cabin inline editor, which stores the
+ * display name in its select and must persist the unit code.
+ *
+ * NOTE: the map is ambiguous for the "Cabaña de madera" units — `madera_34`
+ * and `cabana_4` both display as "CABAÑA 4". The first match wins, mirroring
+ * the historical inline-editor behaviour exactly.
+ *
+ * @param {string} displayName
+ * @returns {string}
+ */
+export function getCabinUnitCode(displayName) {
+  const key = Object.keys(CABIN_NAME_MAP).find(
+    (k) => CABIN_NAME_MAP[k] === displayName,
+  );
+  return key || displayName;
+}
+
 // ── Room lookup helpers ────────────────────────────────────────────────
 
 /**
