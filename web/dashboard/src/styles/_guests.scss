@@ -363,6 +363,17 @@
   }
 }
 
+// Emoji shown inside the gender/age display pills (e.g. 👩 Mujer, 🧑 Adulto).
+// Keeps the emoji optically aligned with the label and prevents it from
+// stretching the pill's line-height.
+.dashboard-emoji {
+  display: inline-block;
+  margin-right: 0.25rem;
+  font-size: 0.95rem;
+  line-height: 1;
+  vertical-align: -0.08em;
+}
+
 // ── Age column (toggle mode: display ⇄ editor, never both) ──
 .dashboard-age-cell {
   white-space: nowrap;

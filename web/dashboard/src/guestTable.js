@@ -255,26 +255,29 @@ export function renderGuestManager(ctx) {
   };
 
   // ── Gender cell helper (inline editable, toggle mode) ──
-  // Shows the guest's gender as a clickable display. Clicking it enters EDIT
-  // mode: the display is hidden and a small inline select (M = Mujer / H =
-  // Hombre / —) appears with a ✓ confirm and ✕ cancel button. The display and
-  // editor are NEVER both visible at once. Confirm saves via
-  // `saveGuestInline("gender", …)`; cancel reverts without saving.
+  // Shows the guest's gender as a clickable display (emoji + label). Clicking
+  // it enters EDIT mode: the display is hidden and a small inline select
+  // (👩 Mujer / 👨 Hombre / —) appears with a ✓ confirm and ✕ cancel button.
+  // The display and editor are NEVER both visible at once. Confirm saves the
+  // RAW value ("M" / "H" / "") via `saveGuestInline("gender", …)`; cancel
+  // reverts without saving.
   const GENDER_OPTIONS = [
-    { value: "", label: "—" },
-    { value: "M", label: "Mujer" },
-    { value: "H", label: "Hombre" },
+    { value: "", label: "—", emoji: "" },
+    { value: "M", label: "Mujer", emoji: "👩" },
+    { value: "H", label: "Hombre", emoji: "👨" },
   ];
   const genderCell = (guest) => {
     const gender = guest.identity?.gender || guest.gender || "";
     const options = GENDER_OPTIONS.map(
-      (g) => `<option value="${g.value}" ${gender === g.value ? "selected" : ""}>${g.label}</option>`,
+      (g) => `<option value="${g.value}" ${gender === g.value ? "selected" : ""}>${g.emoji ? `${g.emoji} ` : ""}${g.label}</option>`,
     ).join("");
-    const displayLabel = GENDER_OPTIONS.find((g) => g.value === gender)?.label || "—";
+    const opt = GENDER_OPTIONS.find((g) => g.value === gender);
+    const displayLabel = opt?.label || "—";
+    const displayEmoji = opt?.emoji || "";
     return `
       <div class="dashboard-gender-cell" data-gender-cell="${guest.id}">
-        <button type="button" class="dashboard-gender-display" data-gender-display="${guest.id}" title="Editar género">
-          ${displayLabel}
+        <button type="button" class="dashboard-gender-display ${gender ? "" : "is-empty"}" data-gender-display="${guest.id}" title="Editar género">
+          ${displayEmoji ? `<span class="dashboard-emoji">${displayEmoji}</span>` : ""}${displayLabel}
         </button>
         <span class="dashboard-inline-editor" data-gender-editor="${guest.id}" hidden>
           <select class="dashboard-inline-select" data-gender-select="${guest.id}" title="Elegir género">${options}</select>
@@ -287,27 +290,30 @@ export function renderGuestManager(ctx) {
 
 
   // ── Age cell helper (inline editable, toggle mode) ──
-  // Shows the guest's age group as a clickable display. Clicking it enters
-  // EDIT mode: the display is hidden and a small inline select (Adulto / Niño
-  // / —) appears with a ✓ confirm and ✕ cancel button. The display and editor
-  // are NEVER both visible at once. Confirm saves via
+  // Shows the guest's age group as a clickable display (emoji + label).
+  // Clicking it enters EDIT mode: the display is hidden and a small inline
+  // select (🧑 Adulto / 🧒 Niño / —) appears with a ✓ confirm and ✕ cancel
+  // button. The display and editor are NEVER both visible at once. Confirm
+  // saves the RAW value ("Adulto" / "Niño" / "") via
   // `saveGuestInline("age", …)`; cancel reverts without saving. Matches the
   // values used by the guest editor modal (Adulto / Niño), NOT a raw number.
   const AGE_OPTIONS = [
-    { value: "", label: "—" },
-    { value: "Adulto", label: "Adulto" },
-    { value: "Niño", label: "Niño" },
+    { value: "", label: "—", emoji: "" },
+    { value: "Adulto", label: "Adulto", emoji: "🧑" },
+    { value: "Niño", label: "Niño", emoji: "🧒" },
   ];
   const ageCell = (guest) => {
     const age = guest.identity?.age ?? guest.age ?? "";
     const options = AGE_OPTIONS.map(
-      (a) => `<option value="${a.value}" ${age === a.value ? "selected" : ""}>${a.label}</option>`,
+      (a) => `<option value="${a.value}" ${age === a.value ? "selected" : ""}>${a.emoji ? `${a.emoji} ` : ""}${a.label}</option>`,
     ).join("");
-    const displayLabel = AGE_OPTIONS.find((a) => a.value === age)?.label || "—";
+    const opt = AGE_OPTIONS.find((a) => a.value === age);
+    const displayLabel = opt?.label || "—";
+    const displayEmoji = opt?.emoji || "";
     return `
       <div class="dashboard-age-cell" data-age-cell="${guest.id}">
-        <button type="button" class="dashboard-age-display" data-age-display="${guest.id}" title="Editar edad">
-          ${displayLabel}
+        <button type="button" class="dashboard-age-display ${age ? "" : "is-empty"}" data-age-display="${guest.id}" title="Editar edad">
+          ${displayEmoji ? `<span class="dashboard-emoji">${displayEmoji}</span>` : ""}${displayLabel}
         </button>
         <span class="dashboard-inline-editor" data-age-editor="${guest.id}" hidden>
           <select class="dashboard-inline-select" data-age-select="${guest.id}" title="Elegir edad">${options}</select>
