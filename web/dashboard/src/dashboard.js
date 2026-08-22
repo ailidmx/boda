@@ -1337,15 +1337,18 @@ function renderDashboard(app) {
   const accountMenu = app.querySelector("[data-account-menu]");
   const accountTrigger = app.querySelector("[data-account-trigger]");
   const accountPanel = app.querySelector("[data-account-menu-panel]");
-  const closeAccountMenu = () => {
-    accountMenu?.classList.remove("is-open");
-    accountTrigger?.setAttribute("aria-expanded", "false");
+  // Show/hide the panel by toggling its `hidden` attribute (the panel's
+  // visibility is driven by `hidden`, NOT the `is-open` class — there is no CSS
+  // for `.is-open` on the panel). `is-open` is kept in sync only as a hook.
+  const setAccountMenu = (open) => {
+    accountMenu?.classList.toggle("is-open", open);
+    if (accountPanel) accountPanel.hidden = !open;
+    accountTrigger?.setAttribute("aria-expanded", String(open));
   };
+  const closeAccountMenu = () => setAccountMenu(false);
   accountTrigger?.addEventListener("click", (e) => {
     e.stopPropagation();
-    const willOpen = !accountMenu.classList.contains("is-open");
-    accountMenu.classList.toggle("is-open", willOpen);
-    accountTrigger.setAttribute("aria-expanded", willOpen ? "true" : "false");
+    setAccountMenu(!accountMenu.classList.contains("is-open"));
   });
   document.addEventListener("click", (e) => {
     if (accountMenu && !accountMenu.contains(e.target)) closeAccountMenu();
