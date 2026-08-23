@@ -150,6 +150,15 @@ const state = {
   filterName: "", // "" = all, "complete" = complete name, "incomplete" = incomplete name
   filterContact: "", // "" = all, "without" = auth user without email/phone
   filterSent: "", // "" = all, "notSent" = invitation has NOT been sent yet
+  // Contextual filters shown only while their column group is active
+  // (Presencia · Alojamiento / Pétanque / Playa).
+  filterAccommodation: "", // "" = all, "yes" = alojamiento confirmado
+  filterWaitingList: "", // "" = all, "yes" = en lista de espera
+  filterNoCabin: "", // "" = all, "without" = sin cabaña asignada
+  filterPayment: "", // "" = all, "yes" = pago confirmado
+  filterPetanque: "", // "" = all, "yes" = juega pétanque
+  filterBoules: "", // "" = all, "yes" = tiene boules propias
+  filterPlaya: "", // "" = all, "yes" = confirmado para la playa (≥4)
   columnGroup: "identity", // which column group is visible in the INVITADOS table
 
   sortKey: "name",
@@ -338,6 +347,13 @@ function getFilteredGuests() {
       filterName: state.filterName,
       filterContact: state.filterContact,
       filterSent: state.filterSent,
+      filterAccommodation: state.filterAccommodation,
+      filterWaitingList: state.filterWaitingList,
+      filterNoCabin: state.filterNoCabin,
+      filterPayment: state.filterPayment,
+      filterPetanque: state.filterPetanque,
+      filterBoules: state.filterBoules,
+      filterPlaya: state.filterPlaya,
     },
     state.liveGuests,
     state.authUsers,
@@ -1766,6 +1782,13 @@ function renderDashboard(app) {
       state.filterName = "";
       state.filterContact = "";
       state.columnGroup = "identity";
+      state.filterAccommodation = "";
+      state.filterWaitingList = "";
+      state.filterNoCabin = "";
+      state.filterPayment = "";
+      state.filterPetanque = "";
+      state.filterBoules = "";
+      state.filterPlaya = "";
     }
     if (tab === "charts") renderChartsPanel();
   };

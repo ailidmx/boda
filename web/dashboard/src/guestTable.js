@@ -31,6 +31,18 @@ const COLUMN_GROUPS = [
   { id: "playa", label: "Playa" },
 ];
 
+// Clear the contextual filters (Presencia / Pétanque / Playa) when switching
+// column groups — each group's filters only make sense while that group is active.
+function resetContextualFilters(state) {
+  state.filterAccommodation = "";
+  state.filterWaitingList = "";
+  state.filterNoCabin = "";
+  state.filterPayment = "";
+  state.filterPetanque = "";
+  state.filterBoules = "";
+  state.filterPlaya = "";
+}
+
 export function renderGuestManager(ctx) {
   const {
     container,
@@ -589,7 +601,80 @@ export function renderGuestManager(ctx) {
     (state.filterEmail ? 1 : 0) +
     (state.filterPhoto ? 1 : 0) +
     (state.filterName ? 1 : 0) +
-    (state.filterSent ? 1 : 0);
+    (state.filterSent ? 1 : 0) +
+    (state.filterAccommodation ? 1 : 0) +
+    (state.filterWaitingList ? 1 : 0) +
+    (state.filterNoCabin ? 1 : 0) +
+    (state.filterPayment ? 1 : 0) +
+    (state.filterPetanque ? 1 : 0) +
+    (state.filterBoules ? 1 : 0) +
+    (state.filterPlaya ? 1 : 0);
+
+  // The filter dropdown shows contextual checkboxes for the ACTIVE column group.
+  const filterDropdownItems = (() => {
+    if (activeColumnGroup === "presencia") {
+      return `
+        <label class="dashboard-checkbox-cell" title="Mostrar solo con alojamiento confirmado">
+          <input type="checkbox" data-filter-accommodation ${state.filterAccommodation === "yes" ? "checked" : ""} />
+          <span>Alojamiento confirmado</span>
+        </label>
+        <label class="dashboard-checkbox-cell" title="Mostrar solo en lista de espera">
+          <input type="checkbox" data-filter-waiting-list ${state.filterWaitingList === "yes" ? "checked" : ""} />
+          <span>Lista de espera</span>
+        </label>
+        <label class="dashboard-checkbox-cell" title="Mostrar solo sin cabaña asignada">
+          <input type="checkbox" data-filter-no-cabin ${state.filterNoCabin === "without" ? "checked" : ""} />
+          <span>Sin cabaña</span>
+        </label>
+        <label class="dashboard-checkbox-cell" title="Mostrar solo con pago confirmado">
+          <input type="checkbox" data-filter-payment ${state.filterPayment === "yes" ? "checked" : ""} />
+          <span>Con pago</span>
+        </label>`;
+    }
+    if (activeColumnGroup === "petanque") {
+      return `
+        <label class="dashboard-checkbox-cell" title="Mostrar solo quienes juegan pétanque">
+          <input type="checkbox" data-filter-petanque ${state.filterPetanque === "yes" ? "checked" : ""} />
+          <span>Participa</span>
+        </label>
+        <label class="dashboard-checkbox-cell" title="Mostrar solo quienes tienen boules propias">
+          <input type="checkbox" data-filter-boules ${state.filterBoules === "yes" ? "checked" : ""} />
+          <span>Tiene boules</span>
+        </label>`;
+    }
+    if (activeColumnGroup === "playa") {
+      return `
+        <label class="dashboard-checkbox-cell" title="Mostrar solo confirmados para la playa (≥4)">
+          <input type="checkbox" data-filter-playa ${state.filterPlaya === "yes" ? "checked" : ""} />
+          <span>Juega playa</span>
+        </label>`;
+    }
+    return `
+      <label class="dashboard-checkbox-cell" title="Mostrar solo niños">
+        <input type="checkbox" data-filter-age-group ${state.filterAgeGroup === "nino" ? "checked" : ""} />
+        <span>Niños</span>
+      </label>
+      <label class="dashboard-checkbox-cell" title="Mostrar solo invitados sin teléfono">
+        <input type="checkbox" data-filter-phone ${state.filterPhone === "without" ? "checked" : ""} />
+        <span>Sin teléfono</span>
+      </label>
+      <label class="dashboard-checkbox-cell" title="Mostrar solo invitados sin correo real">
+        <input type="checkbox" data-filter-email ${state.filterEmail === "without" ? "checked" : ""} />
+        <span>Sin correo</span>
+      </label>
+      <label class="dashboard-checkbox-cell" title="Mostrar solo invitados sin foto">
+        <input type="checkbox" data-filter-photo ${state.filterPhoto === "without" ? "checked" : ""} />
+        <span>Sin foto</span>
+      </label>
+      <label class="dashboard-checkbox-cell" title="Mostrar solo invitados con nombre incompleto (menos de 2 nombres o sin apellido)">
+        <input type="checkbox" data-filter-name ${state.filterName === "incomplete" ? "checked" : ""} />
+        <span>ID incompleto</span>
+      </label>
+      <label class="dashboard-checkbox-cell" title="Mostrar solo invitados sin invitación enviada">
+        <input type="checkbox" data-filter-sent ${state.filterSent === "notSent" ? "checked" : ""} />
+        <span>No enviada</span>
+      </label>`;
+  })();
 
   toolbarEl.innerHTML = `
     ${readinessCard}
@@ -613,30 +698,7 @@ export function renderGuestManager(ctx) {
             <span class="dashboard-filter-dropdown-caret">▾</span>
           </button>
           <div class="dashboard-filter-dropdown-menu" data-filter-dropdown-menu hidden>
-            <label class="dashboard-checkbox-cell" title="Mostrar solo niños">
-              <input type="checkbox" data-filter-age-group ${state.filterAgeGroup === "nino" ? "checked" : ""} />
-              <span>Niños</span>
-            </label>
-            <label class="dashboard-checkbox-cell" title="Mostrar solo invitados sin teléfono">
-              <input type="checkbox" data-filter-phone ${state.filterPhone === "without" ? "checked" : ""} />
-              <span>Sin teléfono</span>
-            </label>
-            <label class="dashboard-checkbox-cell" title="Mostrar solo invitados sin correo real">
-              <input type="checkbox" data-filter-email ${state.filterEmail === "without" ? "checked" : ""} />
-              <span>Sin correo</span>
-            </label>
-            <label class="dashboard-checkbox-cell" title="Mostrar solo invitados sin foto">
-              <input type="checkbox" data-filter-photo ${state.filterPhoto === "without" ? "checked" : ""} />
-              <span>Sin foto</span>
-            </label>
-            <label class="dashboard-checkbox-cell" title="Mostrar solo invitados con nombre incompleto (menos de 2 nombres o sin apellido)">
-              <input type="checkbox" data-filter-name ${state.filterName === "incomplete" ? "checked" : ""} />
-              <span>ID incompleto</span>
-            </label>
-            <label class="dashboard-checkbox-cell" title="Mostrar solo invitados sin invitación enviada">
-              <input type="checkbox" data-filter-sent ${state.filterSent === "notSent" ? "checked" : ""} />
-              <span>No enviada</span>
-            </label>
+            ${filterDropdownItems}
           </div>
         </div>
       </div>
@@ -704,6 +766,7 @@ function renderColumnGroupNav(activeColumnGroup, ctx) {
   ).join("");
   nav.querySelectorAll("[data-column-group]").forEach((btn) => {
     btn.addEventListener("click", () => {
+      resetContextualFilters(ctx.state);
       ctx.state.columnGroup = btn.dataset.columnGroup;
       ctx.renderGuestManager ? ctx.renderGuestManager() : renderGuestManager(ctx);
     });
@@ -761,6 +824,27 @@ function wireToolbar(toolbarEl, container, ctx) {
   });
   toolbarEl.querySelector("[data-filter-sent]")?.addEventListener("change", (e) => {
     toggleFilter("filterSent", e.target.checked ? "notSent" : "");
+  });
+  toolbarEl.querySelector("[data-filter-accommodation]")?.addEventListener("change", (e) => {
+    toggleFilter("filterAccommodation", e.target.checked ? "yes" : "");
+  });
+  toolbarEl.querySelector("[data-filter-waiting-list]")?.addEventListener("change", (e) => {
+    toggleFilter("filterWaitingList", e.target.checked ? "yes" : "");
+  });
+  toolbarEl.querySelector("[data-filter-no-cabin]")?.addEventListener("change", (e) => {
+    toggleFilter("filterNoCabin", e.target.checked ? "without" : "");
+  });
+  toolbarEl.querySelector("[data-filter-payment]")?.addEventListener("change", (e) => {
+    toggleFilter("filterPayment", e.target.checked ? "yes" : "");
+  });
+  toolbarEl.querySelector("[data-filter-petanque]")?.addEventListener("change", (e) => {
+    toggleFilter("filterPetanque", e.target.checked ? "yes" : "");
+  });
+  toolbarEl.querySelector("[data-filter-boules]")?.addEventListener("change", (e) => {
+    toggleFilter("filterBoules", e.target.checked ? "yes" : "");
+  });
+  toolbarEl.querySelector("[data-filter-playa]")?.addEventListener("change", (e) => {
+    toggleFilter("filterPlaya", e.target.checked ? "yes" : "");
   });
 
   toolbarEl.querySelectorAll("[data-readiness-filter]").forEach((row) => {
@@ -890,6 +974,7 @@ function wireGridEvents(gridEl, ctx) {
       const g = getGuest(target.dataset.sendEmail);
       if (g && guestCanEmail(g)) openSendInviteModal(g, "email");
     } else if (target?.dataset.columnGroup) {
+      resetContextualFilters(ctx.state);
       ctx.state.columnGroup = target.dataset.columnGroup;
       rerender();
     } else if (target?.dataset.rsvpDisplay) {

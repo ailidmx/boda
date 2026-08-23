@@ -502,7 +502,7 @@ export function computeReadiness(activeGuests, liveGuests, authUsers) {
 // `guestCanEmail`).
 export function getFilteredGuests(
   activeGuests,
-  { filterGroup, filterQuery, filterAgeGroup, filterPhone, filterEmail, filterPhoto, filterName, filterContact, filterSent },
+  { filterGroup, filterQuery, filterAgeGroup, filterPhone, filterEmail, filterPhoto, filterName, filterContact, filterSent, filterAccommodation, filterWaitingList, filterNoCabin, filterPayment, filterPetanque, filterBoules, filterPlaya },
   liveGuests = [],
   authUsers = {},
 ) {
@@ -549,6 +549,27 @@ export function getFilteredGuests(
     filtered = filtered.filter((g) => g.invitationSent === true);
   } else if (filterSent === "notSent") {
     filtered = filtered.filter((g) => g.invitationSent !== true);
+  }
+  if (filterAccommodation === "yes") {
+    filtered = filtered.filter((g) => getRsvpBooleanAnswer(g, "accommodationConfirm", liveGuests) === 1);
+  }
+  if (filterWaitingList === "yes") {
+    filtered = filtered.filter((g) => getRsvpBooleanAnswer(g, "cabinWaitingList", liveGuests) === 1);
+  }
+  if (filterNoCabin === "without") {
+    filtered = filtered.filter((g) => !g.hosting?.cabin);
+  }
+  if (filterPayment === "yes") {
+    filtered = filtered.filter((g) => g.paymentConfirmed === true);
+  }
+  if (filterPetanque === "yes") {
+    filtered = filtered.filter((g) => getRsvpBooleanAnswer(g, "petanqueParticipation", liveGuests) === 1);
+  }
+  if (filterBoules === "yes") {
+    filtered = filtered.filter((g) => getRsvpBooleanAnswer(g, "petanqueOwnBoules", liveGuests) === 1);
+  }
+  if (filterPlaya === "yes") {
+    filtered = filtered.filter((g) => getRsvpScaleAnswer(g, "playa", liveGuests) >= 4);
   }
   if (filterQuery) {
 
