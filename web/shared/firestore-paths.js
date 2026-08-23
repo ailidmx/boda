@@ -48,6 +48,8 @@ export const collections = {
   loginEvents: "login_events",
   /** Table inventory + seating assignments (admin-only planning). */
   tables: "tables",
+  /** Spatial event-layout plans (zones, definitions, instances, groups, connections, guest assignments). */
+  plans: "plans",
   /** Guest inactivity events (written by the invitation's activity tracker). */
   activityEvents: "activity_events",
   /** Page-view analytics events (written by the invitation). */

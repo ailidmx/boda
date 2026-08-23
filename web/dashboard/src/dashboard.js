@@ -22,7 +22,8 @@ import {
   getCabinNames,
 } from "./rooms.js";
 import { getCabinPhotos, getCabinByDisplayName, cabinPhotoUrl, loadCabins, getAllCabinNames } from "./cabins.js";
-import { loadTables, renderTablesManager } from "./tables.js";
+import { loadTables } from "./tables.js";
+import { renderSpatialEditor } from "./spatialEditor.js";
 import { createMatrixLoader } from "./matrixLoader.js";
 import { collections } from "../../shared/firestore-paths.js";
 import {
@@ -1082,12 +1083,11 @@ function renderCabinAssignments() {
 }
 
 
-// ── Table Assignments (real-life 30m × 6m canvas) ──────────────────────
-
-function renderTableAssignments() {
-  const container = document.querySelector("[data-table-assignments]");
+// ── Spatial event-layout editor (zones, catalog, seating, connections) ──
+function renderSpatialPlan() {
+  const container = document.querySelector("[data-spatial-editor]");
   if (!container) return;
-  renderTablesManager(container);
+  renderSpatialEditor(container);
 }
 
 // ── Data loading ───────────────────────────────────────────────────────
@@ -1300,7 +1300,7 @@ function renderDashboard(app) {
               <h2>Mesas</h2>
             </div>
           </div>
-          <div data-table-assignments></div>
+          <div data-spatial-editor></div>
         </div>
       </section>
 
@@ -1419,6 +1419,7 @@ function renderDashboard(app) {
   renderCabinAssignments();
   renderThanksPanel();
   renderChartsPanel();
+  renderSpatialPlan();
 
 
   // ── Re-render the charts panel when the "Gráficas" tab becomes visible ──
@@ -1493,7 +1494,7 @@ function renderDashboard(app) {
   // the callback here to report the real table count to the matrix loader.
   loadTables((tables) => {
     reportSource("tables", tables || []);
-    renderTableAssignments();
+    renderSpatialPlan();
   });
 
   // ── Handle browser back/forward ──

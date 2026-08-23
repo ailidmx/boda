@@ -1203,6 +1203,68 @@ directly to `master` and push.
   unmerged architecture refactor held for reference). Do NOT delete it without
   explicit confirmation from the human.
 
+---
+
+## 9. Spatial editor (wedding layout & seating) — ALWAYS follow
+
+> The dashboard "Mesas" panel is now a real 2D spatial editor. The full
+> architecture decision lives in `docs/adr/2026-08-22-spatial-editor-architecture.md`.
+> The pure domain/geometry layer is in `web/dashboard/src/spatial/`.
+
+- **Canonical unit is METERS** (rotation in degrees). Pixels are NEVER persisted
+  as physical geometry. Rendering maps world → screen via a camera
+  (`spatial/viewport.js`); zoom/pan only modify the camera, never the plan.
+- **Geometry/domain rules live in `web/dashboard/src/spatial/` (pure, no
+  React/Firestore/DOM)** and MUST NOT be scattered across the editor component:
+  `geometry.js` (snaps, rotation, SAT/circle collision, zone containment, group
+  bounds), `seating.js` (derived seat anchors + AUTO capacity), `catalog.js`
+  (system definitions + usage/delete/structural-change guards), `connections.js`
+  (magnetic connect + derived seat blocking), `groups.js` (pivot/translate/rotate),
+  `editor-state.js` (`reducePlan` semantic reducer + `validatePlacement` +
+  `computeDragCandidate`), `history.js` (local in-session undo/redo), `viewport.js`.
+- **Seat positions are always DERIVED** (`seatAnchorsForDefinition`) — never
+  persisted. Stable ids: round = `seat-<i>`, rect/square = `<edge>-<i>`.
+- **Instances never redefine dimensions.** A placed instance is
+  `{ id, definitionId, zoneId, transform:{x,y,rotation}, groupId }`. Dimensions
+  come from the definition. Resizing a placed object means editing/creating a
+  definition, not mutating the instance.
+- **System definitions are immutable + undeletable** (`isSystemDefinition`).
+  Custom definitions can't be deleted while in use (`canDeleteDefinition`) and
+  structural edits to used custom defs must warn first (`canEditDefinition` +
+  `isStructuralChange`).
+- **A drag A→B is ONE `MOVE_INSTANCES` action → ONE undo entry.** Never record
+  per-grid-position history. Undo/redo is local (`spatial/history.js`) and never
+  persisted.
+- **Connection ≠ group.** A connection is an explicit `{objectAId,portA,objectBId,portB}`
+  that blocks the touching edge's seats (derived, automatic). A group stores only
+  `objectIds` (child transforms only — no group-local coordinate system); moving/
+  rotating the group mutates children around the pivot.
+- **Autosave fires only on semantic commits** (valid drop, rotate, group,
+  connect, guest assign) — NEVER on pointer movement. Persistence goes through
+  `repositories/planRepository.js` → a FLAT document `plans/{planId}` (default
+  `plans/main`). The `collections.plans` path + Firestore rules block were
+  added. **WARNING: the plan must stay FLAT (`plans/main`), NOT nested
+  (`plans/main/plans/default`) — the rule `match /plans/{planId}` only covers
+  the single-level path, and the nested path falls through to default-deny.**
+  The editor exposes `Saving… / Guardado / Error` via `data-se-save`.
+- **The editor is vanilla SVG** (`web/dashboard/src/spatialEditor.js`, styles in
+  `styles/_spatial.scss`), registered on `[data-spatial-editor]` in the "Mesas"
+  panel via `renderSpatialPlan()`. It supersedes the legacy `tables.js` DOM
+  canvas (left intact for legacy data but no longer registered). Do NOT import
+  Konva/Fabric/Pixi for this panel.
+- **Guest data is read LIVE from the `guests` cache** (same as the rest of the
+  dashboard) for the guest-assignment modal; no static registry.
+- **Migration:** `scripts/migrate-tables-to-plan.mjs` materializes the legacy
+  `tables` collection into a plan document (dry-run by default). To release the
+  editor you must run it with `--execute` once (and deploy the new `plans` rule).
+  The legacy `tables` collection is left untouched as a fallback.
+- **Tests:** `web/dashboard/tests/spatial.test.mjs` (77 tests) covers snapping,
+  round/rect seats, rotation, collision (overlap rejected / touching allowed),
+  zone containment, magnetic connections, seat blocking, group transforms,
+  history, catalog guards, and viewport math. `npm test` (root) runs it.
+
+*(Add new spatial-editor lessons here as you discover them.)*
+
 
 
 

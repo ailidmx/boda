@@ -72,6 +72,13 @@ service cloud.firestore {
       allow delete: if canDelete();
     }
 
+    // ── Spatial event-layout plans (single JSON document per plan) ───────
+    match /plans/{planId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
     // ── Thanks / greetings ───────────────────────────────────────────────
     match /thanks/{creditId} {
       allow read: if canRead();
