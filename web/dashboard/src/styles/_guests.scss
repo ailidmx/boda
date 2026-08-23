@@ -842,6 +842,12 @@
   align-items: flex-start;
   gap: 0.6rem;
   min-width: 16rem;
+
+  // The info column is multi-line (name + phone + email + id), so the cell is
+  // top-aligned; keep the avatar vertically centered within the row instead.
+  .dashboard-avatar-wrap {
+    align-self: center;
+  }
 }
 
 .dashboard-identity-info {

@@ -223,3 +223,73 @@
   color: tokens.$ink-muted;
   font-size: 0.82rem;
 }
+
+// ── Card votes free grouped list (native <details>) ──
+// AG Grid 36's rowGroup is Enterprise-only, so the votes panel renders its own
+// expand/collapse grouping. Each <details> is a card; the <summary> shows the
+// card name + average; expanding reveals the per-vote list.
+.cardvotes-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.cardvotes-card {
+  border: 1px solid tokens.$border;
+  border-radius: 0.5rem;
+  background: tokens.$card-bg-solid;
+
+  &[open] {
+    border-color: tokens.$border-strong;
+  }
+
+  summary {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+
+    &::-webkit-details-marker {
+      display: none;
+    }
+
+    &:hover {
+      background: tokens.$cream-light;
+    }
+  }
+}
+
+.cardvotes-card-summary {
+  // summary itself is the flex row; nothing more needed here.
+}
+
+.cardvotes-votes {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid tokens.$border-faint;
+}
+
+.cardvotes-vote {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 1rem;
+  border-bottom: 1px solid tokens.$border-faint;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .cardvotes-name {
+    flex: 1 1 auto;
+  }
+}
+
+.cardvotes-card-name {
+  flex: 1 1 auto;
+  font-weight: 600;
+}

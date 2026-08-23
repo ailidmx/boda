@@ -107,6 +107,23 @@ export function navigateToTab(tabId) {
     window.history.pushState({ tab: tabId }, "", newPath);
   }
   switchTab(tabId);
+  updateTabSelectTrigger();
+}
+
+/**
+ * Update the visible icon + label of the tab-select trigger to reflect the
+ * ACTIVE tab. `renderTabNavigation()` rebuilds the whole select from scratch,
+ * which would close the menu and re-add listeners; this only patches the two
+ * text nodes so the collapsed trigger stays in sync after a navigation.
+ */
+function updateTabSelectTrigger() {
+  const nav = document.querySelector("[data-dashboard-tabs]");
+  if (!nav) return;
+  const active = TABS.find((t) => t.id === activeTab) || TABS[0];
+  const icon = nav.querySelector(".dashboard-tab-select-trigger-icon");
+  const label = nav.querySelector(".dashboard-tab-select-trigger-label");
+  if (icon) icon.textContent = active.icon;
+  if (label) label.textContent = active.label;
 }
 
 /**

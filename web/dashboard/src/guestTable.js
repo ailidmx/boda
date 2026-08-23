@@ -20,6 +20,7 @@
 
 import { createAppDataGrid } from "./data-grid/AppDataGrid.js";
 import { dataHtmlRenderer } from "./data-grid/gridRenderers.js";
+import { badgeStyle } from "./guestDomain.js";
 
 // Column use-case groups shown as chips in the guests section HEADING. Mirrors
 // the pre-migration header group nav; the active chip reveals that column set.
@@ -331,26 +332,12 @@ export function renderGuestManager(ctx) {
   const rsvpBooleanCell = (guest, questionId) => {
     const value = rsvpBooleanValue(guest, questionId);
     const label = value === 1 ? "Sí" : value === 2 ? "No" : "—";
-    const chipClass = value === 1
-      ? "dashboard-badge dashboard-badge-yes"
-      : value === 2
-        ? "dashboard-badge dashboard-badge-no"
-        : "dashboard-badge dashboard-badge-muted";
-    const options = [
-      { v: 0, l: "—" },
-      { v: 1, l: "Sí" },
-      { v: 2, l: "No" },
-    ]
-      .map((o) => `<option value="${o.v}" ${value === o.v ? "selected" : ""}>${o.l}</option>`)
-      .join("");
     return `
       <div class="dashboard-rsvp-cell" data-rsvp-cell="${guest.id}" data-rsvp-question="${questionId}">
-        <button type="button" class="${chipClass}" data-rsvp-boolean-display="${guest.id}" data-rsvp-question="${questionId}" title="Editar respuesta">${label}</button>
-        <span class="dashboard-inline-editor" data-rsvp-boolean-editor="${guest.id}" data-rsvp-question="${questionId}" hidden>
-          <select class="dashboard-inline-select" data-rsvp-boolean-select="${guest.id}" data-rsvp-question="${questionId}" title="Sí / No / —">${options}</select>
-          <button type="button" class="dashboard-link-btn" data-rsvp-boolean-confirm="${guest.id}" data-rsvp-question="${questionId}" title="Guardar">✓</button>
-          <button type="button" class="dashboard-link-btn" data-rsvp-boolean-cancel="${guest.id}" data-rsvp-question="${questionId}" title="Cancelar">✕</button>
-        </span>
+        <label class="dashboard-checkbox-cell" title="Sí / No">
+          <input type="checkbox" class="dashboard-rsvp-boolean-checkbox" data-rsvp-boolean-checkbox="${guest.id}" data-rsvp-question="${questionId}" ${value === 1 ? "checked" : ""} />
+          <span>${label}</span>
+        </label>
       </div>`;
   };
 
@@ -377,27 +364,13 @@ export function renderGuestManager(ctx) {
 
   const paymentConfirmedCell = (guest) => {
     const value = guest.paymentConfirmed;
-    const label = value === true ? "Sí" : value === false ? "No" : "—";
-    const chipClass = value === true
-      ? "dashboard-badge dashboard-badge-yes"
-      : value === false
-        ? "dashboard-badge dashboard-badge-no"
-        : "dashboard-badge dashboard-badge-muted";
-    const options = [
-      { v: "", l: "—" },
-      { v: "1", l: "Sí" },
-      { v: "2", l: "No" },
-    ]
-      .map((o) => `<option value="${o.v}" ${(value === true && o.v === "1") || (value === false && o.v === "2") || (value == null && o.v === "") ? "selected" : ""}>${o.l}</option>`)
-      .join("");
+    const label = value === true ? "Sí" : "—";
     return `
       <div class="dashboard-rsvp-cell" data-payment-cell="${guest.id}">
-        <button type="button" class="${chipClass}" data-payment-display="${guest.id}" title="Editar pago confirmado">${label}</button>
-        <span class="dashboard-inline-editor" data-payment-editor="${guest.id}" hidden>
-          <select class="dashboard-inline-select" data-payment-select="${guest.id}" title="Pago confirmado">${options}</select>
-          <button type="button" class="dashboard-link-btn" data-payment-confirm="${guest.id}" title="Guardar">✓</button>
-          <button type="button" class="dashboard-link-btn" data-payment-cancel="${guest.id}" title="Cancelar">✕</button>
-        </span>
+        <label class="dashboard-checkbox-cell" title="Pago confirmado">
+          <input type="checkbox" class="dashboard-payment-checkbox" data-payment-checkbox="${guest.id}" ${value === true ? "checked" : ""} />
+          <span>${label}</span>
+        </label>
       </div>`;
   };
 
@@ -416,7 +389,7 @@ export function renderGuestManager(ctx) {
     ].join("");
     return `
       <div class="dashboard-rsvp-cell" data-cabin-cell="${guest.id}" data-cabin-period="${period}">
-        <button type="button" class="dashboard-badge ${currentDisplay ? "" : "dashboard-badge-muted"}" data-cabin-display="${guest.id}" data-cabin-period="${period}" title="Editar cabaña">${currentDisplay || "—"}</button>
+        <button type="button" class="dashboard-badge ${currentDisplay ? "" : "dashboard-badge-muted"}" style="${currentDisplay ? `background:${badgeStyle(currentDisplay)};color:#3a2f1e;` : ""}" data-cabin-display="${guest.id}" data-cabin-period="${period}" title="Editar cabaña">${currentDisplay || "—"}</button>
         <span class="dashboard-inline-editor" data-cabin-editor="${guest.id}" data-cabin-period="${period}" hidden>
           <select class="dashboard-inline-select" data-cabin-select="${guest.id}" data-cabin-period="${period}" title="Elegir cabaña">${options}</select>
           <button type="button" class="dashboard-link-btn" data-cabin-confirm="${guest.id}" data-cabin-period="${period}" title="Guardar">✓</button>
@@ -442,7 +415,7 @@ export function renderGuestManager(ctx) {
     ].join("");
     return `
       <div class="dashboard-rsvp-cell" data-room-cell="${guest.id}" data-room-period="${period}">
-        <button type="button" class="dashboard-badge ${currentRoom ? "" : "dashboard-badge-muted"}" data-room-display="${guest.id}" data-room-period="${period}" title="Editar cuarto">${currentRoom || "—"}</button>
+        <button type="button" class="dashboard-badge ${currentRoom ? "" : "dashboard-badge-muted"}" style="${currentRoom ? `background:${badgeStyle(currentRoom)};color:#3a2f1e;` : ""}" data-room-display="${guest.id}" data-room-period="${period}" title="Editar cuarto">${currentRoom || "—"}</button>
         <span class="dashboard-inline-editor" data-room-editor="${guest.id}" data-room-period="${period}" hidden>
           <select class="dashboard-inline-select" data-room-select="${guest.id}" data-room-period="${period}" title="Elegir cuarto">${options}</select>
           <button type="button" class="dashboard-link-btn" data-room-confirm="${guest.id}" data-room-period="${period}" title="Guardar">✓</button>
@@ -577,6 +550,9 @@ export function renderGuestManager(ctx) {
   const readyCount = readiness.ready[groupKey] || 0;
   const totalCount = readiness.total;
   const pct = totalCount ? Math.round((readyCount / totalCount) * 100) : 0;
+  const notSentCount = getActiveGuests().filter(
+    (g) => g.invitationSent !== true && (!state.filterGroup || g.group === state.filterGroup),
+  ).length;
   const readinessCard = `
     <div class="dashboard-readiness-card">
       <div class="dashboard-readiness-head">
@@ -599,9 +575,9 @@ export function renderGuestManager(ctx) {
           <span>Sin contacto</span>
           <span class="dashboard-readiness-count">${readiness.missingContact[groupKey] || 0}</span>
         </button>
-        <button type="button" class="dashboard-readiness-row ${state.filterSent === "sent" ? "is-active" : ""}" data-readiness-filter="sent" title="Filtrar por invitación ya enviada">
-          <span>Enviado</span>
-          <span class="dashboard-readiness-count">${state.filterSent === "sent" ? "✓" : ""}</span>
+        <button type="button" class="dashboard-readiness-row ${state.filterSent === "notSent" ? "is-active" : ""}" data-readiness-filter="sent" title="Filtrar por invitación aún no enviada">
+          <span>No enviada</span>
+          <span class="dashboard-readiness-count">${notSentCount}</span>
         </button>
       </div>
     </div>
@@ -657,9 +633,9 @@ export function renderGuestManager(ctx) {
               <input type="checkbox" data-filter-name ${state.filterName === "incomplete" ? "checked" : ""} />
               <span>ID incompleto</span>
             </label>
-            <label class="dashboard-checkbox-cell" title="Mostrar solo invitados con invitación ya enviada">
-              <input type="checkbox" data-filter-sent ${state.filterSent === "sent" ? "checked" : ""} />
-              <span>Enviado</span>
+            <label class="dashboard-checkbox-cell" title="Mostrar solo invitados sin invitación enviada">
+              <input type="checkbox" data-filter-sent ${state.filterSent === "notSent" ? "checked" : ""} />
+              <span>No enviada</span>
             </label>
           </div>
         </div>
@@ -784,7 +760,7 @@ function wireToolbar(toolbarEl, container, ctx) {
     toggleFilter("filterName", e.target.checked ? "incomplete" : "");
   });
   toolbarEl.querySelector("[data-filter-sent]")?.addEventListener("change", (e) => {
-    toggleFilter("filterSent", e.target.checked ? "sent" : "");
+    toggleFilter("filterSent", e.target.checked ? "notSent" : "");
   });
 
   toolbarEl.querySelectorAll("[data-readiness-filter]").forEach((row) => {
@@ -797,7 +773,7 @@ function wireToolbar(toolbarEl, container, ctx) {
       } else if (kind === "contact") {
         state.filterContact = state.filterContact === "without" ? "" : "without";
       } else if (kind === "sent") {
-        state.filterSent = state.filterSent === "sent" ? "" : "sent";
+        state.filterSent = state.filterSent === "notSent" ? "" : "notSent";
       }
       renderGuestManager(ctx);
     });
@@ -1154,6 +1130,12 @@ function wireGridEvents(gridEl, ctx) {
       if (!ok) t.checked = !t.checked;
     } else if (t.matches("[data-invite-sent]")) {
       const ok = await saveGuestInline(t.dataset.inviteSent, "invitationSent", t.checked);
+      if (!ok) t.checked = !t.checked;
+    } else if (t.matches("[data-rsvp-boolean-checkbox]")) {
+      const ok = await saveGuestRsvpAnswer(t.dataset.rsvpBooleanCheckbox, t.dataset.rsvpQuestion, t.checked ? 1 : 2);
+      if (!ok) t.checked = !t.checked;
+    } else if (t.matches("[data-payment-checkbox]")) {
+      const ok = await saveGuestInline(t.dataset.paymentCheckbox, "paymentConfirmed", t.checked);
       if (!ok) t.checked = !t.checked;
     } else if (t.matches("[data-auth-email-input]")) {
       const email = t.value.trim();

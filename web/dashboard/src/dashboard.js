@@ -149,7 +149,7 @@ const state = {
   filterPhoto: "", // "" = all, "with" = has photo, "without" = no photo
   filterName: "", // "" = all, "complete" = complete name, "incomplete" = incomplete name
   filterContact: "", // "" = all, "without" = auth user without email/phone
-  filterSent: "", // "" = all, "sent" = invitation has been sent
+  filterSent: "", // "" = all, "notSent" = invitation has NOT been sent yet
   columnGroup: "identity", // which column group is visible in the INVITADOS table
 
   sortKey: "name",
