@@ -471,6 +471,14 @@ export function renderCabinAssignments({
       })
       .map(toSummary);
 
+    // 4. Sin cabaña — guests with NO assignment in the ACTIVE period
+    //    (no `cabin` for primary, no `xtraCabin` for extra). This surfaces
+    //    everyone the couple still needs to place, regardless of RSVP answer.
+    specialLists.noCabin = allGuests
+      .map((g) => getMergedGuest(g))
+      .filter((g) => !g[cabinField])
+      .map(toSummary);
+
 
     // Render one special card: label, big count, caption, and a clickable
     // stacked-avatar strip (up to 8 avatars, overflow collapses into +N).
@@ -498,16 +506,25 @@ export function renderCabinAssignments({
         </article>`;
     };
 
-    return `
-      <div class="dashboard-summary dashboard-cabin-special">
+    // Only the first three attention cards are primary-period specific. The
+    // "Sin cabaña" card uses the ACTIVE period's cabin field, so it renders on
+    // BOTH tabs.
+    const primaryCards = period === "primary"
+      ? `
         ${specialCardHtml("Lista de espera", "Quieren una cabaña si se libera", specialLists.waiting, "waiting")}
         ${specialCardHtml("Sin asistencia pero con cabaña", "No confirmaron ningún día pero tienen cabaña", specialLists.noAttendance, "no-attendance")}
-        ${specialCardHtml("Confirmó pero rechazó alojamiento", "Confirmaron asistencia pero dijeron NO al alojamiento", specialLists.declinedHosting, "declined-hosting")}
+        ${specialCardHtml("Confirmó pero rechazó alojamiento", "Confirmaron asistencia pero dijeron NO al alojamiento", specialLists.declinedHosting, "declined-hosting")}`
+      : "";
+
+    return `
+      <div class="dashboard-summary dashboard-cabin-special">
+        ${primaryCards}
+        ${specialCardHtml("Sin cabaña", "Sin asignación en este periodo", specialLists.noCabin, "no-cabin")}
       </div>`;
   };
 
 
-  const specialCards = period === "primary" ? buildSpecialCards() : "";
+  const specialCards = buildSpecialCards();
 
 
   // ── Cabin cards, each grouping guests by ROOM ──
@@ -737,6 +754,7 @@ export function renderCabinAssignments({
     waiting: "Lista de espera",
     "no-attendance": "Sin asistencia pero con cabaña",
     "declined-hosting": "Confirmó pero rechazó alojamiento",
+    "no-cabin": "Sin cabaña",
   };
   container.querySelectorAll("[data-special-card]").forEach((btn) => {
     btn.addEventListener("click", () => {
