@@ -112,6 +112,7 @@ import { updateGuest, softDeleteGuest, createGuest } from "./repositories/guestR
 import { createThanks, updateThanks, deleteThanks } from "./repositories/thanksRepository.js";
 import { updateRecordField } from "./repositories/recordsRepository.js";
 import { renderDataPanel } from "./dataPanel.js";
+import { renderCardVotesPanel as renderCardVotesPanelModule } from "./cardVotesPanel.js";
 
 import {
   buildDashboardGuestEditPayload,
@@ -1143,20 +1144,15 @@ function renderBudgetPanel() {
 }
 
 function renderCardVotesPanel() {
-  renderDataPanel({
-    container: document.querySelector("[data-card-votes-manager]"),
-    collection: collections.cardVotes,
-    records: state.cardVotes.map((r) => ({ ...r, updatedAt: ts(r.updatedAt) })),
-    columns: [
-      { field: "guestId", label: "Invitado" },
-      { field: "cardType", label: "Tipo" },
-      { field: "cardKey", label: "Card" },
-      { field: "rating", label: "Rating", type: "number" },
-      { field: "updatedAt", label: "Actualizado" },
-    ],
-    updateField: updateRecordField,
-    emptyText: "No hay votos de tarjetas.",
-    onAfterEdit: renderCardVotesPanel,
+  const container = document.querySelector("[data-card-votes-manager]");
+  if (!container) return;
+  renderCardVotesPanelModule({
+    container,
+    votes: state.cardVotes,
+    guests: getActiveGuests(),
+    guestAvatarUrl,
+    guestFullName,
+    guestInitials,
   });
 }
 

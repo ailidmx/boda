@@ -149,3 +149,77 @@
   gap: 0.5rem;
   margin-bottom: 1rem;
 }
+
+// ── Card votes (grouped rating view) ──
+.cardvotes-invitado {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+.cardvotes-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  overflow: hidden;
+  background: tokens.$cream-light;
+  color: tokens.$ink;
+  font-size: 0.72rem;
+  font-weight: 600;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+.cardvotes-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cardvotes-stars {
+  color: tokens.$accent;
+  letter-spacing: 0.02em;
+}
+.cardvotes-rating {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.cardvotes-rating-num,
+.cardvotes-avg-num {
+  font-weight: 600;
+  color: tokens.$ink;
+}
+.cardvotes-updated {
+  color: tokens.$ink-muted;
+  font-size: 0.82rem;
+}
+.cardvotes-card-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-width: 0;
+}
+.cardvotes-card-name {
+  font-weight: 600;
+  color: tokens.$dark-deep;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cardvotes-card-avg {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex: 0 0 auto;
+}
+.cardvotes-card-count {
+  color: tokens.$ink-muted;
+  font-size: 0.82rem;
+}
