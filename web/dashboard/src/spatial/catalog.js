@@ -124,6 +124,24 @@ export function isSystemDefinition(def) {
 }
 
 /**
+ * Default visual style per category. These are used when a definition (loaded
+ * from `catalog_definitions`) does not carry explicit style fields, and are the
+ * seed values written to the DB. zIndex controls SVG paint order (higher =
+ * drawn later / on top), so a toldo renders OVER the tables placed beneath it.
+ */
+const CATEGORY_STYLES = {
+  table: { strokeColor: "#8a6a36", fillColor: "#f4ead2", zIndex: 10 },
+  floor: { strokeColor: "#5d6d8a", fillColor: "#e9edf4", zIndex: 0 },
+  provider: { strokeColor: "#5d6d8a", fillColor: "#e9edf4", zIndex: 10 },
+  structure: { strokeColor: "#7a6fa0", fillColor: "#ede9f8", zIndex: 20 },
+  object: { strokeColor: "#8a6a36", fillColor: "#f4ead2", zIndex: 10 },
+};
+
+export function defaultStyleFor(def = {}) {
+  return CATEGORY_STYLES[def.category] || CATEGORY_STYLES.object;
+}
+
+/**
  * Normalize a definition into a concrete, complete shape. Applies sane
  * defaults for missing fields and computes derived capacity when AUTO.
  */
@@ -158,6 +176,13 @@ export function normalizeDefinition(def = {}) {
     seating,
     connection: def.connection || { enabled: false, ports: [] },
     metadata: def.metadata || {},
+    // Visual style (editable in the DB-backed catalog). Falls back to the
+    // per-category default so older/hardcoded defs still render consistently.
+    strokeColor: def.strokeColor || defaultStyleFor(def).strokeColor,
+    fillColor: def.fillColor || defaultStyleFor(def).fillColor,
+    strokeWidth: def.strokeWidth ?? 0.05,
+    opacity: def.opacity ?? 1,
+    zIndex: def.zIndex ?? defaultStyleFor(def).zIndex,
   };
   // Derive auto capacity when seating is enabled and no fixed count exists.
   if (seating.enabled && seating.mode !== "fixed") {
@@ -196,14 +221,11 @@ export function canDeleteDefinition(def, instances) {
  * A used custom definition MAY be edited, but the edit is flagged destructive.
  */
 export function canEditDefinition(def, instances) {
-  if (isSystemDefinition(def)) {
-    return { canEdit: false, reason: "system", usage: 0 };
-  }
+  // All definitions (including the built-in catalog objects) are editable now.
+  // Geometry-affecting fields (shape/size/seating) are LOCKED in the UI while
+  // the definition is in use; style/collision/name remain editable.
   const usage = definitionUsageCount(instances, def.id);
-  if (usage > 0) {
-    return { canEdit: true, destructive: true, usage };
-  }
-  return { canEdit: true, destructive: false, usage: 0 };
+  return { canEdit: true, usage, geometryLocked: usage > 0 };
 }
 
 /**
@@ -234,6 +256,24 @@ export function isStructuralChange(before, after) {
 }
 
 /**
+ * Fields that change an object's physical footprint / seats. These are LOCKED
+ * in the edit modal while the definition is in use. `collidable` is deliberately
+ * NOT geometric — a table or toldo can toggle collision at any time (that's how
+ * you place tables under a toldo).
+ */
+export const GEOMETRY_FIELDS = new Set([
+  "shape",
+  "width",
+  "height",
+  "diameter",
+  "radius",
+  "side",
+  "canRotate",
+  "rotationMode",
+  "seating",
+]);
+
+/**
  * The effective seat count for a definition (used by renderers + seat logic).
  */
 export function definitionSeatCount(definition, opts = {}) {
@@ -242,6 +282,7 @@ export function definitionSeatCount(definition, opts = {}) {
 
 export default {
   SYSTEM_DEFINITIONS,
+  PROVIDER_DEFINITIONS,
   isSystemDefinition,
   normalizeDefinition,
   definitionUsageCount,
@@ -249,5 +290,7 @@ export default {
   canEditDefinition,
   isStructuralChange,
   definitionSeatCount,
+  defaultStyleFor,
   STRUCTURAL_FIELDS,
+  GEOMETRY_FIELDS,
 };

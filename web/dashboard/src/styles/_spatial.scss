@@ -254,10 +254,16 @@
 }
 
 // ── Objects / tables ────────────────────────────────────────────────────
+// Per-object style is injected as CSS custom properties (--se-fill, --se-stroke,
+// --se-stroke-width, --se-opacity) from the DB-backed catalog definition, with
+// the original palette as fallback. The `.is-selected` / `.is-invalid` overrides
+// still win because they are plain class rules (higher specificity than the
+// var-based base), unlike inline `fill`/`stroke` which would beat them.
 .se-object-body {
-  fill: rgba($accent, 0.12);
-  stroke: $accent;
-  stroke-width: 0.05;
+  fill: var(--se-fill, rgba($accent, 0.12));
+  stroke: var(--se-stroke, $accent);
+  stroke-width: var(--se-stroke-width, 0.05);
+  opacity: var(--se-opacity, 1);
   vector-effect: non-scaling-stroke;
 }
 

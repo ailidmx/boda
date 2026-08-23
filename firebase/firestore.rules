@@ -79,6 +79,16 @@ service cloud.firestore {
       allow delete: if canDelete();
     }
 
+    // ── Spatial object catalog definitions (furniture / fixtures) ─────────
+    // One doc per reusable object type (mesa redonda, mesa de novios, pista de
+    // baile, barra de comida, mariachis, toldo, ...). Geometry is editable only
+    // when no plan instance references the definition (enforced in the UI).
+    match /catalog_definitions/{definitionId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
     // ── Budget / expenses (admin-only planning) ──────────────────────────
     match /budget/{itemId} {
       allow read: if canRead();

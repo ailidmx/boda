@@ -460,7 +460,8 @@ export function reducePlan(plan, action) {
       const { id, definition } = action;
       const before = plan.definitions.find((d) => d.id === id);
       if (!before) return plan;
-      if (isSystemDefinition(before)) return plan; // system immutable
+      // Built-in catalog objects are now editable (geometry is locked in the UI
+      // while in use, but style/collision/name may change at any time).
       return { ...plan, definitions: upsertById(plan.definitions, id, { ...before, ...definition }) };
     }
 

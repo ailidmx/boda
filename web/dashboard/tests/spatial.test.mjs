@@ -20,10 +20,13 @@ import {
 
 import {
   SYSTEM_DEFINITIONS,
+  PROVIDER_DEFINITIONS,
   isSystemDefinition,
   canDeleteDefinition,
   canEditDefinition,
   isStructuralChange,
+  normalizeDefinition,
+  defaultStyleFor,
 } from "../src/spatial/catalog.js";
 
 import {
@@ -40,6 +43,7 @@ import {
   reducePlan,
   computeDragCandidate,
   findFreePosition,
+  validatePlacement,
 } from "../src/spatial/editor-state.js";
 
 import { createHistory } from "../src/spatial/history.js";
@@ -427,11 +431,11 @@ test("history: guest assignment undo works", () => {
 });
 
 // ── Catalog guards ───────────────────────────────────────────────────────
-test("system definitions are immutable + undeletable", () => {
+test("built-in catalog objects are undeletable but editable", () => {
   const sys = SYSTEM_DEFINITIONS[0];
   assert.equal(isSystemDefinition(sys), true);
   assert.deepEqual(canDeleteDefinition(sys, []), { canDelete: false, reason: "system", usage: 0 });
-  assert.deepEqual(canEditDefinition(sys, []), { canEdit: false, reason: "system", usage: 0 });
+  assert.deepEqual(canEditDefinition(sys, []), { canEdit: true, usage: 0, geometryLocked: false });
 });
 
 test("custom definition in use cannot be deleted", () => {
@@ -440,10 +444,10 @@ test("custom definition in use cannot be deleted", () => {
   assert.deepEqual(canDeleteDefinition(def, instances), { canDelete: false, reason: "in-use", usage: 1 });
 });
 
-test("used custom definition editable but destructive", () => {
+test("used definition editable with locked geometry", () => {
   const def = { id: "custom-1", origin: "custom", shape: "circle", diameter: 2 };
   const instances = [{ id: "i1", definitionId: "custom-1" }];
-  assert.deepEqual(canEditDefinition(def, instances), { canEdit: true, destructive: true, usage: 1 });
+  assert.deepEqual(canEditDefinition(def, instances), { canEdit: true, usage: 1, geometryLocked: true });
 });
 
 test("structural change detection", () => {
@@ -452,6 +456,44 @@ test("structural change detection", () => {
   const c = { shape: "circle", width: 2, metadata: { description: "y" } };
   assert.equal(isStructuralChange(a, b), true);
   assert.equal(isStructuralChange(a, c), false);
+});
+
+// ── Collision flag (collidable) ──────────────────────────────────────────
+test("collidable:false (toldo) overlaps a table and vice versa; tables still collide", () => {
+  const toldo = PROVIDER_DEFINITIONS.find((d) => d.id === "sys-toldo");
+  const table = SYSTEM_DEFINITIONS[0]; // mesa redonda (collidable defaults to true)
+  const plan = createPlan();
+  plan.definitions = [toldo, table];
+  plan.instances = [
+    { id: "t1", definitionId: table.id, zoneId: "main", transform: { x: 10, y: 10, rotation: 0 } },
+  ];
+
+  // A toldo overlapping the table is allowed (non-collidable).
+  const toldoInst = { id: "toldo1", definitionId: toldo.id, zoneId: "main", transform: { x: 10, y: 10, rotation: 0 } };
+  assert.equal(validatePlacement(plan, toldoInst, toldoInst.transform).valid, true);
+
+  // A table overlapping the toldo is also allowed (toldo is skipped as obstacle).
+  const planWithToldo = { ...plan, instances: [toldoInst] };
+  const table2 = { id: "t2", definitionId: table.id, zoneId: "main", transform: { x: 10, y: 10, rotation: 0 } };
+  assert.equal(validatePlacement(planWithToldo, table2, table2.transform).valid, true);
+
+  // Two tables overlapping is rejected (both collidable).
+  const table3 = { id: "t3", definitionId: table.id, zoneId: "main", transform: { x: 10, y: 10, rotation: 0 } };
+  assert.equal(validatePlacement(plan, table3, table3.transform).valid, false);
+});
+
+// ── Catalog style defaults ───────────────────────────────────────────────
+test("normalizeDefinition applies per-category style defaults", () => {
+  const norm = normalizeDefinition({ id: "x", category: "table", shape: "circle", diameter: 1.8 });
+  assert.equal(norm.strokeColor, defaultStyleFor({ category: "table" }).strokeColor);
+  assert.equal(norm.fillColor, defaultStyleFor({ category: "table" }).fillColor);
+  assert.equal(norm.zIndex, defaultStyleFor({ category: "table" }).zIndex);
+  assert.equal(norm.opacity, 1);
+  assert.equal(norm.strokeWidth, 0.05);
+
+  // A structure (toldo) renders above tables.
+  const toldo = normalizeDefinition({ id: "y", category: "structure", shape: "rectangle", width: 8, height: 4 });
+  assert.ok(toldo.zIndex > norm.zIndex);
 });
 
 // ── Viewport ─────────────────────────────────────────────────────────────

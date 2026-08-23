@@ -17,6 +17,7 @@
 import { doc, getDoc, setDoc, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase.js";
 import { collections } from "../../../shared/firestore-paths.js";
+import { isSystemDefinition } from "../spatial/catalog.js";
 
 const DEFAULT_PLAN_ID = "main";
 
@@ -44,9 +45,13 @@ export async function savePlan(plan, planId = DEFAULT_PLAN_ID) {
       `[planRepository] savePlan → instancias apuntan a definiciones INEXISTENTES: ${missing.join(", ")}`,
     );
   }
+  // Built-in catalog objects live in `catalog_definitions` (not the plan), so
+  // they are NOT duplicated into `plans/main.definitions` — only custom
+  // definitions are persisted here. Instances still reference them by id.
+  const persistedDefinitions = definitions.filter((d) => !isSystemDefinition(d));
   await setDoc(
     doc(db, collections.plans, planId),
-    { ...plan, id: planId, updatedAt: new Date() },
+    { ...plan, definitions: persistedDefinitions, id: planId, updatedAt: new Date() },
     { merge: true },
   );
 }

@@ -27,7 +27,6 @@ import {
   normalizeDefinition,
   canDeleteDefinition,
   canEditDefinition,
-  isStructuralChange,
   definitionSeatCount,
   definitionUsageCount,
 } from "./spatial/catalog.js";
@@ -39,6 +38,7 @@ import { createHistory } from "./spatial/history.js";
 import { screenToWorld, gridSteps, zoomAt, panByScreen, clampZoom, EDITOR_DEFAULTS } from "./spatial/viewport.js";
 
 import { savePlan, loadPlan } from "./repositories/planRepository.js";
+import { loadCatalogDefinitions, saveCatalogDefinition } from "./repositories/catalogRepository.js";
 import { getActiveGuests, getGuest } from "./guests.js";
 
 // ── Module state (transient editor state + authoritative plan) ──────────
@@ -175,6 +175,18 @@ function instanceSeats(inst) {
   return { def: norm, anchors, blocked, seatCount };
 }
 
+// Per-definition visual style → SVG CSS custom properties (read by `.se-object-body`).
+function objectStyleVars(def) {
+  return `--se-fill:${def.fillColor};--se-stroke:${def.strokeColor};--se-stroke-width:${def.strokeWidth};--se-opacity:${def.opacity}`;
+}
+
+// SVG paint order: lower zIndex first (behind), higher last (on top). A toldo
+// (zIndex 20) therefore renders OVER the tables placed beneath it.
+function zIndexOf(inst) {
+  const def = instanceDef(inst);
+  return def ? (normalizeDefinition(def).zIndex ?? 10) : 10;
+}
+
 function guestAt(instanceId, seatId) {
   const gid = plan.guestAssignments?.[instanceId]?.[seatId];
   return gid ? getGuest(gid) : null;
@@ -192,11 +204,12 @@ function instanceMarkup(inst) {
   // 1-based position in the "Objetos reales" list (Novios = 1).
   const position = plan.instances.findIndex((i) => i.id === inst.id) + 1;
 
+  const style = objectStyleVars(def);
   let shapeHtml = "";
   if (dims.shape === "circle") {
-    shapeHtml = `<circle r="${dims.radius}" class="se-object-body"/>`;
+    shapeHtml = `<circle r="${dims.radius}" class="se-object-body" style="${style}"/>`;
   } else {
-    shapeHtml = `<rect x="${-dims.width / 2}" y="${-dims.height / 2}" width="${dims.width}" height="${dims.height}" class="se-object-body"/>`;
+    shapeHtml = `<rect x="${-dims.width / 2}" y="${-dims.height / 2}" width="${dims.width}" height="${dims.height}" class="se-object-body" style="${style}"/>`;
   }
   const positionHtml = `<text class="se-instance-position" text-anchor="middle" dominant-baseline="central" y="0.08">${position}</text>`;
 
@@ -248,9 +261,10 @@ function ghostMarkup() {
   const cy = drag.ghost.y;
   const rotation = drag.ghost.rotation;
   const valid = drag.valid;
+  const style = objectStyleVars(def);
   const shapeHtml = dims.shape === "circle"
-    ? `<circle r="${dims.radius}" class="se-object-body"/>`
-    : `<rect x="${-dims.width / 2}" y="${-dims.height / 2}" width="${dims.width}" height="${dims.height}" class="se-object-body"/>`;
+    ? `<circle r="${dims.radius}" class="se-object-body" style="${style}"/>`
+    : `<rect x="${-dims.width / 2}" y="${-dims.height / 2}" width="${dims.width}" height="${dims.height}" class="se-object-body" style="${style}"/>`;
   return `<g class="se-ghost ${valid ? "" : "is-invalid"}" transform="translate(${cx} ${cy}) rotate(${rotation})">${shapeHtml}</g>`;
 }
 
@@ -315,16 +329,24 @@ function panelMarkup() {
     const cap = definitionSeatCount(d);
     return cap > 0 ? `${cap} asientos` : "sin asientos";
   };
-  const systemItems = [...SYSTEM_DEFINITIONS, ...PROVIDER_DEFINITIONS].map((d) => {
-    return `<button class="se-catalog-item" data-add-def="${d.id}" data-drag-def="${d.id}" draggable="true" type="button" title="Clic: crear una instancia real · Arrastrar: crear y colocar directamente">
-      <span class="se-catalog-badge">Estándar · ${d.category || "objeto"}</span>
-      <strong>${d.name}</strong>
-      <small>${d.metadata?.description || ""} · ${seatLabel(d)}${d.collidable === false ? " · sin colisión" : ""}</small>
-      <small class="se-catalog-hint">＋ Crear instancia · ⇱ arrastrar al salón</small>
-    </button>`;
+  // Built-in catalog objects now come from `plan.definitions` (loaded from the
+  // `catalog_definitions` collection), so the sidebar is fully DB-driven.
+  const catalogDefs = plan.definitions.filter((d) => isSystemDefinition(d));
+  const systemItems = catalogDefs.map((d) => {
+    const usage = definitionUsageCount(plan.instances, d.id);
+    const cap = definitionSeatCount(d);
+    return `<div class="se-catalog-custom" data-custom-def="${d.id}">
+      <button class="se-catalog-item" data-add-def="${d.id}" data-drag-def="${d.id}" draggable="true" type="button" title="Clic: crear una instancia real · Arrastrar: crear y colocar directamente">
+        <span class="se-catalog-badge">Estándar · ${d.category || "objeto"}</span>
+        <strong>${d.name}</strong>
+        <small>${d.metadata?.description || ""} · ${seatLabel(d)}${d.collidable === false ? " · sin colisión" : ""}${usage ? ` · ${usage} en uso` : ""}</small>
+        <small class="se-catalog-hint">＋ Crear instancia · ⇱ arrastrar al salón</small>
+      </button>
+      <button class="se-catalog-action" data-edit-def="${d.id}" type="button" title="Editar definición">✏️</button>
+    </div>`;
   }).join("");
 
-  const customDefs = plan.definitions.filter((d) => d.origin !== "system");
+  const customDefs = plan.definitions.filter((d) => !isSystemDefinition(d));
   const customItems = customDefs.map((d) => {
     const usage = definitionUsageCount(plan.instances, d.id);
     const cap = definitionSeatCount(d);
@@ -455,7 +477,7 @@ function render() {
     </defs>
     ${showGrid ? `<g class="se-grid-layer">${gridLines()}</g>` : ""}
     <g class="se-zones">${plan.zones.filter((z) => z.visible !== false).map(zoneMarkup).join("")}</g>
-    <g class="se-instances">${plan.instances.filter((i) => !i.unplaced).map(instanceMarkup).join("")}</g>
+    <g class="se-instances">${[...plan.instances].filter((i) => !i.unplaced).sort((a, b) => zIndexOf(a) - zIndexOf(b)).map(instanceMarkup).join("")}</g>
     ${ghostMarkup()}
   `;
 
@@ -1083,10 +1105,16 @@ function openGuestPicker(instanceId, seatId) {
 function openCustomDefModal(defId = null) {
   const def = defId ? findDefinition(plan, defId) : null;
   const isEdit = Boolean(def);
-  const can = def ? canEditDefinition(def, plan.instances) : { canEdit: true, destructive: false, usage: 0 };
-  if (def && isSystemDefinition(def)) return;
+  const isBuiltIn = def ? isSystemDefinition(def) : false;
+  const can = def ? canEditDefinition(def, plan.instances) : { canEdit: true, usage: 0, geometryLocked: false };
+  const norm = def ? normalizeDefinition(def) : {};
 
-  const shape = def?.shape || "circle";
+  const shape = norm.shape || "circle";
+  const locked = can.geometryLocked;
+  const lockAttr = locked ? "disabled" : "";
+  const lockNote = locked
+    ? `<p class="se-warning">🔒 Este objeto se usa ${can.usage} veces. Su geometría (forma / tamaño / asientos) está bloqueada mientras existan instancias. Puedes editar nombre, colisión y estilo.</p>`
+    : "";
   const overlay = document.createElement("div");
   overlay.className = "se-modal-overlay";
   overlay.innerHTML = `
@@ -1096,30 +1124,39 @@ function openCustomDefModal(defId = null) {
         <button class="se-modal-close" type="button" data-close>✕</button>
       </div>
       <div class="se-modal-form">
-        ${can.destructive ? `<p class="se-warning">⚠️ Este objeto se usa ${can.usage} veces. Cambiar su geometría puede mover/quitar asientos y desasignar invitados.</p>` : ""}
-        <label>Nombre <input data-name value="${def?.name || ""}"/></label>
+        ${lockNote}
+        <label>Nombre <input data-name value="${norm.name || ""}"/></label>
         <label>Forma
-          <select data-shape>
+          <select data-shape ${lockAttr}>
             <option value="circle" ${shape === "circle" ? "selected" : ""}>Círculo</option>
             <option value="rectangle" ${shape === "rectangle" ? "selected" : ""}>Rectángulo</option>
             <option value="square" ${shape === "square" ? "selected" : ""}>Cuadrado</option>
           </select>
         </label>
-        <label>Ancho / Diámetro (m) <input type="number" step="0.1" min="0.2" data-width value="${def?.width ?? def?.diameter ?? 1.8}"/></label>
+        <label>Ancho / Diámetro (m) <input type="number" step="0.1" min="0.2" data-width value="${norm.width ?? norm.diameter ?? 1.8}" ${lockAttr}/></label>
         <div class="se-form-row">
-          <label>Alto (m) <input type="number" step="0.1" min="0.2" data-height value="${def?.height ?? 0.9}"/></label>
+          <label>Alto (m) <input type="number" step="0.1" min="0.2" data-height value="${norm.height ?? 0.9}" ${lockAttr}/></label>
         </div>
         <label>Asientos
-          <select data-seat-mode>
-            <option value="none" ${def?.seating?.enabled === false ? "selected" : ""}>Ninguno</option>
-            <option value="auto" ${def?.seating?.enabled !== false && def?.seating?.mode !== "fixed" ? "selected" : ""}>Automático</option>
-            <option value="fixed" ${def?.seating?.mode === "fixed" ? "selected" : ""}>Fijo</option>
+          <select data-seat-mode ${lockAttr}>
+            <option value="none" ${norm.seating?.enabled === false ? "selected" : ""}>Ninguno</option>
+            <option value="auto" ${norm.seating?.enabled !== false && norm.seating?.mode !== "fixed" ? "selected" : ""}>Automático</option>
+            <option value="fixed" ${norm.seating?.mode === "fixed" ? "selected" : ""}>Fijo</option>
           </select>
         </label>
-        <label><input type="checkbox" data-collidable ${def?.collidable === false ? "" : "checked"}/> Tiene colisión (desmarcar para objetos altos: toldo, decoración, escenario)</label>
-        <label class="se-fixed-seats ${def?.seating?.mode === "fixed" ? "" : "is-hidden"}" data-fixed-field>
-          Cantidad fija <input type="number" min="1" data-seat-count value="${def?.seating?.seatCount ?? 10}"/>
+        <label><input type="checkbox" data-collidable ${norm.collidable === false ? "" : "checked"}/> Tiene colisión (desmarcar para objetos altos: toldo, decoración, escenario)</label>
+        <label class="se-fixed-seats ${norm.seating?.mode === "fixed" ? "" : "is-hidden"}" data-fixed-field>
+          Cantidad fija <input type="number" min="1" data-seat-count value="${norm.seating?.seatCount ?? 10}" ${lockAttr}/>
         </label>
+        <div class="se-form-row se-form-style">
+          <label>Color borde <input type="color" data-stroke-color value="${norm.strokeColor || "#8a6a36"}"/></label>
+          <label>Color relleno <input type="color" data-fill-color value="${norm.fillColor || "#f4ead2"}"/></label>
+        </div>
+        <div class="se-form-row se-form-style">
+          <label>Grosor borde <input type="number" step="0.01" min="0.01" data-stroke-width value="${norm.strokeWidth ?? 0.05}"/></label>
+          <label>Opacidad <input type="number" step="0.05" min="0" max="1" data-opacity value="${norm.opacity ?? 1}"/></label>
+          <label>Z-index <input type="number" step="1" data-z-index value="${norm.zIndex ?? 10}"/></label>
+        </div>
         <div class="se-modal-actions">
           <button class="se-btn is-primary" data-save type="button">Guardar</button>
           <button class="se-btn" data-close type="button">Cancelar</button>
@@ -1145,33 +1182,47 @@ function openCustomDefModal(defId = null) {
     const seatMode = overlay.querySelector("[data-seat-mode]").value;
     const seatCount = Number(overlay.querySelector("[data-seat-count]").value) || 10;
     const collidable = overlay.querySelector("[data-collidable]").checked;
+    const strokeColor = overlay.querySelector("[data-stroke-color]").value;
+    const fillColor = overlay.querySelector("[data-fill-color]").value;
+    const strokeWidth = Number(overlay.querySelector("[data-stroke-width]").value) || 0.05;
+    const opacity = Number(overlay.querySelector("[data-opacity]").value);
+    const zIndex = Number(overlay.querySelector("[data-z-index]").value);
 
     const seatsEnabled = seatMode !== "none";
     const nextDef = {
       id: def?.id || `custom-${Date.now().toString(36)}`,
-      origin: "custom",
+      origin: def?.origin || "custom",
       name,
-      category: "object",
+      category: def?.category || "object",
       shape,
       width,
       height: shape === "rectangle" ? height : width,
       diameter: shape === "circle" ? width : undefined,
+      radius: shape === "circle" ? width / 2 : undefined,
       rotationMode: shape === "circle" ? "none" : "orthogonal",
       canRotate: shape !== "circle",
       collidable,
+      strokeColor,
+      fillColor,
+      strokeWidth,
+      opacity: Number.isFinite(opacity) ? Math.min(1, Math.max(0, opacity)) : 1,
+      zIndex: Number.isFinite(zIndex) ? zIndex : 10,
       seating: { enabled: seatsEnabled, mode: seatMode, seatCount: seatMode === "fixed" ? seatCount : null, enabledEdges: shape === "square" ? ["north", "east", "south", "west"] : ["north", "south"] },
       connection: { enabled: shape !== "circle", ports: shape === "circle" ? [] : ["north", "east", "south", "west"] },
       metadata: { description: def?.metadata?.description || "" },
     };
 
     if (isEdit) {
-      const before = normalizeDefinition(def);
-      const after = normalizeDefinition(nextDef);
-      if (can.destructive && isStructuralChange(before, after)) {
-        const ok = window.confirm(`Este objeto se usa ${can.usage} veces. Cambiar su geometría puede mover/quitar asientos y desasignar invitados. ¿Continuar y actualizar todas las instancias?`);
-        if (!ok) return;
-      }
       dispatch({ type: "UPDATE_DEFINITION", id: def.id, definition: nextDef });
+      if (isBuiltIn) {
+        // Built-in catalog objects live in `catalog_definitions` — persist there.
+        try {
+          await saveCatalogDefinition(nextDef);
+        } catch (err) {
+          console.error("[spatialEditor] saveCatalogDefinition failed", err);
+          window.alert("No se pudo guardar el objeto en el catálogo.");
+        }
+      }
     } else {
       dispatch({ type: "ADD_DEFINITION", definition: nextDef });
     }
@@ -1597,15 +1648,23 @@ export async function loadSpatialEditor(root) {
     });
   });
 
-  // Load the authoritative plan.
+  // Load the authoritative plan + the DB-backed object catalog.
   const loaded = await loadPlan();
+  let catalogDefs = [];
+  try {
+    catalogDefs = await loadCatalogDefinitions();
+  } catch (err) {
+    console.warn("[spatialEditor] could not load catalog definitions", err);
+  }
+  // Fall back to the hardcoded built-ins if the catalog collection is empty
+  // (e.g. before the seed script has run).
+  const builtIns = catalogDefs.length ? catalogDefs : [...SYSTEM_DEFINITIONS, ...PROVIDER_DEFINITIONS];
   if (loaded && loaded.instances) {
-    // Ensure definitions include all built-in system + provider objects.
-    const defs = [...SYSTEM_DEFINITIONS, ...PROVIDER_DEFINITIONS, ...(loaded.definitions || []).filter((d) => !isSystemDefinition(d))];
-    plan = { ...createPlan(), ...loaded, definitions: defs };
+    const customDefs = (loaded.definitions || []).filter((d) => !isSystemDefinition(d));
+    plan = { ...createPlan(), ...loaded, definitions: [...builtIns, ...customDefs] };
   } else {
     plan = createPlan();
-    plan.definitions = [...SYSTEM_DEFINITIONS, ...PROVIDER_DEFINITIONS];
+    plan.definitions = [...builtIns];
   }
   // Only now is `plan` authoritative — allow autosave/unload writes.
   planLoaded = true;

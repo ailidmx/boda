@@ -50,6 +50,8 @@ export const collections = {
   tables: "tables",
   /** Spatial event-layout plans (zones, definitions, instances, groups, connections, guest assignments). */
   plans: "plans",
+  /** Spatial object catalog definitions (furniture/fixtures: tables, dance floor, bars, mariachis, toldo). */
+  catalogDefinitions: "catalog_definitions",
   /** Guest inactivity events (written by the invitation's activity tracker). */
   activityEvents: "activity_events",
   /** Page-view analytics events (written by the invitation). */

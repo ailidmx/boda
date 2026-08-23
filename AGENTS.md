@@ -1295,25 +1295,37 @@ directly to `master` and push.
   zone containment, magnetic connections, seat blocking, group transforms,
   history, catalog guards, and viewport math. `npm test` (root) runs it.
 
-- **Catalog objects ARE persisted — system definitions are NOT.** The spatial
-  editor's catalog splits into two kinds of "definition":
-  (1) **System + provider definitions** (`SYSTEM_DEFINITIONS` →
+- **Catalog objects ARE DB-backed (`catalog_definitions`).** The spatial editor's
+  catalog splits into two kinds of "definition":
+  (1) **Built-in catalog objects** (the 7: `SYSTEM_DEFINITIONS` →
   `sys-table-round-10`, `sys-table-novios`, `sys-table-rect`;
   `PROVIDER_DEFINITIONS` → pista de baile, barra de comida, mariachis, toldo)
-  are **hardcoded in `web/dashboard/src/spatial/catalog.js`** and are NOT stored
-  in Firestore. They are immutable and injected at load time.
-  (2) **Custom definitions** (created via the "＋ Nuevo objeto" modal) ARE
+  now live in the **`catalog_definitions` collection** (one doc per id), seeded by
+  `scripts/seed-catalog-definitions.mjs`. They are loaded by
+  `catalogRepository.loadCatalogDefinitions()` and editable via the object modal.
+  (2) **Custom definitions** (created via the "＋ Nuevo objeto" modal) ARE still
   persisted inside the plan document as `plans/main.definitions[]`.
-  So the relationship is NOT missing: every instance references its definition
-  via an `instance.definitionId` field, and the WHOLE plan (venue, zones,
-  `definitions[]`, `instances[]`, `groups[]`, `connections[]`,
-  `guestAssignments{}`) is saved together in the single flat `plans/main` doc by
-  `planRepository.savePlan` (merge write). The instance→definition link survives
-  because both arrays persist together. On load, `spatialEditor.js`
-  `loadSpatialEditor()` merges `[...SYSTEM_DEFINITIONS, ...PROVIDER_DEFINITIONS,
-  ...loaded.definitions.filter(nonSystem)]` so in-memory always has the full
-  catalog. `planRepository.savePlan` now logs the definition ids and warns if any
-  instance references a missing `definitionId`.
+  Every instance references its definition via `instance.definitionId`. On load,
+  `spatialEditor.js loadSpatialEditor()` merges `[...catalogDefs (DB),
+  ...loaded.definitions.filter(nonSystem)]` (falling back to the hardcoded
+  `SYSTEM_DEFINITIONS`+`PROVIDER_DEFINITIONS` if the collection is empty).
+  `planRepository.savePlan` now STRIPS built-in (`isSystemDefinition`) defs from
+  `plans/main.definitions` so they are not duplicated in the plan doc.
+- **Catalog definitions carry editable style + collision + geometry fields.** A
+  definition (normalized by `normalizeDefinition`) has `shape`, `width`/`height`/
+  `diameter`/`radius`, `collidable` (mesas `true`, toldo/floor/mariachis `false`),
+  and visual style: `strokeColor`, `fillColor`, `strokeWidth`, `opacity`,
+  `zIndex` (defaults via `defaultStyleFor(category)` — structure/toldo renders
+  above tables). `collidable === false` means the object overlaps/underlaps other
+  objects freely (already honored by `validatePlacement` in `editor-state.js`).
+  `canEditDefinition` now returns `{ canEdit: true, usage, geometryLocked:
+  usage > 0 }` — ALL definitions (incl. built-ins) are editable, but the edit
+  modal DISABLES geometry inputs (shape/size/seating) while `usage > 0`
+  (`GEOMETRY_FIELDS` in `catalog.js`). Style/collision/name stay editable. Built-in
+  edits persist to `catalog_definitions` via `catalogRepository.saveCatalogDefinition`.
+  Rendering applies style via CSS custom properties (`--se-fill/--se-stroke/…`) on
+  `.se-object-body` (so `.is-selected`/`.is-invalid` overrides still win) and paints
+  instances sorted by `zIndex`.
 - **Legacy `tables` docs had BOTH `slots` (canonical) and `guestIds` (derived).**
   `slots` = `{ "0": guestId|null, ... }` (positional), `guestIds` = `[guestId, ...]`
   (ordered non-null, fully derived from `slots`). `guestIds` carried no extra
