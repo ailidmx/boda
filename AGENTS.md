@@ -979,6 +979,38 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   non-ready guest can be missing several pieces and would be double-counted.
   When adding a new checkbox filter, add it to the dropdown menu, wire its
   `data-filter-*` listener, and include it in the `filterCount` computation.
+- **INVITADOS "No enviada" filter + boolean checkboxes** — the identity filter
+  dropdown's "Enviado" checkbox is now **"No enviada"** (`state.filterSent ===
+  "notSent"`; checked = show only guests whose invitation has NOT been sent). The
+  readiness card row shows a real count (not a ✓) via `notSentCount` in
+  `guestTable.js`. The yes/no columns (Alojamiento `accommodationConfirm`, Lista
+  espera `cabinWaitingList`, Pago `paymentConfirmed`, Pétanque
+  `petanqueParticipation`, Boules `petanqueOwnBoules`) render as one-click
+  CHECKBOXES instead of the old Sí/No/— chip + select editor. RSVP booleans save
+  via `saveGuestRsvpAnswer(guestId, questionId, checked ? 1 : 2)`;
+  `paymentConfirmed` saves via `saveGuestInline(guestId, "paymentConfirmed",
+  checked)`. The Cabaña/Cuarto badge cells now use `badgeStyle()` from
+  `guestDomain.js` for deterministic pastel colors.
+- **INVITADOS contextual filters swap per column group** — the filter dropdown
+  (`filterDropdownItems` in `guestTable.js`) shows DIFFERENT checkboxes depending
+  on `state.columnGroup`: Identidad → identity filters; Presencia →
+  `filterAccommodation` / `filterWaitingList` / `filterNoCabin` / `filterPayment`;
+  Pétanque → `filterPetanque` / `filterBoules`; Playa → `filterPlaya`. Filter
+  logic lives in `guestService.js getFilteredGuests()` (string-value pattern:
+  `"yes"` / `"without"`), and `resetContextualFilters(state)` clears them on every
+  column-group switch and on tab leave. Add a new contextual filter in all four
+  spots: the `state` field in `dashboard.js`, the `getFilteredGuests` call +
+  service logic, `filterDropdownItems`, and the `wireToolbar` listener.
+- **Card-votes panel is a FREE grouped `<details>` list, not AG Grid** — AG Grid
+  36's `rowGroup` is Enterprise-only (`RowGroupingModule`), so the dashboard
+  "Votos" panel (`web/dashboard/src/cardVotesPanel.js`) renders its own grouping
+  with native `<details>`/`<summary>`: three sub-tabs (Música/Comida/Guisos),
+  cards sorted by AVERAGE rating, each header showing name + ★ average (1 dec.) +
+  vote count, and expanding reveals votes (avatar + name + stars + numeric rating
+  + timestamp) best → worst. Styles live in `_grid.scss` (`.cardvotes-list`,
+  `.cardvotes-card`, `.cardvotes-votes`, `.cardvotes-vote`). It receives
+  already-loaded votes + guest resolvers and never touches Firestore. Don't
+  reintroduce AG Grid row grouping here.
 - **`[hidden]` must always win over `display` for toggle cells** — the dashboard's
   inline editors toggle view ⇄ edit by setting the `hidden` attribute, but any
   view button whose CSS sets `display: inline-flex`/`inline-block` (e.g.
