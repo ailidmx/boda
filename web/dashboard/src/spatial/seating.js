@@ -102,12 +102,15 @@ export function rectSeatAnchors(dims, seatCount, opts = {}) {
     perEdgeSeats[last].count -= sum - seatCount;
   }
 
-  const anchors = [];
-  let globalIndex = 0;
+  // Build per-edge anchors, preserving each seat's LOCAL index (`i`) and its
+  // stable id (`<edge>-<i>`), geometry, and facing angle. The local index keeps
+  // guest assignments stable across any future ordering change.
+  const byEdge = {};
   for (const edge of enabledEdges) {
     const { usable, count } = perEdgeSeats[edge];
     const len = edgeLength(edge);
     const along = (t) => -len / 2 + startMargin + t * usable; // from edge start
+    const list = [];
     for (let i = 0; i < count; i++) {
       const t = count === 1 ? 0.5 : i / (count - 1);
       const offset = along(t);
@@ -138,16 +141,30 @@ export function rectSeatAnchors(dims, seatCount, opts = {}) {
         default:
           break;
       }
-      anchors.push({
-        id: `${edge}-${i}`,
-        edge,
-        index: globalIndex++,
-        x,
-        y,
-        angle,
-      });
+      list.push({ id: `${edge}-${i}`, edge, x, y, angle });
     }
+    byEdge[edge] = list;
   }
+
+  // Facing-pair ordering: interleave NORTH/SOUTH so pairs look into each
+  // other's eyes — seat 1 (north) faces seat 2 (south), seat 3 faces seat 4,
+  // and so on. This is the human-friendly numbering the couple asked for.
+  const anchors = [];
+  const north = byEdge.north || [];
+  const south = byEdge.south || [];
+  const pairCount = Math.max(north.length, south.length);
+  for (let i = 0; i < pairCount; i++) {
+    if (i < north.length) anchors.push(north[i]);
+    if (i < south.length) anchors.push(south[i]);
+  }
+  // Append any remaining (non N/S) edges in their declared order.
+  for (const edge of enabledEdges) {
+    if (edge === "north" || edge === "south") continue;
+    if (byEdge[edge]) anchors.push(...byEdge[edge]);
+  }
+
+  // Assign the 0-based position index in the FINAL (facing-pair) order.
+  anchors.forEach((a, idx) => { a.index = idx; });
   return anchors;
 }
 

@@ -407,6 +407,14 @@ test("MOVE_GUEST swaps guests when target seat is occupied", () => {
   assert.equal(moved.guestAssignments.a["seat-0"], "g2");
 });
 
+test("ASSIGN_GUEST enforces 1 guest = 1 seat (purges previous seat)", () => {
+  const plan = seededPlan();
+  const assigned = reducePlan(plan, { type: "ASSIGN_GUEST", instanceId: "a", seatId: "seat-0", guestId: "g1" });
+  const reassigned = reducePlan(assigned, { type: "ASSIGN_GUEST", instanceId: "a", seatId: "seat-3", guestId: "g1" });
+  assert.equal(reassigned.guestAssignments.a["seat-0"], undefined);
+  assert.equal(reassigned.guestAssignments.a["seat-3"], "g1");
+});
+
 test("history: guest assignment undo works", () => {
   const plan = seededPlan();
   const h = createHistory();

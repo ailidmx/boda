@@ -29,11 +29,21 @@ const DEFAULT_PLAN_ID = "main";
  * @param {string} planId
  */
 export async function savePlan(plan, planId = DEFAULT_PLAN_ID) {
+  const definitions = plan.definitions || [];
+  const instances = plan.instances || [];
+  const defIds = definitions.map((d) => d.id);
+  const instDefIds = instances.map((i) => i.definitionId);
+  const missing = [...new Set(instDefIds.filter((id) => !defIds.includes(id)))];
   console.log(
     `[planRepository] savePlan → plans/${planId} · ` +
-    `${plan.instances?.length ?? 0} instancias, ${Object.keys(plan.guestAssignments || {}).length} con invitados, ` +
-    `${plan.definitions?.length ?? 0} definiciones`,
+    `${instances.length} instancias, ${Object.keys(plan.guestAssignments || {}).length} con invitados, ` +
+    `${definitions.length} definiciones [${defIds.join(", ")}]`,
   );
+  if (missing.length) {
+    console.warn(
+      `[planRepository] savePlan → instancias apuntan a definiciones INEXISTENTES: ${missing.join(", ")}`,
+    );
+  }
   await setDoc(
     doc(db, collections.plans, planId),
     { ...plan, id: planId, updatedAt: new Date() },

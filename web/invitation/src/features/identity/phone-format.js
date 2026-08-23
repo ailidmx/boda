@@ -81,7 +81,16 @@ export function formatPhone(e164) {
     if (digits.startsWith(cd) && cd.length > code.length) code = cd;
   }
   const national = code ? digits.slice(code.length) : digits;
-  const grouped = national.match(/.{1,2}/g)?.join(" ") || national;
+
+  // Localized grouping for French numbers: the leading digit is the carrier
+  // (e.g. "6"), then digits are paired → "+33 6 69 36 94 20". Other countries
+  // keep the generic two-by-two pairing.
+  let grouped;
+  if (code === "33" && national.length > 1) {
+    grouped = national[0] + " " + (national.slice(1).match(/.{1,2}/g)?.join(" ") || "");
+  } else {
+    grouped = national.match(/.{1,2}/g)?.join(" ") || national;
+  }
   return code ? `+${code} ${grouped}` : grouped;
 }
 

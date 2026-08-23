@@ -34,6 +34,13 @@ const LOADER_BG_IMAGE =
 const DEFAULT_SOURCES = [
   { name: "guests", label: "Invitados" },
   { name: "thanks", label: "Gracias" },
+  { name: "budget", label: "Presupuesto" },
+  { name: "card_votes", label: "Votos" },
+  { name: "guiso_rankings", label: "Guisos" },
+  { name: "song_requests", label: "Canciones" },
+  { name: "page_views", label: "Vistas" },
+  { name: "activity_events", label: "Actividad" },
+  { name: "login_events", label: "Sesiones" },
   { name: "rooms", label: "Cuartos" },
   { name: "tables", label: "Mesas" },
   { name: "auth_users", label: "Cuentas" },

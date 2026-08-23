@@ -32,6 +32,7 @@ import { getFirestore } from "firebase-admin/firestore";
 import { getAuth } from "firebase-admin/auth";
 import { onDocumentCreated, onDocumentUpdated, onDocumentWritten } from "firebase-functions/v2/firestore";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { onSchedule } from "firebase-functions/v2/scheduler";
 
 import { defineSecret } from "firebase-functions/params";
 import { setGlobalOptions } from "firebase-functions/v2";
@@ -1384,6 +1385,61 @@ export const sendInvitation = onCall(
 
     return { ok: true, channel, inviteUrl, sentAt, waLink };
 
+  },
+);
+
+// ── Analytics summary (scheduled) ─────────────────────────────────────────
+//
+// Sends a periodic recap of the three analytics collections to the couple so
+// they get a high-level pulse without receiving a Telegram message for EVERY
+// page view / activity document (which would be extremely noisy). Real-time
+// notifications remain for the meaningful, low-volume events (login via
+// `onLogin`, inactivity via `onActivityEvent`); this scheduled function batches
+// the page_views + activity_events + login_events counts into one digest.
+//
+// Schedule: every 6 hours, in Mexico City time.
+
+async function countSince(collectionName, since) {
+  const db = getFirestore(DB_ID);
+  const snapshot = await db.collection(collectionName)
+    .where("createdAt", ">", since)
+    .count()
+    .get();
+  return snapshot.data().count;
+}
+
+export const analyticsDigest = onSchedule(
+  { schedule: "0 */6 * * *", timeZone: "America/Mexico_City", secrets: [TELEGRAM_TOKEN, TELEGRAM_CHAT_ID] },
+  async () => {
+    const now = new Date();
+    const since = new Date(now.getTime() - 6 * 60 * 60 * 1000);
+
+    let pageViews = 0;
+    let activityEvents = 0;
+    let loginEvents = 0;
+    try {
+      [pageViews, activityEvents, loginEvents] = await Promise.all([
+        countSince("page_views", since),
+        countSince("activity_events", since),
+        countSince("login_events", since),
+      ]);
+    } catch (error) {
+      console.error("[analytics-digest] count failed", error);
+      return;
+    }
+
+    // If nothing happened in this window, skip the message to avoid noise.
+    if (pageViews === 0 && activityEvents === 0 && loginEvents === 0) return;
+
+    const lines = [
+      "📊 *Resumen de actividad (6 h)*",
+      kv("Vistas de sección", String(pageViews)),
+      kv("Eventos de inactividad", String(activityEvents)),
+      kv("Inicios de sesión", String(loginEvents)),
+      kv("Desde", formatTime(since)),
+      kv("Hasta", formatTime(now)),
+    ];
+    await notify(lines.join("\n"));
   },
 );
 

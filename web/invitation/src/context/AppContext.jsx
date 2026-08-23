@@ -25,7 +25,14 @@ import {
   verifyBeforeUpdateEmail,
 } from "firebase/auth";
 
-import { auth } from "../firebase.js";
+import { auth, db } from "../firebase.js";
+import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import { collections } from "../../../shared/firestore-paths.js";
+import {
+  getInvitationLinkParams,
+  computeTimeToAnswer,
+  normalizeSource,
+} from "../invitation-link.js";
 import { content, SUPPORTED_LANGUAGES } from "../content.js";
 import {
   AUTH_EMAIL_DOMAIN,
@@ -47,6 +54,8 @@ import {
   resolveGuestInvitationGroup,
   resolveIdentityCheckPassed,
 } from "../guest-profiles.js";
+
+import { useActivityTracker } from "../hooks/useActivityTracker.js";
 
 
 import { loadRooms } from "../rooms.js";
@@ -212,6 +221,12 @@ export function AppProvider({ children }) {
   // same session (it is still reopenable manually from the user menu).
   const identityPromptShown = useRef(false);
 
+  // Detect when the signed-in guest stops interacting (idle) and write an
+  // `activity_events` record so the couple can see who went inactive. Exposes
+  // `isActive` on the context so `useSectionTime` can pause accumulation while
+  // the guest is idle. No-op until `profile.guest` resolves (after sign-in).
+  const { isActive } = useActivityTracker({ guestId: profile?.guest?.id });
+
   // Tracks the currently active language so the auth listener (which has empty
   // deps) can read the latest value without going stale.
   const languageRef = useRef(language);
@@ -375,15 +390,36 @@ export function AppProvider({ children }) {
     const timeout = new Promise((_, reject) =>
       window.setTimeout(() => reject(new Error("timeout")), 15000),
     );
+    let userCredential;
     try {
       await Promise.race([
         (async () => {
           await setPersistence(auth, browserLocalPersistence);
-          await signInWithEmailAndPassword(auth, email, password);
+          userCredential = await signInWithEmailAndPassword(auth, email, password);
         })(),
         timeout,
       ]);
       window.localStorage.setItem(USERNAME_STORAGE_KEY, username);
+
+      // Write a lightweight `login_events` record on every REAL sign-in. This
+      // MUST live here (not in onAuthStateChanged, which fires on every refresh
+      // via browserLocalPersistence) so the couple is notified only when the
+      // guest actually types their credentials.
+      const uid = userCredential?.user?.uid || null;
+      const linkParams = getInvitationLinkParams();
+      addDoc(collection(db, collections.loginEvents), {
+        guestId: uid,
+        username: normalized,
+        source: normalizeSource(linkParams.source),
+        medium: linkParams.medium || "",
+        campaign: linkParams.campaign || "",
+        sentAt: linkParams.sentAt || null,
+        timeToAnswer: computeTimeToAnswer(linkParams.sentAt),
+        email,
+        createdAt: serverTimestamp(),
+      }).catch((err) => {
+        console.warn("[auth] Failed to log login event", err);
+      });
       // onAuthStateChanged will fire and set authState to signedIn.
     } catch (error) {
       console.warn("Invitation access rejected", error.code || error.message, {
@@ -595,6 +631,7 @@ export function AppProvider({ children }) {
       changePassword,
       changeEmail,
       reauthenticate,
+      isActive,
     }),
 
     [
@@ -608,6 +645,7 @@ export function AppProvider({ children }) {
       musicEnabled,
       musicPlaying,
       musicSectionVisible,
+      isActive,
     ],
   );
 

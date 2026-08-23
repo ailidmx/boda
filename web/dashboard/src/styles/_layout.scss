@@ -389,7 +389,10 @@
 }
 
 
-.dashboard-avatar {
+// Scope the stacked-avatar styles to the summary-card avatar strip so they
+// don't leak into the INVITADOS identity cell (which uses `.dashboard-avatar`
+// with a different size/shape in `_guests.scss`).
+.dashboard-avatars .dashboard-avatar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -410,7 +413,7 @@
   }
 }
 
-.dashboard-avatar-img {
+.dashboard-avatars .dashboard-avatar-img {
   width: 100%;
   height: 100%;
   object-fit: cover;

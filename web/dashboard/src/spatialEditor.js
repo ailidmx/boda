@@ -58,10 +58,20 @@ let showOnlyUnassigned = false; // guest filter: only unassigned
 let showOnlySat5 = false; // guest filter: only SAT level 5
 let showOnlyChildren = false; // guest filter: only children (age "Niño")
 let planLoaded = false; // true once the authoritative plan is in memory (guards writes)
+let reorderDragId = null; // in-flight sidebar reorder drag (instance id)
 
 // ── Debug logging ────────────────────────────────────────────────────────
 function log(...args) {
   console.log("[spatialEditor]", ...args);
+}
+
+// Compact view of the persisted seating state: instanceId → occupied seat count.
+function summarizeAssignments() {
+  const out = {};
+  for (const [iid, seats] of Object.entries(plan.guestAssignments || {})) {
+    out[iid] = Object.keys(seats).length;
+  }
+  return out;
 }
 
 // ── Guest helpers ────────────────────────────────────────────────────────
@@ -338,11 +348,12 @@ function panelMarkup() {
     const seatCount = def ? definitionSeatCount(def) : 0;
     const isPlaced = !inst.unplaced;
     return `
-      <div class="se-instance-wrap">
+      <div class="se-instance-wrap" data-reorder-wrap="${inst.id}">
         <div class="se-instance-item ${isPlaced ? "is-placed" : "is-unplaced"} ${selection.has(inst.id) ? "is-selected" : ""}"
           data-sel-instance="${inst.id}"
           ${!isPlaced ? `data-drag-instance="${inst.id}" draggable="true"` : ""}
           title="${isPlaced ? "Haz clic para enfocar en el salón" : "Arrastra al salón o usa ⚑ para colocación automática"}">
+          <span class="se-instance-grip" data-reorder-instance="${inst.id}" draggable="true" title="Arrastrar para reordenar">⋮⋮</span>
           <button class="se-instance-name" type="button" data-focus-instance="${inst.id}">
             <span class="se-instance-dot ${isPlaced ? "is-placed" : "is-unplaced"}"></span>
             <span class="se-instance-name-text">${label}</span>
@@ -507,14 +518,19 @@ function renderSaveStatus() {
 let persistQueue = Promise.resolve();
 
 async function persist() {
-  if (!planLoaded) return; // never write before the real plan is loaded
+  if (!planLoaded) {
+    console.warn("[spatialEditor] persist SKIPPED (plan not loaded yet)", summarizeAssignments());
+    return; // never write before the real plan is loaded
+  }
   saveState = "saving";
   renderSaveStatus();
+  console.log("[spatialEditor] persist:start", summarizeAssignments());
   try {
     await savePlan(plan);
     saveState = "saved";
+    console.log("[spatialEditor] persist:ok", summarizeAssignments());
   } catch (err) {
-    console.error("[spatialEditor] save failed", err);
+    console.error("[spatialEditor] persist:FAILED", err);
     saveState = "error";
   }
   renderSaveStatus();
@@ -523,7 +539,10 @@ async function persist() {
 function schedulePersist() {
   // Chain onto the queue. `persist` reads the LIVE `plan`, so the last
   // queued write always reflects the newest state even after rapid commits.
-  persistQueue = persistQueue.then(persist).catch((err) => {
+  persistQueue = persistQueue.then(() => {
+    console.log("[spatialEditor] persist:queued", summarizeAssignments());
+    return persist();
+  }).catch((err) => {
     console.error("[spatialEditor] persist queue error", err);
     saveState = "error";
     renderSaveStatus();
@@ -677,6 +696,14 @@ function placeUnplacedInstanceOnDrop(e) {
 
 // Drag start for BOTH abstract definitions and real (unplaced) instances.
 function onCatalogDragStart(e) {
+  const reorderGrip = e.target.closest?.("[data-reorder-instance]");
+  if (reorderGrip) {
+    reorderDragId = reorderGrip.dataset.reorderInstance;
+    e.dataTransfer.setData("text/reorder-instance", reorderDragId);
+    e.dataTransfer.effectAllowed = "move";
+    log(`dragstart reorder-instance ${reorderDragId}`);
+    return;
+  }
   const inst = e.target.closest?.("[data-drag-instance]");
   if (inst) {
     e.dataTransfer.setData("text/custom-instance", inst.dataset.dragInstance);
@@ -746,6 +773,33 @@ function onSlotDrop(e) {
     guestId: drag.guestId,
   }, { record: true });
   guestDrag = null;
+}
+
+function onReorderDragOver(e) {
+  if (reorderDragId == null) return;
+  const wrap = e.target.closest?.("[data-reorder-wrap]");
+  if (!wrap) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = "move";
+}
+
+function onReorderDrop(e) {
+  if (reorderDragId == null) return;
+  e.preventDefault();
+  const wrap = e.target.closest?.("[data-reorder-wrap]");
+  const id = reorderDragId;
+  reorderDragId = null;
+  if (!wrap) return;
+  const targetId = wrap.dataset.reorderWrap;
+  // Insertion index measured in the list AFTER removing the dragged item.
+  const remaining = plan.instances.filter((i) => i.id !== id);
+  const targetIdx = remaining.findIndex((i) => i.id === targetId);
+  if (targetIdx === -1) return;
+  const rect = wrap.getBoundingClientRect();
+  const before = e.clientY < rect.top + rect.height / 2;
+  const insertAt = before ? targetIdx : targetIdx + 1;
+  log(`reorder ${id} → index ${insertAt} (${before ? "before" : "after"} ${targetId})`);
+  dispatch({ type: "MOVE_INSTANCE_INDEX", id, toIndex: insertAt }, { record: true });
 }
 
 function autoPlaceInstance(instanceId) {
@@ -1016,6 +1070,7 @@ function openGuestPicker(instanceId, seatId) {
       if (guestId) {
         dispatch({ type: "ASSIGN_GUEST", instanceId, seatId, guestId });
       } else {
+        console.log(`[spatialEditor] unassign:modal ${instanceId}/${seatId}`, summarizeAssignments());
         dispatch({ type: "UNASSIGN_GUEST", instanceId, seatId });
       }
       close();
@@ -1403,14 +1458,19 @@ export async function loadSpatialEditor(root) {
   sidebar.addEventListener("dragstart", onCatalogDragStart);
   sidebar.addEventListener("dragover", onSlotDragOver);
   sidebar.addEventListener("drop", onSlotDrop);
+  sidebar.addEventListener("dragover", onReorderDragOver);
+  sidebar.addEventListener("drop", onReorderDrop);
+  sidebar.addEventListener("dragend", () => { reorderDragId = null; });
   sidebar.addEventListener("click", (e) => {
     // Remove guest assignment from a slot.
     const unassignBtn = e.target.closest("[data-unassign-instance]");
     if (unassignBtn) {
       const instanceId = unassignBtn.dataset.unassignInstance;
       const seatId = unassignBtn.dataset.unassignSeat;
-      log(`unassign ${instanceId}/${seatId}`);
-      dispatch({ type: "UNASSIGN_GUEST", instanceId, seatId }, { record: true });
+      const guestId = plan.guestAssignments?.[instanceId]?.[seatId];
+      console.log(`[spatialEditor] unassign:start ${instanceId}/${seatId} (guest=${guestId})`, summarizeAssignments());
+      const ok = dispatch({ type: "UNASSIGN_GUEST", instanceId, seatId }, { record: true });
+      console.log(`[spatialEditor] unassign:done ok=${ok} stillAssigned=${Boolean(plan.guestAssignments?.[instanceId]?.[seatId])}`, summarizeAssignments());
       return;
     }
     // Click a seat slot (left pane) → open the find-guest modal to reassign it.
@@ -1460,7 +1520,7 @@ export async function loadSpatialEditor(root) {
       autoPlaceInstance(autoPlaceBtn.dataset.autoPlace);
       return;
     }
-    const reorderBtn = e.target.closest("[data-reorder-instance]");
+    const reorderBtn = e.target.closest("[data-reorder-instance][data-dir]");
     if (reorderBtn) {
       dispatch({ type: "REORDER_INSTANCES", id: reorderBtn.dataset.reorderInstance, dir: reorderBtn.dataset.dir }, { record: true });
       return;

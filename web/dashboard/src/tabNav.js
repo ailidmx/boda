@@ -21,6 +21,11 @@ const PATH_TO_TAB = {
   cabins: "cabins",
   tables: "tables",
   gracias: "thanks",
+  presupuesto: "budget",
+  votos: "cardVotes",
+  guisos: "guisoRankings",
+  canciones: "songRequests",
+  analitica: "analytics",
 };
 
 /** Map internal tab IDs to URL path segments. */
@@ -30,6 +35,11 @@ const TAB_TO_PATH = {
   cabins: "cabins",
   tables: "tables",
   thanks: "gracias",
+  budget: "presupuesto",
+  cardVotes: "votos",
+  guisoRankings: "guisos",
+  songRequests: "canciones",
+  analytics: "analitica",
 };
 
 /** The tab definitions: id, label, and icon. */
@@ -39,6 +49,11 @@ const TABS = [
   { id: "cabins", label: "Cabañas", icon: "🏠" },
   { id: "tables", label: "Mesas", icon: "🪑" },
   { id: "thanks", label: "Gracias", icon: "🙏" },
+  { id: "budget", label: "Presupuesto", icon: "💰" },
+  { id: "cardVotes", label: "Votos", icon: "⭐" },
+  { id: "guisoRankings", label: "Guisos", icon: "🍲" },
+  { id: "songRequests", label: "Canciones", icon: "🎵" },
+  { id: "analytics", label: "Analítica", icon: "📈" },
 ];
 
 /** The currently active tab id. */

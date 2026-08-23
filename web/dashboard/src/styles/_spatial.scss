@@ -42,8 +42,6 @@
 .se-sidebar {
   background: $card-bg;
   border: 1px solid $border;
-  border-radius: 0.5rem;
-  padding: 0.75rem;
   overflow-y: auto;
 }
 
@@ -490,7 +488,6 @@
 .se-sidebar-sections {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
 }
 
 .se-zone-control {
@@ -522,7 +519,6 @@
 
 .se-sidebar-section {
   border: 1px solid $border;
-  border-radius: 0.35rem;
   overflow: hidden;
 
   summary {
@@ -600,6 +596,20 @@
     border-color: $accent;
     box-shadow: 0 0 0 2px rgba($accent, 0.15);
   }
+}
+
+.se-instance-grip {
+  flex-shrink: 0;
+  cursor: grab;
+  color: $ink-muted;
+  font-size: 0.7rem;
+  line-height: 1;
+  letter-spacing: -0.1em;
+  padding: 0 0.2rem;
+  user-select: none;
+
+  &:hover { color: $ink; }
+  &:active { cursor: grabbing; }
 }
 
 .se-instance-name {

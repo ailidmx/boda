@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase.js";
 import { trackEvent } from "../analytics.js";
+import { collections } from "../../../shared/firestore-paths.js";
 
 /**
  * useActivityTracker — detect when the signed-in guest stops interacting with
@@ -62,8 +63,9 @@ export function useActivityTracker({
       });
 
       // 2) Firestore record for the couple (best-effort, fire-and-forget).
+      //    Use the shared collection name contract (single source of truth).
       if (guestId) {
-        addDoc(collection(db, "activity_events"), {
+        addDoc(collection(db, collections.activityEvents), {
           guestId,
           type: "inactive",
           idleSeconds,

@@ -146,9 +146,17 @@ export function renderGuestManager(ctx) {
 
     const phone = guest.identity?.phone || guest.phone || "";
     const phoneInfo = formatPhone(phone);
-    const phoneHtml = phoneInfo
-      ? `<a class="dashboard-phone" href="${phoneInfo.href}" title="Llamar"><span class="dashboard-phone-flag">${phoneInfo.flag}</span><span class="dashboard-phone-number">${phoneInfo.display}</span></a>`
-      : '<span class="dashboard-badge dashboard-badge-muted">—</span>';
+    const phoneHtml = `
+      <div class="dashboard-phone" data-phone-cell="${guest.id}">
+        <button type="button" class="dashboard-phone-display ${phone ? "" : "is-empty"}" data-phone-display="${guest.id}" title="Editar teléfono">
+          ${phoneInfo ? `<span class="dashboard-phone-flag">${phoneInfo.flag}</span><span class="dashboard-phone-number">${phoneInfo.display}</span>` : '<span class="dashboard-badge dashboard-badge-muted">—</span>'}
+        </button>
+        <span class="dashboard-phone-editor" data-phone-editor="${guest.id}" hidden>
+          <input class="dashboard-inline-input" type="tel" value="${phone}" data-phone-input="${guest.id}" placeholder="+52…" title="Teléfono" />
+          <button type="button" class="dashboard-link-btn" data-phone-save="${guest.id}" title="Guardar teléfono">✓</button>
+          <button type="button" class="dashboard-link-btn" data-phone-cancel="${guest.id}" title="Cancelar">✕</button>
+        </span>
+      </div>`;
 
     const authHtml = `
       <div class="dashboard-auth-email-cell" data-auth-email-cell="${guest.id}">
@@ -504,7 +512,7 @@ export function renderGuestManager(ctx) {
 
   const columnDefs = [
     col("actions", "Acciones", actionsCell, "actions", { pinned: "left", width: 150, minWidth: 130, filter: false }),
-    col("identity", "Identidad", identityCell, "name", { pinned: "left", lockPinned: true, width: 320, minWidth: 260, filter: false }),
+    col("identity", "Identidad", identityCell, "name", { pinned: "left", lockPinned: true, width: 340, minWidth: 280, cellClass: "dashboard-grid-cell dashboard-identity-cell-col", filter: false }),
     ...(activeColumnGroup === "identity"
       ? [
           col("send", "Enviar", sendCell, "send", { width: 110, filter: false }),
@@ -679,6 +687,12 @@ export function renderGuestManager(ctx) {
       columnDefs,
       rowData: rows,
       getRowId: (p) => p.data.id,
+      overrides: {
+        // The identity cell renders a full guest card (avatar + name + phone +
+        // email + id); the shared 42px row height clipped it to a single
+        // centered line. Give the guests grid enough vertical room.
+        rowHeight: 108,
+      },
     });
     container._guestGrid = grid;
   } else {
@@ -1063,6 +1077,33 @@ function wireGridEvents(gridEl, ctx) {
           input.select();
         }
       }
+    } else if (target?.dataset.phoneDisplay) {
+      const cell = target.closest(".ag-cell");
+      const display = cell?.querySelector(`[data-phone-display="${target.dataset.phoneDisplay}"]`);
+      const editor = cell?.querySelector(`[data-phone-editor="${target.dataset.phoneDisplay}"]`);
+      if (display) display.hidden = true;
+      if (editor) {
+        editor.hidden = false;
+        const input = editor.querySelector("input");
+        if (input) {
+          input.focus();
+          input.select();
+        }
+      }
+    } else if (target?.dataset.phoneSave) {
+      const guestId = target.dataset.phoneSave;
+      const cell = target.closest(".ag-cell");
+      const input = cell?.querySelector(`[data-phone-input="${guestId}"]`);
+      if (!input) return;
+      const ok = await saveGuestInline(guestId, "phone", input.value.trim());
+      if (ok) rerender();
+      else flashError(input);
+    } else if (target?.dataset.phoneCancel) {
+      const cell = target.closest(".ag-cell");
+      const display = cell?.querySelector(`[data-phone-display="${target.dataset.phoneCancel}"]`);
+      const editor = cell?.querySelector(`[data-phone-editor="${target.dataset.phoneCancel}"]`);
+      if (display) display.hidden = false;
+      if (editor) editor.hidden = true;
     } else if (target?.dataset.authEmailSave) {
       const guestId = target.dataset.authEmailSave;
       const cell = target.closest(".ag-cell");

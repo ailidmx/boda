@@ -1263,6 +1263,46 @@ directly to `master` and push.
   zone containment, magnetic connections, seat blocking, group transforms,
   history, catalog guards, and viewport math. `npm test` (root) runs it.
 
+- **Catalog objects ARE persisted — system definitions are NOT.** The spatial
+  editor's catalog splits into two kinds of "definition":
+  (1) **System + provider definitions** (`SYSTEM_DEFINITIONS` →
+  `sys-table-round-10`, `sys-table-novios`, `sys-table-rect`;
+  `PROVIDER_DEFINITIONS` → pista de baile, barra de comida, mariachis, toldo)
+  are **hardcoded in `web/dashboard/src/spatial/catalog.js`** and are NOT stored
+  in Firestore. They are immutable and injected at load time.
+  (2) **Custom definitions** (created via the "＋ Nuevo objeto" modal) ARE
+  persisted inside the plan document as `plans/main.definitions[]`.
+  So the relationship is NOT missing: every instance references its definition
+  via an `instance.definitionId` field, and the WHOLE plan (venue, zones,
+  `definitions[]`, `instances[]`, `groups[]`, `connections[]`,
+  `guestAssignments{}`) is saved together in the single flat `plans/main` doc by
+  `planRepository.savePlan` (merge write). The instance→definition link survives
+  because both arrays persist together. On load, `spatialEditor.js`
+  `loadSpatialEditor()` merges `[...SYSTEM_DEFINITIONS, ...PROVIDER_DEFINITIONS,
+  ...loaded.definitions.filter(nonSystem)]` so in-memory always has the full
+  catalog. `planRepository.savePlan` now logs the definition ids and warns if any
+  instance references a missing `definitionId`.
+- **Legacy `tables` docs had BOTH `slots` (canonical) and `guestIds` (derived).**
+  `slots` = `{ "0": guestId|null, ... }` (positional), `guestIds` = `[guestId, ...]`
+  (ordered non-null, fully derived from `slots`). `guestIds` carried no extra
+  info, so it was removed via `scripts/cleanup-tables-redundant-guestids.mjs`
+  (after `scripts/backup-tables.mjs` copied `tables` → `tables_backup/*` + JSON).
+  The legacy `tables.js` DOM canvas (the only `guestIds` reader) is dead — its
+  `[data-table-assignments]` container is no longer rendered; the "Mesas" tab
+  renders `[data-spatial-editor]`.
+- **Seating invariants (enforced in `spatial/editor-state.js`):**
+  (1) **1 guest = 1 seat.** `ASSIGN_GUEST` and `MOVE_GUEST` PURGE the guest from
+  every other seat/table first (`purgeGuest`), so a guest can never be duplicated
+  across two tables.
+  (2) **Guest insertion is SWAP, not shift.** Dropping a guest onto an occupied
+  seat SWAPS the two avatars (the displaced guest moves back to the source seat,
+  cross-table or same-table), so no guest is silently dropped. (An earlier
+  insert-and-shift-right model was tried and reverted by the couple.)
+  (3) **Rect/square seats are numbered as facing N/S pairs.** In `rectSeatAnchors`,
+  north and south anchors are interleaved so seat 1 (north) faces seat 2 (south),
+  3 faces 4, etc.; remaining edges (east/west) append after. Seat positions still
+  derive from edge length; only the ORDER/`index` changed. Stable seat ids remain
+  `<edge>-<i>`, so existing `plans/main.guestAssignments` keys stay valid.
 *(Add new spatial-editor lessons here as you discover them.)*
 
 

@@ -78,6 +78,22 @@ function footprintOf(def, transform) {
   return getFootprint(def, transform);
 }
 
+// ── Seating (guest assignment) helpers ───────────────────────────────────
+
+// Remove a guest from EVERY seat so each guest sits in exactly one seat.
+// Returns a NEW guestAssignments map.
+function purgeGuest(guestAssignments, guestId) {
+  const next = {};
+  for (const [iid, seats] of Object.entries(guestAssignments || {})) {
+    const kept = { ...seats };
+    for (const [sid, gid] of Object.entries(kept)) {
+      if (gid === guestId) delete kept[sid];
+    }
+    if (Object.keys(kept).length) next[iid] = kept;
+  }
+  return next;
+}
+
 // ── Placement validation (collision + zone) ─────────────────────────────
 
 /**
@@ -368,11 +384,27 @@ export function reducePlan(plan, action) {
       return { ...plan, instances };
     }
 
+    case "MOVE_INSTANCE_INDEX": {
+      // Drag-and-drop reorder: move `id` to absolute `toIndex` (index in the
+      // array AFTER the moved item has been removed).
+      const { id, toIndex } = action;
+      const from = plan.instances.findIndex((i) => i.id === id);
+      if (from === -1) return plan;
+      const instances = plan.instances.slice();
+      const [moved] = instances.splice(from, 1);
+      const clamped = Math.max(0, Math.min(toIndex, instances.length));
+      instances.splice(clamped, 0, moved);
+      return { ...plan, instances };
+    }
+
     case "ASSIGN_GUEST": {
       const { instanceId, seatId, guestId } = action;
-      const assign = { ...(plan.guestAssignments[instanceId] || {}) };
+      if (guestId == null) return plan;
+      // 1 guest = 1 seat: purge the guest from everywhere first, then place.
+      const purged = purgeGuest(plan.guestAssignments, guestId);
+      const assign = { ...(purged[instanceId] || {}) };
       assign[seatId] = guestId;
-      return { ...plan, guestAssignments: { ...plan.guestAssignments, [instanceId]: assign } };
+      return { ...plan, guestAssignments: { ...purged, [instanceId]: assign } };
     }
 
     case "UNASSIGN_GUEST": {
@@ -384,13 +416,17 @@ export function reducePlan(plan, action) {
 
     case "MOVE_GUEST": {
       const { fromInstanceId, fromSeatId, toInstanceId, toSeatId, guestId } = action;
-      const guestAssignments = { ...(plan.guestAssignments || {}) };
-      const from = { ...(guestAssignments[fromInstanceId] || {}) };
-      const movedGuest = guestId ?? from[fromSeatId];
+      const fromSeat = plan.guestAssignments?.[fromInstanceId]?.[fromSeatId];
+      const movedGuest = guestId ?? fromSeat;
       if (movedGuest === undefined) return plan;
+      if (fromInstanceId === toInstanceId && fromSeatId === toSeatId) return plan;
+
+      // Unique seating: purge the moved guest from wherever they currently sit.
+      const guestAssignments = purgeGuest(plan.guestAssignments, movedGuest);
 
       if (fromInstanceId === toInstanceId) {
-        // Same table: swap (or move into an empty slot) within the one map.
+        // Same table: SWAP within the one map.
+        const from = { ...(guestAssignments[fromInstanceId] || {}) };
         const targetGuest = from[toSeatId];
         from[fromSeatId] = targetGuest !== undefined && targetGuest !== movedGuest ? targetGuest : undefined;
         from[toSeatId] = movedGuest;
@@ -399,12 +435,13 @@ export function reducePlan(plan, action) {
         return { ...plan, guestAssignments };
       }
 
+      // Cross table: SWAP the displaced guest back to the source seat so no
+      // guest is silently dropped.
+      const from = { ...(guestAssignments[fromInstanceId] || {}) };
       const to = { ...(guestAssignments[toInstanceId] || {}) };
       const targetGuest = to[toSeatId]; // may be undefined (empty slot)
       delete from[fromSeatId];
       to[toSeatId] = movedGuest;
-      // If the target seat was occupied, SWAP: move its guest back to the source
-      // seat so no guest is silently dropped.
       if (targetGuest !== undefined && targetGuest !== movedGuest) {
         from[fromSeatId] = targetGuest;
       }

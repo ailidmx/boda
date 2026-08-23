@@ -110,6 +110,8 @@ import {
 import { updateGuest, softDeleteGuest, createGuest } from "./repositories/guestRepository.js";
 
 import { createThanks, updateThanks, deleteThanks } from "./repositories/thanksRepository.js";
+import { updateRecordField } from "./repositories/recordsRepository.js";
+import { renderDataPanel } from "./dataPanel.js";
 
 import {
   buildDashboardGuestEditPayload,
@@ -130,6 +132,14 @@ const state = {
   liveGuests: [], // raw Firestore `guests` records (source of truth)
   authUsers: {}, // uid → { email } LIVE Firebase Auth user list (via listAuthUsers callable)
   thanks: [], // from Firestore collection "thanks" (guest + es/fr/en)
+  budget: [], // from Firestore collection "budget"
+  cardVotes: [], // from Firestore collection "card_votes"
+  guisoRankings: [], // from Firestore collection "guiso_rankings"
+  songRequests: [], // from Firestore collection "song_requests"
+  pageViews: [], // from Firestore collection "page_views"
+  activityEvents: [], // from Firestore collection "activity_events"
+  loginEvents: [], // from Firestore collection "login_events"
+  analyticsBreakdown: "pageViews", // which analytics table the sub-nav shows
   filterGroup: "",
   filterQuery: "",
   filterAgeGroup: "",
@@ -1090,6 +1100,208 @@ function renderSpatialPlan() {
   renderSpatialEditor(container);
 }
 
+// ── Data record panels (budget / votes / rankings / song requests) ──────
+// Each is a generic inline-editable AG Grid table over a flat Firestore
+// collection. `updateRecordField` (recordsRepository) merges a single field
+// back to Firestore on every cell edit. Timestamp + nested-map fields are
+// flattened to readable strings so the generic panel never has to know about
+// Firestore types.
+
+const ts = (v) => {
+  if (!v) return "";
+  if (v && typeof v === "object" && "toDate" in v) return v.toDate().toLocaleString();
+  if (v && typeof v === "object" && v.seconds != null) {
+    return new Date(v.seconds * 1000).toLocaleString();
+  }
+  return String(v);
+};
+const meta = (rec, field, sub) => (rec?.[field] && typeof rec[field] === "object" ? rec[field][sub] : undefined);
+
+function renderBudgetPanel() {
+  renderDataPanel({
+    container: document.querySelector("[data-budget-manager]"),
+    collection: collections.budget,
+    records: state.budget.map((r) => ({ ...r, paidDate: ts(r.paidDate) })),
+    columns: [
+      { field: "item", label: "Concepto" },
+      { field: "totalMxn", label: "Total (MXN)", type: "number" },
+      { field: "approxMxn", label: "Aprox (MXN)", type: "number" },
+      { field: "paidMxn", label: "Pagado (MXN)", type: "number" },
+      { field: "paidBy", label: "Pagado por" },
+      { field: "paidDate", label: "Fecha pago" },
+      { field: "estimatedCount", label: "Estimados", type: "number" },
+      { field: "confirmedCount", label: "Confirmados", type: "number" },
+      { field: "aydeAmount", label: "Aydé (MXN)", type: "number" },
+      { field: "aydePct", label: "Aydé %", type: "number" },
+      { field: "davidAmount", label: "David (MXN)", type: "number" },
+      { field: "davidPct", label: "David %", type: "number" },
+    ],
+    updateField: updateRecordField,
+    emptyText: "No hay partidas de presupuesto.",
+    onAfterEdit: renderBudgetPanel,
+  });
+}
+
+function renderCardVotesPanel() {
+  renderDataPanel({
+    container: document.querySelector("[data-card-votes-manager]"),
+    collection: collections.cardVotes,
+    records: state.cardVotes.map((r) => ({ ...r, updatedAt: ts(r.updatedAt) })),
+    columns: [
+      { field: "guestId", label: "Invitado" },
+      { field: "cardType", label: "Tipo" },
+      { field: "cardKey", label: "Card" },
+      { field: "rating", label: "Rating", type: "number" },
+      { field: "updatedAt", label: "Actualizado" },
+    ],
+    updateField: updateRecordField,
+    emptyText: "No hay votos de tarjetas.",
+    onAfterEdit: renderCardVotesPanel,
+  });
+}
+
+function renderGuisoRankingsPanel() {
+  renderDataPanel({
+    container: document.querySelector("[data-guiso-rankings-manager]"),
+    collection: collections.guisoRankings,
+    records: state.guisoRankings.map((r) => ({ ...r, updatedAt: ts(r.updatedAt) })),
+    columns: [
+      { field: "guestId", label: "Invitado" },
+      { field: "selected", label: "Seleccionados (menú)", type: "array" },
+      { field: "ranking", label: "Ranking completo", type: "array" },
+    ],
+    updateField: updateRecordField,
+    emptyText: "No hay rankings de guisos.",
+    onAfterEdit: renderGuisoRankingsPanel,
+  });
+}
+
+function renderSongRequestsPanel() {
+  renderDataPanel({
+    container: document.querySelector("[data-song-requests-manager]"),
+    collection: collections.songRequests,
+    records: state.songRequests.map((r) => ({
+      ...r,
+      updatedAt: ts(r.updatedAt),
+      title: meta(r, "songMeta", "title"),
+      artist: meta(r, "songMeta", "artist"),
+      year: meta(r, "songMeta", "year"),
+    })),
+    columns: [
+      { field: "guestId", label: "Invitado" },
+      { field: "song", label: "Canción" },
+      { field: "title", label: "Título (meta)" },
+      { field: "artist", label: "Artista (meta)" },
+      { field: "intent", label: "Intención" },
+      { field: "bandType", label: "Agrupación" },
+      { field: "assignedGuestId", label: "Asignado a" },
+    ],
+    updateField: updateRecordField,
+    emptyText: "No hay peticiones de canciones.",
+    onAfterEdit: renderSongRequestsPanel,
+  });
+}
+
+// ── Analytics record panels (page views / activity / login events) ─────
+// One "Analítica" page with a button-group sub-nav switching between three
+// generic inline-editable AG Grid tables over the three analytics collections.
+// These are read-mostly (a row is an event), but the generic panel still allows
+// inline edits via `updateRecordField` where sensible.
+
+function renderPageViewsPanel() {
+  renderDataPanel({
+    container: document.querySelector("[data-analytics-pageviews]"),
+    collection: collections.pageViews,
+    records: state.pageViews.map((r) => ({ ...r, createdAt: ts(r.createdAt) })),
+    columns: [
+      { field: "guestId", label: "Invitado" },
+      { field: "sectionId", label: "Sección" },
+      { field: "navigationType", label: "Tipo navegación" },
+      { field: "createdAt", label: "Momento" },
+    ],
+    updateField: updateRecordField,
+    emptyText: "Aún no hay vistas de sección.",
+    onAfterEdit: renderPageViewsPanel,
+  });
+}
+
+function renderActivityEventsPanel() {
+  renderDataPanel({
+    container: document.querySelector("[data-analytics-activity]"),
+    collection: collections.activityEvents,
+    records: state.activityEvents.map((r) => ({ ...r, createdAt: ts(r.createdAt) })),
+    columns: [
+      { field: "guestId", label: "Invitado" },
+      { field: "type", label: "Tipo" },
+      { field: "idleSeconds", label: "Inactivo (s)", type: "number" },
+      { field: "createdAt", label: "Momento" },
+    ],
+    updateField: updateRecordField,
+    emptyText: "Aún no hay eventos de inactividad.",
+    onAfterEdit: renderActivityEventsPanel,
+  });
+}
+
+function renderLoginEventsPanel() {
+  renderDataPanel({
+    container: document.querySelector("[data-analytics-login]"),
+    collection: collections.loginEvents,
+    records: state.loginEvents.map((r) => ({ ...r, createdAt: ts(r.createdAt) })),
+    columns: [
+      { field: "guestId", label: "Invitado" },
+      { field: "username", label: "Usuario" },
+      { field: "source", label: "Canal" },
+      { field: "medium", label: "Medio" },
+      { field: "campaign", label: "Campaña" },
+      { field: "timeToAnswer", label: "Respuesta (s)", type: "number" },
+      { field: "createdAt", label: "Momento" },
+    ],
+    updateField: updateRecordField,
+    emptyText: "Aún no hay inicios de sesión.",
+    onAfterEdit: renderLoginEventsPanel,
+  });
+}
+
+// Render the "Analítica" button-group sub-nav and toggle which table is visible.
+function renderAnalyticsSubnav() {
+  const nav = document.querySelector("[data-analytics-subnav]");
+  if (!nav) return;
+  const items = [
+    { key: "pageViews", label: "Vistas de sección" },
+    { key: "activityEvents", label: "Inactividad" },
+    { key: "loginEvents", label: "Inicios de sesión" },
+  ];
+  const active = state.analyticsBreakdown || "pageViews";
+
+  nav.innerHTML = items
+    .map(
+      ({ key, label }) => `
+      <button
+        class="dashboard-button ${key === active ? "dashboard-button" : "dashboard-button-secondary"}"
+        type="button"
+        data-analytics-tab="${key}"
+        aria-pressed="${key === active}"
+      >${label}</button>`,
+    )
+    .join("");
+
+  // Toggle table visibility.
+  const toggleTable = (sel, show) => {
+    const wrap = document.querySelector(sel)?.closest(".dashboard-analytics-table");
+    if (wrap) wrap.hidden = !show;
+  };
+  toggleTable("[data-analytics-pageviews]", active === "pageViews");
+  toggleTable("[data-analytics-activity]", active === "activityEvents");
+  toggleTable("[data-analytics-login]", active === "loginEvents");
+
+  nav.querySelectorAll("[data-analytics-tab]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.analyticsBreakdown = btn.dataset.analyticsTab;
+      renderAnalyticsSubnav();
+    });
+  });
+}
+
 // ── Data loading ───────────────────────────────────────────────────────
 
 // The dashboard is LIVE-ONLY: the `guests` collection (via the `onSnapshot`
@@ -1317,6 +1529,80 @@ function renderDashboard(app) {
         </div>
       </section>
 
+      <!-- ── Panel: Budget ── -->
+      <section class="dashboard-panel" data-dashboard-panel="budget">
+        <div class="dashboard-section">
+          <div class="dashboard-section-heading">
+            <div>
+              <p class="dashboard-eyebrow">Presupuesto del evento</p>
+              <h2>Presupuesto</h2>
+            </div>
+          </div>
+          <div data-budget-manager></div>
+        </div>
+      </section>
+
+      <!-- ── Panel: Card votes ── -->
+      <section class="dashboard-panel" data-dashboard-panel="cardVotes">
+        <div class="dashboard-section">
+          <div class="dashboard-section-heading">
+            <div>
+              <p class="dashboard-eyebrow">Votos de tarjetas (comida / música)</p>
+              <h2>Votos</h2>
+            </div>
+          </div>
+          <div data-card-votes-manager></div>
+        </div>
+      </section>
+
+      <!-- ── Panel: Guiso rankings ── -->
+      <section class="dashboard-panel" data-dashboard-panel="guisoRankings">
+        <div class="dashboard-section">
+          <div class="dashboard-section-heading">
+            <div>
+              <p class="dashboard-eyebrow">Rankings de guisos</p>
+              <h2>Guisos</h2>
+            </div>
+          </div>
+          <div data-guiso-rankings-manager></div>
+        </div>
+      </section>
+
+      <!-- ── Panel: Song requests ── -->
+      <section class="dashboard-panel" data-dashboard-panel="songRequests">
+        <div class="dashboard-section">
+          <div class="dashboard-section-heading">
+            <div>
+              <p class="dashboard-eyebrow">Peticiones de canciones</p>
+              <h2>Canciones</h2>
+            </div>
+          </div>
+          <div data-song-requests-manager></div>
+        </div>
+      </section>
+
+      <!-- ── Panel: Analytics ── -->
+      <section class="dashboard-panel" data-dashboard-panel="analytics">
+        <div class="dashboard-section">
+          <div class="dashboard-section-heading">
+            <div>
+              <p class="dashboard-eyebrow">Analítica de uso</p>
+              <h2>Analítica</h2>
+            </div>
+          </div>
+          <div class="dashboard-analytics-subnav" data-analytics-subnav></div>
+          <div class="dashboard-analytics-table" data-analytics-table="pageViews">
+            <div data-analytics-pageviews></div>
+          </div>
+          <div class="dashboard-analytics-table" data-analytics-table="activityEvents" hidden>
+            <div data-analytics-activity></div>
+          </div>
+          <div class="dashboard-analytics-table" data-analytics-table="loginEvents" hidden>
+            <div data-analytics-login></div>
+          </div>
+        </div>
+      </section>
+
     </main>
   `;
 
@@ -1413,6 +1699,38 @@ function renderDashboard(app) {
     },
   );
 
+  // ── Real-time listeners for the record collections ──
+  // Each is a flat Firestore collection shown as an inline-editable AG Grid
+  // table. The onSnapshot populates `state.*` and re-renders its panel; a cell
+  // edit writes a single field back via `updateRecordField` and the listener
+  // refreshes the table.
+
+  const subscribeCollection = (collectionName, stateKey, sourceName, renderFn) => {
+    return onSnapshot(
+      query(collection(db, collectionName), limit(DASHBOARD_QUERY_LIMIT)),
+      (snapshot) => {
+        const records = snapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+        state[stateKey] = records;
+        reportSource(sourceName, records);
+        renderFn();
+      },
+      (error) => {
+        // Still report the source as done (0 docs) so the matrix loader never
+        // hangs on a collection whose read failed (e.g. a missing rules block).
+        console.error(`[dashboard:${stateKey}] Failed to load ${collectionName}`, error);
+        reportSource(sourceName, []);
+      },
+    );
+  };
+
+  const budgetUnsub = subscribeCollection(collections.budget, "budget", "budget", renderBudgetPanel);
+  const cardVotesUnsub = subscribeCollection(collections.cardVotes, "cardVotes", "card_votes", renderCardVotesPanel);
+  const guisoRankingsUnsub = subscribeCollection(collections.guisoRankings, "guisoRankings", "guiso_rankings", renderGuisoRankingsPanel);
+  const songRequestsUnsub = subscribeCollection(collections.songRequests, "songRequests", "song_requests", renderSongRequestsPanel);
+  const pageViewsUnsub = subscribeCollection(collections.pageViews, "pageViews", "page_views", renderPageViewsPanel);
+  const activityEventsUnsub = subscribeCollection(collections.activityEvents, "activityEvents", "activity_events", renderActivityEventsPanel);
+  const loginEventsUnsub = subscribeCollection(collections.loginEvents, "loginEvents", "login_events", renderLoginEventsPanel);
+
   renderTabNavigation();
   renderGroupFilter();
   renderGuestManager();
@@ -1420,6 +1738,14 @@ function renderDashboard(app) {
   renderThanksPanel();
   renderChartsPanel();
   renderSpatialPlan();
+  renderBudgetPanel();
+  renderCardVotesPanel();
+  renderGuisoRankingsPanel();
+  renderSongRequestsPanel();
+  renderPageViewsPanel();
+  renderActivityEventsPanel();
+  renderLoginEventsPanel();
+  renderAnalyticsSubnav();
 
 
   // ── Re-render the charts panel when the "Gráficas" tab becomes visible ──
@@ -1517,6 +1843,13 @@ function renderDashboard(app) {
 
   // Store unsubs for cleanup
   app._thanksUnsub = thanksUnsub;
+  app._budgetUnsub = budgetUnsub;
+  app._cardVotesUnsub = cardVotesUnsub;
+  app._guisoRankingsUnsub = guisoRankingsUnsub;
+  app._songRequestsUnsub = songRequestsUnsub;
+  app._pageViewsUnsub = pageViewsUnsub;
+  app._activityEventsUnsub = activityEventsUnsub;
+  app._loginEventsUnsub = loginEventsUnsub;
 }
 
 export function startDashboard(app) {

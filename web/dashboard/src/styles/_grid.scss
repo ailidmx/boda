@@ -60,6 +60,13 @@
     min-width: 0;
   }
 
+  // The Identidad column renders a multi-line guest card (avatar + name +
+  // phone + email + id). Center-alignment would clip the first/last lines, so
+  // top-align this column's cell content instead.
+  .ag-cell.dashboard-identity-cell-col .dashboard-cell-render {
+    align-items: flex-start;
+  }
+
   // Empty-state overlay matches the dashboard empty text.
   &.ag-overlay-no-rows-wrapper {
     align-items: center;
@@ -74,4 +81,71 @@
   color: tokens.$ink-muted;
   font: inherit;
   padding: 1rem;
+}
+
+// ── Generic inline-editable data panels (budget / votes / rankings / songs) ──
+// Text/array cells render as a button that opens a prompt on click; boolean
+// cells reuse the `.dashboard-badge` Sí/No chip. The doc id is read-only.
+.dashboard-datapanel-text {
+  display: inline-block;
+  max-width: 100%;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 0.82rem;
+  color: tokens.$ink;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: underline dotted;
+  text-underline-offset: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+
+  &:hover {
+    color: tokens.$accent;
+    text-decoration: underline;
+  }
+
+  &.is-empty {
+    color: tokens.$ink-muted;
+  }
+}
+
+.dashboard-datapanel-array {
+  display: inline-block;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: tokens.$ink;
+  text-align: left;
+  cursor: pointer;
+  white-space: normal;
+  overflow-wrap: anywhere;
+
+  &:hover {
+    color: tokens.$accent;
+  }
+}
+
+.dashboard-datapanel-id {
+  font-size: 0.72rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  color: tokens.$ink-muted;
+  white-space: nowrap;
+}
+
+// ── Analítica sub-nav (button group switching between the 3 tables) ──
+.dashboard-analytics-subnav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }

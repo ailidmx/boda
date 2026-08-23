@@ -79,6 +79,13 @@ service cloud.firestore {
       allow delete: if canDelete();
     }
 
+    // ── Budget / expenses (admin-only planning) ──────────────────────────
+    match /budget/{itemId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
     // ── Thanks / greetings ───────────────────────────────────────────────
     match /thanks/{creditId} {
       allow read: if canRead();
