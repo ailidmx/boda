@@ -55,6 +55,7 @@ let initialized = false;
 let pendingGuest = null; // pre-selected guest (assign to next tapped seat)
 let showGrid = true; // grid visibility toggle
 let guestDrag = null; // in-flight guest drag { guestId, fromInstanceId, fromSeatId }
+let listGuestDrag = null; // in-flight guest drag from the sidebar "Invitados" list
 let showOnlyUnassigned = false; // guest filter: only unassigned
 let showOnlySat5 = false; // guest filter: only SAT level 5
 let showOnlyChildren = false; // guest filter: only children (age "Niño")
@@ -428,7 +429,7 @@ function panelMarkup() {
   const guestItems = guests.slice(0, 400).map((g) => {
     const seat = guestSeatLocation(g.id);
     const isPending = pendingGuest === g.id;
-    return `<button class="se-guest-option ${seat ? "is-seated" : ""} ${isPending ? "is-pending" : ""}" data-guest-pick="${g.id}" type="button" title="${seat ? `Sentado en ${seat.label}` : "Seleccionar para asignar a un asiento"}">
+    return `<button class="se-guest-option ${seat ? "is-seated" : ""} ${isPending ? "is-pending" : ""}" data-guest-pick="${g.id}" data-drag-guest-list="${g.id}" draggable="true" type="button" title="${seat ? `Sentado en ${seat.label}` : "Arrastra a un asiento para asignar"}">
       ${guestAvatarUrl(g) ? `<img src="${guestAvatarUrl(g)}" alt=""/>` : `<span class="se-guest-avatar-init">${guestInitials(g)}</span>`}
       <span class="se-guest-name">${guestFullName(g)}</span>
       ${saturdayBadge(g)}
@@ -783,6 +784,15 @@ function onCatalogDragStart(e) {
     log(`dragstart guest ${guestDrag.guestId} from ${guestDrag.fromInstanceId}/${guestDrag.fromSeatId}`);
     return;
   }
+  // Drag a guest from the sidebar "Invitados" list onto a canvas seat.
+  const listGuest = e.target.closest?.("[data-drag-guest-list]");
+  if (listGuest) {
+    listGuestDrag = { guestId: listGuest.dataset.dragGuestList };
+    e.dataTransfer.setData("text/custom-guest-list", listGuestDrag.guestId);
+    e.dataTransfer.effectAllowed = "copy";
+    log(`dragstart guest-list ${listGuestDrag.guestId}`);
+    return;
+  }
   const def = e.target.closest?.("[data-drag-def]");
   if (def) {
     e.dataTransfer.setData("text/plain", def.dataset.dragDef);
@@ -881,6 +891,21 @@ function onCanvasDragOver(e) {
 
 function onCanvasDrop(e) {
   e.preventDefault();
+  // Drop a guest from the "Invitados" list onto a canvas seat.
+  const listGuestId = e.dataTransfer.getData("text/custom-guest-list");
+  if (listGuestId) {
+    const seat = e.target.closest?.("[data-seat-id]");
+    if (seat) {
+      const instanceId = seat.dataset.instanceId;
+      const seatId = seat.dataset.seatId;
+      log(`drop guest-list ${listGuestId} → ${instanceId}/${seatId}`);
+      dispatch({ type: "ASSIGN_GUEST", instanceId, seatId, guestId: listGuestId }, { record: true });
+    } else {
+      log(`drop guest-list ${listGuestId} → no seat under cursor`);
+    }
+    listGuestDrag = null;
+    return;
+  }
   const instanceId = e.dataTransfer.getData("text/custom-instance");
   if (instanceId) {
     placeUnplacedInstanceOnDrop(e);
@@ -893,15 +918,24 @@ function onCanvasDrop(e) {
   }
 }
 
-function removeSelection() {
+function recallSelection() {
+  log(`recall selection: ${[...selection].join(", ") || "(none)"}`);
   for (const id of [...selection]) {
-    dispatch({ type: "REMOVE_INSTANCE", id }, { record: false });
+    const inst = plan.instances.find((i) => i.id === id);
+    if (inst && !inst.unplaced) dispatch({ type: "UNPLACE_INSTANCE", id }, { record: true });
   }
-  // Record removal as a single semantic action is tricky; just record last.
-  // For usable undo, re-apply remove via a composite commit.
   selection = new Set();
   render();
-  schedulePersist();
+}
+
+// Permanent delete: removes the instance(s) + all their guest assignments.
+function deleteSelection() {
+  log(`delete selection: ${[...selection].join(", ") || "(none)"}`);
+  for (const id of [...selection]) {
+    dispatch({ type: "REMOVE_INSTANCE", id }, { record: true });
+  }
+  selection = new Set();
+  render();
 }
 
 function duplicateSelection() {
@@ -1385,7 +1419,86 @@ function handleSeatClick(instanceId, seatId) {
     render();
     return;
   }
-  openGuestPicker(instanceId, seatId);
+  // Left-click on a seat no longer auto-opens the assign modal. Use the
+  // right-click menu ("Asignar invitado…") or pre-select a guest and drop
+  // them onto a seat.
+  const guestId = plan.guestAssignments?.[instanceId]?.[seatId];
+  log(`[seat] click ${instanceId}/${seatId} (guest=${guestId ?? "none"}) — no-op (use right-click menu)`);
+}
+
+// ── Right-click context menu (seats + objects) ──────────────────────────
+
+function closeContextMenu() {
+  document.querySelector(".se-context-menu")?.remove();
+}
+
+function openContextMenu(e, items) {
+  e.preventDefault();
+  closeContextMenu();
+  const menu = document.createElement("div");
+  menu.className = "se-context-menu";
+  for (const item of items) {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = `se-context-item${item.danger ? " is-danger" : ""}`;
+    btn.textContent = item.label;
+    btn.addEventListener("click", () => {
+      closeContextMenu();
+      item.action();
+    });
+    menu.append(btn);
+  }
+  menu.style.left = `${e.clientX}px`;
+  menu.style.top = `${e.clientY}px`;
+  document.body.append(menu);
+  setTimeout(() => {
+    document.addEventListener("click", closeContextMenu, { once: true });
+    document.addEventListener("pointerdown", closeContextMenu, { once: true });
+    document.addEventListener("keydown", (ev) => { if (ev.key === "Escape") closeContextMenu(); }, { once: true });
+    window.addEventListener("blur", closeContextMenu, { once: true });
+  }, 0);
+}
+
+function onContextMenu(e) {
+  const target = findInstanceTarget(e);
+  if (target?.seatId) {
+    const guestId = plan.guestAssignments?.[target.instanceId]?.[target.seatId];
+    openContextMenu(e, [
+      { label: "Asignar invitado…", action: () => openGuestPicker(target.instanceId, target.seatId) },
+      ...(guestId ? [{
+        label: "Quitar asignación",
+        action: () => {
+          log(`[contextmenu] unassign ${target.instanceId}/${target.seatId} (guest=${guestId})`);
+          dispatch({ type: "UNASSIGN_GUEST", instanceId: target.instanceId, seatId: target.seatId }, { record: true });
+        },
+      }] : []),
+    ]);
+    return;
+  }
+  if (target?.instanceId) {
+    const inst = plan.instances.find((i) => i.id === target.instanceId);
+    if (inst) {
+      openContextMenu(e, [
+        ...(inst.unplaced ? [] : [{
+          label: "Recoger al listado",
+          action: () => {
+            log(`[contextmenu] unplace ${inst.id}`);
+            dispatch({ type: "UNPLACE_INSTANCE", id: inst.id }, { record: true });
+          },
+        }]),
+        {
+          label: "Eliminar",
+          danger: true,
+          action: () => {
+            log(`[contextmenu] delete ${inst.id}`);
+            dispatch({ type: "REMOVE_INSTANCE", id: inst.id }, { record: true });
+          },
+        },
+      ]);
+      return;
+    }
+  }
+  closeContextMenu();
 }
 
 function onPointerDown(e) {
@@ -1439,7 +1552,7 @@ function onKeyDown(e) {
     return;
   }
   if (mod && e.key.toLowerCase() === "y") { e.preventDefault(); const r = history.redo(); if (r) { plan = reducePlan(plan, r.action); render(); schedulePersist(); } return; }
-  if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); removeSelection(); return; }
+  if (e.key === "Delete" || e.key === "Backspace") { e.preventDefault(); recallSelection(); return; }
   if (e.key.toLowerCase() === "r") { rotateSelection(90); return; }
   if (e.key.toLowerCase() === "d" && mod) { e.preventDefault(); duplicateSelection(); return; }
   if (e.key.toLowerCase() === "g" && mod) { e.preventDefault(); if (e.shiftKey) ungroupSelection(); else groupSelection(); return; }
@@ -1492,6 +1605,7 @@ export async function loadSpatialEditor(root) {
   svg.addEventListener("wheel", onWheel, { passive: false });
   svg.addEventListener("dragover", onCanvasDragOver);
   svg.addEventListener("drop", onCanvasDrop);
+  svg.addEventListener("contextmenu", onContextMenu);
   document.addEventListener("keydown", onKeyDown);
 
   // Toolbar wiring (delegated).
@@ -1501,7 +1615,7 @@ export async function loadSpatialEditor(root) {
   root.querySelector("[data-group]").addEventListener("click", groupSelection);
   root.querySelector("[data-ungroup]").addEventListener("click", ungroupSelection);
   root.querySelector("[data-duplicate]").addEventListener("click", duplicateSelection);
-  root.querySelector("[data-delete]").addEventListener("click", removeSelection);
+  root.querySelector("[data-delete]").addEventListener("click", deleteSelection);
   root.querySelector("[data-zoom-in]").addEventListener("click", () => { const { w, h } = svgSize(); camera = zoomAt(camera, camera.pxPerMeter * 1.25, { x: w / 2, y: h / 2 }); render(); });
   root.querySelector("[data-zoom-out]").addEventListener("click", () => { const { w, h } = svgSize(); camera = zoomAt(camera, camera.pxPerMeter / 1.25, { x: w / 2, y: h / 2 }); render(); });
   root.querySelector("[data-venue]").addEventListener("click", openVenueModal);

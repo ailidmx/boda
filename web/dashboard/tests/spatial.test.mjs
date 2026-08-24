@@ -539,6 +539,21 @@ test("DEDUPE_GUESTS keeps only the first seat per guest", () => {
   assert.equal(guests.filter((g) => g === "other").length, 1);
 });
 
+test("UNPLACE_INSTANCE recalls object to list without deleting assignments", () => {
+  const plan = createPlan();
+  plan.definitions = [SYSTEM_DEFINITIONS[0]];
+  plan.instances = [{ id: "t1", definitionId: SYSTEM_DEFINITIONS[0].id, zoneId: "main", transform: { x: 0, y: 0, rotation: 0 } }];
+  plan.guestAssignments = { t1: { "seat-0": "moller" } };
+
+  const recalled = reducePlan(plan, { type: "UNPLACE_INSTANCE", id: "t1" });
+  assert.equal(recalled.instances[0].unplaced, true); // moved back to the list
+  assert.equal(recalled.guestAssignments.t1["seat-0"], "moller"); // assignments kept
+
+  const removed = reducePlan(plan, { type: "REMOVE_INSTANCE", id: "t1" });
+  assert.equal(removed.instances.length, 0); // permanently removed
+  assert.equal(removed.guestAssignments.t1, undefined); // assignments purged
+});
+
 test("computeSeatingIntegrity reports duplicates + RSVP↔seat mismatches", () => {
   const guestAssignments = {
     t1: { "seat-0": "moller", "seat-1": "declinedWithSeat", "seat-2": "confirmedSeated" },

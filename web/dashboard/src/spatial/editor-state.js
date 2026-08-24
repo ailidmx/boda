@@ -243,6 +243,16 @@ export function reducePlan(plan, action) {
       return { ...plan, instances: [...plan.instances, instance] };
     }
 
+    case "UNPLACE_INSTANCE": {
+      const { id } = action;
+      const inst = plan.instances.find((i) => i.id === id);
+      if (!inst || inst.unplaced) return plan;
+      // Recall an object from the canvas back into the "Objetos reales" list.
+      // Keep its guest assignments + group so re-placing restores it as-is.
+      const instances = upsertById(plan.instances, id, { ...inst, unplaced: true });
+      return { ...plan, instances };
+    }
+
     case "REMOVE_INSTANCE": {
       const { id } = action;
       const inst = plan.instances.find((i) => i.id === id);

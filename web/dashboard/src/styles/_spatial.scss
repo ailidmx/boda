@@ -496,6 +496,44 @@
   flex-direction: column;
 }
 
+// ── Right-click context menu (seats + objects) ─────────────────────────
+.se-context-menu {
+  position: fixed;
+  z-index: 1000;
+  min-width: 11rem;
+  padding: 0.3rem;
+  border: 1px solid $border-strong;
+  border-radius: 0.5rem;
+  background: $card-bg-solid;
+  box-shadow: 0 0.6rem 1.6rem rgba(65, 50, 28, 0.18);
+}
+
+.se-context-item {
+  display: block;
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  border: none;
+  border-radius: 0.35rem;
+  background: none;
+  font: inherit;
+  font-size: 0.82rem;
+  color: $ink;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: $cream-light;
+  }
+
+  &.is-danger {
+    color: #a0352c;
+
+    &:hover {
+      background: rgba(192, 57, 43, 0.1);
+    }
+  }
+}
+
 .se-integrity {
   padding: 0.6rem 0.65rem;
   border: 1px solid $border-strong;
