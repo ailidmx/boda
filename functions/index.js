@@ -162,20 +162,21 @@ function sourceLabel(source) {
 
 
 // Cloudinary cloud name is public (embedded in every delivery URL), so it is
-// safe to hard-code here. Guest avatars are stored under the `boda/` folder.
+// safe to hard-code here.
 const CLOUD_NAME = "k2ajcgxv";
 
 /**
  * Build a small square Cloudinary delivery URL for a guest's avatar photo.
- * The guest's `cloudinaryId` is stored relative to the `boda/` prefix, so the
- * full public id is `boda/<cloudinaryId>`. Returns null when absent.
+ * The guest's `cloudinaryId` is a FULL Cloudinary public id (the same value the
+ * client renders directly via `guestAvatarUrl` / `resolveGuestPhoto`), so we
+ * use it verbatim WITHOUT prepending `boda/`. Returns null when absent.
  * @param {object} guest  a guest document (or the identity sub-object)
  * @returns {string|null}
  */
 function resolveGuestPhotoUrl(guest) {
   const publicId = guest?.identity?.cloudinaryId || guest?.cloudinaryId;
   if (!publicId) return null;
-  return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/w_256,h_256,c_fill,g_auto/boda/${publicId}`;
+  return `https://res.cloudinary.com/${CLOUD_NAME}/image/upload/w_256,h_256,c_fill,g_auto/${publicId}`;
 }
 
 
@@ -607,16 +608,19 @@ export const onGuestUpdated = onDocumentUpdated(
     const text = lines.filter(Boolean).join("\n");
 
     // Send the guest's avatar photo with the notification as its caption when
-    // available; otherwise fall back to a plain text message.
+    // available. If the photo send fails (e.g. a stale/broken Cloudinary id that
+    // Telegram can't fetch), fall back to a plain text message so the couple
+    // NEVER misses an update notification.
     const photoUrl = resolveGuestPhotoUrl(after);
-    if (photoUrl) {
-      await sendTelegramPhoto(photoUrl, {
-        token: TELEGRAM_TOKEN.value(),
-        chatId: TELEGRAM_CHAT_ID.value(),
-        caption: text,
-        parseMode: "MarkdownV2",
-      });
-    } else {
+    const photoSent = photoUrl
+      ? await sendTelegramPhoto(photoUrl, {
+          token: TELEGRAM_TOKEN.value(),
+          chatId: TELEGRAM_CHAT_ID.value(),
+          caption: text,
+          parseMode: "MarkdownV2",
+        })
+      : false;
+    if (!photoSent) {
       await notify(text);
     }
 

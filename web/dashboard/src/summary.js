@@ -129,6 +129,7 @@ function avatarEl(guest) {
     img.alt = guest.name;
     el.append(img);
   } else {
+    el.classList.add("dashboard-avatar-initials");
     el.textContent = guest.initials || "?";
   }
   return el;

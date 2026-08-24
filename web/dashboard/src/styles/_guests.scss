@@ -551,6 +551,7 @@
   width: 2.4rem;
   height: 2.4rem;
   border-radius: 50%;
+  overflow: hidden;
   object-fit: cover;
   border: 2px solid rgba(85, 69, 45, 0.15);
   background: rgba(85, 69, 45, 0.06);
@@ -563,6 +564,17 @@
   justify-content: center;
   font-size: 1.1rem;
   color: $ink-muted;
+}
+
+// The <img> inside a `.dashboard-avatar` circle wrapper (the summary day-card
+// avatar strip AND the confirmed-guests modal). The wrapper clips it to the
+// circle via `overflow: hidden`; this fills the wrapper and keeps the crop
+// square/centered.
+.dashboard-avatar-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 // ── Avatar wrapper + corner badges ──

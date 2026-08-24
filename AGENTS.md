@@ -332,11 +332,15 @@ npm run test:rules  # Firestore rules tests (uses emulators)
    assignment (`hosting`). Metadata-only touches (`updatedBy`/`updatedAt`) are
    skipped. When the guest has an avatar, the notification is sent via
    `sendTelegramPhoto` (in `functions/telegram.js`) with the avatar as the photo
-   and the message as its caption; otherwise it falls back to `sendTelegramMessage`.
-   The avatar URL is built from `identity.cloudinaryId` (stored relative to the
-   `boda/` prefix) as
-   `https://res.cloudinary.com/k2ajcgxv/image/upload/w_256,h_256,c_fill,g_auto/boda/<id>`
-   (see `resolveGuestPhotoUrl`). When adding a new guest field that should notify,
+   and the message as its caption. **The avatar URL is built from
+   `identity.cloudinaryId` as a FULL public id — NO `boda/` prefix** — matching
+   the client `guestAvatarUrl`/`resolveGuestPhoto` (the id is used verbatim; the
+   `boda/`-prefix convention applies to cabin/dish photos, NOT guest avatars):
+   `https://res.cloudinary.com/k2ajcgxv/image/upload/w_256,h_256,c_fill,g_auto/<id>`
+   (see `resolveGuestPhotoUrl`). **If `sendTelegramPhoto` fails (e.g. a stale id
+   Telegram can't fetch → `Bad Request: failed to get HTTP URL content`), the
+   function falls back to a plain `sendTelegramMessage`**, so the couple never
+   misses an update. When adding a new guest field that should notify,
    add a change-detection block in `onGuestUpdated` and a human-readable line.
  - **Guisos-order Telegram notification** — `onGuisoRanking` in
    `functions/index.js` watches the `guiso_rankings/{guestId}` collection (one doc
