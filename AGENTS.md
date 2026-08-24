@@ -953,11 +953,31 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   **IDENTITY** (always shown: Enviar, Enviada, Invitación, GRUPO, IDIOMA, GÉNERO,
   EDAD, MENSAJE, AVION, estado), **PRESENCIA** (VIERNES, SÁBADO, DOMINGO,
   ALOJAMIENTO, CABAÑA, CUARTO, CABAÑA EXTRA, CUARTO EXTRA, ROCA AZUL),
-  **PETANCA** (PETANQUE, BOULES), and **PLAYA** (PLAYA). The active group is
-  stored in `state.colGroup` and the `<thead>`/row template conditionally render
-  each column based on its group. When adding a new column, assign it to a group
-  in the `COLUMN_GROUPS` map and update the filter bar + `<thead>` + row template
-  together.
+  **PETANCA** (PETANQUE, BOULES), **PLAYA** (PLAYA), and **VUELOS** (AVION,
+  ORIGEN, CONEXIONES, DESTINO, LLEGADA, HORA, Nº VUELO + their "vuelta"/return
+  counterparts). The active group is stored in `state.columnGroup` (the old
+  `state.colGroup` name is gone) and the column defs in `guestTable.js` render
+  each group's columns conditionally (the pinned "Acciones" + "Identidad"
+  columns always show). When adding a new column, assign it to a group in the
+  `COLUMN_GROUPS` map, add its renderer + `columnDefs` entry, and add its sort
+  key to `GUEST_SORT_COLUMNS` (`guestDomain.js`) + `guestSortValue`
+  (`guestService.js`) together. (The table is AG Grid Community now — `columnDefs`,
+  NOT a hand-rolled `<thead>`/row template.)
+- **Dashboard VUELOS column group reads the guest's `flightInfo` map** — the
+  "Vuelos" subview surfaces the flight answers a guest submits in the invitation's
+  FLIGHTS ("Je viens de loin") section. The source of truth is the guest doc's
+  `flightInfo` map (built by `buildGuestFlightInfoPayload` in
+  `web/shared/payload-builders.js`): arrival trip = `origin`, `connections`
+  (0–3 airports), `destination`, `arrivalDate` (`YYYY-MM-DD`), `arrivalTime`
+  (`HH:MM`), `finalFlightNumber`; return trip = the same fields under
+  `flightInfo.departure` (`departureDate`/`departureTime`/`finalFlightNumber`).
+  `legs` also exists in the schema but the form doesn't collect it. Each airport is
+  `{ iata, icao?, name, city?, country?, countryCode, latitude?, longitude? }`.
+  The "Avión" column is the top-level `travelsByPlane` boolean (NOT `travelStatus`).
+  Sort keys are `flOrigin`/`flConnections`/`flDestination`/`flArrivalDate`/
+  `flArrivalTime`/`flFinalFlightNumber` + `flDep*` for the return trip. The Vuelos
+  contextual filters are `filterTravelsByPlane` ("viaja en avión") and
+  `filterHasFlight` ("sin datos de vuelo", via `guestHasFlightData`).
 - **Dashboard INVITADOS has a readiness card + grouped checkbox filter dropdown** —
   the guest table toolbar (`web/dashboard/src/guestTable.js`) renders a readiness
   card (`.dashboard-readiness-card`) showing how many guests are fully "ready"

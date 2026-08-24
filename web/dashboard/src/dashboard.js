@@ -165,6 +165,8 @@ const state = {
   filterPetanque: "", // "" = all, "yes" = juega pétanque
   filterBoules: "", // "" = all, "yes" = tiene boules propias
   filterPlaya: "", // "" = all, "yes" = confirmado para la playa (≥4)
+  filterTravelsByPlane: "", // "" = all, "yes" = viaja en avión (Vuelos group)
+  filterHasFlight: "", // "" = all, "with"/"without" = con/sin datos de vuelo
   columnGroup: "identity", // which column group is visible in the INVITADOS table
 
   sortKey: "name",
@@ -360,6 +362,8 @@ function getFilteredGuests() {
       filterPetanque: state.filterPetanque,
       filterBoules: state.filterBoules,
       filterPlaya: state.filterPlaya,
+      filterTravelsByPlane: state.filterTravelsByPlane,
+      filterHasFlight: state.filterHasFlight,
     },
     state.liveGuests,
     state.authUsers,
@@ -1888,6 +1892,8 @@ function renderDashboard(app) {
       state.filterPetanque = "";
       state.filterBoules = "";
       state.filterPlaya = "";
+      state.filterTravelsByPlane = "";
+      state.filterHasFlight = "";
     }
     if (tab === "charts") renderChartsPanel();
     // The summary cards are contextual: re-render for the new active tab.

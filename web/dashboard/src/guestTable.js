@@ -29,6 +29,7 @@ const COLUMN_GROUPS = [
   { id: "presencia", label: "Presencia · Alojamiento" },
   { id: "petanque", label: "Pétanque" },
   { id: "playa", label: "Playa" },
+  { id: "vuelos", label: "Vuelos" },
 ];
 
 // Clear the contextual filters (Presencia / Pétanque / Playa) when switching
@@ -41,6 +42,8 @@ function resetContextualFilters(state) {
   state.filterPetanque = "";
   state.filterBoules = "";
   state.filterPlaya = "";
+  state.filterTravelsByPlane = "";
+  state.filterHasFlight = "";
 }
 
 export function renderGuestManager(ctx) {
@@ -326,6 +329,40 @@ export function renderGuestManager(ctx) {
       </div>`;
   };
 
+  // ── Vuelos (flight info) cells ──────────────────────────────────────────
+  // A guest's flight answers live on the `flightInfo` map of their guest doc
+  // (arrival trip) plus `flightInfo.departure` (return trip). The fields mirror
+  // `buildGuestFlightInfoPayload` in web/shared/payload-builders.js.
+  const escText = (s) =>
+    String(s ?? "").replace(/[&<>"]/g, (ch) => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;",
+    }[ch]));
+
+  const airportCell = (airport) => {
+    const iata = airport?.iata || "";
+    if (!iata) return '<span class="dashboard-badge dashboard-badge-muted">—</span>';
+    const title = [airport.name, airport.city, airport.country].filter(Boolean).join(", ");
+    return `<span class="dashboard-badge" style="background:${badgeStyle(iata)};color:#3a2f1e;" title="${escText(title)}">${escText(iata)}</span>`;
+  };
+
+  const connectionsCell = (connections) => {
+    const list = (connections || []).filter((a) => a?.iata);
+    if (!list.length) return '<span class="dashboard-badge dashboard-badge-muted">—</span>';
+    return list
+      .map((a) => {
+        const title = [a.name, a.city, a.country].filter(Boolean).join(", ");
+        return `<span class="dashboard-badge" style="background:${badgeStyle(a.iata)};color:#3a2f1e;" title="${escText(title)}">${escText(a.iata)}</span>`;
+      })
+      .join(" ");
+  };
+
+  const flightTextCell = (value) => {
+    const v = String(value || "").trim();
+    return v
+      ? `<span class="dashboard-flight-text" title="${escText(v)}">${escText(v)}</span>`
+      : '<span class="dashboard-badge dashboard-badge-muted">—</span>';
+  };
+
   const rsvpScaleCell = (guest, day) => {
     const level = rsvpScaleValue(guest, day);
     const chipClass =
@@ -543,6 +580,23 @@ export function renderGuestManager(ctx) {
           col("playa", "Playa", (g) => rsvpScaleQuestionCell(g, "playa"), "playa", { width: 120 }),
         ]
       : []),
+    ...(activeColumnGroup === "vuelos"
+      ? [
+          col("travelsByPlane", "Avión", travelsByPlaneCell, "travelsByPlane", { width: 110, filter: false }),
+          col("flOrigin", "Origen", (g) => airportCell(g.flightInfo?.origin), "flOrigin", { width: 110 }),
+          col("flConnections", "Conexiones", (g) => connectionsCell(g.flightInfo?.connections), "flConnections", { width: 170 }),
+          col("flDestination", "Destino", (g) => airportCell(g.flightInfo?.destination), "flDestination", { width: 110 }),
+          col("flArrivalDate", "Llegada", (g) => flightTextCell(g.flightInfo?.arrivalDate), "flArrivalDate", { width: 115 }),
+          col("flArrivalTime", "Hora", (g) => flightTextCell(g.flightInfo?.arrivalTime), "flArrivalTime", { width: 90 }),
+          col("flFinalFlightNumber", "Nº vuelo", (g) => flightTextCell(g.flightInfo?.finalFlightNumber), "flFinalFlightNumber", { width: 110 }),
+          col("flDepOrigin", "Origen (vuelta)", (g) => airportCell(g.flightInfo?.departure?.origin), "flDepOrigin", { width: 125 }),
+          col("flDepConnections", "Conexiones (vuelta)", (g) => connectionsCell(g.flightInfo?.departure?.connections), "flDepConnections", { width: 185 }),
+          col("flDepDestination", "Destino (vuelta)", (g) => airportCell(g.flightInfo?.departure?.destination), "flDepDestination", { width: 125 }),
+          col("flDepDate", "Vuelta", (g) => flightTextCell(g.flightInfo?.departure?.departureDate), "flDepDate", { width: 115 }),
+          col("flDepTime", "Hora (vuelta)", (g) => flightTextCell(g.flightInfo?.departure?.departureTime), "flDepTime", { width: 105 }),
+          col("flDepFlightNumber", "Nº vuelo (vuelta)", (g) => flightTextCell(g.flightInfo?.departure?.finalFlightNumber), "flDepFlightNumber", { width: 130 }),
+        ]
+      : []),
   ];
 
   // ── Stable DOM structure (toolbar + grid element persist across renders) ──
@@ -613,7 +667,9 @@ export function renderGuestManager(ctx) {
     (state.filterPayment ? 1 : 0) +
     (state.filterPetanque ? 1 : 0) +
     (state.filterBoules ? 1 : 0) +
-    (state.filterPlaya ? 1 : 0);
+    (state.filterPlaya ? 1 : 0) +
+    (state.filterTravelsByPlane ? 1 : 0) +
+    (state.filterHasFlight ? 1 : 0);
 
   // The filter dropdown shows contextual checkboxes for the ACTIVE column group.
   const filterDropdownItems = (() => {
@@ -652,6 +708,17 @@ export function renderGuestManager(ctx) {
         <label class="dashboard-checkbox-cell" title="Mostrar solo confirmados para la playa (≥4)">
           <input type="checkbox" data-filter-playa ${state.filterPlaya === "yes" ? "checked" : ""} />
           <span>Juega playa</span>
+        </label>`;
+    }
+    if (activeColumnGroup === "vuelos") {
+      return `
+        <label class="dashboard-checkbox-cell" title="Mostrar solo quienes viajan en avión">
+          <input type="checkbox" data-filter-travels-plane ${state.filterTravelsByPlane === "yes" ? "checked" : ""} />
+          <span>Viaja en avión</span>
+        </label>
+        <label class="dashboard-checkbox-cell" title="Mostrar solo quienes aún no han dado datos de vuelo">
+          <input type="checkbox" data-filter-has-flight ${state.filterHasFlight === "without" ? "checked" : ""} />
+          <span>Sin datos de vuelo</span>
         </label>`;
     }
     return `
@@ -850,6 +917,12 @@ function wireToolbar(toolbarEl, container, ctx) {
   });
   toolbarEl.querySelector("[data-filter-playa]")?.addEventListener("change", (e) => {
     toggleFilter("filterPlaya", e.target.checked ? "yes" : "");
+  });
+  toolbarEl.querySelector("[data-filter-travels-plane]")?.addEventListener("change", (e) => {
+    toggleFilter("filterTravelsByPlane", e.target.checked ? "yes" : "");
+  });
+  toolbarEl.querySelector("[data-filter-has-flight]")?.addEventListener("change", (e) => {
+    toggleFilter("filterHasFlight", e.target.checked ? "without" : "");
   });
 
   toolbarEl.querySelectorAll("[data-readiness-filter]").forEach((row) => {

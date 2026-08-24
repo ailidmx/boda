@@ -39,6 +39,8 @@ export const GUEST_SORT_COLUMNS = [
   "friday", "saturday", "sunday",
   "accommodationConfirm", "cabinWaitingList", "paymentConfirmed",
   "petanqueParticipation", "petanqueOwnBoules", "playa", "rocaAzul", "travelsByPlane",
+  "flOrigin", "flConnections", "flDestination", "flArrivalDate", "flArrivalTime", "flFinalFlightNumber",
+  "flDepOrigin", "flDepConnections", "flDepDestination", "flDepDate", "flDepTime", "flDepFlightNumber",
 ];
 
 

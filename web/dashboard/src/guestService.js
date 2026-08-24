@@ -98,6 +98,15 @@ export function guestCanWhatsapp(guest, liveGuests, authUsers) {
   return guestHasAuth(guest, liveGuests, authUsers) && Boolean(phone);
 }
 
+// Whether a guest has recorded ANY flight info (origin / destination /
+// connections / arrival date-time / final flight number, or the return-trip
+// `departure` map). Used by the Vuelos column group + its "Sin datos de vuelo"
+// filter.
+export function guestHasFlightData(guest) {
+  const fi = guest?.flightInfo || {};
+  return Object.keys(fi).length > 0;
+}
+
 // RSVP scale dropdown for a single attendance day. The stored value stays an
 // int 0–5 (0 = no answer). The select shows the current level and lets the
 // admin pick any level directly (no click-to-cycle). The select's background
@@ -502,7 +511,7 @@ export function computeReadiness(activeGuests, liveGuests, authUsers) {
 // `guestCanEmail`).
 export function getFilteredGuests(
   activeGuests,
-  { filterGroup, filterQuery, filterAgeGroup, filterPhone, filterEmail, filterPhoto, filterName, filterContact, filterSent, filterAccommodation, filterWaitingList, filterNoCabin, filterPayment, filterPetanque, filterBoules, filterPlaya },
+  { filterGroup, filterQuery, filterAgeGroup, filterPhone, filterEmail, filterPhoto, filterName, filterContact, filterSent, filterAccommodation, filterWaitingList, filterNoCabin, filterPayment, filterPetanque, filterBoules, filterPlaya, filterTravelsByPlane, filterHasFlight },
   liveGuests = [],
   authUsers = {},
 ) {
@@ -571,6 +580,14 @@ export function getFilteredGuests(
   if (filterPlaya === "yes") {
     filtered = filtered.filter((g) => getRsvpScaleAnswer(g, "playa", liveGuests) >= 4);
   }
+  if (filterTravelsByPlane === "yes") {
+    filtered = filtered.filter((g) => g.travelsByPlane === true);
+  }
+  if (filterHasFlight === "with") {
+    filtered = filtered.filter((g) => guestHasFlightData(g));
+  } else if (filterHasFlight === "without") {
+    filtered = filtered.filter((g) => !guestHasFlightData(g));
+  }
   if (filterQuery) {
 
 
@@ -594,6 +611,12 @@ export function getFilteredGuests(
   return filtered;
 }
 
+
+// Airport sort label for the Vuelos columns: IATA code first (e.g. "mad"),
+// falling back to the airport name. Lowercased for a stable comparison.
+function airportSortValue(airport) {
+  return (airport?.iata || airport?.name || "").toLowerCase();
+}
 
 // Extract the sortable value for a guest given a column key. The Firebase Auth
 // user map is injected (dependency injection) so this stays a pure function
@@ -658,6 +681,30 @@ export function guestSortValue(guest, key, authUsers = {}, liveGuests = []) {
       return guest?.paymentConfirmed === true ? 1 : 0;
     case "travelsByPlane":
       return guest?.travelsByPlane === true ? 1 : 0;
+    case "flOrigin":
+      return airportSortValue(guest?.flightInfo?.origin);
+    case "flConnections":
+      return (guest?.flightInfo?.connections || []).map((a) => a?.iata || "").join(",").toLowerCase();
+    case "flDestination":
+      return airportSortValue(guest?.flightInfo?.destination);
+    case "flArrivalDate":
+      return guest?.flightInfo?.arrivalDate || "";
+    case "flArrivalTime":
+      return guest?.flightInfo?.arrivalTime || "";
+    case "flFinalFlightNumber":
+      return (guest?.flightInfo?.finalFlightNumber || "").toLowerCase();
+    case "flDepOrigin":
+      return airportSortValue(guest?.flightInfo?.departure?.origin);
+    case "flDepConnections":
+      return (guest?.flightInfo?.departure?.connections || []).map((a) => a?.iata || "").join(",").toLowerCase();
+    case "flDepDestination":
+      return airportSortValue(guest?.flightInfo?.departure?.destination);
+    case "flDepDate":
+      return guest?.flightInfo?.departure?.departureDate || "";
+    case "flDepTime":
+      return guest?.flightInfo?.departure?.departureTime || "";
+    case "flDepFlightNumber":
+      return (guest?.flightInfo?.departure?.finalFlightNumber || "").toLowerCase();
     case "status":
       // Sort by the derived RSVP status (mirrors `guestStatusBadge`):
       // 2 = Confirmado (any day ≥ 4), 1 = Parcial (answered but not confirmed),

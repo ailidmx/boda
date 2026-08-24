@@ -8,6 +8,7 @@ import {
   guestSendEmail,
   guestCanEmail,
   guestCanWhatsapp,
+  guestHasFlightData,
   rsvpLevelChip,
   computeDayConfirmations,
   guestStatusBadge,
@@ -315,5 +316,61 @@ test("guestSortValue sorts by xtraCabin and xtraRoom", () => {
 test("guestSortValue status is neutral (0) and unknown keys return empty", () => {
   assert.equal(guestSortValue({ id: "g1" }, "status"), 0);
   assert.equal(guestSortValue({ id: "g1" }, "unknown"), "");
+});
+
+// ── Vuelos (flight info) sort + filter helpers ──────────────────────────
+
+test("guestSortValue sorts by flight origin/destination IATA, then name", () => {
+  const g = {
+    id: "g1",
+    flightInfo: {
+      origin: { iata: "MAD", name: "Madrid-Barajas", city: "Madrid", country: "España" },
+      destination: { iata: "GDL", name: "Guadalajara" },
+      arrivalDate: "2027-02-19",
+      arrivalTime: "18:40",
+      finalFlightNumber: "AM39",
+      departure: {
+        origin: { iata: "GDL" },
+        destination: { iata: "MAD" },
+        departureDate: "2027-02-23",
+        departureTime: "09:15",
+        finalFlightNumber: "AM38",
+      },
+    },
+  };
+  assert.equal(guestSortValue(g, "flOrigin"), "mad");
+  assert.equal(guestSortValue(g, "flDestination"), "gdl");
+  assert.equal(guestSortValue(g, "flArrivalDate"), "2027-02-19");
+  assert.equal(guestSortValue(g, "flArrivalTime"), "18:40");
+  assert.equal(guestSortValue(g, "flFinalFlightNumber"), "am39");
+  assert.equal(guestSortValue(g, "flDepOrigin"), "gdl");
+  assert.equal(guestSortValue(g, "flDepDestination"), "mad");
+  assert.equal(guestSortValue(g, "flDepDate"), "2027-02-23");
+  assert.equal(guestSortValue(g, "flDepTime"), "09:15");
+  assert.equal(guestSortValue(g, "flDepFlightNumber"), "am38");
+});
+
+test("guestSortValue flight keys are empty when a guest has no flightInfo", () => {
+  assert.equal(guestSortValue({ id: "g1" }, "flOrigin"), "");
+  assert.equal(guestSortValue({ id: "g1" }, "flArrivalDate"), "");
+  assert.equal(guestSortValue({ id: "g1" }, "flDepFlightNumber"), "");
+});
+
+test("guestSortValue sorts connections by joined IATA codes", () => {
+  const g = {
+    id: "g1",
+    flightInfo: {
+      connections: [{ iata: "CDG" }, { iata: "MEX" }],
+      departure: { connections: [{ iata: "MEX" }, { iata: "CDG" }] },
+    },
+  };
+  assert.equal(guestSortValue(g, "flConnections"), "cdg,mex");
+  assert.equal(guestSortValue(g, "flDepConnections"), "mex,cdg");
+});
+
+test("guestHasFlightData is true when flightInfo has keys, false otherwise", () => {
+  assert.equal(guestHasFlightData({ id: "g1", flightInfo: { arrivalDate: "2027-02-19" } }), true);
+  assert.equal(guestHasFlightData({ id: "g2", flightInfo: {} }), false);
+  assert.equal(guestHasFlightData({ id: "g3" }), false);
 });
 

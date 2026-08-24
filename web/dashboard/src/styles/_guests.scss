@@ -506,6 +506,16 @@
   white-space: nowrap;
 }
 
+// Flight info text cells (Origen/Conexiones/Llegada/Nº vuelo, and their
+// return-trip counterparts). Short monospace-ish values so dates, times and
+// flight numbers line up across rows.
+.dashboard-flight-text {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.82rem;
+  color: $ink;
+  white-space: nowrap;
+}
+
 // Shared checkbox cell (used by the travels column and the "Solo niños" filter).
 .dashboard-checkbox-cell {
   display: inline-flex;
