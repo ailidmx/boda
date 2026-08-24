@@ -26,6 +26,7 @@ const PATH_TO_TAB = {
   guisos: "guisoRankings",
   canciones: "songRequests",
   analitica: "analytics",
+  proveedores: "providers",
 };
 
 /** Map internal tab IDs to URL path segments. */
@@ -40,6 +41,7 @@ const TAB_TO_PATH = {
   guisoRankings: "guisos",
   songRequests: "canciones",
   analytics: "analitica",
+  providers: "proveedores",
 };
 
 /** The tab definitions: id, label, and icon. */
@@ -54,6 +56,7 @@ const TABS = [
   { id: "guisoRankings", label: "Guisos", icon: "🍲" },
   { id: "songRequests", label: "Canciones", icon: "🎵" },
   { id: "analytics", label: "Analítica", icon: "📈" },
+  { id: "providers", label: "Proveedores", icon: "🤝" },
 ];
 
 /** The currently active tab id. */

@@ -100,6 +100,7 @@ import { renderSummary } from "./summary.js";
 import { renderCabinAssignments as renderCabinAssignmentsPanel } from "./cabinsPanel.js";
 import { renderThanksPanel as renderThanksPanelModule } from "./thanksPanel.js";
 import { renderChartsPanel as renderChartsPanelModule } from "./chartsPanel.js";
+import { renderProvidersPanel as renderProvidersPanelModule } from "./providersPanel.js";
 
 import {
   getTabFromPath,
@@ -110,6 +111,7 @@ import {
 } from "./tabNav.js";
 
 import { updateGuest, softDeleteGuest, createGuest } from "./repositories/guestRepository.js";
+import { saveProvider, saveOffer, deleteProvider, deleteOffer } from "./repositories/providerRepository.js";
 
 import { createThanks, updateThanks, deleteThanks } from "./repositories/thanksRepository.js";
 import { updateRecordField } from "./repositories/recordsRepository.js";
@@ -139,6 +141,8 @@ const state = {
   cardVotes: [], // from Firestore collection "card_votes"
   guisoRankings: [], // from Firestore collection "guiso_rankings"
   songRequests: [], // from Firestore collection "song_requests"
+  providers: [], // from Firestore collection "providers"
+  offers: [], // from Firestore collection "provider_offers"
   pageViews: [], // from Firestore collection "page_views"
   activityEvents: [], // from Firestore collection "activity_events"
   loginEvents: [], // from Firestore collection "login_events"
@@ -1237,6 +1241,20 @@ function renderCardVotesPanel() {
   });
 }
 
+function renderProvidersPanel() {
+  const container = document.querySelector("[data-providers-manager]");
+  if (!container) return;
+  renderProvidersPanelModule({
+    container,
+    providers: state.providers,
+    offers: state.offers,
+    saveProvider,
+    saveOffer,
+    deleteProvider,
+    deleteOffer,
+  });
+}
+
 function renderGuisoRankingsPanel() {
   renderDataPanel({
     container: document.querySelector("[data-guiso-rankings-manager]"),
@@ -1619,6 +1637,19 @@ function renderDashboard(app) {
         </div>
       </section>
 
+      <!-- ── Panel: Providers ── -->
+      <section class="dashboard-panel" data-dashboard-panel="providers">
+        <div class="dashboard-section">
+          <div class="dashboard-section-heading">
+            <div>
+              <p class="dashboard-eyebrow">Proveedores y ofertas</p>
+              <h2>Proveedores</h2>
+            </div>
+          </div>
+          <div data-providers-manager></div>
+        </div>
+      </section>
+
       <!-- ── Panel: Card votes ── -->
       <section class="dashboard-panel" data-dashboard-panel="cardVotes">
         <div class="dashboard-section">
@@ -1807,6 +1838,8 @@ function renderDashboard(app) {
   const pageViewsUnsub = subscribeCollection(collections.pageViews, "pageViews", "page_views", renderPageViewsPanel);
   const activityEventsUnsub = subscribeCollection(collections.activityEvents, "activityEvents", "activity_events", renderActivityEventsPanel);
   const loginEventsUnsub = subscribeCollection(collections.loginEvents, "loginEvents", "login_events", renderLoginEventsPanel);
+  const providersUnsub = subscribeCollection(collections.providers, "providers", "providers", renderProvidersPanel);
+  const offersUnsub = subscribeCollection(collections.providerOffers, "offers", "provider_offers", renderProvidersPanel);
 
   renderTabNavigation();
   renderGroupFilter();
@@ -1816,6 +1849,7 @@ function renderDashboard(app) {
   renderChartsPanel();
   renderSpatialPlan();
   renderBudgetPanel();
+  renderProvidersPanel();
   renderCardVotesPanel();
   renderGuisoRankingsPanel();
   renderSongRequestsPanel();
