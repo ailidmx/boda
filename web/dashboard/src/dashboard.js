@@ -23,7 +23,8 @@ import {
 } from "./rooms.js";
 import { getCabinPhotos, getCabinByDisplayName, cabinPhotoUrl, loadCabins, getAllCabinNames } from "./cabins.js";
 import { loadTables } from "./tables.js";
-import { renderSpatialEditor } from "./spatialEditor.js";
+import { renderSpatialEditor, getSeatingAssignments, subscribeSeating } from "./spatialEditor.js";
+import { computeSeatingIntegrity } from "./spatial/integrity.js";
 import { createMatrixLoader } from "./matrixLoader.js";
 import { collections } from "../../shared/firestore-paths.js";
 import {
@@ -102,6 +103,7 @@ import { renderChartsPanel as renderChartsPanelModule } from "./chartsPanel.js";
 
 import {
   getTabFromPath,
+  getActiveTab,
   navigateToTab,
   switchTab,
   renderTabNavigation,
@@ -495,6 +497,40 @@ function computeDayConfirmations() {
 // Invitation-send stats (sent / total / percentage) for the summary card.
 function computeInvitationStats() {
   return serviceComputeInvitationStats(getFilteredActiveGuests());
+}
+
+// Seating summary (Mesas tab): seated vs confirmed-Saturday, plus the three
+// seating-integrity signals (duplicates + RSVP↔seat mismatches).
+function computeSeatingStats() {
+  const guests = getActiveGuests();
+  const integrity = computeSeatingIntegrity({
+    guestAssignments: getSeatingAssignments(),
+    allGuests: guests,
+    getSaturdayLevel: (g) => serviceGetRsvpScaleAnswer(g, "saturday", state.liveGuests),
+  });
+  return {
+    seated: integrity.seatedCount,
+    confirmedSaturday: computeDayConfirmations().saturday,
+    confirmadosSinAsiento: integrity.satYesNoSeat.length,
+    asientosSinConfirmar: integrity.satNoWithSeat.length,
+    duplicados: integrity.duplicated.length,
+  };
+}
+
+// Render the summary cards for the ACTIVE tab: the Mesas editor shows seating
+// stats; every other tab shows the default invitations + day cards.
+function renderSummaryForTab() {
+  if (getActiveTab() === "tables") {
+    renderSummary({ seating: computeSeatingStats() });
+    return;
+  }
+  renderSummary({
+    computeDayConfirmations,
+    computeInvitationStats,
+    computeDayDistributions,
+    computeDayConfirmedGuests,
+    computeDayLevelGuests,
+  });
 }
 
 // Per-day RSVP scale distribution (0–5) for the summary cards.
@@ -1791,6 +1827,8 @@ function renderDashboard(app) {
       state.filterPlaya = "";
     }
     if (tab === "charts") renderChartsPanel();
+    // The summary cards are contextual: re-render for the new active tab.
+    renderSummaryForTab();
   };
   window.addEventListener("dashboard:tabchange", onTabChange);
   app._onTabChange = onTabChange;
@@ -1801,17 +1839,16 @@ function renderDashboard(app) {
   // filtered guest list via `getFilteredActiveGuests`) and the INVITADOS table
   // (which already filters by `state.filterGroup`).
   const onGroupChange = () => {
-    renderSummary({
-      computeDayConfirmations,
-      computeInvitationStats,
-      computeDayDistributions,
-      computeDayConfirmedGuests,
-      computeDayLevelGuests,
-    });
+    renderSummaryForTab();
     renderGuestManager();
   };
   window.addEventListener("dashboard:groupchange", onGroupChange);
   app._onGroupChange = onGroupChange;
+
+  // Seating changes in the Mesas editor re-render the summary (seating cards).
+  subscribeSeating(() => {
+    if (getActiveTab() === "tables") renderSummaryForTab();
+  });
 
 
 
@@ -1977,14 +2014,8 @@ export function startDashboard(app) {
       // Re-render live-dependent panels if the dashboard is already shown.
       renderGuestManager();
       renderCabinAssignments();
-      // Re-render the attendance summary cards from the live guests.
-      renderSummary({
-        computeDayConfirmations,
-        computeInvitationStats,
-        computeDayDistributions,
-        computeDayConfirmedGuests,
-        computeDayLevelGuests,
-      });
+      // Re-render the (contextual) summary cards from the live guests.
+      renderSummaryForTab();
 
 
 

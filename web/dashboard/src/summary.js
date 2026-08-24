@@ -444,7 +444,62 @@ function dayCard(label, confirmed, distribution, total, confirmedGuests, levelGu
  *   0–5) of guest summaries, used to make each distribution-bar segment open a
  *   modal listing exactly who answered that level.
  */
+// Seating summary cards (Mesas tab): seated vs confirmed-Saturday, plus the
+// three seating-integrity signals. Replaces the invitations + day cards when
+// the active tab is the spatial "Mesas" editor.
+function seatingCards(stats) {
+  const { seated, confirmedSaturday, confirmadosSinAsiento, asientosSinConfirmar, duplicados } = stats;
+
+  const main = make("article", "dashboard-summary-card dashboard-summary-card--invitations");
+  const head = make("div", "dashboard-inv-head");
+  head.append(
+    make("span", "", "Sentados / Confirmados el sábado"),
+    make("strong", "", `${seated} / ${confirmedSaturday}`),
+  );
+  const progress = make("div", "dashboard-inv-progress");
+  progress.setAttribute("role", "progressbar");
+  progress.setAttribute("aria-valuemin", "0");
+  progress.setAttribute("aria-valuemax", String(confirmedSaturday || 1));
+  progress.setAttribute("aria-valuenow", String(seated));
+  const fill = make("span", "dashboard-inv-progress-fill");
+  const pct = confirmedSaturday ? Math.round((seated / confirmedSaturday) * 100) : 0;
+  fill.style.width = `${pct}%`;
+  progress.append(fill);
+  const meta = make("div", "dashboard-inv-meta");
+  meta.append(
+    make("small", "", `${seated} sentados de ${confirmedSaturday} confirmados el sábado`),
+    make("strong", "dashboard-inv-pct", `${pct}%`),
+  );
+  main.append(head, progress, meta);
+
+  const card = (label, value, hint) => {
+    const a = make("article", "dashboard-summary-card");
+    a.append(
+      make("span", "", label),
+      make("strong", "", String(value)),
+      make("small", "", hint),
+    );
+    return a;
+  };
+
+  return [
+    main,
+    card("Confirmados sin asiento", confirmadosSinAsiento, "Confirmaron el sábado (≥ 4) pero no tienen mesa"),
+    card("Asientos sin confirmar", asientosSinConfirmar, "Tienen mesa pero no confirmaron el sábado"),
+    card("Duplicados", duplicados, "Invitados sentados en más de una mesa"),
+  ];
+}
+
+
 export function renderSummary(ctx) {
+  const summary = document.querySelector("[data-dashboard-summary]");
+  if (!summary) return;
+
+  if (ctx.seating) {
+    summary.replaceChildren(...seatingCards(ctx.seating));
+    return;
+  }
+
   const {
     computeDayConfirmations,
     computeInvitationStats,
@@ -452,8 +507,6 @@ export function renderSummary(ctx) {
     computeDayConfirmedGuests,
     computeDayLevelGuests,
   } = ctx;
-  const summary = document.querySelector("[data-dashboard-summary]");
-  if (!summary) return;
 
   const dayCounts = computeDayConfirmations();
   const invitationStats = computeInvitationStats();

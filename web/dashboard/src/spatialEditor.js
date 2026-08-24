@@ -59,6 +59,22 @@ let showOnlyUnassigned = false; // guest filter: only unassigned
 let showOnlySat5 = false; // guest filter: only SAT level 5
 let showOnlyChildren = false; // guest filter: only children (age "Niño")
 let planLoaded = false; // true once the authoritative plan is in memory (guards writes)
+
+// ── Seating snapshot for the dashboard summary (Mesas tab) ──────────────
+const seatingListeners = new Set();
+
+export function getSeatingAssignments() {
+  return plan.guestAssignments || {};
+}
+
+export function subscribeSeating(listener) {
+  seatingListeners.add(listener);
+  return () => seatingListeners.delete(listener);
+}
+
+function notifySeating() {
+  seatingListeners.forEach((l) => l());
+}
 let reorderDragId = null; // in-flight sidebar reorder drag (instance id)
 
 // ── Debug logging ────────────────────────────────────────────────────────
@@ -673,6 +689,7 @@ function dispatch(action, { record = true, save = true } = {}) {
   if (record) history.commit(before, action);
   render();
   if (save) schedulePersist();
+  notifySeating();
   return true;
 }
 
@@ -1696,6 +1713,7 @@ export async function loadSpatialEditor(root) {
   if (loaded && loaded.instances?.length) fitPlanToView();
   render();
   renderSaveStatus();
+  notifySeating();
 }
 
 export function renderSpatialEditor(root, injected = {}) {
