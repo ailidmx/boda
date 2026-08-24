@@ -500,7 +500,34 @@ function computeInvitationStats() {
 }
 
 // Seating summary (Mesas tab): seated vs confirmed-Saturday, plus the three
-// seating-integrity signals (duplicates + RSVP↔seat mismatches).
+// seating-integrity signals (duplicates + RSVP↔seat mismatches), each with the
+// guest list + RSVP-level distribution for the cards.
+function guestSummaryForSeating(guestId) {
+  const guest = getGuest(guestId);
+  if (!guest) return null;
+  const level = Number(serviceGetRsvpScaleAnswer(guest, "saturday", state.liveGuests)) || 0;
+  return {
+    id: guestId,
+    name: guestFullName(guest),
+    group: guest.group || "Sin grupo",
+    avatar: guestAvatarUrl(guest),
+    initials: guestInitials(guest),
+    level,
+  };
+}
+
+function seatingCardData(guestIds, label, hint) {
+  const guests = guestIds.map(guestSummaryForSeating).filter(Boolean);
+  const distribution = [0, 0, 0, 0, 0, 0];
+  const levelGuests = [[], [], [], [], [], []];
+  for (const g of guests) {
+    const lvl = Math.max(0, Math.min(5, g.level));
+    distribution[lvl] += 1;
+    levelGuests[lvl].push(g);
+  }
+  return { label, hint, count: guests.length, guests, distribution, levelGuests };
+}
+
 function computeSeatingStats() {
   const guests = getActiveGuests();
   const integrity = computeSeatingIntegrity({
@@ -511,9 +538,11 @@ function computeSeatingStats() {
   return {
     seated: integrity.seatedCount,
     confirmedSaturday: computeDayConfirmations().saturday,
-    confirmadosSinAsiento: integrity.satYesNoSeat.length,
-    asientosSinConfirmar: integrity.satNoWithSeat.length,
-    duplicados: integrity.duplicated.length,
+    cards: [
+      seatingCardData(integrity.satYesNoSeat, "Confirmados sin asiento", "Confirmaron el sábado (≥ 4) pero no tienen mesa"),
+      seatingCardData(integrity.satNoWithSeat, "Asientos sin confirmar", "Tienen mesa pero no confirmaron el sábado"),
+      seatingCardData(integrity.duplicated.map((d) => d.guestId), "Duplicados", "Invitados sentados en más de una mesa"),
+    ],
   };
 }
 

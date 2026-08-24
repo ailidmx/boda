@@ -138,16 +138,16 @@ function avatarEl(guest) {
 // the list overflows the card width it scrolls horizontally (the "+N" collapse
 // was removed). Clicking opens the full-screen modal with the whole list
 // grouped by group tag.
-function stackedAvatars(guests, label) {
+function stackedAvatars(guests, label, noun = "confirmados", title) {
   const sorted = [...guests].sort((a, b) => a.name.localeCompare(b.name));
   const wrap = make("button", "dashboard-avatars", "");
   wrap.type = "button";
-  wrap.setAttribute("aria-label", `Ver ${sorted.length} confirmados de ${label}`);
-  wrap.title = `Ver ${sorted.length} confirmados de ${label}`;
+  wrap.setAttribute("aria-label", `Ver ${sorted.length} ${noun} de ${label}`);
+  wrap.title = `Ver ${sorted.length} ${noun} de ${label}`;
 
   sorted.forEach((g) => wrap.append(avatarEl(g)));
 
-  wrap.addEventListener("click", () => openConfirmedModal(sorted, label));
+  wrap.addEventListener("click", () => openConfirmedModal(sorted, label, title));
   return wrap;
 }
 
@@ -174,7 +174,7 @@ function groupConfirmedGuests(guests) {
 // <details> block, collapsed by default. Closes on ✕, on the backdrop, or on
 // Escape. While open, background scrolling is locked (the modal scrolls
 // independently).
-function openConfirmedModal(guests, label) {
+function openConfirmedModal(guests, label, title) {
   const overlay = make("div", "dashboard-modal-overlay dashboard-confirmed-overlay");
   overlay.setAttribute("role", "dialog");
   overlay.setAttribute("aria-modal", "true");
@@ -183,7 +183,7 @@ function openConfirmedModal(guests, label) {
   const modal = make("div", "dashboard-confirmed-modal");
   const head = make("div", "dashboard-confirmed-head");
   head.append(
-    make("h3", "", `Confirmados · ${label}`),
+    make("h3", "", title || `Confirmados · ${label}`),
     make("span", "dashboard-confirmed-count", `${guests.length} invitados`),
     (() => {
       const close = make("button", "dashboard-modal-close", "✕");
@@ -448,7 +448,7 @@ function dayCard(label, confirmed, distribution, total, confirmedGuests, levelGu
 // three seating-integrity signals. Replaces the invitations + day cards when
 // the active tab is the spatial "Mesas" editor.
 function seatingCards(stats) {
-  const { seated, confirmedSaturday, confirmadosSinAsiento, asientosSinConfirmar, duplicados } = stats;
+  const { seated, confirmedSaturday, cards } = stats;
 
   const main = make("article", "dashboard-summary-card dashboard-summary-card--invitations");
   const head = make("div", "dashboard-inv-head");
@@ -472,22 +472,22 @@ function seatingCards(stats) {
   );
   main.append(head, progress, meta);
 
-  const card = (label, value, hint) => {
-    const a = make("article", "dashboard-summary-card");
-    a.append(
-      make("span", "", label),
-      make("strong", "", String(value)),
-      make("small", "", hint),
-    );
-    return a;
-  };
+  return [main, ...cards.map(seatingGuestCard)];
+}
 
-  return [
-    main,
-    card("Confirmados sin asiento", confirmadosSinAsiento, "Confirmaron el sábado (≥ 4) pero no tienen mesa"),
-    card("Asientos sin confirmar", asientosSinConfirmar, "Tienen mesa pero no confirmaron el sábado"),
-    card("Duplicados", duplicados, "Invitados sentados en más de una mesa"),
-  ];
+// One seating card: same look/feature as a day card (stacked avatars → modal +
+// RSVP-level distribution bar + legend), but for a specific seating category.
+function seatingGuestCard({ label, hint, count, guests, distribution, levelGuests }) {
+  const article = make("article", "dashboard-summary-card");
+  article.append(
+    make("span", "", label),
+    make("strong", "", String(count)),
+    make("small", "", hint),
+    stackedAvatars(guests, label, "invitados", label),
+    distributionBar(distribution, count || 1, levelGuests, label),
+    distributionLegend(distribution),
+  );
+  return article;
 }
 
 
