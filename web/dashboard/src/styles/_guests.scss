@@ -877,17 +877,53 @@
   color: rgba(85, 69, 45, 0.35);
 }
 
-// ── Name cell: all 4 name inputs inline in a row (always editable) ──
+// ── Name cell: view (full name) ⇄ edit (4 inputs + confirm/cancel) ──
 .dashboard-name-cell {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 0.25rem;
   min-width: 14rem;
+}
 
-  .dashboard-inline-input {
-    flex: 1 1 0;
-    min-width: 0;
+.dashboard-name-display {
+  display: inline-block;
+  padding: 0.2rem 0.35rem;
+  border: 1px solid transparent;
+  border-radius: 0.35rem;
+  background: transparent;
+  font: inherit;
+  font-size: 0.85rem;
+  line-height: 1.25;
+  color: $ink;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+
+  &:hover {
+    border-color: $border-strong;
+    background: rgba(255, 253, 249, 0.6);
+    color: $accent;
+  }
+}
+
+.dashboard-name-editor {
+  margin-top: 0.3rem;
+  padding: 0.5rem;
+  border: 1px solid $border-strong;
+  border-radius: 0.4rem;
+  background: rgba(255, 253, 249, 0.7);
+
+  // `hidden` must win so the editor stays collapsed in view mode.
+  &[hidden] {
+    display: none;
+  }
+}
+
+.dashboard-name-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.3rem;
+  margin-top: 0.3rem;
+
+  .dashboard-link-btn {
+    font-size: 1.1rem;
   }
 }
 

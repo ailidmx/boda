@@ -123,10 +123,21 @@ export function renderGuestManager(ctx) {
     const ml = identity.maternalLastName || guest.maternalLastName || "";
     return `
       <div class="dashboard-name-cell" data-name-cell="${guest.id}">
-        <input class="dashboard-inline-input" type="text" value="${f}" data-name-field="firstName" data-guest-id="${guest.id}" placeholder="Nombre" title="Nombre" />
-        <input class="dashboard-inline-input" type="text" value="${m}" data-name-field="middleName" data-guest-id="${guest.id}" placeholder="Nombre 2" title="Segundo nombre" />
-        <input class="dashboard-inline-input" type="text" value="${l}" data-name-field="lastName" data-guest-id="${guest.id}" placeholder="Apellido" title="Apellido paterno" />
-        <input class="dashboard-inline-input" type="text" value="${ml}" data-name-field="maternalLastName" data-guest-id="${guest.id}" placeholder="Apellido 2" title="Apellido materno" />
+        <button type="button" class="dashboard-name-display" data-name-display="${guest.id}" title="Editar nombre">
+          ${guestFullName(guest) || "—"}
+        </button>
+        <div class="dashboard-name-editor" data-name-editor="${guest.id}" hidden>
+          <div class="dashboard-name-fields">
+            <input class="dashboard-inline-input" type="text" value="${f}" data-name-field="firstName" data-guest-id="${guest.id}" placeholder="Nombre" />
+            <input class="dashboard-inline-input" type="text" value="${m}" data-name-field="middleName" data-guest-id="${guest.id}" placeholder="Nombre 2" />
+            <input class="dashboard-inline-input" type="text" value="${l}" data-name-field="lastName" data-guest-id="${guest.id}" placeholder="Apellido" />
+            <input class="dashboard-inline-input" type="text" value="${ml}" data-name-field="maternalLastName" data-guest-id="${guest.id}" placeholder="Apellido 2" />
+          </div>
+          <div class="dashboard-name-actions">
+            <button type="button" class="dashboard-link-btn" data-name-confirm="${guest.id}" title="Guardar">✓</button>
+            <button type="button" class="dashboard-link-btn" data-name-cancel="${guest.id}" title="Cancelar">✕</button>
+          </div>
+        </div>
       </div>`;
   };
 
@@ -1059,6 +1070,22 @@ function wireGridEvents(gridEl, ctx) {
     } else if (target?.dataset.roomCancel) {
       toggle(target, `[data-room-display="${target.dataset.roomCancel}"][data-room-period="${target.dataset.roomPeriod}"]`,
         `[data-room-editor="${target.dataset.roomCancel}"][data-room-period="${target.dataset.roomPeriod}"]`, false);
+    } else if (target?.dataset.nameDisplay) {
+      toggle(target, `[data-name-display="${target.dataset.nameDisplay}"]`, `[data-name-editor="${target.dataset.nameDisplay}"]`, true);
+      target.closest(".ag-cell")?.querySelector('[data-name-field="firstName"]')?.focus();
+    } else if (target?.dataset.nameConfirm) {
+      const guestId = target.dataset.nameConfirm;
+      const inputs = target.closest(".ag-cell")?.querySelectorAll("[data-name-field]");
+      if (inputs?.length) {
+        let ok = true;
+        for (const input of inputs) {
+          const saved = await saveGuestInline(guestId, input.dataset.nameField, input.value.trim());
+          if (!saved) ok = false;
+        }
+        if (ok) rerender();
+      }
+    } else if (target?.dataset.nameCancel) {
+      toggle(target, `[data-name-display="${target.dataset.nameCancel}"]`, `[data-name-editor="${target.dataset.nameCancel}"]`, false);
     } else if (target?.dataset.messageDisplay) {
       toggle(target, `[data-message-display="${target.dataset.messageDisplay}"]`, `[data-message-editor="${target.dataset.messageDisplay}"]`, true);
       target.closest(".ag-cell")?.querySelector(`[data-message-input="${target.dataset.messageDisplay}"]`)?.focus();
@@ -1206,10 +1233,6 @@ function wireGridEvents(gridEl, ctx) {
       const ok = await saveGuestEmail(t.dataset.authEmailInput, email);
       if (ok) rerender();
       else flashError(t);
-    } else if (t.matches("[data-name-field]")) {
-      const ok = await saveGuestInline(t.dataset.guestId, t.dataset.nameField, t.value.trim());
-      t.style.borderColor = ok ? "#4caf50" : "#a0352c";
-      setTimeout(() => (t.style.borderColor = ""), 1000);
     } else if (t.matches("[data-invgroup-new]")) {
       await commitGroup("invgroup-select", "invgroup-new", applyInvitationGroupChange, (id) => getGuest(id)?.invitationGroup || "")(t);
     } else if (t.matches("[data-group-new]")) {
