@@ -123,16 +123,10 @@ export function renderGuestManager(ctx) {
     const ml = identity.maternalLastName || guest.maternalLastName || "";
     return `
       <div class="dashboard-name-cell" data-name-cell="${guest.id}">
-        <button type="button" class="dashboard-name-display" data-name-display="${guest.id}" title="Editar nombre">
-          ${guestFullName(guest) || "—"}
-        </button>
-        <div class="dashboard-name-editor" data-name-editor="${guest.id}" hidden>
-          <input class="dashboard-inline-input" type="text" value="${f}" data-name-field="firstName" data-guest-id="${guest.id}" placeholder="Nombre" />
-          <input class="dashboard-inline-input" type="text" value="${m}" data-name-field="middleName" data-guest-id="${guest.id}" placeholder="Nombre 2" />
-          <input class="dashboard-inline-input" type="text" value="${l}" data-name-field="lastName" data-guest-id="${guest.id}" placeholder="Apellido" />
-          <input class="dashboard-inline-input" type="text" value="${ml}" data-name-field="maternalLastName" data-guest-id="${guest.id}" placeholder="Apellido 2" />
-          <button type="button" class="dashboard-link-btn" data-name-done="${guest.id}" title="Listo">✓</button>
-        </div>
+        <input class="dashboard-inline-input" type="text" value="${f}" data-name-field="firstName" data-guest-id="${guest.id}" placeholder="Nombre" title="Nombre" />
+        <input class="dashboard-inline-input" type="text" value="${m}" data-name-field="middleName" data-guest-id="${guest.id}" placeholder="Nombre 2" title="Segundo nombre" />
+        <input class="dashboard-inline-input" type="text" value="${l}" data-name-field="lastName" data-guest-id="${guest.id}" placeholder="Apellido" title="Apellido paterno" />
+        <input class="dashboard-inline-input" type="text" value="${ml}" data-name-field="maternalLastName" data-guest-id="${guest.id}" placeholder="Apellido 2" title="Apellido materno" />
       </div>`;
   };
 
@@ -1065,22 +1059,6 @@ function wireGridEvents(gridEl, ctx) {
     } else if (target?.dataset.roomCancel) {
       toggle(target, `[data-room-display="${target.dataset.roomCancel}"][data-room-period="${target.dataset.roomPeriod}"]`,
         `[data-room-editor="${target.dataset.roomCancel}"][data-room-period="${target.dataset.roomPeriod}"]`, false);
-    } else if (target?.dataset.nameDisplay) {
-      const cell = target.closest(".ag-cell");
-      const editor = cell?.querySelector(`[data-name-editor="${target.dataset.nameDisplay}"]`);
-      if (editor) {
-        editor.hidden = !editor.hidden;
-        if (!editor.hidden) editor.querySelector('[data-name-field="firstName"]')?.focus();
-      }
-    } else if (target?.dataset.nameDone) {
-      const cell = target.closest(".ag-cell");
-      const editor = cell?.querySelector(`[data-name-editor="${target.dataset.nameDone}"]`);
-      const display = cell?.querySelector(`[data-name-display="${target.dataset.nameDone}"]`);
-      if (editor) editor.hidden = true;
-      if (display) {
-        const g = getGuest(target.dataset.nameDone);
-        if (g) display.textContent = guestFullName(g) || "—";
-      }
     } else if (target?.dataset.messageDisplay) {
       toggle(target, `[data-message-display="${target.dataset.messageDisplay}"]`, `[data-message-editor="${target.dataset.messageDisplay}"]`, true);
       target.closest(".ag-cell")?.querySelector(`[data-message-input="${target.dataset.messageDisplay}"]`)?.focus();
