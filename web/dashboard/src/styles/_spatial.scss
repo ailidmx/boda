@@ -714,6 +714,16 @@
   &:active { cursor: grabbing; }
 }
 
+.se-instance-num {
+  flex-shrink: 0;
+  font-size: 0.66rem;
+  font-weight: 700;
+  color: $ink-muted;
+  min-width: 1.4rem;
+  text-align: right;
+  user-select: none;
+}
+
 .se-instance-name {
   display: flex;
   align-items: center;

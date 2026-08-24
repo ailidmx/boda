@@ -397,6 +397,7 @@ function panelMarkup() {
           ${!isPlaced ? `data-drag-instance="${inst.id}" draggable="true"` : ""}
           title="${isPlaced ? "Haz clic para enfocar en el salón" : "Arrastra al salón o usa ⚑ para colocación automática"}">
           <span class="se-instance-grip" data-reorder-instance="${inst.id}" draggable="true" title="Arrastrar para reordenar">⋮⋮</span>
+          <span class="se-instance-num" title="Número de objeto">#${String(index + 1).padStart(2, "0")}</span>
           <button class="se-instance-name" type="button" data-focus-instance="${inst.id}">
             <span class="se-instance-dot ${isPlaced ? "is-placed" : "is-unplaced"}"></span>
             <span class="se-instance-name-text">${label}</span>
@@ -1565,6 +1566,12 @@ function openContextMenu(e, items) {
 }
 
 function onContextMenu(e) {
+  // Right-clicking while dragging a guest cancels the drag.
+  if (drag?.mode === "guest") {
+    e.preventDefault();
+    cancelGuestDrag();
+    return;
+  }
   const target = findInstanceTarget(e);
   if (target?.seatId) {
     const guestId = plan.guestAssignments?.[target.instanceId]?.[target.seatId];
