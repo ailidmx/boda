@@ -409,9 +409,32 @@ export function reducePlan(plan, action) {
 
     case "UNASSIGN_GUEST": {
       const { instanceId, seatId } = action;
-      const assign = { ...(plan.guestAssignments[instanceId] || {}) };
-      delete assign[seatId];
-      return { ...plan, guestAssignments: { ...plan.guestAssignments, [instanceId]: assign } };
+      const guestId = plan.guestAssignments?.[instanceId]?.[seatId];
+      if (guestId === undefined) {
+        // Seat is already empty — still clean the key defensively.
+        const assign = { ...(plan.guestAssignments[instanceId] || {}) };
+        delete assign[seatId];
+        return { ...plan, guestAssignments: { ...plan.guestAssignments, [instanceId]: assign } };
+      }
+      // 1 guest = 1 seat: unassigning a guest removes them from EVERY seat.
+      // This also repairs legacy duplicate assignments (a guest can only sit once).
+      return { ...plan, guestAssignments: purgeGuest(plan.guestAssignments, guestId) };
+    }
+
+    case "DEDUPE_GUESTS": {
+      // Repair action: keep only the FIRST seat per guest, drop later duplicates.
+      const next = {};
+      const seen = new Set();
+      for (const [iid, seats] of Object.entries(plan.guestAssignments || {})) {
+        const kept = {};
+        for (const [sid, gid] of Object.entries(seats)) {
+          if (gid == null || seen.has(gid)) continue;
+          seen.add(gid);
+          kept[sid] = gid;
+        }
+        if (Object.keys(kept).length) next[iid] = kept;
+      }
+      return { ...plan, guestAssignments: next };
     }
 
     case "MOVE_GUEST": {

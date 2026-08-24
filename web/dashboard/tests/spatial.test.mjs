@@ -511,3 +511,56 @@ test("gridSteps adapt to zoom", () => {
   assert.deepEqual(gridSteps(20), { major: 1, minor: 0.5 });
   assert.deepEqual(gridSteps(40), { major: 1, minor: 0.25 });
 });
+
+// ── Seating integrity (unassign purges, dedupe, RSVP/seat mismatch) ──────
+import { computeSeatingIntegrity } from "../src/spatial/integrity.js";
+
+test("UNASSIGN_GUEST purges the guest from every seat", () => {
+  const plan = createPlan();
+  plan.guestAssignments = {
+    t1: { "seat-0": "moller", "seat-1": "other" },
+    t2: { "seat-0": "moller" }, // duplicate
+  };
+  const next = reducePlan(plan, { type: "UNASSIGN_GUEST", instanceId: "t1", seatId: "seat-0" });
+  assert.equal(next.guestAssignments.t1["seat-0"], undefined); // unassigned
+  assert.equal(next.guestAssignments.t1["seat-1"], "other"); // untouched
+  assert.equal(next.guestAssignments.t2?.["seat-0"], undefined); // duplicate purged (instance emptied)
+});
+
+test("DEDUPE_GUESTS keeps only the first seat per guest", () => {
+  const plan = createPlan();
+  plan.guestAssignments = {
+    t1: { "seat-0": "moller", "seat-1": "other" },
+    t2: { "seat-0": "moller" },
+  };
+  const next = reducePlan(plan, { type: "DEDUPE_GUESTS" });
+  const guests = Object.values(next.guestAssignments).flatMap((s) => Object.values(s));
+  assert.equal(guests.filter((g) => g === "moller").length, 1);
+  assert.equal(guests.filter((g) => g === "other").length, 1);
+});
+
+test("computeSeatingIntegrity reports duplicates + RSVP↔seat mismatches", () => {
+  const guestAssignments = {
+    t1: { "seat-0": "moller", "seat-1": "declinedWithSeat", "seat-2": "confirmedSeated" },
+    t2: { "seat-0": "moller" },
+  };
+  const allGuests = [
+    { id: "moller" },
+    { id: "confirmedNoSeat" },
+    { id: "declinedWithSeat" },
+    { id: "confirmedSeated" },
+  ];
+  const getSaturdayLevel = (g) => {
+    if (g.id === "moller") return 5;
+    if (g.id === "confirmedNoSeat") return 5;
+    if (g.id === "declinedWithSeat") return 2;
+    if (g.id === "confirmedSeated") return 5;
+    return 0;
+  };
+  const res = computeSeatingIntegrity({ guestAssignments, allGuests, getSaturdayLevel });
+  assert.equal(res.duplicated.length, 1);
+  assert.equal(res.duplicated[0].guestId, "moller");
+  assert.ok(res.satYesNoSeat.includes("confirmedNoSeat"));
+  assert.ok(res.satNoWithSeat.includes("declinedWithSeat"));
+  assert.ok(!res.satYesNoSeat.includes("confirmedSeated"));
+});

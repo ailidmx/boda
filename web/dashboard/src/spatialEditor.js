@@ -33,6 +33,7 @@ import {
 
 import { seatAnchorsForDefinition } from "./spatial/seating.js";
 import { blockedSeatIds } from "./spatial/connections.js";
+import { computeSeatingIntegrity } from "./spatial/integrity.js";
 import { snapToGrid, normalizeDims, getFootprintBounds } from "./spatial/geometry.js";
 import { createHistory } from "./spatial/history.js";
 import { screenToWorld, gridSteps, zoomAt, panByScreen, clampZoom, EDITOR_DEFAULTS } from "./spatial/viewport.js";
@@ -433,9 +434,27 @@ function panelMarkup() {
       </div>`
     : "";
 
+  // Seating integrity: duplicated guests + RSVP(Saturday) ↔ seat mismatches.
+  const integrity = computeSeatingIntegrity({
+    guestAssignments: plan.guestAssignments,
+    allGuests: getActiveGuests(),
+    getSaturdayLevel: saturdayLevel,
+  });
+  const dupCount = integrity.duplicated.length;
+  const integrityBanner = dupCount || integrity.satYesNoSeat.length || integrity.satNoWithSeat.length
+    ? `<div class="se-integrity">
+        <strong>⚠️ Revisión de asientos</strong>
+        ${dupCount ? `<p>${dupCount} invitado(s) duplicado(s) en varias mesas.</p>` : ""}
+        ${integrity.satYesNoSeat.length ? `<p>${integrity.satYesNoSeat.length} confirmado(s) sábado sin asiento.</p>` : ""}
+        ${integrity.satNoWithSeat.length ? `<p>${integrity.satNoWithSeat.length} no confirmado(s) sábado con asiento.</p>` : ""}
+        ${dupCount ? `<button class="se-btn" data-dedupe-guests type="button">Corregir duplicados</button>` : ""}
+      </div>`
+    : "";
+
   // Order: 1. Invitados · 2. Mesas · 3. Catálogo.
   return `
     <div class="se-sidebar-sections">
+      ${integrityBanner}
       ${zoneHeader}
       <details class="se-sidebar-section" data-se-section="guests" open>
         <summary>Invitados <span class="se-count">${guests.length}</span></summary>
@@ -1536,6 +1555,11 @@ export async function loadSpatialEditor(root) {
     }
     const addBtn = e.target.closest("[data-add-def]");
     if (addBtn) { addInstance(addBtn.dataset.addDef); return; }
+    const dedupeBtn = e.target.closest("[data-dedupe-guests]");
+    if (dedupeBtn) {
+      dispatch({ type: "DEDUPE_GUESTS" }, { record: true });
+      return;
+    }
     const editBtn = e.target.closest("[data-edit-def]");
     if (editBtn) { openCustomDefModal(editBtn.dataset.editDef); return; }
     const delBtn = e.target.closest("[data-delete-def]");

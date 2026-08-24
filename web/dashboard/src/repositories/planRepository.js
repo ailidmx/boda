@@ -62,7 +62,10 @@ export async function savePlan(plan, planId = DEFAULT_PLAN_ID) {
  */
 export async function loadPlan(planId = DEFAULT_PLAN_ID) {
   const ref = doc(db, collections.plans, planId);
-  const snap = await getDoc(ref);
+  // Read from the SERVER, not the local cache. The editor autosaves on commit;
+  // a cache-first read can return a stale snapshot after a reload (e.g. a guest
+  // that was just unassigned reappearing), so always fetch authoritative data.
+  const snap = await getDoc(ref, { source: "server" });
   const exists = snap.exists();
   console.log(
     `[planRepository] loadPlan → plans/${planId} · exists=${exists}` +

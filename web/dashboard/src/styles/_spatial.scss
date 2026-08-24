@@ -496,6 +496,30 @@
   flex-direction: column;
 }
 
+.se-integrity {
+  padding: 0.6rem 0.65rem;
+  border: 1px solid $border-strong;
+  border-radius: 0.35rem;
+  background: rgba(192, 57, 43, 0.08);
+
+  strong {
+    font-size: 0.78rem;
+    color: #a0352c;
+  }
+
+  p {
+    margin: 0.2rem 0 0;
+    font-size: 0.72rem;
+    color: $ink-muted;
+  }
+
+  .se-btn {
+    margin-top: 0.4rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.72rem;
+  }
+}
+
 .se-zone-control {
   display: flex;
   align-items: center;
