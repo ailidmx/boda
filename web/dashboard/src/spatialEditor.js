@@ -1556,10 +1556,16 @@ function openContextMenu(e, items) {
   }
   menu.style.left = `${e.clientX}px`;
   menu.style.top = `${e.clientY}px`;
+  // CRITICAL: a `pointerdown` on the menu button fires BEFORE its `click`. If we
+  // let that bubble to a document-level close handler, the menu (and button) is
+  // removed before the click lands, so the menu action never runs. Stop the
+  // pointerdown from bubbling so the button's click handler is the one that
+  // closes + runs the action.
+  menu.addEventListener("pointerdown", (ev) => ev.stopPropagation());
   document.body.append(menu);
   setTimeout(() => {
     document.addEventListener("click", closeContextMenu, { once: true });
-    document.addEventListener("pointerdown", closeContextMenu, { once: true });
+    document.addEventListener("contextmenu", closeContextMenu, { once: true });
     document.addEventListener("keydown", (ev) => { if (ev.key === "Escape") closeContextMenu(); }, { once: true });
     window.addEventListener("blur", closeContextMenu, { once: true });
   }, 0);
