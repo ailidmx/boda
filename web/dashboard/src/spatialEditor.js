@@ -1522,6 +1522,15 @@ function endGuestDrag() {
   render();
 }
 
+// Cancel an in-flight guest drag (Escape) without moving the guest.
+function cancelGuestDrag() {
+  log("[guest-drag] cancelled");
+  clearGuestDropTarget();
+  if (guestDragGhost) { guestDragGhost.remove(); guestDragGhost = null; }
+  drag = null;
+  render();
+}
+
 // ── Right-click context menu (seats + objects) ──────────────────────────
 
 function closeContextMenu() {
@@ -1598,6 +1607,9 @@ function onContextMenu(e) {
 }
 
 function onPointerDown(e) {
+  // Right/middle clicks open the context menu, not a drag. Only the primary
+  // button (left / touch / pen contact) starts drag/select/assign.
+  if (e.button !== 0) return;
   const target = findInstanceTarget(e);
   if (target) {
     if (target.seatId) {
@@ -1654,7 +1666,11 @@ function onKeyDown(e) {
   if (e.key.toLowerCase() === "r") { rotateSelection(90); return; }
   if (e.key.toLowerCase() === "d" && mod) { e.preventDefault(); duplicateSelection(); return; }
   if (e.key.toLowerCase() === "g" && mod) { e.preventDefault(); if (e.shiftKey) ungroupSelection(); else groupSelection(); return; }
-  if (e.key === "Escape") { selection = new Set(); render(); }
+  if (e.key === "Escape") {
+    if (drag?.mode === "guest") { cancelGuestDrag(); return; }
+    selection = new Set();
+    render();
+  }
 }
 
 // ── Public entry ─────────────────────────────────────────────────────────
