@@ -56,6 +56,8 @@ let pendingGuest = null; // pre-selected guest (assign to next tapped seat)
 let showGrid = true; // grid visibility toggle
 let guestDrag = null; // in-flight guest drag { guestId, fromInstanceId, fromSeatId }
 let listGuestDrag = null; // in-flight guest drag from the sidebar "Invitados" list
+let guestDragGhost = null; // HTML ghost avatar while dragging a guest on the canvas
+let guestDropTarget = null; // { instanceId, seatId } currently hovered during a guest drag
 let showOnlyUnassigned = false; // guest filter: only unassigned
 let showOnlySat5 = false; // guest filter: only SAT level 5
 let showOnlyChildren = false; // guest filter: only children (age "Niño")
@@ -1409,21 +1411,104 @@ function endPan() {
   drag = null;
 }
 
-function handleSeatClick(instanceId, seatId) {
+function isSeatBlocked(instanceId, seatId) {
+  const inst = plan.instances.find((i) => i.id === instanceId);
+  if (!inst) return false;
+  return instanceSeats(inst).blocked.has(seatId);
+}
+
+// ── Guest drag on the canvas (move a seated guest to another seat) ─────
+
+function handleSeatClick(instanceId, seatId, e) {
+  const guestId = plan.guestAssignments?.[instanceId]?.[seatId];
+  if (guestId) {
+    // Occupied seat → start a guest drag (move to another seat).
+    beginGuestDrag(instanceId, seatId, guestId, e);
+    return;
+  }
   // If a guest was pre-selected in the sidebar, assign them directly.
   if (pendingGuest) {
-    const guestId = pendingGuest;
-    log(`assign pending guest ${guestId} → ${instanceId}/${seatId}`);
-    dispatch({ type: "ASSIGN_GUEST", instanceId, seatId, guestId }, { record: true });
+    const pg = pendingGuest;
+    log(`assign pending guest ${pg} → ${instanceId}/${seatId}`);
+    dispatch({ type: "ASSIGN_GUEST", instanceId, seatId, guestId: pg }, { record: true });
     pendingGuest = null;
     render();
     return;
   }
-  // Left-click on a seat no longer auto-opens the assign modal. Use the
-  // right-click menu ("Asignar invitado…") or pre-select a guest and drop
-  // them onto a seat.
-  const guestId = plan.guestAssignments?.[instanceId]?.[seatId];
-  log(`[seat] click ${instanceId}/${seatId} (guest=${guestId ?? "none"}) — no-op (use right-click menu)`);
+  // Left-click on an empty seat no longer opens the assign modal. Use the
+  // right-click menu ("Asignar invitado…") or drag a guest from the sidebar.
+  log(`[seat] click ${instanceId}/${seatId} — empty, no pending guest (use right-click menu)`);
+}
+
+function beginGuestDrag(instanceId, seatId, guestId, e) {
+  const guest = getGuest(guestId);
+  drag = { mode: "guest", active: true, fromInstanceId: instanceId, fromSeatId: seatId, guestId };
+  guestDragGhost = document.createElement("div");
+  guestDragGhost.className = "se-guest-drag-ghost";
+  const avatar = guestAvatarUrl(guest);
+  if (avatar) {
+    const img = document.createElement("img");
+    img.src = avatar;
+    img.alt = "";
+    guestDragGhost.append(img);
+  } else {
+    guestDragGhost.textContent = guestInitials(guest) || "?";
+  }
+  document.body.append(guestDragGhost);
+  moveGuestGhost(e);
+  svg.setPointerCapture(e.pointerId);
+  log(`[guest-drag] start ${guestId} from ${instanceId}/${seatId}`);
+}
+
+function moveGuestGhost(e) {
+  if (!guestDragGhost) return;
+  guestDragGhost.style.left = `${e.clientX}px`;
+  guestDragGhost.style.top = `${e.clientY}px`;
+}
+
+function setGuestDropTarget(hover) {
+  if (guestDropTarget && guestDropTarget.instanceId === hover?.instanceId && guestDropTarget.seatId === hover?.seatId) return;
+  clearGuestDropTarget();
+  guestDropTarget = hover;
+  if (hover) {
+    const seat = svg.querySelector(`[data-instance-id="${CSS.escape(hover.instanceId)}"][data-seat-id="${CSS.escape(hover.seatId)}"]`);
+    if (seat) seat.classList.add("is-drop-target");
+  }
+}
+
+function clearGuestDropTarget() {
+  if (guestDropTarget) {
+    const seat = svg.querySelector(`[data-instance-id="${CSS.escape(guestDropTarget.instanceId)}"][data-seat-id="${CSS.escape(guestDropTarget.seatId)}"]`);
+    if (seat) seat.classList.remove("is-drop-target");
+  }
+  guestDropTarget = null;
+}
+
+function updateGuestDrag(e) {
+  if (!drag?.active || drag.mode !== "guest") return;
+  moveGuestGhost(e);
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  const seatEl = el?.closest?.("[data-seat-id]");
+  const hover = seatEl
+    ? { instanceId: seatEl.dataset.instanceId, seatId: seatEl.dataset.seatId }
+    : null;
+  setGuestDropTarget(hover);
+}
+
+function endGuestDrag() {
+  const target = guestDropTarget;
+  const { fromInstanceId, fromSeatId, guestId } = drag;
+  const valid = target
+    && !(target.instanceId === fromInstanceId && target.seatId === fromSeatId)
+    && !isSeatBlocked(target.instanceId, target.seatId);
+  log(`[guest-drag] end guest=${guestId} → ${valid ? `${target.instanceId}/${target.seatId}` : "none"} (valid=${valid})`);
+  clearGuestDropTarget();
+  if (guestDragGhost) { guestDragGhost.remove(); guestDragGhost = null; }
+  drag = null;
+  if (valid) {
+    dispatch({ type: "MOVE_GUEST", fromInstanceId, fromSeatId, toInstanceId: target.instanceId, toSeatId: target.seatId, guestId }, { record: true });
+  }
+  render();
 }
 
 // ── Right-click context menu (seats + objects) ──────────────────────────
@@ -1505,7 +1590,7 @@ function onPointerDown(e) {
   const target = findInstanceTarget(e);
   if (target) {
     if (target.seatId) {
-      handleSeatClick(target.instanceId, target.seatId);
+      handleSeatClick(target.instanceId, target.seatId, e);
       return;
     }
     if (!e.shiftKey && !selection.has(target.instanceId)) selectOnly([target.instanceId]);
@@ -1526,11 +1611,13 @@ function onPointerMove(e) {
   if (!drag?.active) return;
   if (drag.mode === "pan") updatePan(e);
   else if (drag.mode === "object") updateObjectDrag(e);
+  else if (drag.mode === "guest") updateGuestDrag(e);
 }
 
 function onPointerUp(e) {
   if (drag?.mode === "object") endObjectDrag();
   else if (drag?.mode === "pan") endPan();
+  else if (drag?.mode === "guest") endGuestDrag();
 }
 
 function onWheel(e) {

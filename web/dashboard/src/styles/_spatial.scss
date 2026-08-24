@@ -534,6 +534,40 @@
   }
 }
 
+// ── Guest drag on canvas: floating avatar ghost + green drop-target seat ──
+.se-guest-drag-ghost {
+  position: fixed;
+  z-index: 1001;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  border: 2px solid $accent;
+  background: $cream-light;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0.4rem 1rem rgba(65, 50, 28, 0.25);
+  font-weight: 600;
+  font-size: 0.7rem;
+  color: $ink;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+// Magnetic catch: the seat under a dragged guest lights up green.
+.se-seat.is-drop-target .se-seat-circle {
+  fill: rgba(46, 125, 50, 0.35);
+  stroke: #2e7d32;
+  stroke-width: 0.09;
+}
+
 .se-integrity {
   padding: 0.6rem 0.65rem;
   border: 1px solid $border-strong;
