@@ -51,6 +51,7 @@ let camera = { panX: 0, panY: 0, pxPerMeter: EDITOR_DEFAULTS.defaultPxPerMeter }
 let selection = new Set();
 let drag = null; // { mode:"pan"|"object", startWorld, movedIds, startTransform, ghostEl, active, pinch? }
 let saveState = "idle"; // idle | saving | saved | error
+let dirty = false; // true when `plan` has local changes not yet persisted
 let initialized = false;
 let pendingGuest = null; // pre-selected guest (assign to next tapped seat)
 let showGrid = true; // grid visibility toggle
@@ -587,8 +588,9 @@ async function persist() {
   console.log("[spatialEditor] persist:start", summarizeAssignments());
   try {
     await savePlan(plan);
+    dirty = false;
     saveState = "saved";
-    console.log("[spatialEditor] persist:ok", summarizeAssignments());
+    console.log("[spatialEditor] persist:ok dirty=false", summarizeAssignments());
   } catch (err) {
     console.error("[spatialEditor] persist:FAILED", err);
     saveState = "error";
@@ -617,10 +619,18 @@ function schedulePersist() {
 // bit us: hiding the tab mid-load wiped all instances). Guards on `planLoaded`.
 window.addEventListener("beforeunload", () => {
   if (!planLoaded || saveState === "saving") return;
+  // Only flush UNSAVED local changes. A tab that merely LOADED (and was never
+  // edited) must NOT write — doing so would clobber edits made from another
+  // tab/device with this tab's stale in-memory snapshot. This was the root
+  // cause of "unassign reverts on reload".
+  if (!dirty) { console.log("[spatialEditor] beforeunload SKIP (clean, no local changes)"); return; }
+  console.log("[spatialEditor] beforeunload FLUSH (dirty)", summarizeAssignments());
   savePlan(plan).catch(() => {});
 });
 document.addEventListener("visibilitychange", () => {
   if (!planLoaded || document.visibilityState !== "hidden" || saveState === "saving") return;
+  if (!dirty) { console.log("[spatialEditor] visibilitychange SKIP (clean)"); return; }
+  console.log("[spatialEditor] visibilitychange FLUSH (dirty)", summarizeAssignments());
   savePlan(plan).catch(() => {});
 });
 
@@ -689,6 +699,7 @@ function dispatch(action, { record = true, save = true } = {}) {
     return false; // rejected (invalid placement / immutability guard)
   }
   plan = next;
+  dirty = true;
   if (record) history.commit(before, action);
   render();
   if (save) schedulePersist();
