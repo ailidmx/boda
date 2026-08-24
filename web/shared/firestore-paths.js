@@ -59,6 +59,26 @@ export const collections = {
   /** Wedding budget / expenses (admin-only planning). */
   budget: "budget",
 
+  // ── Wedding planning / procurement domain (timeline · providers · offers · budget) ──
+  /** Timeline layers (program, music, food, furniture, … — parallel tracks). */
+  timelineLayers: "timeline_layers",
+  /** Timeline slots (a need/activity over time, independent of any provider). */
+  timelineSlots: "timeline_slots",
+  /** Providers / vendors (one record supports multiple categories). */
+  providers: "providers",
+  /** Provider offers / proposals (multiple commercial offers per provider). */
+  providerOffers: "provider_offers",
+  /** Slot↔offer candidates (many per slot, at most one selected). */
+  slotCandidates: "slot_candidates",
+  /** Standalone / manual budget items (not provider-derived). */
+  budgetManualItems: "budget_manual_items",
+  /** Sponsor / padrino / guest contributions. */
+  contributions: "contributions",
+  /** Actual payments (deposit / installment / balance / refund). */
+  payments: "payments",
+  /** Wedding-level budget context (guest counts, currency, timezone, targets). */
+  budgetEvents: "budget_events",
+
 };
 
 

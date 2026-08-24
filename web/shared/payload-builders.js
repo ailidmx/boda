@@ -870,3 +870,136 @@ export function buildDashboardGuestHostingPayload({ guestId, hosting, editorGues
 }
 
 
+// ── Wedding planning / procurement domain ────────────────────────────────
+// Timeline layers/slots, providers, offers, manual budget items, contributions
+// and payments. Admin-planning payloads shaped to `web/dashboard/src/budget/`.
+
+const toObj = (v) => (v && typeof v === "object" && !Array.isArray(v) ? v : {});
+const toStrArr = (v) => (Array.isArray(v) ? v.map((x) => String(x).trim()).filter(Boolean) : []);
+const toNum = (v, d = 0) => { const n = Number(v); return Number.isFinite(n) ? n : d; };
+
+export function buildProviderPayload({ name, categoryIds, contact, notes, tags, status, categoryData, timestamp }) {
+  return {
+    name: String(name ?? "").trim(),
+    categoryIds: toStrArr(categoryIds),
+    contact: toObj(contact),
+    notes: String(notes ?? "").trim(),
+    tags: toStrArr(tags),
+    status: String(status ?? "active").trim() || "active",
+    categoryData: toObj(categoryData),
+    updatedAt: timestamp,
+  };
+}
+
+export function buildOfferPayload({ providerId, categoryId, name, description, pricingModel, pricingData, additionalCharges, constraints, currency, taxConfiguration, active, lineItems, optionGroups, timestamp }) {
+  return {
+    providerId: String(providerId ?? "").trim(),
+    categoryId: String(categoryId ?? "").trim(),
+    name: String(name ?? "").trim(),
+    description: String(description ?? "").trim(),
+    pricingModel: String(pricingModel ?? "fixed").trim() || "fixed",
+    pricingData: toObj(pricingData),
+    additionalCharges: Array.isArray(additionalCharges) ? additionalCharges : [],
+    constraints: toObj(constraints),
+    currency: String(currency ?? "MXN").trim() || "MXN",
+    taxConfiguration: toObj(taxConfiguration),
+    active: active !== false,
+    lineItems: Array.isArray(lineItems) ? lineItems : [],
+    optionGroups: Array.isArray(optionGroups) ? optionGroups : [],
+    updatedAt: timestamp,
+  };
+}
+
+export function buildTimelineLayerPayload({ eventId, key, name, type, categoryId, order, color, icon, visible, locked, timestamp }) {
+  return {
+    eventId: String(eventId ?? "").trim(),
+    key: String(key ?? "").trim(),
+    name: String(name ?? "").trim(),
+    type: String(type ?? "custom").trim() || "custom",
+    categoryId: categoryId ? String(categoryId).trim() : "",
+    order: toNum(order, 0),
+    color: color ? String(color) : "",
+    icon: icon ? String(icon) : "",
+    visible: visible !== false,
+    locked: Boolean(locked),
+    updatedAt: timestamp,
+  };
+}
+
+export function buildTimelineSlotPayload({ eventId, layerId, name, description, categoryId, startAt, endAt, requirementData, selectedOfferId, estimatedBudget, targetBudget, status, timestamp }) {
+  return {
+    eventId: String(eventId ?? "").trim(),
+    layerId: String(layerId ?? "").trim(),
+    name: String(name ?? "").trim(),
+    description: String(description ?? "").trim(),
+    categoryId: categoryId ? String(categoryId).trim() : "",
+    startAt,
+    endAt,
+    requirementData: toObj(requirementData),
+    selectedOfferId: selectedOfferId ? String(selectedOfferId).trim() : null,
+    estimatedBudget: estimatedBudget != null ? toNum(estimatedBudget) : null,
+    targetBudget: targetBudget != null ? toNum(targetBudget) : null,
+    status: String(status ?? "planned").trim() || "planned",
+    updatedAt: timestamp,
+  };
+}
+
+export function buildBudgetManualItemPayload({ eventId, categoryId, name, description, amount, currency, status, payerAllocations, timestamp }) {
+  return {
+    eventId: String(eventId ?? "").trim(),
+    categoryId: categoryId ? String(categoryId).trim() : "",
+    name: String(name ?? "").trim(),
+    description: String(description ?? "").trim(),
+    amount: toNum(amount),
+    currency: String(currency ?? "MXN").trim() || "MXN",
+    status: String(status ?? "planned").trim() || "planned",
+    payerAllocations: Array.isArray(payerAllocations) ? payerAllocations : [],
+    updatedAt: timestamp,
+  };
+}
+
+export function buildContributionPayload({ sourceType, sourceId, sourceLabel, amount, percentage, appliesToItemId, appliesToSlotId, status, notes, timestamp }) {
+  return {
+    sourceType: String(sourceType ?? "person").trim() || "person",
+    sourceId: sourceId ? String(sourceId).trim() : "",
+    sourceLabel: String(sourceLabel ?? "").trim(),
+    amount: amount != null ? toNum(amount) : null,
+    percentage: percentage != null ? toNum(percentage) : null,
+    appliesToItemId: appliesToItemId ? String(appliesToItemId).trim() : "",
+    appliesToSlotId: appliesToSlotId ? String(appliesToSlotId).trim() : "",
+    status: String(status ?? "committed").trim() || "committed",
+    notes: String(notes ?? "").trim(),
+    updatedAt: timestamp,
+  };
+}
+
+export function buildPaymentPayload({ budgetItemId, providerId, offerId, scheduleItemId, amount, paidById, paidAt, method, type, notes, timestamp }) {
+  return {
+    budgetItemId: budgetItemId ? String(budgetItemId).trim() : "",
+    providerId: providerId ? String(providerId).trim() : "",
+    offerId: offerId ? String(offerId).trim() : "",
+    scheduleItemId: scheduleItemId ? String(scheduleItemId).trim() : "",
+    amount: toNum(amount),
+    paidById: paidById ? String(paidById).trim() : "",
+    paidAt: paidAt ?? null,
+    method: method ? String(method).trim() : "",
+    type: String(type ?? "balance").trim() || "balance",
+    notes: String(notes ?? "").trim(),
+    updatedAt: timestamp,
+  };
+}
+
+export function buildBudgetEventPayload({ guestCount, confirmedGuestCount, adults, children, currency, timezone, targets, timestamp }) {
+  return {
+    guestCount: toNum(guestCount),
+    confirmedGuestCount: confirmedGuestCount != null ? toNum(confirmedGuestCount) : null,
+    adults: adults != null ? toNum(adults) : null,
+    children: children != null ? toNum(children) : null,
+    currency: String(currency ?? "MXN").trim() || "MXN",
+    timezone: String(timezone ?? "America/Mexico_City").trim(),
+    targets: toObj(targets),
+    updatedAt: timestamp,
+  };
+}
+
+

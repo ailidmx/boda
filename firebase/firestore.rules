@@ -96,6 +96,53 @@ service cloud.firestore {
       allow delete: if canDelete();
     }
 
+    // ── Wedding planning / procurement domain ─────────────────────────────
+    match /timeline_layers/{layerId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+    match /timeline_slots/{slotId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+    match /providers/{providerId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+    match /provider_offers/{offerId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+    match /slot_candidates/{candidateId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+    match /budget_manual_items/{itemId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+    match /contributions/{contributionId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+    match /payments/{paymentId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+    match /budget_events/{eventId} {
+      allow read: if canRead();
+      allow create, update: if canWrite();
+      allow delete: if canDelete();
+    }
+
     // ── Thanks / greetings ───────────────────────────────────────────────
     match /thanks/{creditId} {
       allow read: if canRead();

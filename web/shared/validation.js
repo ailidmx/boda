@@ -654,3 +654,79 @@ export function isValidInvitationCode(code) {
   if (code === undefined || code === null || code === "") return true;
   return VALID_INVITATION_CODES.includes(code);
 }
+
+
+// ── Wedding planning / procurement domain validators ──────────────────────
+// Admin-planning payloads. Loose schema (required fields + types) matching the
+// SIMPLE rules model (no field-level enforcement server-side).
+
+const PRICING_MODELS = ["fixed", "hourly", "daily", "per_person", "per_item", "per_unit", "package", "tiered", "quantity_formula", "composite", "custom"];
+
+function isOptionalObject(v) { return v == null || (typeof v === "object" && !Array.isArray(v)); }
+function isOptionalArray(v) { return v == null || Array.isArray(v); }
+
+export function validateProviderPayload(payload) {
+  if (!isObject(payload)) return { valid: false, errors: ["payload must be an object"] };
+  return runChecks(payload, [
+    { check: isNonEmptyString(payload.name) && isShortText(payload.name, 200), message: "name must be a non-empty string ≤ 200" },
+    { check: isOptionalArray(payload.categoryIds), message: "categoryIds must be an array" },
+    { check: isOptionalObject(payload.contact), message: "contact must be an object" },
+    { check: isOptionalObject(payload.categoryData), message: "categoryData must be an object" },
+  ]);
+}
+
+export function validateOfferPayload(payload) {
+  if (!isObject(payload)) return { valid: false, errors: ["payload must be an object"] };
+  return runChecks(payload, [
+    { check: isNonEmptyString(payload.providerId) && isShortText(payload.providerId, 100), message: "providerId required (string ≤ 100)" },
+    { check: isNonEmptyString(payload.name) && isShortText(payload.name, 200), message: "name required (string ≤ 200)" },
+    { check: isOneOf(payload.pricingModel, PRICING_MODELS), message: "invalid pricingModel" },
+    { check: isOptionalObject(payload.pricingData), message: "pricingData must be an object" },
+    { check: isOptionalArray(payload.additionalCharges), message: "additionalCharges must be an array" },
+  ]);
+}
+
+export function validateTimelineLayerPayload(payload) {
+  if (!isObject(payload)) return { valid: false, errors: ["payload must be an object"] };
+  return runChecks(payload, [
+    { check: isNonEmptyString(payload.name) && isShortText(payload.name, 200), message: "name required (string ≤ 200)" },
+    { check: payload.order == null || Number.isFinite(Number(payload.order)), message: "order must be a number" },
+  ]);
+}
+
+export function validateTimelineSlotPayload(payload) {
+  if (!isObject(payload)) return { valid: false, errors: ["payload must be an object"] };
+  return runChecks(payload, [
+    { check: isNonEmptyString(payload.layerId) && isShortText(payload.layerId, 100), message: "layerId required" },
+    { check: isNonEmptyString(payload.name) && isShortText(payload.name, 200), message: "name required" },
+    { check: payload.startAt != null, message: "startAt required" },
+    { check: payload.endAt != null, message: "endAt required" },
+    { check: isOptionalObject(payload.requirementData), message: "requirementData must be an object" },
+  ]);
+}
+
+export function validateBudgetManualItemPayload(payload) {
+  if (!isObject(payload)) return { valid: false, errors: ["payload must be an object"] };
+  return runChecks(payload, [
+    { check: isNonEmptyString(payload.name) && isShortText(payload.name, 200), message: "name required" },
+    { check: Number.isFinite(Number(payload.amount)), message: "amount must be a number" },
+    { check: isOptionalArray(payload.payerAllocations), message: "payerAllocations must be an array" },
+  ]);
+}
+
+export function validateContributionPayload(payload) {
+  if (!isObject(payload)) return { valid: false, errors: ["payload must be an object"] };
+  return runChecks(payload, [
+    { check: isOneOf(payload.sourceType, ["person", "couple", "guests", "external"]), message: "invalid sourceType" },
+    { check: payload.amount == null || Number.isFinite(Number(payload.amount)), message: "amount must be a number" },
+    { check: payload.percentage == null || Number.isFinite(Number(payload.percentage)), message: "percentage must be a number" },
+  ]);
+}
+
+export function validatePaymentPayload(payload) {
+  if (!isObject(payload)) return { valid: false, errors: ["payload must be an object"] };
+  return runChecks(payload, [
+    { check: Number.isFinite(Number(payload.amount)), message: "amount must be a number" },
+    { check: isOneOf(payload.type, ["deposit", "installment", "balance", "refund"]), message: "invalid payment type" },
+  ]);
+}
