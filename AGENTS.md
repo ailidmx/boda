@@ -1035,6 +1035,26 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   `.cardvotes-card`, `.cardvotes-votes`, `.cardvotes-vote`). It receives
   already-loaded votes + guest resolvers and never touches Firestore. Don't
   reintroduce AG Grid row grouping here.
+- **Dashboard "Timeline" tab is a layers + slots editor** — the dashboard has a
+  "Timeline" tab (`/dashboard/timeline`, added to `tabNav.js`) that renders the
+  `timeline_layers` + `timeline_slots` collections as parallel "tracks" (one card
+  per layer, sorted by `order`) with their slots listed chronologically. The UI
+  lives in `web/dashboard/src/timelinePanel.js` (vanilla JS, presentation-only —
+  never touches Firestore); it receives `layers`/`slots`/`offers` and injected
+  `saveLayer`/`saveSlot`/`deleteLayer`/`deleteSlot` callbacks. The dashboard
+  wires those to `timelineRepository` + `buildTimelineLayerPayload` /
+  `buildTimelineSlotPayload` (payload-builders) + `validateTimelineLayerPayload` /
+  `validateTimelineSlotPayload` (validation), and injects `serverTimestamp()` as
+  `updatedAt`. Slot `startAt`/`endAt` are date-times (ISO / `datetime-local`
+  strings or Firestore timestamps — read via `toDate()` like
+  `budget/pricing.js`). Layer fields: `eventId, key, name, type, categoryId,
+  order, color, icon, visible, locked`. Slot fields: `eventId, layerId, name,
+  description, categoryId, startAt, endAt, requirementData, selectedOfferId,
+  estimatedBudget, targetBudget, status`. Styles live in `_grid.scss`
+  (`.timeline-*`); the modals reuse the shared `.se-modal-*` / `.se-btn` chrome
+  from `_spatial.scss`. When adding a new timeline field, update the panel +
+  `buildTimeline*Payload` + `validateTimeline*Payload` + the Firestore rules
+  together.
 - **`[hidden]` must always win over `display` for toggle cells** — the dashboard's
   inline editors toggle view ⇄ edit by setting the `hidden` attribute, but any
   view button whose CSS sets `display: inline-flex`/`inline-block` (e.g.

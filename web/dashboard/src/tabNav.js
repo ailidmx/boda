@@ -27,6 +27,7 @@ const PATH_TO_TAB = {
   canciones: "songRequests",
   analitica: "analytics",
   proveedores: "providers",
+  timeline: "timeline",
 };
 
 /** Map internal tab IDs to URL path segments. */
@@ -42,6 +43,7 @@ const TAB_TO_PATH = {
   songRequests: "canciones",
   analytics: "analitica",
   providers: "proveedores",
+  timeline: "timeline",
 };
 
 /** The tab definitions: id, label, and icon. */
@@ -57,6 +59,7 @@ const TABS = [
   { id: "songRequests", label: "Canciones", icon: "🎵" },
   { id: "analytics", label: "Analítica", icon: "📈" },
   { id: "providers", label: "Proveedores", icon: "🤝" },
+  { id: "timeline", label: "Timeline", icon: "🕐" },
 ];
 
 /** The currently active tab id. */

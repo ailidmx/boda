@@ -101,6 +101,7 @@ import { renderCabinAssignments as renderCabinAssignmentsPanel } from "./cabinsP
 import { renderThanksPanel as renderThanksPanelModule } from "./thanksPanel.js";
 import { renderChartsPanel as renderChartsPanelModule } from "./chartsPanel.js";
 import { renderProvidersPanel as renderProvidersPanelModule } from "./providersPanel.js";
+import { renderTimelinePanel as renderTimelinePanelModule } from "./timelinePanel.js";
 
 import {
   getTabFromPath,
@@ -112,6 +113,7 @@ import {
 
 import { updateGuest, softDeleteGuest, createGuest } from "./repositories/guestRepository.js";
 import { saveProvider, saveOffer, deleteProvider, deleteOffer } from "./repositories/providerRepository.js";
+import { saveLayer as saveLayerRepo, saveSlot as saveSlotRepo, deleteLayer as deleteLayerRepo, deleteSlot as deleteSlotRepo } from "./repositories/timelineRepository.js";
 
 import { createThanks, updateThanks, deleteThanks } from "./repositories/thanksRepository.js";
 import { updateRecordField } from "./repositories/recordsRepository.js";
@@ -124,7 +126,14 @@ import {
   buildGuestRsvpPayload,
   buildDashboardGuestHostingPayload,
   buildGuestCreatePayload,
+  buildTimelineLayerPayload,
+  buildTimelineSlotPayload,
 } from "../../shared/payload-builders.js";
+
+import {
+  validateTimelineLayerPayload,
+  validateTimelineSlotPayload,
+} from "../../shared/validation.js";
 
 
 
@@ -143,6 +152,8 @@ const state = {
   songRequests: [], // from Firestore collection "song_requests"
   providers: [], // from Firestore collection "providers"
   offers: [], // from Firestore collection "provider_offers"
+  timelineLayers: [], // from Firestore collection "timeline_layers"
+  timelineSlots: [], // from Firestore collection "timeline_slots"
   pageViews: [], // from Firestore collection "page_views"
   activityEvents: [], // from Firestore collection "activity_events"
   loginEvents: [], // from Firestore collection "login_events"
@@ -1259,6 +1270,40 @@ function renderProvidersPanel() {
   });
 }
 
+// ── Timeline (layers + slots) ───────────────────────────────────────────
+// The timeline panel is presentation-only. These wrappers build the payload via
+// the shared payload-builders (with a server timestamp), validate it against
+// the same rules the Firestore rules mirror, and persist through the repository.
+
+function saveTimelineLayer(raw) {
+  const payload = { id: raw.id, ...buildTimelineLayerPayload({ ...raw, timestamp: serverTimestamp() }) };
+  const result = validateTimelineLayerPayload(payload);
+  if (!result.valid) throw new Error(`Capa inválida: ${result.errors.join("; ")}`);
+  return saveLayerRepo(payload);
+}
+
+function saveTimelineSlot(raw) {
+  const payload = { id: raw.id, ...buildTimelineSlotPayload({ ...raw, timestamp: serverTimestamp() }) };
+  const result = validateTimelineSlotPayload(payload);
+  if (!result.valid) throw new Error(`Actividad inválida: ${result.errors.join("; ")}`);
+  return saveSlotRepo(payload);
+}
+
+function renderTimelinePanel() {
+  const container = document.querySelector("[data-timeline-manager]");
+  if (!container) return;
+  renderTimelinePanelModule({
+    container,
+    layers: state.timelineLayers,
+    slots: state.timelineSlots,
+    offers: state.offers,
+    saveLayer: saveTimelineLayer,
+    saveSlot: saveTimelineSlot,
+    deleteLayer: deleteLayerRepo,
+    deleteSlot: deleteSlotRepo,
+  });
+}
+
 function renderGuisoRankingsPanel() {
   renderDataPanel({
     container: document.querySelector("[data-guiso-rankings-manager]"),
@@ -1654,6 +1699,19 @@ function renderDashboard(app) {
         </div>
       </section>
 
+      <!-- ── Panel: Timeline ── -->
+      <section class="dashboard-panel" data-dashboard-panel="timeline">
+        <div class="dashboard-section">
+          <div class="dashboard-section-heading">
+            <div>
+              <p class="dashboard-eyebrow">Programa del evento por capas</p>
+              <h2>Timeline</h2>
+            </div>
+          </div>
+          <div data-timeline-manager></div>
+        </div>
+      </section>
+
       <!-- ── Panel: Card votes ── -->
       <section class="dashboard-panel" data-dashboard-panel="cardVotes">
         <div class="dashboard-section">
@@ -1844,6 +1902,8 @@ function renderDashboard(app) {
   const loginEventsUnsub = subscribeCollection(collections.loginEvents, "loginEvents", "login_events", renderLoginEventsPanel);
   const providersUnsub = subscribeCollection(collections.providers, "providers", "providers", renderProvidersPanel);
   const offersUnsub = subscribeCollection(collections.providerOffers, "offers", "provider_offers", renderProvidersPanel);
+  const timelineLayersUnsub = subscribeCollection(collections.timelineLayers, "timelineLayers", "timeline_layers", renderTimelinePanel);
+  const timelineSlotsUnsub = subscribeCollection(collections.timelineSlots, "timelineSlots", "timeline_slots", renderTimelinePanel);
 
   renderTabNavigation();
   renderGroupFilter();
@@ -1854,6 +1914,7 @@ function renderDashboard(app) {
   renderSpatialPlan();
   renderBudgetPanel();
   renderProvidersPanel();
+  renderTimelinePanel();
   renderCardVotesPanel();
   renderGuisoRankingsPanel();
   renderSongRequestsPanel();
