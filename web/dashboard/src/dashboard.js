@@ -908,8 +908,8 @@ function groupTagCell(guest, { current, options, badgeAttr, selectAttr, newAttr,
         <select class="dashboard-group-inline-select" data-${selectAttr}="${guest.id}" title="${title}">
           ${selectOptions}
         </select>
-        <button type="button" class="dashboard-link-btn" data-${selectAttr}-confirm="${guest.id}" title="Guardar">✓</button>
-        <button type="button" class="dashboard-link-btn" data-${selectAttr}-cancel="${guest.id}" title="Cancelar">✕</button>
+        <button type="button" class="dashboard-inline-btn dashboard-inline-btn--confirm" data-${selectAttr}-confirm="${guest.id}" title="Guardar">✓</button>
+        <button type="button" class="dashboard-inline-btn dashboard-inline-btn--cancel" data-${selectAttr}-cancel="${guest.id}" title="Cancelar">✕</button>
         <input class="dashboard-group-new" data-${newAttr}="${guest.id}" type="text" placeholder="Nuevo grupo…" hidden />
       </span>
     </div>`;

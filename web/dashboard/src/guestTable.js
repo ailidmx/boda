@@ -137,8 +137,8 @@ export function renderGuestManager(ctx) {
             <input class="dashboard-inline-input" type="text" value="${ml}" data-name-field="maternalLastName" data-guest-id="${guest.id}" placeholder="2º apellido" />
           </div>
           <div class="dashboard-name-actions">
-            <button type="button" class="dashboard-link-btn dashboard-name-confirm" data-name-confirm="${guest.id}" title="Guardar nombre">Guardar</button>
-            <button type="button" class="dashboard-link-btn dashboard-name-cancel" data-name-cancel="${guest.id}" title="Cancelar">Cancelar</button>
+            <button type="button" class="dashboard-inline-btn dashboard-inline-btn--confirm" data-name-confirm="${guest.id}" title="Guardar nombre">✓</button>
+            <button type="button" class="dashboard-inline-btn dashboard-inline-btn--cancel" data-name-cancel="${guest.id}" title="Cancelar">✕</button>
           </div>
         </div>
       </div>`;
@@ -174,8 +174,8 @@ export function renderGuestManager(ctx) {
         </button>
         <span class="dashboard-phone-editor" data-phone-editor="${guest.id}" hidden>
           <input class="dashboard-inline-input" type="tel" value="${phone}" data-phone-input="${guest.id}" placeholder="+52…" title="Teléfono" />
-          <button type="button" class="dashboard-link-btn" data-phone-save="${guest.id}" title="Guardar teléfono">✓</button>
-          <button type="button" class="dashboard-link-btn" data-phone-cancel="${guest.id}" title="Cancelar">✕</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--confirm" data-phone-save="${guest.id}" title="Guardar teléfono">✓</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--cancel" data-phone-cancel="${guest.id}" title="Cancelar">✕</button>
         </span>
       </div>`;
 
@@ -186,7 +186,7 @@ export function renderGuestManager(ctx) {
         </button>
         <span class="dashboard-auth-email-editor" data-auth-email-editor="${guest.id}" hidden>
           <input class="dashboard-inline-input" type="email" value="${authEmail}" data-auth-email-input="${guest.id}" title="Correo de acceso" placeholder="correo@ejemplo.com" />
-          <button type="button" class="dashboard-link-btn dashboard-auth-email-save" data-auth-email-save="${guest.id}" title="Guardar correo">Guardar</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--confirm dashboard-auth-email-save" data-auth-email-save="${guest.id}" title="Guardar correo">✓</button>
         </span>
       </div>`;
 
@@ -248,8 +248,8 @@ export function renderGuestManager(ctx) {
         </button>
         <span class="dashboard-inline-editor" data-gender-editor="${guest.id}" hidden>
           <select class="dashboard-inline-select" data-gender-select="${guest.id}" title="Elegir género">${options}</select>
-          <button type="button" class="dashboard-link-btn" data-gender-confirm="${guest.id}" title="Guardar">✓</button>
-          <button type="button" class="dashboard-link-btn" data-gender-cancel="${guest.id}" title="Cancelar">✕</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--confirm" data-gender-confirm="${guest.id}" title="Guardar">✓</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--cancel" data-gender-cancel="${guest.id}" title="Cancelar">✕</button>
         </span>
       </div>`;
   };
@@ -286,8 +286,8 @@ export function renderGuestManager(ctx) {
         </button>
         <span class="dashboard-inline-editor" data-age-editor="${guest.id}" hidden>
           <select class="dashboard-inline-select" data-age-select="${guest.id}" title="Elegir edad">${options}</select>
-          <button type="button" class="dashboard-link-btn" data-age-confirm="${guest.id}" title="Guardar">✓</button>
-          <button type="button" class="dashboard-link-btn" data-age-cancel="${guest.id}" title="Cancelar">✕</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--confirm" data-age-confirm="${guest.id}" title="Guardar">✓</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--cancel" data-age-cancel="${guest.id}" title="Cancelar">✕</button>
         </span>
       </div>`;
   };
@@ -312,8 +312,8 @@ export function renderGuestManager(ctx) {
         </button>
         <span class="dashboard-inline-editor" data-lang-editor="${guest.id}" hidden>
           <select class="dashboard-inline-select" data-lang-select="${guest.id}" title="Elegir idioma">${options}</select>
-          <button type="button" class="dashboard-link-btn" data-lang-confirm="${guest.id}" title="Guardar">✓</button>
-          <button type="button" class="dashboard-link-btn" data-lang-cancel="${guest.id}" title="Cancelar">✕</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--confirm" data-lang-confirm="${guest.id}" title="Guardar">✓</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--cancel" data-lang-cancel="${guest.id}" title="Cancelar">✕</button>
         </span>
       </div>`;
   };
@@ -377,8 +377,8 @@ export function renderGuestManager(ctx) {
         <button type="button" class="${chipClass}" data-rsvp-display="${guest.id}" data-rsvp-day="${day}" title="Editar asistencia (0–5)">${level}</button>
         <span class="dashboard-inline-editor" data-rsvp-editor="${guest.id}" data-rsvp-day="${day}" hidden>
           <select class="dashboard-inline-select" data-rsvp-select="${guest.id}" data-rsvp-day="${day}" title="Nivel de asistencia (0–5)">${options}</select>
-          <button type="button" class="dashboard-link-btn" data-rsvp-confirm="${guest.id}" data-rsvp-day="${day}" title="Guardar">✓</button>
-          <button type="button" class="dashboard-link-btn" data-rsvp-cancel="${guest.id}" data-rsvp-day="${day}" title="Cancelar">✕</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--confirm" data-rsvp-confirm="${guest.id}" data-rsvp-day="${day}" title="Guardar">✓</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--cancel" data-rsvp-cancel="${guest.id}" data-rsvp-day="${day}" title="Cancelar">✕</button>
         </span>
       </div>`;
   };
@@ -410,8 +410,8 @@ export function renderGuestManager(ctx) {
         <button type="button" class="${chipClass}" data-rsvp-scale-display="${guest.id}" data-rsvp-question="${questionId}" title="Editar (0–5)">${value}</button>
         <span class="dashboard-inline-editor" data-rsvp-scale-editor="${guest.id}" data-rsvp-question="${questionId}" hidden>
           <select class="dashboard-inline-select" data-rsvp-scale-select="${guest.id}" data-rsvp-question="${questionId}" title="Nivel (0–5)">${options}</select>
-          <button type="button" class="dashboard-link-btn" data-rsvp-scale-confirm="${guest.id}" data-rsvp-question="${questionId}" title="Guardar">✓</button>
-          <button type="button" class="dashboard-link-btn" data-rsvp-scale-cancel="${guest.id}" data-rsvp-question="${questionId}" title="Cancelar">✕</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--confirm" data-rsvp-scale-confirm="${guest.id}" data-rsvp-question="${questionId}" title="Guardar">✓</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--cancel" data-rsvp-scale-cancel="${guest.id}" data-rsvp-question="${questionId}" title="Cancelar">✕</button>
         </span>
       </div>`;
   };
@@ -446,8 +446,8 @@ export function renderGuestManager(ctx) {
         <button type="button" class="dashboard-badge ${currentDisplay ? "" : "dashboard-badge-muted"}" style="${currentDisplay ? `background:${badgeStyle(currentDisplay)};color:#3a2f1e;` : ""}" data-cabin-display="${guest.id}" data-cabin-period="${period}" title="Editar cabaña">${currentDisplay || "—"}</button>
         <span class="dashboard-inline-editor" data-cabin-editor="${guest.id}" data-cabin-period="${period}" hidden>
           <select class="dashboard-inline-select" data-cabin-select="${guest.id}" data-cabin-period="${period}" title="Elegir cabaña">${options}</select>
-          <button type="button" class="dashboard-link-btn" data-cabin-confirm="${guest.id}" data-cabin-period="${period}" title="Guardar">✓</button>
-          <button type="button" class="dashboard-link-btn" data-cabin-cancel="${guest.id}" data-cabin-period="${period}" title="Cancelar">✕</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--confirm" data-cabin-confirm="${guest.id}" data-cabin-period="${period}" title="Guardar">✓</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--cancel" data-cabin-cancel="${guest.id}" data-cabin-period="${period}" title="Cancelar">✕</button>
         </span>
       </div>`;
   };
@@ -472,8 +472,8 @@ export function renderGuestManager(ctx) {
         <button type="button" class="dashboard-badge ${currentRoom ? "" : "dashboard-badge-muted"}" style="${currentRoom ? `background:${badgeStyle(currentRoom)};color:#3a2f1e;` : ""}" data-room-display="${guest.id}" data-room-period="${period}" title="Editar cuarto">${currentRoom || "—"}</button>
         <span class="dashboard-inline-editor" data-room-editor="${guest.id}" data-room-period="${period}" hidden>
           <select class="dashboard-inline-select" data-room-select="${guest.id}" data-room-period="${period}" title="Elegir cuarto">${options}</select>
-          <button type="button" class="dashboard-link-btn" data-room-confirm="${guest.id}" data-room-period="${period}" title="Guardar">✓</button>
-          <button type="button" class="dashboard-link-btn" data-room-cancel="${guest.id}" data-room-period="${period}" title="Cancelar">✕</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--confirm" data-room-confirm="${guest.id}" data-room-period="${period}" title="Guardar">✓</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--cancel" data-room-cancel="${guest.id}" data-room-period="${period}" title="Cancelar">✕</button>
         </span>
       </div>`;
   };
@@ -493,8 +493,8 @@ export function renderGuestManager(ctx) {
         <button type="button" class="dashboard-message-display ${msg ? "" : "is-empty"}" data-message-display="${guest.id}" title="${escAttr(msg)}">${msg ? escAttr(truncated) : "—"}</button>
         <span class="dashboard-message-editor" data-message-editor="${guest.id}" hidden>
           <input class="dashboard-inline-input" type="text" value="${escAttr(msg)}" data-message-input="${guest.id}" placeholder="Mensaje…" />
-          <button type="button" class="dashboard-link-btn" data-message-save="${guest.id}" title="Guardar">✓</button>
-          <button type="button" class="dashboard-link-btn" data-message-cancel="${guest.id}" title="Cancelar">✕</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--confirm" data-message-save="${guest.id}" title="Guardar">✓</button>
+          <button type="button" class="dashboard-inline-btn dashboard-inline-btn--cancel" data-message-cancel="${guest.id}" title="Cancelar">✕</button>
         </span>
       </div>`;
   };
