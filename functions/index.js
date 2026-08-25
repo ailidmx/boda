@@ -756,12 +756,14 @@ export const updateGuestEmail = onCall(
     }
 
     // Keep the guest's `firebaseEmail` field in sync (server-side write bypasses
-    // the client rules). Also backfill `guestId` so the top-level id field is
-    // always present, even for guests originally created without it (e.g. from
-    // the Google Sheets sync).
+    // the client rules). Also backfill `guestId` and `firebaseUid` (both equal
+    // the auth uid, which IS the guest doc id) so the AUTH ⇄ GUEST relation is
+    // explicit, even for guests originally created without it (e.g. from the
+    // Google Sheets sync).
     await db.collection("guests").doc(guestId).set(
       {
         guestId,
+        firebaseUid: guestId,
         firebaseEmail: newEmail,
         updatedBy: request.auth.uid,
         updatedAt: new Date(),
@@ -868,11 +870,14 @@ export const createGuestAuth = onCall(
     }
 
     // Keep the guest's `firebaseEmail` field in sync (server-side write bypasses
-    // the client rules). Also backfill `guestId` so the top-level id field is
-    // always present, even for guests originally created without it.
+    // the client rules). Also backfill `guestId` and `firebaseUid` (both equal
+    // the auth uid, which IS the guest doc id) so the AUTH ⇄ GUEST relation is
+    // explicit, and the top-level id field is always present even for guests
+    // originally created without it.
     await db.collection("guests").doc(guestId).set(
       {
         guestId,
+        firebaseUid: guestId,
         firebaseEmail: newEmail,
         updatedBy: request.auth.uid,
         updatedAt: new Date(),

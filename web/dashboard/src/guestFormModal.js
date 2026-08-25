@@ -50,6 +50,12 @@ const RSVP_BOOL_OPTIONS = [
   { value: "2", label: "No" },
 ];
 const SCALE_OPTIONS = [0, 1, 2, 3, 4, 5];
+// Yes/no for "does this guest need a Firebase Auth (login) account?" (create
+// mode only — the email field is shown/required only when "Sí" is picked).
+const AUTH_OPTIONS = [
+  { value: "false", label: "No" },
+  { value: "true", label: "Sí" },
+];
 
 function esc(v) {
   return String(v ?? "").replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[ch]));
@@ -146,10 +152,23 @@ function identityTab({ mode, guest, ctx }) {
     </div>`);
 
   parts.push(field("Teléfono", textInput("phone", id.phone || guest?.phone || "", "+52 …")));
-  parts.push(field(
-    "Correo de acceso",
-    textInput("email", mode === "edit" ? (ctx.getAuthEmail?.(guest.id) || "") : "", "invitado@correo.com"),
-  ));
+
+  if (mode === "create") {
+    // Ask explicitly whether this guest needs a Firebase Auth (login) account.
+    // The email field below is shown/required only when "Sí" is picked, so the
+    // guest is only provisioned an auth account when the admin asks for it.
+    parts.push(field("Cuenta de acceso (login)", selectInput("createAuth", optionsHtml(AUTH_OPTIONS, "false"))));
+    parts.push(`
+      <div class="dashboard-modal-field" data-email-field hidden>
+        <label>Correo de acceso</label>
+        <input type="text" data-f-email placeholder="invitado@correo.com" />
+      </div>`);
+  } else {
+    parts.push(field(
+      "Correo de acceso",
+      textInput("email", ctx.getAuthEmail?.(guest.id) || "", "invitado@correo.com"),
+    ));
+  }
 
   if (mode === "edit") {
     const sent = guest?.invitationSent === true ? "true" : "";
@@ -358,6 +377,18 @@ function openGuestForm({ mode, guest, ctx }) {
     ["[data-f-firstName]", "[data-f-lastName]", "[data-f-maternalLastName]"].forEach((sel) => {
       overlay.querySelector(sel)?.addEventListener("input", refreshId);
     });
+
+    // Auth toggle → show/require the email field only when the admin wants a login.
+    const createAuthSel = overlay.querySelector("[data-f-createAuth]");
+    const emailField = overlay.querySelector("[data-email-field]");
+    const emailInput = overlay.querySelector("[data-f-email]");
+    const syncEmailVisibility = () => {
+      const show = createAuthSel?.value === "true";
+      if (emailField) emailField.hidden = !show;
+      if (!show && emailInput) emailInput.value = "";
+    };
+    createAuthSel?.addEventListener("change", syncEmailVisibility);
+    syncEmailVisibility();
   }
 
   overlay.querySelector("[data-gf-save]").addEventListener("click", async () => {
@@ -383,6 +414,7 @@ async function saveCreate(overlay, ctx, setStatus) {
   const guestId = overlay.querySelector("[data-create-id]")?.value.trim();
   if (!guestId) throw new Error("No se pudo generar un ID a partir del nombre.");
 
+  const createAuth = v("createAuth") === "true";
   const email = v("email").trim();
   const payload = ctx.buildGuestCreatePayload({
     guestId,
@@ -401,8 +433,10 @@ async function saveCreate(overlay, ctx, setStatus) {
   });
   await ctx.createGuest(guestId, payload);
 
-  // Provision the Firebase Auth account (uid == guest doc id) when an email was given.
-  if (email) {
+  // Provision the Firebase Auth account (uid == guest doc id) only when the
+  // admin explicitly asked for it. The email is required in that case.
+  if (createAuth) {
+    if (!email) throw new Error("El correo de acceso es obligatorio para crear la cuenta de acceso.");
     const functions = getFunctions();
     const createGuestAuth = httpsCallable(functions, "createGuestAuth");
     await createGuestAuth({ guestId, email });

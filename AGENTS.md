@@ -924,7 +924,7 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   `rgb(255 253 248 / 85%)`), NOT red. Rules tests in
   `web/invitation/tests/firestore.rules.test.mjs` prove a guest can write
   `paymentConfirmed` + `rsvp.answers` on their own and on a group member's doc.
-- **Dashboard "Agregar invitado" modal creates a guest + optional auth account** —
+- **Dashboard "Agregar invitado" modal asks whether to create an auth account** —
   the INVITADOS table toolbar has a "+ Agregar invitado" button
   (`data-add-guest`) that opens the create-guest modal
   (`web/dashboard/src/guestFormModal.js`, `openCreateGuestModal`). The modal
@@ -932,23 +932,27 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   (in `guestDomain.js`), builds the payload via `buildGuestCreatePayload` (in
   `web/shared/payload-builders.js`), and creates the doc via the `createGuest`
   repository function (`setDoc` WITHOUT merge so a duplicate id fails loudly).
-  If an email is provided, it calls the `createGuestAuth` Cloud Function
-  (`functions/index.js`) to provision the guest's Firebase Auth account
-  (uid == guest doc id) and keep `firebaseEmail` in sync. The modal is a pure
-  presentation module — all persistence flows through the injected repository
-  + payload-builder + id helpers. When adding a new guest-facing field to the
-  create form, update `buildGuestCreatePayload` and the modal together.
-- **Cloud Functions backfill the top-level `guestId` field whenever an auth account is created/updated** —
+  It also has an explicit **"Cuenta de acceso (login)"** Sí/No select (default
+  No). Only when "Sí" is picked does the "Correo de acceso" email field appear
+  (required), and `saveCreate` then calls the `createGuestAuth` Cloud Function
+  to provision the guest's Firebase Auth account (uid == guest doc id) and keep
+  `firebaseEmail` + `firebaseUid` in sync. The modal is a pure presentation
+  module — all persistence flows through the injected repository + payload-builder
+  + id helpers. When adding a new guest-facing field to the create form, update
+  `buildGuestCreatePayload` and the modal together.
+- **Cloud Functions backfill the top-level `guestId` + `firebaseUid` fields whenever an auth account is created/updated** —
   the three callable functions that create or update a guest's Firebase Auth account
   (`createGuestAuth`, `updateGuestEmail`, and `sendInvitation` — the latter auto-creates
   the account if missing) all merge-write `guestId` (the doc id) into the guest's
-  `guests` doc alongside `firebaseEmail`/`invitationSent`. This is a safety net: guests
+  `guests` doc alongside `firebaseEmail`/`invitationSent`; `createGuestAuth` and
+  `updateGuestEmail` ALSO write `firebaseUid` (== the auth uid == the doc id) so the
+  AUTH ⇄ GUEST relation is explicit on the record. This is a safety net: guests
   imported via the Google Sheets sync (or created before the field existed) may lack the
   top-level `guestId` field even though it's the doc id, and several readers rely on it
-  (`resolveGuestName` falls back to `data.guestId`; `onLogin` reads `data.guestId`). So
-  backfilling it server-side (which bypasses the client rules) guarantees the field is
-  present as soon as the guest has a login. `buildGuestCreatePayload` already includes
-  `guestId` for the dashboard create flow, but the backfill covers every other path.
+  (`resolveGuestName` falls back to `data.guestId`; `onLogin` reads `data.guestId`). The
+  auth uid IS the guest doc id (a natural 1:1 relation), and `firebaseUid` records it
+  explicitly. `buildGuestCreatePayload` already includes `guestId` for the dashboard
+  create flow, but the backfill covers every other path.
 - **The `invitation_groups` collection no longer exists** — the dashboard's
   Groups panel, its tab, the `onSnapshot` listener, and the dead
   `groupsPanel.js` + `repositories/groupRepository.js` modules were removed.
