@@ -122,21 +122,25 @@
 .gf-tabs {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
-  padding: 0.9rem 1.75rem 0;
+  gap: 0.4rem;
+  padding: 1rem 1.75rem;
   border-bottom: 1px solid $border-light;
+  background: rgba(85, 69, 45, 0.03);
 }
 
 .gf-tab {
-  padding: 0.4rem 0.85rem;
-  border: 1px solid $border;
-  border-bottom: none;
-  border-radius: 0.4rem 0.4rem 0 0;
-  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 0.95rem;
+  border: 1px solid $border-strong;
+  border-radius: 0.4rem;
+  background: $card-bg;
+  color: $ink;
   font: inherit;
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  color: $ink-muted;
+  letter-spacing: 0.02em;
   cursor: pointer;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
 
@@ -147,13 +151,16 @@
   }
 
   &:hover:not(.is-active) {
-    border-color: $border-strong;
+    border-color: $accent;
+    background: rgba(138, 106, 54, 0.08);
     color: $ink;
   }
 }
 
 .gf-panel {
-  display: block;
+  display: grid;
+  gap: 0.9rem;
+  align-content: start;
 
   &[hidden] {
     display: none;
