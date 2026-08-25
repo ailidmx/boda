@@ -508,18 +508,34 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   sortable column, add its key to `GUEST_SORT_COLUMNS`, add a `case` in
   `guestSortValue`, and wrap the `<th>` in `sortTh(key, label)`.
 
+- **Dashboard guest modal is a SHARED tabbed form (`guestFormModal.js`)** — the
+  "✏️ Editar" and "＋ Agregar invitado" modals are now ONE shared module
+  (`web/dashboard/src/guestFormModal.js`, exporting `openGuestEditor` +
+  `openCreateGuestModal`) that mirrors the INVITADOS table's column groups as
+  tab buttons (Identidad / Presencia / Pétanque / Playa / Vuelos), with the
+  fields in the SAME list + order as the table's `columnDefs`. It is pure
+  presentation: every write flows through injected save functions
+  (`saveGuestInline` / `saveGuestEmail` / `saveGuestRsvpAnswer` /
+  `saveGuestHosting` / `saveGuestFlightInfo` / `createGuest`). **Email change
+  uses the SAME `updateGuestEmail` Cloud Function path as the table's inline
+  email editor** (via `saveGuestEmail`). Flight info is saved via
+  `saveGuestFlightInfo` (dashboard.js), which builds the `flightInfo` map
+  DIRECTLY (not `buildGuestFlightInfoPayload`, which omits empty fields and
+  can't clear a value) and preserves an existing airport object when its IATA
+  is unchanged. The old `guestEditorModal.js` / `guestCreateModal.js` were
+  deleted. Styles live in `_modal.scss` (`.gf-*`).
 - **Dashboard edit modal can upload a guest avatar to Cloudinary** — the
-  "✏️ Editar" modal (`openGuestEditor` in `dashboard.js`) has a photo section
+  "✏️ Editar" modal (`openGuestEditor` in `guestFormModal.js`) has a photo section
   with a preview thumbnail, a "📷 Subir foto" file input, and a text input for
   pasting a Cloudinary ID manually. Picking a file calls
-  `uploadAvatarToCloudinary(file)` (an inline helper in `dashboard.js` that
+  `uploadAvatarToCloudinary(file)` (an inline helper in `guestFormModal.js` that
   mirrors the invitation's `uploadAvatar`): it POSTs to
   `https://api.cloudinary.com/v1_1/k2ajcgxv/image/upload` with the unsigned
   preset `boda_avatars_unsigned` (overridable via
   `VITE_CLOUDINARY_UPLOAD_PRESET`) and folder `boda/avatars`, then fills the
-  `identityCloudinaryId` input and refreshes the preview. On save, the public
+  `data-f-cloudinaryId` input and refreshes the preview. On save, the public
   id is written to BOTH `identity.cloudinaryId` and top-level `cloudinaryId`
-  via `buildDashboardGuestEditPayload` — the same field the invitation reads.
+  via `saveGuestInline` — the same field the invitation reads.
   The upload runs client-side (no Cloud Function), so it requires the unsigned
   preset to be enabled in the Cloudinary dashboard. Styles live in
   `_guests.scss` (`.dashboard-avatar-upload*`).
@@ -911,7 +927,7 @@ npm run test:rules  # Firestore rules tests (uses emulators)
 - **Dashboard "Agregar invitado" modal creates a guest + optional auth account** —
   the INVITADOS table toolbar has a "+ Agregar invitado" button
   (`data-add-guest`) that opens the create-guest modal
-  (`web/dashboard/src/guestCreateModal.js`, `openCreateGuestModal`). The modal
+  (`web/dashboard/src/guestFormModal.js`, `openCreateGuestModal`). The modal
   derives a unique guest id from the name via `buildGuestId` + `uniqueGuestId`
   (in `guestDomain.js`), builds the payload via `buildGuestCreatePayload` (in
   `web/shared/payload-builders.js`), and creates the doc via the `createGuest`
