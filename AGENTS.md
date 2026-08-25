@@ -938,6 +938,17 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   presentation module — all persistence flows through the injected repository
   + payload-builder + id helpers. When adding a new guest-facing field to the
   create form, update `buildGuestCreatePayload` and the modal together.
+- **Cloud Functions backfill the top-level `guestId` field whenever an auth account is created/updated** —
+  the three callable functions that create or update a guest's Firebase Auth account
+  (`createGuestAuth`, `updateGuestEmail`, and `sendInvitation` — the latter auto-creates
+  the account if missing) all merge-write `guestId` (the doc id) into the guest's
+  `guests` doc alongside `firebaseEmail`/`invitationSent`. This is a safety net: guests
+  imported via the Google Sheets sync (or created before the field existed) may lack the
+  top-level `guestId` field even though it's the doc id, and several readers rely on it
+  (`resolveGuestName` falls back to `data.guestId`; `onLogin` reads `data.guestId`). So
+  backfilling it server-side (which bypasses the client rules) guarantees the field is
+  present as soon as the guest has a login. `buildGuestCreatePayload` already includes
+  `guestId` for the dashboard create flow, but the backfill covers every other path.
 - **The `invitation_groups` collection no longer exists** — the dashboard's
   Groups panel, its tab, the `onSnapshot` listener, and the dead
   `groupsPanel.js` + `repositories/groupRepository.js` modules were removed.

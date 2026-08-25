@@ -756,9 +756,12 @@ export const updateGuestEmail = onCall(
     }
 
     // Keep the guest's `firebaseEmail` field in sync (server-side write bypasses
-    // the client rules).
+    // the client rules). Also backfill `guestId` so the top-level id field is
+    // always present, even for guests originally created without it (e.g. from
+    // the Google Sheets sync).
     await db.collection("guests").doc(guestId).set(
       {
+        guestId,
         firebaseEmail: newEmail,
         updatedBy: request.auth.uid,
         updatedAt: new Date(),
@@ -865,9 +868,11 @@ export const createGuestAuth = onCall(
     }
 
     // Keep the guest's `firebaseEmail` field in sync (server-side write bypasses
-    // the client rules).
+    // the client rules). Also backfill `guestId` so the top-level id field is
+    // always present, even for guests originally created without it.
     await db.collection("guests").doc(guestId).set(
       {
+        guestId,
         firebaseEmail: newEmail,
         updatedBy: request.auth.uid,
         updatedAt: new Date(),
@@ -1363,6 +1368,7 @@ export const sendInvitation = onCall(
     // client — the dashboard no longer needs to call saveGuestInline for this.
     await db.collection("guests").doc(guestId).set(
       {
+        guestId,
         invitationSent: true,
         invitationSentAt: sentAt,
         invitationChannel: channel,
