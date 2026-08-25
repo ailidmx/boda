@@ -1391,6 +1391,26 @@ directly to `master` and push.
   3 faces 4, etc.; remaining edges (east/west) append after. Seat positions still
   derive from edge length; only the ORDER/`index` changed. Stable seat ids remain
   `<edge>-<i>`, so existing `plans/main.guestAssignments` keys stay valid.
+- **Guest click (spatial editor) selects + highlights their table** — clicking a
+  guest in the sidebar "Invitados" list sets `selectedGuestId` (module state),
+  which (a) adds `is-selected-guest` to the guest row, (b) adds
+  `is-guest-highlight` to the "Mesas" sidebar entry that contains them, and
+  (c) adds `is-guest-selected` to their seat on the canvas (a ring). For a
+  PLACED seated guest it also expands the "Mesas" section and `scrollIntoView`s
+  the table (`scrollToInstanceInSidebar`). Unseated guests still toggle the
+  existing `pendingGuest` pre-select (assign-to-seat) flow. Styles in
+  `_spatial.scss` (`.is-selected-guest` / `.is-guest-highlight` /
+  `.is-guest-selected`).
+- **INVITADOS "Identidad" name editor is inline + auto-fits column width** — the
+  name editor renders the 4 name inputs in a single row (`flex-wrap: nowrap`)
+  with text "Guardar"/"Cancelar" buttons inline (`.dashboard-name-editor` is a
+  flex row). The Identidad column auto-sizes to content in VIEW mode
+  (`grid.api.autoSizeColumns(["identity"])`, done once on first render and again
+  after confirm/cancel) and widens to a fixed 640px while editing
+  (`setColumnWidths`), via the `gridApi()` helper in `wireGridEvents` (reads
+  `ctx.container._guestGrid.api`). Edit-open → `widenIdentityForEdit()`; close →
+  `sizeIdentityToContent()`.
+
 *(Add new spatial-editor lessons here as you discover them.)*
 
 

@@ -132,13 +132,13 @@ export function renderGuestManager(ctx) {
         <div class="dashboard-name-editor" data-name-editor="${guest.id}" hidden>
           <div class="dashboard-name-fields">
             <input class="dashboard-inline-input" type="text" value="${f}" data-name-field="firstName" data-guest-id="${guest.id}" placeholder="Nombre" />
-            <input class="dashboard-inline-input" type="text" value="${m}" data-name-field="middleName" data-guest-id="${guest.id}" placeholder="Nombre 2" />
+            <input class="dashboard-inline-input" type="text" value="${m}" data-name-field="middleName" data-guest-id="${guest.id}" placeholder="2º nombre" />
             <input class="dashboard-inline-input" type="text" value="${l}" data-name-field="lastName" data-guest-id="${guest.id}" placeholder="Apellido" />
-            <input class="dashboard-inline-input" type="text" value="${ml}" data-name-field="maternalLastName" data-guest-id="${guest.id}" placeholder="Apellido 2" />
+            <input class="dashboard-inline-input" type="text" value="${ml}" data-name-field="maternalLastName" data-guest-id="${guest.id}" placeholder="2º apellido" />
           </div>
           <div class="dashboard-name-actions">
-            <button type="button" class="dashboard-link-btn" data-name-confirm="${guest.id}" title="Guardar">✓</button>
-            <button type="button" class="dashboard-link-btn" data-name-cancel="${guest.id}" title="Cancelar">✕</button>
+            <button type="button" class="dashboard-link-btn dashboard-name-confirm" data-name-confirm="${guest.id}" title="Guardar nombre">Guardar</button>
+            <button type="button" class="dashboard-link-btn dashboard-name-cancel" data-name-cancel="${guest.id}" title="Cancelar">Cancelar</button>
           </div>
         </div>
       </div>`;
@@ -805,6 +805,11 @@ export function renderGuestManager(ctx) {
       },
     });
     container._guestGrid = grid;
+    // Fit the Identidad column to its content once on first render (view mode).
+    if (!container.dataset.identitySized) {
+      container.dataset.identitySized = "1";
+      requestAnimationFrame(() => grid.api?.autoSizeColumns?.(["identity"]));
+    }
   } else {
     grid.setColumnDefs(columnDefs);
     grid.setRowData(rows);
@@ -976,6 +981,15 @@ function wireGridEvents(gridEl, ctx) {
 
   const rerender = () => renderGuestManager(ctx);
 
+  // ── Identity column width (content-fit in view, wider while editing) ──
+  const gridApi = () => ctx.container?._guestGrid?.api;
+  const sizeIdentityToContent = () => {
+    requestAnimationFrame(() => gridApi()?.autoSizeColumns?.(["identity"]));
+  };
+  const widenIdentityForEdit = () => {
+    gridApi()?.setColumnWidths?.([{ key: "identity", newWidth: 640 }]);
+  };
+
   // Group editor (Invitación + GRUPO) shared logic.
   const groupConfirm = (selectAttr, newAttr, applyFn, getCurrent) => {
     return (btn) => {
@@ -1145,6 +1159,7 @@ function wireGridEvents(gridEl, ctx) {
         `[data-room-editor="${target.dataset.roomCancel}"][data-room-period="${target.dataset.roomPeriod}"]`, false);
     } else if (target?.dataset.nameDisplay) {
       toggle(target, `[data-name-display="${target.dataset.nameDisplay}"]`, `[data-name-editor="${target.dataset.nameDisplay}"]`, true);
+      widenIdentityForEdit();
       target.closest(".ag-cell")?.querySelector('[data-name-field="firstName"]')?.focus();
     } else if (target?.dataset.nameConfirm) {
       const guestId = target.dataset.nameConfirm;
@@ -1155,10 +1170,14 @@ function wireGridEvents(gridEl, ctx) {
           const saved = await saveGuestInline(guestId, input.dataset.nameField, input.value.trim());
           if (!saved) ok = false;
         }
-        if (ok) rerender();
+        if (ok) {
+          rerender();
+          sizeIdentityToContent();
+        }
       }
     } else if (target?.dataset.nameCancel) {
       toggle(target, `[data-name-display="${target.dataset.nameCancel}"]`, `[data-name-editor="${target.dataset.nameCancel}"]`, false);
+      sizeIdentityToContent();
     } else if (target?.dataset.messageDisplay) {
       toggle(target, `[data-message-display="${target.dataset.messageDisplay}"]`, `[data-message-editor="${target.dataset.messageDisplay}"]`, true);
       target.closest(".ag-cell")?.querySelector(`[data-message-input="${target.dataset.messageDisplay}"]`)?.focus();

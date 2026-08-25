@@ -343,6 +343,14 @@
   opacity: 0.4;
 }
 
+// Selected guest (clicked in "Invitados"): a clear ring around their seat
+// avatar on the canvas so the admin can spot them at a glance.
+.se-seat.is-guest-selected .se-seat-circle {
+  fill: rgba($accent, 0.45);
+  stroke: $accent;
+  stroke-width: 0.1;
+}
+
 // ── Labels ──────────────────────────────────────────────────────────────
 .se-label {
   pointer-events: none;
@@ -538,8 +546,8 @@
 .se-guest-drag-ghost {
   position: fixed;
   z-index: 1001;
-  width: 2rem;
-  height: 2rem;
+  width: 2.4rem;
+  height: 2.4rem;
   border-radius: 50%;
   border: 2px solid $accent;
   background: $cream-light;
@@ -550,11 +558,13 @@
   transform: translate(-50%, -50%);
   box-shadow: 0 0.4rem 1rem rgba(65, 50, 28, 0.25);
   font-weight: 600;
-  font-size: 0.7rem;
+  font-size: 0.72rem;
+  line-height: 1;
   color: $ink;
   overflow: hidden;
 
   img {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -697,6 +707,12 @@
   &.is-selected {
     border-color: $accent;
     box-shadow: 0 0 0 2px rgba($accent, 0.15);
+  }
+
+  &.is-guest-highlight {
+    border-color: $accent;
+    box-shadow: 0 0 0 2px rgba($accent, 0.22);
+    background: rgba($accent, 0.06);
   }
 }
 
@@ -989,6 +1005,13 @@
   &.is-pending {
     border-color: $accent;
     background: rgba($accent, 0.08);
+  }
+
+  &.is-selected-guest {
+    border-color: $accent;
+    box-shadow: 0 0 0 2px rgba($accent, 0.18);
+    background: rgba($accent, 0.07);
+    opacity: 1;
   }
 
   &.is-seated {

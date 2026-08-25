@@ -63,6 +63,7 @@ let showOnlyUnassigned = false; // guest filter: only unassigned
 let showOnlySat5 = false; // guest filter: only SAT level 5
 let showOnlyChildren = false; // guest filter: only children (age "Niño")
 let planLoaded = false; // true once the authoritative plan is in memory (guards writes)
+let selectedGuestId = null; // clicked guest to highlight (avatar + their table in the sidebar)
 
 // ── Seating snapshot for the dashboard summary (Mesas tab) ──────────────
 const seatingListeners = new Set();
@@ -239,7 +240,10 @@ function instanceMarkup(inst) {
     const guest = guestAt(inst.id, a.id);
     const px = a.x;
     const py = a.y;
-    const cls = isBlocked ? "is-blocked" : guest ? "is-occupied" : "is-available";
+    const cls = [
+      isBlocked ? "is-blocked" : guest ? "is-occupied" : "is-available",
+      guest && guest.id === selectedGuestId ? "is-guest-selected" : "",
+    ].filter(Boolean).join(" ");
     // Occupied seats render the guest's avatar face (clipped to a circle), or
     // their 2-character initials when they have no photo. Empty seats show a
     // "?" placeholder. No other text on the canvas.
@@ -390,9 +394,11 @@ function panelMarkup() {
     const occupied = Object.keys(plan.guestAssignments?.[inst.id] || {}).length;
     const seatCount = def ? definitionSeatCount(def) : 0;
     const isPlaced = !inst.unplaced;
+    const containsSelectedGuest = Boolean(selectedGuestId) &&
+      Object.values(plan.guestAssignments?.[inst.id] || {}).includes(selectedGuestId);
     return `
       <div class="se-instance-wrap" data-reorder-wrap="${inst.id}">
-        <div class="se-instance-item ${isPlaced ? "is-placed" : "is-unplaced"} ${selection.has(inst.id) ? "is-selected" : ""}"
+        <div class="se-instance-item ${isPlaced ? "is-placed" : "is-unplaced"} ${selection.has(inst.id) ? "is-selected" : ""} ${containsSelectedGuest ? "is-guest-highlight" : ""}"
           data-sel-instance="${inst.id}"
           ${!isPlaced ? `data-drag-instance="${inst.id}" draggable="true"` : ""}
           title="${isPlaced ? "Haz clic para enfocar en el salón" : "Arrastra al salón o usa ⚑ para colocación automática"}">
@@ -433,7 +439,8 @@ function panelMarkup() {
   const guestItems = guests.slice(0, 400).map((g) => {
     const seat = guestSeatLocation(g.id);
     const isPending = pendingGuest === g.id;
-    return `<button class="se-guest-option ${seat ? "is-seated" : ""} ${isPending ? "is-pending" : ""}" data-guest-pick="${g.id}" data-drag-guest-list="${g.id}" draggable="true" type="button" title="${seat ? `Sentado en ${seat.label}` : "Arrastra a un asiento para asignar"}">
+    const isSelectedGuest = selectedGuestId === g.id;
+    return `<button class="se-guest-option ${seat ? "is-seated" : ""} ${isPending ? "is-pending" : ""} ${isSelectedGuest ? "is-selected-guest" : ""}" data-guest-pick="${g.id}" data-drag-guest-list="${g.id}" draggable="true" type="button" title="${seat ? `Sentado en ${seat.label}` : "Arrastra a un asiento para asignar"}">
       ${guestAvatarUrl(g) ? `<img src="${guestAvatarUrl(g)}" alt=""/>` : `<span class="se-guest-avatar-init">${guestInitials(g)}</span>`}
       <span class="se-guest-name">${guestFullName(g)}</span>
       ${saturdayBadge(g)}
@@ -654,6 +661,18 @@ function focusInstance(instanceId) {
   selection = new Set([instanceId]);
   log(`focusInstance ${instanceId} → center (${(b.minX + b.maxX) / 2}, ${(b.minY + b.maxY) / 2})`);
   render();
+}
+
+// Scroll the sidebar so a table's "Mesas" entry is visible (and make sure the
+// Mesas section is expanded). Used to surface a guest's assigned table when the
+// admin clicks a guest in the "Invitados" list.
+function scrollToInstanceInSidebar(instanceId) {
+  const panel = container?.querySelector("[data-se-sidebar]");
+  if (!panel) return;
+  const section = panel.querySelector('[data-se-section="real"]');
+  if (section) section.setAttribute("open", "");
+  const item = panel.querySelector(`[data-reorder-wrap="${instanceId}"]`);
+  if (item) item.scrollIntoView({ block: "nearest", behavior: "smooth" });
 }
 
 // ── Fit camera to the plan ──────────────────────────────────────────────
@@ -1859,12 +1878,18 @@ export async function loadSpatialEditor(root) {
       return;
     }
 
-    // Guest pre-select.
+    // Guest click → select it (highlight avatar + their table in the sidebar)
+    // and pre-select unseated guests for assignment.
     const guestPick = e.target.closest("[data-guest-pick]");
     if (guestPick) {
-      pendingGuest = pendingGuest === guestPick.dataset.guestPick ? null : guestPick.dataset.guestPick;
-      log(`guest pre-selected: ${pendingGuest}`);
-      renderPanel();
+      const gid = guestPick.dataset.guestPick;
+      selectedGuestId = selectedGuestId === gid ? null : gid;
+      const seat = guestSeatLocation(gid);
+      // Pre-select (assign to a seat) only applies to guests who are NOT seated.
+      pendingGuest = seat ? null : (pendingGuest === gid ? null : gid);
+      log(`guest selected: ${selectedGuestId || "(none)"}${seat ? ` → ${seat.label}` : ""}`);
+      render();
+      if (selectedGuestId && seat && seat.placed) scrollToInstanceInSidebar(seat.instanceId);
       return;
     }
     const clearPending = e.target.closest("[data-clear-pending]");
