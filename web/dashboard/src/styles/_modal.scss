@@ -111,3 +111,89 @@
   color: #a0352c;
   font-size: 0.85rem;
 }
+
+// ── Tabbed guest form (CREATE + EDIT) ───────────────────────────────────
+// The guest modal is split by the same field groups as the INVITADOS table's
+// column-group chips (Identidad / Presencia / Pétanque / Playa / Vuelos).
+.gf-modal {
+  width: min(100%, 44rem);
+}
+
+.gf-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding: 0.9rem 1.75rem 0;
+  border-bottom: 1px solid $border-light;
+}
+
+.gf-tab {
+  padding: 0.4rem 0.85rem;
+  border: 1px solid $border;
+  border-bottom: none;
+  border-radius: 0.4rem 0.4rem 0 0;
+  background: transparent;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: $ink-muted;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+
+  &.is-active {
+    background: $accent;
+    border-color: $accent;
+    color: #fff;
+  }
+
+  &:hover:not(.is-active) {
+    border-color: $border-strong;
+    color: $ink;
+  }
+}
+
+.gf-panel {
+  display: block;
+
+  &[hidden] {
+    display: none;
+  }
+}
+
+.gf-empty-tab {
+  color: $ink-muted;
+  font-size: 0.85rem;
+  margin: 0;
+  text-align: center;
+  padding: 2rem 0;
+}
+
+.gf-footer {
+  padding: 0 1.75rem 1.5rem;
+
+  .dashboard-modal-actions {
+    margin-top: 1rem;
+  }
+
+  small {
+    display: block;
+    margin-top: 0.6rem;
+    font-size: 0.85rem;
+
+    &[data-state="success"] { color: #2e7d32; }
+    &[data-state="error"] { color: #a0352c; }
+  }
+}
+
+// 4 name inputs in the guest form (2×2 grid, same order as the table's inline
+// name editor).
+.dashboard-modal-name-fields {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem;
+
+  input {
+    width: 100%;
+  }
+}
+

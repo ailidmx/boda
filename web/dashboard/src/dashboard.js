@@ -92,9 +92,8 @@ import {
 
 
 import { renderGuestManager as renderGuestManagerTable } from "./guestTable.js";
-import { openGuestEditor as openGuestEditorModal } from "./guestEditorModal.js";
+import { openGuestEditor as openGuestEditorModal, openCreateGuestModal as openCreateGuestModalModule } from "./guestFormModal.js";
 import { openDeleteConfirm as openDeleteConfirmModule, openSendInviteModal as openSendInviteModalModule } from "./guestModals.js";
-import { openCreateGuestModal as openCreateGuestModalModule } from "./guestCreateModal.js";
 
 import { renderSummary } from "./summary.js";
 import { renderCabinAssignments as renderCabinAssignmentsPanel } from "./cabinsPanel.js";
@@ -121,11 +120,11 @@ import { renderDataPanel } from "./dataPanel.js";
 import { renderCardVotesPanel as renderCardVotesPanelModule } from "./cardVotesPanel.js";
 
 import {
-  buildDashboardGuestEditPayload,
   buildDashboardGuestInlinePayload,
   buildGuestRsvpPayload,
   buildDashboardGuestHostingPayload,
   buildGuestCreatePayload,
+  buildGuestFlightInfoPayload,
   buildTimelineLayerPayload,
   buildTimelineSlotPayload,
 } from "../../shared/payload-builders.js";
@@ -673,17 +672,28 @@ function guestStatusBadge(guest) {
 
 // ── Guest Editor Modal ─────────────────────────────────────────────────
 
-// The "✏️ Editar" modal (form rendering, Cloudinary avatar upload, and the
-// guest save) lives in `guestEditorModal.js`. This thin adapter injects the
-// dashboard's module-scope dependencies so the modal stays a pure presentation
-// module that never touches Firestore directly.
+// The "✏️ Editar" modal (tabbed form) lives in `guestFormModal.js`. This thin
+// adapter injects the dashboard's module-scope save functions so the modal stays
+// a pure presentation module that never touches Firestore directly.
 function openGuestEditor(guest) {
   openGuestEditorModal(guest, {
+    getGuest,
+    getActiveGuests,
     guestAvatarUrl,
     guestInitials,
-    buildDashboardGuestEditPayload,
-    updateGuest,
-    getGuest,
+    getAuthEmail,
+    saveGuestInline,
+    saveGuestEmail,
+    saveGuestRsvpAnswer,
+    saveGuestHosting,
+    saveGuestFlightInfo,
+    getCabinNames,
+    getCabinDisplayName,
+    getCabinUnitCode,
+    getRoomsByCabin,
+    getInvitationGroupOptions,
+    getGroupOptions,
+    renderGuestManager,
   });
 }
 
@@ -783,6 +793,62 @@ async function saveGuestEmail(guestId, email) {
     console.error("Failed to update guest email", err);
     return false;
   }
+}
+
+// The guest's Firebase Auth login email (used to pre-fill the editor's "Correo
+// de acceso" field). Mirrors the identity column, which shows the auth email.
+function getAuthEmail(guestId) {
+  return state.authUsers[guestId]?.email || "";
+}
+
+// Persist a guest's flight info (the Vuelos column group). Builds the full
+// `flightInfo` map directly (NOT via `buildGuestFlightInfoPayload`, which
+// OMITS empty fields and therefore can't clear a previously-set value). An
+// unchanged IATA code reuses the existing airport object so name/city/country
+// survive; a newly-typed code builds a minimal `{ iata, name, countryCode }`.
+async function saveGuestFlightInfo(guestId, raw) {
+  const guest = getGuest(guestId);
+  const existing = guest?.flightInfo || {};
+  const existingDep = existing.departure || {};
+
+  const str = (v) => String(v || "").trim();
+  const airport = (iata, prev) => {
+    const code = String(iata || "").trim().toUpperCase();
+    if (!code) return null;
+    if (prev && String(prev.iata || "").toUpperCase() === code) return prev;
+    return { iata: code, name: code, countryCode: "" };
+  };
+  const connections = (list, prevList) =>
+    String(list || "").split(",").map((s) => s.trim().toUpperCase()).filter(Boolean)
+      .map((code) => (prevList || []).find((p) => String(p.iata || "").toUpperCase() === code) || { iata: code, name: code, countryCode: "" });
+
+  const dep = {
+    origin: airport(raw.depOriginIata, existingDep.origin),
+    destination: airport(raw.depDestinationIata, existingDep.destination),
+    connections: connections(raw.depConnections, existingDep.connections),
+    departureDate: str(raw.departureDate) || null,
+    departureTime: str(raw.departureTime) || null,
+    finalFlightNumber: str(raw.depFlightNumber) || null,
+  };
+  const hasDep = Object.values(dep).some((x) => (Array.isArray(x) ? x.length > 0 : Boolean(x)));
+
+  const flightInfo = {
+    origin: airport(raw.originIata, existing.origin),
+    destination: airport(raw.destinationIata, existing.destination),
+    connections: connections(raw.connections, existing.connections),
+    arrivalDate: str(raw.arrivalDate) || null,
+    arrivalTime: str(raw.arrivalTime) || null,
+    finalFlightNumber: str(raw.finalFlightNumber) || null,
+    departure: hasDep ? dep : null,
+  };
+
+  await updateGuest(guestId, {
+    guestId,
+    flightInfo,
+    updatedBy: getCurrentUserId(),
+    updatedAt: serverTimestamp(),
+  });
+  return true;
 }
 
 
@@ -1027,10 +1093,10 @@ function openSendInviteModal(guest, channel = null) {
 
 // ── Create Guest Modal ─────────────────────────────────────────────────
 
-// The "Agregar invitado" modal (form rendering + create flow) lives in
-// `guestCreateModal.js`. This thin adapter injects the dashboard's module-scope
-// dependencies (repository + payload-builder + id helpers + live cache) so the
-// modal stays a pure presentation module that never touches Firestore directly.
+// The "Agregar invitado" modal (tabbed form) lives in `guestFormModal.js`. This
+// thin adapter injects the dashboard's module-scope dependencies (repository +
+// payload-builder + id helpers + live cache) so the modal stays a pure
+// presentation module that never touches Firestore directly.
 function openCreateGuestModal() {
   openCreateGuestModalModule({
     createGuest,
@@ -1038,6 +1104,8 @@ function openCreateGuestModal() {
     buildGuestId,
     uniqueGuestId,
     getActiveGuests,
+    getInvitationGroupOptions,
+    getGroupOptions,
     renderGuestManager,
   });
 }
