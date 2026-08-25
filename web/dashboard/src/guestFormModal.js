@@ -105,8 +105,8 @@ async function uploadAvatarToCloudinary(file) {
 
 // Photo / avatar field (edit mode only). Mirrors the table's avatar + edit badge.
 function avatarField(guest, ctx) {
-  const photo = ctx.guestAvatarUrl?.(guest);
-  const initials = ctx.guestInitials?.(guest);
+  const photo = guest ? ctx.guestAvatarUrl?.(guest) : "";
+  const initials = guest ? ctx.guestInitials?.(guest) : "?";
   const cloudinaryId = guest?.identity?.cloudinaryId || guest?.cloudinaryId || "";
   return `
     <div class="dashboard-modal-field">
@@ -129,7 +129,9 @@ function identityTab({ mode, guest, ctx }) {
   const id = guest?.identity || {};
   const parts = [];
 
-  if (mode === "edit") parts.push(avatarField(guest, ctx));
+  // Photo upload is available in BOTH create and edit modes (in create the
+  // guest is null, so the preview is empty until a photo is uploaded).
+  parts.push(avatarField(guest, ctx));
 
   // Nombre (4 inline fields, matching the table's name editor order).
   parts.push(`
@@ -172,7 +174,7 @@ function identityTab({ mode, guest, ctx }) {
   parts.push(field("Idioma", selectInput("lang", optionsHtml(LANG_OPTIONS, id.lang || guest?.lang || ""))));
   parts.push(field("Género", selectInput("gender", optionsHtml(GENDER_OPTIONS, id.gender || guest?.gender || ""))));
   parts.push(field("Edad", selectInput("age", optionsHtml(AGE_OPTIONS, id.age || guest?.age || ""))));
-  parts.push(field("Mensaje", textInput("message", guest?.message || id.message || guest?.messageAuthor || "", "Autor del mensaje")));
+  parts.push(field("Mensaje", textInput("message", guest?.message || id.message || guest?.messageAuthor || "", "Mensaje personalizado")));
 
   if (mode === "edit") {
     parts.push(field("Verificación de identidad", selectInput("idCheckUser", optionsHtml(
@@ -394,7 +396,7 @@ async function saveCreate(overlay, ctx, setStatus) {
     invitationGroup: v("invitationGroup"),
     tagGroup: v("tagGroup"),
     phone: v("phone"),
-    cloudinaryId: "",
+    cloudinaryId: v("cloudinaryId").trim(),
     timestamp: new Date(),
   });
   await ctx.createGuest(guestId, payload);
