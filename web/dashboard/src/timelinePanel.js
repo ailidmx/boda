@@ -146,7 +146,9 @@ export function renderTimelinePanel(ctx) {
 
   container.querySelector("[data-new-layer]")?.addEventListener("click", () => openLayerModal(ctx));
   container.querySelectorAll("[data-new-slot]").forEach((b) => {
-    if (b.dataset.newSlot) b.addEventListener("click", () => openSlotModal(ctx, null, b.dataset.newSlot));
+    // The toolbar button has `data-new-slot` with NO value (empty string), so
+    // fall back to null — otherwise the guard would skip wiring its handler.
+    b.addEventListener("click", () => openSlotModal(ctx, null, b.dataset.newSlot || null));
   });
   container.querySelectorAll("[data-edit-layer]").forEach((b) => b.addEventListener("click", () => openLayerModal(ctx, b.dataset.editLayer)));
   container.querySelectorAll("[data-delete-layer]").forEach((b) => b.addEventListener("click", async () => {
