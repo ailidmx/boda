@@ -181,14 +181,33 @@
   .dashboard-modal-actions {
     margin-top: 1rem;
   }
+}
 
-  small {
-    display: block;
-    margin-top: 0.6rem;
-    font-size: 0.85rem;
+// Error/success message block shown above the form actions.
+.gf-message {
+  padding: 0.7rem 0.9rem;
+  border: 1px solid $border-strong;
+  border-radius: 0.4rem;
+  background: $card-bg;
+  color: $ink;
+  font-size: 0.88rem;
+  font-weight: 500;
+  line-height: 1.4;
 
-    &[data-state="success"] { color: #2e7d32; }
-    &[data-state="error"] { color: #a0352c; }
+  &[data-state="success"] {
+    border-color: rgba(21, 87, 36, 0.35);
+    background: $status-yes-bg;
+    color: $status-yes-text;
+  }
+
+  &[data-state="error"] {
+    border-color: rgba(114, 28, 36, 0.35);
+    background: $status-no-bg;
+    color: $status-no-text;
+  }
+
+  &[hidden] {
+    display: none;
   }
 }
 

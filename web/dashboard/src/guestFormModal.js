@@ -12,6 +12,7 @@
 // (via the injected `saveGuestEmail`).
 
 import { getFunctions, httpsCallable } from "firebase/functions";
+import { DEFAULT_AUTH_EMAIL_DOMAIN } from "./guestDomain.js";
 
 const TABS = [
   { id: "identity", label: "Identidad" },
@@ -161,7 +162,7 @@ function identityTab({ mode, guest, ctx }) {
     parts.push(`
       <div class="dashboard-modal-field" data-email-field hidden>
         <label>Correo de acceso</label>
-        <input type="text" data-f-email placeholder="invitado@correo.com" />
+        <input type="text" data-f-email placeholder="id@${DEFAULT_AUTH_EMAIL_DOMAIN}" />
       </div>`);
   } else {
     parts.push(field(
@@ -309,11 +310,11 @@ function openGuestForm({ mode, guest, ctx }) {
       </div>
       <div class="dashboard-modal-body gf-body">${panels}</div>
       <div class="gf-footer">
+        <div class="gf-message" data-gf-message hidden role="alert"></div>
         <div class="dashboard-modal-actions">
           <button class="dashboard-button" type="button" data-gf-save>${mode === "create" ? "Crear invitado" : "Guardar cambios"}</button>
           <button class="dashboard-button dashboard-button-secondary" type="button" data-modal-close>Cancelar</button>
         </div>
-        <small data-gf-status></small>
       </div>
     </div>`;
   document.body.appendChild(overlay);
@@ -322,8 +323,18 @@ function openGuestForm({ mode, guest, ctx }) {
   overlay.querySelectorAll("[data-modal-close]").forEach((btn) => btn.addEventListener("click", close));
   overlay.addEventListener("click", (e) => { if (e.target === overlay) close(); });
 
-  const status = overlay.querySelector("[data-gf-status]");
-  const setStatus = (text, state) => { status.textContent = text; status.dataset.state = state || ""; };
+  const status = overlay.querySelector("[data-gf-message]");
+  const setStatus = (text, state) => {
+    if (text) {
+      status.textContent = text;
+      status.hidden = false;
+      status.dataset.state = state || "";
+    } else {
+      status.textContent = "";
+      status.hidden = true;
+      status.dataset.state = "";
+    }
+  };
 
   // ── Tab switching ──
   overlay.querySelectorAll("[data-gf-tab]").forEach((btn) => {
@@ -366,6 +377,17 @@ function openGuestForm({ mode, guest, ctx }) {
   // ── Create mode: live id preview ──
   if (mode === "create") {
     const idInput = overlay.querySelector("[data-create-id]");
+    const createAuthSel = overlay.querySelector("[data-f-createAuth]");
+    const emailField = overlay.querySelector("[data-email-field]");
+    const emailInput = overlay.querySelector("[data-f-email]");
+
+    // Auto-fill the login email with id@domain, unless the admin edited it.
+    const refreshEmail = () => {
+      if (emailInput.dataset.auto === "false") return;
+      const id = idInput?.value.trim();
+      emailInput.value = id ? `${id}@${DEFAULT_AUTH_EMAIL_DOMAIN}` : "";
+    };
+
     const refreshId = () => {
       const firstName = overlay.querySelector("[data-f-firstName]").value.trim();
       const lastName = overlay.querySelector("[data-f-lastName]").value.trim();
@@ -373,20 +395,25 @@ function openGuestForm({ mode, guest, ctx }) {
       const base = ctx.buildGuestId({ firstName, lastName, maternalLastName });
       const existing = (ctx.getActiveGuests?.() || []).map((g) => g.id);
       idInput.value = base ? ctx.uniqueGuestId(base, existing) : "";
+      refreshEmail();
     };
     ["[data-f-firstName]", "[data-f-lastName]", "[data-f-maternalLastName]"].forEach((sel) => {
       overlay.querySelector(sel)?.addEventListener("input", refreshId);
     });
 
-    // Auth toggle → show/require the email field only when the admin wants a login.
-    const createAuthSel = overlay.querySelector("[data-f-createAuth]");
-    const emailField = overlay.querySelector("[data-email-field]");
-    const emailInput = overlay.querySelector("[data-f-email]");
+    // Auth toggle → show the email field and default it to id@domain.
     const syncEmailVisibility = () => {
       const show = createAuthSel?.value === "true";
       if (emailField) emailField.hidden = !show;
-      if (!show && emailInput) emailInput.value = "";
+      if (show) {
+        if (emailInput.dataset.auto !== "false") emailInput.dataset.auto = "true";
+        refreshEmail();
+      } else {
+        emailInput.value = "";
+      }
     };
+    // Manual edits stop the auto-fill.
+    emailInput?.addEventListener("input", () => { emailInput.dataset.auto = "false"; });
     createAuthSel?.addEventListener("change", syncEmailVisibility);
     syncEmailVisibility();
   }
@@ -409,7 +436,7 @@ async function saveCreate(overlay, ctx, setStatus) {
   const v = (attr) => overlay.querySelector(`[data-f-${attr}]`)?.value ?? "";
   const firstName = v("firstName").trim();
   const lastName = v("lastName").trim();
-  if (!firstName || !lastName) throw new Error("El nombre y el apellido son obligatorios.");
+  if (!firstName) throw new Error("El nombre es obligatorio.");
 
   const guestId = overlay.querySelector("[data-create-id]")?.value.trim();
   if (!guestId) throw new Error("No se pudo generar un ID a partir del nombre.");

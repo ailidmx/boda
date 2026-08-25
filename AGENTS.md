@@ -936,10 +936,15 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   No). Only when "Sí" is picked does the "Correo de acceso" email field appear
   (required), and `saveCreate` then calls the `createGuestAuth` Cloud Function
   to provision the guest's Firebase Auth account (uid == guest doc id) and keep
-  `firebaseEmail` + `firebaseUid` in sync. The modal is a pure presentation
-  module — all persistence flows through the injected repository + payload-builder
-  + id helpers. When adding a new guest-facing field to the create form, update
-  `buildGuestCreatePayload` and the modal together.
+  `firebaseEmail` + `firebaseUid` in sync. When "Sí" is picked the email field
+  auto-fills to `<generated-id>@${DEFAULT_AUTH_EMAIL_DOMAIN}` (tracked via a
+  `data-auto` flag so manual edits stop the auto-fill). Only **first name** is
+  required to create a guest (the id is generated from first name + optional
+  last/maternal last name). Form errors/success render in a `.gf-message`
+  block above the action buttons (not a tiny footer note). The modal is a pure
+  presentation module — all persistence flows through the injected repository
+  + payload-builder + id helpers. When adding a new guest-facing field to the
+  create form, update `buildGuestCreatePayload` and the modal together.
 - **Cloud Functions backfill the top-level `guestId` + `firebaseUid` fields whenever an auth account is created/updated** —
   the three callable functions that create or update a guest's Firebase Auth account
   (`createGuestAuth`, `updateGuestEmail`, and `sendInvitation` — the latter auto-creates
