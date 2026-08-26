@@ -15,7 +15,7 @@ function formatBuild(build) {
 }
 
 export function Footer() {
-  const { t, language } = useApp();
+  const { t } = useApp();
   const footer = t.footer || {};
   const identity = t.identity || {};
   const versionLabel = formatBuild(BUILD);
@@ -34,7 +34,7 @@ export function Footer() {
           </a>
         </div>
       )}
-      <InstallApp language={language} />
+      <InstallApp />
       <div className="footer-inner">
         <InitialsSwap variant="identity-swap--footer" delay="0s" />
         <p className="footer-names">
