@@ -843,22 +843,24 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   dependency array (verified in the deployed function's
   `secretEnvironmentVariables`). When adding a new send channel, include the
   Telegram notification in the function.
-- **Email invitations use a Firebase password-RESET link, not a plaintext password** —
-  the `sendInvitation` email channel no longer emails the guest's stored
-  `firebasePassword`. Instead it generates a Firebase password-reset link via
-  `getAuth().generatePasswordResetLink(email)` and the email template
-  (`invitationEmailBody`) shows a "set your password" button pointing at it. If
-  the guest has no auth account yet, the function auto-creates one with a random
-  password (`randomBytes(16).toString("hex")`, never shown or stored) so the
-  reset link works. If the reset link can't be generated, the email falls back
-  to the invitation link. The invitation URL (`buildInvitationUrl`) therefore
-  OMITS the `password` query param for the email channel (`includePassword=false`)
-  — no plaintext password in the URL (browser history / referrer headers). The
-  WhatsApp channel still includes the password (`includePassword=true`) because
-  the couple sends that link directly. The login form pre-fills the email from
-  the `guest` param and the guest types the password they set via the reset link.
+- **Email invitations give the shared default password `vivamexico`, NOT a reset link** —
+  the `sendInvitation` email channel no longer generates a Firebase
+  password-reset link. Instead it ensures the guest's Firebase Auth account
+  exists with the shared default password (`DEFAULT_PASSWORD = "vivamexico"` in
+  `functions/index.js`, matching `SHARED_PASSWORD` in `web/shared/guests.js`),
+  creating the account if missing and `updateUser`-ing the password to
+  `vivamexico` so the message is accurate. The email template
+  (`invitationEmailBody`) and WhatsApp message (`buildWhatsAppMessage`) show
+  "Contraseña : vivamexico" inline instead of a "set your password" button.
+  `createGuestAuth` and `updateGuestEmail` also create new auth accounts with
+  `vivamexico` (no more random hex password). The invitation URL
+  (`buildInvitationUrl`) still OMITS the `password` query param for the email
+  channel (`includePassword=false`) — no plaintext password in the URL (browser
+  history / referrer headers). The WhatsApp channel still includes the password
+  (`includePassword=true`) because the couple sends that link directly. The login
+  form pre-fills the email from the `guest` param and the guest types `vivamexico`.
   When adding a new send channel, decide whether it should carry a plaintext
-  password or a reset link and pass the matching `includePassword` flag.
+  password and pass the matching `includePassword` flag.
 - **WhatsApp invitations open a `wa.me` deep link with the message pre-filled** —
   the `sendInvitation` WhatsApp channel does NOT auto-send anything. It builds a
   plain-text invitation message via `buildWhatsAppMessage` (SAME content as the

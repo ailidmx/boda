@@ -39,7 +39,6 @@ import { setGlobalOptions } from "firebase-functions/v2";
 
 import { sendTelegramMessage, sendTelegramPhoto, escapeMarkdown } from "./telegram.js";
 import { google } from "googleapis";
-import { randomBytes } from "node:crypto";
 
 
 
@@ -49,6 +48,10 @@ initializeApp();
 // The app uses a named Firestore database (migrated to us-central1 so Cloud
 // Functions can run in the same region). All reads/writes target this database.
 const DB_ID = "boda-us-central1";
+
+// Shared default password for guest login accounts. The email invitation tells
+// the guest to sign in with this password (no password-reset link).
+const DEFAULT_PASSWORD = "vivamexico";
 
 // Force all functions to deploy to us-central1 (the region of the Firestore
 // database). Without this, the CLI defaults to the project's original region
@@ -737,7 +740,7 @@ export const updateGuestEmail = onCall(
           authUser = await getAuth().createUser({
             uid: guestId,
             email: newEmail,
-            password: randomBytes(16).toString("hex"),
+            password: DEFAULT_PASSWORD,
             displayName: guest.identity?.firstName || guest.firstName || guestId,
           });
         } else {
@@ -851,7 +854,7 @@ export const createGuestAuth = onCall(
           authUser = await getAuth().createUser({
             uid: guestId,
             email: newEmail,
-            password: randomBytes(16).toString("hex"),
+            password: DEFAULT_PASSWORD,
             displayName: guest.identity?.firstName || guest.firstName || guestId,
           });
         } else {
@@ -910,9 +913,9 @@ export const createGuestAuth = onCall(
  *
  * The plaintext password is ONLY included for the WhatsApp channel (where the
  * couple sends the link directly and may rely on it). For the email channel we
- * omit it — the email instead carries a Firebase password-reset link so the
- * guest sets their own password (no plaintext password in the URL, which would
- * otherwise be logged in browser history / referrer headers).
+ * omit it — the email instead shows the shared default password inline (no
+ * plaintext password in the URL, which would otherwise be logged in browser
+ * history / referrer headers).
  *
  * @param {object} guest  the guest document
  * @param {string} inviteType  "email" | "whatsapp"
@@ -958,26 +961,21 @@ function escapeHtml(value) {
 /**
  * The three invitation email templates (ES / FR / EN). Each is an HTML body
  * with the couple's message, the invitation link embedded as a real clickable
- * <a href> (so the long URL is hidden behind a "CLIQUE ICI!"-style link), and a
- * password-reset link so the guest can set their own password. The couple's
- * shared Gmail account sends these.
+ * <a href> (so the long URL is hidden behind a "CLIQUE ICI!"-style link), and
+ * the shared default password shown inline. The couple's shared Gmail account
+ * sends these.
  *
  * @param {string} lang  "es" | "fr" | "en"
  * @param {object} guest  the guest document
  * @param {string} inviteUrl  the invitation URL (pre-fills the login email)
  * @param {string} email  the guest's login email
- * @param {string|null} resetLink  Firebase password-reset link (may be null)
  */
-function invitationEmailBody(lang, guest, inviteUrl, email, resetLink) {
+function invitationEmailBody(lang, guest, inviteUrl, email) {
 
   const name = guest.identity?.firstName || guest.firstName || guest.guestId || "";
 
   // Escape the invite URL for safe use inside an href attribute.
   const href = escapeHtml(inviteUrl);
-  // The reset link is the primary way the guest sets their password. If it
-  // could not be generated, fall back to the invitation link so the email
-  // still works (the guest can contact the couple for access).
-  const resetHref = escapeHtml(resetLink || inviteUrl);
 
 
   // The couple's copy. The French text is the reference (STICK TO THE TEXT);
@@ -990,9 +988,7 @@ function invitationEmailBody(lang, guest, inviteUrl, email, resetLink) {
       ctaLabel: "CLIC AQUÍ",
       login: "Tus datos de acceso son:",
       emailLabel: "Correo",
-      setPassword: "Establece tu contraseña aquí:",
-      setPasswordLabel: "ESTABLECER CONTRASEÑA",
-      setPasswordNote: "Elige una contraseña para acceder a tu invitación.",
+      passwordLabel: "Contraseña",
       help: "Si tienes cualquier duda, escríbenos por WhatsApp.",
       helpPhones: "David: +52 33 3201 7504 · Aydé: +52 33 3661 6738",
       signoff: "¡Te esperamos!",
@@ -1004,9 +1000,7 @@ function invitationEmailBody(lang, guest, inviteUrl, email, resetLink) {
       ctaLabel: "CLIQUE ICI",
       login: "Vos identifiants de connexion sont :",
       emailLabel: "E-mail",
-      setPassword: "Définissez votre mot de passe ici :",
-      setPasswordLabel: "DÉFINIR LE MOT DE PASSE",
-      setPasswordNote: "Choisissez un mot de passe pour accéder à votre invitation.",
+      passwordLabel: "Mot de passe",
       help: "Si vous avez la moindre question, écrivez-nous sur WhatsApp.",
       helpPhones: "David : +52 33 3201 7504 · Aydé : +52 33 3661 6738",
       signoff: "À très bientôt !",
@@ -1018,9 +1012,7 @@ function invitationEmailBody(lang, guest, inviteUrl, email, resetLink) {
       ctaLabel: "CLICK HERE",
       login: "Your login details are:",
       emailLabel: "Email",
-      setPassword: "Set your password here:",
-      setPasswordLabel: "SET PASSWORD",
-      setPasswordNote: "Choose a password to access your invitation.",
+      passwordLabel: "Password",
       help: "If you have any questions, message us on WhatsApp.",
       helpPhones: "David: +52 33 3201 7504 · Aydé: +52 33 3661 6738",
       signoff: "See you soon!",
@@ -1061,11 +1053,7 @@ function invitationEmailBody(lang, guest, inviteUrl, email, resetLink) {
               <td style="padding:16px 40px 24px;background:#faf6ee;border-top:1px solid #efe7d6;">
                 <p style="margin:0 0 8px;font-size:13px;color:#8a6a36;">${esc(t.login)}</p>
                 <p style="margin:0 0 4px;font-size:14px;line-height:1.6;">${esc(t.emailLabel)} : ${esc(email)}</p>
-                <p style="margin:0 0 12px;font-size:14px;line-height:1.6;">${esc(t.setPassword)}</p>
-                <p style="margin:0 0 16px;text-align:center;">
-                  <a href="${resetHref}" style="display:inline-block;background:#8a6a36;color:#ffffff;text-decoration:none;font-size:14px;letter-spacing:0.06em;padding:12px 28px;border-radius:8px;">${esc(t.setPasswordLabel)}</a>
-                </p>
-                <p style="margin:0 0 12px;font-size:13px;line-height:1.6;color:#8a6a36;">${esc(t.setPasswordNote)}</p>
+                <p style="margin:0 0 12px;font-size:14px;line-height:1.6;">${esc(t.passwordLabel)} : <strong style="letter-spacing:0.02em;">${esc(DEFAULT_PASSWORD)}</strong></p>
                 <p style="margin:0 0 4px;font-size:14px;line-height:1.6;">${esc(t.help)}</p>
                 <p style="margin:0 0 12px;font-size:14px;line-height:1.6;">
                   <a href="https://wa.me/523332017504" style="color:#1ebe5b;text-decoration:none;">David : +52 33 3201 7504</a>
@@ -1088,18 +1076,18 @@ function invitationEmailBody(lang, guest, inviteUrl, email, resetLink) {
 
 /**
  * Build the plain-text WhatsApp invitation message. It carries the SAME content
- * as the email template (title, body, CTA, login details, password note, help
- * line with both phone numbers, signoff) but adapted for WhatsApp: no HTML, no
- * buttons — just readable plain text with the invitation link pasted inline.
+ * as the email template (title, body, CTA, login details, default password,
+ * help line with both phone numbers, signoff) but adapted for WhatsApp: no
+ * HTML, no buttons — just readable plain text with the invitation link pasted
+ * inline.
  *
  * @param {string} lang  "es" | "fr" | "en"
  * @param {object} guest  the guest document
  * @param {string} inviteUrl  the invitation URL (pre-fills the login email)
  * @param {string} email  the guest's login email
- * @param {string|null} resetLink  Firebase password-reset link (may be null)
  * @returns {string}  the plain-text message body
  */
-function buildWhatsAppMessage(lang, guest, inviteUrl, email, resetLink) {
+function buildWhatsAppMessage(lang, guest, inviteUrl, email) {
 
   const name = guest.identity?.firstName || guest.firstName || guest.guestId || "";
 
@@ -1110,8 +1098,7 @@ function buildWhatsAppMessage(lang, guest, inviteUrl, email, resetLink) {
       cta: "Encuentra toda la información sobre la boda aquí:",
       login: "Tus datos de acceso son:",
       emailLabel: "Correo",
-      setPassword: "Establece tu contraseña aquí:",
-      setPasswordNote: "Elige una contraseña para acceder a tu invitación.",
+      passwordLabel: "Contraseña",
       help: "Si tienes cualquier duda, escríbenos por WhatsApp.",
       helpPhones: "David: +52 33 3201 7504 · Aydé: +52 33 3661 6738",
       signoff: "¡Te esperamos!",
@@ -1122,8 +1109,7 @@ function buildWhatsAppMessage(lang, guest, inviteUrl, email, resetLink) {
       cta: "Vous trouverez toutes les informations sur le mariage ici :",
       login: "Vos identifiants de connexion sont :",
       emailLabel: "E-mail",
-      setPassword: "Définissez votre mot de passe ici :",
-      setPasswordNote: "Choisissez un mot de passe pour accéder à votre invitation.",
+      passwordLabel: "Mot de passe",
       help: "Si vous avez la moindre question, écrivez-nous sur WhatsApp.",
       helpPhones: "David : +52 33 3201 7504 · Aydé : +52 33 3661 6738",
       signoff: "À très bientôt !",
@@ -1134,8 +1120,7 @@ function buildWhatsAppMessage(lang, guest, inviteUrl, email, resetLink) {
       cta: "You'll find all the information about the wedding here:",
       login: "Your login details are:",
       emailLabel: "Email",
-      setPassword: "Set your password here:",
-      setPasswordNote: "Choose a password to access your invitation.",
+      passwordLabel: "Password",
       help: "If you have any questions, message us on WhatsApp.",
       helpPhones: "David: +52 33 3201 7504 · Aydé: +52 33 3661 6738",
       signoff: "See you soon!",
@@ -1143,11 +1128,6 @@ function buildWhatsAppMessage(lang, guest, inviteUrl, email, resetLink) {
   };
 
   const t = copy[lang] || copy.es;
-
-  // The reset link is the primary way the guest sets their password. If it
-  // could not be generated, fall back to the invitation link so the message
-  // still works (the guest can contact the couple for access).
-  const resetHref = resetLink || inviteUrl;
 
   return [
     `${t.title} 🎉`,
@@ -1161,9 +1141,7 @@ function buildWhatsAppMessage(lang, guest, inviteUrl, email, resetLink) {
     ``,
     `${t.login}`,
     `${t.emailLabel}: ${email}`,
-    `${t.setPassword}`,
-    resetHref,
-    t.setPasswordNote,
+    `${t.passwordLabel}: ${DEFAULT_PASSWORD}`,
     ``,
     `${t.help}`,
     t.helpPhones,
@@ -1301,21 +1279,14 @@ export const sendInvitation = onCall(
 
     const lang = guest.lang || guest.identity?.lang || "es";
 
-    // The plaintext password is only included in the URL for the WhatsApp
-    // channel (where the couple sends the link directly). For email we omit it
-    // and instead send a Firebase password-reset link so the guest sets their
-    // own password — no plaintext password is ever emailed or stored.
+    // The invitation URL pre-fills the login email. For WhatsApp the stored
+    // password is also included as a query param; for email it is omitted.
     const inviteUrl = buildInvitationUrl(guest, channel, email, channel === "whatsapp");
     const sentAt = new Date().toISOString();
 
-    // Generate a Firebase password-reset link so the guest can set their own
-    // password. This is used by BOTH channels: the email embeds it as a button,
-    // and the WhatsApp message includes it as a clickable link. If the guest has
-    // no auth account yet, create one with a random password (never shown or
-    // stored) so the reset link works. If we can't generate a link for any
-    // reason, leave it null — the message/email falls back to the invitation
-    // link so it still goes out (the guest can contact the couple).
-    let resetLink = null;
+    // Ensure the guest has a Firebase Auth account with the shared default
+    // password ("vivamexico"). The message/email tells the guest to sign in
+    // with this password, so we keep it in sync here (no password-reset link).
     if (email) {
       try {
         let authUser;
@@ -1326,16 +1297,18 @@ export const sendInvitation = onCall(
             authUser = await getAuth().createUser({
               uid: guestId,
               email,
-              password: randomBytes(16).toString("hex"),
+              password: DEFAULT_PASSWORD,
               displayName: guest.identity?.firstName || guest.firstName || guestId,
             });
           } else {
             throw e;
           }
         }
-        resetLink = await getAuth().generatePasswordResetLink(email);
+        // Enforce the shared default password so the message is accurate.
+        await getAuth().updateUser(authUser.uid, { password: DEFAULT_PASSWORD });
       } catch (e) {
-        // Leave resetLink null — the message/email falls back to the invitation link.
+        // If auth provisioning fails, the message still goes out; the guest can
+        // contact the couple for access.
       }
     }
 
@@ -1351,7 +1324,7 @@ export const sendInvitation = onCall(
       }
       // Normalise the phone to digits only (strip spaces, dashes, +, parens).
       const digits = String(phone).replace(/[^\d]/g, "");
-      const message = buildWhatsAppMessage(lang, guest, inviteUrl, email, resetLink);
+      const message = buildWhatsAppMessage(lang, guest, inviteUrl, email);
       waLink = `https://wa.me/${digits}?text=${encodeURIComponent(message)}`;
     }
 
@@ -1363,7 +1336,7 @@ export const sendInvitation = onCall(
           ? "Your invitation to David & Aydé's wedding"
           : "Tu invitación a la boda de David & Aydé";
 
-      await sendGmail({ to: email, subject, body: invitationEmailBody(lang, guest, inviteUrl, email, resetLink) });
+      await sendGmail({ to: email, subject, body: invitationEmailBody(lang, guest, inviteUrl, email) });
     }
 
 
