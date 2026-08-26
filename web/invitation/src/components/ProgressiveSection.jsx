@@ -2,12 +2,9 @@ import React, { Suspense, useEffect, useRef, useState } from "react";
 
 /**
  * Mount a section's heavy React subtree shortly before it approaches the
- * viewport. The section shell itself always exists, so hash navigation and
- * analytics can still resolve stable section ids immediately after sign-in.
- *
- * `rootMargin` deliberately starts loading well before the guest reaches the
- * section. On browsers without IntersectionObserver we fail open and mount
- * immediately rather than risking missing content.
+ * viewport. Pending shells reserve one viewport of space so all deferred
+ * sections do not collapse onto the same coordinate and accidentally trigger
+ * at once. The stable shell also keeps hash targets available immediately.
  */
 export function ProgressiveSection({ id, children, rootMargin = "1400px 0px" }) {
   const ref = useRef(null);
@@ -35,7 +32,14 @@ export function ProgressiveSection({ id, children, rootMargin = "1400px 0px" }) 
   }, [active, rootMargin]);
 
   return (
-    <section id={id} ref={ref} className="lazy-section" data-progressive-section>
+    <section
+      id={id}
+      ref={ref}
+      className="lazy-section"
+      data-progressive-section
+      data-progressive-state={active ? "active" : "pending"}
+      style={active ? undefined : { minHeight: "100svh" }}
+    >
       {active ? <Suspense fallback={null}>{children}</Suspense> : null}
     </section>
   );
