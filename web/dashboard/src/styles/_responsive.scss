@@ -11,16 +11,22 @@
     align-items: flex-start;
   }
 
-  // On tablet the thin navbar wraps: title on its own line, then the nav row
-  // (tabs + group filter), then the account menu.
+  // On tablet the header wraps into two lines: the title on its own line, and
+  // the nav controls (tabs + group filter) + account menu on the second line.
   .dashboard-header {
     flex-wrap: wrap;
     align-items: center;
+    gap: 0.5rem 1rem;
+  }
+
+  .dashboard-header-title {
+    flex: 1 1 100%;
   }
 
   .dashboard-header-navrow {
-    order: 3;
-    flex-basis: 100%;
+    order: 0;
+    flex: 1 1 auto;
+    justify-content: flex-start;
   }
 }
 
@@ -34,28 +40,25 @@
     flex-direction: column;
   }
 
-  // On mobile the nav row stacks: the tab buttons wrap on their own line and
-  // the group filter dropdown sits below, stretching full-width so it's easy
-  // to tap.
+  // On mobile the header keeps the two-line layout: title on line 1, and all
+  // the UI (tab select + group filter + account menu) on line 2 — the nav
+  // controls stay side by side instead of stacking vertically.
   .dashboard-header-navrow {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5rem;
   }
 
   .dashboard-tabs {
     justify-content: flex-start;
   }
 
-  .dashboard-group-select-trigger {
-    width: 100%;
-    justify-content: space-between;
-  }
-
   .dashboard-group-select-menu {
-    left: 0;
     right: 0;
-    min-width: 0;
+    left: auto;
+    min-width: 14rem;
   }
 
 }

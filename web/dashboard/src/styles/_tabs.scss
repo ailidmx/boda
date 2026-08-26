@@ -143,13 +143,14 @@
   left: 0;
   z-index: 60;
   min-width: 13rem;
-  max-height: 18rem;
+  // Let the menu grow to show ALL sections (no max-height / internal scroll).
+  max-height: none;
   padding: 0.4rem;
   border: 1px solid $border;
   border-radius: 0.5rem;
   background: $card-bg-solid;
   box-shadow: $shadow-modal;
-  overflow-y: auto;
+  overflow-y: visible;
   opacity: 0;
   visibility: hidden;
   transform: translateY(-6px);

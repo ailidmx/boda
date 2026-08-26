@@ -130,6 +130,14 @@ function updateTabSelectTrigger() {
   const label = nav.querySelector(".dashboard-tab-select-trigger-label");
   if (icon) icon.textContent = active.icon;
   if (label) label.textContent = active.label;
+  // Also keep the opened menu's active option (highlight + aria-selected) in
+  // sync, otherwise reopening the dropdown still shows the previously selected
+  // item as "active".
+  nav.querySelectorAll("[data-tab-select-option]").forEach((btn) => {
+    const isActive = btn.dataset.tabSelectOption === activeTab;
+    btn.classList.toggle("is-active", isActive);
+    btn.setAttribute("aria-selected", isActive ? "true" : "false");
+  });
 }
 
 /**
