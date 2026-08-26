@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { lazy, useEffect } from "react";
 import { AppProvider, useApp } from "./context/AppContext.jsx";
 import { RsvpProvider } from "./context/RsvpContext.jsx";
 import { AuthGate } from "./components/AuthGate.jsx";
@@ -6,6 +6,7 @@ import { Nav } from "./components/Nav.jsx";
 import { Countdown } from "./components/Countdown.jsx";
 import { Hero } from "./components/Hero.jsx";
 import { FullLoadGate } from "./components/FullLoadGate.jsx";
+import { ProgressiveSection } from "./components/ProgressiveSection.jsx";
 import { LanguageModal } from "./components/LanguageModal.jsx";
 import { IdentityModal } from "./components/IdentityModal.jsx";
 import { WinampPlayer } from "./components/WinampPlayer.jsx";
@@ -13,76 +14,45 @@ import { useVersionCheck } from "./hooks/useVersionCheck.js";
 import { useClickTracking } from "./hooks/useClickTracking.js";
 import { usePageViewTracking } from "./hooks/usePageViewTracking.js";
 import { trackInvitationVisit } from "./analytics.js";
-import {
-  getInvitationLinkParams,
-  computeTimeToAnswer,
-  normalizeSource,
-} from "./invitation-link.js";
+import { getInvitationLinkParams, computeTimeToAnswer, normalizeSource } from "./invitation-link.js";
 import { guestTravelsByPlane } from "./guest-profiles.js";
 
-// Full-load architecture: every section is imported eagerly and mounted up
-// front. The FullLoadGate preloads all section chunks behind a cinematic
-// Matrix loader, so once the guest is signed in the whole invitation is
-// available instantly and navigation is completely fluid (no lazy chunks
-// fetched while scrolling).
-import { Story } from "./components/Story.jsx";
-import { Venue } from "./components/Venue.jsx";
-import { Weekend, WeekendProgram } from "./components/Weekend.jsx";
-import { Petanque } from "./components/Petanque.jsx";
-import { Accommodation } from "./components/Accommodation.jsx";
-import { Weather } from "./components/Weather.jsx";
-import { Food } from "./components/Food.jsx";
-import { Guisos } from "./components/Guisos.jsx";
-import { Music } from "./components/Music.jsx";
-import { Travel } from "./components/Travel.jsx";
-import { Attire, DressCode } from "./components/Attire.jsx";
-import { Gift } from "./components/Gift.jsx";
-import { Coast } from "./components/Coast.jsx";
-import { RSVP } from "./components/RSVP.jsx";
-import { TeAnimas } from "./components/TeAnimas.jsx";
-import { GuestCloud } from "./components/GuestCloud.jsx";
-import { Photos } from "./components/Photos.jsx";
-import { Thanks } from "./components/Thanks.jsx";
-import { Footer } from "./components/Footer.jsx";
+// Keep the app shell and Hero eager; progressively fetch the long-tail sections
+// before they approach the viewport. Named-export adapters preserve the
+// existing component modules without introducing wrapper files.
+const Story = lazy(() => import("./components/Story.jsx").then((m) => ({ default: m.Story })));
+const Venue = lazy(() => import("./components/Venue.jsx").then((m) => ({ default: m.Venue })));
+const Weekend = lazy(() => import("./components/Weekend.jsx").then((m) => ({ default: m.Weekend })));
+const WeekendProgram = lazy(() => import("./components/Weekend.jsx").then((m) => ({ default: m.WeekendProgram })));
+const Petanque = lazy(() => import("./components/Petanque.jsx").then((m) => ({ default: m.Petanque })));
+const Accommodation = lazy(() => import("./components/Accommodation.jsx").then((m) => ({ default: m.Accommodation })));
+const Weather = lazy(() => import("./components/Weather.jsx").then((m) => ({ default: m.Weather })));
+const Food = lazy(() => import("./components/Food.jsx").then((m) => ({ default: m.Food })));
+const Guisos = lazy(() => import("./components/Guisos.jsx").then((m) => ({ default: m.Guisos })));
+const Music = lazy(() => import("./components/Music.jsx").then((m) => ({ default: m.Music })));
+const Travel = lazy(() => import("./components/Travel.jsx").then((m) => ({ default: m.Travel })));
+const Attire = lazy(() => import("./components/Attire.jsx").then((m) => ({ default: m.Attire })));
+const DressCode = lazy(() => import("./components/Attire.jsx").then((m) => ({ default: m.DressCode })));
+const Gift = lazy(() => import("./components/Gift.jsx").then((m) => ({ default: m.Gift })));
+const Coast = lazy(() => import("./components/Coast.jsx").then((m) => ({ default: m.Coast })));
+const RSVP = lazy(() => import("./components/RSVP.jsx").then((m) => ({ default: m.RSVP })));
+const TeAnimas = lazy(() => import("./components/TeAnimas.jsx").then((m) => ({ default: m.TeAnimas })));
+const GuestCloud = lazy(() => import("./components/GuestCloud.jsx").then((m) => ({ default: m.GuestCloud })));
+const Photos = lazy(() => import("./components/Photos.jsx").then((m) => ({ default: m.Photos })));
+const Thanks = lazy(() => import("./components/Thanks.jsx").then((m) => ({ default: m.Thanks })));
+const Footer = lazy(() => import("./components/Footer.jsx").then((m) => ({ default: m.Footer })));
 
 function Invitation() {
   const { authState, profile } = useApp();
-
-  // The FLIGHTS ("Je viens de loin") section is only relevant for guests who
-  // travel by plane. When the signed-in guest does NOT travel by plane, the
-  // section is hidden entirely: it is removed from the DOM, from the nav menu,
-  // and from the "next section" bottom links.
-  //
-  // The guest's travel status is stored on the guest doc as the boolean
-  // `travelsByPlane` (true = flies in). See guestTravelsByPlane().
   const travelsByPlane = guestTravelsByPlane(profile?.guest);
 
-  // Force guests onto the latest deployed version: periodically compare the
-  // running build number against the deployed version.json and hard-reload if
-  // a newer release has shipped. Runs for all auth states.
   useVersionCheck();
-
-  // Log every click to Analytics (delegated listener). Runs for all auth
-  // states so we also capture clicks on the sign-in gate.
   useClickTracking();
-
-  // Treat every section view as a page view (Analytics `page_view` + a
-  // Firestore `page_views` record per guest). Only meaningful once signed in,
-  // when the sections are rendered.
   usePageViewTracking({ guestId: profile?.guest?.id });
 
-  // Log an `invitation_visit` event once per page load when the guest arrived
-  // via an invitation link carrying the analytics query params (guest email,
-  // UTM source/medium/campaign, sent_at). This lets us measure which channel
-  // (email / WhatsApp / other) drives logins and how quickly guests answer
-  // after the invitation is sent. Fires for ALL auth states (a guest arriving
-  // via a link is tracked even before they sign in). The params were captured
-  // eagerly in `main.jsx` before the URL was cleaned, so they survive here.
   useEffect(() => {
     const params = getInvitationLinkParams();
-    if (!params.guest && !params.source && !params.medium && !params.campaign) {
-      return; // not an invitation-link visit — nothing to track
-    }
+    if (!params.guest && !params.source && !params.medium && !params.campaign) return;
     trackInvitationVisit({
       guest: params.guest,
       source: normalizeSource(params.source),
@@ -92,28 +62,14 @@ function Invitation() {
     });
   }, []);
 
-  // On first load (direct visit, refresh, or a shared link with a hash like
-  // `#thanks`), clear any hash from the URL. The sections are gated behind
-  // sign-in, so the browser cannot scroll to a hash target that does not exist
-  // yet — leaving it in place can crash or leave the page stuck mid-scroll.
-  // Redirecting to the root (no hash) lets the app boot normally.
   useEffect(() => {
     if (window.location.hash) {
-      window.history.replaceState(
-        null,
-        "",
-        window.location.pathname + window.location.search,
-      );
+      window.history.replaceState(null, "", window.location.pathname + window.location.search);
     }
   }, []);
 
-  if (authState === "loading") {
-    return <div className="app-loading" aria-label="Loading" />;
-  }
-
-  if (authState === "signedOut") {
-    return <AuthGate />;
-  }
+  if (authState === "loading") return <div className="app-loading" aria-label="Loading" />;
+  if (authState === "signedOut") return <AuthGate />;
 
   return (
     <FullLoadGate>
@@ -125,86 +81,28 @@ function Invitation() {
 
       <main>
         <Hero />
-        <section id="story" className="lazy-section">
-          <Story />
-        </section>
-
-        <section id="venue" className="lazy-section">
-          <Venue />
-        </section>
-        <section id="weekend" className="lazy-section">
-          <Weekend />
-        </section>
-        <section id="attire" className="lazy-section">
-          <Attire />
-        </section>
-        <section id="dress-code" className="lazy-section">
-          <DressCode />
-        </section>
-        <section id="weather" className="lazy-section">
-          <Weather />
-        </section>
-        <section id="weekend-program" className="lazy-section">
-          <WeekendProgram />
-        </section>
-        {/* "Vous vous lancez ?" — placed right after the programme. */}
-        <section id="te-animas" className="lazy-section">
-          <TeAnimas />
-        </section>
-        {/* "Je viens de loin" — placed right after the programme. Only shown
-            for guests who travel by plane (see travelsByPlane above). */}
-        {travelsByPlane && (
-          <section id="travel" className="lazy-section">
-            <Travel />
-          </section>
-        )}
-
-        <section id="accommodation" className="lazy-section">
-          <Accommodation />
-        </section>
-        <section id="petanque" className="lazy-section">
-          <Petanque />
-        </section>
-        <section id="food" className="lazy-section">
-          <Food />
-        </section>
-        {/* "¿Qué guisos?" — menu vote, placed right after the food section. */}
-        <section id="guisos" className="lazy-section">
-          <Guisos />
-        </section>
-        {/* The Music section renders the live-music lineup, the "Pide tu
-            canción" song-request subsection, the playlists and the genre
-            survey ("your tastes") in that order. */}
-        <section id="music" className="lazy-section">
-          <Music />
-        </section>
-        <section id="coast" className="lazy-section">
-          <Coast />
-        </section>
-        {/* The final RSVP form sits right before the INVITES section. */}
-        <section id="rsvp" className="lazy-section">
-          <RSVP />
-        </section>
-
-        {/* "Cadeaux" (gift) sits right after the RSVP and before the
-            thank-you section. */}
-        <section id="gift" className="lazy-section">
-          <Gift />
-        </section>
-        <section id="photos" className="lazy-section">
-          <Photos />
-        </section>
-        <section id="guests" className="lazy-section">
-          <GuestCloud />
-        </section>
-        <section id="thanks" className="lazy-section">
-          <Thanks />
-        </section>
+        <ProgressiveSection id="story"><Story /></ProgressiveSection>
+        <ProgressiveSection id="venue"><Venue /></ProgressiveSection>
+        <ProgressiveSection id="weekend"><Weekend /></ProgressiveSection>
+        <ProgressiveSection id="attire"><Attire /></ProgressiveSection>
+        <ProgressiveSection id="dress-code"><DressCode /></ProgressiveSection>
+        <ProgressiveSection id="weather"><Weather /></ProgressiveSection>
+        <ProgressiveSection id="weekend-program"><WeekendProgram /></ProgressiveSection>
+        <ProgressiveSection id="te-animas"><TeAnimas /></ProgressiveSection>
+        {travelsByPlane && <ProgressiveSection id="travel"><Travel /></ProgressiveSection>}
+        <ProgressiveSection id="accommodation"><Accommodation /></ProgressiveSection>
+        <ProgressiveSection id="petanque"><Petanque /></ProgressiveSection>
+        <ProgressiveSection id="food"><Food /></ProgressiveSection>
+        <ProgressiveSection id="guisos"><Guisos /></ProgressiveSection>
+        <ProgressiveSection id="music"><Music /></ProgressiveSection>
+        <ProgressiveSection id="coast"><Coast /></ProgressiveSection>
+        <ProgressiveSection id="rsvp"><RSVP /></ProgressiveSection>
+        <ProgressiveSection id="gift"><Gift /></ProgressiveSection>
+        <ProgressiveSection id="photos"><Photos /></ProgressiveSection>
+        <ProgressiveSection id="guests"><GuestCloud /></ProgressiveSection>
+        <ProgressiveSection id="thanks"><Thanks /></ProgressiveSection>
       </main>
-
-      <section id="footer" className="lazy-section">
-        <Footer />
-      </section>
+      <ProgressiveSection id="footer"><Footer /></ProgressiveSection>
     </FullLoadGate>
   );
 }
@@ -212,9 +110,7 @@ function Invitation() {
 export function App() {
   return (
     <AppProvider>
-      <RsvpProvider>
-        <Invitation />
-      </RsvpProvider>
+      <RsvpProvider><Invitation /></RsvpProvider>
     </AppProvider>
   );
 }
