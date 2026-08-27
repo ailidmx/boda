@@ -197,11 +197,27 @@
 }
 
 .guisos-card .star-vote__star {
-  color: rgb(36 33 25 / 40%);
+  color: rgb(36 33 25 / 48%);
+}
+
+/* Empty (not-yet-achieved) stars render as clear outlined slots; filled stars
+   are solid gold. So before voting there are 5 outlined slots, and after a
+   partial vote (e.g. 4/5) the remaining un-voted slot stays outlined. */
+.guisos-card .star-vote__star svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
 }
 
 .guisos-card .star-vote__star.is-filled {
   color: var(--marigold);
+}
+
+.guisos-card .star-vote__star.is-filled svg {
+  fill: currentColor;
+  stroke: none;
 }
 
 /* Anchor subsection — a "continue" link that scrolls to the reorder panel.
