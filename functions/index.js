@@ -85,11 +85,14 @@ async function notify(text) {
   });
 }
 
-// True when a document was written by a local dev client (which stamps its
-// `sourceHost` field on analytics/data writes). We skip Telegram notifications
-// for these so localhost testing never spams the couple.
-function isLocalhostSource(data) {
-  return data?.sourceHost === "localhost" || data?.sourceHost === "127.0.0.1";
+// True only when THIS write carries a new localhost marker. The marker is
+// unique per client write, so a later dashboard/server update that preserves
+// the old field is never mistaken for local activity.
+function isCurrentLocalWrite(before, after) {
+  const marker = after?.sourceHost;
+  const isLocal = typeof marker === "string"
+    && (marker.startsWith("localhost#") || marker.startsWith("127.0.0.1#"));
+  return isLocal && marker !== before?.sourceHost;
 }
 
 // ── Helpers ────────────────────────────────────────────────────────────────
@@ -384,7 +387,7 @@ export const onCardVote = onDocumentCreated(
   async (event) => {
 
     const data = event.data?.data() || {};
-    if (isLocalhostSource(data)) return;
+    if (isCurrentLocalWrite(null, data)) return;
     const guestId = data.guestId || "";
     const name = await resolveGuestName(guestId);
     const time = formatTime(data.updatedAt);
@@ -415,8 +418,9 @@ export const onGuisoRanking = onDocumentWritten(
 
   async (event) => {
 
+    const before = event.data?.before?.data() || {};
     const data = event.data?.after?.data() || {};
-    if (isLocalhostSource(data)) return;
+    if (isCurrentLocalWrite(before, data)) return;
     const guestId = event.params.guestId || data.guestId || "";
     const name = await resolveGuestName(guestId);
     const time = formatTime(data.updatedAt);
@@ -449,7 +453,7 @@ export const onSongRequest = onDocumentCreated(
   async (event) => {
 
     const data = event.data?.data() || {};
-    if (isLocalhostSource(data)) return;
+    if (isCurrentLocalWrite(null, data)) return;
     const guestId = data.guestId || "";
     const name = (await resolveGuestName(guestId)) || guestId;
     const time = formatTime(data.createdAt || data.timestamp);
@@ -493,8 +497,9 @@ export const onGenreRating = onDocumentWritten(
 
   async (event) => {
 
+    const before = event.data?.before?.data() || {};
     const data = event.data?.after?.data() || {};
-    if (isLocalhostSource(data)) return;
+    if (isCurrentLocalWrite(before, data)) return;
     const guestId = data.guestId || "";
     const name = (await resolveGuestName(guestId)) || guestId;
     const time = formatTime(data.updatedAt || data.timestamp);
@@ -526,7 +531,7 @@ export const onGuestUpdated = onDocumentUpdated(
 
     const before = event.data?.before?.data() || {};
     const after = event.data?.after?.data() || {};
-    if (isLocalhostSource(after)) return;
+    if (isCurrentLocalWrite(before, after)) return;
     const guestId = event.params.guestId || "";
     const name = await resolveGuestName(guestId);
 
@@ -1442,6 +1447,5 @@ export const analyticsDigest = onSchedule(
     await notify(lines.join("\n"));
   },
 );
-
 
 

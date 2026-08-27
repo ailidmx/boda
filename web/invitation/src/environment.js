@@ -7,8 +7,16 @@ export function isLocalHost() {
   return host === "localhost" || host === "127.0.0.1";
 }
 
-/** The current origin hostname (e.g. "localhost" or the prod domain). */
+/** Production hostname, or a unique per-write marker when running locally. */
 export function sourceHost() {
   if (typeof window === "undefined") return "";
-  return window.location.hostname;
+  const host = window.location.hostname;
+  if (host !== "localhost" && host !== "127.0.0.1") return host;
+
+  // A unique marker lets Cloud Functions identify the CURRENT local write.
+  // Comparing only a persistent `sourceHost: "localhost"` value would silence
+  // a later legitimate dashboard update to the same document.
+  const writeId = globalThis.crypto?.randomUUID?.()
+    || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  return `${host}#${writeId}`;
 }

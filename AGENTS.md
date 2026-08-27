@@ -1117,7 +1117,12 @@ npm run test:rules  # Firestore rules tests (uses emulators)
 - **Localhost (dev) never sends analytics or Telegram notifications** — the
   invitation suppresses all analytics + notification-triggering writes when
   `window.location.hostname` is `localhost`/`127.0.0.1` (helpers
-  `isLocalHost()`/`sourceHost()` in `web/invitation/src/environment.js`).
+  `isLocalHost()`/`sourceHost()` in `web/invitation/src/environment.js`). Local
+  `sourceHost` values include a unique per-write suffix (for example
+  `localhost#<uuid>`), and Cloud Functions suppress a notification only when
+  that marker changed in the current write. Never suppress solely because a
+  document retains an old localhost marker: a later dashboard/server update
+  must still notify normally.
   Firebase Analytics is disabled via `analytics.js` `isEnabled()`, and the
   analytics collections (`login_events`, `activity_events`, `page_views`) are
   skipped at their write sites (`AppContext.jsx` sign-in, `useActivityTracker`,
@@ -1466,7 +1471,6 @@ directly to `master` and push.
   `sizeIdentityToContent()`.
 
 *(Add new spatial-editor lessons here as you discover them.)*
-
 
 
 
