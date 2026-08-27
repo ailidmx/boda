@@ -16,6 +16,7 @@
 import { doc, serverTimestamp, setDoc } from "firebase/firestore";
 
 import { db } from "./firebase.js";
+import { sourceHost } from "./environment.js";
 import { collections } from "../../shared/firestore-paths.js";
 import { buildGuestFlightInfoPayload } from "../../shared/payload-builders.js";
 import { validateGuestContactPayload } from "../../shared/validation.js";
@@ -79,6 +80,8 @@ export async function saveFlightInfo({
   if (!result.valid) {
     throw new Error(`Invalid flight info payload: ${result.errors.join("; ")}`);
   }
+
+  next.sourceHost = sourceHost();
 
   logDb("write:start", {
     collection: collections.guests,

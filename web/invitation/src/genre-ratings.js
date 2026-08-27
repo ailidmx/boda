@@ -24,6 +24,7 @@ import {
 } from "firebase/firestore";
 
 import { db } from "./firebase.js";
+import { sourceHost } from "./environment.js";
 import { collections } from "../../shared/firestore-paths.js";
 import { buildGenreRatingPayload } from "../../shared/payload-builders.js";
 import { validateGenreRatingPayload } from "../../shared/validation.js";
@@ -258,6 +259,8 @@ export async function saveGenreRating({ genreId, genreName, guestId, rating }) {
   if (!result.valid) {
     throw new Error(`Invalid genre rating payload: ${result.errors.join("; ")}`);
   }
+
+  next.sourceHost = sourceHost();
 
   logDb("write:start", {
     collection: collections.genreRatings,

@@ -1,5 +1,6 @@
 import { analytics } from "./firebase.js";
 import { logEvent } from "firebase/analytics";
+import { isLocalHost } from "./environment.js";
 
 /**
  * analytics.js — thin, safe wrapper around Firebase Analytics.
@@ -15,7 +16,7 @@ import { logEvent } from "firebase/analytics";
  * always safe.
  */
 
-const isEnabled = () => typeof analytics !== "undefined" && analytics !== null;
+const isEnabled = () => !isLocalHost() && typeof analytics !== "undefined" && analytics !== null;
 
 /**
  * Log a raw Analytics event with params. Safe no-op when Analytics is off.

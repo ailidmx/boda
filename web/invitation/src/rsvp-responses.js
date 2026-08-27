@@ -18,6 +18,7 @@
 import { doc, setDoc, serverTimestamp } from "firebase/firestore";
 
 import { db } from "./firebase.js";
+import { sourceHost } from "./environment.js";
 import { collections } from "../../shared/firestore-paths.js";
 import { getGroupMembers, resolveLiveGuest } from "./guest-profiles.js";
 
@@ -167,6 +168,8 @@ export async function saveRsvpAnswers(guest, answers, editorGuestId) {
     throw new Error(`Invalid RSVP payload: ${result.errors.join("; ")}`);
   }
 
+  next.sourceHost = sourceHost();
+
   logDb("write:start", { collection: collections.guests, docId: guest.id, op: "setDoc", merge: true, payload: next });
   try {
     await setDoc(ref, next, { merge: true });
@@ -218,6 +221,8 @@ export async function savePaymentConfirmed(guest, editorGuestId) {
       if (!result.valid) {
         throw new Error(`Invalid payment-confirmation payload: ${result.errors.join("; ")}`);
       }
+
+      next.sourceHost = sourceHost();
 
       logDb("write:start", { collection: collections.guests, docId: member.id, op: "setDoc", merge: true, payload: next });
       try {

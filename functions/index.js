@@ -85,6 +85,13 @@ async function notify(text) {
   });
 }
 
+// True when a document was written by a local dev client (which stamps its
+// `sourceHost` field on analytics/data writes). We skip Telegram notifications
+// for these so localhost testing never spams the couple.
+function isLocalhostSource(data) {
+  return data?.sourceHost === "localhost" || data?.sourceHost === "127.0.0.1";
+}
+
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 // The couple is in Mexico City. Cloud Functions run in UTC by default, so we
@@ -377,6 +384,7 @@ export const onCardVote = onDocumentCreated(
   async (event) => {
 
     const data = event.data?.data() || {};
+    if (isLocalhostSource(data)) return;
     const guestId = data.guestId || "";
     const name = await resolveGuestName(guestId);
     const time = formatTime(data.updatedAt);
@@ -408,6 +416,7 @@ export const onGuisoRanking = onDocumentWritten(
   async (event) => {
 
     const data = event.data?.after?.data() || {};
+    if (isLocalhostSource(data)) return;
     const guestId = event.params.guestId || data.guestId || "";
     const name = await resolveGuestName(guestId);
     const time = formatTime(data.updatedAt);
@@ -440,6 +449,7 @@ export const onSongRequest = onDocumentCreated(
   async (event) => {
 
     const data = event.data?.data() || {};
+    if (isLocalhostSource(data)) return;
     const guestId = data.guestId || "";
     const name = (await resolveGuestName(guestId)) || guestId;
     const time = formatTime(data.createdAt || data.timestamp);
@@ -484,6 +494,7 @@ export const onGenreRating = onDocumentWritten(
   async (event) => {
 
     const data = event.data?.after?.data() || {};
+    if (isLocalhostSource(data)) return;
     const guestId = data.guestId || "";
     const name = (await resolveGuestName(guestId)) || guestId;
     const time = formatTime(data.updatedAt || data.timestamp);
@@ -515,6 +526,7 @@ export const onGuestUpdated = onDocumentUpdated(
 
     const before = event.data?.before?.data() || {};
     const after = event.data?.after?.data() || {};
+    if (isLocalhostSource(after)) return;
     const guestId = event.params.guestId || "";
     const name = await resolveGuestName(guestId);
 
