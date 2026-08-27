@@ -1114,6 +1114,27 @@ npm run test:rules  # Firestore rules tests (uses emulators)
   `pre-tables-guestids-2026-08-16T15-35-11-541Z` backup using dot-notation updates.
   When writing any script that touches a nested Firestore map, prefer dot-notation
   and always run a dry-run + verify a sample before `--execute`.
+- **Localhost (dev) never sends analytics or Telegram notifications** — the
+  invitation suppresses all analytics + notification-triggering writes when
+  `window.location.hostname` is `localhost`/`127.0.0.1` (helpers
+  `isLocalHost()`/`sourceHost()` in `web/invitation/src/environment.js`). Local
+  `sourceHost` values include a unique per-write suffix (for example
+  `localhost#<uuid>`), and Cloud Functions suppress a notification only when
+  that marker changed in the current write. Never suppress solely because a
+  document retains an old localhost marker: a later dashboard/server update
+  must still notify normally.
+  Firebase Analytics is disabled via `analytics.js` `isEnabled()`, and the
+  analytics collections (`login_events`, `activity_events`, `page_views`) are
+  skipped at their write sites (`AppContext.jsx` sign-in, `useActivityTracker`,
+  `usePageViewTracking`). For the DATA collections that must stay writable for
+  local testing (`guests`, `song_requests`, `genre_ratings`, `guiso_rankings`),
+  the client stamps `sourceHost` onto the payload AFTER client-side validation
+  (the Firestore rules are the SIMPLE `canWrite()` model, so NO rules/validation
+  field-list changes are needed), and the Cloud Functions `onGuestUpdated`,
+  `onSongRequest`, `onGenreRating`, `onGuisoRanking` bail out early via
+  `isLocalhostSource()`. When adding a new guest-facing write that should be
+  suppressed locally, stamp `sourceHost` after validation and check it in the
+  matching trigger — never edit the SIMPLE rules for a single diagnostic field.
 - *(Add new lessons here as you discover them.)*
 
 
@@ -1450,7 +1471,6 @@ directly to `master` and push.
   `sizeIdentityToContent()`.
 
 *(Add new spatial-editor lessons here as you discover them.)*
-
 
 
 

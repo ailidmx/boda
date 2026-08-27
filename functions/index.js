@@ -85,6 +85,16 @@ async function notify(text) {
   });
 }
 
+// True only when THIS write carries a new localhost marker. The marker is
+// unique per client write, so a later dashboard/server update that preserves
+// the old field is never mistaken for local activity.
+function isCurrentLocalWrite(before, after) {
+  const marker = after?.sourceHost;
+  const isLocal = typeof marker === "string"
+    && (marker.startsWith("localhost#") || marker.startsWith("127.0.0.1#"));
+  return isLocal && marker !== before?.sourceHost;
+}
+
 // ── Helpers ────────────────────────────────────────────────────────────────
 
 // The couple is in Mexico City. Cloud Functions run in UTC by default, so we
@@ -377,6 +387,7 @@ export const onCardVote = onDocumentCreated(
   async (event) => {
 
     const data = event.data?.data() || {};
+    if (isCurrentLocalWrite(null, data)) return;
     const guestId = data.guestId || "";
     const name = await resolveGuestName(guestId);
     const time = formatTime(data.updatedAt);
@@ -407,7 +418,9 @@ export const onGuisoRanking = onDocumentWritten(
 
   async (event) => {
 
+    const before = event.data?.before?.data() || {};
     const data = event.data?.after?.data() || {};
+    if (isCurrentLocalWrite(before, data)) return;
     const guestId = event.params.guestId || data.guestId || "";
     const name = await resolveGuestName(guestId);
     const time = formatTime(data.updatedAt);
@@ -440,6 +453,7 @@ export const onSongRequest = onDocumentCreated(
   async (event) => {
 
     const data = event.data?.data() || {};
+    if (isCurrentLocalWrite(null, data)) return;
     const guestId = data.guestId || "";
     const name = (await resolveGuestName(guestId)) || guestId;
     const time = formatTime(data.createdAt || data.timestamp);
@@ -483,7 +497,9 @@ export const onGenreRating = onDocumentWritten(
 
   async (event) => {
 
+    const before = event.data?.before?.data() || {};
     const data = event.data?.after?.data() || {};
+    if (isCurrentLocalWrite(before, data)) return;
     const guestId = data.guestId || "";
     const name = (await resolveGuestName(guestId)) || guestId;
     const time = formatTime(data.updatedAt || data.timestamp);
@@ -515,6 +531,7 @@ export const onGuestUpdated = onDocumentUpdated(
 
     const before = event.data?.before?.data() || {};
     const after = event.data?.after?.data() || {};
+    if (isCurrentLocalWrite(before, after)) return;
     const guestId = event.params.guestId || "";
     const name = await resolveGuestName(guestId);
 
@@ -1430,6 +1447,5 @@ export const analyticsDigest = onSchedule(
     await notify(lines.join("\n"));
   },
 );
-
 
 

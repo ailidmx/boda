@@ -616,6 +616,38 @@
   background: var(--ink);
 }
 
+/* Install-to-home-screen help shown inline in the user dropdown. */
+.user-menu__install-help {
+  margin: 0.5rem 0.75rem 0.75rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 0.5rem;
+  background: rgb(255 255 255 / 8%);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.user-menu__install-help strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--marigold);
+}
+
+.user-menu__install-help p {
+  margin: 0 0 0.5rem;
+}
+
+.user-menu__install-help button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: rgb(255 255 255 / 70%);
+  font: inherit;
+  font-size: 0.72rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 /* Language section inside the user dropdown. */
 
 .user-menu__section {
@@ -897,18 +929,25 @@
 
 
 .about-modal__subtitle {
+  width: 100%;
   max-width: 34rem;
+  min-width: 0;
   margin: 0 auto 1.1rem;
+  box-sizing: border-box;
   color: rgb(255 255 255 / 82%);
   font-size: 0.82rem;
-  line-height: 1.45;
+  line-height: 1.5;
   text-align: center;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
+  white-space: normal;
 }
 
 
 .about-modal__list {
   display: grid;
+  flex: 1 1 auto;
+  min-height: 0;
   gap: 0.55rem;
   margin: 0;
   padding: 0.15rem 0.4rem 0.4rem;
@@ -964,6 +1003,7 @@
 
 
 .about-modal__actions {
+  flex: 0 0 auto;
   display: flex;
   justify-content: flex-end;
   gap: 0.55rem;

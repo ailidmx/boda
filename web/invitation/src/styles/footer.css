@@ -38,6 +38,62 @@
   color: rgb(255 255 255 / 55%);
 }
 
+/* Install-to-home-screen control — a compact pill button plus an inline
+   disclosure with iOS / generic instructions (see InstallApp.jsx). */
+.install-app {
+  position: relative;
+  width: min(100%, 42rem);
+  margin: 0 auto 2.25rem;
+}
+
+.install-app__button {
+  min-height: 48px;
+  padding: 0.8rem 1.2rem;
+  border: 1px solid rgb(228 185 104 / 65%);
+  border-radius: 999px;
+  background: transparent;
+  color: #e4b968;
+  font: 600 0.95rem/1 var(--font-body, inherit);
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.install-app__button:focus-visible {
+  outline: 3px solid rgb(228 185 104 / 45%);
+  outline-offset: 4px;
+}
+
+.install-app__help {
+  margin: 1rem auto 0;
+  padding: 1rem 1.1rem;
+  max-width: 32rem;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 1rem;
+  background: rgb(255 255 255 / 8%);
+  text-align: left;
+  font-family: var(--font-body, inherit);
+}
+
+.install-app__help strong {
+  color: #e4b968;
+}
+
+.install-app__help p {
+  margin: 0.55rem 0 0.8rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.install-app__help button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: rgb(255 255 255 / 70%);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 /* Footer meta — a single elegant line joining the tagline, date/venue and
    privacy note with small dot separators. On desktop it stays on one line
    with a small, refined font; on narrow screens it wraps gracefully. */
@@ -79,5 +135,3 @@
   letter-spacing: 0.04em;
   line-height: 1.4;
 }
-
-

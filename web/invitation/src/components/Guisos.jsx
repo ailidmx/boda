@@ -348,31 +348,33 @@ export function Guisos() {
         <SwipeCardCarousel className="guisos-grid" label={guisos.flavoursTitle}>
           {dishes.map((dish, index) => (
             <article className="flavour-card guisos-card reveal" key={index}>
-              {dish.cloudinaryId ? (
-                <button
-                  type="button"
-                  className="flavour-card__media guisos-card__photo"
-                  aria-label={`${guisos.openPhoto || "Ver foto"}: ${dish.name}`}
-                  onClick={() => setLightbox({ startIndex: index })}
-                >
-                  <img
-                    src={cloudinaryImage(`boda/${dish.cloudinaryId}`)}
-                    alt={dish.name}
-                    loading="lazy"
-                    decoding="async"
+              <div className="guisos-card__media">
+                {dish.cloudinaryId ? (
+                  <button
+                    type="button"
+                    className="guisos-card__photo"
+                    aria-label={`${guisos.openPhoto || "Ver foto"}: ${dish.name}`}
+                    onClick={() => setLightbox({ startIndex: index })}
+                  >
+                    <img
+                      src={cloudinaryImage(`boda/${dish.cloudinaryId}`)}
+                      alt={dish.name}
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </button>
+                ) : (
+                  <div
+                    className="guisos-card__photo guisos-card__photo--placeholder"
+                    aria-hidden="true"
                   />
-                </button>
-              ) : (
-
-                <div className="flavour-card__illustration" aria-hidden="true">
-                  <span>{guisos.flavourPlaceholder}</span>
-                </div>
-              )}
-              <div className="guisos-card__body">
-                <h3>{dish.name}</h3>
-                <p>{dish.note}</p>
+                )}
+                <h3 className="guisos-card__title">{dish.name}</h3>
               </div>
-              <StarVote cardType="guiso" cardKey={dish.name} onVote={handleVote} />
+              <div className="guisos-card__body">
+                {dish.note && <p>{dish.note}</p>}
+                <StarVote cardType="guiso" cardKey={dish.name} onVote={handleVote} />
+              </div>
             </article>
           ))}
 

@@ -22,6 +22,7 @@ import {
 
 
 import { db } from "./firebase.js";
+import { sourceHost } from "./environment.js";
 import { collections } from "../../shared/firestore-paths.js";
 import { buildSongRequestPayload } from "../../shared/payload-builders.js";
 import { validateSongRequestPayload } from "../../shared/validation.js";
@@ -104,6 +105,8 @@ export async function saveSongRequest({ guestId, song, intent, bandType, songMet
   if (!result.valid) {
     throw new Error(`Invalid song request payload: ${result.errors.join("; ")}`);
   }
+
+  next.sourceHost = sourceHost();
 
   logDb("write:start", {
     collection: collections.songRequests,
@@ -206,6 +209,8 @@ export async function updateSongRequest({ requestId, guestId, song, intent, band
   if (!result.valid) {
     throw new Error(`Invalid song request payload: ${result.errors.join("; ")}`);
   }
+
+  next.sourceHost = sourceHost();
 
   logDb("write:start", {
     collection: collections.songRequests,

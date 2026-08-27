@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 
 import { useApp } from "../../context/AppContext.jsx";
+import { useInstallPrompt } from "../../hooks/useInstallPrompt.js";
 import { LANGUAGE_FLAGS, LANGUAGE_FLAGS_ONLY } from "../../components/ui.jsx";
 import { AboutModal } from "../../components/AboutModal.jsx";
 
@@ -26,6 +27,7 @@ export function UserMenu() {
   } = useApp();
   const nav = t.nav || {};
   const identity = t.identity || {};
+  const installText = (t.footer && t.footer.installApp) || {};
 
   const [open, setOpen] = useState(false);
   const [accountModal, setAccountModal] = useState(null); // null | "email" | "password"
@@ -38,6 +40,7 @@ export function UserMenu() {
   const [modalStatus, setModalStatus] = useState(null); // { type, text }
   const [busy, setBusy] = useState(false);
   const menuRef = useRef(null);
+  const installApp = useInstallPrompt();
 
   const guest = profile?.guest;
   const isAdmin = guest?.isAdmin === true;
@@ -218,6 +221,26 @@ export function UserMenu() {
       {open && (
         <div className="user-menu__dropdown">
           <>
+            {!installApp.installed && (
+              <button
+                className="user-menu__item"
+                type="button"
+                data-analytics="menu.install"
+                onClick={installApp.promptInstall}
+              >
+                <span className="user-menu__item-icon" aria-hidden="true">⬇</span>
+                {installText.install}
+              </button>
+            )}
+            {!installApp.installed && installApp.showHelp && (
+              <div className="user-menu__install-help">
+                <strong>{installText.title}</strong>
+                <p>{installApp.isIOS ? installText.ios : installText.fallback}</p>
+                <button type="button" onClick={() => installApp.setShowHelp(false)}>
+                  {installText.close}
+                </button>
+              </div>
+            )}
             <div
               className="user-menu__section"
               role="group"

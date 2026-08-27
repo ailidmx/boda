@@ -21,6 +21,7 @@ import {
 } from "firebase/firestore";
 
 import { db } from "./firebase.js";
+import { sourceHost } from "./environment.js";
 import { collections } from "../../shared/firestore-paths.js";
 import { buildGuisoRankingPayload } from "../../shared/payload-builders.js";
 import { validateGuisoRankingPayload } from "../../shared/validation.js";
@@ -139,6 +140,8 @@ export async function saveGuisoRanking({ guestId, ranking, selected }) {
   if (!result.valid) {
     throw new Error(`Invalid guiso ranking payload: ${result.errors.join("; ")}`);
   }
+
+  next.sourceHost = sourceHost();
 
   logDb("write:start", {
     collection: collections.guisoRankings,

@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase.js";
 import { trackPageView } from "../analytics.js";
+import { isLocalHost } from "../environment.js";
 
 /**
  * Custom event dispatched by the navigation (Nav.jsx) whenever a nav link is
@@ -93,7 +94,7 @@ export function usePageViewTracking({ guestId } = {}) {
       });
 
       // Persist for per-user analysis (best-effort).
-      if (guestId) {
+      if (guestId && !isLocalHost()) {
         addDoc(collection(db, "page_views"), {
           guestId,
           sectionId,

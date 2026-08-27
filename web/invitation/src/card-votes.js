@@ -21,6 +21,7 @@ import {
 } from "firebase/firestore";
 
 import { db } from "./firebase.js";
+import { sourceHost } from "./environment.js";
 import { collections } from "../../shared/firestore-paths.js";
 import { buildCardVotePayload } from "../../shared/payload-builders.js";
 import { validateCardVotePayload } from "../../shared/validation.js";
@@ -274,6 +275,8 @@ export async function saveCardVote({ cardType, cardKey, guestId, rating }) {
   if (!result.valid) {
     throw new Error(`Invalid card vote payload: ${result.errors.join("; ")}`);
   }
+
+  next.sourceHost = sourceHost();
 
   logDb("write:start", {
     collection: collections.cardVotes,

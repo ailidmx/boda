@@ -26,6 +26,7 @@
 import { collection, doc, getDoc, getDocs, onSnapshot, query, setDoc, serverTimestamp, where } from "firebase/firestore";
 
 import { db } from "./firebase.js";
+import { sourceHost } from "./environment.js";
 import { collections } from "../../shared/firestore-paths.js";
 import {
   buildGuestNamePayload,
@@ -420,6 +421,8 @@ export async function saveGuestName(guest, name, editorGuestId) {
     throw new Error(`Invalid guest name payload: ${result.errors.join("; ")}`);
   }
 
+  next.sourceHost = sourceHost();
+
   logDb("write:start", { collection: collections.guests, docId: guest.id, op: "setDoc", merge: true, payload: next });
   try {
     await setDoc(ref, next, { merge: true });
@@ -459,6 +462,8 @@ export async function saveGuestPhoto(guest, cloudinaryId, editorGuestId) {
   if (!result.valid) {
     throw new Error(`Invalid guest photo payload: ${result.errors.join("; ")}`);
   }
+
+  next.sourceHost = sourceHost();
 
   logDb("write:start", { collection: collections.guests, docId: guest.id, op: "setDoc", merge: true, payload: next });
   try {
@@ -504,6 +509,8 @@ export async function saveGuestContact(guest, contact, editorGuestId) {
     throw new Error(`Invalid guest contact payload: ${result.errors.join("; ")}`);
   }
 
+  next.sourceHost = sourceHost();
+
   logDb("write:start", { collection: collections.guests, docId: guest.id, op: "setDoc", merge: true, payload: next });
   try {
     await setDoc(ref, next, { merge: true });
@@ -545,6 +552,8 @@ export async function saveGuestMessageAuthor(guest, message, editorGuestId) {
     throw new Error(`Invalid guest message author payload: ${result.errors.join("; ")}`);
   }
 
+  next.sourceHost = sourceHost();
+
   logDb("write:start", { collection: collections.guests, docId: guest.id, op: "setDoc", merge: true, payload: next });
   try {
     await setDoc(ref, next, { merge: true });
@@ -585,6 +594,8 @@ export async function saveIdentityCheckPassed(guest, passed, editorGuestId) {
   if (!result.valid) {
     throw new Error(`Invalid identity check payload: ${result.errors.join("; ")}`);
   }
+
+  next.sourceHost = sourceHost();
 
   logDb("write:start", { collection: collections.guests, docId: guest.id, op: "setDoc", merge: true, payload: next });
   try {

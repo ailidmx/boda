@@ -95,33 +95,34 @@
 }
 
 
-/* ── Guisos dish cards: photo-as-background with a legibility overlay ────
-   Each guisos card is a full-bleed photo card: the dish photo fills the whole
-   card as a background, and a dark gradient overlay sits on top so the title,
-   note and star vote stay readable. This overrides the generic `.flavour-card`
-   layout (photo strip on top + parchment body below) ONLY for the guisos
-   section — the Food section keeps its original look.
+/* ── Guisos dish cards: photo on top with an overlaid title, then a
+   parchment body for the description + star vote ────────────────────────
+   A simpler, clearer card than the old full-bleed photo layout:
+     • Top — the dish photo at a fixed aspect ratio, with the title overlaid
+       at the bottom over a dark scrim, so the photo stays large and legible.
+     • Bottom — a warm parchment body holding the description and the star
+       vote, so both read clearly against a light background and the empty
+       stars invite the guest to vote. */
 
-   The card's height is driven by its CONTENT (title + note + star vote), not
-   by the photo's aspect ratio. The photo is an absolutely-positioned backdrop
-   that fills the card, so long dish notes are never clipped — the card simply
-   grows to fit them. */
 .guisos-card {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  background: #1c1a17;
   border-color: rgb(198 139 43 / 45%);
 }
 
-/* The photo is the full-bleed background layer. It is absolutely positioned
-   to fill the whole card (inset: 0) so it never dictates the card's height —
-   the card grows to fit its content instead. */
-.guisos-card .flavour-card__media {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
+/* Photo wrapper — full-width, fixed aspect ratio, no padding. */
+.guisos-card .guisos-card__media {
+  position: relative;
+  display: block;
+  flex: 0 0 auto;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #1c1a17;
+}
+
+/* The clickable photo fills the wrapper. */
+.guisos-card .guisos-card__photo {
   display: block;
   width: 100%;
   height: 100%;
@@ -131,94 +132,93 @@
   cursor: zoom-in;
 }
 
-.guisos-card .flavour-card__media img {
+.guisos-card .guisos-card__photo img {
   display: block;
   width: 100%;
   height: 100%;
-  aspect-ratio: auto;
   object-fit: cover;
 }
 
-/* The illustration fallback (no photo) also fills the card as a backdrop. */
-.guisos-card .flavour-card__illustration {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  width: 100%;
-  height: 100%;
-  aspect-ratio: auto;
+/* Placeholder (no photo) keeps the same aspect ratio with a warm gradient. */
+.guisos-card .guisos-card__photo--placeholder {
+  cursor: default;
+  background:
+    radial-gradient(80% 80% at 50% 28%, rgb(198 139 43 / 34%), transparent 70%),
+    linear-gradient(150deg, #2b2418, #1c1a17);
 }
 
-/* Legibility overlay — a dark scrim that covers ALL the text content (title,
-   note and star vote) so every line stays readable against any photo. The
-   card grows to fit its content, so the text block fills the lower portion of
-   the card; the overlay is darkest there and only lightens at the very top
-   (which holds no text). */
-.guisos-card::after {
-  content: "";
+/* Title overlaid at the bottom of the photo over a dark scrim. */
+.guisos-card .guisos-card__title {
   position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: linear-gradient(
-    180deg,
-    rgb(20 16 10 / 12%) 0%,
-    rgb(20 16 10 / 58%) 38%,
-    rgb(20 16 10 / 90%) 100%
-  );
-  border-radius: inherit;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 2.6rem 1.1rem 0.85rem;
+  background: linear-gradient(180deg, transparent, rgb(20 16 10 / 92%));
+  color: var(--white);
+  text-shadow: 0 1px 3px rgb(0 0 0 / 45%);
   pointer-events: none;
-  height: auto;
-  width: auto;
 }
 
-/* The inner gold hairline frame stays above the overlay. */
-.guisos-card::before {
-  z-index: 3;
+/* Hide the generic gold hairline rule under the overlaid title. */
+.guisos-card .guisos-card__title::after {
+  display: none;
 }
 
-/* The card body (title + note) sits in normal flow above the photo backdrop,
-   so the card grows to fit its content (long notes are never clipped). It
-   reserves bottom padding so the star vote (in flow below) never overlaps the
-   text. */
+/* Body — parchment panel with the description + star vote. */
 .guisos-card .guisos-card__body {
   position: relative;
   z-index: 2;
-  flex: 1 0 auto;
+  flex: 1;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  gap: 0.6rem;
-  padding: clamp(1.4rem, 3vw, 2rem) clamp(1.4rem, 3vw, 2rem) 0.5rem;
-  color: var(--white);
-}
-
-.guisos-card h3 {
-  color: var(--white);
-  text-shadow: 0 1px 3px rgb(0 0 0 / 45%);
-}
-
-.guisos-card h3::after {
-  background: linear-gradient(90deg, var(--marigold), rgb(198 139 43 / 0%));
+  justify-content: flex-start;
+  gap: 0.8rem;
+  padding: clamp(1.1rem, 3vw, 1.6rem);
 }
 
 .guisos-card .guisos-card__body p {
-  color: rgb(255 253 248 / 92%);
-  text-shadow: 0 1px 2px rgb(0 0 0 / 45%);
+  margin: 0;
+  color: rgb(36 33 25 / 74%);
+  font-size: 0.95rem;
+  line-height: 1.6;
 }
 
-/* The star vote sits in normal flow below the body text, above the legibility
-   scrim, so it stays tappable and visible and the card grows to fit it. It is
-   part of the photo card (no footer divider, no extra top gap) and uses light
-   text so it reads clearly on the dark photo backdrop. */
+/* Star vote inside the parchment body: no extra divider, compact, and the
+   empty stars stay clearly visible (higher contrast) to invite voting. */
 .guisos-card .star-vote {
   position: relative;
   z-index: 2;
-  margin: 0;
-  padding: 0.4rem clamp(1.4rem, 3vw, 2rem) clamp(1.4rem, 3vw, 2rem);
+  margin: 0.2rem 0 0;
+  padding: 0;
   border-top: 0;
 }
 
+.guisos-card .star-vote__star {
+  color: rgb(36 33 25 / 48%);
+}
 
+/* Empty (not-yet-achieved) stars render as clear outlined slots; filled stars
+   are solid gold. So before voting there are 5 outlined slots, and after a
+   partial vote (e.g. 4/5) the remaining un-voted slot stays outlined. */
+.guisos-card .star-vote__star svg {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.guisos-card .star-vote__star.is-filled {
+  color: var(--marigold);
+}
+
+.guisos-card .star-vote__star.is-filled svg {
+  fill: currentColor;
+  stroke: none;
+}
 
 /* Anchor subsection — a "continue" link that scrolls to the reorder panel.
    The base `.section-nav` provides the top border + centered link; this just

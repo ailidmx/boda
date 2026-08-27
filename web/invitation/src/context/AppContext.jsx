@@ -34,6 +34,7 @@ import {
   normalizeSource,
 } from "../invitation-link.js";
 import { content, SUPPORTED_LANGUAGES } from "../content.js";
+import { isLocalHost } from "../environment.js";
 import {
   AUTH_EMAIL_DOMAIN,
   getActiveGuests,
@@ -407,19 +408,21 @@ export function AppProvider({ children }) {
       // guest actually types their credentials.
       const uid = userCredential?.user?.uid || null;
       const linkParams = getInvitationLinkParams();
-      addDoc(collection(db, collections.loginEvents), {
-        guestId: uid,
-        username: normalized,
-        source: normalizeSource(linkParams.source),
-        medium: linkParams.medium || "",
-        campaign: linkParams.campaign || "",
-        sentAt: linkParams.sentAt || null,
-        timeToAnswer: computeTimeToAnswer(linkParams.sentAt),
-        email,
-        createdAt: serverTimestamp(),
-      }).catch((err) => {
-        console.warn("[auth] Failed to log login event", err);
-      });
+      if (!isLocalHost()) {
+        addDoc(collection(db, collections.loginEvents), {
+          guestId: uid,
+          username: normalized,
+          source: normalizeSource(linkParams.source),
+          medium: linkParams.medium || "",
+          campaign: linkParams.campaign || "",
+          sentAt: linkParams.sentAt || null,
+          timeToAnswer: computeTimeToAnswer(linkParams.sentAt),
+          email,
+          createdAt: serverTimestamp(),
+        }).catch((err) => {
+          console.warn("[auth] Failed to log login event", err);
+        });
+      }
       // onAuthStateChanged will fire and set authState to signedIn.
     } catch (error) {
       console.warn("Invitation access rejected", error.code || error.message, {

@@ -12,6 +12,7 @@ import { WinampPlayer } from "./components/WinampPlayer.jsx";
 import { useVersionCheck } from "./hooks/useVersionCheck.js";
 import { useClickTracking } from "./hooks/useClickTracking.js";
 import { usePageViewTracking } from "./hooks/usePageViewTracking.js";
+import { InstallPromptProvider } from "./hooks/useInstallPrompt.js";
 import { trackInvitationVisit } from "./analytics.js";
 import {
   getInvitationLinkParams,
@@ -211,10 +212,12 @@ function Invitation() {
 
 export function App() {
   return (
-    <AppProvider>
-      <RsvpProvider>
-        <Invitation />
-      </RsvpProvider>
-    </AppProvider>
+    <InstallPromptProvider>
+      <AppProvider>
+        <RsvpProvider>
+          <Invitation />
+        </RsvpProvider>
+      </AppProvider>
+    </InstallPromptProvider>
   );
 }
