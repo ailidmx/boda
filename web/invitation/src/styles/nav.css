@@ -616,6 +616,38 @@
   background: var(--ink);
 }
 
+/* Install-to-home-screen help shown inline in the user dropdown. */
+.user-menu__install-help {
+  margin: 0.5rem 0.75rem 0.75rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid rgb(255 255 255 / 18%);
+  border-radius: 0.5rem;
+  background: rgb(255 255 255 / 8%);
+  font-size: 0.72rem;
+  line-height: 1.5;
+}
+
+.user-menu__install-help strong {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--marigold);
+}
+
+.user-menu__install-help p {
+  margin: 0 0 0.5rem;
+}
+
+.user-menu__install-help button {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: rgb(255 255 255 / 70%);
+  font: inherit;
+  font-size: 0.72rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
 /* Language section inside the user dropdown. */
 
 .user-menu__section {
