@@ -530,8 +530,10 @@ export function RSVP() {
               />
             )}
 
-            {/* Total: sums the primary stay and the extra stay (when present). */}
-            {(() => {
+            {/* Total: sums the primary stay and the extra stay. Only shown when
+                an extra stay is present — with a single stay, the primary
+                PaymentSummary above already IS the total. */}
+            {getXtraCabinId(profile?.guest) && (() => {
               const {
                 perPersonTotal,
                 perPersonOriginal,
