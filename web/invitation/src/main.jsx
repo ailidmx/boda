@@ -48,6 +48,8 @@ import "./styles/identitymodal.css";
 import "./styles/winamp.css";
 
 import "./styles/responsive.css";
+// Capability-based mobile/PWA refinements intentionally load last.
+import "./styles/mobile-hardening.css";
 
 import { App } from "./App.jsx";
 import {
