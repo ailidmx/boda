@@ -13,13 +13,18 @@ import { WinampPlayer } from "./components/WinampPlayer.jsx";
 import { useVersionCheck } from "./hooks/useVersionCheck.js";
 import { useClickTracking } from "./hooks/useClickTracking.js";
 import { usePageViewTracking } from "./hooks/usePageViewTracking.js";
+import { InstallPromptProvider } from "./hooks/useInstallPrompt.js";
 import { trackInvitationVisit } from "./analytics.js";
-import { getInvitationLinkParams, computeTimeToAnswer, normalizeSource } from "./invitation-link.js";
+import {
+  getInvitationLinkParams,
+  computeTimeToAnswer,
+  normalizeSource,
+} from "./invitation-link.js";
 import { guestTravelsByPlane } from "./guest-profiles.js";
 
-// Keep the app shell and Hero eager; progressively fetch the long-tail sections
-// before they approach the viewport. Named-export adapters preserve the
-// existing component modules without introducing wrapper files.
+// Keep the app shell and Hero eager. Long-tail sections are fetched before
+// they approach the viewport. Named-export adapters preserve the existing
+// component modules without wrapper files.
 const Story = lazy(() => import("./components/Story.jsx").then((m) => ({ default: m.Story })));
 const Venue = lazy(() => import("./components/Venue.jsx").then((m) => ({ default: m.Venue })));
 const Weekend = lazy(() => import("./components/Weekend.jsx").then((m) => ({ default: m.Weekend })));
@@ -44,15 +49,42 @@ const Footer = lazy(() => import("./components/Footer.jsx").then((m) => ({ defau
 
 function Invitation() {
   const { authState, profile } = useApp();
+
+  // The FLIGHTS ("Je viens de loin") section is only relevant for guests who
+  // travel by plane. When the signed-in guest does NOT travel by plane, the
+  // section is hidden entirely: it is removed from the DOM, from the nav menu,
+  // and from the "next section" bottom links.
+  //
+  // The guest's travel status is stored on the guest doc as the boolean
+  // `travelsByPlane` (true = flies in). See guestTravelsByPlane().
   const travelsByPlane = guestTravelsByPlane(profile?.guest);
 
+  // Force guests onto the latest deployed version: periodically compare the
+  // running build number against the deployed version.json and hard-reload if
+  // a newer release has shipped. Runs for all auth states.
   useVersionCheck();
+
+  // Log every click to Analytics (delegated listener). Runs for all auth
+  // states so we also capture clicks on the sign-in gate.
   useClickTracking();
+
+  // Treat every section view as a page view (Analytics `page_view` + a
+  // Firestore `page_views` record per guest). Only meaningful once signed in,
+  // when the sections are rendered.
   usePageViewTracking({ guestId: profile?.guest?.id });
 
+  // Log an `invitation_visit` event once per page load when the guest arrived
+  // via an invitation link carrying the analytics query params (guest email,
+  // UTM source/medium/campaign, sent_at). This lets us measure which channel
+  // (email / WhatsApp / other) drives logins and how quickly guests answer
+  // after the invitation is sent. Fires for ALL auth states (a guest arriving
+  // via a link is tracked even before they sign in). The params were captured
+  // eagerly in `main.jsx` before the URL was cleaned, so they survive here.
   useEffect(() => {
     const params = getInvitationLinkParams();
-    if (!params.guest && !params.source && !params.medium && !params.campaign) return;
+    if (!params.guest && !params.source && !params.medium && !params.campaign) {
+      return; // not an invitation-link visit — nothing to track
+    }
     trackInvitationVisit({
       guest: params.guest,
       source: normalizeSource(params.source),
@@ -62,14 +94,28 @@ function Invitation() {
     });
   }, []);
 
+  // On first load (direct visit, refresh, or a shared link with a hash like
+  // `#thanks`), clear any hash from the URL. The sections are gated behind
+  // sign-in, so the browser cannot scroll to a hash target that does not exist
+  // yet — leaving it in place can crash or leave the page stuck mid-scroll.
+  // Redirecting to the root (no hash) lets the app boot normally.
   useEffect(() => {
     if (window.location.hash) {
-      window.history.replaceState(null, "", window.location.pathname + window.location.search);
+      window.history.replaceState(
+        null,
+        "",
+        window.location.pathname + window.location.search,
+      );
     }
   }, []);
 
-  if (authState === "loading") return <div className="app-loading" aria-label="Loading" />;
-  if (authState === "signedOut") return <AuthGate />;
+  if (authState === "loading") {
+    return <div className="app-loading" aria-label="Loading" />;
+  }
+
+  if (authState === "signedOut") {
+    return <AuthGate />;
+  }
 
   return (
     <FullLoadGate>
@@ -89,7 +135,9 @@ function Invitation() {
         <ProgressiveSection id="weather"><Weather /></ProgressiveSection>
         <ProgressiveSection id="weekend-program"><WeekendProgram /></ProgressiveSection>
         <ProgressiveSection id="te-animas"><TeAnimas /></ProgressiveSection>
-        {travelsByPlane && <ProgressiveSection id="travel"><Travel /></ProgressiveSection>}
+        {travelsByPlane && (
+          <ProgressiveSection id="travel"><Travel /></ProgressiveSection>
+        )}
         <ProgressiveSection id="accommodation"><Accommodation /></ProgressiveSection>
         <ProgressiveSection id="petanque"><Petanque /></ProgressiveSection>
         <ProgressiveSection id="food"><Food /></ProgressiveSection>
@@ -102,6 +150,7 @@ function Invitation() {
         <ProgressiveSection id="guests"><GuestCloud /></ProgressiveSection>
         <ProgressiveSection id="thanks"><Thanks /></ProgressiveSection>
       </main>
+
       <ProgressiveSection id="footer"><Footer /></ProgressiveSection>
     </FullLoadGate>
   );
@@ -109,8 +158,12 @@ function Invitation() {
 
 export function App() {
   return (
-    <AppProvider>
-      <RsvpProvider><Invitation /></RsvpProvider>
-    </AppProvider>
+    <InstallPromptProvider>
+      <AppProvider>
+        <RsvpProvider>
+          <Invitation />
+        </RsvpProvider>
+      </AppProvider>
+    </InstallPromptProvider>
   );
 }
