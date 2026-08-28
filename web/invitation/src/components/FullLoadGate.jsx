@@ -88,7 +88,7 @@ export function FullLoadGate({ children }) {
     }, minDisplayMs);
 
     if (urls.length === 0) {
-      loadedRef.current = 0;
+      loadedRef.current = 1;
       totalRef.current = 1;
       setProgress(0.97);
     } else {
