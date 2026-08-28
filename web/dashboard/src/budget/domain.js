@@ -25,6 +25,16 @@ export const PROVIDER_CATEGORIES = [
   { id: "custom", label: "Personalizado" },
 ];
 
+export const PROVIDER_STATUSES = [
+  { id: "prospect", label: "Prospecto" },
+  { id: "contacted", label: "Contactado" },
+  { id: "quoted", label: "Cotización recibida" },
+  { id: "shortlisted", label: "Preseleccionado" },
+  { id: "selected", label: "Seleccionado" },
+  { id: "rejected", label: "Descartado" },
+  { id: "archived", label: "Archivado" },
+];
+
 export const CANDIDATE_STATUSES = ["considering", "quoted", "shortlisted", "rejected", "selected"];
 export const OFFER_STATUSES = ["draft", "requested", "quoted", "negotiating", "accepted", "rejected", "expired"];
 export const BUDGET_SOURCE_TYPES = ["provider_offer", "formula", "manual", "adjustment", "tax", "contingency", "other"];
@@ -55,6 +65,7 @@ export function selectCandidate(candidates = [], candidateId) {
 
 export default {
   PROVIDER_CATEGORIES,
+  PROVIDER_STATUSES,
   CANDIDATE_STATUSES,
   OFFER_STATUSES,
   BUDGET_SOURCE_TYPES,
