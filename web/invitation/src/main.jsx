@@ -32,6 +32,7 @@ import "./styles/story-bg.css";
 import "./styles/travel.css";
 import "./styles/flight-info.css";
 
+
 import "./styles/mapcarousel.css";
 import "./styles/attire.css";
 import "./styles/gift.css";
@@ -56,9 +57,21 @@ import {
   cleanInvitationLinkUrl,
 } from "./invitation-link.js";
 
+// Capture the invitation-link query params (guest, password, utm_*, sent_at)
+// BEFORE they are hidden from the URL, so `signIn()` and `AuthGate` can still
+// read them for pre-fill and analytics after the cleanup below.
 captureInvitationLinkParams();
+
+// Hide the invitation-link query params from the address bar for cleaner
+// navigation and so the shared password is not left visible in the URL. This
+// runs before the first render; the captured params above survive it.
 cleanInvitationLinkUrl();
 
+// Register the service worker for offline support + PWA installability.
+
+
+// Only in production: in dev the Vite server handles HMR and we don't want a
+// service worker caching stale modules during development.
 if (import.meta.env.PROD && "serviceWorker" in navigator) {
   window.addEventListener("load", () => {
     navigator.serviceWorker.register("/sw.js").catch((err) => {
@@ -68,5 +81,11 @@ if (import.meta.env.PROD && "serviceWorker" in navigator) {
 }
 
 const container = document.querySelector("#app");
+
+// The dashboard is now a separate build served under /dashboard/* (via the
+// Vite proxy in dev, and Firebase Hosting rewrites in production). This
+// invitation build only renders the React invitation.
 const root = createRoot(container);
+
 root.render(<App />);
+
