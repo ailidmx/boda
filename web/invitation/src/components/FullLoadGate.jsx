@@ -4,33 +4,27 @@ import { cloudinaryImage } from "../cloudinary.js";
 import { MEDIA } from "../media.js";
 
 /**
- * FullLoadGate — the "load everything up front" architecture.
+ * Loading gate for the critical invitation shell.
  *
- * Every section is statically imported and mounted up front (see App.jsx), so
- * once the guest is signed in the whole invitation is available instantly and
- * navigation is completely fluid. This gate masks the remaining wait (the
- * heavy hero/gallery images still streaming in) behind a cinematic Matrix
- * loader.
- *
- * Progress is real: it is driven by how many of the heavy hero images have
- * finished loading, and the "MB de amour" counter reflects the actual bytes
- * the browser has transferred (from `performance.getEntriesByType('resource')`).
- *
- * Once loading completes, the loader runs its reveal sequence and then the
- * full invitation fades in.
+ * The Hero remains eager, while long-tail sections are now progressively
+ * mounted by ProgressiveSection. The gate therefore waits only for a small
+ * network-aware set of hero images instead of making first entry depend on
+ * every piece of invitation content.
  */
-
-// The base portrait used by the Matrix loader (Cloudinary account root).
 const LOADER_IMAGE = cloudinaryImage("matrix_bbs1p1", { width: 1200 });
 
-// Heavy images to preload behind the loader. The hero slideshow is the biggest
-// set of eager images, so preloading it makes the reveal feel complete.
 function heroImageUrls() {
   const media = MEDIA.hero;
   const list = Array.isArray(media) ? media : media ? [media] : [];
-  return list
+  const urls = list
     .map((item) => (typeof item === "string" ? item : item?.src))
     .filter(Boolean);
+
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  const constrained = connection?.saveData || /(^|-)2g$/.test(connection?.effectiveType || "");
+  const narrow = window.matchMedia?.("(max-width: 899px)")?.matches;
+  const criticalCount = constrained ? 2 : narrow ? 3 : 5;
+  return urls.slice(0, criticalCount);
 }
 
 export function FullLoadGate({ children }) {
@@ -41,44 +35,34 @@ export function FullLoadGate({ children }) {
   const loadedRef = useRef(0);
   const totalRef = useRef(0);
   const bytesRef = useRef(0);
-  // The loader must stay visible for at least MIN_DISPLAY_MS so it never
-  // flashes by in a stroboscopic blink when images load very fast.
   const mountedAtRef = useRef(0);
-  const MIN_DISPLAY_MS = 3000;
 
   useEffect(() => {
     let cancelled = false;
     mountedAtRef.current = performance.now();
+    const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+    const constrained = connection?.saveData || /(^|-)2g$/.test(connection?.effectiveType || "");
+    const narrow = window.matchMedia?.("(max-width: 899px)")?.matches;
+    // Preserve the cinematic reveal, but do not impose a three-second tax on
+    // every phone visit. Slower/data-saving connections get the shortest gate.
+    const minDisplayMs = constrained ? 700 : narrow ? 1200 : 1800;
 
     const updateBytes = () => {
       if (cancelled) return;
       let total = 0;
       try {
-        const entries = performance.getEntriesByType("resource");
-        for (const e of entries) {
-          if (typeof e.transferSize === "number" && e.transferSize > 0) {
-            total += e.transferSize;
-          }
+        for (const e of performance.getEntriesByType("resource")) {
+          if (typeof e.transferSize === "number" && e.transferSize > 0) total += e.transferSize;
         }
-      } catch {
-        /* ignore */
-      }
+      } catch { /* ignore */ }
       bytesRef.current = total;
       setBytesLoaded(total);
     };
 
-    // Poll transferred bytes a few times a second for a live "MB de amour".
     const bytesTimer = window.setInterval(updateBytes, 250);
-
-    // Clamp progress so it never reaches 1 (which triggers the reveal) before
-    // the minimum display time has elapsed.
     const clampProgress = (raw) => {
       const elapsed = performance.now() - mountedAtRef.current;
-      if (elapsed < MIN_DISPLAY_MS) {
-        // Keep the bar near-full but not complete until the minimum time.
-        return Math.min(raw, 0.97);
-      }
-      return raw;
+      return elapsed < minDisplayMs ? Math.min(raw, 0.97) : raw;
     };
 
     const markLoaded = () => {
@@ -87,44 +71,31 @@ export function FullLoadGate({ children }) {
       const p = clampProgress(raw);
       setProgress(p);
       updateBytes();
-      if (p >= 1) {
-        window.clearInterval(bytesTimer);
-      }
+      if (p >= 1) window.clearInterval(bytesTimer);
     };
 
-    // Preload the loader portrait so the reveal is instant.
     const portrait = new Image();
     portrait.src = LOADER_IMAGE;
 
-    // Preload all hero images and track real progress.
     const urls = heroImageUrls();
     totalRef.current = urls.length;
-
-    // Once the minimum display time has elapsed, release the final 3% so the
-    // reveal can start (if everything is already loaded).
     const releaseTimer = window.setTimeout(() => {
       if (cancelled) return;
       if (loadedRef.current >= totalRef.current) {
         setProgress(1);
         window.clearInterval(bytesTimer);
       }
-    }, MIN_DISPLAY_MS);
+    }, minDisplayMs);
 
     if (urls.length === 0) {
-      // Nothing to preload: still respect the minimum display time.
-      loadedRef.current = 0;
+      loadedRef.current = 1;
       totalRef.current = 1;
       setProgress(0.97);
     } else {
       urls.forEach((url) => {
         const img = new Image();
         img.src = url;
-        img.onload = () => {
-          if (!cancelled) markLoaded();
-        };
-        img.onerror = () => {
-          if (!cancelled) markLoaded();
-        };
+        img.onload = img.onerror = () => { if (!cancelled) markLoaded(); };
       });
     }
 
@@ -135,10 +106,8 @@ export function FullLoadGate({ children }) {
     };
   }, []);
 
-
   const handleRevealComplete = () => {
     setRevealed(true);
-    // Give the fade-out a moment before unmounting the loader.
     window.setTimeout(() => setDone(true), 450);
   };
 
@@ -152,10 +121,7 @@ export function FullLoadGate({ children }) {
           onRevealComplete={handleRevealComplete}
         />
       )}
-      <div
-        className={`full-load-content${revealed ? " is-revealed" : ""}`}
-        aria-hidden={!revealed}
-      >
+      <div className={`full-load-content${revealed ? " is-revealed" : ""}`} aria-hidden={!revealed}>
         {children}
       </div>
     </>

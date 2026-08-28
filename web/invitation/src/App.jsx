@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { lazy, useEffect } from "react";
 import { AppProvider, useApp } from "./context/AppContext.jsx";
 import { RsvpProvider } from "./context/RsvpContext.jsx";
 import { AuthGate } from "./components/AuthGate.jsx";
@@ -6,6 +6,7 @@ import { Nav } from "./components/Nav.jsx";
 import { Countdown } from "./components/Countdown.jsx";
 import { Hero } from "./components/Hero.jsx";
 import { FullLoadGate } from "./components/FullLoadGate.jsx";
+import { ProgressiveSection } from "./components/ProgressiveSection.jsx";
 import { LanguageModal } from "./components/LanguageModal.jsx";
 import { IdentityModal } from "./components/IdentityModal.jsx";
 import { WinampPlayer } from "./components/WinampPlayer.jsx";
@@ -21,30 +22,30 @@ import {
 } from "./invitation-link.js";
 import { guestTravelsByPlane } from "./guest-profiles.js";
 
-// Full-load architecture: every section is imported eagerly and mounted up
-// front. The FullLoadGate preloads all section chunks behind a cinematic
-// Matrix loader, so once the guest is signed in the whole invitation is
-// available instantly and navigation is completely fluid (no lazy chunks
-// fetched while scrolling).
-import { Story } from "./components/Story.jsx";
-import { Venue } from "./components/Venue.jsx";
-import { Weekend, WeekendProgram } from "./components/Weekend.jsx";
-import { Petanque } from "./components/Petanque.jsx";
-import { Accommodation } from "./components/Accommodation.jsx";
-import { Weather } from "./components/Weather.jsx";
-import { Food } from "./components/Food.jsx";
-import { Guisos } from "./components/Guisos.jsx";
-import { Music } from "./components/Music.jsx";
-import { Travel } from "./components/Travel.jsx";
-import { Attire, DressCode } from "./components/Attire.jsx";
-import { Gift } from "./components/Gift.jsx";
-import { Coast } from "./components/Coast.jsx";
-import { RSVP } from "./components/RSVP.jsx";
-import { TeAnimas } from "./components/TeAnimas.jsx";
-import { GuestCloud } from "./components/GuestCloud.jsx";
-import { Photos } from "./components/Photos.jsx";
-import { Thanks } from "./components/Thanks.jsx";
-import { Footer } from "./components/Footer.jsx";
+// Keep the app shell and Hero eager. Long-tail sections are fetched before
+// they approach the viewport. Named-export adapters preserve the existing
+// component modules without wrapper files.
+const Story = lazy(() => import("./components/Story.jsx").then((m) => ({ default: m.Story })));
+const Venue = lazy(() => import("./components/Venue.jsx").then((m) => ({ default: m.Venue })));
+const Weekend = lazy(() => import("./components/Weekend.jsx").then((m) => ({ default: m.Weekend })));
+const WeekendProgram = lazy(() => import("./components/Weekend.jsx").then((m) => ({ default: m.WeekendProgram })));
+const Petanque = lazy(() => import("./components/Petanque.jsx").then((m) => ({ default: m.Petanque })));
+const Accommodation = lazy(() => import("./components/Accommodation.jsx").then((m) => ({ default: m.Accommodation })));
+const Weather = lazy(() => import("./components/Weather.jsx").then((m) => ({ default: m.Weather })));
+const Food = lazy(() => import("./components/Food.jsx").then((m) => ({ default: m.Food })));
+const Guisos = lazy(() => import("./components/Guisos.jsx").then((m) => ({ default: m.Guisos })));
+const Music = lazy(() => import("./components/Music.jsx").then((m) => ({ default: m.Music })));
+const Travel = lazy(() => import("./components/Travel.jsx").then((m) => ({ default: m.Travel })));
+const Attire = lazy(() => import("./components/Attire.jsx").then((m) => ({ default: m.Attire })));
+const DressCode = lazy(() => import("./components/Attire.jsx").then((m) => ({ default: m.DressCode })));
+const Gift = lazy(() => import("./components/Gift.jsx").then((m) => ({ default: m.Gift })));
+const Coast = lazy(() => import("./components/Coast.jsx").then((m) => ({ default: m.Coast })));
+const RSVP = lazy(() => import("./components/RSVP.jsx").then((m) => ({ default: m.RSVP })));
+const TeAnimas = lazy(() => import("./components/TeAnimas.jsx").then((m) => ({ default: m.TeAnimas })));
+const GuestCloud = lazy(() => import("./components/GuestCloud.jsx").then((m) => ({ default: m.GuestCloud })));
+const Photos = lazy(() => import("./components/Photos.jsx").then((m) => ({ default: m.Photos })));
+const Thanks = lazy(() => import("./components/Thanks.jsx").then((m) => ({ default: m.Thanks })));
+const Footer = lazy(() => import("./components/Footer.jsx").then((m) => ({ default: m.Footer })));
 
 function Invitation() {
   const { authState, profile } = useApp();
@@ -126,86 +127,31 @@ function Invitation() {
 
       <main>
         <Hero />
-        <section id="story" className="lazy-section">
-          <Story />
-        </section>
-
-        <section id="venue" className="lazy-section">
-          <Venue />
-        </section>
-        <section id="weekend" className="lazy-section">
-          <Weekend />
-        </section>
-        <section id="attire" className="lazy-section">
-          <Attire />
-        </section>
-        <section id="dress-code" className="lazy-section">
-          <DressCode />
-        </section>
-        <section id="weather" className="lazy-section">
-          <Weather />
-        </section>
-        <section id="weekend-program" className="lazy-section">
-          <WeekendProgram />
-        </section>
-        {/* "Vous vous lancez ?" — placed right after the programme. */}
-        <section id="te-animas" className="lazy-section">
-          <TeAnimas />
-        </section>
-        {/* "Je viens de loin" — placed right after the programme. Only shown
-            for guests who travel by plane (see travelsByPlane above). */}
+        <ProgressiveSection id="story"><Story /></ProgressiveSection>
+        <ProgressiveSection id="venue"><Venue /></ProgressiveSection>
+        <ProgressiveSection id="weekend"><Weekend /></ProgressiveSection>
+        <ProgressiveSection id="attire"><Attire /></ProgressiveSection>
+        <ProgressiveSection id="dress-code"><DressCode /></ProgressiveSection>
+        <ProgressiveSection id="weather"><Weather /></ProgressiveSection>
+        <ProgressiveSection id="weekend-program"><WeekendProgram /></ProgressiveSection>
+        <ProgressiveSection id="te-animas"><TeAnimas /></ProgressiveSection>
         {travelsByPlane && (
-          <section id="travel" className="lazy-section">
-            <Travel />
-          </section>
+          <ProgressiveSection id="travel"><Travel /></ProgressiveSection>
         )}
-
-        <section id="accommodation" className="lazy-section">
-          <Accommodation />
-        </section>
-        <section id="petanque" className="lazy-section">
-          <Petanque />
-        </section>
-        <section id="food" className="lazy-section">
-          <Food />
-        </section>
-        {/* "¿Qué guisos?" — menu vote, placed right after the food section. */}
-        <section id="guisos" className="lazy-section">
-          <Guisos />
-        </section>
-        {/* The Music section renders the live-music lineup, the "Pide tu
-            canción" song-request subsection, the playlists and the genre
-            survey ("your tastes") in that order. */}
-        <section id="music" className="lazy-section">
-          <Music />
-        </section>
-        <section id="coast" className="lazy-section">
-          <Coast />
-        </section>
-        {/* The final RSVP form sits right before the INVITES section. */}
-        <section id="rsvp" className="lazy-section">
-          <RSVP />
-        </section>
-
-        {/* "Cadeaux" (gift) sits right after the RSVP and before the
-            thank-you section. */}
-        <section id="gift" className="lazy-section">
-          <Gift />
-        </section>
-        <section id="photos" className="lazy-section">
-          <Photos />
-        </section>
-        <section id="guests" className="lazy-section">
-          <GuestCloud />
-        </section>
-        <section id="thanks" className="lazy-section">
-          <Thanks />
-        </section>
+        <ProgressiveSection id="accommodation"><Accommodation /></ProgressiveSection>
+        <ProgressiveSection id="petanque"><Petanque /></ProgressiveSection>
+        <ProgressiveSection id="food"><Food /></ProgressiveSection>
+        <ProgressiveSection id="guisos"><Guisos /></ProgressiveSection>
+        <ProgressiveSection id="music"><Music /></ProgressiveSection>
+        <ProgressiveSection id="coast"><Coast /></ProgressiveSection>
+        <ProgressiveSection id="rsvp"><RSVP /></ProgressiveSection>
+        <ProgressiveSection id="gift"><Gift /></ProgressiveSection>
+        <ProgressiveSection id="photos"><Photos /></ProgressiveSection>
+        <ProgressiveSection id="guests"><GuestCloud /></ProgressiveSection>
+        <ProgressiveSection id="thanks"><Thanks /></ProgressiveSection>
       </main>
 
-      <section id="footer" className="lazy-section">
-        <Footer />
-      </section>
+      <ProgressiveSection id="footer"><Footer /></ProgressiveSection>
     </FullLoadGate>
   );
 }
