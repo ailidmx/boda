@@ -2,9 +2,15 @@
 // Lists providers + their offers and provides add/edit modals. Persistence goes
 // through the injected repository callbacks; this module never touches Firestore.
 
-import { PROVIDER_CATEGORIES } from "./budget/domain.js";
+import { OFFER_STATUSES, PROVIDER_CATEGORIES, PROVIDER_STATUSES } from "./budget/domain.js";
 
 const CATEGORY_LABEL = new Map(PROVIDER_CATEGORIES.map((c) => [c.id, c.label]));
+const PROVIDER_STATUS_LABEL = new Map(PROVIDER_STATUSES.map((s) => [s.id, s.label]));
+const OFFER_STATUS_LABEL = new Map([
+  ["draft", "Borrador"], ["requested", "Solicitada"], ["quoted", "Cotizada"],
+  ["negotiating", "En negociación"], ["accepted", "Aceptada"],
+  ["rejected", "Rechazada"], ["expired", "Vencida"],
+]);
 
 // Pricing fields shown for each simple model. Complex models (tiered,
 // quantity_formula, composite) fall back to a JSON textarea.
@@ -38,11 +44,15 @@ export function renderProvidersPanel(ctx) {
   const card = (p) => {
     const pOffers = offersByProvider.get(p.id) || [];
     const cats = (p.categoryIds || []).map((id) => `<span class="provider-cat">${esc(CATEGORY_LABEL.get(id) || id)}</span>`).join("");
-    const contact = [p.contact?.phone, p.contact?.email].filter(Boolean).map((v) => `<span class="provider-contact">${esc(v)}</span>`).join(" · ");
+    const contact = [p.contact?.person, p.contact?.phone, p.contact?.email]
+      .filter(Boolean)
+      .map((v) => `<span class="provider-contact">${esc(v)}</span>`)
+      .join(" · ");
+    const providerStatus = p.status || "prospect";
     const offerRows = pOffers.map((o) => `
       <div class="offer-item">
         <span class="offer-name">${esc(o.name)}</span>
-        <span class="offer-meta">${esc(o.pricingModel)}${o.currency ? ` · ${esc(o.currency)}` : ""}</span>
+        <span class="offer-meta">${esc(OFFER_STATUS_LABEL.get(o.status || "draft") || o.status)} · ${esc(o.pricingModel)}${o.currency ? ` · ${esc(o.currency)}` : ""}</span>
         <button class="dashboard-link-btn" data-edit-offer="${esc(o.id)}" title="Editar oferta">✏️</button>
         <button class="dashboard-link-btn" data-delete-offer="${esc(o.id)}" title="Eliminar oferta">🗑</button>
       </div>`).join("") || '<p class="provider-empty">Sin ofertas aún.</p>';
@@ -51,6 +61,7 @@ export function renderProvidersPanel(ctx) {
         <div class="provider-head">
           <strong>${esc(p.name)}</strong>
           <span class="provider-cats">${cats}</span>
+          <span class="provider-cat provider-status is-${esc(providerStatus)}">${esc(PROVIDER_STATUS_LABEL.get(providerStatus) || providerStatus)}</span>
           <span class="provider-actions">
             <button class="dashboard-link-btn" data-new-offer="${esc(p.id)}" title="Agregar oferta">＋</button>
             <button class="dashboard-link-btn" data-edit-provider="${esc(p.id)}" title="Editar proveedor">✏️</button>
@@ -104,6 +115,7 @@ function openProviderModal(ctx, id) {
   modal(id ? "Editar proveedor" : "Nuevo proveedor", `
     <label>Nombre <input data-name value="${esc(p?.name || "")}"/></label>
     <div class="provider-cats-field">${catBoxes}</div>
+    <label>Etapa <select data-status>${PROVIDER_STATUSES.map((s) => `<option value="${esc(s.id)}" ${(p?.status || "prospect") === s.id ? "selected" : ""}>${esc(s.label)}</option>`).join("")}</select></label>
     <label>Persona de contacto <input data-contact-person value="${esc(p?.contact?.person || "")}"/></label>
     <label>Teléfono <input data-contact-phone value="${esc(p?.contact?.phone || "")}"/></label>
     <label>Correo <input data-contact-email value="${esc(p?.contact?.email || "")}"/></label>
@@ -121,7 +133,7 @@ function openProviderModal(ctx, id) {
         email: el.querySelector("[data-contact-email]").value.trim(),
       },
       notes: el.querySelector("[data-notes]").value.trim(),
-      status: p?.status || "active",
+      status: el.querySelector("[data-status]").value,
       categoryData: p?.categoryData || {},
     });
     close();
@@ -144,6 +156,7 @@ function openOfferModal(ctx, providerId, offer) {
     <label>Modelo de precios <select data-model>${[...SIMPLE_MODELS, ...COMPLEX_MODELS].map((m) => `<option value="${m}" ${model === m ? "selected" : ""}>${m}</option>`).join("")}</select></label>
     <div data-fields>${fieldsHtml}</div>
     <label>Cargos adicionales (JSON) <textarea data-charges rows="3">${esc(JSON.stringify(o?.additionalCharges || [], null, 2))}</textarea></label>
+    <label>Estado <select data-status>${OFFER_STATUSES.map((s) => `<option value="${esc(s)}" ${(o?.status || "draft") === s ? "selected" : ""}>${esc(OFFER_STATUS_LABEL.get(s) || s)}</option>`).join("")}</select></label>
     <label>Moneda <input data-currency value="${esc(o?.currency || "MXN")}"/></label>
     <div class="se-modal-actions"><button class="se-btn is-primary" data-save type="button">Guardar</button><button class="se-btn" data-close type="button">Cancelar</button></div>
   `, async (el, close) => {
@@ -166,6 +179,7 @@ function openOfferModal(ctx, providerId, offer) {
       pricingData,
       additionalCharges: charges,
       currency: el.querySelector("[data-currency]").value.trim() || "MXN",
+      status: el.querySelector("[data-status]").value,
       active: o?.active !== false,
     });
     close();
