@@ -24,7 +24,12 @@ const sheetName = arg("sheet-name") || "Presupuesto";
 if (!spreadsheetId) throw new Error("Pass --sheet-id or set BODA_BUDGET_SHEET_ID.");
 
 const require = createRequire(import.meta.url);
-const serviceAccount = require(join(here, "../integraciones/google_sheets/service_account.json"));
+const firebaseServiceAccount = require(join(here, "../integraciones/google_sheets/firebase_service_account.json"));
+const sheetsServiceAccount = require(join(here, "../integraciones/google_sheets/sheets_service_account.json"));
+const expectedSheetsEmail = process.env.BODA_SHEETS_SERVICE_ACCOUNT_EMAIL;
+if (expectedSheetsEmail && sheetsServiceAccount.client_email !== expectedSheetsEmail) {
+  throw new Error("The configured Google Sheets service account does not match the expected identity.");
+}
 const source = { spreadsheetId, sheet: sheetName };
 
 function base64url(value) {
@@ -34,14 +39,14 @@ async function accessToken() {
   const now = Math.floor(Date.now() / 1000);
   const header = base64url(JSON.stringify({ alg: "RS256", typ: "JWT" }));
   const payload = base64url(JSON.stringify({
-    iss: serviceAccount.client_email,
+    iss: sheetsServiceAccount.client_email,
     scope: "https://www.googleapis.com/auth/spreadsheets.readonly",
     aud: "https://oauth2.googleapis.com/token", iat: now, exp: now + 3600,
   }));
   const input = `${header}.${payload}`;
   const signer = createSign("RSA-SHA256");
   signer.update(input); signer.end();
-  const assertion = `${input}.${base64url(signer.sign(serviceAccount.private_key))}`;
+  const assertion = `${input}.${base64url(signer.sign(sheetsServiceAccount.private_key))}`;
   const response = await fetch("https://oauth2.googleapis.com/token", {
     method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: new URLSearchParams({ grant_type: "urn:ietf:params:oauth:grant-type:jwt-bearer", assertion }),
@@ -188,7 +193,7 @@ if (!execute) {
 const reqFromInvitation = createRequire(join(here, "../web/invitation/package.json"));
 const { initializeApp, cert } = await import(reqFromInvitation.resolve("firebase-admin/app"));
 const { getFirestore, FieldValue } = await import(reqFromInvitation.resolve("firebase-admin/firestore"));
-const app = initializeApp({ credential: cert(serviceAccount), projectId: serviceAccount.project_id });
+const app = initializeApp({ credential: cert(firebaseServiceAccount), projectId: firebaseServiceAccount.project_id });
 const db = getFirestore(app, "boda-us-central1");
 const groups = [
   [collections.budgetEvents, [parsed.event]],
