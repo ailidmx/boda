@@ -73,13 +73,16 @@
     place-items: center;
   }
 
+  /* `min-width: 0` here is a flex/grid overflow guard. The dropdowns
+     (.user-menu__dropdown / .mobile-nav__dropdown) are deliberately EXCLUDED:
+     they are absolutely-positioned panels with their own `min-width`
+     (13rem / 15rem) in nav.css, so forcing them to `min-width: 0` collapses
+     the menu to its content width and loses the panel style. */
   main,
   .section,
   .section-heading,
   .identity-modal-card,
-  .identity-modal-body,
-  .user-menu__dropdown,
-  .mobile-nav__dropdown {
+  .identity-modal-body {
     min-width: 0;
     max-width: 100%;
   }
@@ -109,9 +112,11 @@
 }
 
 @media (pointer: coarse) {
-  button,
-  [role="button"],
-  .button,
+  /* Only inline links get a larger tap target. Do NOT blanket-apply a
+     min-height to every button: the circular `.rsvp-scale-btn` (2.4rem,
+     border-radius 50%) would stretch into an oval and lose its emoji shape.
+     The small touch controls (arrows, toggles, triggers) already get their
+     touch target in the `@media (max-width: 899px)` block above. */
   .text-link,
   .section-nav-link { min-height: var(--mobile-touch-target); }
 }
