@@ -115,7 +115,8 @@ function parse(values) {
     // Detail-only rows (for example package inclusions or menu choices) remain
     // attached to the preceding payable row instead of becoming fake expenses.
     if (!total && items.length && items.at(-1).name === name) {
-      items.at(-1).details.push(text(row[1])).filter(Boolean);
+      const detail = text(row[1]);
+      if (detail) items.at(-1).details.push(detail);
       continue;
     }
 
