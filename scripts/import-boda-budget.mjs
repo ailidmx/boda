@@ -63,6 +63,12 @@ const number = (value) => Number.isFinite(Number(value)) ? Number(value) : 0;
 const text = (value) => String(value ?? "").trim();
 const slug = (value) => text(value).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase()
   .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 48);
+function responsibilityShares(value) {
+  const payer = text(value).toLowerCase();
+  if (/^david$|solo david|100% david/.test(payer)) return { david: 1, ayde: 0 };
+  if (/^ayd[eé]$|solo ayd[eé]|100% ayd[eé]/.test(payer)) return { david: 0, ayde: 1 };
+  return { david: 0.5, ayde: 0.5 };
+}
 const stableId = (prefix, row, name) => `${prefix}-${row}-${slug(name) || createHash("sha1").update(String(row)).digest("hex").slice(0, 8)}`;
 const category = (value) => ({
   ALOJAMIENTO: "accommodation", BEBIDA: "beverages", POSTRES: "desserts",
@@ -126,7 +132,7 @@ function parse(values) {
     const item = {
       id, name, description: text(row[1]), categoryId: category(type),
       amount: total, currency: "MXN", included: Boolean(row[3]),
-      payer: text(row[4]), sponsorName: text(row[5]) || null,
+      payer: text(row[4]), responsibilityShares: responsibilityShares(row[4]), sponsorName: text(row[5]) || null,
       targetGuestCount: number(row[13]) || null,
       pricePerPerson: perPerson || null,
       pricingModel: formula?.pricingModel || (perPerson ? "per_person" : "fixed"),
@@ -142,16 +148,17 @@ function parse(values) {
       if (!amount) return;
       payments.push({
         id: stableId(`sheet-${paymentType}`, index + 1, name),
-        budgetItemId: id, type: paymentType, amount, currency: "MXN",
-        payer: text(row[payerColumn]), status: row[15] ? "paid" : "planned",
-        paidAtLabel: text(row[15]) || null, source: { ...source, row: index + 1 },
+        budgetItemId: id, kind: "planned", type: paymentType, amount, currency: "MXN",
+        plannedPayerLabel: text(row[payerColumn]), payerId: null, status: "planned",
+        dueRule: paymentType === "deposit" ? "on_booking" : (paymentType === "installment" ? "one_week_before" : "event_day"),
+        sourcePaidAtLabel: text(row[15]) || null, source: { ...source, row: index + 1 },
       });
     });
     if (item.sponsorName) {
       contributions.push({
         id: stableId("sheet-contribution", index + 1, name),
         budgetItemId: id, contributorName: item.sponsorName,
-        amount: total, currency: "MXN", status: "pledged",
+        coverageMode: "full", committedAmount: total, amount: total, currency: "MXN", status: "pledged",
         source: { ...source, row: index + 1 },
       });
     }
