@@ -41,18 +41,22 @@ jobs:
         run: |
           npm ci
           npm --prefix web/invitation ci
-      - name: Configure private service account
+      - name: Configure private service accounts
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BODA_500805 }}
+          GOOGLE_SHEETS_SERVICE_ACCOUNT: ${{ secrets.GOOGLE_SHEETS_SERVICE_ACCOUNT_BODA_500805 }}
         run: |
           test -n "$FIREBASE_SERVICE_ACCOUNT"
+          test -n "$GOOGLE_SHEETS_SERVICE_ACCOUNT"
           mkdir -p integraciones/google_sheets
-          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > integraciones/google_sheets/service_account.json
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > integraciones/google_sheets/firebase_service_account.json
+          printf '%s' "$GOOGLE_SHEETS_SERVICE_ACCOUNT" > integraciones/google_sheets/sheets_service_account.json
       - name: Import budget
         env:
           BODA_BUDGET_SHEET_ID: ${{ inputs.sheet_id }}
           BODA_BUDGET_SHEET_NAME: ${{ inputs.sheet_name }}
           IMPORT_MODE: ${{ inputs.mode }}
+          BODA_SHEETS_SERVICE_ACCOUNT_EMAIL: boda-sheets-mcp@boda-500805.iam.gserviceaccount.com
         run: |
           set -euo pipefail
           args=("--sheet-name=$BODA_BUDGET_SHEET_NAME")
