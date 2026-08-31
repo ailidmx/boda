@@ -1,0 +1,57 @@
+name: Import Boda providers to Firestore
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - scripts/import-boda-providers.mjs
+      - .github/workflows/import-boda-providers.yml
+      - proveedores/**
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Import mode
+        required: true
+        type: choice
+        default: dry-run
+        options:
+          - dry-run
+          - execute
+
+permissions:
+  contents: read
+
+concurrency:
+  group: boda-provider-import
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependencies
+        run: |
+          npm ci
+          npm --prefix web/invitation ci
+      - name: Configure Firebase service account
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_BODA_500805 }}
+        run: |
+          test -n "$FIREBASE_SERVICE_ACCOUNT"
+          mkdir -p integraciones/google_sheets
+          printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > integraciones/google_sheets/firebase_service_account.json
+      - name: Import providers
+        env:
+          IMPORT_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'dry-run' }}
+        run: |
+          set -euo pipefail
+          args=()
+          if [ "$IMPORT_MODE" = "execute" ]; then
+            args+=("--execute")
+          fi
+          node scripts/import-boda-providers.mjs "${args[@]}"

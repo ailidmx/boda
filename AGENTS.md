@@ -153,6 +153,11 @@ silently moving; kill any stale dev server before running `dev:network`.
   (see `reports/gsheet-firestore-sync-report.md` for the latest run).
 - Guest identity/profile logic lives in `web/invitation/src/guest-profiles.js`
   and `web/invitation/src/invitation-profile.js`.
+- **Budget and provider imports are separate.** `scripts/import-boda-budget.mjs`
+  writes budget events/items/payments/contributions only. Documented providers,
+  offers, and budget-item links are seeded idempotently by
+  `scripts/import-boda-providers.mjs`; it never creates placeholder providers
+  for generic expenses and never deletes documents.
 
 ---
 
@@ -1471,7 +1476,6 @@ directly to `master` and push.
   `sizeIdentityToContent()`.
 
 *(Add new spatial-editor lessons here as you discover them.)*
-
 
 
 
