@@ -100,6 +100,7 @@ import { renderCabinAssignments as renderCabinAssignmentsPanel } from "./cabinsP
 import { renderThanksPanel as renderThanksPanelModule } from "./thanksPanel.js";
 import { renderChartsPanel as renderChartsPanelModule } from "./chartsPanel.js";
 import { renderProvidersPanel as renderProvidersPanelModule } from "./providersPanel.js";
+import { renderBudgetPanel as renderBudgetPanelModule } from "./budgetPanel.js";
 import { renderTimelinePanel as renderTimelinePanelModule } from "./timelinePanel.js";
 
 import {
@@ -112,6 +113,10 @@ import {
 
 import { updateGuest, softDeleteGuest, createGuest } from "./repositories/guestRepository.js";
 import { saveProvider, saveOffer, deleteProvider, deleteOffer } from "./repositories/providerRepository.js";
+import {
+  saveManualItem, saveContribution, savePayment, saveEventContext,
+  subscribeManualItems, subscribeContributions, subscribePayments,
+} from "./repositories/budgetRepository.js";
 import { saveLayer as saveLayerRepo, saveSlot as saveSlotRepo, deleteLayer as deleteLayerRepo, deleteSlot as deleteSlotRepo } from "./repositories/timelineRepository.js";
 
 import { createThanks, updateThanks, deleteThanks } from "./repositories/thanksRepository.js";
@@ -146,6 +151,10 @@ const state = {
   authUsers: {}, // uid → { email } LIVE Firebase Auth user list (via listAuthUsers callable)
   thanks: [], // from Firestore collection "thanks" (guest + es/fr/en)
   budget: [], // from Firestore collection "budget"
+  budgetItems: [],
+  contributions: [],
+  payments: [],
+  budgetEvent: {},
   cardVotes: [], // from Firestore collection "card_votes"
   guisoRankings: [], // from Firestore collection "guiso_rankings"
   songRequests: [], // from Firestore collection "song_requests"
@@ -1287,27 +1296,16 @@ const ts = (v) => {
 const meta = (rec, field, sub) => (rec?.[field] && typeof rec[field] === "object" ? rec[field][sub] : undefined);
 
 function renderBudgetPanel() {
-  renderDataPanel({
+  renderBudgetPanelModule({
     container: document.querySelector("[data-budget-manager]"),
-    collection: collections.budget,
-    records: state.budget.map((r) => ({ ...r, paidDate: ts(r.paidDate) })),
-    columns: [
-      { field: "item", label: "Concepto" },
-      { field: "totalMxn", label: "Total (MXN)", type: "number" },
-      { field: "approxMxn", label: "Aprox (MXN)", type: "number" },
-      { field: "paidMxn", label: "Pagado (MXN)", type: "number" },
-      { field: "paidBy", label: "Pagado por" },
-      { field: "paidDate", label: "Fecha pago" },
-      { field: "estimatedCount", label: "Estimados", type: "number" },
-      { field: "confirmedCount", label: "Confirmados", type: "number" },
-      { field: "aydeAmount", label: "Aydé (MXN)", type: "number" },
-      { field: "aydePct", label: "Aydé %", type: "number" },
-      { field: "davidAmount", label: "David (MXN)", type: "number" },
-      { field: "davidPct", label: "David %", type: "number" },
-    ],
-    updateField: updateRecordField,
-    emptyText: "No hay partidas de presupuesto.",
-    onAfterEdit: renderBudgetPanel,
+    items: state.budgetItems,
+    contributions: state.contributions,
+    payments: state.payments,
+    event: state.budgetEvent,
+    saveManualItem,
+    saveContribution,
+    savePayment,
+    saveEventContext,
   });
 }
 
@@ -1961,7 +1959,23 @@ function renderDashboard(app) {
     );
   };
 
-  const budgetUnsub = subscribeCollection(collections.budget, "budget", "budget", renderBudgetPanel);
+  const budgetUnsub = subscribeManualItems((records) => {
+    state.budgetItems = records;
+    reportSource("budget", records);
+    renderBudgetPanel();
+  });
+  const contributionsUnsub = subscribeContributions((records) => {
+    state.contributions = records;
+    renderBudgetPanel();
+  });
+  const paymentsUnsub = subscribePayments((records) => {
+    state.payments = records;
+    renderBudgetPanel();
+  });
+  const budgetEventUnsub = subscribeCollection(collections.budgetEvents, "budgetEvents", "budget_events", () => {
+    state.budgetEvent = state.budgetEvents.find((event) => event.id === "main") || {};
+    renderBudgetPanel();
+  });
   const cardVotesUnsub = subscribeCollection(collections.cardVotes, "cardVotes", "card_votes", renderCardVotesPanel);
   const guisoRankingsUnsub = subscribeCollection(collections.guisoRankings, "guisoRankings", "guiso_rankings", renderGuisoRankingsPanel);
   const songRequestsUnsub = subscribeCollection(collections.songRequests, "songRequests", "song_requests", renderSongRequestsPanel);
@@ -2098,6 +2112,9 @@ function renderDashboard(app) {
   // Store unsubs for cleanup
   app._thanksUnsub = thanksUnsub;
   app._budgetUnsub = budgetUnsub;
+  app._contributionsUnsub = contributionsUnsub;
+  app._paymentsUnsub = paymentsUnsub;
+  app._budgetEventUnsub = budgetEventUnsub;
   app._cardVotesUnsub = cardVotesUnsub;
   app._guisoRankingsUnsub = guisoRankingsUnsub;
   app._songRequestsUnsub = songRequestsUnsub;
@@ -2251,8 +2268,6 @@ export function startDashboard(app) {
 
 
 }
-
-
 
 
 

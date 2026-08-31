@@ -2,6 +2,8 @@
 @use "tokens" as *;
 
 @media (max-width: $bp-tablet) {
+  .budget-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .budget-columns { grid-template-columns: 1fr; }
   .dashboard-summary {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -31,6 +33,10 @@
 }
 
 @media (max-width: $bp-mobile) {
+  .budget-kpis { grid-template-columns: 1fr 1fr; gap: 0.45rem; }
+  .budget-kpi { padding: 0.65rem; }
+  .budget-toolbar .dashboard-button { flex: 1 1 auto; }
+  .budget-guest-target { flex: 1 0 100%; }
   .dashboard-summary {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -62,5 +68,4 @@
   }
 
 }
-
 
