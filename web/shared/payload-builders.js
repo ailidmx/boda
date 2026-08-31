@@ -958,32 +958,44 @@ export function buildBudgetManualItemPayload({ eventId, categoryId, name, descri
   };
 }
 
-export function buildContributionPayload({ sourceType, sourceId, sourceLabel, amount, percentage, appliesToItemId, appliesToSlotId, status, notes, timestamp }) {
+export function buildContributionPayload({ sourceType, sourceId, sourceLabel, contributorName, coverageMode, committedAmount, amount, percentage, budgetItemId, appliesToItemId, appliesToSlotId, status, notes, currency, timestamp }) {
+  const itemId = budgetItemId || appliesToItemId;
   return {
     sourceType: String(sourceType ?? "person").trim() || "person",
     sourceId: sourceId ? String(sourceId).trim() : "",
     sourceLabel: String(sourceLabel ?? "").trim(),
+    contributorName: String(contributorName ?? sourceLabel ?? "").trim(),
+    coverageMode: String(coverageMode ?? (percentage != null ? "percentage" : "amount")).trim(),
+    committedAmount: committedAmount != null ? toNum(committedAmount) : (amount != null ? toNum(amount) : null),
     amount: amount != null ? toNum(amount) : null,
     percentage: percentage != null ? toNum(percentage) : null,
-    appliesToItemId: appliesToItemId ? String(appliesToItemId).trim() : "",
+    budgetItemId: itemId ? String(itemId).trim() : "",
+    appliesToItemId: itemId ? String(itemId).trim() : "",
     appliesToSlotId: appliesToSlotId ? String(appliesToSlotId).trim() : "",
     status: String(status ?? "committed").trim() || "committed",
     notes: String(notes ?? "").trim(),
+    currency: String(currency ?? "MXN").trim() || "MXN",
     updatedAt: timestamp,
   };
 }
 
-export function buildPaymentPayload({ budgetItemId, providerId, offerId, scheduleItemId, amount, paidById, paidAt, method, type, notes, timestamp }) {
+export function buildPaymentPayload({ budgetItemId, providerId, offerId, scheduleItemId, amount, paidById, payerId, paidAt, method, type, kind, status, dueRule, currency, notes, timestamp }) {
+  const resolvedPayerId = payerId || paidById;
   return {
     budgetItemId: budgetItemId ? String(budgetItemId).trim() : "",
     providerId: providerId ? String(providerId).trim() : "",
     offerId: offerId ? String(offerId).trim() : "",
     scheduleItemId: scheduleItemId ? String(scheduleItemId).trim() : "",
     amount: toNum(amount),
-    paidById: paidById ? String(paidById).trim() : "",
+    paidById: resolvedPayerId ? String(resolvedPayerId).trim() : "",
+    payerId: resolvedPayerId ? String(resolvedPayerId).trim() : "",
     paidAt: paidAt ?? null,
     method: method ? String(method).trim() : "",
     type: String(type ?? "balance").trim() || "balance",
+    kind: String(kind ?? "actual").trim() || "actual",
+    status: String(status ?? "paid").trim() || "paid",
+    dueRule: dueRule ? String(dueRule).trim() : "",
+    currency: String(currency ?? "MXN").trim() || "MXN",
     notes: String(notes ?? "").trim(),
     updatedAt: timestamp,
   };
@@ -1001,5 +1013,4 @@ export function buildBudgetEventPayload({ guestCount, confirmedGuestCount, adult
     updatedAt: timestamp,
   };
 }
-
 

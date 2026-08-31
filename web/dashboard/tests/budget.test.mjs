@@ -11,6 +11,7 @@ import {
 import { projectBudget } from "../src/budget/projection.js";
 
 import { selectSlotOffer, selectCandidate } from "../src/budget/domain.js";
+import { buildContributionPayload, buildPaymentPayload } from "../../shared/payload-builders.js";
 
 const SAT_18 = "2027-02-20T18:00:00-06:00";
 const SAT_20 = "2027-02-20T20:00:00-06:00";
@@ -173,4 +174,26 @@ test("duration + quantity are derived (canonical start/end)", () => {
 test("calculateBase defaults", () => {
   assert.equal(calculateBase("hourly", { hourlyRate: 4000 }, { durationHours: 2 }).amount, 8000);
   assert.equal(calculateBase("per_person", { pricePerPerson: 500 }, { guestCount: 100 }).amount, 50000);
+});
+
+test("payment payload keeps settlement-compatible payer and state", () => {
+  const payload = buildPaymentPayload({
+    budgetItemId: "food", amount: "500", payerId: "david",
+    type: "deposit", kind: "actual", status: "paid",
+  });
+  assert.equal(payload.payerId, "david");
+  assert.equal(payload.paidById, "david");
+  assert.equal(payload.kind, "actual");
+  assert.equal(payload.status, "paid");
+});
+
+test("contribution payload keeps both item references", () => {
+  const payload = buildContributionPayload({
+    sourceType: "person", contributorName: "Mamá", budgetItemId: "dress",
+    coverageMode: "full", amount: 1000, status: "pledged",
+  });
+  assert.equal(payload.budgetItemId, "dress");
+  assert.equal(payload.appliesToItemId, "dress");
+  assert.equal(payload.contributorName, "Mamá");
+  assert.equal(payload.coverageMode, "full");
 });

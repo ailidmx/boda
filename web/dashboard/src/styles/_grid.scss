@@ -390,6 +390,109 @@
   margin: 0;
 }
 
+// ── Operational budget ─────────────────────────────────────────────────
+.budget-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-bottom: 1rem;
+}
+
+.budget-guest-target {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-right: auto;
+  color: tokens.$ink-muted;
+  font-size: 0.82rem;
+
+  input {
+    width: 5rem;
+    min-height: 2.45rem;
+    border: 1px solid tokens.$border;
+    border-radius: 0.45rem;
+    padding: 0.35rem 0.5rem;
+    font: inherit;
+    color: tokens.$ink;
+    background: tokens.$card-bg-solid;
+  }
+}
+
+.budget-kpis {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.budget-kpi {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  min-width: 0;
+  padding: 0.85rem;
+  border: 1px solid tokens.$border;
+  border-radius: 0.65rem;
+  background: tokens.$card-bg-solid;
+
+  span, small { color: tokens.$ink-muted; font-size: 0.72rem; }
+  strong { color: tokens.$dark-deep; font-size: 1.08rem; }
+}
+
+.budget-settlement {
+  margin: 0.8rem 0;
+  padding: 0.7rem 0.85rem;
+  border-radius: 0.55rem;
+  background: tokens.$cream-light;
+  color: tokens.$ink;
+  font-size: 0.82rem;
+}
+
+.budget-columns {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.8rem;
+
+  > section {
+    min-width: 0;
+    border: 1px solid tokens.$border;
+    border-radius: 0.65rem;
+    background: tokens.$card-bg-solid;
+    overflow: hidden;
+  }
+}
+
+.budget-subhead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0.85rem;
+  border-bottom: 1px solid tokens.$border-faint;
+
+  h3 { margin: 0; font-size: 0.9rem; color: tokens.$dark-deep; }
+  span { color: tokens.$ink-muted; font-size: 0.75rem; }
+}
+
+.budget-list { max-height: 34rem; overflow: auto; }
+
+.budget-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.65rem 0.8rem;
+  border-bottom: 1px solid tokens.$border-faint;
+
+  &:last-child { border-bottom: 0; }
+  div { min-width: 0; }
+  strong, small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  strong { color: tokens.$ink; font-size: 0.8rem; }
+  small { margin-top: 0.15rem; color: tokens.$ink-muted; font-size: 0.68rem; }
+  b { color: tokens.$dark-deep; font-size: 0.78rem; white-space: nowrap; }
+}
+
+.budget-modal { width: min(38rem, calc(100vw - 1rem)); }
+
 .provider-cats-field {
   display: flex;
   flex-wrap: wrap;
@@ -562,4 +665,3 @@
     background: tokens.$card-bg-solid;
   }
 }
-
