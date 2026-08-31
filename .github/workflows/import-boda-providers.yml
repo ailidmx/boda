@@ -1,6 +1,12 @@
 name: Import Boda providers to Firestore
 
 on:
+  push:
+    branches: [master]
+    paths:
+      - scripts/import-boda-providers.mjs
+      - .github/workflows/import-boda-providers.yml
+      - proveedores/**
   workflow_dispatch:
     inputs:
       mode:
@@ -41,7 +47,7 @@ jobs:
           printf '%s' "$FIREBASE_SERVICE_ACCOUNT" > integraciones/google_sheets/firebase_service_account.json
       - name: Import providers
         env:
-          IMPORT_MODE: ${{ inputs.mode }}
+          IMPORT_MODE: ${{ github.event_name == 'workflow_dispatch' && inputs.mode || 'dry-run' }}
         run: |
           set -euo pipefail
           args=()
