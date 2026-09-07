@@ -101,7 +101,8 @@ export function Coast() {
               <div className="plan-card__meta">
                 <span className="plan-card__dates">{plan.dates}</span>
                 <span className="plan-card__nights">
-                  {plan.nights} {plan.nights === 1 ? nightsLabel.one : nightsLabel.other}
+                  <span aria-hidden="true">🌙</span> {plan.nights}{" "}
+                  {plan.nights === 1 ? nightsLabel.one : nightsLabel.other}
                 </span>
               </div>
               <strong className="plan-card__title">
