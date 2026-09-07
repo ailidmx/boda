@@ -648,7 +648,7 @@ export function Accommodation() {
 
   return (
 
-    <section className="accommodation-section section story-bg" ref={sectionRef}>
+    <section className="accommodation-section section story-bg" id="accommodation" ref={sectionRef}>
 
       <div className="accommodation-copy reveal" id="accommodation-overview">
         <p className="eyebrow">{accommodation.eyebrow}</p>

@@ -9,7 +9,7 @@ export function Weekend() {
   const nav = t.nav || {};
 
   return (
-    <section className="weekend-section section story-bg">
+    <section className="weekend-section section story-bg" id="weekend">
       {/* ── Slide 1 · banner + the three days, one full-height slide ── */}
       <div className="weekend-slide">
         <div className="weekend-banner">
@@ -146,6 +146,7 @@ function DayProgramSlideset({ programs }) {
 
   return (
     <section
+      id="weekend-program"
       className={`weekend-program section weekend-program--${theme}`}
       ref={sectionRef}
       style={{ backgroundImage: `url(${themeImage})` }}

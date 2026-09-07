@@ -99,7 +99,7 @@ export function Weather() {
   };
 
   return (
-    <section className="weather-section section story-bg" ref={sectionRef}>
+    <section className="weather-section section story-bg" id="weather" ref={sectionRef}>
       <div className="weather-heading reveal">
         <div>
           <p className="eyebrow">{weather.eyebrow}</p>

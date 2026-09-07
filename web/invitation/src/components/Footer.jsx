@@ -21,7 +21,7 @@ export function Footer() {
   const versionLabel = formatBuild(BUILD);
 
   return (
-    <footer className="site-footer">
+    <footer className="site-footer" id="footer">
       {identity.whatsappUrl && (
         <div className="site-footer-whatsapp">
           <a className="identity-whatsapp-link" href={identity.whatsappUrl} target="_blank" rel="noopener noreferrer">

@@ -328,7 +328,7 @@ export function RSVP() {
   }, [cartItems]);
 
   return (
-    <section className="rsvp-section section story-bg reveal">
+    <section className="rsvp-section section story-bg reveal" id="rsvp">
       <p className="eyebrow">{rsvp.eyebrow}</p>
       <h2>{rsvp.title}</h2>
       <p>{rsvp.body}</p>

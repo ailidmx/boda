@@ -38,8 +38,8 @@ export const NAV_LINKS = [
   ["accommodation", "#accommodation"],
   ["petanque", "#petanque"],
 
-  // FOOD groups the food section, the guisos ranking, the guisos order panel
-  // and the food comment box under one dropdown.
+  // FOOD groups the food section, the guisos ranking and the guisos order
+  // panel under one dropdown.
   {
     key: "food",
     href: "#food",
@@ -47,7 +47,6 @@ export const NAV_LINKS = [
       ["food", "#food"],
       ["guisos", "#guisos"],
       ["guisosOrder", "#guisos-order"],
-      ["foodComment", "#food-comment"],
     ],
   },
 

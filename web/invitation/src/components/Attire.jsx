@@ -25,7 +25,7 @@ export function Attire() {
     lightbox?.source === "wixarica" ? wixaricaSlides : oaxacaSlides;
 
   return (
-    <section className="attire-section attire-section--tematica section story-bg">
+    <section className="attire-section attire-section--tematica section story-bg" id="attire">
       {/* Full-bleed terracotta background behind the whole tematica section. */}
       <div className="attire-bg attire-bg--terracotta" aria-hidden="true" />
 
@@ -116,7 +116,7 @@ export function DressCode() {
   const dressCode = attire.dressCode || {};
 
   return (
-    <section className="attire-section attire-section--dresscode section story-bg">
+    <section className="attire-section attire-section--dresscode section story-bg" id="dress-code">
       {/* Full-bleed confetti background behind the dress-code section. */}
       <div className="attire-bg attire-bg--confetti" aria-hidden="true" />
 
