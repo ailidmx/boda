@@ -14,6 +14,7 @@ export const coast = {
         kind: "plan",
         questionId: "playa",
         nights: 4,
+        gallery: "vallarta",
       },
       {
         icon: "🏙️",
@@ -22,6 +23,7 @@ export const coast = {
         body: "Ciudad, traslados y descanso.",
         kind: "marker",
         nights: 2,
+        gallery: "guadalajara",
       },
       {
         icon: "🌙",
@@ -30,6 +32,7 @@ export const coast = {
         body: "Llegada temprana al lugar.",
         kind: "marker",
         nights: 1,
+        gallery: "rocaAzul",
       },
       {
         icon: "💍",
@@ -38,6 +41,7 @@ export const coast = {
         body: "Roca Azul · Jocotepec.",
         kind: "wedding",
         nights: 2,
+        gallery: "rocaAzul",
       },
       {
         icon: "🏡",
@@ -47,6 +51,7 @@ export const coast = {
         kind: "plan",
         questionId: "rocaAzul",
         nights: 2,
+        gallery: "rocaAzul",
       },
       {
         icon: "⛰️",
@@ -56,6 +61,7 @@ export const coast = {
         kind: "plan",
         questionId: "tapalpa",
         nights: 2,
+        gallery: "tapalpa",
       },
       {
         icon: "🏖️",
@@ -65,6 +71,7 @@ export const coast = {
         kind: "plan",
         questionId: "barraNavidad",
         nights: 3,
+        gallery: "barra",
       },
     ],
     note:
@@ -123,6 +130,7 @@ export const coast = {
         kind: "plan",
         questionId: "playa",
         nights: 4,
+        gallery: "vallarta",
       },
       {
         icon: "🏙️",
@@ -131,6 +139,7 @@ export const coast = {
         body: "Ville, transferts et repos.",
         kind: "marker",
         nights: 2,
+        gallery: "guadalajara",
       },
       {
         icon: "🌙",
@@ -139,6 +148,7 @@ export const coast = {
         body: "Arrivée tôt sur place.",
         kind: "marker",
         nights: 1,
+        gallery: "rocaAzul",
       },
       {
         icon: "💍",
@@ -147,6 +157,7 @@ export const coast = {
         body: "Roca Azul · Jocotepec.",
         kind: "wedding",
         nights: 2,
+        gallery: "rocaAzul",
       },
       {
         icon: "🏡",
@@ -156,6 +167,7 @@ export const coast = {
         kind: "plan",
         questionId: "rocaAzul",
         nights: 2,
+        gallery: "rocaAzul",
       },
       {
         icon: "⛰️",
@@ -165,6 +177,7 @@ export const coast = {
         kind: "plan",
         questionId: "tapalpa",
         nights: 2,
+        gallery: "tapalpa",
       },
       {
         icon: "🏖️",
@@ -174,6 +187,7 @@ export const coast = {
         kind: "plan",
         questionId: "barraNavidad",
         nights: 3,
+        gallery: "barra",
       },
     ],
     note:
@@ -232,6 +246,7 @@ export const coast = {
         kind: "plan",
         questionId: "playa",
         nights: 4,
+        gallery: "vallarta",
       },
       {
         icon: "🏙️",
@@ -240,6 +255,7 @@ export const coast = {
         body: "City, transfers and rest.",
         kind: "marker",
         nights: 2,
+        gallery: "guadalajara",
       },
       {
         icon: "🌙",
@@ -248,6 +264,7 @@ export const coast = {
         body: "Early arrival at the venue.",
         kind: "marker",
         nights: 1,
+        gallery: "rocaAzul",
       },
       {
         icon: "💍",
@@ -256,6 +273,7 @@ export const coast = {
         body: "Roca Azul · Jocotepec.",
         kind: "wedding",
         nights: 2,
+        gallery: "rocaAzul",
       },
       {
         icon: "🏡",
@@ -265,6 +283,7 @@ export const coast = {
         kind: "plan",
         questionId: "rocaAzul",
         nights: 2,
+        gallery: "rocaAzul",
       },
       {
         icon: "⛰️",
@@ -274,6 +293,7 @@ export const coast = {
         kind: "plan",
         questionId: "tapalpa",
         nights: 2,
+        gallery: "tapalpa",
       },
       {
         icon: "🏖️",
@@ -283,6 +303,7 @@ export const coast = {
         kind: "plan",
         questionId: "barraNavidad",
         nights: 3,
+        gallery: "barra",
       },
     ],
     note:

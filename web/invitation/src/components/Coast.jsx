@@ -1,15 +1,16 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useApp } from "../context/AppContext.jsx";
 import { useRsvp, RSVP_FLOWS } from "../context/RsvpContext.jsx";
 import { getRsvpScale, UNANSWERED_LEVEL } from "../rsvp-scale.js";
 import { getGroupMembers, resolveGuestName } from "../guest-profiles.js";
 import { getActiveGuests } from "../guests.js";
 import { saveRsvpAnswers } from "../rsvp-responses.js";
+import { LightboxCarousel } from "./LightboxCarousel.jsx";
+import { getPlanGallery } from "../plan-galleries.js";
 
 // "Nos 2 semaines" — a compact timeline of the whole two weeks (before,
-// wedding, after). Each plan is a short card; votable cards carry an inline
-// scale vote so guests can answer directly without a separate form. The
-// wedding card is a marker (no vote).
+// wedding, after). Each plan is a short card with a photo gallery behind it
+// (click to open the lightbox); votable cards also carry an inline scale vote.
 function InlineVote({ questionId, guests, answers, scale, language, labels, onVote }) {
   const currentFor = (guestId) =>
     Number(answers[questionId]?.[guestId]) || UNANSWERED_LEVEL;
@@ -33,7 +34,10 @@ function InlineVote({ questionId, guests, answers, scale, language, labels, onVo
                 className={`plan-card__vote-btn${current === UNANSWERED_LEVEL ? " is-selected" : ""}`}
                 aria-label={`${name.fullName}: ${labels.noAnswer}`}
                 title={labels.noAnswer}
-                onClick={() => onVote(questionId, guest.id, UNANSWERED_LEVEL)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onVote(questionId, guest.id, UNANSWERED_LEVEL);
+                }}
               >
                 —
               </button>
@@ -44,7 +48,10 @@ function InlineVote({ questionId, guests, answers, scale, language, labels, onVo
                   className={`plan-card__vote-btn${current === entry.level ? " is-selected" : ""}`}
                   aria-label={`${name.fullName}: ${entry[language] || entry.es}`}
                   title={entry[language] || entry.es}
-                  onClick={() => onVote(questionId, guest.id, entry.level)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onVote(questionId, guest.id, entry.level);
+                  }}
                 >
                   {entry.emoji}
                 </button>
@@ -66,6 +73,8 @@ export function Coast() {
   const flow = RSVP_FLOWS.coast;
   const scale = getRsvpScale();
 
+  const [activeGallery, setActiveGallery] = useState(null); // { label, photos, index }
+
   const guests = useMemo(
     () => getGroupMembers(profile?.guest, getActiveGuests()),
     [profile?.guest],
@@ -83,6 +92,12 @@ export function Coast() {
     }
   };
 
+  const openGallery = (plan) => {
+    const photos = getPlanGallery(plan.gallery);
+    if (!photos.length) return;
+    setActiveGallery({ label: plan.title, photos, index: 0 });
+  };
+
   return (
     <section className="coast-section coast-section--after section" id="after">
       <div id="after-intro" className="coast-copy reveal">
@@ -93,35 +108,61 @@ export function Coast() {
         </div>
 
         <div className="plan-cards">
-          {coast.plans.map((plan, index) => (
-            <article
-              className={`plan-card${plan.kind === "wedding" ? " plan-card--wedding" : ""}`}
-              key={index}
-            >
-              <div className="plan-card__meta">
-                <span className="plan-card__dates">{plan.dates}</span>
-                <span className="plan-card__nights">
-                  <span aria-hidden="true">🌙</span> {plan.nights}{" "}
-                  {plan.nights === 1 ? nightsLabel.one : nightsLabel.other}
-                </span>
-              </div>
-              <strong className="plan-card__title">
-                <span aria-hidden="true">{plan.icon}</span> {plan.title}
-              </strong>
-              <span className="plan-card__body">{plan.body}</span>
-              {plan.questionId && (
-                <InlineVote
-                  questionId={plan.questionId}
-                  guests={guests}
-                  answers={answers}
-                  scale={scale}
-                  language={language}
-                  labels={voteLabels}
-                  onVote={handleVote}
-                />
-              )}
-            </article>
-          ))}
+          {coast.plans.map((plan, index) => {
+            const photos = getPlanGallery(plan.gallery);
+            const hasGallery = photos.length > 0;
+            return (
+              <article
+                className={`plan-card${plan.kind === "wedding" ? " plan-card--wedding" : ""}${hasGallery ? " plan-card--gallery" : ""}`}
+                key={index}
+                style={hasGallery ? { "--plan-image": `url("${photos[0].src}")` } : undefined}
+                onClick={() => openGallery(plan)}
+                role={hasGallery ? "button" : undefined}
+                tabIndex={hasGallery ? 0 : undefined}
+                aria-label={hasGallery ? plan.title : undefined}
+                onKeyDown={
+                  hasGallery
+                    ? (e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          openGallery(plan);
+                        }
+                      }
+                    : undefined
+                }
+              >
+                <div className="plan-card__meta">
+                  <span className="plan-card__dates">{plan.dates}</span>
+                  <div className="plan-card__meta-right">
+                    <span className="plan-card__nights">
+                      <span aria-hidden="true">🌙</span> {plan.nights}{" "}
+                      {plan.nights === 1 ? nightsLabel.one : nightsLabel.other}
+                    </span>
+                    {hasGallery && (
+                      <span className="plan-card__gallery-badge" aria-hidden="true">
+                        📷 {photos.length}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <strong className="plan-card__title">
+                  <span aria-hidden="true">{plan.icon}</span> {plan.title}
+                </strong>
+                <span className="plan-card__body">{plan.body}</span>
+                {plan.questionId && (
+                  <InlineVote
+                    questionId={plan.questionId}
+                    guests={guests}
+                    answers={answers}
+                    scale={scale}
+                    language={language}
+                    labels={voteLabels}
+                    onVote={handleVote}
+                  />
+                )}
+              </article>
+            );
+          })}
         </div>
 
         <p className="coast-note">{coast.note}</p>
@@ -133,6 +174,14 @@ export function Coast() {
           <span aria-hidden="true">↓</span>
         </a>
       </nav>
+
+      <LightboxCarousel
+        open={activeGallery !== null}
+        onClose={() => setActiveGallery(null)}
+        images={activeGallery?.photos || []}
+        startIndex={activeGallery?.index ?? 0}
+        label={activeGallery?.label || ""}
+      />
     </section>
   );
 }
