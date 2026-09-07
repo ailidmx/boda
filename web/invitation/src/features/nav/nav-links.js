@@ -64,17 +64,14 @@ export const NAV_LINKS = [
     ],
   },
 
-  // AVANT ("Avant ?") groups the intro, the beach plan, the Barra de Navidad
-  // suggestions, the mini RSVP and the beach budget under one dropdown, in the
-  // order they appear on the page.
+  // AVANT ("Avant ?") groups the beach-plan intro and the mini RSVP under one
+  // dropdown, in the order they appear on the page.
   {
     key: "avant",
     href: "#avant",
     children: [
       ["avantIntro", "#avant-intro"],
-      ["avantPlan", "#avant-barra"],
       ["avantRsvp", "#avant-rsvp"],
-      ["avantBudget", "#avant-budget"],
     ],
   },
 

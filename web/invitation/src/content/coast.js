@@ -1,23 +1,28 @@
 export const coast = {
   es: {
     eyebrow: "¿Y después?",
-    title: "Prolongar el gusto de estar juntos",
+    title: "Tres paradas para alargar la fiesta",
     body:
-      "La fiesta no termina el domingo. Hemos preparado dos planes para seguir disfrutando juntos, y cada quien elige el que mejor le venga.",
+      "La fiesta no termina el domingo. Estos son los tres planes para seguir juntos, y cada quien se apunta al que mejor le venga.",
     plans: [
       {
-        title: "Plan 1 · Quedarse en Roca Azul",
-        body:
-          "Rentar una cabaña dos noches más, del domingo al martes, para seguir conviviendo en el lugar. Si te interesa, indícalo en el RSVP y organizaremos la cabaña para tu grupo.",
+        title: "Roca Azul",
+        dates: "Dom 21 → Mar 23",
+        body: "2 días más en el lugar.",
       },
       {
-        title: "Plan 2 · Mazamitla",
-        body:
-          "Del martes 23 al domingo 28 de febrero nos vamos a Mazamitla, un pueblo mágico en la sierra. No es luna de miel — estás cordialmente invitado a seguir la fiesta. Podemos organizar transportes en común.",
+        title: "Tapalpa",
+        dates: "Mar 23 → Jue 25",
+        body: "Pueblo mágico en la sierra.",
+      },
+      {
+        title: "Barra de Navidad",
+        dates: "Jue 25 → Dom 28",
+        body: "Playa en la Costa Alegre.",
       },
     ],
     note:
-      "Las fechas exactas, el transporte y el presupuesto dependerán del número de personas interesadas. En Mazamitla hay cabañas y hoteles para todos los presupuestos.",
+      "Las fechas exactas y el transporte dependerán del número de personas interesadas.",
     rsvpMini: {
       eyebrow: "¿Y después?",
       title: "¿Te apuntas?",
@@ -26,13 +31,18 @@ export const coast = {
       questions: [
         {
           id: "rocaAzul",
-          title: "Plan 1 · Quedarse en Roca Azul",
-          subtitle: "Dos noches más en el lugar, del domingo al martes.",
+          title: "Roca Azul",
+          subtitle: "Del domingo 21 al martes 23 (2 días más).",
         },
         {
-          id: "mazamitla",
-          title: "Plan 2 · Mazamitla",
-          subtitle: "Del martes 23 al domingo 28 de febrero.",
+          id: "tapalpa",
+          title: "Tapalpa",
+          subtitle: "Del martes 23 al jueves 25.",
+        },
+        {
+          id: "barraNavidad",
+          title: "Barra de Navidad",
+          subtitle: "Del jueves 25 al domingo 28.",
         },
       ],
       recapTitle: "Resumen",
@@ -51,23 +61,28 @@ export const coast = {
   },
   fr: {
     eyebrow: "Et après ?",
-    title: "Prolonger le plaisir d’être ensemble",
+    title: "Trois étapes pour prolonger la fête",
     body:
-      "La fête ne s’arrête pas dimanche. Nous avons préparé deux plans pour continuer à profiter ensemble, et chacun choisit celui qui lui convient le mieux.",
+      "La fête ne s’arrête pas dimanche. Voici les trois plans pour continuer ensemble, et chacun choisit celui qui lui convient.",
     plans: [
       {
-        title: "Plan 1 · Rester à Roca Azul",
-        body:
-          "Louer un gîte deux nuits de plus, du dimanche au mardi, pour continuer à se retrouver sur place. Si cela t’intéresse, indique-le dans le RSVP et nous organiserons le gîte pour ton groupe.",
+        title: "Roca Azul",
+        dates: "Dim 21 → Mar 23",
+        body: "2 jours de plus sur place.",
       },
       {
-        title: "Plan 2 · Mazamitla",
-        body:
-          "Du mardi 23 au dimanche 28 février, nous partons à Mazamitla, un pueblo mágico dans la sierra. Ce n’est pas une lune de miel — tu es cordialement invité à continuer la fête. Nous pouvons organiser des transports en commun.",
+        title: "Tapalpa",
+        dates: "Mar 23 → Jeu 25",
+        body: "Pueblo mágico dans la sierra.",
+      },
+      {
+        title: "Barra de Navidad",
+        dates: "Jeu 25 → Dim 28",
+        body: "Plage sur la Costa Alegre.",
       },
     ],
     note:
-      "Les dates exactes, le transport et le budget dépendront du nombre de personnes intéressées. À Mazamitla, il y a des cabanes et des hôtels pour tous les budgets.",
+      "Les dates exactes et le transport dépendront du nombre de personnes intéressées.",
     rsvpMini: {
       eyebrow: "Et après ?",
       title: "Tu t’inscris ?",
@@ -76,13 +91,18 @@ export const coast = {
       questions: [
         {
           id: "rocaAzul",
-          title: "Plan 1 · Rester à Roca Azul",
-          subtitle: "Deux nuits de plus sur place, du dimanche au mardi.",
+          title: "Roca Azul",
+          subtitle: "Du dimanche 21 au mardi 23 (2 jours de plus).",
         },
         {
-          id: "mazamitla",
-          title: "Plan 2 · Mazamitla",
-          subtitle: "Du mardi 23 au dimanche 28 février.",
+          id: "tapalpa",
+          title: "Tapalpa",
+          subtitle: "Du mardi 23 au jeudi 25.",
+        },
+        {
+          id: "barraNavidad",
+          title: "Barra de Navidad",
+          subtitle: "Du jeudi 25 au dimanche 28.",
         },
       ],
       recapTitle: "Résumé",
@@ -101,23 +121,28 @@ export const coast = {
   },
   en: {
     eyebrow: "And afterwards?",
-    title: "Keep enjoying being together",
+    title: "Three stops to keep the party going",
     body:
-      "The party doesn’t end on Sunday. We have prepared two plans to keep enjoying time together, and everyone chooses whichever suits them best.",
+      "The party doesn’t end on Sunday. Here are the three plans to keep enjoying time together, and everyone picks whichever suits them best.",
     plans: [
       {
-        title: "Plan 1 · Stay at Roca Azul",
-        body:
-          "Rent a guest house for two more nights, from Sunday to Tuesday, to keep spending time together at the venue. If you are interested, let us know in the RSVP and we will arrange a guest house for your group.",
+        title: "Roca Azul",
+        dates: "Sun 21 → Tue 23",
+        body: "2 more days at the venue.",
       },
       {
-        title: "Plan 2 · Mazamitla",
-        body:
-          "From Tuesday February 23 to Sunday February 28, we head to Mazamitla, a magical mountain town. It’s not a honeymoon — you’re warmly invited to keep the party going. We can organise shared transport.",
+        title: "Tapalpa",
+        dates: "Tue 23 → Thu 25",
+        body: "Magical mountain town.",
+      },
+      {
+        title: "Barra de Navidad",
+        dates: "Thu 25 → Sun 28",
+        body: "Beach on the Costalegre.",
       },
     ],
     note:
-      "The exact dates, transport, and budget will depend on the number of interested guests. In Mazamitla there are cabins and hotels for every budget.",
+      "The exact dates and transport will depend on the number of interested guests.",
     rsvpMini: {
       eyebrow: "And afterwards?",
       title: "Are you in?",
@@ -126,13 +151,18 @@ export const coast = {
       questions: [
         {
           id: "rocaAzul",
-          title: "Plan 1 · Stay at Roca Azul",
-          subtitle: "Two more nights at the venue, from Sunday to Tuesday.",
+          title: "Roca Azul",
+          subtitle: "From Sunday 21 to Tuesday 23 (2 more days).",
         },
         {
-          id: "mazamitla",
-          title: "Plan 2 · Mazamitla",
-          subtitle: "From Tuesday February 23 to Sunday February 28.",
+          id: "tapalpa",
+          title: "Tapalpa",
+          subtitle: "From Tuesday 23 to Thursday 25.",
+        },
+        {
+          id: "barraNavidad",
+          title: "Barra de Navidad",
+          subtitle: "From Thursday 25 to Sunday 28.",
         },
       ],
       recapTitle: "Summary",

@@ -4,29 +4,21 @@ import { useRsvp, RSVP_FLOWS } from "../context/RsvpContext.jsx";
 import { RsvpQuestion } from "./RsvpQuestion.jsx";
 import { RsvpRecap } from "./RsvpRecap.jsx";
 import { FlipStepCard } from "./FlipStepCard.jsx";
-import { BARRA_PHOTOS } from "../barraGallery.js";
-import { LightboxCarousel } from "./LightboxCarousel.jsx";
 import { getGroupMembers } from "../guest-profiles.js";
 import { getActiveGuests } from "../guests.js";
 import { computeInitialStepIndex } from "../rsvp-responses.js";
 import { Button } from "./ui/Button.jsx";
-import { CoastSuggestions, CoastBudget } from "../features/coast/index.js";
 
-// "Avant ?" — the beach plan BEFORE the wedding (Barra de Navidad,
-// Friday February 12 → Tuesday February 16). This section reuses the coast
-// beach visuals, the Barra de Navidad photo strip, the accommodation
-// suggestions, the beach budget, and a single-question mini RSVP (the `playa`
-// scale answer).
+// "Avant ?" — the beach plan BEFORE the wedding (Bahía de Banderas,
+// Friday February 12 → Tuesday February 16). Compact plan cards + a
+// single-question mini RSVP (`playa`).
 export function Avant() {
-  const { t, language, interfaceText, profile } = useApp();
+  const { t, interfaceText, profile } = useApp();
   const { answers, setAnswer, markResume, saveFlow } = useRsvp();
   const avant = t.avant || {};
-  const suggestions = avant.suggestions || {};
   const rsvpMini = avant.rsvpMini || {};
-  const budget = avant.budget || {};
   const flow = RSVP_FLOWS.avant;
 
-  const barraRef = useRef(null);
   const rsvpRef = useRef(null);
   const handleNavigate = () => {
     rsvpRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -49,24 +41,7 @@ export function Avant() {
   );
 
   const initialStep = computeInitialStepIndex(questions, guests, answers);
-
-  const [saveStatus, setSaveStatus] = useState("idle"); // idle | working | saved | error
-  const [barraLightbox, setBarraLightbox] = useState(null);
-
-  // ── Barra de Navidad budget estimate ─────────────────────────────────────
-  const BARRA_NIGHTS = 4;
-  const BARRA_MIN_PER_NIGHT = 1200;
-  const BARRA_MAX_PER_NIGHT = 2500;
-  const INTEREST_THRESHOLD = 3;
-  const interestedCount = useMemo(
-    () =>
-      guests.filter(
-        (guest) => (answers.playa?.[guest.id] ?? 0) >= INTEREST_THRESHOLD,
-      ).length,
-    [guests, answers.playa],
-  );
-  const barraMinTotal = BARRA_MIN_PER_NIGHT * BARRA_NIGHTS * interestedCount;
-  const barraMaxTotal = BARRA_MAX_PER_NIGHT * BARRA_NIGHTS * interestedCount;
+  const [saveStatus, setSaveStatus] = useState("idle");
 
   const handleAnswerChange = (questionId, guestId, level) => {
     setAnswer(questionId, guestId, level, flow);
@@ -102,16 +77,6 @@ export function Avant() {
           ? rsvpMini.error
           : "";
 
-  const scrollBarra = (direction) => {
-    const el = barraRef.current;
-    if (!el) return;
-    const photo = el.querySelector(".barra-photo");
-    const step = photo
-      ? photo.getBoundingClientRect().width + 0.8 * 16
-      : el.clientWidth * 0.8;
-    el.scrollBy({ left: direction * step, behavior: "smooth" });
-  };
-
   return (
     <section className="coast-section section" id="avant">
       <div className="coast-scene" aria-hidden="true">
@@ -142,74 +107,22 @@ export function Avant() {
         <span className="coast-scene__beach" />
       </div>
 
-      {/* Screen 1 · the beach plan intro. */}
       <div id="avant-intro" className="coast-copy reveal">
         <div className="section-heading">
           <p className="eyebrow">{avant.eyebrow}</p>
           <h2>{avant.title}</h2>
           <p className="lead">{avant.body}</p>
         </div>
-        <div className="coast-ideas">
+        <div className="plan-cards">
           {avant.plans.map((plan, index) => (
-            <article key={index}>
-              <strong>{plan.title}</strong>
-              <span>{plan.body}</span>
+            <article className="plan-card" key={index}>
+              <span className="plan-card__dates">{plan.dates}</span>
+              <strong className="plan-card__title">{plan.title}</strong>
+              <span className="plan-card__body">{plan.body}</span>
             </article>
           ))}
         </div>
         <p className="coast-note">{avant.note}</p>
-      </div>
-
-      <a
-        className="section-nav-link section-nav-link--inline"
-        href="#avant-barra"
-      >
-        <span>{t.nav.avantPlan}</span>
-        <span aria-hidden="true">↓</span>
-      </a>
-
-      {/* Screen 2 · Barra de Navidad photo strip + suggestions. */}
-      <div id="avant-barra" className="coast-barra">
-        <div className="barra-carousel" aria-label={avant.barraPhotosLabel}>
-          <div className="barra-photos" ref={barraRef}>
-            {BARRA_PHOTOS.map((photo, index) => (
-              <button
-                className="barra-photo"
-                type="button"
-                key={index}
-                onClick={() => setBarraLightbox(index)}
-                aria-label={`${avant.barraPhotosLabel} · ${index + 1} — ver en grande`}
-              >
-                <img
-                  src={photo.src}
-                  alt={`${avant.barraPhotosLabel} · ${index + 1}`}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </button>
-            ))}
-          </div>
-          <div className="barra-carousel__nav" aria-label={`${avant.barraPhotosLabel} navigation`}>
-            <button
-              className="barra-carousel__arrow"
-              type="button"
-              aria-label="Previous"
-              onClick={() => scrollBarra(-1)}
-            >
-              ‹
-            </button>
-            <button
-              className="barra-carousel__arrow"
-              type="button"
-              aria-label="Next"
-              onClick={() => scrollBarra(1)}
-            >
-              ›
-            </button>
-          </div>
-        </div>
-
-        <CoastSuggestions suggestions={suggestions} language={language} />
       </div>
 
       <a
@@ -220,7 +133,6 @@ export function Avant() {
         <span aria-hidden="true">↓</span>
       </a>
 
-      {/* Screen 3 · the mini RSVP (single `playa` question + recap). */}
       <div id="avant-rsvp" className="coast-rsvp-mini reveal" ref={rsvpRef}>
         <div className="coast-rsvp-mini-head">
           <p className="eyebrow">{rsvpMini.eyebrow}</p>
@@ -313,39 +225,12 @@ export function Avant() {
         />
       </div>
 
-      <a
-        className="section-nav-link section-nav-link--inline"
-        href="#avant-budget"
-      >
-        <span>{t.nav.avantBudget}</span>
-        <span aria-hidden="true">↓</span>
-      </a>
-
-      {/* Screen 4 · beach budget estimate. */}
-      <div id="avant-budget" className="coast-budget">
-        <CoastBudget
-          budget={budget}
-          language={language}
-          barraMinTotal={barraMinTotal}
-          barraMaxTotal={barraMaxTotal}
-          interestedCount={interestedCount}
-        />
-      </div>
-
       <nav className="section-nav coast-section-nav" aria-label="Continue">
         <a className="section-nav-link" href="#after">
           <span>{t.nav.coast}</span>
           <span aria-hidden="true">↓</span>
         </a>
       </nav>
-
-      <LightboxCarousel
-        open={barraLightbox !== null}
-        onClose={() => setBarraLightbox(null)}
-        images={BARRA_PHOTOS}
-        startIndex={barraLightbox ?? 0}
-        label={avant.barraPhotosLabel}
-      />
     </section>
   );
 }

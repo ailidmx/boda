@@ -200,19 +200,20 @@ export function Coast() {
 
   return (
     <section className="coast-section coast-section--after section" id="after">
-      {/* Screen 1 · the intro: the two "Et après ?" plans (Roca Azul +
-          Mazamitla). */}
+      {/* Screen 1 · the intro: the three "Et après ?" plans (Roca Azul,
+          Tapalpa, Barra de Navidad) as compact cards. */}
       <div id="after-intro" className="coast-copy reveal">
         <div className="section-heading">
           <p className="eyebrow">{coast.eyebrow}</p>
           <h2>{coast.title}</h2>
           <p className="lead">{coast.body}</p>
         </div>
-        <div className="coast-ideas">
+        <div className="plan-cards">
           {coast.plans.map((plan, index) => (
-            <article key={index}>
-              <strong>{plan.title}</strong>
-              <span>{plan.body}</span>
+            <article className="plan-card" key={index}>
+              <span className="plan-card__dates">{plan.dates}</span>
+              <strong className="plan-card__title">{plan.title}</strong>
+              <span className="plan-card__body">{plan.body}</span>
             </article>
           ))}
         </div>
@@ -269,8 +270,8 @@ export function Coast() {
         </a>
       )}
 
-      {/* Screen 3 · the mini RSVP: Step 1 = stay at Roca Azul, Step 2 =
-          Mazamitla, Step 3 = summary. */}
+      {/* Screen 3 · the mini RSVP: Roca Azul → Tapalpa → Barra de Navidad →
+          summary. */}
       <div id="after-rsvp" className="coast-rsvp-mini reveal" ref={rsvpRef}>
         <div className="coast-rsvp-mini-head">
           <p className="eyebrow">{rsvpMini.eyebrow}</p>

@@ -23,9 +23,9 @@
   color: var(--white);
 }
 
-/* "Et après ?" variant — a forest / mountain palette (Roca Azul + Mazamitla)
+/* "Et après ?" variant — a forest / mountain palette (Roca Azul + Tapalpa)
    that replaces the beach gradient for the "after the wedding" section. The
-   intro/ideas/note/RSVP panels are translucent dark and stay legible over
+   intro/cards/note/RSVP panels are translucent dark and stay legible over
    this deeper backdrop. */
 .coast-section--after {
   background:
@@ -244,6 +244,52 @@
 .coast-note {
   margin-top: 2rem;
   font-size: 0.8rem;
+}
+
+/* Compact plan cards — a short, at-a-glance presentation of the "Avant ?" /
+   "Et après ?" plans, replacing the long `.coast-ideas` monologue. Each card
+   is a date chip + short title + one-liner, laid out in a responsive grid. */
+.plan-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.9rem;
+  margin-top: 2rem;
+}
+
+.plan-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 1.15rem 1.25rem;
+  border-radius: 0.9rem;
+  background: rgb(0 0 0 / 32%);
+  border: 1px solid rgb(255 255 255 / 14%);
+  backdrop-filter: blur(6px);
+}
+
+.plan-card__dates {
+  align-self: flex-start;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 16%);
+  color: var(--white);
+}
+
+.plan-card__title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: #F2D49B;
+}
+
+.plan-card__body {
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: rgb(255 255 255 / 82%);
 }
 
 /* Barra de Navidad photo strip, mirroring the Chapala slideset: a horizontal

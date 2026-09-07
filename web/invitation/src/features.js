@@ -18,7 +18,7 @@ export const FEATURES = {
     {
       icon: "🏖️",
       title: "¿Y antes? ¿Y después?",
-      body: "Ahora hay dos planes extra: la playa antes de la boda (12–16 de febrero) y, después, Roca Azul + Mazamitla (23–28 de febrero).",
+      body: "Ahora hay cuatro paradas: la playa antes de la boda en Bahía de Banderas (12–16 de febrero) y, después, Roca Azul + Tapalpa + Barra de Navidad (21–28 de febrero).",
     },
     {
       icon: "⭐",
@@ -105,7 +105,7 @@ export const FEATURES = {
     {
       icon: "🏖️",
       title: "Et avant ? Et après ?",
-      body: "Deux plans bonus : la plage avant le mariage (12–16 février) et, après, Roca Azul + Mazamitla (23–28 février).",
+      body: "Quatre étapes : la plage avant le mariage à Bahía de Banderas (12–16 février) et, après, Roca Azul + Tapalpa + Barra de Navidad (21–28 février).",
     },
     {
       icon: "⭐",
@@ -192,7 +192,7 @@ export const FEATURES = {
     {
       icon: "🏖️",
       title: "Before? After?",
-      body: "Two bonus plans: the beach before the wedding (Feb 12–16), and afterwards Roca Azul + Mazamitla (Feb 23–28).",
+      body: "Four stops: the beach before the wedding in Bahía de Banderas (Feb 12–16), and afterwards Roca Azul + Tapalpa + Barra de Navidad (Feb 21–28).",
     },
     {
       icon: "⭐",

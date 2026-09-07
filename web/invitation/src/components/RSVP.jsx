@@ -89,7 +89,7 @@ export function RSVP() {
   );
 
   // ── Extra-stay questions (scale variant) ────────────────────────────────
-  // Mirrors the mini-RSVP in the Coast section: rocaAzul + mazamitla.
+  // Mirrors the mini-RSVP in the Coast section: rocaAzul + tapalpa + barraNavidad.
   const extraStayQuestions = useMemo(
     () =>
       (coastRsvpMini.questions || []).map((q) => ({
@@ -515,7 +515,7 @@ export function RSVP() {
         )}
 
         {/* Extra-stay questions: one row per guest, 0–5 likelihood selector
-            for the "Et après ?" plans (stay at Roca Azul + Mazamitla). Mirrors
+            for the "Et après ?" plans (Roca Azul + Tapalpa + Barra). Mirrors
             the mini-RSVP in the Coast section. Shows ONLY the current step by
             default: the first question not fully answered by every group
             member, or the recap when all questions are answered. */}
