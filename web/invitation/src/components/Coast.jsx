@@ -4,8 +4,6 @@ import { useRsvp, RSVP_FLOWS } from "../context/RsvpContext.jsx";
 import { RsvpQuestion } from "./RsvpQuestion.jsx";
 import { RsvpRecap } from "./RsvpRecap.jsx";
 import { FlipStepCard } from "./FlipStepCard.jsx";
-import { BARRA_PHOTOS } from "../barraGallery.js";
-import { LightboxCarousel } from "./LightboxCarousel.jsx";
 import {
   getGroupMembers,
   resolveGuestName,
@@ -19,22 +17,16 @@ import { getActiveGuests } from "../guests.js";
 import { computeInitialStepIndex } from "../rsvp-responses.js";
 import { Button } from "./ui/Button.jsx";
 
-import {
-  ExtraStayCard,
-  CoastSuggestions,
-  CoastBudget,
-} from "../features/coast/index.js";
+import { ExtraStayCard } from "../features/coast/index.js";
 
 
 export function Coast() {
   const { t, language, interfaceText, profile } = useApp();
   const { answers, setAnswer, markResume, saveFlow } = useRsvp();
   const coast = t.coast || {};
-  const suggestions = coast.suggestions || {};
   const rsvpMini = coast.rsvpMini || {};
   const flow = RSVP_FLOWS.coast;
 
-  const barraRef = useRef(null);
   // The mini RSVP card. Used to scroll the flow back into view on every step
   // change (next/back/modify) so the guest always lands at the top of the
   // card instead of being left mid-page.
@@ -81,9 +73,7 @@ export function Coast() {
     return source?.hosting?.isXtraCabinPaid ?? source?.isXtraCabinPaid;
   };
 
-
   // The active member shown in the extra-stay card. Defaults to the signed-in
-
   // guest; the guest selector (member tabs) lets the user switch between the
   // members of their invitation group, mirroring the Accommodation section.
   const [activeMemberId, setActiveMemberId] = useState(null);
@@ -110,7 +100,6 @@ export function Coast() {
   const extraCoveredLabel = option.payment?.covered || "";
 
   // Extra cabin display name (normalised whitespace, like the primary cabin).
-
   const extraCabinName = extraCabin?.name?.replace(/\s+/g, " ") || extraCabinId;
 
   // Photos come from the DB (Cloudinary IDs). cloudinaryIds may be an array
@@ -129,17 +118,6 @@ export function Coast() {
   const extraPaidByCouple = resolveXtraCovered(liveActive);
 
   // ── Extra cabin occupancy ────────────────────────────────────────────────
-
-  // Occupancy is computed by parsing the whole guests collection and finding
-  // every guest who shares the SAME extra cabin (xtraCabin), not just those
-  // with a matching room id. Each occupant carries their room, their
-  // "paid by the couple" flag (isXtraCabinPaidByNovios), avatar and name so
-  // the modal shows the complete picture of who shares the extra cabin.
-  //
-  // NOTE: the live `xtraCabin`/`xtraRoom`/`isXtraCabinPaidByNovios` data lives
-  // in the Firestore `guests` collection. It is loaded for ALL guests at
-  // startup via `loadAllGuests()` (see AppContext), so guests from other
-  // invitation groups who share this extra cabin are included too.
   const extraCabinRooms = extraCabin ? getRoomsByCabin(extraCabin.id) : [];
 
   // All active guests assigned to this extra cabin (by resolved xtraCabin id).
@@ -167,35 +145,6 @@ export function Coast() {
     room: cabinRoom,
     occupants: extraCabinOccupants.filter((o) => o.roomId === cabinRoom.id),
   }));
-  const unassignedExtraOccupants = extraCabinOccupants.filter(
-    (o) => !extraCabinRooms.some((r) => r.id === o.roomId),
-  );
-  if (unassignedExtraOccupants.length > 0) {
-    extraRoomOccupants.push({
-      room: { id: "__unassigned__", capacity: unassignedExtraOccupants.length, isShared: true },
-      occupants: unassignedExtraOccupants,
-    });
-  }
-
-  // Debug traces for the extra cabin occupancy calculation.
-  console.log("[coast][extra-cabin-occupancy]", {
-    activeGuestId: liveActive?.id,
-    extraCabinId,
-    extraCabinName: extraCabin?.name,
-    extraRoom,
-    totalActiveGuests: getActiveGuests().length,
-    matchedOccupants: extraCabinOccupants.map((o) => ({
-      id: o.id,
-      name: o.name,
-      roomId: o.roomId,
-      covered: o.covered,
-    })),
-    rooms: extraRoomOccupants.map(({ room, occupants }) => ({
-      roomId: room.id,
-      occupantCount: occupants.length,
-      occupantIds: occupants.map((o) => o.id),
-    })),
-  });
 
   // The two scale questions about the "Et après ?" plans. Levels: 0–5.
   const questions = useMemo(
@@ -215,32 +164,8 @@ export function Coast() {
 
   const [saveStatus, setSaveStatus] = useState("idle"); // idle | working | saved | error
 
-  // Full-screen lightbox for the Barra de Navidad photo strip. `barraLightbox`
-  // holds the start index or null. The lightbox itself is swipeable.
-  const [barraLightbox, setBarraLightbox] = useState(null);
-
-  // ── Barra de Navidad budget estimate ─────────────────────────────────────
-  // A hotel night in Barra de Navidad runs ~1,200–2,500 MXN per person. The
-  // beach plan (Plan 2 · La plage) is 4 nights (Tue–Sat). We estimate the
-  // group total from how many group members rated the beach plan as
-  // interested (level ≥ 3 on the 0–5 scale).
-  const BARRA_NIGHTS = 4;
-  const BARRA_MIN_PER_NIGHT = 1200;
-  const BARRA_MAX_PER_NIGHT = 2500;
-  const INTEREST_THRESHOLD = 3;
-  const interestedCount = useMemo(
-    () =>
-      guests.filter(
-        (guest) => (answers.playa?.[guest.id] ?? 0) >= INTEREST_THRESHOLD,
-      ).length,
-    [guests, answers.playa],
-  );
-  const barraMinTotal = BARRA_MIN_PER_NIGHT * BARRA_NIGHTS * interestedCount;
-  const barraMaxTotal = BARRA_MAX_PER_NIGHT * BARRA_NIGHTS * interestedCount;
-  const budget = coast.budget || {};
-
   const handleAnswerChange = (questionId, guestId, level) => {
-    setAnswer(questionId, guestId, level, RSVP_FLOWS.coast);
+    setAnswer(questionId, guestId, level, flow);
   };
 
   const handleSaveAnswers = async () => {
@@ -249,7 +174,6 @@ export function Coast() {
     if (!editorGuestId) return;
     setSaveStatus("working");
     try {
-      // Persist each guest's answers to their own rsvp_responses doc.
       await saveFlow({ flow, questions, guests, editorGuestId });
       setSaveStatus("saved");
     } catch (error) {
@@ -258,18 +182,12 @@ export function Coast() {
     }
   };
 
-  // Runs before the card advances forward. When leaving the LAST question step
-  // (i.e. entering the recap), persist the answers automatically so the guest
-  // never reaches the recap thinking they saved when they didn't. Always
-  // returns true so the recap is shown with the save result (working/saved/
-  // error) in its reserved message area.
   const handleBeforeNext = async (currentIndex) => {
     if (currentIndex === questions.length - 1) {
       await handleSaveAnswers();
     }
     return true;
   };
-
 
   const saveStatusText =
     saveStatus === "working"
@@ -280,54 +198,10 @@ export function Coast() {
           ? rsvpMini.error
           : "";
 
-  // Scroll the Barra de Navidad photo strip by one photo (or ~80% of the
-  // viewport when no photo is measurable). Used by the prev/next controls.
-  const scrollBarra = (direction) => {
-    const el = barraRef.current;
-    if (!el) return;
-    const photo = el.querySelector(".barra-photo");
-    const step = photo
-      ? photo.getBoundingClientRect().width + 0.8 * 16
-      : el.clientWidth * 0.8;
-    el.scrollBy({ left: direction * step, behavior: "smooth" });
-  };
-
   return (
-    <section className="coast-section section" id="after">
-      {/* Beach story backdrop — a layered scene that reads top-to-bottom:
-          sky with a sun (top right) → horizon with birds & boats → sparkling
-          sea → sandy beach. Purely decorative; sits behind the content. */}
-      <div className="coast-scene" aria-hidden="true">
-        <span className="coast-scene__sun" />
-        <svg className="coast-scene__birds" viewBox="0 0 200 60" preserveAspectRatio="none">
-          <path d="M10 30 Q20 12 30 30 Q40 12 50 30" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-          <path d="M70 22 Q78 8 86 22 Q94 8 102 22" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-          <path d="M120 34 Q127 22 134 34 Q141 22 148 34" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-        </svg>
-        <svg className="coast-scene__boats" viewBox="0 0 260 90" preserveAspectRatio="none">
-          <g className="coast-scene__boat coast-scene__boat--1">
-            <path d="M10 55 Q30 70 60 55 L52 40 L18 40 Z" fill="currentColor" opacity="0.9" />
-            <path d="M35 40 L35 18 L52 40 Z" fill="currentColor" opacity="0.85" />
-          </g>
-          <g className="coast-scene__boat coast-scene__boat--2">
-            <path d="M150 60 Q170 74 198 60 L190 46 L158 46 Z" fill="currentColor" opacity="0.8" />
-            <path d="M174 46 L174 26 L190 46 Z" fill="currentColor" opacity="0.75" />
-          </g>
-        </svg>
-        <span className="coast-scene__sparkle coast-scene__sparkle--1" />
-        <span className="coast-scene__sparkle coast-scene__sparkle--2" />
-        <span className="coast-scene__sparkle coast-scene__sparkle--3" />
-        <span className="coast-scene__sparkle coast-scene__sparkle--4" />
-        <span className="coast-scene__sparkle coast-scene__sparkle--5" />
-        <span className="coast-scene__sparkle coast-scene__sparkle--6" />
-        <span className="coast-scene__sparkle coast-scene__sparkle--7" />
-        <span className="coast-scene__sparkle coast-scene__sparkle--8" />
-        <span className="coast-scene__beach" />
-      </div>
-
-      {/* Screen 1 · "Prolonger le plaisir ?" — the intro: the two "Et après ?"
-          plans. The Barra de Navidad photo strip lives on its own screen
-          (Screen 3) with the accommodation suggestions. */}
+    <section className="coast-section coast-section--after section" id="after">
+      {/* Screen 1 · the intro: the two "Et après ?" plans (Roca Azul +
+          Mazamitla). */}
       <div id="after-intro" className="coast-copy reveal">
         <div className="section-heading">
           <p className="eyebrow">{coast.eyebrow}</p>
@@ -345,22 +219,18 @@ export function Coast() {
         <p className="coast-note">{coast.note}</p>
       </div>
 
-      {/* Inline nav: from the intro to the extra-stay plan (Screen 2), or
-          straight to Barra de Navidad (Screen 3) when the guest has no extra
-          cabin assigned. */}
+      {/* Inline nav: from the intro to the extra-stay plan, or straight to the
+          mini RSVP when the guest has no extra cabin assigned. */}
       <a
         className="section-nav-link section-nav-link--inline"
-        href={hasExtraCabin ? "#after-plan" : "#after-barra"}
+        href={hasExtraCabin ? "#after-plan" : "#after-rsvp"}
       >
-        <span>{t.nav[hasExtraCabin ? "coastPlan" : "coastBarra"]}</span>
+        <span>{t.nav[hasExtraCabin ? "coastPlan" : "coastRsvp"]}</span>
         <span aria-hidden="true">↓</span>
       </a>
 
-      {/* Screen 2 · "El plan para ti" — the extra stay (Plan 1 · stay at Roca
-          Azul, Sunday→Tuesday). Shown only when the active guest has an extra
-          cabin assigned for the second stay. Reuses the same StayPlanCard as
-          the Hébergement section so the pricing, "paid by the couple" banner,
-          and on-sale styling match. */}
+      {/* Screen 2 · the extra stay (Plan 1 · stay at Roca Azul, Sunday→Tuesday).
+          Shown only when the active guest has an extra cabin assigned. */}
       {hasExtraCabin && extraCabin && (
         <div id="after-plan" className="coast-plan">
           <ExtraStayCard
@@ -385,81 +255,22 @@ export function Coast() {
             payment={extraPayment}
             coveredLabel={extraCoveredLabel}
           />
-
         </div>
       )}
 
-      {/* Inline nav: from the extra-stay plan to Barra de Navidad (Screen 3). */}
+      {/* Inline nav: from the extra-stay plan to the mini RSVP. */}
       {hasExtraCabin && extraCabin && (
         <a
           className="section-nav-link section-nav-link--inline"
-          href="#after-barra"
+          href="#after-rsvp"
         >
-          <span>{t.nav.coastBarra}</span>
+          <span>{t.nav.coastRsvp}</span>
           <span aria-hidden="true">↓</span>
         </a>
       )}
 
-      {/* Screen 3 · "Barra de Navidad" — the photo strip of Barra de Navidad
-          plus the accommodation suggestions (mirrors the Accommodation "no
-          cabin" pattern: an Airbnb section and a hotel section). */}
-      <div id="after-barra" className="coast-barra">
-        <div className="barra-carousel" aria-label={coast.barraPhotosLabel}>
-          <div className="barra-photos" ref={barraRef}>
-            {BARRA_PHOTOS.map((photo, index) => (
-              <button
-                className="barra-photo"
-                type="button"
-                key={index}
-                onClick={() => setBarraLightbox(index)}
-                aria-label={`${coast.barraPhotosLabel} · ${index + 1} — ver en grande`}
-              >
-                <img
-                  src={photo.src}
-                  alt={`${coast.barraPhotosLabel} · ${index + 1}`}
-                  loading="lazy"
-                  decoding="async"
-                />
-              </button>
-            ))}
-          </div>
-          <div className="barra-carousel__nav" aria-label={`${coast.barraPhotosLabel} navigation`}>
-            <button
-              className="barra-carousel__arrow"
-              type="button"
-              aria-label="Previous"
-              onClick={() => scrollBarra(-1)}
-            >
-              ‹
-            </button>
-            <button
-              className="barra-carousel__arrow"
-              type="button"
-              aria-label="Next"
-              onClick={() => scrollBarra(1)}
-            >
-              ›
-            </button>
-          </div>
-        </div>
-
-        <CoastSuggestions suggestions={suggestions} language={language} />
-      </div>
-
-      {/* Inline nav: from Barra de Navidad to the mini RSVP (Screen 4). */}
-      <a
-        className="section-nav-link section-nav-link--inline"
-        href="#after-rsvp"
-      >
-        <span>{t.nav.coastRsvp}</span>
-        <span aria-hidden="true">↓</span>
-      </a>
-
-      {/* Screen 4 · "Te apuntas?" — the mini RSVP, a 3-step flipable card
-          (like "¡Te animas!" and pétanque): Step 1 = stay at Roca Azul,
-          Step 2 = the beach plan, Step 3 = summary. Each guest rates how
-          likely they are to join each "Et après ?" plan (0–5). Answers are
-          saved per guest to Firestore via saveRsvpAnswers. */}
+      {/* Screen 3 · the mini RSVP: Step 1 = stay at Roca Azul, Step 2 =
+          Mazamitla, Step 3 = summary. */}
       <div id="after-rsvp" className="coast-rsvp-mini reveal" ref={rsvpRef}>
         <div className="coast-rsvp-mini-head">
           <p className="eyebrow">{rsvpMini.eyebrow}</p>
@@ -508,10 +319,6 @@ export function Coast() {
                     >
                       {rsvpMini.modifyButton}
                     </Button>
-                    {/* Dedicated, always-present save-status placeholder.
-                        It reserves space and announces the result
-                        (working / saved / error) via aria-live so the guest
-                        always sees the outcome of the save. */}
                     <p
                       className={`rsvp-status${
                         saveStatus === "saved"
@@ -526,7 +333,6 @@ export function Coast() {
                       {saveStatusText}
                     </p>
                   </div>
-
                 </div>
               ),
             },
@@ -537,10 +343,6 @@ export function Coast() {
           hideNextOn={[questions.length - 1]}
           onBeforeNext={handleBeforeNext}
           navRight={({ index, next }) => {
-            // On the last question step, replace the "Next" button with the
-            // gold "Save my responses" CTA, on the same line as Back.
-            // Clicking it advances to the recap; `onBeforeNext` persists the
-            // answers first and the result shows in the recap.
             if (index !== questions.length - 1) return null;
             return (
               <button
@@ -553,7 +355,6 @@ export function Coast() {
               </button>
             );
           }}
-
           copy={{
             step: interfaceText.stepLabel || "Step",
             next: interfaceText.next || "Next",
@@ -562,48 +363,15 @@ export function Coast() {
         />
       </div>
 
-      {/* Inline nav: from the mini RSVP to the beach budget (Screen 5). */}
-      <a
-        className="section-nav-link section-nav-link--inline"
-        href="#after-budget"
-      >
-        <span>{t.nav.coastBudget}</span>
-        <span aria-hidden="true">↓</span>
-      </a>
-
-      {/* Screen 5 · "Presupuesto playa" — the Barra de Navidad budget
-          estimate, a "budget to plan" block that turns the per-night
-          per-person rate (1,200–2,500 MXN) into a group total for the 4 beach
-          nights, based on how many group members rated the beach plan as
-          interested (level ≥ 3). */}
-      <div id="after-budget" className="coast-budget">
-        <CoastBudget
-          budget={budget}
-          language={language}
-          barraMinTotal={barraMinTotal}
-          barraMaxTotal={barraMaxTotal}
-          interestedCount={interestedCount}
-        />
-      </div>
-
-
-      {/* Desktop-only bottom nav: leads to the photos section. */}
+      {/* Desktop-only bottom nav: leads to the RSVP section. */}
       <nav className="section-nav coast-section-nav" aria-label="Continue">
         <a className="section-nav-link" href="#rsvp">
           <span>{t.nav.rsvp}</span>
           <span aria-hidden="true">↓</span>
         </a>
       </nav>
-
-      {/* Full-screen lightbox for the Barra de Navidad photo strip. The
-          lightbox itself is swipeable (touch, arrows, dots). */}
-      <LightboxCarousel
-        open={barraLightbox !== null}
-        onClose={() => setBarraLightbox(null)}
-        images={BARRA_PHOTOS}
-        startIndex={barraLightbox ?? 0}
-        label={coast.barraPhotosLabel}
-      />
     </section>
   );
 }
+
+export default Coast;

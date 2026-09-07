@@ -238,6 +238,7 @@ function presenciaTab({ guest, ctx }) {
     field("Cabaña extra", selectInput("xtraCabin", cabinOptions(xtraCabinDisplay))),
     field("Cuarto extra", selectInput("xtraRoom", roomOptions(xtraCabinDisplay, h.xtraRoom))),
     field("Roca Azul", selectInput("rocaAzul", scaleOptions(Number(a.rocaAzul) || 0))),
+    field("Mazamitla", selectInput("mazamitla", scaleOptions(Number(a.mazamitla) || 0))),
     field("Pago", selectInput("paymentConfirmed", optionsHtml(TOP_BOOL_OPTIONS,
       guest?.paymentConfirmed === true ? "true" : guest?.paymentConfirmed === false ? "false" : ""))),
   ].join("");
@@ -520,7 +521,7 @@ async function saveEdit(overlay, guest, ctx, setStatus) {
     if (!ok) throw new Error("No se pudo actualizar el correo de acceso.");
   }
 
-  for (const key of ["friday", "saturday", "sunday", "playa", "rocaAzul"]) {
+  for (const key of ["friday", "saturday", "sunday", "playa", "rocaAzul", "mazamitla"]) {
     const level = Number(v(key)) || 0;
     if (level !== (Number(rsvp[key]) || 0)) await ctx.saveGuestRsvpAnswer(guestId, key, level);
   }

@@ -36,6 +36,8 @@ export function RSVP() {
   const petanque = rsvp.petanque || {};
   const petanqueTribute = t.petanqueTribute || {};
   const petanqueMini = petanqueTribute.rsvpMini || {};
+  const avant = t.avant || {};
+  const avantRsvpMini = avant.rsvpMini || {};
   const coast = t.coast || {};
   const coastRsvpMini = coast.rsvpMini || {};
 
@@ -87,7 +89,7 @@ export function RSVP() {
   );
 
   // ── Extra-stay questions (scale variant) ────────────────────────────────
-  // Mirrors the mini-RSVP in the Coast section: rocaAzul + playa.
+  // Mirrors the mini-RSVP in the Coast section: rocaAzul + mazamitla.
   const extraStayQuestions = useMemo(
     () =>
       (coastRsvpMini.questions || []).map((q) => ({
@@ -97,6 +99,19 @@ export function RSVP() {
         variant: "scale",
       })),
     [coastRsvpMini],
+  );
+
+  // ── Avant questions (scale variant) ─────────────────────────────────────
+  // Mirrors the mini-RSVP in the Avant section: the `playa` beach question.
+  const avantQuestions = useMemo(
+    () =>
+      (avantRsvpMini.questions || []).map((q) => ({
+        id: q.id,
+        title: q.title,
+        subtitle: q.subtitle,
+        variant: "scale",
+      })),
+    [avantRsvpMini],
   );
 
   // ── Current step per fieldset ───────────────────────────────────────────
@@ -118,6 +133,8 @@ export function RSVP() {
     guests,
     answers,
   );
+
+  const avantStep = computeInitialStepIndex(avantQuestions, guests, answers);
 
   // ── Save status for the final submit ────────────────────────────────────
 
@@ -144,6 +161,7 @@ export function RSVP() {
       const flows = [
         { flow: RSVP_FLOWS.teAnimas, questions: scale.questions || [] },
         { flow: RSVP_FLOWS.petanque, questions: visiblePetanqueQuestions },
+        { flow: RSVP_FLOWS.avant, questions: avantQuestions },
         { flow: RSVP_FLOWS.coast, questions: extraStayQuestions },
       ];
       for (const { flow, questions } of flows) {
@@ -345,6 +363,11 @@ export function RSVP() {
               done: petanqueStep >= visiblePetanqueQuestions.length,
             },
             {
+              flow: RSVP_FLOWS.avant,
+              label: rsvp.progressAvant,
+              done: avantStep >= avantQuestions.length,
+            },
+            {
               flow: RSVP_FLOWS.coast,
               label: rsvp.progressCoast,
               done: extraStayStep >= extraStayQuestions.length,
@@ -456,9 +479,44 @@ export function RSVP() {
         )}
 
 
+        {/* Avant questions: one row per guest, 0–5 likelihood selector for the
+            "Avant ?" beach plan. Mirrors the mini-RSVP in the Avant section. */}
+        {avantQuestions.length > 0 && guests.length > 0 && (
+          <fieldset className="rsvp-scale-fieldset">
+            <legend>{rsvp.progressAvant}</legend>
+            <p className="fieldset-note">{avantRsvpMini.intro}</p>
+            {avantStep < avantQuestions.length ? (
+              <div className="rsvp-scale-questions">
+                {(() => {
+                  const q = avantQuestions[avantStep];
+                  return (
+                    <RsvpQuestion
+                      key={q.id}
+                      questionId={q.id}
+                      title={q.title}
+                      subtitle={q.subtitle}
+                      guests={guests}
+                      answers={answers[q.id] || {}}
+                      onChange={(guestId, level) =>
+                        handleAnswerChange(q.id, guestId, level, RSVP_FLOWS.avant)
+                      }
+                    />
+                  );
+                })()}
+              </div>
+            ) : (
+              <RsvpRecap
+                questions={avantQuestions}
+                guests={guests}
+                answers={answers}
+              />
+            )}
+          </fieldset>
+        )}
+
         {/* Extra-stay questions: one row per guest, 0–5 likelihood selector
-            for the "Et après ?" plans (stay at Roca Azul + beach). Mirrors the
-            mini-RSVP in the Coast section. Shows ONLY the current step by
+            for the "Et après ?" plans (stay at Roca Azul + Mazamitla). Mirrors
+            the mini-RSVP in the Coast section. Shows ONLY the current step by
             default: the first question not fully answered by every group
             member, or the recap when all questions are answered. */}
         {extraStayQuestions.length > 0 && guests.length > 0 && (

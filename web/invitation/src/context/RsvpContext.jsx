@@ -40,12 +40,14 @@ import { getActiveGuests } from "../guests.js";
 export const RSVP_FLOWS = {
   teAnimas: "teAnimas",
   petanque: "petanque",
+  avant: "avant",
   coast: "coast",
 };
 
 const INITIAL_PROGRESS = {
   [RSVP_FLOWS.teAnimas]: "pending",
   [RSVP_FLOWS.petanque]: "pending",
+  [RSVP_FLOWS.avant]: "pending",
   [RSVP_FLOWS.coast]: "pending",
 };
 

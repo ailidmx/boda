@@ -566,6 +566,7 @@ export function renderGuestManager(ctx) {
           col("xtraCabin", "Cabaña extra", (g) => cabinCell(g, "extra"), "xtraCabin", { width: 140 }),
           col("xtraRoom", "Cuarto extra", (g) => roomCell(g, "extra"), "xtraRoom", { width: 140 }),
           col("rocaAzul", "Roca Azul", (g) => rsvpScaleQuestionCell(g, "rocaAzul"), "rocaAzul", { width: 120 }),
+          col("mazamitla", "Mazamitla", (g) => rsvpScaleQuestionCell(g, "mazamitla"), "mazamitla", { width: 130 }),
           col("paymentConfirmed", "Pago", paymentConfirmedCell, "paymentConfirmed", { width: 110 }),
         ]
       : []),

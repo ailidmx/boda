@@ -23,6 +23,21 @@
   color: var(--white);
 }
 
+/* "Et après ?" variant — a forest / mountain palette (Roca Azul + Mazamitla)
+   that replaces the beach gradient for the "after the wedding" section. The
+   intro/ideas/note/RSVP panels are translucent dark and stay legible over
+   this deeper backdrop. */
+.coast-section--after {
+  background:
+    linear-gradient(180deg,
+      #1f3d33 0%,
+      #2a4a3f 30%,
+      #3d5f4d 55%,
+      #5a7d63 78%,
+      #8aa07c 100%);
+  color: var(--white);
+}
+
 /* ── Beach story backdrop ────────────────────────────────────────────────
    A decorative, layered scene that reads top-to-bottom: sky with a sun in
    the top-right corner → horizon with birds & boats → sparkling sea → sandy

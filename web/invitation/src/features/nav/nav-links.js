@@ -64,18 +64,29 @@ export const NAV_LINKS = [
     ],
   },
 
-  // COAST ("Et après ?") groups the intro, the extra-stay plan, the Barra de
-  // Navidad suggestions, the mini RSVP and the beach budget under one dropdown,
-  // in the order they appear on the page.
+  // AVANT ("Avant ?") groups the intro, the beach plan, the Barra de Navidad
+  // suggestions, the mini RSVP and the beach budget under one dropdown, in the
+  // order they appear on the page.
+  {
+    key: "avant",
+    href: "#avant",
+    children: [
+      ["avantIntro", "#avant-intro"],
+      ["avantPlan", "#avant-barra"],
+      ["avantRsvp", "#avant-rsvp"],
+      ["avantBudget", "#avant-budget"],
+    ],
+  },
+
+  // COAST ("Et après ?") groups the intro, the extra-stay plan and the mini
+  // RSVP under one dropdown, in the order they appear on the page.
   {
     key: "coast",
     href: "#after",
     children: [
       ["coastIntro", "#after-intro"],
       ["coastPlan", "#after-plan"],
-      ["coastBarra", "#after-barra"],
       ["coastRsvp", "#after-rsvp"],
-      ["coastBudget", "#after-budget"],
     ],
   },
 

@@ -111,7 +111,8 @@ export const rsvp = {
           progressLabel: "Antes de enviar, completa cada sección:",
           progressTeAnimas: "¿Te animas? (viernes, sábado, domingo)",
           progressPetanque: "Torneo de petanca",
-          progressCoast: "¿Y después? (playa)",
+          progressAvant: "¿Y antes? (playa)",
+          progressCoast: "¿Y después? (Roca Azul + Mazamitla)",
           progressResume: "Completado",
           progressPending: "Pendiente",
           recap: {
@@ -297,7 +298,8 @@ export const rsvp = {
           progressLabel: "Avant d’envoyer, complète chaque section :",
           progressTeAnimas: "Ça te tente ? (vendredi, samedi, dimanche)",
           progressPetanque: "Tournoi de pétanque",
-          progressCoast: "Et après ? (plage)",
+          progressAvant: "Et avant ? (plage)",
+          progressCoast: "Et après ? (Roca Azul + Mazamitla)",
           progressResume: "Terminé",
           progressPending: "En attente",
           recap: {
@@ -484,7 +486,8 @@ export const rsvp = {
           progressLabel: "Before sending, complete each section:",
           progressTeAnimas: "Are you in? (Friday, Saturday, Sunday)",
           progressPetanque: "Pétanque tournament",
-          progressCoast: "And afterwards? (beach)",
+          progressAvant: "And before? (beach)",
+          progressCoast: "And afterwards? (Roca Azul + Mazamitla)",
           progressResume: "Completed",
           progressPending: "Pending",
           recap: {

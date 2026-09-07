@@ -19,6 +19,7 @@ import { attire } from "./attire.js";
 import { gift } from "./gift.js";
 import { thanks } from "./thanks.js";
 import { coast } from "./coast.js";
+import { avant } from "./avant.js";
 import { rsvp } from "./rsvp.js";
 import { petanqueTribute } from "./petanqueTribute.js";
 import { footer } from "./footer.js";
@@ -50,6 +51,7 @@ export const content = {
     attire: attire.es,
     gift: gift.es,
     thanks: thanks.es,
+    avant: avant.es,
     coast: coast.es,
     rsvp: rsvp.es,
     petanqueTribute: petanqueTribute.es,
@@ -80,6 +82,7 @@ export const content = {
     attire: attire.fr,
     gift: gift.fr,
     thanks: thanks.fr,
+    avant: avant.fr,
     coast: coast.fr,
     rsvp: rsvp.fr,
     petanqueTribute: petanqueTribute.fr,
@@ -110,6 +113,7 @@ export const content = {
     attire: attire.en,
     gift: gift.en,
     thanks: thanks.en,
+    avant: avant.en,
     coast: coast.en,
     rsvp: rsvp.en,
     petanqueTribute: petanqueTribute.en,
