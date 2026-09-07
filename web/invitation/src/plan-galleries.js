@@ -82,14 +82,24 @@ const CHACALA_IDS = [
   "chacala-5_ms1maq",
 ];
 
-// TODO: add Cloudinary ids when provided (prefix depends on upload location).
-const GUADALAJARA_IDS = []; // Guadalajara
+// Guadalajara photos (root public ids, provided by the couple).
+const GUADALAJARA_IDS = [
+  "gdl_sxiggh",
+  "gdl2_opif6k",
+  "gdl3_r8q5l7",
+  "gdl4_f0n0ne",
+  "gdl5_rqppf5",
+  "gdl6_nl2iun",
+  "gdl7_d3woas",
+  "gdl8_c9iepr",
+  "gdl9_lzzr6n",
+];
 
 export const PLAN_GALLERIES = {
   vallarta: rootSet(VALLARTA_IDS),
   sanPancho: rootSet(SAN_PANCHO_IDS),
   chacala: rootSet(CHACALA_IDS),
-  guadalajara: bodaSet(GUADALAJARA_IDS),
+  guadalajara: rootSet(GUADALAJARA_IDS),
   rocaAzul: ROCA_AZUL_PHOTOS,
   tapalpa: rootSet(TAPALPA_IDS),
   barra: BARRA_PHOTOS,
