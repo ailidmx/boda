@@ -68,6 +68,7 @@ export const coast = {
         questionId: "tapalpa",
         nights: 2,
         gallery: "tapalpa",
+        wishlist: "https://www.airbnb.fr/wishlists/2185576607",
       },
       {
         icon: "🏖️",
@@ -206,6 +207,7 @@ export const coast = {
         questionId: "tapalpa",
         nights: 2,
         gallery: "tapalpa",
+        wishlist: "https://www.airbnb.fr/wishlists/2185576607",
       },
       {
         icon: "🏖️",
@@ -344,6 +346,7 @@ export const coast = {
         questionId: "tapalpa",
         nights: 2,
         gallery: "tapalpa",
+        wishlist: "https://www.airbnb.fr/wishlists/2185576607",
       },
       {
         icon: "🏖️",
