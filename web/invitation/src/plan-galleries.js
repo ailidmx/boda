@@ -62,9 +62,25 @@ const TAPALPA_IDS = [
   "tapalpa-11_zo0wbv",
 ];
 
-// TODO: add Cloudinary ids when provided (root, like the other couple-provided sets).
-const SAN_PANCHO_IDS = []; // San Pancho (SURF)
-const CHACALA_IDS = []; // Chacala (CALME)
+// San Pancho (SURF) photos (root public ids, provided by the couple).
+const SAN_PANCHO_IDS = [
+  "sanpancho-2_txcmrx",
+  "sanpancho-3_ohfrqf",
+  "sanpancho4_rtaqjg",
+  "sanpancho-5_lvuvta",
+  "sanpancho-6_pelfha",
+  "sanpancho_fsfuh5",
+];
+
+// Chacala (CALME) photos (root public ids, provided by the couple).
+const CHACALA_IDS = [
+  "chacala_mjizfz",
+  "chacala-1_po9j5h",
+  "chacala-2_pi59s9",
+  "chacala-3_lxgy4l",
+  "chacala-4_ovvc4e",
+  "chacala-5_ms1maq",
+];
 
 // TODO: add Cloudinary ids when provided (prefix depends on upload location).
 const GUADALAJARA_IDS = []; // Guadalajara
