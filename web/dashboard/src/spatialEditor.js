@@ -55,6 +55,7 @@ let dirty = false; // true when `plan` has local changes not yet persisted
 let initialized = false;
 let pendingGuest = null; // pre-selected guest (assign to next tapped seat)
 let showGrid = true; // grid visibility toggle
+let magnet3m = false; // 3m block magnet (aligns table centres to 3×3m blocks)
 let guestDrag = null; // in-flight guest drag { guestId, fromInstanceId, fromSeatId }
 let listGuestDrag = null; // in-flight guest drag from the sidebar "Invitados" list
 let guestDragGhost = null; // HTML ghost avatar while dragging a guest on the canvas
@@ -153,6 +154,27 @@ function svgSize() {
 function visibleViewBox() {
   const { w, h } = svgSize();
   return { minX: camera.panX, minY: camera.panY, w: w / camera.pxPerMeter, h: h / camera.pxPerMeter };
+}
+
+// Snap a table's CENTRE to the centre of the nearest 3m × 3m block, aligned
+// to the room's top-left corner (the "3m magnet").
+function snapTo3mCenter(value, origin, step = 3) {
+  const block = Math.floor((value - origin) / step);
+  return Number((origin + block * step + step / 2).toFixed(6));
+}
+
+// 3m block grid overlay (block boundaries), rendered when the magnet is on.
+function grid3mLines() {
+  const zone = plan.zones[0];
+  if (!zone) return "";
+  const lines = [];
+  for (let x = zone.x; x <= zone.x + zone.width + 1e-9; x += 3) {
+    lines.push(`<line x1="${x}" y1="${zone.y}" x2="${x}" y2="${zone.y + zone.height}" class="se-grid-3m"/>`);
+  }
+  for (let y = zone.y; y <= zone.y + zone.height + 1e-9; y += 3) {
+    lines.push(`<line x1="${zone.x}" y1="${y}" x2="${zone.x + zone.width}" y2="${y}" class="se-grid-3m"/>`);
+  }
+  return lines.join("");
 }
 
 function gridLines() {
@@ -523,6 +545,7 @@ function render() {
       <clipPath id="se-seat-clip" clipPathUnits="userSpaceOnUse"><circle r="0.32"/></clipPath>
     </defs>
     ${showGrid ? `<g class="se-grid-layer">${gridLines()}</g>` : ""}
+    ${magnet3m ? `<g class="se-grid-layer se-grid-3m-layer">${grid3mLines()}</g>` : ""}
     <g class="se-zones">${plan.zones.filter((z) => z.visible !== false).map(zoneMarkup).join("")}</g>
     <g class="se-instances">${[...plan.instances].filter((i) => !i.unplaced).sort((a, b) => zIndexOf(a) - zIndexOf(b)).map(instanceMarkup).join("")}</g>
     ${ghostMarkup()}
@@ -741,12 +764,17 @@ function selectedInstances() {
 function createInstance(definitionId, { placed = true, x = 0, y = 0 } = {}) {
   const def = findDefinition(plan, definitionId);
   if (!def) return null;
+  const norm = normalizeDefinition(def);
+  const zone = plan.zones[0];
+  const isTable = norm.category === "table";
+  const sx = magnet3m && isTable && zone ? snapTo3mCenter(x, zone.x) : snapToGrid(x, EDITOR_DEFAULTS.snap);
+  const sy = magnet3m && isTable && zone ? snapTo3mCenter(y, zone.y) : snapToGrid(y, EDITOR_DEFAULTS.snap);
   const id = `inst-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
   const instance = {
     id,
     definitionId,
     zoneId: plan.zones[0]?.id || "main",
-    transform: { x: snapToGrid(x, EDITOR_DEFAULTS.snap), y: snapToGrid(y, EDITOR_DEFAULTS.snap), rotation: 0 },
+    transform: { x: sx, y: sy, rotation: 0 },
   };
   if (!placed) instance.unplaced = true;
   log(`createInstance ${definitionId} → ${id} (${placed ? "placed" : "unplaced"})`);
@@ -775,10 +803,16 @@ function placeUnplacedInstanceOnDrop(e) {
   const inst = plan.instances.find((i) => i.id === instanceId);
   if (!inst) return;
   const world = worldOf(e);
+  const def = instanceDef(inst);
+  const norm = def && normalizeDefinition(def);
+  const isTable = norm?.category === "table";
+  const zone = plan.zones[0];
+  const x = magnet3m && isTable && zone ? snapTo3mCenter(world.x, zone.x) : snapToGrid(world.x, EDITOR_DEFAULTS.snap);
+  const y = magnet3m && isTable && zone ? snapTo3mCenter(world.y, zone.y) : snapToGrid(world.y, EDITOR_DEFAULTS.snap);
   const transform = {
     ...inst.transform,
-    x: snapToGrid(world.x, EDITOR_DEFAULTS.snap),
-    y: snapToGrid(world.y, EDITOR_DEFAULTS.snap),
+    x,
+    y,
   };
   log(`placeUnplacedInstanceOnDrop ${instanceId} → (${transform.x}, ${transform.y})`);
   dispatch({ type: "MOVE_INSTANCES", moves: [{ id: instanceId, transform }] }, { record: true });
@@ -987,16 +1021,25 @@ function duplicateSelection() {
 
 function rotateSelection(deg = 90) {
   const changed = [];
+  const blocked = [];
   for (const inst of selectedInstances()) {
     const def = instanceDef(inst);
     const norm = def && normalizeDefinition(def);
-    if (norm && !norm.canRotate) continue;
+    if (norm && !norm.canRotate) {
+      blocked.push(inst.id);
+      continue;
+    }
     const rotation = (((inst.transform.rotation || 0) + deg) % 360 + 360) % 360;
     if (dispatch({ type: "ROTATE_INSTANCE", id: inst.id, rotation }, { record: false })) {
       changed.push(inst.id);
+    } else {
+      blocked.push(inst.id);
     }
   }
   if (changed.length) schedulePersist();
+  if (blocked.length && !changed.length) {
+    log(`rotate: no se pudo rotar ${blocked.length} objeto(s) — fuera de la zona o no rotable`);
+  }
 }
 
 function groupSelection() {
@@ -1378,12 +1421,30 @@ function updateObjectDrag(e) {
   // Primary instance drives snapping (connection + grid).
   const primaryId = movedIds[0];
   const primary = plan.instances.find((i) => i.id === primaryId);
-  const rawTransform = {
-    ...startTransforms.get(primaryId),
-    x: snapToGrid(startTransforms.get(primaryId).x + dx, EDITOR_DEFAULTS.snap),
-    y: snapToGrid(startTransforms.get(primaryId).y + dy, EDITOR_DEFAULTS.snap),
-  };
-  const cand = computeDragCandidate(plan, primary, { ...rawTransform, rotation: rawTransform.rotation }, EDITOR_DEFAULTS.snap);
+  const primaryDef = instanceDef(primary);
+  const primaryNorm = primaryDef && normalizeDefinition(primaryDef);
+  const isTable = primaryNorm?.category === "table";
+  const zone = plan.zones[0];
+
+  let cand;
+  if (magnet3m && isTable && zone) {
+    // 3m magnet: snap the table's centre to the centre of the nearest 3×3m block.
+    cand = {
+      transform: {
+        ...startTransforms.get(primaryId),
+        x: snapTo3mCenter(startTransforms.get(primaryId).x + dx, zone.x),
+        y: snapTo3mCenter(startTransforms.get(primaryId).y + dy, zone.y),
+        rotation: startTransforms.get(primaryId).rotation || 0,
+      },
+    };
+  } else {
+    const rawTransform = {
+      ...startTransforms.get(primaryId),
+      x: snapToGrid(startTransforms.get(primaryId).x + dx, EDITOR_DEFAULTS.snap),
+      y: snapToGrid(startTransforms.get(primaryId).y + dy, EDITOR_DEFAULTS.snap),
+    };
+    cand = computeDragCandidate(plan, primary, { ...rawTransform, rotation: rawTransform.rotation }, EDITOR_DEFAULTS.snap);
+  }
 
   // Move other selected objects by the same snapped delta.
   const snapDx = cand.transform.x - startTransforms.get(primaryId).x;
@@ -1616,13 +1677,20 @@ function onContextMenu(e) {
     const inst = plan.instances.find((i) => i.id === target.instanceId);
     if (inst) {
       openContextMenu(e, [
-        ...(inst.unplaced ? [] : [{
+        ...(!inst.unplaced ? [{
+          label: "Rotar 90°",
+          action: () => {
+            log(`[contextmenu] rotate ${inst.id}`);
+            selectOnly([inst.id]);
+            rotateSelection(90);
+          },
+        }, {
           label: "Recoger al listado",
           action: () => {
             log(`[contextmenu] unplace ${inst.id}`);
             dispatch({ type: "UNPLACE_INSTANCE", id: inst.id }, { record: true });
           },
-        }]),
+        }] : []),
         {
           label: "Eliminar",
           danger: true,
@@ -1731,6 +1799,7 @@ export async function loadSpatialEditor(root) {
           <button class="se-btn" data-delete type="button" title="Eliminar (Supr)">Eliminar</button>
           <button class="se-btn" data-venue type="button" title="Tamaño del salón">⛶ Salón</button>
           <button class="se-btn" data-grid-toggle type="button" title="Mostrar/ocultar la cuadrícula"># Cuadrícula</button>
+          <button class="se-btn" data-magnet-3m type="button" title="Imán de 3m — alinea el centro de las mesas a bloques de 3×3m">⛶ 3m</button>
           <button class="se-btn" data-zoom-out title="Alejar">−</button>
           <button class="se-btn" data-zoom-in title="Acercar">＋</button>
           <span class="se-save" data-se-save></span>
@@ -1768,6 +1837,12 @@ export async function loadSpatialEditor(root) {
   root.querySelector("[data-grid-toggle]").addEventListener("click", () => {
     showGrid = !showGrid;
     log(`grid visibility: ${showGrid ? "on" : "off"}`);
+    render();
+  });
+  root.querySelector("[data-magnet-3m]").addEventListener("click", () => {
+    magnet3m = !magnet3m;
+    root.querySelector("[data-magnet-3m]").classList.toggle("is-active", magnet3m);
+    log(`magnet 3m: ${magnet3m ? "on" : "off"}`);
     render();
   });
 

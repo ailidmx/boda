@@ -102,7 +102,8 @@ function purgeGuest(guestAssignments, guestId) {
  *   - must stay entirely inside its zone
  *   - must not overlap any OTHER instance (touching allowed)
  */
-export function validatePlacement(plan, instance, candidateTransform) {
+export function validatePlacement(plan, instance, candidateTransform, opts = {}) {
+  const { skipCollision = false } = opts;
   const def = instanceDefinition(plan, instance);
   if (!def) return { valid: false, reason: "missing-definition" };
 
@@ -115,7 +116,9 @@ export function validatePlacement(plan, instance, candidateTransform) {
 
   // Non-collidable objects (toldo, decor, stage) overlap freely — they occupy
   // different vertical space, so a non-collidable moving object ignores others.
-  if (def.collidable === false) return { valid: true };
+  // Rotation (skipCollision) also ignores collision so the user can re-orient
+  // a table and then drag it clear of its neighbours.
+  if (skipCollision || def.collidable === false) return { valid: true };
 
   for (const other of plan.instances) {
     if (other.id === instance.id) continue;
@@ -296,7 +299,13 @@ export function reducePlan(plan, action) {
       const def = instanceDefinition(plan, inst);
       if (def && !def.canRotate) return plan;
       const transform = { ...inst.transform, rotation };
-      const validation = validatePlacement(plan, inst, transform);
+      // Rotation only re-orients (position is unchanged) — allow it even if the
+      // rotated footprint overlaps a neighbour, so the user can rotate then
+      // drag it clear. Zone containment is still enforced so the table never
+      // leaves the room.
+      const validation = validatePlacement(plan, inst, transform, {
+        skipCollision: true,
+      });
       if (!validation.valid) return plan;
       return { ...plan, instances: upsertById(plan.instances, id, { ...inst, transform }) };
     }
