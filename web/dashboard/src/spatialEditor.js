@@ -255,7 +255,9 @@ function instanceMarkup(inst) {
   } else {
     shapeHtml = `<rect x="${-dims.width / 2}" y="${-dims.height / 2}" width="${dims.width}" height="${dims.height}" class="se-object-body" style="${style}"/>`;
   }
-  const positionHtml = `<text class="se-instance-position" text-anchor="middle" dominant-baseline="central" y="0.08">${position}</text>`;
+  // Table number stays readable while the shape rotates: counter-rotate it so
+  // it is always upright. It lives outside `.se-rotatable` for that reason.
+  const positionHtml = `<text class="se-instance-position" text-anchor="middle" dominant-baseline="central" y="0.08" transform="rotate(${-rotation})">${position}</text>`;
 
   const seatHtml = anchors.map((a) => {
     const isBlocked = blocked.has(a.id);
@@ -280,7 +282,10 @@ function instanceMarkup(inst) {
     const rsvpDot = guest
       ? `<circle class="se-seat-rsvp-badge" cx="0" cy="-0.34" r="0.09" fill="${saturdayDotColor(saturdayLevel(guest))}"/>`
       : "";
-    return `<g class="se-seat ${cls}" data-instance-id="${inst.id}" data-seat-id="${a.id}" transform="translate(${px} ${py})">
+    // The seat follows the table's rotation (its position stays anchored around
+    // the table), but its content — avatar face + initials — is counter-rotated
+    // so faces always stay upright.
+    return `<g class="se-seat ${cls}" data-instance-id="${inst.id}" data-seat-id="${a.id}" transform="translate(${px} ${py}) rotate(${-rotation})">
       <circle r="0.32" class="se-seat-circle"/>
       ${inner}
       ${rsvpDot}
@@ -292,7 +297,8 @@ function instanceMarkup(inst) {
     <g class="se-instance ${isSelected ? "is-selected" : ""} ${group ? "is-grouped" : ""}"
       data-instance-id="${inst.id}"
       transform="translate(${cx} ${cy}) rotate(${rotation})">
-      <g class="se-rotatable">${shapeHtml}${positionHtml}</g>
+      <g class="se-rotatable">${shapeHtml}</g>
+      ${positionHtml}
       <g class="se-seats">${seatHtml}</g>
     </g>`;
 }

@@ -33,7 +33,9 @@ export const RECT_EDGES = ["north", "east", "south", "west"];
  */
 export function roundSeatAnchors(seatCount, opts = {}) {
   const radius = opts.radius ?? 0.9;
-  const seatRadius = opts.seatRadius ?? radius + SEAT_OFFSET;
+  // Avatars sit half-in / half-out: their centre touches the circle (the table
+  // radius), instead of floating fully outside it.
+  const seatRadius = radius;
   const startAngle = opts.startAngle ?? -90; // first seat at top
   const anchors = [];
   for (let i = 0; i < seatCount; i++) {
@@ -120,21 +122,21 @@ export function rectSeatAnchors(dims, seatCount, opts = {}) {
       switch (edge) {
         case "north":
           x = offset;
-          y = -hh - SEAT_OFFSET;
+          y = -hh; // avatar straddles the edge (half in, half out)
           angle = -90;
           break;
         case "south":
           x = offset;
-          y = hh + SEAT_OFFSET;
+          y = hh;
           angle = 90;
           break;
         case "east":
-          x = hw + SEAT_OFFSET;
+          x = hw;
           y = offset;
           angle = 0;
           break;
         case "west":
-          x = -hw - SEAT_OFFSET;
+          x = -hw;
           y = offset;
           angle = 180;
           break;
@@ -227,8 +229,9 @@ export function estimateCapacity(definition, opts = {}) {
   if (shape === "circle") {
     const diameter = definition?.diameter ?? definition?.width ?? 1.8;
     const radius = definition?.radius ?? diameter / 2;
-    const seatRadius = definition?.seating?.seatRadius ?? radius + SEAT_OFFSET;
-    const circumference = 2 * Math.PI * seatRadius;
+    // Seats now sit ON the circle (half in / half out), so capacity is derived
+    // from the table radius, not an offset chair ring.
+    const circumference = 2 * Math.PI * radius;
     return Math.max(1, Math.floor(circumference / seatWidth));
   }
   const width = definition?.width ?? 2.4;

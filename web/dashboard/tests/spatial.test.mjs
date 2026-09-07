@@ -105,9 +105,9 @@ test("rect table: seats avoid corners (margin respected)", () => {
 
 // ── Capacity estimation ──────────────────────────────────────────────────
 test("circle capacity from circumference", () => {
-  // radius 0.9 → seatRadius 1.25 → C ≈ 7.85 / 0.6 ≈ 13
+  // radius 0.9 → seats ON the circle → C ≈ 5.65 / 0.6 ≈ 9
   const cap = estimateCapacity({ shape: "circle", radius: 0.9 });
-  assert.ok(cap >= 12 && cap <= 14);
+  assert.ok(cap >= 8 && cap <= 10);
 });
 
 test("fixed seat count wins over auto", () => {
