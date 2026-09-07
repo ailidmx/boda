@@ -49,6 +49,87 @@ function StarRating({ questionId, guest, answers, onVote }) {
   );
 }
 
+// Estimated budget for the extra plans, based on the group's "yes" answers
+// (level ≥ 4). Each plan's cost = price × nights × rooms (2 people per room).
+function BudgetEstimate({ plans, guests, answers, budget, nightsLabel, language }) {
+  if (!budget?.title) return null;
+
+  const yesCount = (questionId) =>
+    guests.filter((g) => Number(answers[questionId]?.[g.id]) >= 4).length;
+
+  // Preferred Bahía sub-destination = the one with the most stars across the group.
+  const resolveSub = (subs) => {
+    let best = subs[0];
+    let bestScore = -1;
+    for (const d of subs) {
+      const score = guests.reduce(
+        (s, g) => s + (Number(answers[d.questionId]?.[g.id]) || 0),
+        0,
+      );
+      if (score > bestScore) {
+        bestScore = score;
+        best = d;
+      }
+    }
+    return best;
+  };
+
+  const lines = [];
+  for (const plan of plans) {
+    if (plan.subDestinations) {
+      const people = yesCount(plan.questionId);
+      if (people === 0) continue;
+      const sub = resolveSub(plan.subDestinations);
+      lines.push({ name: plan.title, nights: plan.nights, priceMxn: sub.priceMxn, priceEur: sub.priceEur, people });
+    } else if (plan.questionId && plan.priceMxn != null) {
+      const people = yesCount(plan.questionId);
+      if (people === 0) continue;
+      lines.push({ name: plan.title, nights: plan.nights, priceMxn: plan.priceMxn, priceEur: plan.priceEur, people });
+    }
+  }
+
+  if (lines.length === 0) {
+    return <p className="plan-budget-empty reveal">{budget.empty}</p>;
+  }
+
+  const rooms = (people) => Math.ceil(people / 2);
+  const costMxn = (l) => l.priceMxn * l.nights * rooms(l.people);
+  const costEur = (l) => l.priceEur * l.nights * rooms(l.people);
+  const totalMxn = lines.reduce((s, l) => s + costMxn(l), 0);
+  const totalEur = lines.reduce((s, l) => s + costEur(l), 0);
+
+  return (
+    <div className="plan-budget reveal">
+      <div className="section-heading">
+        <p className="eyebrow">{budget.eyebrow}</p>
+        <h3>{budget.title}</h3>
+        <p className="plan-budget-intro">{budget.intro}</p>
+      </div>
+      <ul className="plan-budget-list">
+        {lines.map((l) => (
+          <li key={l.name} className="plan-budget-row">
+            <span className="plan-budget-name">
+              {l.name}
+              <small>
+                {" "}· {l.nights} {l.nights === 1 ? nightsLabel.one : nightsLabel.other}
+              </small>
+            </span>
+            <span className="plan-budget-amount">
+              {formatMoney(costMxn(l), language)} MXN · {formatMoney(costEur(l), language)} €
+            </span>
+          </li>
+        ))}
+      </ul>
+      <div className="plan-budget-total">
+        <span>{budget.total}</span>
+        <strong>
+          {formatMoney(totalMxn, language)} MXN · {formatMoney(totalEur, language)} €
+        </strong>
+      </div>
+    </div>
+  );
+}
+
 function PlanCard({
   plan,
   nightsLabel,
@@ -239,6 +320,7 @@ export function Coast() {
   const voteLabels = coast.vote || {};
   const nightsLabel = coast.nightsLabel || { one: "nuit", other: "nuits" };
   const wishlistLabel = coast.wishlistLabel || "Airbnb";
+  const budget = coast.budget || {};
   const flow = RSVP_FLOWS.coast;
 
   const [activeGallery, setActiveGallery] = useState(null);
@@ -294,6 +376,14 @@ export function Coast() {
             <sup>*</sup> {coast.priceNote}
           </p>
         )}
+        <BudgetEstimate
+          plans={coast.plans}
+          guests={guests}
+          answers={answers}
+          budget={budget}
+          nightsLabel={nightsLabel}
+          language={language}
+        />
       </div>
 
       <nav className="section-nav coast-section-nav" aria-label="Continue">

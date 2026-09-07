@@ -8,6 +8,14 @@ export const coast = {
     wishlistLabel: "Lista Airbnb",
     priceNote:
       "Basado en una noche de hotel para 2 personas en temporada. En Airbnb hay mejores precios para grupos.",
+    budget: {
+      eyebrow: "Presupuesto estimado",
+      title: "Tu presupuesto estimado",
+      intro:
+        "Según vuestras respuestas, esto es lo que costaría vuestro viaje extra (base: 2 personas por habitación).",
+      total: "Total estimado",
+      empty: "Aún no habéis confirmado ningún plan extra.",
+    },
     plans: [
       {
         icon: "🌊",
@@ -143,6 +151,14 @@ export const coast = {
     wishlistLabel: "Liste Airbnb",
     priceNote:
       "Basé sur une nuit d’hôtel pour 2 personnes en saison. Sur Airbnb, il y a de meilleurs prix pour les groupes.",
+    budget: {
+      eyebrow: "Budget estimé",
+      title: "Ton budget estimé",
+      intro:
+        "Selon vos réponses, voici ce que coûterait votre séjour extra (base : 2 personnes par chambre).",
+      total: "Total estimé",
+      empty: "Vous n’avez encore confirmé aucun plan extra.",
+    },
     plans: [
       {
         icon: "🌊",
@@ -278,6 +294,14 @@ export const coast = {
     wishlistLabel: "Airbnb list",
     priceNote:
       "Based on a 2-person hotel night in season. Airbnbs have better prices for groups.",
+    budget: {
+      eyebrow: "Estimated budget",
+      title: "Your estimated budget",
+      intro:
+        "Based on your answers, this is roughly what your extra trip would cost (2 people per room).",
+      total: "Estimated total",
+      empty: "You haven’t confirmed any extra plan yet.",
+    },
     plans: [
       {
         icon: "🌊",

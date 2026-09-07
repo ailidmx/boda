@@ -1455,3 +1455,74 @@
 }
 
 
+
+/* Estimated budget for the extra plans. */
+.plan-budget {
+  margin-top: 2.5rem;
+  padding: 1.5rem 1.75rem;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 1rem;
+  background: rgb(0 0 0 / 24%);
+  backdrop-filter: blur(8px);
+}
+
+.plan-budget-intro {
+  margin-top: 0.4rem;
+  color: rgb(255 255 255 / 82%);
+}
+
+.plan-budget-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.25rem 0 0;
+}
+
+.plan-budget-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.65rem 0;
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
+}
+
+.plan-budget-name {
+  color: rgb(255 253 248 / 92%);
+  font-weight: 600;
+}
+
+.plan-budget-name small {
+  color: rgb(255 255 255 / 62%);
+  font-weight: 400;
+}
+
+.plan-budget-amount {
+  color: #f2d49b;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.plan-budget-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgb(242 212 155 / 35%);
+}
+
+.plan-budget-total span {
+  color: rgb(255 253 248 / 88%);
+  font-weight: 700;
+}
+
+.plan-budget-total strong {
+  color: #f2d49b;
+  font-size: 1.1rem;
+}
+
+.plan-budget-empty {
+  margin-top: 1.5rem;
+  color: rgb(255 255 255 / 68%);
+}
