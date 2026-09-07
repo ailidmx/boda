@@ -18,7 +18,7 @@ export const FEATURES = {
     {
       icon: "🏖️",
       title: "Dos semanas de fiesta",
-      body: "Una línea de tiempo con 5 paradas (playa, boda, Roca Azul, Tapalpa y Barra de Navidad) donde votas directamente desde cada tarjeta.",
+      body: "Una línea de tiempo completa de las dos semanas (playa, Guadalajara, Roca Azul, boda, Tapalpa y Barra de Navidad) con noches y votos directos en cada tarjeta.",
     },
     {
       icon: "⭐",
@@ -105,7 +105,7 @@ export const FEATURES = {
     {
       icon: "🏖️",
       title: "Deux semaines de fête",
-      body: "Une frise avec 5 étapes (plage, mariage, Roca Azul, Tapalpa et Barra de Navidad) où tu votes directement depuis chaque carte.",
+      body: "Une frise complète des deux semaines (plage, Guadalajara, Roca Azul, mariage, Tapalpa et Barra de Navidad) avec le nombre de nuits et un vote direct sur chaque carte.",
     },
     {
       icon: "⭐",
@@ -192,7 +192,7 @@ export const FEATURES = {
     {
       icon: "🏖️",
       title: "Two weeks of celebration",
-      body: "A timeline with 5 stops (beach, wedding, Roca Azul, Tapalpa and Barra de Navidad) where you vote directly from each card.",
+      body: "A complete two-week timeline (beach, Guadalajara, Roca Azul, wedding, Tapalpa and Barra de Navidad) with nights and a direct vote on each card.",
     },
     {
       icon: "⭐",

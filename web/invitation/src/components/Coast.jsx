@@ -62,6 +62,7 @@ export function Coast() {
   const { answers, setAnswer } = useRsvp();
   const coast = t.coast || {};
   const voteLabels = coast.vote || {};
+  const nightsLabel = coast.nightsLabel || { one: "nuit", other: "nuits" };
   const flow = RSVP_FLOWS.coast;
   const scale = getRsvpScale();
 
@@ -97,7 +98,12 @@ export function Coast() {
               className={`plan-card${plan.kind === "wedding" ? " plan-card--wedding" : ""}`}
               key={index}
             >
-              <span className="plan-card__dates">{plan.dates}</span>
+              <div className="plan-card__meta">
+                <span className="plan-card__dates">{plan.dates}</span>
+                <span className="plan-card__nights">
+                  {plan.nights} {plan.nights === 1 ? nightsLabel.one : nightsLabel.other}
+                </span>
+              </div>
               <strong className="plan-card__title">
                 <span aria-hidden="true">{plan.icon}</span> {plan.title}
               </strong>

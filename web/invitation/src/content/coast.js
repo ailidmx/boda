@@ -4,6 +4,7 @@ export const coast = {
     title: "Dos semanas de fiesta",
     body:
       "Este es el hilo de nuestras dos semanas juntos — antes, durante y después de la boda. Vota directamente en las paradas que te tienten.",
+    nightsLabel: { one: "noche", other: "noches" },
     plans: [
       {
         icon: "🌊",
@@ -12,21 +13,40 @@ export const coast = {
         body: "Chacala, San Pancho y Vallarta.",
         kind: "plan",
         questionId: "playa",
+        nights: 4,
+      },
+      {
+        icon: "🏙️",
+        dates: "Mar 16 → Jue 18",
+        title: "Guadalajara",
+        body: "Ciudad, traslados y descanso.",
+        kind: "marker",
+        nights: 2,
+      },
+      {
+        icon: "🌙",
+        dates: "Jue 18 → Vie 19",
+        title: "Roca Azul · 1 noche antes",
+        body: "Llegada temprana al lugar.",
+        kind: "marker",
+        nights: 1,
       },
       {
         icon: "💍",
-        dates: "Sáb 20",
+        dates: "Vie 19 → Dom 21",
         title: "La boda",
         body: "Roca Azul · Jocotepec.",
         kind: "wedding",
+        nights: 2,
       },
       {
         icon: "🏡",
         dates: "Dom 21 → Mar 23",
-        title: "Roca Azul",
-        body: "2 días más en el lugar.",
+        title: "Roca Azul · 2 días más",
+        body: "Seguir en el lugar.",
         kind: "plan",
         questionId: "rocaAzul",
+        nights: 2,
       },
       {
         icon: "⛰️",
@@ -35,6 +55,7 @@ export const coast = {
         body: "Pueblo mágico en la sierra.",
         kind: "plan",
         questionId: "tapalpa",
+        nights: 2,
       },
       {
         icon: "🏖️",
@@ -43,6 +64,7 @@ export const coast = {
         body: "Playa en la Costa Alegre.",
         kind: "plan",
         questionId: "barraNavidad",
+        nights: 3,
       },
     ],
     note:
@@ -91,6 +113,7 @@ export const coast = {
     title: "Deux semaines de fête",
     body:
       "Voici le fil de nos deux semaines ensemble — avant, pendant et après le mariage. Vote directement sur les étapes qui te tentent.",
+    nightsLabel: { one: "nuit", other: "nuits" },
     plans: [
       {
         icon: "🌊",
@@ -99,21 +122,40 @@ export const coast = {
         body: "Chacala, San Pancho et Vallarta.",
         kind: "plan",
         questionId: "playa",
+        nights: 4,
+      },
+      {
+        icon: "🏙️",
+        dates: "Mar 16 → Jeu 18",
+        title: "Guadalajara",
+        body: "Ville, transferts et repos.",
+        kind: "marker",
+        nights: 2,
+      },
+      {
+        icon: "🌙",
+        dates: "Jeu 18 → Ven 19",
+        title: "Roca Azul · 1 nuit avant",
+        body: "Arrivée tôt sur place.",
+        kind: "marker",
+        nights: 1,
       },
       {
         icon: "💍",
-        dates: "Sam 20",
+        dates: "Ven 19 → Dim 21",
         title: "Le mariage",
         body: "Roca Azul · Jocotepec.",
         kind: "wedding",
+        nights: 2,
       },
       {
         icon: "🏡",
         dates: "Dim 21 → Mar 23",
-        title: "Roca Azul",
-        body: "2 jours de plus sur place.",
+        title: "Roca Azul · 2 jours de plus",
+        body: "Rester sur place.",
         kind: "plan",
         questionId: "rocaAzul",
+        nights: 2,
       },
       {
         icon: "⛰️",
@@ -122,6 +164,7 @@ export const coast = {
         body: "Pueblo mágico dans la sierra.",
         kind: "plan",
         questionId: "tapalpa",
+        nights: 2,
       },
       {
         icon: "🏖️",
@@ -130,6 +173,7 @@ export const coast = {
         body: "Plage sur la Costa Alegre.",
         kind: "plan",
         questionId: "barraNavidad",
+        nights: 3,
       },
     ],
     note:
@@ -178,6 +222,7 @@ export const coast = {
     title: "Two weeks of celebration",
     body:
       "Here is the thread of our two weeks together — before, during and after the wedding. Vote directly on the stops that tempt you.",
+    nightsLabel: { one: "night", other: "nights" },
     plans: [
       {
         icon: "🌊",
@@ -186,21 +231,40 @@ export const coast = {
         body: "Chacala, San Pancho and Vallarta.",
         kind: "plan",
         questionId: "playa",
+        nights: 4,
+      },
+      {
+        icon: "🏙️",
+        dates: "Tue 16 → Thu 18",
+        title: "Guadalajara",
+        body: "City, transfers and rest.",
+        kind: "marker",
+        nights: 2,
+      },
+      {
+        icon: "🌙",
+        dates: "Thu 18 → Fri 19",
+        title: "Roca Azul · 1 night before",
+        body: "Early arrival at the venue.",
+        kind: "marker",
+        nights: 1,
       },
       {
         icon: "💍",
-        dates: "Sat 20",
+        dates: "Fri 19 → Sun 21",
         title: "The wedding",
         body: "Roca Azul · Jocotepec.",
         kind: "wedding",
+        nights: 2,
       },
       {
         icon: "🏡",
         dates: "Sun 21 → Tue 23",
-        title: "Roca Azul",
-        body: "2 more days at the venue.",
+        title: "Roca Azul · 2 more days",
+        body: "Stay on at the venue.",
         kind: "plan",
         questionId: "rocaAzul",
+        nights: 2,
       },
       {
         icon: "⛰️",
@@ -209,6 +273,7 @@ export const coast = {
         body: "Magical mountain town.",
         kind: "plan",
         questionId: "tapalpa",
+        nights: 2,
       },
       {
         icon: "🏖️",
@@ -217,6 +282,7 @@ export const coast = {
         body: "Beach on the Costalegre.",
         kind: "plan",
         questionId: "barraNavidad",
+        nights: 3,
       },
     ],
     note:
