@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 
 import { dialogBehavior, dialogClasses } from "./dialog-state.js";
 
@@ -73,7 +74,7 @@ export function Dialog({
 
   if (!open) return null;
 
-  return (
+  return createPortal(
     <div
       ref={overlayRef}
       className={overlay}
@@ -98,6 +99,7 @@ export function Dialog({
         </button>
         {children}
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
