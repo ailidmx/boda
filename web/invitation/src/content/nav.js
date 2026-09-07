@@ -72,7 +72,7 @@ export const nav = {
     guisos: "Guisos",
     guisosOrder: "Orden de guisos",
     foodComment: "Comentario",
-    coast: "Nuestras 2 semanas",
+    coast: "Antes y después",
 
     
     menu1: "Menú",
@@ -170,7 +170,7 @@ export const nav = {
     guisos: "Plats mijotés",
     guisosOrder: "Ordre des plats",
     foodComment: "Commentaire",
-    coast: "Nos 2 semaines",
+    coast: "Avant et après",
 
     
     menu1: "Menu",
@@ -267,7 +267,7 @@ export const nav = {
     guisos: "Stews",
     guisosOrder: "Stew order",
     foodComment: "Comment",
-    coast: "Our 2 weeks",
+    coast: "Before & after",
 
     
     menu1: "Menu",

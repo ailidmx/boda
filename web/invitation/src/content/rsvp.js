@@ -111,7 +111,7 @@ export const rsvp = {
           progressLabel: "Antes de enviar, completa cada sección:",
           progressTeAnimas: "¿Te animas? (viernes, sábado, domingo)",
           progressPetanque: "Torneo de petanca",
-          progressCoast: "Nuestras 2 semanas",
+          progressCoast: "Antes y después",
           progressResume: "Completado",
           progressPending: "Pendiente",
           recap: {
@@ -297,7 +297,7 @@ export const rsvp = {
           progressLabel: "Avant d’envoyer, complète chaque section :",
           progressTeAnimas: "Ça te tente ? (vendredi, samedi, dimanche)",
           progressPetanque: "Tournoi de pétanque",
-          progressCoast: "Nos 2 semaines",
+          progressCoast: "Avant et après",
           progressResume: "Terminé",
           progressPending: "En attente",
           recap: {
@@ -484,7 +484,7 @@ export const rsvp = {
           progressLabel: "Before sending, complete each section:",
           progressTeAnimas: "Are you in? (Friday, Saturday, Sunday)",
           progressPetanque: "Pétanque tournament",
-          progressCoast: "Our 2 weeks",
+          progressCoast: "Before & after",
           progressResume: "Completed",
           progressPending: "Pending",
           recap: {

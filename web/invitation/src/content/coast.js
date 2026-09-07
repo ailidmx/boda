@@ -83,6 +83,7 @@ export const coast = {
     vote: {
       label: "Tu voto",
       noAnswer: "Sin responder",
+      button: "Votar",
     },
     rsvpMini: {
       eyebrow: "Del 12 al 28 de febrero",
@@ -203,6 +204,7 @@ export const coast = {
     vote: {
       label: "Ton vote",
       noAnswer: "Sans réponse",
+      button: "Voter",
     },
     rsvpMini: {
       eyebrow: "Du 12 au 28 février",
@@ -323,6 +325,7 @@ export const coast = {
     vote: {
       label: "Your vote",
       noAnswer: "No answer",
+      button: "Vote",
     },
     rsvpMini: {
       eyebrow: "February 12–28",
