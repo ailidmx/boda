@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useApp } from "../context/AppContext.jsx";
 import { useRsvp, RSVP_FLOWS } from "../context/RsvpContext.jsx";
-import { getGroupMembers } from "../guest-profiles.js";
+import { getGroupMembers, resolveGuestName } from "../guest-profiles.js";
 import { getActiveGuests } from "../guests.js";
 import { saveRsvpAnswers } from "../rsvp-responses.js";
 import { LightboxCarousel } from "./LightboxCarousel.jsx";
@@ -9,25 +9,75 @@ import { RsvpQuestion } from "./RsvpQuestion.jsx";
 import { Dialog } from "./ui/Dialog.jsx";
 import { getPlanGallery } from "../plan-galleries.js";
 
-// How often the card background advances to the next photo (ms).
 const GALLERY_INTERVAL = 5000;
 
-// "Avant et après" — a compact timeline of the whole two weeks. Each plan is a
-// short card whose background is a photo gallery that auto-plays (random start,
-// navigation dots); clicking the card opens the same photos in the lightbox.
-// Votable cards carry a "Vote" button that opens a modal with the card summary
-// and the full scale vote.
-function PlanCard({ plan, nightsLabel, voteButtonLabel, onOpenGallery, onOpenVote }) {
+// Inline star rating (1–5) for the multi-destination Bahía de Banderas card.
+// Each group member rates the active destination; the level maps straight onto
+// the shared `rsvp.answers` scale (star N → level N).
+function StarRating({ questionId, guests, answers, onVote }) {
+  return (
+    <div className="plan-card__stars">
+      {guests.map((guest) => {
+        const name = resolveGuestName(guest);
+        const current = Number(answers[questionId]?.[guest.id]) || 0;
+        return (
+          <div className="plan-card__stars-row" key={guest.id}>
+            <span className="plan-card__stars-name">{name.firstName}</span>
+            <div className="plan-card__stars-list" role="group" aria-label={name.fullName}>
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  className={`plan-card__star${star <= current ? " is-on" : ""}`}
+                  aria-label={`${name.fullName}: ${star} estrellas`}
+                  aria-pressed={current === star}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onVote(questionId, guest.id, current === star ? 0 : star);
+                  }}
+                >
+                  ★
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function PlanCard({
+  plan,
+  nightsLabel,
+  voteButtonLabel,
+  guests,
+  answers,
+  onOpenGallery,
+  onOpenVote,
+  onVote,
+}) {
   const subDestinations = plan.subDestinations || [];
-  const photos = subDestinations.length
-    ? subDestinations.flatMap((d) => getPlanGallery(d.gallery))
+  const isMultiDestination = subDestinations.length > 0;
+
+  const [activeSubIndex, setActiveSubIndex] = useState(0);
+  const activeSub = isMultiDestination ? subDestinations[activeSubIndex] : null;
+
+  const photos = isMultiDestination
+    ? getPlanGallery(activeSub.gallery)
     : getPlanGallery(plan.gallery);
   const hasGallery = photos.length > 0;
 
-  // Random start index + auto-advance through the gallery photos.
-  const [index, setIndex] = useState(() =>
-    hasGallery ? Math.floor(Math.random() * photos.length) : 0,
-  );
+  const combinedCount = isMultiDestination
+    ? subDestinations.reduce((n, d) => n + getPlanGallery(d.gallery).length, 0)
+    : photos.length;
+
+  const [index, setIndex] = useState(0);
+
+  // Auto-advance the active gallery; reset when switching destination.
+  useEffect(() => {
+    setIndex(0);
+  }, [activeSubIndex]);
 
   useEffect(() => {
     if (!hasGallery || photos.length <= 1) return undefined;
@@ -39,7 +89,11 @@ function PlanCard({ plan, nightsLabel, voteButtonLabel, onOpenGallery, onOpenVot
 
   const open = () => {
     if (!hasGallery) return;
-    onOpenGallery({ label: plan.title, photos, index });
+    onOpenGallery({
+      label: activeSub ? `${activeSub.name} · ${activeSub.tag}` : plan.title,
+      photos,
+      index,
+    });
   };
 
   return (
@@ -71,6 +125,26 @@ function PlanCard({ plan, nightsLabel, voteButtonLabel, onOpenGallery, onOpenVot
         />
       )}
 
+      {isMultiDestination && (
+        <div className="plan-card__tabs" role="tablist" aria-label={plan.title}>
+          {subDestinations.map((d, i) => (
+            <button
+              key={d.gallery}
+              type="button"
+              role="tab"
+              aria-selected={i === activeSubIndex}
+              className={`plan-card__tab${i === activeSubIndex ? " is-active" : ""}`}
+              onClick={(e) => {
+                e.stopPropagation();
+                setActiveSubIndex(i);
+              }}
+            >
+              {d.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       <div className="plan-card__meta">
         <span className="plan-card__dates">{plan.dates}</span>
         <div className="plan-card__meta-right">
@@ -80,43 +154,38 @@ function PlanCard({ plan, nightsLabel, voteButtonLabel, onOpenGallery, onOpenVot
           </span>
           {hasGallery && (
             <span className="plan-card__gallery-badge" aria-hidden="true">
-              📷 {photos.length}
+              📷 {combinedCount}
             </span>
           )}
         </div>
       </div>
+
+      {isMultiDestination && (
+        <div className="plan-card__tags">
+          {subDestinations.map((d) => (
+            <span
+              key={d.gallery}
+              className={`plan-card__tag${d.gallery === activeSub.gallery ? " is-active" : ""}`}
+            >
+              {d.tag}
+            </span>
+          ))}
+        </div>
+      )}
 
       <strong className="plan-card__title">
         <span aria-hidden="true">{plan.icon}</span> {plan.title}
       </strong>
       <span className="plan-card__body">{plan.body}</span>
 
-      {subDestinations.length > 0 && (
-        <div className="plan-card__subs">
-          {subDestinations.map((d) => {
-            const dPhotos = getPlanGallery(d.gallery);
-            const enabled = dPhotos.length > 0;
-            return (
-              <button
-                key={d.gallery}
-                type="button"
-                className="plan-card__sub"
-                disabled={!enabled}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (!enabled) return;
-                  onOpenGallery({ label: `${d.name} · ${d.tag}`, photos: dPhotos, index: 0 });
-                }}
-              >
-                <span className="plan-card__sub-tag">{d.tag}</span>
-                <span className="plan-card__sub-name">{d.name}</span>
-              </button>
-            );
-          })}
-        </div>
-      )}
-
-      {plan.questionId && (
+      {isMultiDestination ? (
+        <StarRating
+          questionId={activeSub.questionId}
+          guests={guests}
+          answers={answers}
+          onVote={onVote}
+        />
+      ) : plan.questionId ? (
         <button
           type="button"
           className="plan-card__vote-cta"
@@ -127,7 +196,7 @@ function PlanCard({ plan, nightsLabel, voteButtonLabel, onOpenGallery, onOpenVot
         >
           {voteButtonLabel}
         </button>
-      )}
+      ) : null}
 
       {hasGallery && photos.length > 1 && (
         <div className="plan-card__dots" role="group" aria-label={plan.title}>
@@ -158,7 +227,7 @@ export function Coast() {
   const nightsLabel = coast.nightsLabel || { one: "nuit", other: "nuits" };
   const flow = RSVP_FLOWS.coast;
 
-  const [activeGallery, setActiveGallery] = useState(null); // { label, photos, index }
+  const [activeGallery, setActiveGallery] = useState(null);
   const [votingPlan, setVotingPlan] = useState(null);
 
   const guests = useMemo(
@@ -194,8 +263,11 @@ export function Coast() {
               plan={plan}
               nightsLabel={nightsLabel}
               voteButtonLabel={voteLabels.button}
+              guests={guests}
+              answers={answers}
               onOpenGallery={setActiveGallery}
               onOpenVote={setVotingPlan}
+              onVote={handleVote}
             />
           ))}
         </div>

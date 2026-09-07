@@ -482,6 +482,108 @@
   font-weight: 600;
 }
 
+/* Multi-destination tabs (Bahía de Banderas): selector between destinations. */
+.plan-card__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgb(255 255 255 / 14%);
+}
+
+.plan-card__tab {
+  padding: 0.3rem 0.7rem;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 999px;
+  background: rgb(10 16 28 / 34%);
+  color: rgb(255 255 255 / 80%);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.plan-card__tab:hover {
+  background: rgb(10 16 28 / 55%);
+}
+
+.plan-card__tab.is-active {
+  background: rgb(242 212 155 / 22%);
+  border-color: #f2d49b;
+  color: #f2d49b;
+}
+
+/* Tag badges (VIBRANT / SURF / CALME). */
+.plan-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: -0.25rem;
+}
+
+.plan-card__tag {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 10%);
+  border: 1px solid rgb(255 255 255 / 16%);
+  color: rgb(255 255 255 / 68%);
+}
+
+.plan-card__tag.is-active {
+  background: rgb(242 212 155 / 18%);
+  border-color: rgb(242 212 155 / 60%);
+  color: #f2d49b;
+}
+
+/* Inline star rating (multi-destination cards). */
+.plan-card__stars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.plan-card__stars-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  justify-content: space-between;
+}
+
+.plan-card__stars-name {
+  font-size: 0.85rem;
+  color: rgb(255 255 255 / 88%);
+}
+
+.plan-card__stars-list {
+  display: flex;
+  gap: 0.1rem;
+}
+
+.plan-card__star {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: rgb(255 255 255 / 28%);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.plan-card__star:hover {
+  color: rgb(255 255 255 / 60%);
+  transform: scale(1.15);
+}
+
+.plan-card__star.is-on {
+  color: #f2d49b;
+}
+
 /* "Vote" button — opens the vote modal (summary + scale selector). */
 .plan-card__vote-cta {
   align-self: flex-start;

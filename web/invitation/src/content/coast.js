@@ -12,12 +12,11 @@ export const coast = {
         title: "Playa · Bahía de Banderas",
         body: "Tres destinos para elegir.",
         kind: "plan",
-        questionId: "playa",
         nights: 4,
         subDestinations: [
-          { name: "Puerto Vallarta", tag: "Vibrante", gallery: "vallarta" },
-          { name: "San Pancho", tag: "Surf", gallery: "sanPancho" },
-          { name: "Chacala", tag: "Calma", gallery: "chacala" },
+          { name: "Puerto Vallarta", tag: "Vibrante", gallery: "vallarta", questionId: "vallarta" },
+          { name: "San Pancho", tag: "Surf", gallery: "sanPancho", questionId: "sanPancho" },
+          { name: "Chacala", tag: "Calma", gallery: "chacala", questionId: "chacala" },
         ],
       },
       {
@@ -92,9 +91,19 @@ export const coast = {
         "Vota qué tan probable es que te unas a cada parada. Puedes cambiar tu respuesta en cualquier momento.",
       questions: [
         {
-          id: "playa",
-          title: "La playa · Bahía de Banderas",
-          subtitle: "Del viernes 12 al martes 16.",
+          id: "vallarta",
+          title: "Puerto Vallarta",
+          subtitle: "Del viernes 12 al martes 16 · Vibrante.",
+        },
+        {
+          id: "sanPancho",
+          title: "San Pancho",
+          subtitle: "Del viernes 12 al martes 16 · Surf.",
+        },
+        {
+          id: "chacala",
+          title: "Chacala",
+          subtitle: "Del viernes 12 al martes 16 · Calma.",
         },
         {
           id: "rocaAzul",
@@ -133,12 +142,11 @@ export const coast = {
         title: "Plage · Bahía de Banderas",
         body: "Trois destinations au choix.",
         kind: "plan",
-        questionId: "playa",
         nights: 4,
         subDestinations: [
-          { name: "Puerto Vallarta", tag: "Vibrant", gallery: "vallarta" },
-          { name: "San Pancho", tag: "Surf", gallery: "sanPancho" },
-          { name: "Chacala", tag: "Calme", gallery: "chacala" },
+          { name: "Puerto Vallarta", tag: "Vibrant", gallery: "vallarta", questionId: "vallarta" },
+          { name: "San Pancho", tag: "Surf", gallery: "sanPancho", questionId: "sanPancho" },
+          { name: "Chacala", tag: "Calme", gallery: "chacala", questionId: "chacala" },
         ],
       },
       {
@@ -213,9 +221,19 @@ export const coast = {
         "Vote pour dire à quel point tu as envie de rejoindre chaque étape. Tu peux modifier ta réponse à tout moment.",
       questions: [
         {
-          id: "playa",
-          title: "La plage · Bahía de Banderas",
-          subtitle: "Du vendredi 12 au mardi 16.",
+          id: "vallarta",
+          title: "Puerto Vallarta",
+          subtitle: "Du vendredi 12 au mardi 16 · Vibrant.",
+        },
+        {
+          id: "sanPancho",
+          title: "San Pancho",
+          subtitle: "Du vendredi 12 au mardi 16 · Surf.",
+        },
+        {
+          id: "chacala",
+          title: "Chacala",
+          subtitle: "Du vendredi 12 au mardi 16 · Calme.",
         },
         {
           id: "rocaAzul",
@@ -254,12 +272,11 @@ export const coast = {
         title: "Beach · Bahía de Banderas",
         body: "Three destinations to choose from.",
         kind: "plan",
-        questionId: "playa",
         nights: 4,
         subDestinations: [
-          { name: "Puerto Vallarta", tag: "Vibrant", gallery: "vallarta" },
-          { name: "San Pancho", tag: "Surf", gallery: "sanPancho" },
-          { name: "Chacala", tag: "Calm", gallery: "chacala" },
+          { name: "Puerto Vallarta", tag: "Vibrant", gallery: "vallarta", questionId: "vallarta" },
+          { name: "San Pancho", tag: "Surf", gallery: "sanPancho", questionId: "sanPancho" },
+          { name: "Chacala", tag: "Calm", gallery: "chacala", questionId: "chacala" },
         ],
       },
       {
@@ -334,9 +351,19 @@ export const coast = {
         "Vote on how likely you are to join each stop. You can change your answer at any time.",
       questions: [
         {
-          id: "playa",
-          title: "The beach · Bahía de Banderas",
-          subtitle: "From Friday 12 to Tuesday 16.",
+          id: "vallarta",
+          title: "Puerto Vallarta",
+          subtitle: "From Friday 12 to Tuesday 16 · Vibrant.",
+        },
+        {
+          id: "sanPancho",
+          title: "San Pancho",
+          subtitle: "From Friday 12 to Tuesday 16 · Surf.",
+        },
+        {
+          id: "chacala",
+          title: "Chacala",
+          subtitle: "From Friday 12 to Tuesday 16 · Calm.",
         },
         {
           id: "rocaAzul",
