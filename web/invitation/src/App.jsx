@@ -31,6 +31,7 @@ const Weekend = lazy(() => import("./components/Weekend.jsx").then((m) => ({ def
 const WeekendProgram = lazy(() => import("./components/Weekend.jsx").then((m) => ({ default: m.WeekendProgram })));
 const Petanque = lazy(() => import("./components/Petanque.jsx").then((m) => ({ default: m.Petanque })));
 const Accommodation = lazy(() => import("./components/Accommodation.jsx").then((m) => ({ default: m.Accommodation })));
+const ExtraStaySection = lazy(() => import("./components/ExtraStaySection.jsx").then((m) => ({ default: m.ExtraStaySection })));
 const Weather = lazy(() => import("./components/Weather.jsx").then((m) => ({ default: m.Weather })));
 const Food = lazy(() => import("./components/Food.jsx").then((m) => ({ default: m.Food })));
 const Guisos = lazy(() => import("./components/Guisos.jsx").then((m) => ({ default: m.Guisos })));
@@ -138,6 +139,7 @@ function Invitation() {
           <TeAnimas />
           {travelsByPlane && <Travel />}
           <Accommodation />
+          <ExtraStaySection />
           <Petanque />
           <Food />
           <Guisos />

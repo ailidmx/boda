@@ -9,6 +9,7 @@ import { RsvpQuestion } from "./RsvpQuestion.jsx";
 import { Dialog } from "./ui/Dialog.jsx";
 import { getPlanGallery } from "../plan-galleries.js";
 import { getCabin } from "../cabins.js";
+import { getRoom } from "../rooms.js";
 import { MXN_PER_EUR } from "../features/coast/data.js";
 
 const GALLERY_INTERVAL = 5000;
@@ -94,11 +95,29 @@ function BudgetEstimate({ plans, guests, answers, budget, nightsLabel, language 
 
   const rooms = (people) => Math.ceil(people / 2);
 
-  // Real price across the DISTINCT cabins assigned via the given field.
+  // Real price for a cabin stay: the group's share of the assigned cabins'
+  // `totalPrice2Nights`, split across ALL occupants of each cabin (cabins can
+  // be shared across invitation groups). This mirrors the Hébergement
+  // section's `groupTotal` (room→cabin resolution + per-person split), so the
+  // budget never over-charges a shared cabin.
   const cabinRealMxn = (field) => {
-    const ids = new Set(guests.filter((g) => g[field]).map((g) => g[field]));
+    const roomField = field === "cabin" ? "room" : "xtraRoom";
+    const all = getActiveGuests();
+    const resolveCabinId = (g) => {
+      const room = g[roomField] ? getRoom(g[roomField]) : null;
+      return room?.cabin || g[field];
+    };
+    const occupantCount = (cabinId) =>
+      all.filter((g) => resolveCabinId(g) === cabinId).length;
     let total = 0;
-    for (const id of ids) total += Number(getCabin(id)?.totalPrice2Nights) || 0;
+    for (const g of guests) {
+      const cabinId = resolveCabinId(g);
+      if (!cabinId) continue;
+      const cabin = getCabin(cabinId);
+      const count = occupantCount(cabinId);
+      if (!cabin?.totalPrice2Nights || count <= 0) continue;
+      total += cabin.totalPrice2Nights / count;
+    }
     return total;
   };
 
