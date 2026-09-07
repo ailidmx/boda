@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useApp } from "../context/AppContext.jsx";
 import { useRsvp, RSVP_FLOWS } from "../context/RsvpContext.jsx";
-import { getGroupMembers, resolveGuestName } from "../guest-profiles.js";
+import { getGroupMembers, resolveGuestName, resolveGuestPhoto } from "../guest-profiles.js";
 import { getActiveGuests } from "../guests.js";
 import { saveRsvpAnswers } from "../rsvp-responses.js";
 import { LightboxCarousel } from "./LightboxCarousel.jsx";
@@ -54,8 +54,8 @@ function StarRating({ questionId, guest, answers, onVote }) {
 function BudgetEstimate({ plans, guests, answers, budget, nightsLabel, language }) {
   if (!budget?.title) return null;
 
-  const yesCount = (questionId) =>
-    guests.filter((g) => Number(answers[questionId]?.[g.id]) >= 4).length;
+  const yesGuests = (questionId) =>
+    guests.filter((g) => Number(answers[questionId]?.[g.id]) >= 4);
 
   // Preferred Bahía sub-destination = the one with the most stars across the group.
   const resolveSub = (subs) => {
@@ -77,14 +77,14 @@ function BudgetEstimate({ plans, guests, answers, budget, nightsLabel, language 
   const lines = [];
   for (const plan of plans) {
     if (plan.subDestinations) {
-      const people = yesCount(plan.questionId);
-      if (people === 0) continue;
+      const participants = yesGuests(plan.questionId);
+      if (participants.length === 0) continue;
       const sub = resolveSub(plan.subDestinations);
-      lines.push({ name: plan.title, nights: plan.nights, priceMxn: sub.priceMxn, priceEur: sub.priceEur, people });
+      lines.push({ name: plan.title, nights: plan.nights, priceMxn: sub.priceMxn, priceEur: sub.priceEur, participants });
     } else if (plan.questionId && plan.priceMxn != null) {
-      const people = yesCount(plan.questionId);
-      if (people === 0) continue;
-      lines.push({ name: plan.title, nights: plan.nights, priceMxn: plan.priceMxn, priceEur: plan.priceEur, people });
+      const participants = yesGuests(plan.questionId);
+      if (participants.length === 0) continue;
+      lines.push({ name: plan.title, nights: plan.nights, priceMxn: plan.priceMxn, priceEur: plan.priceEur, participants });
     }
   }
 
@@ -93,8 +93,8 @@ function BudgetEstimate({ plans, guests, answers, budget, nightsLabel, language 
   }
 
   const rooms = (people) => Math.ceil(people / 2);
-  const costMxn = (l) => l.priceMxn * l.nights * rooms(l.people);
-  const costEur = (l) => l.priceEur * l.nights * rooms(l.people);
+  const costMxn = (l) => l.priceMxn * l.nights * rooms(l.participants.length);
+  const costEur = (l) => l.priceEur * l.nights * rooms(l.participants.length);
   const totalMxn = lines.reduce((s, l) => s + costMxn(l), 0);
   const totalEur = lines.reduce((s, l) => s + costEur(l), 0);
 
@@ -108,12 +108,31 @@ function BudgetEstimate({ plans, guests, answers, budget, nightsLabel, language 
       <ul className="plan-budget-list">
         {lines.map((l) => (
           <li key={l.name} className="plan-budget-row">
-            <span className="plan-budget-name">
-              {l.name}
-              <small>
-                {" "}· {l.nights} {l.nights === 1 ? nightsLabel.one : nightsLabel.other}
-              </small>
-            </span>
+            <div className="plan-budget-info">
+              <span className="plan-budget-name">
+                {l.name}
+                <small>
+                  {" "}· {l.nights} {l.nights === 1 ? nightsLabel.one : nightsLabel.other}
+                </small>
+              </span>
+              <div className="plan-budget-avatars">
+                {l.participants.map((g) => {
+                  const photo = resolveGuestPhoto(g);
+                  const name = resolveGuestName(g);
+                  return (
+                    <span key={g.id} className="plan-budget-avatar" title={name.fullName}>
+                      {photo ? (
+                        <img src={photo} alt={name.fullName} loading="lazy" />
+                      ) : (
+                        <span className="plan-budget-avatar--fallback">
+                          {(name.fullName || "?").charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
             <span className="plan-budget-amount">
               {formatMoney(costMxn(l), language)} MXN · {formatMoney(costEur(l), language)} €
             </span>

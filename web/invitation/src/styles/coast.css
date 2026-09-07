@@ -1467,8 +1467,11 @@
 }
 
 .plan-budget-intro {
-  margin-top: 0.4rem;
-  color: rgb(255 255 255 / 82%);
+  margin-top: 0.5rem;
+  padding-left: 0.9rem;
+  border-left: 2px solid rgb(242 212 155 / 60%);
+  color: rgb(242 212 155 / 92%);
+  font-style: italic;
 }
 
 .plan-budget-list {
@@ -1479,11 +1482,52 @@
 
 .plan-budget-row {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 1rem;
-  padding: 0.65rem 0;
+  padding: 0.7rem 0;
   border-bottom: 1px solid rgb(255 255 255 / 12%);
+}
+
+.plan-budget-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.plan-budget-avatars {
+  display: flex;
+  align-items: center;
+}
+
+.plan-budget-avatar {
+  width: 1.9rem;
+  height: 1.9rem;
+  margin-left: -0.55rem;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgb(20 26 36);
+  background: rgb(255 255 255 / 14%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plan-budget-avatar:first-child {
+  margin-left: 0;
+}
+
+.plan-budget-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.plan-budget-avatar--fallback {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgb(255 253 248 / 90%);
 }
 
 .plan-budget-name {
