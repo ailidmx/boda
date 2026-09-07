@@ -18,6 +18,18 @@ function formatMoney(amount, language) {
   return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(amount);
 }
 
+// Fisher–Yates shuffle so each card's gallery starts in a different order.
+// The three Roca Azul cards share one photo set, so shuffling keeps them from
+// all showing the identical carousel.
+function shuffle(array) {
+  const arr = [...array];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
 // Inline star rating (1–5) for the multi-destination Bahía de Banderas card.
 // Each group member rates the active destination; the level maps straight onto
 // the shared `rsvp.answers` scale (star N → level N).
@@ -113,13 +125,16 @@ function BudgetEstimate({ plans, guests, answers, budget, nightsLabel, language 
       const participants = [...cabinGuests, ...voteGuests];
       if (participants.length === 0) continue;
       const realMxn = cabinRealMxn(plan.cabinField);
+      // The cabin price (`totalPrice2Nights`) and the plan's `priceMxn` are
+      // BOTH already for the full 2-night stay, so the estimate for guests
+      // without a cabin must NOT multiply by `nights`.
       const estimateMxn =
         plan.priceMxn != null
-          ? plan.priceMxn * plan.nights * rooms(voteGuests.length)
+          ? plan.priceMxn * rooms(voteGuests.length)
           : 0;
       const estimateEur =
         plan.priceEur != null
-          ? plan.priceEur * plan.nights * rooms(voteGuests.length)
+          ? plan.priceEur * rooms(voteGuests.length)
           : 0;
       lines.push({
         name: plan.title,
@@ -224,9 +239,11 @@ function PlanCard({
   const priceMxn = isMultiDestination ? activeSub?.priceMxn : plan.priceMxn;
   const priceEur = isMultiDestination ? activeSub?.priceEur : plan.priceEur;
 
-  const photos = isMultiDestination
-    ? getPlanGallery(activeSub.gallery)
-    : getPlanGallery(plan.gallery);
+  const galleryKey = isMultiDestination ? activeSub.gallery : plan.gallery;
+  const photos = useMemo(
+    () => shuffle(getPlanGallery(galleryKey)),
+    [galleryKey],
+  );
   const hasGallery = photos.length > 0;
 
   const [index, setIndex] = useState(0);
