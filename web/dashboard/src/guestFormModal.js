@@ -238,6 +238,8 @@ function presenciaTab({ guest, ctx }) {
     field("Cabaña extra", selectInput("xtraCabin", cabinOptions(xtraCabinDisplay))),
     field("Cuarto extra", selectInput("xtraRoom", roomOptions(xtraCabinDisplay, h.xtraRoom))),
     field("Roca Azul", selectInput("rocaAzul", scaleOptions(Number(a.rocaAzul) || 0))),
+    field("Tapalpa", selectInput("tapalpa", scaleOptions(Number(a.tapalpa) || 0))),
+    field("Barra de Navidad", selectInput("barraNavidad", scaleOptions(Number(a.barraNavidad) || 0))),
     field("Pago", selectInput("paymentConfirmed", optionsHtml(TOP_BOOL_OPTIONS,
       guest?.paymentConfirmed === true ? "true" : guest?.paymentConfirmed === false ? "false" : ""))),
   ].join("");
@@ -253,7 +255,12 @@ function petanqueTab({ guest }) {
 
 function playaTab({ guest }) {
   const a = guest?.rsvp?.answers || {};
-  return field("Playa", selectInput("playa", scaleOptions(Number(a.playa) || 0)));
+  return [
+    field("Bahía de Banderas", selectInput("playa", scaleOptions(Number(a.playa) || 0))),
+    field("Puerto Vallarta", selectInput("vallarta", scaleOptions(Number(a.vallarta) || 0))),
+    field("San Pancho", selectInput("sanPancho", scaleOptions(Number(a.sanPancho) || 0))),
+    field("Chacala", selectInput("chacala", scaleOptions(Number(a.chacala) || 0))),
+  ].join("");
 }
 
 function vuelosTab({ guest }) {
@@ -520,7 +527,7 @@ async function saveEdit(overlay, guest, ctx, setStatus) {
     if (!ok) throw new Error("No se pudo actualizar el correo de acceso.");
   }
 
-  for (const key of ["friday", "saturday", "sunday", "playa", "rocaAzul"]) {
+  for (const key of ["friday", "saturday", "sunday", "playa", "vallarta", "sanPancho", "chacala", "rocaAzul", "tapalpa", "barraNavidad"]) {
     const level = Number(v(key)) || 0;
     if (level !== (Number(rsvp[key]) || 0)) await ctx.saveGuestRsvpAnswer(guestId, key, level);
   }

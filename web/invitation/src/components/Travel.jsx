@@ -29,6 +29,7 @@ export function Travel() {
 
   return (
     <section
+      id="travel"
       className={`travel-section section story-bg travel-bg--${BACKGROUND}`}
     >
       <div className="travel-heading reveal">

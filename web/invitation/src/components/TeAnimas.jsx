@@ -165,7 +165,7 @@ export function TeAnimas() {
 
 
   return (
-    <section ref={sectionRef} className="rsvp-section section story-bg reveal">
+    <section id="te-animas" ref={sectionRef} className="rsvp-section section story-bg reveal">
       <p className="eyebrow">{t.nav.teAnimas}</p>
       <p>{scale.intro}</p>
 

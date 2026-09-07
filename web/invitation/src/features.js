@@ -16,6 +16,11 @@
 export const FEATURES = {
   es: [
     {
+      icon: "🏖️",
+      title: "Antes y después",
+      body: "Una línea de tiempo de las dos semanas (Puerto Vallarta, San Pancho y Chacala, Guadalajara, Roca Azul, la boda, Tapalpa y Barra de Navidad) con galerías, noches y votos en cada tarjeta.",
+    },
+    {
       icon: "⭐",
       title: "Vota por tus favoritos",
       body: "Califica con estrellas los platillos y los grupos musicales para ayudarnos a armar el menú y la fiesta perfectos.",
@@ -98,6 +103,11 @@ export const FEATURES = {
   ],
   fr: [
     {
+      icon: "🏖️",
+      title: "Avant et après",
+      body: "Une frise des deux semaines (Puerto Vallarta, San Pancho et Chacala, Guadalajara, Roca Azul, le mariage, Tapalpa et Barra de Navidad) avec galeries, nuits et votes sur chaque carte.",
+    },
+    {
       icon: "⭐",
       title: "Vote pour tes favoris",
       body: "Note avec des étoiles les plats et les groupes de musique pour nous aider à composer le menu et la fête parfaits.",
@@ -179,6 +189,11 @@ export const FEATURES = {
     },
   ],
   en: [
+    {
+      icon: "🏖️",
+      title: "Before & after",
+      body: "A two-week timeline (Puerto Vallarta, San Pancho and Chacala, Guadalajara, Roca Azul, the wedding, Tapalpa and Barra de Navidad) with galleries, nights and votes on each card.",
+    },
     {
       icon: "⭐",
       title: "Vote for your favorites",

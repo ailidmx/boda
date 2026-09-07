@@ -23,6 +23,21 @@
   color: var(--white);
 }
 
+/* "Et après ?" variant — a forest / mountain palette (Roca Azul + Tapalpa)
+   that replaces the beach gradient for the "after the wedding" section. The
+   intro/cards/note/RSVP panels are translucent dark and stay legible over
+   this deeper backdrop. */
+.coast-section--after {
+  background:
+    linear-gradient(180deg,
+      #1f3d33 0%,
+      #2a4a3f 30%,
+      #3d5f4d 55%,
+      #5a7d63 78%,
+      #8aa07c 100%);
+  color: var(--white);
+}
+
 /* ── Beach story backdrop ────────────────────────────────────────────────
    A decorative, layered scene that reads top-to-bottom: sky with a sun in
    the top-right corner → horizon with birds & boats → sparkling sea → sandy
@@ -229,6 +244,620 @@
 .coast-note {
   margin-top: 2rem;
   font-size: 0.8rem;
+}
+
+/* Compact plan cards — a short, at-a-glance timeline of the whole two weeks
+   (before, wedding, after), replacing the long `.coast-ideas` monologue. Each
+   card is a date chip + short title + one-liner, laid out in a responsive
+   grid; votable cards also carry an inline scale vote. */
+.plan-cards {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.9rem;
+  margin-top: 2rem;
+}
+
+/* Desktop: present the 7 timeline cards in three rows — 2, 3, 2. The cards are
+   laid out on a 6-column grid; the first/last rows span half-width (3 cols)
+   and the middle row spans a third (2 cols). */
+@media (min-width: 900px) {
+  .plan-cards {
+    grid-template-columns: repeat(6, 1fr);
+  }
+
+  .plan-card:nth-child(1),
+  .plan-card:nth-child(2),
+  .plan-card:nth-child(6),
+  .plan-card:nth-child(7) {
+    grid-column: span 3;
+  }
+
+  .plan-card:nth-child(3),
+  .plan-card:nth-child(4),
+  .plan-card:nth-child(5) {
+    grid-column: span 2;
+  }
+}
+
+.plan-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding: 1.35rem 1.4rem;
+  border-radius: 1rem;
+  border: 1px solid rgb(255 255 255 / 18%);
+  background:
+    linear-gradient(160deg,
+      rgb(255 255 255 / 16%) 0%,
+      rgb(255 255 255 / 5%) 40%,
+      rgb(0 0 0 / 26%) 100%);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 28%);
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.plan-card:hover {
+  transform: translateY(-3px);
+  border-color: rgb(242 212 155 / 45%);
+  box-shadow: 0 16px 40px rgb(0 0 0 / 38%);
+}
+
+.plan-card__meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.plan-card__meta-right {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.plan-card__dates {
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fff3cf 0%, #f2d49b 48%, #e2b96a 100%);
+  color: #3a2f1e;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 22%);
+}
+
+.plan-card__nights {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  background: rgb(10 16 28 / 35%);
+  border: 1px solid rgb(255 255 255 / 22%);
+  color: rgb(255 253 248 / 92%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 10%);
+}
+
+/* Cards with a photo gallery: an auto-playing full-bleed background image
+   under a dark scrim, with the card content layered on top. Clicking the card
+   opens the same photos in the lightbox; dots navigate the background. */
+.plan-card--gallery {
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+}
+
+.plan-card__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  animation: plan-card-bg-in 0.9s ease;
+}
+
+@keyframes plan-card-bg-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.plan-card--gallery::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgb(10 16 28 / 52%) 0%, rgb(10 16 28 / 78%) 100%);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.plan-card--gallery > *:not(.plan-card__bg) {
+  position: relative;
+  z-index: 2;
+}
+
+.plan-card__dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: auto;
+  padding-top: 0.6rem;
+}
+
+.plan-card__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 42%);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.plan-card__dot:hover {
+  background: rgb(255 255 255 / 70%);
+}
+
+.plan-card__dot.is-active {
+  background: #f2d49b;
+  transform: scale(1.3);
+}
+
+.plan-card__title {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: #F2D49B;
+}
+
+.plan-card__body {
+  font-size: 0.9rem;
+  line-height: 1.45;
+  color: rgb(255 255 255 / 82%);
+}
+
+/* Sub-destination chips (e.g. Bahía de Banderas → Puerto Vallarta / San
+   Pancho / Chacala), each with a tag + name and its own gallery. */
+.plan-card__subs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.plan-card__sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.32rem 0.7rem;
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: 999px;
+  background: rgb(10 16 28 / 38%);
+  color: var(--white);
+  font-size: 0.8rem;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.plan-card__sub:hover:not(:disabled) {
+  border-color: rgb(242 212 155 / 55%);
+  background: rgb(10 16 28 / 55%);
+}
+
+.plan-card__sub:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.plan-card__sub-tag {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #f2d49b;
+}
+
+.plan-card__sub-name {
+  font-weight: 600;
+}
+
+/* Multi-destination tabs (Bahía de Banderas): selector between destinations. */
+.plan-card__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px solid rgb(255 255 255 / 14%);
+}
+
+.plan-card__tab {
+  padding: 0.3rem 0.7rem;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 999px;
+  background: rgb(10 16 28 / 34%);
+  color: rgb(255 255 255 / 80%);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.plan-card__tab:hover {
+  background: rgb(10 16 28 / 55%);
+}
+
+.plan-card__tab.is-active {
+  background: rgb(242 212 155 / 22%);
+  border-color: #f2d49b;
+  color: #f2d49b;
+}
+
+/* Active sub-destination tag (VIBRANT / SURF / CALME) — shown next to the
+   dates badge in the card meta line. */
+.plan-card__meta-left {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.plan-card__tag {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  background: rgb(242 212 155 / 18%);
+  border: 1px solid rgb(242 212 155 / 60%);
+  color: #f2d49b;
+}
+
+/* Inline star rating (multi-destination cards). */
+.plan-card__stars {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.plan-card__stars-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  justify-content: space-between;
+}
+
+.plan-card__stars-name {
+  font-size: 0.85rem;
+  color: rgb(255 255 255 / 88%);
+}
+
+.plan-card__stars-list {
+  display: flex;
+  gap: 0.1rem;
+}
+
+.plan-card__star {
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: rgb(255 255 255 / 28%);
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.plan-card__star:hover {
+  color: rgb(255 255 255 / 60%);
+  transform: scale(1.15);
+}
+
+.plan-card__star.is-on {
+  color: #f2d49b;
+}
+
+/* "Vote" button — opens the vote modal (summary + scale selector). */
+.plan-card__vote-cta {
+  margin-left: auto;
+  padding: 0.5rem 1.05rem;
+  border: 1px solid rgb(242 212 155 / 60%);
+  border-radius: 999px;
+  background: rgb(242 212 155 / 14%);
+  color: #f2d49b;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.plan-card__vote-cta:hover {
+  background: rgb(242 212 155 / 28%);
+  border-color: #f2d49b;
+  transform: translateY(-1px);
+}
+
+.plan-card__cabin-assigned {
+  margin-left: auto;
+  padding: 0.5rem 1.05rem;
+  border: 1px solid rgb(122 214 170 / 55%);
+  border-radius: 999px;
+  background: rgb(122 214 170 / 14%);
+  color: #9ee6c3;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Airbnb wishlist link. */
+.plan-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.plan-card__wishlist {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.42rem 0.9rem;
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: 999px;
+  background: rgb(10 16 28 / 38%);
+  color: rgb(255 253 248 / 90%);
+  font-size: 0.8rem;
+  font-weight: 700;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.plan-card__wishlist:hover {
+  border-color: rgb(255 255 255 / 45%);
+  background: rgb(10 16 28 / 55%);
+}
+
+.plan-card__body-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.plan-card__price {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #f2d49b;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.plan-card__price sup {
+  font-size: 0.7em;
+  color: rgb(255 255 255 / 62%);
+}
+
+.coast-price-note {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: rgb(255 255 255 / 68%);
+}
+
+.coast-price-note sup {
+  color: #f2d49b;
+}
+
+/* ── Plan vote modal ─────────────────────────────────────────────────────── */
+.plan-vote-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 62%);
+  backdrop-filter: blur(4px);
+}
+
+.plan-vote-modal__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(34rem, 100%);
+  max-height: 90vh;
+  overflow: hidden;
+  padding: 1.75rem 1.5rem;
+  border-radius: 1.1rem;
+  border: 1px solid rgb(255 255 255 / 16%);
+  background: linear-gradient(160deg, rgb(40 50 62 / 98%) 0%, rgb(22 30 40 / 98%) 100%);
+  box-shadow: 0 24px 60px rgb(0 0 0 / 55%);
+  color: var(--white);
+}
+
+.plan-vote-modal__scroll {
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1;
+}
+
+.plan-vote-modal__close {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  z-index: 20;
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 12%);
+  color: var(--white);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.plan-vote-modal__close:hover {
+  background: rgb(255 255 255 / 24%);
+}
+
+.plan-vote-modal__summary {
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
+}
+
+.plan-vote-modal__body {
+  margin-top: 0.4rem;
+  font-size: 0.95rem;
+  color: rgb(255 255 255 / 82%);
+}
+
+.plan-vote-modal__nights {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  padding: 0.28rem 0.6rem;
+  border-radius: 999px;
+  background: rgb(10 16 28 / 40%);
+  border: 1px solid rgb(255 255 255 / 20%);
+  color: rgb(255 253 248 / 90%);
+}
+
+.plan-vote-modal__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid rgb(255 255 255 / 12%);
+}
+
+.plan-vote-modal__save {
+  align-self: stretch;
+  padding: 0.72rem 1rem;
+  border: 1px solid rgb(242 212 155 / 60%);
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #f7d78a 0%, #e0b75c 100%);
+  color: #1c1204;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+}
+
+.plan-vote-modal__save:hover:not(:disabled) {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.plan-vote-modal__save:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.plan-vote-modal__error {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #ffb4b4;
+}
+
+/* The wedding card is a marker, not a vote — a gold-tinted emphasis card. */
+.plan-card--wedding {
+  border-color: rgb(242 212 155 / 60%);
+  background:
+    linear-gradient(160deg,
+      rgb(242 212 155 / 22%) 0%,
+      rgb(242 212 155 / 6%) 45%,
+      rgb(0 0 0 / 30%) 100%);
+  box-shadow: 0 10px 30px rgb(242 212 155 / 14%);
+}
+
+.plan-card--wedding .plan-card__dates {
+  background: linear-gradient(135deg, #fff7d9 0%, #f7d78a 50%, #e0b75c 100%);
+  color: #3a2f1e;
+}
+
+/* Inline vote — each votable card carries a compact per-guest scale so guests
+   can answer directly from the timeline without a separate mini-RSVP. */
+.plan-card__vote {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgb(255 255 255 / 14%);
+}
+
+.plan-card__vote-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 60%);
+}
+
+.plan-card__vote-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  justify-content: space-between;
+}
+
+.plan-card__vote-name {
+  font-size: 0.85rem;
+  color: rgb(255 255 255 / 88%);
+}
+
+.plan-card__vote-scale {
+  display: flex;
+  gap: 0.15rem;
+}
+
+.plan-card__vote-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: rgb(255 255 255 / 8%);
+  color: var(--white);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.plan-card__vote-btn:hover {
+  background: rgb(255 255 255 / 18%);
+  transform: translateY(-1px);
+}
+
+.plan-card__vote-btn.is-selected {
+  background: rgb(242 212 155 / 28%);
+  border-color: #F2D49B;
 }
 
 /* Barra de Navidad photo strip, mirroring the Chapala slideset: a horizontal
@@ -886,3 +1515,119 @@
 }
 
 
+
+/* Estimated budget for the extra plans. */
+.plan-budget {
+  margin-top: 2.5rem;
+  padding: 1.5rem 1.75rem;
+  border: 1px solid rgb(255 255 255 / 14%);
+  border-radius: 1rem;
+  background: rgb(0 0 0 / 24%);
+  backdrop-filter: blur(8px);
+}
+
+.plan-budget-intro {
+  margin-top: 0.5rem;
+  padding-left: 0.9rem;
+  border-left: 2px solid rgb(242 212 155 / 60%);
+  color: rgb(242 212 155 / 92%);
+  font-style: italic;
+}
+
+.plan-budget-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.25rem 0 0;
+}
+
+.plan-budget-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.85rem 0;
+  border-bottom: 1px solid rgb(255 255 255 / 12%);
+}
+
+.plan-budget-meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.plan-budget-nights {
+  color: rgb(255 255 255 / 62%);
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.plan-budget-avatars {
+  display: flex;
+  align-items: center;
+}
+
+.plan-budget-avatar {
+  width: 1.9rem;
+  height: 1.9rem;
+  margin-left: -0.55rem;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid rgb(20 26 36);
+  background: rgb(255 255 255 / 14%);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.plan-budget-avatar:first-child {
+  margin-left: 0;
+}
+
+.plan-budget-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.plan-budget-avatar--fallback {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: rgb(255 253 248 / 90%);
+}
+
+.plan-budget-name {
+  color: rgb(255 253 248 / 92%);
+  font-weight: 600;
+}
+
+.plan-budget-amount {
+  color: #f2d49b;
+  font-weight: 700;
+  white-space: nowrap;
+  margin-left: auto;
+}
+
+.plan-budget-total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid rgb(242 212 155 / 35%);
+}
+
+.plan-budget-total span {
+  color: rgb(255 253 248 / 88%);
+  font-weight: 700;
+}
+
+.plan-budget-total strong {
+  color: #f2d49b;
+  font-size: 1.1rem;
+}
+
+.plan-budget-empty {
+  margin-top: 1.5rem;
+  color: rgb(255 255 255 / 68%);
+}

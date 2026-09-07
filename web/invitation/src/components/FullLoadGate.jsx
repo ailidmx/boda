@@ -6,10 +6,10 @@ import { MEDIA } from "../media.js";
 /**
  * Loading gate for the critical invitation shell.
  *
- * The Hero remains eager, while long-tail sections are now progressively
- * mounted by ProgressiveSection. The gate therefore waits only for a small
- * network-aware set of hero images instead of making first entry depend on
- * every piece of invitation content.
+ * The Hero remains eager; the long-tail sections are code-split and fetched
+ * up front (no progressive mounting). The gate therefore waits for a small
+ * network-aware set of hero images, while the sections load in parallel
+ * behind the loader.
  */
 const LOADER_IMAGE = cloudinaryImage("matrix_bbs1p1", { width: 1200 });
 

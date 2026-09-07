@@ -38,8 +38,8 @@ export const NAV_LINKS = [
   ["accommodation", "#accommodation"],
   ["petanque", "#petanque"],
 
-  // FOOD groups the food section, the guisos ranking, the guisos order panel
-  // and the food comment box under one dropdown.
+  // FOOD groups the food section, the guisos ranking and the guisos order
+  // panel under one dropdown.
   {
     key: "food",
     href: "#food",
@@ -47,7 +47,6 @@ export const NAV_LINKS = [
       ["food", "#food"],
       ["guisos", "#guisos"],
       ["guisosOrder", "#guisos-order"],
-      ["foodComment", "#food-comment"],
     ],
   },
 
@@ -64,20 +63,9 @@ export const NAV_LINKS = [
     ],
   },
 
-  // COAST ("Et après ?") groups the intro, the extra-stay plan, the Barra de
-  // Navidad suggestions, the mini RSVP and the beach budget under one dropdown,
-  // in the order they appear on the page.
-  {
-    key: "coast",
-    href: "#after",
-    children: [
-      ["coastIntro", "#after-intro"],
-      ["coastPlan", "#after-plan"],
-      ["coastBarra", "#after-barra"],
-      ["coastRsvp", "#after-rsvp"],
-      ["coastBudget", "#after-budget"],
-    ],
-  },
+  // COAST ("Nos 2 semaines") — the whole two-week timeline (before, wedding,
+  // after) as compact vote cards.
+  ["coast", "#after"],
 
   ["rsvp", "#rsvp"],
   ["gift", "#gift"],

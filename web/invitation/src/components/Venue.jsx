@@ -490,7 +490,7 @@ export function Venue() {
 
 
   return (
-    <section className="facilities-section section story-bg" ref={sectionRef}>
+    <section className="facilities-section section story-bg" id="venue" ref={sectionRef}>
       {/* ── Single slide · heading + photo-cards + gallery ───────────── */}
       <div className="venue-slide venue-slide--one">
 

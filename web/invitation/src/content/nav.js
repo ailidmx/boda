@@ -71,13 +71,8 @@ export const nav = {
     food: "Comida",
     guisos: "Guisos",
     guisosOrder: "Orden de guisos",
-    foodComment: "Comentario",
-    coast: "¿Y después?",
-    coastIntro: "Prolongar el gusto",
-    coastPlan: "El plan para ti",
-    coastBarra: "Barra de Navidad",
-    coastRsvp: "¿Te apuntas?",
-    coastBudget: "Presupuesto playa",
+
+    coast: "Antes y después",
 
     
     menu1: "Menú",
@@ -174,13 +169,8 @@ export const nav = {
     food: "Cuisine",
     guisos: "Plats mijotés",
     guisosOrder: "Ordre des plats",
-    foodComment: "Commentaire",
-    coast: "Et après ?",
-    coastIntro: "Prolonger le plaisir",
-    coastPlan: "Le plan pour toi",
-    coastBarra: "Barra de Navidad",
-    coastRsvp: "Tu t’inscris ?",
-    coastBudget: "Budget plage",
+
+    coast: "Avant et après",
 
     
     menu1: "Menu",
@@ -276,13 +266,8 @@ export const nav = {
     food: "Food",
     guisos: "Stews",
     guisosOrder: "Stew order",
-    foodComment: "Comment",
-    coast: "And afterwards?",
-    coastIntro: "Keep enjoying",
-    coastPlan: "The plan for you",
-    coastBarra: "Barra de Navidad",
-    coastRsvp: "Are you in?",
-    coastBudget: "Beach budget",
+
+    coast: "Before & after",
 
     
     menu1: "Menu",

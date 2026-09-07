@@ -31,7 +31,7 @@ function logDb(event, detail) {
 export const DEFAULT_RSVP_SCALE = [
   {
     level: 1,
-    emoji: "🙅",
+    emoji: "❌",
     fr: "Non, je ne viens pas",
     es: "No, no voy a venir",
     en: "No, I'm not coming",
@@ -59,7 +59,7 @@ export const DEFAULT_RSVP_SCALE = [
   },
   {
     level: 5,
-    emoji: "🎉",
+    emoji: "✅",
     fr: "Oui, je viens !",
     es: "¡Sí, voy!",
     en: "Yes, I'm coming!",

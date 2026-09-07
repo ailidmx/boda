@@ -7,7 +7,7 @@ export function Gift() {
   const gift = t.gift || {};
 
   return (
-    <section className="gift-section section story-bg">
+    <section className="gift-section section story-bg" id="gift">
       {/* Full-bleed background behind the whole CADEAUX section. The final
           chosen background is "midnight". The copy stays in the foreground. */}
       <div className="gift-bg gift-bg--midnight" aria-hidden="true" />

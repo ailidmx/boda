@@ -566,6 +566,8 @@ export function renderGuestManager(ctx) {
           col("xtraCabin", "Cabaña extra", (g) => cabinCell(g, "extra"), "xtraCabin", { width: 140 }),
           col("xtraRoom", "Cuarto extra", (g) => roomCell(g, "extra"), "xtraRoom", { width: 140 }),
           col("rocaAzul", "Roca Azul", (g) => rsvpScaleQuestionCell(g, "rocaAzul"), "rocaAzul", { width: 120 }),
+          col("tapalpa", "Tapalpa", (g) => rsvpScaleQuestionCell(g, "tapalpa"), "tapalpa", { width: 120 }),
+          col("barraNavidad", "Barra Navidad", (g) => rsvpScaleQuestionCell(g, "barraNavidad"), "barraNavidad", { width: 140 }),
           col("paymentConfirmed", "Pago", paymentConfirmedCell, "paymentConfirmed", { width: 110 }),
         ]
       : []),
@@ -577,7 +579,10 @@ export function renderGuestManager(ctx) {
       : []),
     ...(activeColumnGroup === "playa"
       ? [
-          col("playa", "Playa", (g) => rsvpScaleQuestionCell(g, "playa"), "playa", { width: 120 }),
+          col("playa", "Bahía", (g) => rsvpScaleQuestionCell(g, "playa"), "playa", { width: 120 }),
+          col("vallarta", "Puerto Vallarta", (g) => rsvpScaleQuestionCell(g, "vallarta"), "vallarta", { width: 150 }),
+          col("sanPancho", "San Pancho", (g) => rsvpScaleQuestionCell(g, "sanPancho"), "sanPancho", { width: 130 }),
+          col("chacala", "Chacala", (g) => rsvpScaleQuestionCell(g, "chacala"), "chacala", { width: 120 }),
         ]
       : []),
     ...(activeColumnGroup === "vuelos"
@@ -707,7 +712,7 @@ export function renderGuestManager(ctx) {
       return `
         <label class="dashboard-checkbox-cell" title="Mostrar solo confirmados para la playa (≥4)">
           <input type="checkbox" data-filter-playa ${state.filterPlaya === "yes" ? "checked" : ""} />
-          <span>Juega playa</span>
+          <span>Confirma playa</span>
         </label>`;
     }
     if (activeColumnGroup === "vuelos") {

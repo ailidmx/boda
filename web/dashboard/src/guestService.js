@@ -675,7 +675,12 @@ export function guestSortValue(guest, key, authUsers = {}, liveGuests = []) {
     case "petanqueOwnBoules":
       return getRsvpBooleanAnswer(guest, key, liveGuests);
     case "playa":
+    case "vallarta":
+    case "chacala":
+    case "sanPancho":
     case "rocaAzul":
+    case "tapalpa":
+    case "barraNavidad":
       return getRsvpScaleAnswer(guest, key, liveGuests);
     case "paymentConfirmed":
       return guest?.paymentConfirmed === true ? 1 : 0;

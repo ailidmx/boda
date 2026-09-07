@@ -4,7 +4,7 @@
  *
  * Responsibilities (per the architecture contract):
  *   - collection path (via `collections.plans`)
- *   - read (get + live onSnapshot) and write (set with merge)
+ *   - read (get + live onSnapshot) and write (full-document replace)
  *   - Firestore-specific errors
  *
  * The repository owns all Firestore access. It contains NO UI behavior and NO
@@ -49,10 +49,16 @@ export async function savePlan(plan, planId = DEFAULT_PLAN_ID) {
   // they are NOT duplicated into `plans/main.definitions` — only custom
   // definitions are persisted here. Instances still reference them by id.
   const persistedDefinitions = definitions.filter((d) => !isSystemDefinition(d));
+
+  // IMPORTANT: write WITHOUT `{ merge: true }`. A merged write is a patch keyed
+  // by the LEAF paths present in the payload, so keys REMOVED from nested maps
+  // (a guest unassigned from `guestAssignments`) are never deleted server-side —
+  // the guest "comes back" on reload. `plan` is the complete authoritative
+  // document (loaded from the server + local edits), so a full replace is safe
+  // and correctly drops deleted seats/tables/definitions.
   await setDoc(
     doc(db, collections.plans, planId),
     { ...plan, definitions: persistedDefinitions, id: planId, updatedAt: new Date() },
-    { merge: true },
   );
 }
 
