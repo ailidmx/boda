@@ -358,23 +358,28 @@
   color: rgb(255 253 248 / 90%);
 }
 
-/* Cards with a photo gallery: a full-bleed background image under a dark
-   scrim, with the card content layered on top. Clicking the card opens the
-   lightbox. */
+/* Cards with a photo gallery: an auto-playing full-bleed background image
+   under a dark scrim, with the card content layered on top. Clicking the card
+   opens the same photos in the lightbox; dots navigate the background. */
 .plan-card--gallery {
   position: relative;
   overflow: hidden;
   cursor: pointer;
 }
 
-.plan-card--gallery::before {
-  content: "";
+.plan-card__bg {
   position: absolute;
   inset: 0;
-  background-image: var(--plan-image);
-  background-size: cover;
-  background-position: center;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
   z-index: 0;
+  animation: plan-card-bg-in 0.9s ease;
+}
+
+@keyframes plan-card-bg-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .plan-card--gallery::after {
@@ -382,12 +387,41 @@
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg, rgb(10 16 28 / 52%) 0%, rgb(10 16 28 / 78%) 100%);
-  z-index: 0;
+  z-index: 1;
+  pointer-events: none;
 }
 
-.plan-card--gallery > * {
+.plan-card--gallery > *:not(.plan-card__bg) {
   position: relative;
-  z-index: 1;
+  z-index: 2;
+}
+
+.plan-card__dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: auto;
+  padding-top: 0.6rem;
+}
+
+.plan-card__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 42%);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.plan-card__dot:hover {
+  background: rgb(255 255 255 / 70%);
+}
+
+.plan-card__dot.is-active {
+  background: #f2d49b;
+  transform: scale(1.3);
 }
 
 .plan-card__title {

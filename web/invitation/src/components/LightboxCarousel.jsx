@@ -16,7 +16,7 @@ import { createPortal } from "react-dom";
  *   - startIndex: number — which slide to open on (default 0)
  *   - label: string — accessible label for the dialog
  */
-export function LightboxCarousel({ open, onClose, images, startIndex = 0, label = "Galería" }) {
+export function LightboxCarousel({ open, onClose, images, startIndex = 0, label = "Galería", autoPlay = false, autoPlayInterval = 4000, randomStart = false }) {
   const [index, setIndex] = useState(startIndex);
   // Direction of the last slide change ("next" | "prev") so the image can
   // animate in from the correct side, like swipeable cards.
@@ -26,10 +26,26 @@ export function LightboxCarousel({ open, onClose, images, startIndex = 0, label 
   const touchStartX = useRef(null);
 
 
-  // Keep the active slide in sync when the modal opens with a new startIndex.
+  // Keep the active slide in sync when the modal opens — optionally starting
+  // at a random index.
   useEffect(() => {
-    if (open) setIndex(startIndex);
-  }, [open, startIndex]);
+    if (!open) return;
+    if (randomStart && count > 1) {
+      setIndex(Math.floor(Math.random() * count));
+    } else {
+      setIndex(startIndex);
+    }
+  }, [open, startIndex, randomStart, count]);
+
+  // Auto-play: advance to the next slide on an interval while open.
+  useEffect(() => {
+    if (!open || !autoPlay || count <= 1) return undefined;
+    const timer = window.setInterval(() => {
+      setIndex((prev) => (prev + 1) % count);
+      setDirection("next");
+    }, autoPlayInterval);
+    return () => window.clearInterval(timer);
+  }, [open, autoPlay, autoPlayInterval, count]);
 
   const goTo = useCallback(
     (next) => {

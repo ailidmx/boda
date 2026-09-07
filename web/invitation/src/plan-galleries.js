@@ -46,15 +46,30 @@ const VALLARTA_IDS = [
   "VALLARTA-5_k4bwcm",
 ];
 
+// Tapalpa photos (root public ids, provided by the couple).
+const TAPALPA_IDS = [
+  "tapalpa_qumlzy",
+  "tapalpa-1_ahgevn",
+  "tapalpa-2_i2zjcf",
+  "tapalpa-3_tqe7tl",
+  "tapalpa-4_be7ixa",
+  "tapalpa-5_nxegd0",
+  "tapalpa-6_xlt7fe",
+  "tapalpa-7_ebqirs",
+  "tapalpa-8_ns0jv1",
+  "tapalpa-9_um3lol",
+  "tapalpa-10_g6w18l",
+  "tapalpa-11_zo0wbv",
+];
+
 // TODO: add Cloudinary ids when provided (prefix depends on upload location).
-const TAPALPA_IDS = []; // Tapalpa
 const GUADALAJARA_IDS = []; // Guadalajara
 
 export const PLAN_GALLERIES = {
   vallarta: rootSet(VALLARTA_IDS),
   guadalajara: bodaSet(GUADALAJARA_IDS),
   rocaAzul: ROCA_AZUL_PHOTOS,
-  tapalpa: bodaSet(TAPALPA_IDS),
+  tapalpa: rootSet(TAPALPA_IDS),
   barra: BARRA_PHOTOS,
 };
 
