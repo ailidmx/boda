@@ -3,7 +3,8 @@
  *
  * Some guests ended up seated in MORE than one seat (legacy data). This keeps
  * the FIRST seat per guest (by iteration order) and drops later duplicates,
- * then writes the cleaned `guestAssignments` back to `plans/main` (merge).
+ * then writes the cleaned `guestAssignments` back to `plans/main` (full replace
+ * — NOT `merge`, which would leave removed duplicate seat keys in the doc).
  * Dry-run by default; `--execute` writes.
  *
  *   node scripts/dedupe-plan-guests.mjs
@@ -49,7 +50,10 @@ for (const [iid, seats] of Object.entries(ga)) {
 console.log(`seats before: ${kept + removed} · after: ${kept} · duplicates removed: ${removed}`);
 
 if (EXECUTE) {
-  await db.collection("plans").doc("main").set({ guestAssignments: next, updatedAt: new Date() }, { merge: true });
+  // Full replace (no merge): a merged write only patches the leaf seat paths
+  // present in `next`, so the duplicate seat keys REMOVED here would stay in the
+  // document. `data` is the complete plan doc, so writing it back wholesale is safe.
+  await db.collection("plans").doc("main").set({ ...data, guestAssignments: next, updatedAt: new Date() });
   console.log("✅ dedupe written to plans/main");
 } else {
   console.log("Dry run — re-run with --execute to write.");
