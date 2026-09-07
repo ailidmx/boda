@@ -79,6 +79,7 @@ export const coast = {
         questionId: "barraNavidad",
         nights: 3,
         gallery: "barra",
+        wishlist: "https://www.airbnb.fr/wishlists/2185579673",
       },
     ],
     note:
@@ -218,6 +219,7 @@ export const coast = {
         questionId: "barraNavidad",
         nights: 3,
         gallery: "barra",
+        wishlist: "https://www.airbnb.fr/wishlists/2185579673",
       },
     ],
     note:
@@ -357,6 +359,7 @@ export const coast = {
         questionId: "barraNavidad",
         nights: 3,
         gallery: "barra",
+        wishlist: "https://www.airbnb.fr/wishlists/2185579673",
       },
     ],
     note:
