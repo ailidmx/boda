@@ -587,6 +587,18 @@
   transform: translateY(-1px);
 }
 
+.plan-card__cabin-assigned {
+  margin-left: auto;
+  padding: 0.5rem 1.05rem;
+  border: 1px solid rgb(122 214 170 / 55%);
+  border-radius: 999px;
+  background: rgb(122 214 170 / 14%);
+  color: #9ee6c3;
+  font-size: 0.85rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
 /* Airbnb wishlist link. */
 .plan-card__actions {
   display: flex;
@@ -1530,18 +1542,23 @@
 
 .plan-budget-row {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: 0.7rem 0;
+  flex-direction: column;
+  gap: 0.45rem;
+  padding: 0.85rem 0;
   border-bottom: 1px solid rgb(255 255 255 / 12%);
 }
 
-.plan-budget-info {
+.plan-budget-meta {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  min-width: 0;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.plan-budget-nights {
+  color: rgb(255 255 255 / 62%);
+  font-size: 0.85rem;
+  white-space: nowrap;
 }
 
 .plan-budget-avatars {
@@ -1583,15 +1600,11 @@
   font-weight: 600;
 }
 
-.plan-budget-name small {
-  color: rgb(255 255 255 / 62%);
-  font-weight: 400;
-}
-
 .plan-budget-amount {
   color: #f2d49b;
   font-weight: 700;
   white-space: nowrap;
+  margin-left: auto;
 }
 
 .plan-budget-total {

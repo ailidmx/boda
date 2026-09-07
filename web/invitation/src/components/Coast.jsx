@@ -8,6 +8,8 @@ import { LightboxCarousel } from "./LightboxCarousel.jsx";
 import { RsvpQuestion } from "./RsvpQuestion.jsx";
 import { Dialog } from "./ui/Dialog.jsx";
 import { getPlanGallery } from "../plan-galleries.js";
+import { getCabin } from "../cabins.js";
+import { MXN_PER_EUR } from "../features/coast/data.js";
 
 const GALLERY_INTERVAL = 5000;
 
@@ -51,6 +53,10 @@ function StarRating({ questionId, guest, answers, onVote }) {
 
 // Estimated budget for the extra plans, based on the group's "yes" answers
 // (level ≥ 4). Each plan's cost = price × nights × rooms (2 people per room).
+// Plans with a `cabinField` (the wedding cabin + the extra "2 días más" cabin)
+// use the REAL cabin price from the inventory instead of the hotel estimate:
+// guests with a pre-assigned cabin are priced via the cabin's
+// `totalPrice2Nights`; guests without one fall back to the vote estimate.
 function BudgetEstimate({ plans, guests, answers, budget, nightsLabel, language }) {
   if (!budget?.title) return null;
 
@@ -74,17 +80,66 @@ function BudgetEstimate({ plans, guests, answers, budget, nightsLabel, language 
     return best;
   };
 
+  const rooms = (people) => Math.ceil(people / 2);
+
+  // Real price across the DISTINCT cabins assigned via the given field.
+  const cabinRealMxn = (field) => {
+    const ids = new Set(guests.filter((g) => g[field]).map((g) => g[field]));
+    let total = 0;
+    for (const id of ids) total += Number(getCabin(id)?.totalPrice2Nights) || 0;
+    return total;
+  };
+
   const lines = [];
   for (const plan of plans) {
     if (plan.subDestinations) {
       const participants = yesGuests(plan.questionId);
       if (participants.length === 0) continue;
       const sub = resolveSub(plan.subDestinations);
-      lines.push({ name: plan.title, nights: plan.nights, priceMxn: sub.priceMxn, priceEur: sub.priceEur, participants });
+      lines.push({
+        name: plan.title,
+        nights: plan.nights,
+        participants,
+        estimateMxn: sub.priceMxn * plan.nights * rooms(participants.length),
+        estimateEur: sub.priceEur * plan.nights * rooms(participants.length),
+      });
+    } else if (plan.cabinField) {
+      // Real cabin stay (wedding + "2 días más"): assigned guests use the real
+      // cabin price, the rest (if any) use the vote estimate.
+      const cabinGuests = guests.filter((g) => g[plan.cabinField]);
+      const voteGuests = plan.questionId
+        ? yesGuests(plan.questionId).filter((g) => !g[plan.cabinField])
+        : [];
+      const participants = [...cabinGuests, ...voteGuests];
+      if (participants.length === 0) continue;
+      const realMxn = cabinRealMxn(plan.cabinField);
+      const estimateMxn =
+        plan.priceMxn != null
+          ? plan.priceMxn * plan.nights * rooms(voteGuests.length)
+          : 0;
+      const estimateEur =
+        plan.priceEur != null
+          ? plan.priceEur * plan.nights * rooms(voteGuests.length)
+          : 0;
+      lines.push({
+        name: plan.title,
+        nights: plan.nights,
+        participants,
+        realMxn,
+        realEur: Math.round(realMxn / MXN_PER_EUR),
+        estimateMxn,
+        estimateEur,
+      });
     } else if (plan.questionId && plan.priceMxn != null) {
       const participants = yesGuests(plan.questionId);
       if (participants.length === 0) continue;
-      lines.push({ name: plan.title, nights: plan.nights, priceMxn: plan.priceMxn, priceEur: plan.priceEur, participants });
+      lines.push({
+        name: plan.title,
+        nights: plan.nights,
+        participants,
+        estimateMxn: plan.priceMxn * plan.nights * rooms(participants.length),
+        estimateEur: plan.priceEur * plan.nights * rooms(participants.length),
+      });
     }
   }
 
@@ -92,11 +147,10 @@ function BudgetEstimate({ plans, guests, answers, budget, nightsLabel, language 
     return <p className="plan-budget-empty reveal">{budget.empty}</p>;
   }
 
-  const rooms = (people) => Math.ceil(people / 2);
-  const costMxn = (l) => l.priceMxn * l.nights * rooms(l.participants.length);
-  const costEur = (l) => l.priceEur * l.nights * rooms(l.participants.length);
-  const totalMxn = lines.reduce((s, l) => s + costMxn(l), 0);
-  const totalEur = lines.reduce((s, l) => s + costEur(l), 0);
+  const lineMxn = (l) => (l.realMxn || 0) + (l.estimateMxn || 0);
+  const lineEur = (l) => (l.realEur || 0) + (l.estimateEur || 0);
+  const totalMxn = lines.reduce((s, l) => s + lineMxn(l), 0);
+  const totalEur = lines.reduce((s, l) => s + lineEur(l), 0);
 
   return (
     <div className="plan-budget reveal">
@@ -108,34 +162,32 @@ function BudgetEstimate({ plans, guests, answers, budget, nightsLabel, language 
       <ul className="plan-budget-list">
         {lines.map((l) => (
           <li key={l.name} className="plan-budget-row">
-            <div className="plan-budget-info">
-              <span className="plan-budget-name">
-                {l.name}
-                <small>
-                  {" "}· {l.nights} {l.nights === 1 ? nightsLabel.one : nightsLabel.other}
-                </small>
+            <span className="plan-budget-name">{l.name}</span>
+            <div className="plan-budget-meta">
+              <span className="plan-budget-nights">
+                {l.nights} {l.nights === 1 ? nightsLabel.one : nightsLabel.other}
               </span>
-              <div className="plan-budget-avatars">
-                {l.participants.map((g) => {
-                  const photo = resolveGuestPhoto(g);
-                  const name = resolveGuestName(g);
-                  return (
-                    <span key={g.id} className="plan-budget-avatar" title={name.fullName}>
-                      {photo ? (
-                        <img src={photo} alt={name.fullName} loading="lazy" />
-                      ) : (
-                        <span className="plan-budget-avatar--fallback">
-                          {(name.fullName || "?").charAt(0).toUpperCase()}
-                        </span>
-                      )}
-                    </span>
-                  );
-                })}
-              </div>
+              <span className="plan-budget-amount">
+                {formatMoney(lineMxn(l), language)} MXN · {formatMoney(lineEur(l), language)} €
+              </span>
             </div>
-            <span className="plan-budget-amount">
-              {formatMoney(costMxn(l), language)} MXN · {formatMoney(costEur(l), language)} €
-            </span>
+            <div className="plan-budget-avatars">
+              {l.participants.map((g) => {
+                const photo = resolveGuestPhoto(g);
+                const name = resolveGuestName(g);
+                return (
+                  <span key={g.id} className="plan-budget-avatar" title={name.fullName}>
+                    {photo ? (
+                      <img src={photo} alt={name.fullName} loading="lazy" />
+                    ) : (
+                      <span className="plan-budget-avatar--fallback">
+                        {(name.fullName || "?").charAt(0).toUpperCase()}
+                      </span>
+                    )}
+                  </span>
+                );
+              })}
+            </div>
           </li>
         ))}
       </ul>
@@ -154,6 +206,8 @@ function PlanCard({
   nightsLabel,
   wishlistLabel,
   voteButtonLabel,
+  cabinAssignedLabel,
+  hasCabin,
   guest,
   answers,
   language,
@@ -283,7 +337,7 @@ function PlanCard({
         />
       )}
 
-      {(plan.wishlist || plan.questionId) && (
+      {(plan.wishlist || plan.questionId || plan.cabinField) && (
         <div className="plan-card__actions">
           {plan.wishlist && (
             <a
@@ -296,7 +350,11 @@ function PlanCard({
               🏠 {wishlistLabel}
             </a>
           )}
-          {plan.questionId && (
+          {plan.cabinField && hasCabin ? (
+            <span className="plan-card__cabin-assigned">
+              🏡 {cabinAssignedLabel}
+            </span>
+          ) : plan.questionId ? (
             <button
               type="button"
               className="plan-card__vote-cta"
@@ -307,7 +365,7 @@ function PlanCard({
             >
               {voteButtonLabel}
             </button>
-          )}
+          ) : null}
         </div>
       )}
 
@@ -406,6 +464,12 @@ export function Coast() {
               nightsLabel={nightsLabel}
               wishlistLabel={wishlistLabel}
               voteButtonLabel={voteLabels.button}
+              cabinAssignedLabel={voteLabels.cabinAssigned}
+              hasCabin={
+                plan.cabinField
+                  ? guests.some((g) => g[plan.cabinField])
+                  : false
+              }
               guest={profile?.guest}
               answers={answers}
               language={language}
