@@ -97,6 +97,9 @@ const interfaceText = {
     submitSuccess: "¡Gracias! Recibimos tu respuesta.",
     submitError:
       "No pudimos enviar la respuesta. Revisa tu conexión e inténtalo de nuevo.",
+    stepLabel: "Paso",
+    next: "Siguiente",
+    back: "Atrás",
     langPrompt: {
       title: "¿Idioma preferido?",
       body: "Tu invitación estaba en {current}, pero detectamos que tu idioma preferido podría ser {preferred}. ¿La cambiamos a {preferred}?",
@@ -126,6 +129,9 @@ const interfaceText = {
     submitWorking: "Envoi…",
     submitSuccess: "Merci ! Nous avons bien reçu votre réponse.",
     submitError: "L’envoi a échoué. Vérifiez votre connexion et réessayez.",
+    stepLabel: "Étape",
+    next: "Suivant",
+    back: "Retour",
     langPrompt: {
       title: "Langue préférée ?",
       body: "Votre navigateur est en {current}, mais nous pensons que votre langue préférée pourrait être {preferred}. On passe l'invitation en {preferred} ?",
@@ -157,6 +163,9 @@ const interfaceText = {
     submitSuccess: "Thank you! We received your response.",
     submitError:
       "We could not send your response. Check your connection and try again.",
+    stepLabel: "Step",
+    next: "Next",
+    back: "Back",
     langPrompt: {
       title: "Preferred language?",
       body: "Your invitation was in {current}, but we think your preferred language might be {preferred}. Shall we switch it to {preferred}?",
