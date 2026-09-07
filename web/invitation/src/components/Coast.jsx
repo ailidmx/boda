@@ -333,7 +333,7 @@ function PlanCard({
 }
 
 export function Coast() {
-  const { t, language, profile } = useApp();
+  const { t, language, interfaceText, profile } = useApp();
   const { answers, setAnswer } = useRsvp();
   const coast = t.coast || {};
   const voteLabels = coast.vote || {};
@@ -344,6 +344,7 @@ export function Coast() {
 
   const [activeGallery, setActiveGallery] = useState(null);
   const [votingPlan, setVotingPlan] = useState(null);
+  const [voteSaveStatus, setVoteSaveStatus] = useState("idle");
 
   const guests = useMemo(
     () => getGroupMembers(profile?.guest, getActiveGuests()),
@@ -359,6 +360,32 @@ export function Coast() {
       await saveRsvpAnswers(guest, { [questionId]: level }, editorGuestId);
     } catch (error) {
       console.warn("[coast] vote save failed", error.code || error.message);
+    }
+  };
+
+  const handleVoteChange = (questionId, guestId, level) => {
+    setAnswer(questionId, guestId, level, flow);
+  };
+
+  const handleSaveVote = async () => {
+    if (!votingPlan) return;
+    const editorGuestId = profile?.guest?.id;
+    const questionId = votingPlan.questionId;
+    if (!editorGuestId || !questionId) return;
+    setVoteSaveStatus("working");
+    try {
+      await Promise.all(
+        guests.map((guest) => {
+          const level = answers[questionId]?.[guest.id];
+          if (level === undefined) return Promise.resolve();
+          return saveRsvpAnswers(guest, { [questionId]: level }, editorGuestId);
+        }),
+      );
+      setVoteSaveStatus("saved");
+      setVotingPlan(null);
+    } catch (error) {
+      console.warn("[coast] vote save failed", error.code || error.message);
+      setVoteSaveStatus("error");
     }
   };
 
@@ -452,9 +479,26 @@ export function Coast() {
               guests={guests}
               answers={answers[votingPlan.questionId] || {}}
               onChange={(guestId, level) =>
-                handleVote(votingPlan.questionId, guestId, level)
+                handleVoteChange(votingPlan.questionId, guestId, level)
               }
             />
+            <div className="plan-vote-modal__actions">
+              {voteSaveStatus === "error" && (
+                <p className="plan-vote-modal__error" role="alert">
+                  {interfaceText.submitError}
+                </p>
+              )}
+              <button
+                type="button"
+                className="plan-vote-modal__save"
+                onClick={handleSaveVote}
+                disabled={voteSaveStatus === "working"}
+              >
+                {voteSaveStatus === "working"
+                  ? voteLabels.saving
+                  : voteLabels.save}
+              </button>
+            </div>
           </div>
         )}
       </Dialog>

@@ -730,6 +730,45 @@
   color: rgb(255 253 248 / 90%);
 }
 
+.plan-vote-modal__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  padding-top: 1rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid rgb(255 255 255 / 12%);
+}
+
+.plan-vote-modal__save {
+  align-self: stretch;
+  padding: 0.72rem 1rem;
+  border: 1px solid rgb(242 212 155 / 60%);
+  border-radius: 0.5rem;
+  background: linear-gradient(135deg, #f7d78a 0%, #e0b75c 100%);
+  color: #1c1204;
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: filter 0.2s ease, transform 0.2s ease, opacity 0.2s ease;
+}
+
+.plan-vote-modal__save:hover:not(:disabled) {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+}
+
+.plan-vote-modal__save:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.plan-vote-modal__error {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #ffb4b4;
+}
+
 /* The wedding card is a marker, not a vote — a gold-tinted emphasis card. */
 .plan-card--wedding {
   border-color: rgb(242 212 155 / 60%);
