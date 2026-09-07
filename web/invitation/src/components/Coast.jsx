@@ -433,7 +433,7 @@ export function Coast() {
         closeClassName="plan-vote-modal__close"
       >
         {votingPlan && (
-          <>
+          <div className="plan-vote-modal__scroll">
             <div className="plan-vote-modal__summary">
               <p className="eyebrow">
                 <span aria-hidden="true">{votingPlan.icon}</span> {votingPlan.dates}
@@ -455,7 +455,7 @@ export function Coast() {
                 handleVote(votingPlan.questionId, guestId, level)
               }
             />
-          </>
+          </div>
         )}
       </Dialog>
     </section>
