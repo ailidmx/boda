@@ -1,4 +1,4 @@
-import React, { lazy, useEffect } from "react";
+import React, { lazy, Suspense, useEffect } from "react";
 import { AppProvider, useApp } from "./context/AppContext.jsx";
 import { RsvpProvider } from "./context/RsvpContext.jsx";
 import { AuthGate } from "./components/AuthGate.jsx";
@@ -6,7 +6,6 @@ import { Nav } from "./components/Nav.jsx";
 import { Countdown } from "./components/Countdown.jsx";
 import { Hero } from "./components/Hero.jsx";
 import { FullLoadGate } from "./components/FullLoadGate.jsx";
-import { ProgressiveSection } from "./components/ProgressiveSection.jsx";
 import { LanguageModal } from "./components/LanguageModal.jsx";
 import { IdentityModal } from "./components/IdentityModal.jsx";
 import { WinampPlayer } from "./components/WinampPlayer.jsx";
@@ -22,8 +21,9 @@ import {
 } from "./invitation-link.js";
 import { guestTravelsByPlane } from "./guest-profiles.js";
 
-// Keep the app shell and Hero eager. Long-tail sections are fetched before
-// they approach the viewport. Named-export adapters preserve the existing
+// Keep the app shell and Hero eager. The long-tail sections are code-split but
+// fetched up front behind a single Suspense — the MatrixLoader is the loading
+// state while everything loads. Named-export adapters preserve the existing
 // component modules without wrapper files.
 const Story = lazy(() => import("./components/Story.jsx").then((m) => ({ default: m.Story })));
 const Venue = lazy(() => import("./components/Venue.jsx").then((m) => ({ default: m.Venue })));
@@ -127,31 +127,33 @@ function Invitation() {
 
       <main>
         <Hero />
-        <ProgressiveSection id="story"><Story /></ProgressiveSection>
-        <ProgressiveSection id="venue"><Venue /></ProgressiveSection>
-        <ProgressiveSection id="weekend"><Weekend /></ProgressiveSection>
-        <ProgressiveSection id="attire"><Attire /></ProgressiveSection>
-        <ProgressiveSection id="dress-code"><DressCode /></ProgressiveSection>
-        <ProgressiveSection id="weather"><Weather /></ProgressiveSection>
-        <ProgressiveSection id="weekend-program"><WeekendProgram /></ProgressiveSection>
-        <ProgressiveSection id="te-animas"><TeAnimas /></ProgressiveSection>
-        {travelsByPlane && (
-          <ProgressiveSection id="travel"><Travel /></ProgressiveSection>
-        )}
-        <ProgressiveSection id="accommodation"><Accommodation /></ProgressiveSection>
-        <ProgressiveSection id="petanque"><Petanque /></ProgressiveSection>
-        <ProgressiveSection id="food"><Food /></ProgressiveSection>
-        <ProgressiveSection id="guisos"><Guisos /></ProgressiveSection>
-        <ProgressiveSection id="music"><Music /></ProgressiveSection>
-        <ProgressiveSection id="coast"><Coast /></ProgressiveSection>
-        <ProgressiveSection id="rsvp"><RSVP /></ProgressiveSection>
-        <ProgressiveSection id="gift"><Gift /></ProgressiveSection>
-        <ProgressiveSection id="photos"><Photos /></ProgressiveSection>
-        <ProgressiveSection id="guests"><GuestCloud /></ProgressiveSection>
-        <ProgressiveSection id="thanks"><Thanks /></ProgressiveSection>
+        <Suspense fallback={null}>
+          <Story />
+          <Venue />
+          <Weekend />
+          <Attire />
+          <DressCode />
+          <Weather />
+          <WeekendProgram />
+          <TeAnimas />
+          {travelsByPlane && <Travel />}
+          <Accommodation />
+          <Petanque />
+          <Food />
+          <Guisos />
+          <Music />
+          <Coast />
+          <RSVP />
+          <Gift />
+          <Photos />
+          <GuestCloud />
+          <Thanks />
+        </Suspense>
       </main>
 
-      <ProgressiveSection id="footer"><Footer /></ProgressiveSection>
+      <Suspense fallback={null}>
+        <Footer />
+      </Suspense>
     </FullLoadGate>
   );
 }
