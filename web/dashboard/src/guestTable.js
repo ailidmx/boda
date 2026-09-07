@@ -579,6 +579,7 @@ export function renderGuestManager(ctx) {
       : []),
     ...(activeColumnGroup === "playa"
       ? [
+          col("playa", "Bahía", (g) => rsvpScaleQuestionCell(g, "playa"), "playa", { width: 120 }),
           col("vallarta", "Puerto Vallarta", (g) => rsvpScaleQuestionCell(g, "vallarta"), "vallarta", { width: 150 }),
           col("sanPancho", "San Pancho", (g) => rsvpScaleQuestionCell(g, "sanPancho"), "sanPancho", { width: 130 }),
           col("chacala", "Chacala", (g) => rsvpScaleQuestionCell(g, "chacala"), "chacala", { width: 120 }),

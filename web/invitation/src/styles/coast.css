@@ -499,12 +499,13 @@
   color: #f2d49b;
 }
 
-/* Tag badges (VIBRANT / SURF / CALME). */
-.plan-card__tags {
+/* Active sub-destination tag (VIBRANT / SURF / CALME) — shown next to the
+   dates badge in the card meta line. */
+.plan-card__meta-left {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
-  margin-top: -0.25rem;
+  align-items: center;
+  gap: 0.4rem;
+  min-width: 0;
 }
 
 .plan-card__tag {
@@ -512,16 +513,11 @@
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  white-space: nowrap;
   padding: 0.22rem 0.55rem;
   border-radius: 999px;
-  background: rgb(255 255 255 / 10%);
-  border: 1px solid rgb(255 255 255 / 16%);
-  color: rgb(255 255 255 / 68%);
-}
-
-.plan-card__tag.is-active {
   background: rgb(242 212 155 / 18%);
-  border-color: rgb(242 212 155 / 60%);
+  border: 1px solid rgb(242 212 155 / 60%);
   color: #f2d49b;
 }
 

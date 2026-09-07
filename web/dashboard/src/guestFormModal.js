@@ -256,6 +256,7 @@ function petanqueTab({ guest }) {
 function playaTab({ guest }) {
   const a = guest?.rsvp?.answers || {};
   return [
+    field("Bahía de Banderas", selectInput("playa", scaleOptions(Number(a.playa) || 0))),
     field("Puerto Vallarta", selectInput("vallarta", scaleOptions(Number(a.vallarta) || 0))),
     field("San Pancho", selectInput("sanPancho", scaleOptions(Number(a.sanPancho) || 0))),
     field("Chacala", selectInput("chacala", scaleOptions(Number(a.chacala) || 0))),
@@ -526,7 +527,7 @@ async function saveEdit(overlay, guest, ctx, setStatus) {
     if (!ok) throw new Error("No se pudo actualizar el correo de acceso.");
   }
 
-  for (const key of ["friday", "saturday", "sunday", "vallarta", "sanPancho", "chacala", "rocaAzul", "tapalpa", "barraNavidad"]) {
+  for (const key of ["friday", "saturday", "sunday", "playa", "vallarta", "sanPancho", "chacala", "rocaAzul", "tapalpa", "barraNavidad"]) {
     const level = Number(v(key)) || 0;
     if (level !== (Number(rsvp[key]) || 0)) await ctx.saveGuestRsvpAnswer(guestId, key, level);
   }

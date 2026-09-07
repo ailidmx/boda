@@ -12,6 +12,7 @@ export const coast = {
         title: "Playa · Bahía de Banderas",
         body: "Tres destinos para elegir.",
         kind: "plan",
+        questionId: "playa",
         nights: 4,
         subDestinations: [
           { name: "Puerto Vallarta", tag: "Vibrante", gallery: "vallarta", questionId: "vallarta" },
@@ -91,6 +92,11 @@ export const coast = {
         "Vota qué tan probable es que te unas a cada parada. Puedes cambiar tu respuesta en cualquier momento.",
       questions: [
         {
+          id: "playa",
+          title: "Bahía de Banderas",
+          subtitle: "¿Vendrás al plan de playa?",
+        },
+        {
           id: "vallarta",
           title: "Puerto Vallarta",
           subtitle: "Del viernes 12 al martes 16 · Vibrante.",
@@ -142,6 +148,7 @@ export const coast = {
         title: "Plage · Bahía de Banderas",
         body: "Trois destinations au choix.",
         kind: "plan",
+        questionId: "playa",
         nights: 4,
         subDestinations: [
           { name: "Puerto Vallarta", tag: "Vibrant", gallery: "vallarta", questionId: "vallarta" },
@@ -221,6 +228,11 @@ export const coast = {
         "Vote pour dire à quel point tu as envie de rejoindre chaque étape. Tu peux modifier ta réponse à tout moment.",
       questions: [
         {
+          id: "playa",
+          title: "Bahía de Banderas",
+          subtitle: "Viens-tu au plan plage ?",
+        },
+        {
           id: "vallarta",
           title: "Puerto Vallarta",
           subtitle: "Du vendredi 12 au mardi 16 · Vibrant.",
@@ -272,6 +284,7 @@ export const coast = {
         title: "Beach · Bahía de Banderas",
         body: "Three destinations to choose from.",
         kind: "plan",
+        questionId: "playa",
         nights: 4,
         subDestinations: [
           { name: "Puerto Vallarta", tag: "Vibrant", gallery: "vallarta", questionId: "vallarta" },
@@ -350,6 +363,11 @@ export const coast = {
       intro:
         "Vote on how likely you are to join each stop. You can change your answer at any time.",
       questions: [
+        {
+          id: "playa",
+          title: "Bahía de Banderas",
+          subtitle: "Will you come to the beach plan?",
+        },
         {
           id: "vallarta",
           title: "Puerto Vallarta",

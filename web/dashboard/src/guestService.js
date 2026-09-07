@@ -578,12 +578,7 @@ export function getFilteredGuests(
     filtered = filtered.filter((g) => getRsvpBooleanAnswer(g, "petanqueOwnBoules", liveGuests) === 1);
   }
   if (filterPlaya === "yes") {
-    filtered = filtered.filter(
-      (g) =>
-        getRsvpScaleAnswer(g, "vallarta", liveGuests) >= 4 ||
-        getRsvpScaleAnswer(g, "sanPancho", liveGuests) >= 4 ||
-        getRsvpScaleAnswer(g, "chacala", liveGuests) >= 4,
-    );
+    filtered = filtered.filter((g) => getRsvpScaleAnswer(g, "playa", liveGuests) >= 4);
   }
   if (filterTravelsByPlane === "yes") {
     filtered = filtered.filter((g) => g.travelsByPlane === true);
@@ -679,6 +674,7 @@ export function guestSortValue(guest, key, authUsers = {}, liveGuests = []) {
     case "petanqueParticipation":
     case "petanqueOwnBoules":
       return getRsvpBooleanAnswer(guest, key, liveGuests);
+    case "playa":
     case "vallarta":
     case "chacala":
     case "sanPancho":

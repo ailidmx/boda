@@ -142,7 +142,10 @@ function PlanCard({
       )}
 
       <div className="plan-card__meta">
-        <span className="plan-card__dates">{plan.dates}</span>
+        <div className="plan-card__meta-left">
+          <span className="plan-card__dates">{plan.dates}</span>
+          {activeSub && <span className="plan-card__tag">{activeSub.tag}</span>}
+        </div>
         <div className="plan-card__meta-right">
           <span className="plan-card__nights">
             <span aria-hidden="true">🌙</span> {plan.nights}{" "}
@@ -151,31 +154,32 @@ function PlanCard({
         </div>
       </div>
 
-      {isMultiDestination && (
-        <div className="plan-card__tags">
-          {subDestinations.map((d) => (
-            <span
-              key={d.gallery}
-              className={`plan-card__tag${d.gallery === activeSub.gallery ? " is-active" : ""}`}
-            >
-              {d.tag}
-            </span>
-          ))}
-        </div>
-      )}
-
       <strong className="plan-card__title">
         <span aria-hidden="true">{plan.icon}</span> {plan.title}
       </strong>
       <span className="plan-card__body">{plan.body}</span>
 
       {isMultiDestination ? (
-        <StarRating
-          questionId={activeSub.questionId}
-          guests={guests}
-          answers={answers}
-          onVote={onVote}
-        />
+        <>
+          <StarRating
+            questionId={activeSub.questionId}
+            guests={guests}
+            answers={answers}
+            onVote={onVote}
+          />
+          {plan.questionId && (
+            <button
+              type="button"
+              className="plan-card__vote-cta"
+              onClick={(e) => {
+                e.stopPropagation();
+                onOpenVote(plan);
+              }}
+            >
+              {voteButtonLabel}
+            </button>
+          )}
+        </>
       ) : plan.questionId ? (
         <button
           type="button"
