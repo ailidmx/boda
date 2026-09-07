@@ -62,11 +62,17 @@ const TAPALPA_IDS = [
   "tapalpa-11_zo0wbv",
 ];
 
+// TODO: add Cloudinary ids when provided (root, like the other couple-provided sets).
+const SAN_PANCHO_IDS = []; // San Pancho (SURF)
+const CHACALA_IDS = []; // Chacala (CALME)
+
 // TODO: add Cloudinary ids when provided (prefix depends on upload location).
 const GUADALAJARA_IDS = []; // Guadalajara
 
 export const PLAN_GALLERIES = {
   vallarta: rootSet(VALLARTA_IDS),
+  sanPancho: rootSet(SAN_PANCHO_IDS),
+  chacala: rootSet(CHACALA_IDS),
   guadalajara: bodaSet(GUADALAJARA_IDS),
   rocaAzul: ROCA_AZUL_PHOTOS,
   tapalpa: rootSet(TAPALPA_IDS),

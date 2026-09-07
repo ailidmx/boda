@@ -79,7 +79,10 @@ function PlanCard({
   onVote,
   onOpenGallery,
 }) {
-  const photos = getPlanGallery(plan.gallery);
+  const subDestinations = plan.subDestinations || [];
+  const photos = subDestinations.length
+    ? subDestinations.flatMap((d) => getPlanGallery(d.gallery))
+    : getPlanGallery(plan.gallery);
   const hasGallery = photos.length > 0;
 
   // Random start index + auto-advance through the gallery photos.
@@ -148,6 +151,31 @@ function PlanCard({
         <span aria-hidden="true">{plan.icon}</span> {plan.title}
       </strong>
       <span className="plan-card__body">{plan.body}</span>
+
+      {subDestinations.length > 0 && (
+        <div className="plan-card__subs">
+          {subDestinations.map((d) => {
+            const dPhotos = getPlanGallery(d.gallery);
+            const enabled = dPhotos.length > 0;
+            return (
+              <button
+                key={d.gallery}
+                type="button"
+                className="plan-card__sub"
+                disabled={!enabled}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (!enabled) return;
+                  onOpenGallery({ label: `${d.name} · ${d.tag}`, photos: dPhotos, index: 0 });
+                }}
+              >
+                <span className="plan-card__sub-tag">{d.tag}</span>
+                <span className="plan-card__sub-name">{d.name}</span>
+              </button>
+            );
+          })}
+        </div>
+      )}
 
       {plan.questionId && (
         <InlineVote

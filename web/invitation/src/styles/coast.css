@@ -437,6 +437,51 @@
   color: rgb(255 255 255 / 82%);
 }
 
+/* Sub-destination chips (e.g. Bahía de Banderas → Puerto Vallarta / San
+   Pancho / Chacala), each with a tag + name and its own gallery. */
+.plan-card__subs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.plan-card__sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.32rem 0.7rem;
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: 999px;
+  background: rgb(10 16 28 / 38%);
+  color: var(--white);
+  font-size: 0.8rem;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.plan-card__sub:hover:not(:disabled) {
+  border-color: rgb(242 212 155 / 55%);
+  background: rgb(10 16 28 / 55%);
+}
+
+.plan-card__sub:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.plan-card__sub-tag {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #f2d49b;
+}
+
+.plan-card__sub-name {
+  font-weight: 600;
+}
+
 /* The wedding card is a marker, not a vote — a gold-tinted emphasis card. */
 .plan-card--wedding {
   border-color: rgb(242 212 155 / 60%);
