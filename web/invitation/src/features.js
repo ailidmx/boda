@@ -16,6 +16,11 @@
 export const FEATURES = {
   es: [
     {
+      icon: "🏖️",
+      title: "¿Y antes? ¿Y después?",
+      body: "Ahora hay dos planes extra: la playa antes de la boda (12–16 de febrero) y, después, Roca Azul + Mazamitla (23–28 de febrero).",
+    },
+    {
       icon: "⭐",
       title: "Vota por tus favoritos",
       body: "Califica con estrellas los platillos y los grupos musicales para ayudarnos a armar el menú y la fiesta perfectos.",
@@ -98,6 +103,11 @@ export const FEATURES = {
   ],
   fr: [
     {
+      icon: "🏖️",
+      title: "Et avant ? Et après ?",
+      body: "Deux plans bonus : la plage avant le mariage (12–16 février) et, après, Roca Azul + Mazamitla (23–28 février).",
+    },
+    {
       icon: "⭐",
       title: "Vote pour tes favoris",
       body: "Note avec des étoiles les plats et les groupes de musique pour nous aider à composer le menu et la fête parfaits.",
@@ -179,6 +189,11 @@ export const FEATURES = {
     },
   ],
   en: [
+    {
+      icon: "🏖️",
+      title: "Before? After?",
+      body: "Two bonus plans: the beach before the wedding (Feb 12–16), and afterwards Roca Azul + Mazamitla (Feb 23–28).",
+    },
     {
       icon: "⭐",
       title: "Vote for your favorites",
