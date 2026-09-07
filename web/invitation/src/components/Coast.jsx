@@ -122,7 +122,7 @@ function PlanCard({
           className="plan-card__bg"
           src={photos[index].src}
           alt=""
-          loading="lazy"
+          loading="eager"
           decoding="async"
           key={index}
         />
@@ -164,14 +164,15 @@ function PlanCard({
       <strong className="plan-card__title">
         <span aria-hidden="true">{plan.icon}</span> {plan.title}
       </strong>
-      <span className="plan-card__body">{plan.body}</span>
-
-      {priceMxn != null && (
-        <span className="plan-card__price">
-          {formatMoney(priceMxn, language)} MXN / {formatMoney(priceEur, language)} €{" "}
-          <sup>*</sup>
-        </span>
-      )}
+      <div className="plan-card__body-row">
+        <span className="plan-card__body">{plan.body}</span>
+        {priceMxn != null && (
+          <span className="plan-card__price">
+            {formatMoney(priceMxn, language)} MXN / {formatMoney(priceEur, language)} €{" "}
+            <sup>*</sup>
+          </span>
+        )}
+      </div>
 
       {isMultiDestination && (
         <StarRating

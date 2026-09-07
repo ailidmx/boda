@@ -62,6 +62,8 @@ export const coast = {
         questionId: "rocaAzul",
         nights: 2,
         gallery: "rocaAzul",
+        priceMxn: 1200,
+        priceEur: 61,
       },
       {
         icon: "⛰️",
@@ -195,6 +197,8 @@ export const coast = {
         questionId: "rocaAzul",
         nights: 2,
         gallery: "rocaAzul",
+        priceMxn: 1200,
+        priceEur: 61,
       },
       {
         icon: "⛰️",
@@ -328,6 +332,8 @@ export const coast = {
         questionId: "rocaAzul",
         nights: 2,
         gallery: "rocaAzul",
+        priceMxn: 1200,
+        priceEur: 61,
       },
       {
         icon: "⛰️",

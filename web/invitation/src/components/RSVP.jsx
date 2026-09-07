@@ -119,8 +119,10 @@ export function RSVP() {
     answers,
   );
 
-  // Manual step navigation for the "Avant et après" questions — the guest
-  // steps through them with explicit prev/next buttons instead of auto-advancing.
+  // Manual step navigation for the RSVP fieldsets — the guest steps through
+  // them with explicit prev/next buttons instead of auto-advancing.
+  const [scaleNavStep, setScaleNavStep] = useState(0);
+  const [petanqueNavStep, setPetanqueNavStep] = useState(0);
   const [coastStep, setCoastStep] = useState(0);
 
   // ── Save status for the final submit ────────────────────────────────────
@@ -388,10 +390,10 @@ export function RSVP() {
           <fieldset className="rsvp-scale-fieldset">
             <legend>{rsvp.groups.attendance}</legend>
             <p className="fieldset-note">{scale.intro}</p>
-            {scaleStep < scaleQuestions.length ? (
+            {scaleNavStep < scaleQuestions.length ? (
               <div className="rsvp-scale-questions">
                 {(() => {
-                  const q = scaleQuestions[scaleStep];
+                  const q = scaleQuestions[scaleNavStep];
                   return (
                     <RsvpQuestion
                       key={q.id}
@@ -404,16 +406,44 @@ export function RSVP() {
                         handleAnswerChange(q.id, guestId, level, RSVP_FLOWS.teAnimas)
                       }
                     />
-
                   );
                 })()}
+                <div className="rsvp-step-nav">
+                  <button
+                    type="button"
+                    className="rsvp-step-nav__btn"
+                    disabled={scaleNavStep === 0}
+                    onClick={() => setScaleNavStep((s) => s - 1)}
+                  >
+                    ← {interfaceText.back || "Back"}
+                  </button>
+                  <span className="rsvp-step-nav__count">
+                    {scaleNavStep + 1} / {scaleQuestions.length}
+                  </span>
+                  <button
+                    type="button"
+                    className="rsvp-step-nav__btn rsvp-step-nav__btn--primary"
+                    onClick={() => setScaleNavStep((s) => s + 1)}
+                  >
+                    {interfaceText.next || "Next"} →
+                  </button>
+                </div>
               </div>
             ) : (
-              <RsvpRecap
-                questions={scaleQuestions}
-                guests={guests}
-                answers={answers}
-              />
+              <div className="rsvp-recap-step">
+                <RsvpRecap
+                  questions={scaleQuestions}
+                  guests={guests}
+                  answers={answers}
+                />
+                <button
+                  type="button"
+                  className="rsvp-step-nav__btn"
+                  onClick={() => setScaleNavStep(0)}
+                >
+                  ← {rsvp.groups.attendance}
+                </button>
+              </div>
             )}
           </fieldset>
         )}
@@ -428,10 +458,10 @@ export function RSVP() {
           <fieldset className="rsvp-scale-fieldset">
             <legend>{rsvp.progressPetanque}</legend>
             <p className="fieldset-note">{petanque.intro}</p>
-            {petanqueStep < visiblePetanqueQuestions.length ? (
+            {petanqueNavStep < visiblePetanqueQuestions.length ? (
               <div className="rsvp-scale-questions">
                 {(() => {
-                  const q = visiblePetanqueQuestions[petanqueStep];
+                  const q = visiblePetanqueQuestions[petanqueNavStep];
                   return (
                     <RsvpQuestion
                       key={q.id}
@@ -445,16 +475,44 @@ export function RSVP() {
                         handleAnswerChange(q.id, guestId, level, RSVP_FLOWS.petanque)
                       }
                     />
-
                   );
                 })()}
+                <div className="rsvp-step-nav">
+                  <button
+                    type="button"
+                    className="rsvp-step-nav__btn"
+                    disabled={petanqueNavStep === 0}
+                    onClick={() => setPetanqueNavStep((s) => s - 1)}
+                  >
+                    ← {interfaceText.back || "Back"}
+                  </button>
+                  <span className="rsvp-step-nav__count">
+                    {petanqueNavStep + 1} / {visiblePetanqueQuestions.length}
+                  </span>
+                  <button
+                    type="button"
+                    className="rsvp-step-nav__btn rsvp-step-nav__btn--primary"
+                    onClick={() => setPetanqueNavStep((s) => s + 1)}
+                  >
+                    {interfaceText.next || "Next"} →
+                  </button>
+                </div>
               </div>
             ) : (
-              <RsvpRecap
-                questions={visiblePetanqueQuestions}
-                guests={guests}
-                answers={answers}
-              />
+              <div className="rsvp-recap-step">
+                <RsvpRecap
+                  questions={visiblePetanqueQuestions}
+                  guests={guests}
+                  answers={answers}
+                />
+                <button
+                  type="button"
+                  className="rsvp-step-nav__btn"
+                  onClick={() => setPetanqueNavStep(0)}
+                >
+                  ← {rsvp.progressPetanque}
+                </button>
+              </div>
             )}
           </fieldset>
         )}
