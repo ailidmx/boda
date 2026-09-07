@@ -68,10 +68,6 @@ function PlanCard({
     : getPlanGallery(plan.gallery);
   const hasGallery = photos.length > 0;
 
-  const combinedCount = isMultiDestination
-    ? subDestinations.reduce((n, d) => n + getPlanGallery(d.gallery).length, 0)
-    : photos.length;
-
   const [index, setIndex] = useState(0);
 
   // Auto-advance the active gallery; reset when switching destination.
@@ -152,11 +148,6 @@ function PlanCard({
             <span aria-hidden="true">🌙</span> {plan.nights}{" "}
             {plan.nights === 1 ? nightsLabel.one : nightsLabel.other}
           </span>
-          {hasGallery && (
-            <span className="plan-card__gallery-badge" aria-hidden="true">
-              📷 {combinedCount}
-            </span>
-          )}
         </div>
       </div>
 
