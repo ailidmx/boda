@@ -1291,3 +1291,48 @@
 
 
 
+
+/* Step navigation for the "Avant et après" questions in the final RSVP. */
+.rsvp-step-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1.25rem;
+}
+
+.rsvp-step-nav__btn {
+  padding: 0.55rem 1rem;
+  border: 1px solid rgb(255 255 255 / 25%);
+  border-radius: 0.6rem;
+  background: rgb(255 255 255 / 8%);
+  color: var(--white);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.rsvp-step-nav__btn:hover:not(:disabled) {
+  background: rgb(255 255 255 / 16%);
+}
+
+.rsvp-step-nav__btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.rsvp-step-nav__btn--primary {
+  border-color: rgb(242 212 155 / 60%);
+  background: rgb(242 212 155 / 14%);
+  color: #f2d49b;
+}
+
+.rsvp-step-nav__btn--primary:hover:not(:disabled) {
+  background: rgb(242 212 155 / 26%);
+}
+
+.rsvp-step-nav__count {
+  font-size: 0.85rem;
+  color: rgb(255 255 255 / 70%);
+}

@@ -109,21 +109,6 @@ export const coast = {
           subtitle: "¿Vendrás al plan de playa?",
         },
         {
-          id: "vallarta",
-          title: "Puerto Vallarta",
-          subtitle: "Del viernes 12 al martes 16 · Vibrante.",
-        },
-        {
-          id: "sanPancho",
-          title: "San Pancho",
-          subtitle: "Del viernes 12 al martes 16 · Surf.",
-        },
-        {
-          id: "chacala",
-          title: "Chacala",
-          subtitle: "Del viernes 12 al martes 16 · Calma.",
-        },
-        {
           id: "rocaAzul",
           title: "Roca Azul (2 días más)",
           subtitle: "Del domingo 21 al martes 23.",
@@ -257,21 +242,6 @@ export const coast = {
           subtitle: "Viens-tu au plan plage ?",
         },
         {
-          id: "vallarta",
-          title: "Puerto Vallarta",
-          subtitle: "Du vendredi 12 au mardi 16 · Vibrant.",
-        },
-        {
-          id: "sanPancho",
-          title: "San Pancho",
-          subtitle: "Du vendredi 12 au mardi 16 · Surf.",
-        },
-        {
-          id: "chacala",
-          title: "Chacala",
-          subtitle: "Du vendredi 12 au mardi 16 · Calme.",
-        },
-        {
           id: "rocaAzul",
           title: "Roca Azul (2 jours de plus)",
           subtitle: "Du dimanche 21 au mardi 23.",
@@ -403,21 +373,6 @@ export const coast = {
           id: "playa",
           title: "Bahía de Banderas",
           subtitle: "Will you come to the beach plan?",
-        },
-        {
-          id: "vallarta",
-          title: "Puerto Vallarta",
-          subtitle: "From Friday 12 to Tuesday 16 · Vibrant.",
-        },
-        {
-          id: "sanPancho",
-          title: "San Pancho",
-          subtitle: "From Friday 12 to Tuesday 16 · Surf.",
-        },
-        {
-          id: "chacala",
-          title: "Chacala",
-          subtitle: "From Friday 12 to Tuesday 16 · Calm.",
         },
         {
           id: "rocaAzul",

@@ -19,35 +19,32 @@ function formatMoney(amount, language) {
 // Inline star rating (1–5) for the multi-destination Bahía de Banderas card.
 // Each group member rates the active destination; the level maps straight onto
 // the shared `rsvp.answers` scale (star N → level N).
-function StarRating({ questionId, guests, answers, onVote }) {
+function StarRating({ questionId, guest, answers, onVote }) {
+  if (!guest) return null;
+  const name = resolveGuestName(guest);
+  const current = Number(answers[questionId]?.[guest.id]) || 0;
   return (
     <div className="plan-card__stars">
-      {guests.map((guest) => {
-        const name = resolveGuestName(guest);
-        const current = Number(answers[questionId]?.[guest.id]) || 0;
-        return (
-          <div className="plan-card__stars-row" key={guest.id}>
-            <span className="plan-card__stars-name">{name.firstName}</span>
-            <div className="plan-card__stars-list" role="group" aria-label={name.fullName}>
-              {[1, 2, 3, 4, 5].map((star) => (
-                <button
-                  key={star}
-                  type="button"
-                  className={`plan-card__star${star <= current ? " is-on" : ""}`}
-                  aria-label={`${name.fullName}: ${star} estrellas`}
-                  aria-pressed={current === star}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onVote(questionId, guest.id, current === star ? 0 : star);
-                  }}
-                >
-                  ★
-                </button>
-              ))}
-            </div>
-          </div>
-        );
-      })}
+      <div className="plan-card__stars-row">
+        <span className="plan-card__stars-name">{name.firstName}</span>
+        <div className="plan-card__stars-list" role="group" aria-label={name.fullName}>
+          {[1, 2, 3, 4, 5].map((star) => (
+            <button
+              key={star}
+              type="button"
+              className={`plan-card__star${star <= current ? " is-on" : ""}`}
+              aria-label={`${name.fullName}: ${star} estrellas`}
+              aria-pressed={current === star}
+              onClick={(e) => {
+                e.stopPropagation();
+                onVote(questionId, guest.id, current === star ? 0 : star);
+              }}
+            >
+              ★
+            </button>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
@@ -57,7 +54,7 @@ function PlanCard({
   nightsLabel,
   wishlistLabel,
   voteButtonLabel,
-  guests,
+  guest,
   answers,
   language,
   onOpenGallery,
@@ -179,7 +176,7 @@ function PlanCard({
       {isMultiDestination && (
         <StarRating
           questionId={activeSub.questionId}
-          guests={guests}
+          guest={guest}
           answers={answers}
           onVote={onVote}
         />
@@ -280,7 +277,7 @@ export function Coast() {
               nightsLabel={nightsLabel}
               wishlistLabel={wishlistLabel}
               voteButtonLabel={voteLabels.button}
-              guests={guests}
+              guest={profile?.guest}
               answers={answers}
               language={language}
               onOpenGallery={setActiveGallery}
