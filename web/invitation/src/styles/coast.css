@@ -246,9 +246,10 @@
   font-size: 0.8rem;
 }
 
-/* Compact plan cards — a short, at-a-glance presentation of the "Avant ?" /
-   "Et après ?" plans, replacing the long `.coast-ideas` monologue. Each card
-   is a date chip + short title + one-liner, laid out in a responsive grid. */
+/* Compact plan cards — a short, at-a-glance timeline of the whole two weeks
+   (before, wedding, after), replacing the long `.coast-ideas` monologue. Each
+   card is a date chip + short title + one-liner, laid out in a responsive
+   grid; votable cards also carry an inline scale vote. */
 .plan-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
@@ -290,6 +291,80 @@
   font-size: 0.9rem;
   line-height: 1.45;
   color: rgb(255 255 255 / 82%);
+}
+
+/* The wedding card is a marker, not a vote — a gold-tinted emphasis card. */
+.plan-card--wedding {
+  border-color: rgb(242 212 155 / 55%);
+  background: rgb(0 0 0 / 38%);
+}
+
+.plan-card--wedding .plan-card__dates {
+  background: rgb(242 212 155 / 22%);
+  color: #F2D49B;
+}
+
+/* Inline vote — each votable card carries a compact per-guest scale so guests
+   can answer directly from the timeline without a separate mini-RSVP. */
+.plan-card__vote {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: 0.6rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgb(255 255 255 / 14%);
+}
+
+.plan-card__vote-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(255 255 255 / 60%);
+}
+
+.plan-card__vote-row {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  justify-content: space-between;
+}
+
+.plan-card__vote-name {
+  font-size: 0.85rem;
+  color: rgb(255 255 255 / 88%);
+}
+
+.plan-card__vote-scale {
+  display: flex;
+  gap: 0.15rem;
+}
+
+.plan-card__vote-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.9rem;
+  height: 1.9rem;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 0.5rem;
+  background: rgb(255 255 255 / 8%);
+  color: var(--white);
+  font-size: 0.95rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.plan-card__vote-btn:hover {
+  background: rgb(255 255 255 / 18%);
+  transform: translateY(-1px);
+}
+
+.plan-card__vote-btn.is-selected {
+  background: rgb(242 212 155 / 28%);
+  border-color: #F2D49B;
 }
 
 /* Barra de Navidad photo strip, mirroring the Chapala slideset: a horizontal

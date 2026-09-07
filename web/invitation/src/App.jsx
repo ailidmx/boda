@@ -39,7 +39,6 @@ const Travel = lazy(() => import("./components/Travel.jsx").then((m) => ({ defau
 const Attire = lazy(() => import("./components/Attire.jsx").then((m) => ({ default: m.Attire })));
 const DressCode = lazy(() => import("./components/Attire.jsx").then((m) => ({ default: m.DressCode })));
 const Gift = lazy(() => import("./components/Gift.jsx").then((m) => ({ default: m.Gift })));
-const Avant = lazy(() => import("./components/Avant.jsx").then((m) => ({ default: m.Avant })));
 const Coast = lazy(() => import("./components/Coast.jsx").then((m) => ({ default: m.Coast })));
 const RSVP = lazy(() => import("./components/RSVP.jsx").then((m) => ({ default: m.RSVP })));
 const TeAnimas = lazy(() => import("./components/TeAnimas.jsx").then((m) => ({ default: m.TeAnimas })));
@@ -144,7 +143,6 @@ function Invitation() {
         <ProgressiveSection id="food"><Food /></ProgressiveSection>
         <ProgressiveSection id="guisos"><Guisos /></ProgressiveSection>
         <ProgressiveSection id="music"><Music /></ProgressiveSection>
-        <ProgressiveSection id="avant"><Avant /></ProgressiveSection>
         <ProgressiveSection id="coast"><Coast /></ProgressiveSection>
         <ProgressiveSection id="rsvp"><RSVP /></ProgressiveSection>
         <ProgressiveSection id="gift"><Gift /></ProgressiveSection>

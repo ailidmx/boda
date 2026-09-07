@@ -1,38 +1,71 @@
 export const coast = {
   es: {
-    eyebrow: "¿Y después?",
-    title: "Tres paradas para alargar la fiesta",
+    eyebrow: "Del 12 al 28 de febrero",
+    title: "Dos semanas de fiesta",
     body:
-      "La fiesta no termina el domingo. Estos son los tres planes para seguir juntos, y cada quien se apunta al que mejor le venga.",
+      "Este es el hilo de nuestras dos semanas juntos — antes, durante y después de la boda. Vota directamente en las paradas que te tienten.",
     plans: [
       {
-        title: "Roca Azul",
+        icon: "🌊",
+        dates: "Vie 12 → Mar 16",
+        title: "Playa · Bahía de Banderas",
+        body: "Chacala, San Pancho y Vallarta.",
+        kind: "plan",
+        questionId: "playa",
+      },
+      {
+        icon: "💍",
+        dates: "Sáb 20",
+        title: "La boda",
+        body: "Roca Azul · Jocotepec.",
+        kind: "wedding",
+      },
+      {
+        icon: "🏡",
         dates: "Dom 21 → Mar 23",
+        title: "Roca Azul",
         body: "2 días más en el lugar.",
+        kind: "plan",
+        questionId: "rocaAzul",
       },
       {
-        title: "Tapalpa",
+        icon: "⛰️",
         dates: "Mar 23 → Jue 25",
+        title: "Tapalpa",
         body: "Pueblo mágico en la sierra.",
+        kind: "plan",
+        questionId: "tapalpa",
       },
       {
-        title: "Barra de Navidad",
+        icon: "🏖️",
         dates: "Jue 25 → Dom 28",
+        title: "Barra de Navidad",
         body: "Playa en la Costa Alegre.",
+        kind: "plan",
+        questionId: "barraNavidad",
       },
     ],
     note:
       "Las fechas exactas y el transporte dependerán del número de personas interesadas.",
+    vote: {
+      label: "Tu voto",
+      noAnswer: "Sin responder",
+    },
     rsvpMini: {
-      eyebrow: "¿Y después?",
-      title: "¿Te apuntas?",
+      eyebrow: "Del 12 al 28 de febrero",
+      title: "Tus votos",
       intro:
-        "Cuéntanos qué tan probable es que te unas a cada plan. Puedes cambiar tu respuesta en cualquier momento.",
+        "Vota qué tan probable es que te unas a cada parada. Puedes cambiar tu respuesta en cualquier momento.",
       questions: [
         {
+          id: "playa",
+          title: "La playa · Bahía de Banderas",
+          subtitle: "Del viernes 12 al martes 16.",
+        },
+        {
           id: "rocaAzul",
-          title: "Roca Azul",
-          subtitle: "Del domingo 21 al martes 23 (2 días más).",
+          title: "Roca Azul (2 días más)",
+          subtitle: "Del domingo 21 al martes 23.",
         },
         {
           id: "tapalpa",
@@ -52,47 +85,74 @@ export const coast = {
       success: "¡Gracias! Guardamos tus respuestas.",
       error: "No pudimos guardar. Revisa tu conexión e inténtalo de nuevo.",
     },
-    extraStay: {
-      eyebrow: "Tu estancia · domingo a martes",
-      title: "Tu cabaña para la segunda estancia",
-      citation:
-        "Hemos previsto una cabaña para ti para la segunda parte de la estancia, del domingo al martes.",
-    },
   },
   fr: {
-    eyebrow: "Et après ?",
-    title: "Trois étapes pour prolonger la fête",
+    eyebrow: "Du 12 au 28 février",
+    title: "Deux semaines de fête",
     body:
-      "La fête ne s’arrête pas dimanche. Voici les trois plans pour continuer ensemble, et chacun choisit celui qui lui convient.",
+      "Voici le fil de nos deux semaines ensemble — avant, pendant et après le mariage. Vote directement sur les étapes qui te tentent.",
     plans: [
       {
-        title: "Roca Azul",
+        icon: "🌊",
+        dates: "Ven 12 → Mar 16",
+        title: "Plage · Bahía de Banderas",
+        body: "Chacala, San Pancho et Vallarta.",
+        kind: "plan",
+        questionId: "playa",
+      },
+      {
+        icon: "💍",
+        dates: "Sam 20",
+        title: "Le mariage",
+        body: "Roca Azul · Jocotepec.",
+        kind: "wedding",
+      },
+      {
+        icon: "🏡",
         dates: "Dim 21 → Mar 23",
+        title: "Roca Azul",
         body: "2 jours de plus sur place.",
+        kind: "plan",
+        questionId: "rocaAzul",
       },
       {
-        title: "Tapalpa",
+        icon: "⛰️",
         dates: "Mar 23 → Jeu 25",
+        title: "Tapalpa",
         body: "Pueblo mágico dans la sierra.",
+        kind: "plan",
+        questionId: "tapalpa",
       },
       {
-        title: "Barra de Navidad",
+        icon: "🏖️",
         dates: "Jeu 25 → Dim 28",
+        title: "Barra de Navidad",
         body: "Plage sur la Costa Alegre.",
+        kind: "plan",
+        questionId: "barraNavidad",
       },
     ],
     note:
       "Les dates exactes et le transport dépendront du nombre de personnes intéressées.",
+    vote: {
+      label: "Ton vote",
+      noAnswer: "Sans réponse",
+    },
     rsvpMini: {
-      eyebrow: "Et après ?",
-      title: "Tu t’inscris ?",
+      eyebrow: "Du 12 au 28 février",
+      title: "Tes votes",
       intro:
-        "Dis-nous quelle est la probabilité que tu rejoignes chaque plan. Tu peux modifier ta réponse à tout moment.",
+        "Vote pour dire à quel point tu as envie de rejoindre chaque étape. Tu peux modifier ta réponse à tout moment.",
       questions: [
         {
+          id: "playa",
+          title: "La plage · Bahía de Banderas",
+          subtitle: "Du vendredi 12 au mardi 16.",
+        },
+        {
           id: "rocaAzul",
-          title: "Roca Azul",
-          subtitle: "Du dimanche 21 au mardi 23 (2 jours de plus).",
+          title: "Roca Azul (2 jours de plus)",
+          subtitle: "Du dimanche 21 au mardi 23.",
         },
         {
           id: "tapalpa",
@@ -112,47 +172,74 @@ export const coast = {
       success: "Merci ! Nous avons enregistré tes réponses.",
       error: "Impossible d’enregistrer. Vérifie ta connexion et réessaie.",
     },
-    extraStay: {
-      eyebrow: "Ton séjour du dimanche au mardi",
-      title: "Voici l'option que nous avons prévu pour toi, nous espérons qu'elle te plaira",
-      citation:
-        "Nous avons prévu une cabane pour toi pour la deuxième partie du séjour, du dimanche au mardi.",
-    },
   },
   en: {
-    eyebrow: "And afterwards?",
-    title: "Three stops to keep the party going",
+    eyebrow: "February 12–28",
+    title: "Two weeks of celebration",
     body:
-      "The party doesn’t end on Sunday. Here are the three plans to keep enjoying time together, and everyone picks whichever suits them best.",
+      "Here is the thread of our two weeks together — before, during and after the wedding. Vote directly on the stops that tempt you.",
     plans: [
       {
-        title: "Roca Azul",
+        icon: "🌊",
+        dates: "Fri 12 → Tue 16",
+        title: "Beach · Bahía de Banderas",
+        body: "Chacala, San Pancho and Vallarta.",
+        kind: "plan",
+        questionId: "playa",
+      },
+      {
+        icon: "💍",
+        dates: "Sat 20",
+        title: "The wedding",
+        body: "Roca Azul · Jocotepec.",
+        kind: "wedding",
+      },
+      {
+        icon: "🏡",
         dates: "Sun 21 → Tue 23",
+        title: "Roca Azul",
         body: "2 more days at the venue.",
+        kind: "plan",
+        questionId: "rocaAzul",
       },
       {
-        title: "Tapalpa",
+        icon: "⛰️",
         dates: "Tue 23 → Thu 25",
+        title: "Tapalpa",
         body: "Magical mountain town.",
+        kind: "plan",
+        questionId: "tapalpa",
       },
       {
-        title: "Barra de Navidad",
+        icon: "🏖️",
         dates: "Thu 25 → Sun 28",
+        title: "Barra de Navidad",
         body: "Beach on the Costalegre.",
+        kind: "plan",
+        questionId: "barraNavidad",
       },
     ],
     note:
       "The exact dates and transport will depend on the number of interested guests.",
+    vote: {
+      label: "Your vote",
+      noAnswer: "No answer",
+    },
     rsvpMini: {
-      eyebrow: "And afterwards?",
-      title: "Are you in?",
+      eyebrow: "February 12–28",
+      title: "Your votes",
       intro:
-        "Tell us how likely you are to join each plan. You can change your answer at any time.",
+        "Vote on how likely you are to join each stop. You can change your answer at any time.",
       questions: [
         {
+          id: "playa",
+          title: "The beach · Bahía de Banderas",
+          subtitle: "From Friday 12 to Tuesday 16.",
+        },
+        {
           id: "rocaAzul",
-          title: "Roca Azul",
-          subtitle: "From Sunday 21 to Tuesday 23 (2 more days).",
+          title: "Roca Azul (2 more days)",
+          subtitle: "From Sunday 21 to Tuesday 23.",
         },
         {
           id: "tapalpa",
@@ -171,12 +258,6 @@ export const coast = {
       button: "Save my answers",
       success: "Thank you! We saved your answers.",
       error: "We could not save. Check your connection and try again.",
-    },
-    extraStay: {
-      eyebrow: "Your stay · Sunday to Tuesday",
-      title: "Your guest house for the second stay",
-      citation:
-        "We have planned a guest house for you for the second part of your stay, from Sunday to Tuesday.",
     },
   },
 };

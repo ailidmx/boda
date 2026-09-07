@@ -17,8 +17,8 @@ export const FEATURES = {
   es: [
     {
       icon: "🏖️",
-      title: "¿Y antes? ¿Y después?",
-      body: "Ahora hay cuatro paradas: la playa antes de la boda en Bahía de Banderas (12–16 de febrero) y, después, Roca Azul + Tapalpa + Barra de Navidad (21–28 de febrero).",
+      title: "Dos semanas de fiesta",
+      body: "Una línea de tiempo con 5 paradas (playa, boda, Roca Azul, Tapalpa y Barra de Navidad) donde votas directamente desde cada tarjeta.",
     },
     {
       icon: "⭐",
@@ -104,8 +104,8 @@ export const FEATURES = {
   fr: [
     {
       icon: "🏖️",
-      title: "Et avant ? Et après ?",
-      body: "Quatre étapes : la plage avant le mariage à Bahía de Banderas (12–16 février) et, après, Roca Azul + Tapalpa + Barra de Navidad (21–28 février).",
+      title: "Deux semaines de fête",
+      body: "Une frise avec 5 étapes (plage, mariage, Roca Azul, Tapalpa et Barra de Navidad) où tu votes directement depuis chaque carte.",
     },
     {
       icon: "⭐",
@@ -191,8 +191,8 @@ export const FEATURES = {
   en: [
     {
       icon: "🏖️",
-      title: "Before? After?",
-      body: "Four stops: the beach before the wedding in Bahía de Banderas (Feb 12–16), and afterwards Roca Azul + Tapalpa + Barra de Navidad (Feb 21–28).",
+      title: "Two weeks of celebration",
+      body: "A timeline with 5 stops (beach, wedding, Roca Azul, Tapalpa and Barra de Navidad) where you vote directly from each card.",
     },
     {
       icon: "⭐",

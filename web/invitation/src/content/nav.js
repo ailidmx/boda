@@ -72,13 +72,7 @@ export const nav = {
     guisos: "Guisos",
     guisosOrder: "Orden de guisos",
     foodComment: "Comentario",
-    avant: "¿Y antes?",
-    avantIntro: "La playa",
-    avantRsvp: "¿Te apuntas?",
-    coast: "¿Y después?",
-    coastIntro: "Prolongar el gusto",
-    coastPlan: "El plan para ti",
-    coastRsvp: "¿Te apuntas?",
+    coast: "Nuestras 2 semanas",
 
     
     menu1: "Menú",
@@ -176,13 +170,7 @@ export const nav = {
     guisos: "Plats mijotés",
     guisosOrder: "Ordre des plats",
     foodComment: "Commentaire",
-    avant: "Et avant ?",
-    avantIntro: "La plage",
-    avantRsvp: "Tu t’inscris ?",
-    coast: "Et après ?",
-    coastIntro: "Prolonger le plaisir",
-    coastPlan: "Le plan pour toi",
-    coastRsvp: "Tu t’inscris ?",
+    coast: "Nos 2 semaines",
 
     
     menu1: "Menu",
@@ -279,13 +267,7 @@ export const nav = {
     guisos: "Stews",
     guisosOrder: "Stew order",
     foodComment: "Comment",
-    avant: "And before?",
-    avantIntro: "The beach",
-    avantRsvp: "Are you in?",
-    coast: "And afterwards?",
-    coastIntro: "Keep enjoying",
-    coastPlan: "The plan for you",
-    coastRsvp: "Are you in?",
+    coast: "Our 2 weeks",
 
     
     menu1: "Menu",

@@ -64,28 +64,9 @@ export const NAV_LINKS = [
     ],
   },
 
-  // AVANT ("Avant ?") groups the beach-plan intro and the mini RSVP under one
-  // dropdown, in the order they appear on the page.
-  {
-    key: "avant",
-    href: "#avant",
-    children: [
-      ["avantIntro", "#avant-intro"],
-      ["avantRsvp", "#avant-rsvp"],
-    ],
-  },
-
-  // COAST ("Et après ?") groups the intro, the extra-stay plan and the mini
-  // RSVP under one dropdown, in the order they appear on the page.
-  {
-    key: "coast",
-    href: "#after",
-    children: [
-      ["coastIntro", "#after-intro"],
-      ["coastPlan", "#after-plan"],
-      ["coastRsvp", "#after-rsvp"],
-    ],
-  },
+  // COAST ("Nos 2 semaines") — the whole two-week timeline (before, wedding,
+  // after) as compact vote cards.
+  ["coast", "#after"],
 
   ["rsvp", "#rsvp"],
   ["gift", "#gift"],
