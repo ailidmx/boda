@@ -50,6 +50,7 @@ function StarRating({ questionId, guests, answers, onVote }) {
 function PlanCard({
   plan,
   nightsLabel,
+  wishlistLabel,
   voteButtonLabel,
   guests,
   answers,
@@ -193,6 +194,18 @@ function PlanCard({
         </button>
       ) : null}
 
+      {plan.wishlist && (
+        <a
+          className="plan-card__wishlist"
+          href={plan.wishlist}
+          target="_blank"
+          rel="noreferrer"
+          onClick={(e) => e.stopPropagation()}
+        >
+          🏠 {wishlistLabel}
+        </a>
+      )}
+
       {hasGallery && photos.length > 1 && (
         <div className="plan-card__dots" role="group" aria-label={plan.title}>
           {photos.map((_, i) => (
@@ -220,6 +233,7 @@ export function Coast() {
   const coast = t.coast || {};
   const voteLabels = coast.vote || {};
   const nightsLabel = coast.nightsLabel || { one: "nuit", other: "nuits" };
+  const wishlistLabel = coast.wishlistLabel || "Airbnb";
   const flow = RSVP_FLOWS.coast;
 
   const [activeGallery, setActiveGallery] = useState(null);
@@ -257,6 +271,7 @@ export function Coast() {
               key={index}
               plan={plan}
               nightsLabel={nightsLabel}
+              wishlistLabel={wishlistLabel}
               voteButtonLabel={voteLabels.button}
               guests={guests}
               answers={answers}

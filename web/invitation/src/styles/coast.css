@@ -587,6 +587,29 @@
   transform: translateY(-1px);
 }
 
+/* Airbnb wishlist link. */
+.plan-card__wishlist {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+  padding: 0.42rem 0.9rem;
+  border: 1px solid rgb(255 255 255 / 22%);
+  border-radius: 999px;
+  background: rgb(10 16 28 / 38%);
+  color: rgb(255 253 248 / 90%);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.plan-card__wishlist:hover {
+  border-color: rgb(255 255 255 / 45%);
+  background: rgb(10 16 28 / 55%);
+}
+
 /* ── Plan vote modal ─────────────────────────────────────────────────────── */
 .plan-vote-modal {
   position: fixed;

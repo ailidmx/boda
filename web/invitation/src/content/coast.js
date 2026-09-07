@@ -5,6 +5,7 @@ export const coast = {
     body:
       "Este es el hilo de nuestras dos semanas juntos — antes, durante y después de la boda. Vota directamente en las paradas que te tienten.",
     nightsLabel: { one: "noche", other: "noches" },
+    wishlistLabel: "Lista Airbnb",
     plans: [
       {
         icon: "🌊",
@@ -19,6 +20,7 @@ export const coast = {
           { name: "San Pancho", tag: "Surf", gallery: "sanPancho", questionId: "sanPancho" },
           { name: "Chacala", tag: "Calma", gallery: "chacala", questionId: "chacala" },
         ],
+        wishlist: "https://www.airbnb.fr/wishlists/2183912809",
       },
       {
         icon: "🏙️",
@@ -141,6 +143,7 @@ export const coast = {
     body:
       "Voici le fil de nos deux semaines ensemble — avant, pendant et après le mariage. Vote directement sur les étapes qui te tentent.",
     nightsLabel: { one: "nuit", other: "nuits" },
+    wishlistLabel: "Liste Airbnb",
     plans: [
       {
         icon: "🌊",
@@ -155,6 +158,7 @@ export const coast = {
           { name: "San Pancho", tag: "Surf", gallery: "sanPancho", questionId: "sanPancho" },
           { name: "Chacala", tag: "Calme", gallery: "chacala", questionId: "chacala" },
         ],
+        wishlist: "https://www.airbnb.fr/wishlists/2183912809",
       },
       {
         icon: "🏙️",
@@ -277,6 +281,7 @@ export const coast = {
     body:
       "Here is the thread of our two weeks together — before, during and after the wedding. Vote directly on the stops that tempt you.",
     nightsLabel: { one: "night", other: "nights" },
+    wishlistLabel: "Airbnb list",
     plans: [
       {
         icon: "🌊",
@@ -291,6 +296,7 @@ export const coast = {
           { name: "San Pancho", tag: "Surf", gallery: "sanPancho", questionId: "sanPancho" },
           { name: "Chacala", tag: "Calm", gallery: "chacala", questionId: "chacala" },
         ],
+        wishlist: "https://www.airbnb.fr/wishlists/2183912809",
       },
       {
         icon: "🏙️",
