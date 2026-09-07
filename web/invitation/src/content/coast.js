@@ -6,6 +6,8 @@ export const coast = {
       "Este es el hilo de nuestras dos semanas juntos — antes, durante y después de la boda. Vota directamente en las paradas que te tienten.",
     nightsLabel: { one: "noche", other: "noches" },
     wishlistLabel: "Lista Airbnb",
+    priceNote:
+      "Basado en una noche de hotel para 2 personas en temporada. En Airbnb hay mejores precios para grupos.",
     plans: [
       {
         icon: "🌊",
@@ -16,9 +18,9 @@ export const coast = {
         questionId: "playa",
         nights: 4,
         subDestinations: [
-          { name: "Puerto Vallarta", tag: "Vibrante", gallery: "vallarta", questionId: "vallarta" },
-          { name: "San Pancho", tag: "Surf", gallery: "sanPancho", questionId: "sanPancho" },
-          { name: "Chacala", tag: "Calma", gallery: "chacala", questionId: "chacala" },
+          { name: "Puerto Vallarta", tag: "Vibrante", gallery: "vallarta", questionId: "vallarta", priceMxn: 1200, priceEur: 61 },
+          { name: "San Pancho", tag: "Surf", gallery: "sanPancho", questionId: "sanPancho", priceMxn: 1450, priceEur: 74 },
+          { name: "Chacala", tag: "Calma", gallery: "chacala", questionId: "chacala", priceMxn: 750, priceEur: 38 },
         ],
         wishlist: "https://www.airbnb.fr/wishlists/2183912809",
       },
@@ -30,6 +32,8 @@ export const coast = {
         kind: "marker",
         nights: 2,
         gallery: "guadalajara",
+        priceMxn: 765,
+        priceEur: 39,
       },
       {
         icon: "🌙",
@@ -69,6 +73,8 @@ export const coast = {
         nights: 2,
         gallery: "tapalpa",
         wishlist: "https://www.airbnb.fr/wishlists/2185576607",
+        priceMxn: 1150,
+        priceEur: 59,
       },
       {
         icon: "🏖️",
@@ -80,6 +86,8 @@ export const coast = {
         nights: 3,
         gallery: "barra",
         wishlist: "https://www.airbnb.fr/wishlists/2185579673",
+        priceMxn: 950,
+        priceEur: 48,
       },
     ],
     note:
@@ -146,6 +154,8 @@ export const coast = {
       "Voici le fil de nos deux semaines ensemble — avant, pendant et après le mariage. Vote directement sur les étapes qui te tentent.",
     nightsLabel: { one: "nuit", other: "nuits" },
     wishlistLabel: "Liste Airbnb",
+    priceNote:
+      "Basé sur une nuit d’hôtel pour 2 personnes en saison. Sur Airbnb, il y a de meilleurs prix pour les groupes.",
     plans: [
       {
         icon: "🌊",
@@ -156,9 +166,9 @@ export const coast = {
         questionId: "playa",
         nights: 4,
         subDestinations: [
-          { name: "Puerto Vallarta", tag: "Vibrant", gallery: "vallarta", questionId: "vallarta" },
-          { name: "San Pancho", tag: "Surf", gallery: "sanPancho", questionId: "sanPancho" },
-          { name: "Chacala", tag: "Calme", gallery: "chacala", questionId: "chacala" },
+          { name: "Puerto Vallarta", tag: "Vibrant", gallery: "vallarta", questionId: "vallarta", priceMxn: 1200, priceEur: 61 },
+          { name: "San Pancho", tag: "Surf", gallery: "sanPancho", questionId: "sanPancho", priceMxn: 1450, priceEur: 74 },
+          { name: "Chacala", tag: "Calme", gallery: "chacala", questionId: "chacala", priceMxn: 750, priceEur: 38 },
         ],
         wishlist: "https://www.airbnb.fr/wishlists/2183912809",
       },
@@ -170,6 +180,8 @@ export const coast = {
         kind: "marker",
         nights: 2,
         gallery: "guadalajara",
+        priceMxn: 765,
+        priceEur: 39,
       },
       {
         icon: "🌙",
@@ -209,6 +221,8 @@ export const coast = {
         nights: 2,
         gallery: "tapalpa",
         wishlist: "https://www.airbnb.fr/wishlists/2185576607",
+        priceMxn: 1150,
+        priceEur: 59,
       },
       {
         icon: "🏖️",
@@ -220,6 +234,8 @@ export const coast = {
         nights: 3,
         gallery: "barra",
         wishlist: "https://www.airbnb.fr/wishlists/2185579673",
+        priceMxn: 950,
+        priceEur: 48,
       },
     ],
     note:
@@ -286,6 +302,8 @@ export const coast = {
       "Here is the thread of our two weeks together — before, during and after the wedding. Vote directly on the stops that tempt you.",
     nightsLabel: { one: "night", other: "nights" },
     wishlistLabel: "Airbnb list",
+    priceNote:
+      "Based on a 2-person hotel night in season. Airbnbs have better prices for groups.",
     plans: [
       {
         icon: "🌊",
@@ -296,9 +314,9 @@ export const coast = {
         questionId: "playa",
         nights: 4,
         subDestinations: [
-          { name: "Puerto Vallarta", tag: "Vibrant", gallery: "vallarta", questionId: "vallarta" },
-          { name: "San Pancho", tag: "Surf", gallery: "sanPancho", questionId: "sanPancho" },
-          { name: "Chacala", tag: "Calm", gallery: "chacala", questionId: "chacala" },
+          { name: "Puerto Vallarta", tag: "Vibrant", gallery: "vallarta", questionId: "vallarta", priceMxn: 1200, priceEur: 61 },
+          { name: "San Pancho", tag: "Surf", gallery: "sanPancho", questionId: "sanPancho", priceMxn: 1450, priceEur: 74 },
+          { name: "Chacala", tag: "Calm", gallery: "chacala", questionId: "chacala", priceMxn: 750, priceEur: 38 },
         ],
         wishlist: "https://www.airbnb.fr/wishlists/2183912809",
       },
@@ -310,6 +328,8 @@ export const coast = {
         kind: "marker",
         nights: 2,
         gallery: "guadalajara",
+        priceMxn: 765,
+        priceEur: 39,
       },
       {
         icon: "🌙",
@@ -349,6 +369,8 @@ export const coast = {
         nights: 2,
         gallery: "tapalpa",
         wishlist: "https://www.airbnb.fr/wishlists/2185576607",
+        priceMxn: 1150,
+        priceEur: 59,
       },
       {
         icon: "🏖️",
@@ -360,6 +382,8 @@ export const coast = {
         nights: 3,
         gallery: "barra",
         wishlist: "https://www.airbnb.fr/wishlists/2185579673",
+        priceMxn: 950,
+        priceEur: 48,
       },
     ],
     note:

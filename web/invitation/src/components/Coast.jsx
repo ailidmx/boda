@@ -11,6 +11,11 @@ import { getPlanGallery } from "../plan-galleries.js";
 
 const GALLERY_INTERVAL = 5000;
 
+function formatMoney(amount, language) {
+  const locale = language === "fr" ? "fr-FR" : language === "en" ? "en-US" : "es-MX";
+  return new Intl.NumberFormat(locale, { maximumFractionDigits: 0 }).format(amount);
+}
+
 // Inline star rating (1–5) for the multi-destination Bahía de Banderas card.
 // Each group member rates the active destination; the level maps straight onto
 // the shared `rsvp.answers` scale (star N → level N).
@@ -54,6 +59,7 @@ function PlanCard({
   voteButtonLabel,
   guests,
   answers,
+  language,
   onOpenGallery,
   onOpenVote,
   onVote,
@@ -63,6 +69,9 @@ function PlanCard({
 
   const [activeSubIndex, setActiveSubIndex] = useState(0);
   const activeSub = isMultiDestination ? subDestinations[activeSubIndex] : null;
+
+  const priceMxn = isMultiDestination ? activeSub?.priceMxn : plan.priceMxn;
+  const priceEur = isMultiDestination ? activeSub?.priceEur : plan.priceEur;
 
   const photos = isMultiDestination
     ? getPlanGallery(activeSub.gallery)
@@ -160,14 +169,35 @@ function PlanCard({
       </strong>
       <span className="plan-card__body">{plan.body}</span>
 
-      {isMultiDestination ? (
-        <>
-          <StarRating
-            questionId={activeSub.questionId}
-            guests={guests}
-            answers={answers}
-            onVote={onVote}
-          />
+      {priceMxn != null && (
+        <span className="plan-card__price">
+          {formatMoney(priceMxn, language)} MXN / {formatMoney(priceEur, language)} €{" "}
+          <sup>*</sup>
+        </span>
+      )}
+
+      {isMultiDestination && (
+        <StarRating
+          questionId={activeSub.questionId}
+          guests={guests}
+          answers={answers}
+          onVote={onVote}
+        />
+      )}
+
+      {(plan.wishlist || plan.questionId) && (
+        <div className="plan-card__actions">
+          {plan.wishlist && (
+            <a
+              className="plan-card__wishlist"
+              href={plan.wishlist}
+              target="_blank"
+              rel="noreferrer"
+              onClick={(e) => e.stopPropagation()}
+            >
+              🏠 {wishlistLabel}
+            </a>
+          )}
           {plan.questionId && (
             <button
               type="button"
@@ -180,30 +210,7 @@ function PlanCard({
               {voteButtonLabel}
             </button>
           )}
-        </>
-      ) : plan.questionId ? (
-        <button
-          type="button"
-          className="plan-card__vote-cta"
-          onClick={(e) => {
-            e.stopPropagation();
-            onOpenVote(plan);
-          }}
-        >
-          {voteButtonLabel}
-        </button>
-      ) : null}
-
-      {plan.wishlist && (
-        <a
-          className="plan-card__wishlist"
-          href={plan.wishlist}
-          target="_blank"
-          rel="noreferrer"
-          onClick={(e) => e.stopPropagation()}
-        >
-          🏠 {wishlistLabel}
-        </a>
+        </div>
       )}
 
       {hasGallery && photos.length > 1 && (
@@ -228,7 +235,7 @@ function PlanCard({
 }
 
 export function Coast() {
-  const { t, profile } = useApp();
+  const { t, language, profile } = useApp();
   const { answers, setAnswer } = useRsvp();
   const coast = t.coast || {};
   const voteLabels = coast.vote || {};
@@ -275,6 +282,7 @@ export function Coast() {
               voteButtonLabel={voteLabels.button}
               guests={guests}
               answers={answers}
+              language={language}
               onOpenGallery={setActiveGallery}
               onOpenVote={setVotingPlan}
               onVote={handleVote}
@@ -283,6 +291,11 @@ export function Coast() {
         </div>
 
         <p className="coast-note">{coast.note}</p>
+        {coast.priceNote && (
+          <p className="coast-price-note">
+            <sup>*</sup> {coast.priceNote}
+          </p>
+        )}
       </div>
 
       <nav className="section-nav coast-section-nav" aria-label="Continue">

@@ -568,8 +568,7 @@
 
 /* "Vote" button — opens the vote modal (summary + scale selector). */
 .plan-card__vote-cta {
-  align-self: flex-start;
-  margin-top: 0.35rem;
+  margin-left: auto;
   padding: 0.5rem 1.05rem;
   border: 1px solid rgb(242 212 155 / 60%);
   border-radius: 999px;
@@ -577,6 +576,7 @@
   color: #f2d49b;
   font-size: 0.85rem;
   font-weight: 700;
+  white-space: nowrap;
   cursor: pointer;
   transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
 }
@@ -588,12 +588,17 @@
 }
 
 /* Airbnb wishlist link. */
+.plan-card__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
 .plan-card__wishlist {
-  align-self: flex-start;
   display: inline-flex;
   align-items: center;
   gap: 0.35rem;
-  margin-top: 0.4rem;
   padding: 0.42rem 0.9rem;
   border: 1px solid rgb(255 255 255 / 22%);
   border-radius: 999px;
@@ -601,6 +606,7 @@
   color: rgb(255 253 248 / 90%);
   font-size: 0.8rem;
   font-weight: 700;
+  white-space: nowrap;
   text-decoration: none;
   transition: border-color 0.2s ease, background 0.2s ease;
 }
@@ -608,6 +614,30 @@
 .plan-card__wishlist:hover {
   border-color: rgb(255 255 255 / 45%);
   background: rgb(10 16 28 / 55%);
+}
+
+.plan-card__price {
+  display: inline-block;
+  margin-top: 0.4rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: #f2d49b;
+  letter-spacing: 0.01em;
+}
+
+.plan-card__price sup {
+  font-size: 0.7em;
+  color: rgb(255 255 255 / 62%);
+}
+
+.coast-price-note {
+  margin-top: 1rem;
+  font-size: 0.8rem;
+  color: rgb(255 255 255 / 68%);
+}
+
+.coast-price-note sup {
+  color: #f2d49b;
 }
 
 /* ── Plan vote modal ─────────────────────────────────────────────────────── */
