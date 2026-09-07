@@ -307,6 +307,31 @@ function PlanCard({
           : undefined
       }
     >
+      <div className="plan-card__meta">
+        <div className="plan-card__meta-left">
+          <span className="plan-card__dates">{plan.dates}</span>
+        </div>
+        <div className="plan-card__meta-right">
+          <span className="plan-card__nights">
+            <span aria-hidden="true">🌙</span> {plan.nights}{" "}
+            {plan.nights === 1 ? nightsLabel.one : nightsLabel.other}
+          </span>
+        </div>
+      </div>
+
+      <strong className="plan-card__title">
+        <span aria-hidden="true">{plan.icon}</span> {plan.title}
+      </strong>
+      <div className="plan-card__body-row">
+        <span className="plan-card__body">{plan.body}</span>
+        {priceMxn != null && (
+          <span className="plan-card__price">
+            {formatMoney(priceMxn, language)} MXN / {formatMoney(priceEur, language)} €{" "}
+            <sup>*</sup>
+          </span>
+        )}
+      </div>
+
       {hasGallery && (
         <img
           className="plan-card__bg"
@@ -338,31 +363,7 @@ function PlanCard({
         </div>
       )}
 
-      <div className="plan-card__meta">
-        <div className="plan-card__meta-left">
-          <span className="plan-card__dates">{plan.dates}</span>
-          {activeSub && <span className="plan-card__tag">{activeSub.tag}</span>}
-        </div>
-        <div className="plan-card__meta-right">
-          <span className="plan-card__nights">
-            <span aria-hidden="true">🌙</span> {plan.nights}{" "}
-            {plan.nights === 1 ? nightsLabel.one : nightsLabel.other}
-          </span>
-        </div>
-      </div>
-
-      <strong className="plan-card__title">
-        <span aria-hidden="true">{plan.icon}</span> {plan.title}
-      </strong>
-      <div className="plan-card__body-row">
-        <span className="plan-card__body">{plan.body}</span>
-        {priceMxn != null && (
-          <span className="plan-card__price">
-            {formatMoney(priceMxn, language)} MXN / {formatMoney(priceEur, language)} €{" "}
-            <sup>*</sup>
-          </span>
-        )}
-      </div>
+      {activeSub && <span className="plan-card__tag">{activeSub.tag}</span>}
 
       {isMultiDestination && (
         <StarRating

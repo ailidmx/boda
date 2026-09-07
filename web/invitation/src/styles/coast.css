@@ -499,8 +499,8 @@
   color: #f2d49b;
 }
 
-/* Active sub-destination tag (VIBRANT / SURF / CALME) — shown next to the
-   dates badge in the card meta line. */
+/* Active sub-destination tag (VIBRANT / SURF / CALME) — shown on its own line
+   under the destination tabs, sized to fit its content. */
 .plan-card__meta-left {
   display: flex;
   align-items: center;
@@ -509,6 +509,7 @@
 }
 
 .plan-card__tag {
+  align-self: flex-start;
   font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.08em;
