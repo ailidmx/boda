@@ -17,8 +17,8 @@ export const FEATURES = {
   es: [
     {
       icon: "🏖️",
-      title: "Dos semanas de fiesta",
-      body: "Una línea de tiempo completa de las dos semanas (playa, Guadalajara, Roca Azul, boda, Tapalpa y Barra de Navidad) con noches y votos directos en cada tarjeta.",
+      title: "Antes y después",
+      body: "Una línea de tiempo de las dos semanas (Puerto Vallarta, San Pancho y Chacala, Guadalajara, Roca Azul, la boda, Tapalpa y Barra de Navidad) con galerías, noches y votos en cada tarjeta.",
     },
     {
       icon: "⭐",
@@ -104,8 +104,8 @@ export const FEATURES = {
   fr: [
     {
       icon: "🏖️",
-      title: "Deux semaines de fête",
-      body: "Une frise complète des deux semaines (plage, Guadalajara, Roca Azul, mariage, Tapalpa et Barra de Navidad) avec le nombre de nuits et un vote direct sur chaque carte.",
+      title: "Avant et après",
+      body: "Une frise des deux semaines (Puerto Vallarta, San Pancho et Chacala, Guadalajara, Roca Azul, le mariage, Tapalpa et Barra de Navidad) avec galeries, nuits et votes sur chaque carte.",
     },
     {
       icon: "⭐",
@@ -191,8 +191,8 @@ export const FEATURES = {
   en: [
     {
       icon: "🏖️",
-      title: "Two weeks of celebration",
-      body: "A complete two-week timeline (beach, Guadalajara, Roca Azul, wedding, Tapalpa and Barra de Navidad) with nights and a direct vote on each card.",
+      title: "Before & after",
+      body: "A two-week timeline (Puerto Vallarta, San Pancho and Chacala, Guadalajara, Roca Azul, the wedding, Tapalpa and Barra de Navidad) with galleries, nights and votes on each card.",
     },
     {
       icon: "⭐",
