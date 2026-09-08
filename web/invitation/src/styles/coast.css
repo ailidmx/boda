@@ -257,25 +257,11 @@
   margin-top: 2rem;
 }
 
-/* Desktop: present the 7 timeline cards in three rows — 2, 3, 2. The cards are
-   laid out on a 6-column grid; the first/last rows span half-width (3 cols)
-   and the middle row spans a third (2 cols). */
+/* Desktop: present the 7 timeline cards in a uniform 3-column grid (3 per
+   line), so the cards are always three-up at the app's max width. */
 @media (min-width: 900px) {
   .plan-cards {
-    grid-template-columns: repeat(6, 1fr);
-  }
-
-  .plan-card:nth-child(1),
-  .plan-card:nth-child(2),
-  .plan-card:nth-child(6),
-  .plan-card:nth-child(7) {
-    grid-column: span 3;
-  }
-
-  .plan-card:nth-child(3),
-  .plan-card:nth-child(4),
-  .plan-card:nth-child(5) {
-    grid-column: span 2;
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
