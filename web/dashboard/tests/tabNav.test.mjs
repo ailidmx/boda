@@ -38,6 +38,15 @@ test("a ceremonia deep link resolves to the ceremonia tab", async () => {
   assert.equal(getTabFromPath(), "ceremonia");
 });
 
+test("the plaza tab also keeps its own URL segment", async () => {
+  const pushed = stubBrowser("/dashboard/invitados");
+  const { navigateToTab, getTabFromPath } = await import("../src/tabNav.js");
+  navigateToTab("plaza");
+  assert.deepEqual(pushed, ["/dashboard/plaza"]);
+  window.location.pathname = "/dashboard/plaza";
+  assert.equal(getTabFromPath(), "plaza");
+});
+
 test("an unknown deep link falls back to the guests tab", async () => {
   stubBrowser("/dashboard/no-existe");
   const { getTabFromPath } = await import("../src/tabNav.js");

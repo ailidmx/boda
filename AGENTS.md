@@ -1545,6 +1545,30 @@ directly to `master` and push.
   The panel pauses playback when the user switches to another dashboard tab and
   exposes `host._ceremoniaCleanup` for teardown.
 
+---
+
+## 11. Plaza / aforo y flujo (venue planner) — ALWAYS follow
+
+> Admin-only panel at `/dashboard/plaza`. It answers "how many fit, how many can
+> sit on the muret, and how long does the portón take" with the couple's own
+> measurements.
+
+- **The math is pure and tested** (`web/dashboard/src/venue/capacity.js`,
+  `tests/venue.test.mjs`): standing density (0.5 / 0.7 / 1.0 m² per person),
+  chair rows (seat width, row pitch, aisle), wall seats (0.55 m per person, one
+  or both sides), gate flow (one by one vs two abreast, seconds per group) and a
+  queue check against the arrival window. The panel only renders.
+- **Two abreast needs 2 × 0.45 m + 0.1 m of clear width** (~1.0 m); below that
+  the panel says it does not fit instead of pretending.
+- **The default time per group is an assumption, not a measurement**: 5 s per
+  person and 7 s per couple (40 % longer). Change it with the couple's real
+  greeting ritual.
+- **Satellite scale:** 50 ft = 15.24 m. On the El Faro capture that bar spans
+  ~210 px, so **1 m ≈ 13.8 px**; the "Escala del mapa" card converts any measured
+  span. Prefer Google Maps' own distance tool over pixel guesses.
+- **Storage is local** (`boda:venue-plan:v1`, plain config) and resetable; the
+  diagram is generated to scale from the same numbers (no hardcoded areas).
+
 
 
 
