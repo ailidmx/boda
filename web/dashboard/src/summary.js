@@ -492,6 +492,12 @@ function seatingGuestCard({ label, hint, count, guests, distribution, levelGuest
 }
 
 
+// Which tabs own the summary cards: INVITADOS (invitations + days) and MESAS
+// (seating integrity). Every other tab shows no summary at all.
+export function summaryVisibleForTab(tab) {
+  return tab === "guests" || tab === "tables";
+}
+
 export function renderSummary(ctx) {
   const summary = document.querySelector("[data-dashboard-summary]");
   if (!summary) return;

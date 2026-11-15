@@ -95,7 +95,7 @@ import { renderGuestManager as renderGuestManagerTable } from "./guestTable.js";
 import { openGuestEditor as openGuestEditorModal, openCreateGuestModal as openCreateGuestModalModule } from "./guestFormModal.js";
 import { openDeleteConfirm as openDeleteConfirmModule, openSendInviteModal as openSendInviteModalModule } from "./guestModals.js";
 
-import { renderSummary } from "./summary.js";
+import { renderSummary, summaryVisibleForTab } from "./summary.js";
 import { renderCabinAssignments as renderCabinAssignmentsPanel } from "./cabinsPanel.js";
 import { renderThanksPanel as renderThanksPanelModule } from "./thanksPanel.js";
 import { renderChartsPanel as renderChartsPanelModule } from "./chartsPanel.js";
@@ -576,9 +576,20 @@ function computeSeatingStats() {
 }
 
 // Render the summary cards for the ACTIVE tab: the Mesas editor shows seating
-// stats; every other tab shows the default invitations + day cards.
+// stats, INVITADOS shows invitations + day cards, and every other tab hides the
+// summary entirely (those numbers belong to the guest list, not to Ceremonia,
+// Plaza, Presupuesto, etc.).
 function renderSummaryForTab() {
-  if (getActiveTab() === "tables") {
+  const tab = getActiveTab();
+  const summary = document.querySelector("[data-dashboard-summary]");
+  const visible = summaryVisibleForTab(tab);
+  if (summary) {
+    summary.classList.toggle("dashboard-summary--hidden", !visible);
+    if (!visible) summary.replaceChildren();
+  }
+  if (!visible) return;
+
+  if (tab === "tables") {
     renderSummary({ seating: computeSeatingStats() });
     return;
   }
