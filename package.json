@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "build:all": "node scripts/build-all.mjs",
+    "audio:extract": "node scripts/extract-ceremony-audio.mjs",
     "dev:invitation": "npm --prefix web/invitation run dev",
     "dev:dashboard": "npm --prefix web/dashboard run dev",
     "dev:invitation:network": "npm --prefix web/invitation run dev:network",

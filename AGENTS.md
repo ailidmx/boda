@@ -1477,6 +1477,46 @@ directly to `master` and push.
 
 *(Add new spatial-editor lessons here as you discover them.)*
 
+---
+
+## 10. Ceremonia Player (audio-synced rehearsal) — ALWAYS follow
+
+> Admin-only panel at `/dashboard/ceremonia`. It exists to rehearse the ceremony
+> choreography against the real track, not to publish audio.
+
+- **The audio element is the clock.** `ceremoniaPlayer.js` never advances its own
+  time while audio is loaded: every frame reads `audio.currentTime` and asks
+  `ceremonia/motion.js` where the dancers are. Do not reintroduce a
+  `requestAnimationFrame` accumulator with a "speed" multiplier — that was the
+  prototype bug (drift after pause/seek/rate change). The synthetic clock is a
+  clearly-labelled fallback used only when no file is imported.
+- **No copyrighted audio in the repo or in Hosting.** The admin imports a local
+  file; it is stored in **IndexedDB** (`ceremonia/audioStore.js`), never in
+  `public/`, never in Firestore, never in the exported JSON. `npm run
+  audio:extract -- --input <local file> --execute` converts a file the couple
+  already owns with ffmpeg into `tmp/ceremony-audio/` (gitignored); it refuses to
+  write inside `web/` on purpose.
+- **Three pure modules, tested in Node** (`web/dashboard/tests/ceremonia.test.mjs`):
+  `ceremonia/schema.js` (v2 schema, sanitizing, v1 → v2 cue migration),
+  `ceremonia/motion.js` (keyframe interpolation, spiral geometry, meeting
+  detection) and the panel itself. Keep DOM and storage out of those two.
+- **Meetings are provisional.** A meeting means *both dancers within the
+  tolerance at the same time*; a path crossing is NOT a meeting. Detected
+  meetings are suggestions that become cues only when a human clicks "→ cue".
+- **01:44 (104 s) is a user-provided reference, not a section boundary or a
+  track duration.** It ships as a `user-reference` cue and must stay editable.
+- **Two independent motion timelines** (David / Aydé) with keyframes
+  `{t, p, ease}`; `p` is normalized progress along the caracol (0 → 1) and the
+  easing of the segment's END keyframe shapes the curve.
+- **Persistence is per browser**: cues/keyframes/settings in `localStorage`
+  (`boda:ceremonia-player:v2`), audio in IndexedDB. Never claim cross-device
+  sync; JSON export is the backup.
+- `renderCeremoniaPlayer(host)` keeps its single-argument signature so
+  `dashboard.js` only needs the `[data-ceremonia-player]` panel and one call.
+  The panel pauses playback when the user switches to another dashboard tab and
+  exposes `host._ceremoniaCleanup` for teardown.
+
+
 
 
 
