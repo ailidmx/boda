@@ -23,7 +23,8 @@
  *
  * Guard rails: the output folder must NOT be inside `web/` (that is what gets
  * published to Firebase Hosting), so a copyrighted track cannot accidentally
- * ship with the invitation.
+ * ship with the invitation. URLs are refused outright: this is not a
+ * YouTube/Spotify downloader.
  */
 import { spawnSync } from "node:child_process";
 import { existsSync, mkdirSync, statSync } from "node:fs";
@@ -57,6 +58,27 @@ function fail(message) {
   process.exit(1);
 }
 
+/**
+ * The tool works on local files only. Refuse URLs so nobody mistakes it for a
+ * YouTube/Spotify downloader: YouTube's terms forbid downloading, and the
+ * ceremony track is a copyrighted commercial recording.
+ */
+function assertLocalInput(value) {
+  const remote = /^(https?|ftp):\/\//iu.test(value);
+  const knownHost = /^(www\.)?(youtube\.com|youtu\.be|music\.youtube\.com|spotify\.com|open\.spotify\.com)\//iu.test(
+    value,
+  );
+  if (remote || knownHost) {
+    fail(
+      "Esto NO descarga audio de internet (YouTube, Spotify, etc.).\n" +
+        "YouTube prohíbe la descarga en sus términos y este track es una grabación con derechos.\n" +
+        "Consigue el archivo por una vía legal (compra, copia del CD o grabación propia)\n" +
+        "y pásalo como ruta local: --input /ruta/a/tu/archivo.mp3",
+    );
+  }
+}
+
+
 function toNumber(value, fallback, label) {
   if (value === undefined) return fallback;
   const n = Number(value);
@@ -79,6 +101,8 @@ function assertSafeOutput(outDir) {
 function main() {
   const args = parseArgs(process.argv.slice(2));
   if (!args.input) fail("Falta --input <archivo local>. Este script no descarga audio.");
+
+  assertLocalInput(args.input);
 
   const input = resolve(args.input.replace(/^~(?=\/)/u, process.env.HOME ?? "~"));
   if (!existsSync(input)) fail(`No existe el archivo de entrada: ${input}`);
