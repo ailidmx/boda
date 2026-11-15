@@ -1510,11 +1510,15 @@ directly to `master` and push.
   easing of the segment's END keyframe shapes the curve.
 - **Both dancers start moving at t=0 by default.** Do not add silent holds to
   the defaults: the old 8 % hold made Aydé look frozen for the first ~56 s of an
-  11:43 track. A hold must be an explicit keyframe the couple adds.
-- **Timeline length:** `DEFAULT_DURATION` is the real track length (**11:43 =
-  703 s**). Without audio the "Duración total" field is editable and rescales
+  11:44 track. A hold must be an explicit keyframe the couple adds.
+- **Timeline length:** `DEFAULT_DURATION` is the real track length (**11:44 =
+  704 s**). Without audio the "Duración total" field is editable and rescales
   keyframes proportionally (`rescaleChoreography`); with audio the element's
   `duration` wins and the field is disabled.
+- **Schema versioning is load-bearing.** v3 migrates the v2 placeholder
+  (10:30 + Aydé's 8 % hold) once, on read, and rewrites localStorage under
+  `boda:ceremonia-player:v3`. Never re-apply a migration to a current-version
+  payload: a v3 hold or a human-chosen duration must be respected.
 - **Persistence is per browser**: cues/keyframes/settings in `localStorage`
   (`boda:ceremonia-player:v2`), audio in IndexedDB. Never claim cross-device
   sync; JSON export is the backup.

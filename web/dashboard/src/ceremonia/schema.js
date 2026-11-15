@@ -10,10 +10,10 @@
  * exported JSON never contains music.
  */
 
-export const SCHEMA_VERSION = 2;
+export const SCHEMA_VERSION = 3;
 
-/** Fallback timeline length when there is no audio file yet (seconds = 11:43). */
-export const DEFAULT_DURATION = 703;
+/** Fallback timeline length when there is no audio file yet (704 s = 11:44). */
+export const DEFAULT_DURATION = 704;
 
 /** Spiral density (turns per caracol). Geometry, not a playback speed. */
 export const DEFAULT_TURNS = 5.8;
@@ -23,6 +23,9 @@ export const USER_REFERENCE_SEC = 104;
 
 /** v2 shipped this artificial hold before Aydé started moving (8% of the track). */
 const LEGACY_AYDE_HOLD = 0.08;
+
+/** v2 shipped this timeline length; v3 replaces it with the real track length. */
+const LEGACY_DEFAULT_DURATION = 630;
 
 export const EASINGS = ["linear", "easeIn", "easeOut", "easeInOut"];
 export const CUE_KINDS = ["cue", "user-reference", "suggested"];
@@ -37,6 +40,14 @@ export const LIMITS = {
 };
 
 const clamp = (n, min, max) => Math.min(max, Math.max(min, n));
+
+/** Multiply every keyframe time by `ratio` (used by migrations and rescale). */
+function scaleKeyframes(keyframes, ratio) {
+  return keyframes.map((keyframe) => ({
+    ...keyframe,
+    t: Math.round(keyframe.t * ratio * 100) / 100,
+  }));
+}
 
 function finite(value, fallback = 0) {
   const n = Number(value);
@@ -150,12 +161,17 @@ function isLegacyAydeHold(keyframes, duration) {
 }
 
 /**
- * Accepts ANY stored/imported payload (v1, v2, garbage) and returns a valid v2
- * choreography. Never throws, never returns null.
+ * Accepts ANY stored/imported payload (v1, v2, v3, garbage) and returns a valid
+ * current-version choreography. Never throws, never returns null.
  */
 export function sanitizeChoreography(raw) {
   const source = raw && typeof raw === "object" ? raw : {};
-  const duration = clamp(
+  const sourceVersion = Number.isFinite(Number(source.version))
+    ? Number(source.version)
+    : 1;
+  const migrateLegacy = sourceVersion < SCHEMA_VERSION;
+
+  let duration = clamp(
     finite(source.duration, DEFAULT_DURATION),
     1,
     LIMITS.duration,
@@ -170,20 +186,38 @@ export function sanitizeChoreography(raw) {
     source.dancers && typeof source.dancers === "object" ? source.dancers : {};
 
   const aydeSource = dancersSource.ayde?.keyframes;
-  const aydeKeyframes = isLegacyAydeHold(aydeSource, duration)
-    ? defaultKeyframes(duration, 0)
-    : sanitizeKeyframes(aydeSource, duration, defaultKeyframes(duration, 0));
+  let aydeKeyframes;
+  if (migrateLegacy && isLegacyAydeHold(aydeSource, duration)) {
+    aydeKeyframes = defaultKeyframes(duration, 0);
+  } else {
+    aydeKeyframes = sanitizeKeyframes(aydeSource, duration, defaultKeyframes(duration, 0));
+  }
+  let davidKeyframes = sanitizeKeyframes(
+    dancersSource.david?.keyframes,
+    duration,
+    defaultKeyframes(duration, 0),
+  );
 
   const cuesSource = Array.isArray(source.cues)
     ? source.cues
     : migrateV1Meetings(source);
-  const cues = [];
+  let cues = [];
   for (const [index, cue] of cuesSource.entries()) {
     if (cues.length >= LIMITS.cues) break;
     const clean = sanitizeCue(cue, duration, index);
     if (clean && !cues.some((c) => c.id === clean.id)) cues.push(clean);
   }
   if (!cues.length) cues.push(...defaultCues());
+
+  // v2 → v3: the built-in 10:30 timeline was a placeholder. Rescale it to the
+  // real track length once, so an old localStorage does not keep showing 10:30.
+  if (migrateLegacy && Math.abs(duration - LEGACY_DEFAULT_DURATION) <= 0.5) {
+    const ratio = DEFAULT_DURATION / duration;
+    davidKeyframes = scaleKeyframes(davidKeyframes, ratio);
+    aydeKeyframes = scaleKeyframes(aydeKeyframes, ratio);
+    duration = DEFAULT_DURATION;
+    cues = cues.map((cue) => ({ ...cue, t: Math.min(cue.t, duration) }));
+  }
 
   return {
     version: SCHEMA_VERSION,
@@ -202,11 +236,7 @@ export function sanitizeChoreography(raw) {
     turns: clamp(finite(source.turns, DEFAULT_TURNS), 1, 20),
     dancers: {
       david: {
-        keyframes: sanitizeKeyframes(
-          dancersSource.david?.keyframes,
-          duration,
-          defaultKeyframes(duration, 0),
-        ),
+        keyframes: davidKeyframes,
       },
       ayde: {
         keyframes: aydeKeyframes,
@@ -271,18 +301,13 @@ export function rescaleChoreography(state, nextDuration) {
     Math.round(clamp(finite(nextDuration, clean.duration), 1, LIMITS.duration) * 100) /
     100;
   const ratio = next / clean.duration;
-  const scale = (keyframes) =>
-    keyframes.map((keyframe) => ({
-      ...keyframe,
-      t: Math.round(keyframe.t * ratio * 100) / 100,
-    }));
 
   return sanitizeChoreography({
     ...clean,
     duration: next,
     dancers: {
-      david: { keyframes: scale(clean.dancers.david.keyframes) },
-      ayde: { keyframes: scale(clean.dancers.ayde.keyframes) },
+      david: { keyframes: scaleKeyframes(clean.dancers.david.keyframes, ratio) },
+      ayde: { keyframes: scaleKeyframes(clean.dancers.ayde.keyframes, ratio) },
     },
     cues: clean.cues.map((cue) => ({ ...cue, t: Math.min(cue.t, next) })),
     track: {

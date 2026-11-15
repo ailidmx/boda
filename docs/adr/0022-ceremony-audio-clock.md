@@ -37,10 +37,11 @@ Constraints:
    independent animation clock while audio is loaded. Seek/pause/rate changes are
    applied to the element only. A clearly-labelled synthetic clock remains as a
    fallback for rehearsal without audio.
-3. **Choreography is a versioned v2 schema** (`ceremonia/schema.js`), sanitized on
-   every read/write, with v1 (`duration`/`turns`/`speed`/`meetings` fractions)
-   migrated to cues in seconds. Cues, keyframes and settings live in
-   `localStorage`; **audio never does**.
+3. **Choreography is a versioned schema** (`ceremonia/schema.js`, currently v3),
+   sanitized on every read/write, with v1 (`duration`/`turns`/`speed`/`meetings`
+   fractions) migrated to cues in seconds and a one-time v2 → v3 migration that
+   drops the placeholder 10:30 timeline and Aydé's artificial 8 % hold. Cues,
+   keyframes and settings live in `localStorage`; **audio never does**.
 4. **Meetings are provisional suggestions**, computed as "both dancers within a
    tolerance at the same time" (`ceremonia/motion.js`). A path crossing is not a
    meeting; a human must promote a suggestion to a cue.

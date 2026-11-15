@@ -32,7 +32,8 @@ import {
   spiralPoint,
 } from "./ceremonia/motion.js";
 
-const STORAGE_KEY = "boda:ceremonia-player:v2";
+const STORAGE_KEY = "boda:ceremonia-player:v3";
+const PREVIOUS_KEY = "boda:ceremonia-player:v2";
 const LEGACY_KEY = "boda:ceremonia-player:v1";
 const SAMPLES = 360;
 const DANCERS = [
@@ -47,16 +48,31 @@ const esc = (value) =>
       ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch],
   );
 
+let needsMigration = false;
+
 function readStoredState() {
+  needsMigration = false;
   try {
-    const v2 = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    if (v2) return sanitizeChoreography(v2);
+    const current = JSON.parse(localStorage.getItem(STORAGE_KEY));
+    if (current) return sanitizeChoreography(current);
   } catch {
     /* ignore corrupt storage */
   }
   try {
-    const v1 = JSON.parse(localStorage.getItem(LEGACY_KEY));
-    if (v1) return sanitizeChoreography({ ...v1, version: 1 });
+    const previous = JSON.parse(localStorage.getItem(PREVIOUS_KEY));
+    if (previous) {
+      needsMigration = true;
+      return sanitizeChoreography(previous);
+    }
+  } catch {
+    /* ignore corrupt previous storage */
+  }
+  try {
+    const legacy = JSON.parse(localStorage.getItem(LEGACY_KEY));
+    if (legacy) {
+      needsMigration = true;
+      return sanitizeChoreography({ ...legacy, version: 1 });
+    }
   } catch {
     /* ignore corrupt legacy storage */
   }
@@ -1037,6 +1053,17 @@ export function renderCeremoniaPlayer(host) {
   );
 
   // ── Init ────────────────────────────────────────────────────────────────
+  if (needsMigration) {
+    // Persist the migrated state under the current key so the next load does
+    // not need to migrate again, and drop the stale copies.
+    saveState();
+    try {
+      localStorage.removeItem(PREVIOUS_KEY);
+      localStorage.removeItem(LEGACY_KEY);
+    } catch {
+      /* storage may be blocked; the state is still migrated in memory */
+    }
+  }
   buildStage();
   syncControls();
   setMode();

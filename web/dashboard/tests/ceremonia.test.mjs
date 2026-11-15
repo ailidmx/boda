@@ -104,11 +104,56 @@ test("formatClock renders mm:ss", () => {
   assert.equal(formatClock(-9), "00:00");
 });
 
-test("the default timeline is the real track length (11:43)", () => {
+test("the default timeline is the real track length (11:44)", () => {
   const state = sanitizeChoreography(null);
   assert.equal(state.duration, DEFAULT_DURATION);
-  assert.equal(DEFAULT_DURATION, 703);
-  assert.equal(formatClock(state.duration), "11:43");
+  assert.equal(DEFAULT_DURATION, 704);
+  assert.equal(formatClock(state.duration), "11:44");
+});
+
+test("a stored v2 state with the 10:30 placeholder is migrated to 11:44", () => {
+  const storedV2 = {
+    version: 2,
+    duration: 630,
+    cues: [{ id: "user-reference-104", t: 104, label: "ref", kind: "user-reference" }],
+    dancers: {
+      david: { keyframes: [{ t: 0, p: 0 }, { t: 630, p: 1 }] },
+      ayde: {
+        keyframes: [
+          { t: 0, p: 0, ease: "linear" },
+          { t: 50.4, p: 0, ease: "easeInOut" },
+          { t: 630, p: 1, ease: "easeOut" },
+        ],
+      },
+    },
+  };
+  const state = sanitizeChoreography(storedV2);
+  assert.equal(state.version, SCHEMA_VERSION);
+  assert.equal(state.duration, 704);
+  assert.equal(formatClock(state.duration), "11:44");
+  assert.equal(state.dancers.david.keyframes.at(-1).t, 704);
+  assert.equal(state.dancers.ayde.keyframes.length, 2);
+  assert.equal(state.dancers.ayde.keyframes.at(-1).t, 704);
+  assert.equal(state.cues[0].t, 104);
+});
+
+test("a v3 state keeps a duration the human chose on purpose", () => {
+  const state = sanitizeChoreography({
+    version: SCHEMA_VERSION,
+    duration: 630,
+    dancers: {
+      david: { keyframes: [{ t: 0, p: 0 }, { t: 630, p: 1 }] },
+      ayde: {
+        keyframes: [
+          { t: 0, p: 0, ease: "linear" },
+          { t: 50.4, p: 0, ease: "easeInOut" },
+          { t: 630, p: 1, ease: "easeOut" },
+        ],
+      },
+    },
+  });
+  assert.equal(state.duration, 630);
+  assert.equal(state.dancers.ayde.keyframes.length, 3, "v3 holds are intentional");
 });
 
 test("both dancers start moving from the first seconds", () => {
