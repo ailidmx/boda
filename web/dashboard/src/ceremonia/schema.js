@@ -12,14 +12,17 @@
 
 export const SCHEMA_VERSION = 2;
 
-/** Fallback timeline length when there is no audio file yet (seconds). */
-export const DEFAULT_DURATION = 630;
+/** Fallback timeline length when there is no audio file yet (seconds = 11:43). */
+export const DEFAULT_DURATION = 703;
 
 /** Spiral density (turns per caracol). Geometry, not a playback speed. */
 export const DEFAULT_TURNS = 5.8;
 
 /** The user-provided reference marker: 01:44. Its musical meaning is unknown. */
 export const USER_REFERENCE_SEC = 104;
+
+/** v2 shipped this artificial hold before Aydé started moving (8% of the track). */
+const LEGACY_AYDE_HOLD = 0.08;
 
 export const EASINGS = ["linear", "easeIn", "easeOut", "easeInOut"];
 export const CUE_KINDS = ["cue", "user-reference", "suggested"];
@@ -51,11 +54,12 @@ function cleanText(value, fallback = "") {
 export function defaultKeyframes(duration = DEFAULT_DURATION, delay = 0) {
   const end = clamp(finite(duration, DEFAULT_DURATION), 1, LIMITS.duration);
   const start = clamp(delay, 0, end);
-  return [
-    { t: 0, p: 0, ease: "linear" },
-    { t: start, p: 0, ease: "easeInOut" },
-    { t: end, p: 1, ease: "easeOut" },
-  ];
+  const frames = [{ t: 0, p: 0, ease: "linear" }];
+  // A real hold only when the caller asks for one; a 0 delay must not create a
+  // duplicate keyframe at t=0 (that made Aydé look frozen in v2).
+  if (start > 0.01) frames.push({ t: start, p: 0, ease: "easeInOut" });
+  frames.push({ t: end, p: 1, ease: "easeOut" });
+  return frames;
 }
 
 export function defaultCues() {
@@ -83,7 +87,7 @@ export function createDefaults(duration = DEFAULT_DURATION) {
     turns: DEFAULT_TURNS,
     dancers: {
       david: { keyframes: defaultKeyframes(duration, 0) },
-      ayde: { keyframes: defaultKeyframes(duration, duration * 0.08) },
+      ayde: { keyframes: defaultKeyframes(duration, 0) },
     },
     cues: defaultCues(),
     settings: { rate: 1, loop: false, tolerancePx: 14 },
@@ -127,6 +131,25 @@ function sanitizeKeyframes(raw, duration, fallback) {
 }
 
 /**
+ * v2 shipped an artificial 8 % hold on Aydé's timeline, which made her look
+ * frozen for the first ~56 s of an 11:43 track. Recognise that exact default
+ * and replace it with the neutral one (both dancers start together).
+ */
+function isLegacyAydeHold(keyframes, duration) {
+  if (!Array.isArray(keyframes) || keyframes.length !== 3) return false;
+  const [first, hold, last] = keyframes;
+  const expected = Math.round(duration * LEGACY_AYDE_HOLD * 100) / 100;
+  return (
+    first?.t === 0 &&
+    first?.p === 0 &&
+    Math.abs(hold?.t - expected) <= 0.06 &&
+    hold?.p === 0 &&
+    Math.abs(last?.t - duration) <= 0.06 &&
+    last?.p === 1
+  );
+}
+
+/**
  * Accepts ANY stored/imported payload (v1, v2, garbage) and returns a valid v2
  * choreography. Never throws, never returns null.
  */
@@ -145,6 +168,11 @@ export function sanitizeChoreography(raw) {
     source.settings && typeof source.settings === "object" ? source.settings : {};
   const dancersSource =
     source.dancers && typeof source.dancers === "object" ? source.dancers : {};
+
+  const aydeSource = dancersSource.ayde?.keyframes;
+  const aydeKeyframes = isLegacyAydeHold(aydeSource, duration)
+    ? defaultKeyframes(duration, 0)
+    : sanitizeKeyframes(aydeSource, duration, defaultKeyframes(duration, 0));
 
   const cuesSource = Array.isArray(source.cues)
     ? source.cues
@@ -181,11 +209,7 @@ export function sanitizeChoreography(raw) {
         ),
       },
       ayde: {
-        keyframes: sanitizeKeyframes(
-          dancersSource.ayde?.keyframes,
-          duration,
-          defaultKeyframes(duration, duration * 0.08),
-        ),
+        keyframes: aydeKeyframes,
       },
     },
     cues,
@@ -231,6 +255,41 @@ export function migrateV1Meetings(raw) {
 /** Plain JSON for export/download — no Blob, no functions, no audio. */
 export function serializeChoreography(state) {
   return JSON.stringify(sanitizeChoreography(state), null, 2);
+}
+
+/**
+ * Change the timeline length while keeping the choreography's shape.
+ *
+ * Keyframe times scale proportionally (the relative rhythm survives), cues keep
+ * their absolute time but are clamped to the new end, and the user reference
+ * cannot end up past the end. Used both by the "Duración total" field and when
+ * the imported audio reports its real length.
+ */
+export function rescaleChoreography(state, nextDuration) {
+  const clean = sanitizeChoreography(state);
+  const next =
+    Math.round(clamp(finite(nextDuration, clean.duration), 1, LIMITS.duration) * 100) /
+    100;
+  const ratio = next / clean.duration;
+  const scale = (keyframes) =>
+    keyframes.map((keyframe) => ({
+      ...keyframe,
+      t: Math.round(keyframe.t * ratio * 100) / 100,
+    }));
+
+  return sanitizeChoreography({
+    ...clean,
+    duration: next,
+    dancers: {
+      david: { keyframes: scale(clean.dancers.david.keyframes) },
+      ayde: { keyframes: scale(clean.dancers.ayde.keyframes) },
+    },
+    cues: clean.cues.map((cue) => ({ ...cue, t: Math.min(cue.t, next) })),
+    track: {
+      ...clean.track,
+      referenceSec: Math.min(clean.track.referenceSec, next),
+    },
+  });
 }
 
 /** `${minutes}:${seconds}`; the ceremony is minutes long, never hours. */

@@ -21,6 +21,7 @@ import {
 import {
   EASINGS,
   formatClock,
+  rescaleChoreography,
   sanitizeChoreography,
   serializeChoreography,
 } from "./ceremonia/schema.js";
@@ -155,6 +156,11 @@ export function renderCeremoniaPlayer(host) {
       </label>
       <label><input data-loop type="checkbox"> Repetir</label>
       <label>Vueltas <input data-turns type="number" min="1" max="20" step="0.1" style="width:70px"></label>
+      <label>Duración total
+        <input data-duration type="number" min="1" step="1" style="width:80px"
+               aria-label="Duración total en segundos">
+        <span class="ceremonia__cue-kind" data-duration-hint></span>
+      </label>
     </div>
 
     <div class="ceremonia__grid">
@@ -462,27 +468,35 @@ export function renderCeremoniaPlayer(host) {
 
   /** Keep the choreography proportional when the real audio is longer/shorter. */
   function applyAudioDuration(seconds) {
-    const next = Math.max(1, Math.round(seconds * 100) / 100);
+    const next = Math.round(seconds * 100) / 100;
     if (Math.abs(next - state.duration) > 0.5) {
-      const ratio = next / state.duration;
-      ["david", "ayde"].forEach((key) => {
-        state.dancers[key].keyframes = state.dancers[key].keyframes.map((kf) => ({
-          ...kf,
-          t: Math.round(kf.t * ratio * 100) / 100,
-        }));
-      });
-      state.cues = state.cues.map((cue) => ({ ...cue, t: Math.min(cue.t, next) }));
-      state.duration = next;
+      state = rescaleChoreography(state, next);
       saveState();
       renderCues();
       renderKeyframes("david");
       renderKeyframes("ayde");
       setStatus(
-        `Duración real del audio: ${formatClock(next)}. La timeline se reescaló proporcionalmente.`,
+        `Duración real del audio: ${formatClock(state.duration)}. La timeline se reescaló proporcionalmente.`,
       );
     }
-    scrub.max = String(Math.round(state.duration * 100) / 100);
+    updateDurationControl();
     q("[data-total]").textContent = formatClock(state.duration);
+    draw();
+  }
+
+  /**
+   * The duration field is only editable without audio: once a file is loaded,
+   * its real length is the timeline (the audio is the clock).
+   */
+  function updateDurationControl() {
+    const input = q("[data-duration]");
+    input.value = String(Math.round(state.duration * 100) / 100);
+    input.disabled = hasAudio();
+    input.title = hasAudio()
+      ? "La duración la marca el audio importado"
+      : "Segundos de la timeline de ensayo";
+    q("[data-duration-hint]").textContent = formatClock(state.duration);
+    scrub.max = String(Math.round(state.duration * 100) / 100);
   }
 
   async function attachAudio(record) {
@@ -493,6 +507,7 @@ export function renderCeremoniaPlayer(host) {
     audio.loop = state.settings.loop;
     audioNameEl.textContent = `${record.name} · ${formatClock(record.duration || 0)}`;
     setMode();
+    updateDurationControl();
   }
 
   async function importAudio(file) {
@@ -537,7 +552,7 @@ export function renderCeremoniaPlayer(host) {
     await clearAudio();
     audioNameEl.textContent = "";
     setMode();
-    scrub.max = String(state.duration);
+    updateDurationControl();
     draw();
     setStatus("Audio quitado de este navegador. Los cues y keyframes se conservan.");
   }
@@ -744,7 +759,7 @@ export function renderCeremoniaPlayer(host) {
     rateSelect.value = String(nearest);
     q("[data-loop]").checked = state.settings.loop;
     q("[data-turns]").value = String(state.turns);
-    scrub.max = String(Math.round(state.duration * 100) / 100);
+    updateDurationControl();
     if (hasAudio()) audio.playbackRate = state.settings.rate;
     audio.loop = state.settings.loop;
     renderCues();
@@ -834,6 +849,27 @@ export function renderCeremoniaPlayer(host) {
     },
     listens,
   );
+
+  q("[data-duration]").addEventListener(
+    "change",
+    (event) => {
+      const next = Number(event.target.value);
+      if (!Number.isFinite(next) || next <= 0) {
+        updateDurationControl();
+        return;
+      }
+      state = rescaleChoreography(state, next);
+      saveState();
+      renderCues();
+      renderKeyframes("david");
+      renderKeyframes("ayde");
+      updateDurationControl();
+      seekTo(Math.min(timeNow(), state.duration));
+      setStatus(`Duración total ajustada a ${formatClock(state.duration)}.`);
+    },
+    listens,
+  );
+
 
   q("[data-file]").addEventListener(
     "change",

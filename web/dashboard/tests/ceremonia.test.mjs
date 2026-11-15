@@ -2,11 +2,13 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import {
+  DEFAULT_DURATION,
   SCHEMA_VERSION,
   USER_REFERENCE_SEC,
   createDefaults,
   formatClock,
   migrateV1Meetings,
+  rescaleChoreography,
   sanitizeChoreography,
   serializeChoreography,
 } from "../src/ceremonia/schema.js";
@@ -101,6 +103,66 @@ test("formatClock renders mm:ss", () => {
   assert.equal(formatClock(USER_REFERENCE_SEC), "01:44");
   assert.equal(formatClock(-9), "00:00");
 });
+
+test("the default timeline is the real track length (11:43)", () => {
+  const state = sanitizeChoreography(null);
+  assert.equal(state.duration, DEFAULT_DURATION);
+  assert.equal(DEFAULT_DURATION, 703);
+  assert.equal(formatClock(state.duration), "11:43");
+});
+
+test("both dancers start moving from the first seconds", () => {
+  const state = sanitizeChoreography(null);
+  assert.ok(progressAt(state.dancers.david.keyframes, 10) > 0);
+  assert.ok(
+    progressAt(state.dancers.ayde.keyframes, 10) > 0,
+    "Aydé must not be frozen at the start",
+  );
+  assert.ok(progressAt(state.dancers.ayde.keyframes, 60) > 0.05);
+});
+
+test("the v2 artificial 8% hold on Aydé is repaired", () => {
+  const legacy = {
+    version: 2,
+    duration: 703,
+    dancers: {
+      david: { keyframes: [{ t: 0, p: 0 }, { t: 703, p: 1 }] },
+      ayde: {
+        keyframes: [
+          { t: 0, p: 0, ease: "linear" },
+          { t: 56.24, p: 0, ease: "easeInOut" },
+          { t: 703, p: 1, ease: "easeOut" },
+        ],
+      },
+    },
+  };
+  const state = sanitizeChoreography(legacy);
+  assert.equal(state.dancers.ayde.keyframes.length, 2);
+  assert.ok(progressAt(state.dancers.ayde.keyframes, 10) > 0);
+});
+
+test("rescale keeps the shape and clamps cues to the new end", () => {
+  const base = sanitizeChoreography({
+    duration: 630,
+    dancers: {
+      david: { keyframes: [{ t: 0, p: 0 }, { t: 630, p: 1 }] },
+      ayde: { keyframes: [{ t: 0, p: 0 }, { t: 315, p: 0.5 }] },
+    },
+  });
+
+  const longer = rescaleChoreography(base, 703);
+  assert.equal(longer.duration, 703);
+  assert.equal(longer.dancers.david.keyframes.at(-1).t, 703);
+  assert.equal(longer.dancers.ayde.keyframes.at(-1).t, 351.5);
+  assert.equal(longer.cues.find((cue) => cue.kind === "user-reference").t, 104);
+
+  const shorter = rescaleChoreography(longer, 90);
+  assert.equal(shorter.duration, 90);
+  assert.ok(shorter.cues.every((cue) => cue.t <= 90));
+  assert.equal(shorter.track.referenceSec, 90);
+  assert.equal(shorter.dancers.david.keyframes.at(-1).t, 90);
+});
+
 
 // ── Motion math ──────────────────────────────────────────────────────────
 test("progress holds before the first and after the last keyframe", () => {

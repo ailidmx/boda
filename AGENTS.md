@@ -1508,6 +1508,13 @@ directly to `master` and push.
 - **Two independent motion timelines** (David / Aydé) with keyframes
   `{t, p, ease}`; `p` is normalized progress along the caracol (0 → 1) and the
   easing of the segment's END keyframe shapes the curve.
+- **Both dancers start moving at t=0 by default.** Do not add silent holds to
+  the defaults: the old 8 % hold made Aydé look frozen for the first ~56 s of an
+  11:43 track. A hold must be an explicit keyframe the couple adds.
+- **Timeline length:** `DEFAULT_DURATION` is the real track length (**11:43 =
+  703 s**). Without audio the "Duración total" field is editable and rescales
+  keyframes proportionally (`rescaleChoreography`); with audio the element's
+  `duration` wins and the field is disabled.
 - **Persistence is per browser**: cues/keyframes/settings in `localStorage`
   (`boda:ceremonia-player:v2`), audio in IndexedDB. Never claim cross-device
   sync; JSON export is the backup.
