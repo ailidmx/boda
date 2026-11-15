@@ -28,6 +28,12 @@ export const DEFAULTS = {
   secondsPerGroup: 5,
   people: 150,
   arrivalWindowMin: 30,
+  // Reception flow (Kiki at the gate)
+  greeters: 1,
+  secondsPerGuest: 8,
+  receptionAbreast: 1,
+  frenchPercent: 40,
+  startClock: "18:30",
 };
 
 const positive = (value, fallback = 0) => {

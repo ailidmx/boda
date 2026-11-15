@@ -109,7 +109,7 @@ export function createDefaults(duration = DEFAULT_DURATION) {
     },
     cues: defaultCues(),
     settings: { rate: 1, loop: false, tolerancePx: 14 },
-    stage: { radiusMeters: 4, bodyRadiusMeters: 0.28, targetSpeedMps: 0.35 },
+    stage: { radiusMeters: 8, bodyRadiusMeters: 0.28, targetSpeedMps: 0.35 },
   };
 }
 
@@ -285,7 +285,7 @@ export function sanitizeChoreography(raw) {
       ),
     },
     stage: {
-      radiusMeters: clamp(finite(stageSource.radiusMeters, 4), 0.5, 60),
+      radiusMeters: clamp(finite(stageSource.radiusMeters, 8), 0.5, 60),
       bodyRadiusMeters: clamp(finite(stageSource.bodyRadiusMeters, 0.28), 0.1, 1.2),
       targetSpeedMps: clamp(finite(stageSource.targetSpeedMps, 0.35), 0.02, 2),
     },

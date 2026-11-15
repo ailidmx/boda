@@ -208,8 +208,8 @@ export function renderCeremoniaPlayer(host) {
       <div class="ceremonia__card">
         <h4>Escala real</h4>
         <p class="ceremonia__note">
-          El radio real del caracol convierte el recorrido a metros. Dime el
-          espacio del venue y lo ajusto.
+          Si el caracol ocupa el ancho de la plaza (≈16 m), el radio es <strong>8 m</strong>.
+          El radio real convierte el recorrido a metros; dime el espacio del venue y lo ajusto.
         </p>
         <div class="ceremonia__bar">
           <label>Radio (m)

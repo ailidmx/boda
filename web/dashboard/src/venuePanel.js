@@ -12,6 +12,7 @@ import {
   metersFromPixels,
   planVenue,
 } from "./venue/capacity.js";
+import { simulateReception } from "./venue/flow.js";
 
 const STORAGE_KEY = "boda:venue-plan:v1";
 const MAP_REFERENCE_METERS = 15.24; // 50 ft, the bar in the satellite capture.
@@ -28,6 +29,9 @@ const FIELDS = [
   { key: "gateWidthM", label: "Portón (m)", min: 0.6, max: 6, step: 0.05 },
   { key: "secondsPerGroup", label: "Segundos por grupo", min: 1, max: 60, step: 1 },
   { key: "arrivalWindowMin", label: "Llegada en (min)", min: 1, max: 240, step: 1 },
+  { key: "greeters", label: "Kikis en el portón", min: 1, max: 4, step: 1 },
+  { key: "secondsPerGuest", label: "Segundos por grupo (recepción)", min: 2, max: 30, step: 1 },
+  { key: "frenchPercent", label: "% francés (izquierda)", min: 0, max: 100, step: 1 },
 ];
 
 function readSettings() {
@@ -136,6 +140,34 @@ export function renderVenuePanel(host) {
       </div>
 
       <div class="venue__card">
+        <h3>Recepción · Kiki</h3>
+        <p class="venue__note">
+          Kiki saluda en el portón y manda a cada invitado a la <strong>izquierda
+          (francés)</strong> o a la <strong>derecha (español)</strong>.
+        </p>
+        <div class="venue__fields">
+          <label class="venue__field">Kikis
+            <input data-field="greeters" type="number" min="1" max="4" step="1">
+          </label>
+          <label class="venue__field">Segundos por grupo
+            <input data-field="secondsPerGuest" type="number" min="2" max="30" step="1">
+          </label>
+          <label class="venue__field">% francés (izquierda)
+            <input data-field="frenchPercent" type="number" min="0" max="100" step="1">
+          </label>
+          <label class="venue__field">Entrada
+            <select data-reception-abreast>
+              <option value="1">De uno en uno</option>
+              <option value="2">De dos en dos</option>
+            </select>
+          </label>
+          <label class="venue__field">Empieza a las
+            <input data-field="startClock" type="time">
+          </label>
+        </div>
+      </div>
+
+      <div class="venue__card">
         <h3>Escala del mapa</h3>
         <p class="venue__note">
           En tu captura, <strong>50 ft = 15.24 m</strong> ≈ ${MAP_REFERENCE_PIXELS} px.
@@ -164,6 +196,12 @@ export function renderVenuePanel(host) {
 
     <svg class="venue__plan" data-plan viewBox="0 0 340 240" role="img"
          aria-label="Plano a escala del área, las sillas, el muret y el portón"></svg>
+
+    <h3>Flujo de recepción</h3>
+    <div class="venue__results" data-reception></div>
+    <svg class="venue__plan" data-queue viewBox="0 0 340 90" role="img"
+         aria-label="Cola de invitados en el portón a lo largo del tiempo"></svg>
+
     <p class="venue__status" data-status role="status"></p>
   </div>
   `;
@@ -191,6 +229,7 @@ export function renderVenuePanel(host) {
     q("[data-wall-both]").checked = Boolean(settings.wallBothSides);
     q("[data-abreast]").value = String(settings.abreast);
     q("[data-view]").value = settings.view;
+    q("[data-reception-abreast]").value = String(settings.receptionAbreast);
     q("[data-calibration]").value = String(settings.calibrationPixels ?? 100);
   }
 
@@ -250,6 +289,104 @@ export function renderVenuePanel(host) {
         </p>
       </div>
     `;
+  }
+
+  function receptionPlan() {
+    return simulateReception({
+      people: settings.people,
+      greeters: settings.greeters,
+      secondsPerGroup: settings.secondsPerGuest,
+      abreast: settings.receptionAbreast,
+      windowMinutes: settings.arrivalWindowMin,
+      frenchPercent: settings.frenchPercent,
+      startClock: settings.startClock,
+    });
+  }
+
+  function renderReception() {
+    const plan = receptionPlan();
+    q("[data-reception]").innerHTML = `
+      <div class="venue__card">
+        <h3>Izquierda · francés</h3>
+        <p class="venue__big">${plan.split.french}</p>
+        <p class="venue__note">${settings.frenchPercent}% de ${plan.total} · sector FR</p>
+      </div>
+      <div class="venue__card">
+        <h3>Derecha · español</h3>
+        <p class="venue__big">${plan.split.spanish}</p>
+        <p class="venue__note">${100 - settings.frenchPercent}% de ${plan.total} · sector ES</p>
+      </div>
+      <div class="venue__card">
+        <h3>Último invitado</h3>
+        <p class="venue__big">${plan.endClock || "—"}</p>
+        <p class="venue__note">${formatDuration(plan.lastEndMinutes)} desde las ${settings.startClock} · ${plan.perMinute.toFixed(1)}/min</p>
+      </div>
+      <div class="venue__card">
+        <h3>Cola y espera</h3>
+        <p class="venue__big">${plan.maxQueue}</p>
+        <p class="venue__note">grupos en cola · espera máx ${formatDuration(plan.maxWaitSeconds / 60)} · media ${formatDuration(plan.averageWaitSeconds / 60)}</p>
+      </div>
+    `;
+    drawQueue(plan);
+  }
+
+  function drawQueue(plan) {
+    const svg = q("[data-queue]");
+    const W = 340;
+    const H = 90;
+    const pad = 12;
+    const maxT = Math.max(1, plan.lastEndSeconds);
+    const maxQ = Math.max(1, plan.maxQueue);
+
+    svg.replaceChildren();
+    const ns = "http://www.w3.org/2000/svg";
+    const make = (tag, attrs) => {
+      const node = document.createElementNS(ns, tag);
+      Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, value));
+      svg.appendChild(node);
+      return node;
+    };
+    const label = (x, y, value, attrs = {}) => {
+      const node = make("text", { x, y, "font-size": "8", fill: "#475569", ...attrs });
+      node.textContent = value;
+    };
+
+    make("line", {
+      x1: pad,
+      y1: H - pad,
+      x2: W - pad,
+      y2: H - pad,
+      stroke: "#cbd5e1",
+      "stroke-width": "1",
+    });
+    make("line", {
+      x1: pad,
+      y1: pad,
+      x2: pad,
+      y2: H - pad,
+      stroke: "#cbd5e1",
+      "stroke-width": "1",
+    });
+
+    if (!plan.timeline.length) {
+      label(W / 2, H / 2, "sin invitados", { "text-anchor": "middle" });
+      return;
+    }
+
+    const scaleX = (seconds) => pad + (seconds / maxT) * (W - pad * 2);
+    const scaleY = (queue) => H - pad - (queue / maxQ) * (H - pad * 2);
+    const points = plan.timeline
+      .map((point) => `${scaleX(point.arrival).toFixed(2)},${scaleY(point.queue).toFixed(2)}`)
+      .join(" ");
+    make("polyline", {
+      points,
+      fill: "none",
+      stroke: "#0f766e",
+      "stroke-width": "1.6",
+    });
+    label(pad, pad - 3, `cola máx ${plan.maxQueue}`, { fill: "#0f766e" });
+    label(W - pad, H - 3, `${formatDuration(maxT / 60)}`, { "text-anchor": "end" });
+    label(pad, H - 3, settings.startClock, {});
   }
 
   function drawPlan() {
@@ -401,6 +538,7 @@ export function renderVenuePanel(host) {
   function commit({ persist = true } = {}) {
     if (persist) save();
     renderResults();
+    renderReception();
     drawPlan();
     updateCalibration();
   }
@@ -411,6 +549,11 @@ export function renderVenuePanel(host) {
       "change",
       () => {
         const key = input.dataset.field;
+        if (key === "startClock") {
+          settings.startClock = input.value || "18:30";
+          commit();
+          return;
+        }
         const value = Number(input.value);
         if (!Number.isFinite(value)) return;
         settings[key] = value;
@@ -451,6 +594,15 @@ export function renderVenuePanel(host) {
     "change",
     (event) => {
       settings.view = event.target.value;
+      commit();
+    },
+    listens,
+  );
+
+  q("[data-reception-abreast]").addEventListener(
+    "change",
+    (event) => {
+      settings.receptionAbreast = Number(event.target.value);
       commit();
     },
     listens,

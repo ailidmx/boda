@@ -1575,6 +1575,15 @@ directly to `master` and push.
   span. Prefer Google Maps' own distance tool over pixel guesses.
 - **Storage is local** (`boda:venue-plan:v1`, plain config) and resetable; the
   diagram is generated to scale from the same numbers (no hardcoded areas).
+- **Reception flow (Kiki):** `venue/flow.js` simulates the gate with greeters in
+  parallel, uniform arrivals over the window, and splits guests **left = francés**
+  / **right = español** by `frenchPercent`. The queue is deterministic
+  (`ceil(wait / service)` groups ahead), so "one Kiki vs two", "one by one vs
+  pairs" and "arrive over 10 or 30 minutes" are comparable. It is a model, not a
+  measurement: tune `secondsPerGroup` with the real greeting ritual.
+- **The ceremony radius follows the plaza:** if the caracol fills the ~16 m
+  width, `stage.radiusMeters` = 8 (path ≈ 154 m at 5.8 turns → 0.22 m/s over
+  11:44). Change it when the real space is measured.
 
 
 
