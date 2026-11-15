@@ -22,6 +22,7 @@ import {
   arcLengthPx,
   solveTurnsForSpeed,
   sortKeyframes,
+  signedSpinDegrees,
   spiralPoint,
   spinDegrees,
   uniformSpeedKeyframes,
@@ -322,6 +323,45 @@ test("dancersAt follows only the audio time it is given", () => {
 test("meeting detection is a no-op without a duration", () => {
   assert.deepEqual(detectMeetings({ duration: 0 }), []);
 });
+
+// ── Chirality (snail shell handedness) ───────────────────────────────────
+test("the couple is one dextral and one sinistral: David is the left-handed one", () => {
+  const state = sanitizeChoreography(null);
+  assert.equal(state.dancers.david.handedness, "sinistral");
+  assert.equal(state.dancers.ayde.handedness, "dextral");
+});
+
+test("an invalid handedness falls back to the defaults", () => {
+  const state = sanitizeChoreography({
+    dancers: {
+      david: { handedness: "clockwise" },
+      ayde: { handedness: null },
+    },
+  });
+  assert.equal(state.dancers.david.handedness, "sinistral");
+  assert.equal(state.dancers.ayde.handedness, "dextral");
+});
+
+test("a sinistral shell starts on the right, a dextral one on the left", () => {
+  const dextral = spiralPoint(0, 0, TURNS, undefined, "dextral");
+  const sinistral = spiralPoint(0, 0, TURNS, undefined, "sinistral");
+  assert.ok(dextral.x < 180, `dextral starts left (${dextral.x})`);
+  assert.ok(sinistral.x > 180, `sinistral starts right (${sinistral.x})`);
+  // Both still converge on the centre.
+  assert.deepEqual(
+    spiralPoint(0, 1, TURNS, undefined, "dextral"),
+    spiralPoint(0, 1, TURNS, undefined, "sinistral"),
+  );
+});
+
+test("the self-rotation follows the shell handedness (opposite signs)", () => {
+  const dextral = signedSpinDegrees(0.4, TURNS, 4, 0.28, "dextral");
+  const sinistral = signedSpinDegrees(0.4, TURNS, 4, 0.28, "sinistral");
+  assert.ok(dextral > 0);
+  assert.ok(sinistral < 0);
+  assert.ok(Math.abs(Math.abs(dextral) - Math.abs(sinistral)) < 1e-9);
+});
+
 
 // ── Constant linear speed (arc length) ───────────────────────────────────
 const TURNS = 5.8;

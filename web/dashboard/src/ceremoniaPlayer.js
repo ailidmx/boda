@@ -30,10 +30,10 @@ import {
   detectMeetings,
   pathMetersTotal,
   progressAt,
+  signedSpinDegrees,
   solveTurnsForSpeed,
   spiralPath,
   spiralPoint,
-  spinDegrees,
 } from "./ceremonia/motion.js";
 
 const STORAGE_KEY = "boda:ceremonia-player:v4";
@@ -240,12 +240,24 @@ export function renderCeremoniaPlayer(host) {
       </p>
       <div class="ceremonia__grid">
         <div class="ceremonia__card">
-          <h4>🔵 David · ahora <span data-david-now>0%</span></h4>
+          <h4>🔵 David · ahora <span data-david-now>0%</span> · <span data-hand-label="david"></span></h4>
+          <label>Mano
+            <select data-hand="david">
+              <option value="sinistral">Zurdo · levógiro</option>
+              <option value="dextral">Diestro · dextrógiro</option>
+            </select>
+          </label>
           <div data-kf-david></div>
           <button type="button" class="dashboard-button" data-kf-add="david">+ Keyframe aquí</button>
         </div>
         <div class="ceremonia__card">
-          <h4>🟠 Aydé · ahora <span data-ayde-now>0%</span></h4>
+          <h4>🟠 Aydé · ahora <span data-ayde-now>0%</span> · <span data-hand-label="ayde"></span></h4>
+          <label>Mano
+            <select data-hand="ayde">
+              <option value="sinistral">Zurdo · levógiro</option>
+              <option value="dextral">Diestro · dextrógiro</option>
+            </select>
+          </label>
           <div data-kf-ayde></div>
           <button type="button" class="dashboard-button" data-kf-add="ayde">+ Keyframe aquí</button>
         </div>
@@ -289,6 +301,7 @@ export function renderCeremoniaPlayer(host) {
   let spiralPoints = [[], []];
 
   const hasAudio = () => Boolean(audio.getAttribute("src"));
+  const handednessOf = (person) => state.dancers[DANCERS[person].key].handedness;
   const durationSec = () =>
     Number.isFinite(audio.duration) && audio.duration > 0
       ? audio.duration
@@ -331,7 +344,7 @@ export function renderCeremoniaPlayer(host) {
     dots = [];
     spiralPoints = [0, 1].map((person) =>
       Array.from({ length: SAMPLES + 1 }, (_, index) =>
-        spiralPoint(person, index / SAMPLES, state.turns),
+        spiralPoint(person, index / SAMPLES, state.turns, undefined, handednessOf(person)),
       ),
     );
 
@@ -339,7 +352,7 @@ export function renderCeremoniaPlayer(host) {
       make(
         "path",
         {
-          d: spiralPath(person, state.turns),
+          d: spiralPath(person, state.turns, 480, handednessOf(person)),
           fill: "none",
           stroke: dancer.color,
           "stroke-width": "1.6",
@@ -422,14 +435,16 @@ export function renderCeremoniaPlayer(host) {
 
     DANCERS.forEach((dancer, person) => {
       const p = progress[dancer.key];
-      const point = spiralPoint(person, p, state.turns);
+      const handedness = state.dancers[dancer.key].handedness;
+      const point = spiralPoint(person, p, state.turns, undefined, handedness);
       const dot = dots[person];
       dot?.group.setAttribute(
         "transform",
         `translate(${point.x.toFixed(2)} ${point.y.toFixed(2)})`,
       );
-      // Self-rotation, like a planet: one turn per body circumference walked.
-      const spin = spinDegrees(p, state.turns, radiusMeters, bodyRadiusMeters) % 360;
+      // Signed self-rotation: dextral and sinistral shells roll opposite ways.
+      const spin =
+        signedSpinDegrees(p, state.turns, radiusMeters, bodyRadiusMeters, handedness) % 360;
       dot?.spin.setAttribute("transform", `rotate(${spin.toFixed(1)})`);
       traceEls[person]?.setAttribute("d", traceFor(person, p));
     });
@@ -439,6 +454,14 @@ export function renderCeremoniaPlayer(host) {
     if (!scrubbing) scrub.value = String(Math.min(t, Number(scrub.max) || 0));
     davidNow.textContent = `${Math.round(progress.david * 100)}%`;
     aydeNow.textContent = `${Math.round(progress.ayde * 100)}%`;
+  }
+
+  function updateHandLabels() {
+    DANCERS.forEach((dancer) => {
+      const hand = state.dancers[dancer.key].handedness;
+      q(`[data-hand-label="${dancer.key}"]`).textContent =
+        hand === "sinistral" ? "zurdo · levógiro" : "diestro · dextrógiro";
+    });
   }
 
   /** Distancia total, velocidad media y giros sobre sí, con la escala real. */
@@ -856,6 +879,10 @@ export function renderCeremoniaPlayer(host) {
     q("[data-turns]").value = String(state.turns);
     q("[data-radius]").value = String(state.stage.radiusMeters);
     q("[data-target-speed]").value = String(state.stage.targetSpeedMps);
+    DANCERS.forEach((dancer) => {
+      q(`[data-hand="${dancer.key}"]`).value = state.dancers[dancer.key].handedness;
+    });
+    updateHandLabels();
     updateDurationControl();
     updateScaleInfo();
     if (hasAudio()) audio.playbackRate = state.settings.rate;
@@ -1002,6 +1029,26 @@ export function renderCeremoniaPlayer(host) {
   );
 
   q("[data-reset-walk]").addEventListener("click", () => resetWalking(true), listens);
+
+  host.querySelectorAll("[data-hand]").forEach((select) => {
+    select.addEventListener(
+      "change",
+      () => {
+        const key = select.dataset.hand;
+        state.dancers[key].handedness = select.value;
+        saveState();
+        buildStage();
+        updateHandLabels();
+        draw();
+        setStatus(
+          `${key === "david" ? "David" : "Aydé"}: ${
+            select.value === "sinistral" ? "zurdo (levógiro)" : "diestro (dextrógiro)"
+          }.`,
+        );
+      },
+      listens,
+    );
+  });
 
   q("[data-duration]").addEventListener(
     "change",

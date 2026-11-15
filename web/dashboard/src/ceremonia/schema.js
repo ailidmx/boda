@@ -10,7 +10,7 @@
  * exported JSON never contains music.
  */
 
-import { uniformSpeedKeyframes } from "./motion.js";
+import { HANDEDNESS, uniformSpeedKeyframes } from "./motion.js";
 
 export const SCHEMA_VERSION = 4;
 
@@ -104,8 +104,8 @@ export function createDefaults(duration = DEFAULT_DURATION) {
     duration,
     turns: DEFAULT_TURNS,
     dancers: {
-      david: { keyframes: walkingKeyframes(duration, DEFAULT_TURNS) },
-      ayde: { keyframes: walkingKeyframes(duration, DEFAULT_TURNS) },
+      david: { keyframes: walkingKeyframes(duration, DEFAULT_TURNS), handedness: "sinistral" },
+      ayde: { keyframes: walkingKeyframes(duration, DEFAULT_TURNS), handedness: "dextral" },
     },
     cues: defaultCues(),
     settings: { rate: 1, loop: false, tolerancePx: 14 },
@@ -259,9 +259,15 @@ export function sanitizeChoreography(raw) {
     dancers: {
       david: {
         keyframes: davidKeyframes,
+        handedness: HANDEDNESS.includes(dancersSource.david?.handedness)
+          ? dancersSource.david.handedness
+          : "sinistral",
       },
       ayde: {
         keyframes: aydeKeyframes,
+        handedness: HANDEDNESS.includes(dancersSource.ayde?.handedness)
+          ? dancersSource.ayde.handedness
+          : "dextral",
       },
     },
     cues,

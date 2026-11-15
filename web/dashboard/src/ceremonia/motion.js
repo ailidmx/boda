@@ -61,11 +61,33 @@ export function progressAt(keyframes, timeSec) {
 /**
  * Position on the spiral for `progress` (0 = outer start, 1 = center).
  * `personIndex` 0 = David (left, blue), 1 = Aydé (right, orange).
+ *
+ * `handedness` is the shell chirality: **dextral** (the majority of snails,
+ * clockwise inward, starts on the left) or **sinistral** (the rare left-handed
+ * one, counterclockwise, starts on the right). It is explicit per dancer so the
+ * geometry never depends on the array index — David is the left-handed one.
  */
-export function spiralPoint(personIndex, progress, turns, stage = STAGE) {
+export const HANDEDNESS = ["dextral", "sinistral"];
+
+export function handednessDirection(handedness) {
+  return handedness === "sinistral" ? -1 : 1;
+}
+
+export function spiralPoint(
+  personIndex,
+  progress,
+  turns,
+  stage = STAGE,
+  handedness = null,
+) {
   const p = clamp(progress, 0, 1);
-  const direction = personIndex === 0 ? 1 : -1;
-  const startAngle = personIndex === 0 ? Math.PI : 0;
+  const direction =
+    handedness === "dextral" || handedness === "sinistral"
+      ? handednessDirection(handedness)
+      : personIndex === 0
+        ? 1
+        : -1;
+  const startAngle = direction === 1 ? Math.PI : 0;
   const angle = startAngle + direction * Math.PI * 2 * turns * p;
   const radius = stage.radius * (1 - p) ** 0.9;
   const cx = stage.cx + (personIndex === 0 ? -stage.offset : stage.offset) * (1 - p);
@@ -78,8 +100,20 @@ export function spiralPoint(personIndex, progress, turns, stage = STAGE) {
 /** Both dancers' positions at audio time `timeSec`. */
 export function dancersAt(state, timeSec) {
   const turns = Number.isFinite(state?.turns) ? state.turns : 0;
-  const david = spiralPoint(0, progressAt(state?.dancers?.david?.keyframes, timeSec), turns);
-  const ayde = spiralPoint(1, progressAt(state?.dancers?.ayde?.keyframes, timeSec), turns);
+  const david = spiralPoint(
+    0,
+    progressAt(state?.dancers?.david?.keyframes, timeSec),
+    turns,
+    undefined,
+    state?.dancers?.david?.handedness,
+  );
+  const ayde = spiralPoint(
+    1,
+    progressAt(state?.dancers?.ayde?.keyframes, timeSec),
+    turns,
+    undefined,
+    state?.dancers?.ayde?.handedness,
+  );
   return { david, ayde };
 }
 
@@ -141,10 +175,10 @@ export function detectMeetings(state, options = {}) {
 }
 
 /** Polyline `d` attribute for the full spiral of one dancer. */
-export function spiralPath(personIndex, turns, samples = 480) {
+export function spiralPath(personIndex, turns, samples = 480, handedness = null) {
   const points = [];
   for (let i = 0; i <= samples; i += 1) {
-    const { x, y } = spiralPoint(personIndex, i / samples, turns);
+    const { x, y } = spiralPoint(personIndex, i / samples, turns, undefined, handedness);
     points.push(`${i ? "L" : "M"}${x.toFixed(2)} ${y.toFixed(2)}`);
   }
   return points.join(" ");
@@ -261,6 +295,23 @@ export function spinDegrees(progress, turns, radiusMeters, bodyRadiusMeters) {
   if (!Number.isFinite(bodyRadius) || bodyRadius <= 0) return 0;
   const distance = pathMetersAt(progress, turns, radiusMeters);
   return (distance / (2 * Math.PI * bodyRadius)) * 360;
+}
+
+/**
+ * Signed self-rotation: a **dextral** shell rolls one way and a **sinistral**
+ * one the other, so the couple counter-rotates instead of turning in lockstep.
+ */
+export function signedSpinDegrees(
+  progress,
+  turns,
+  radiusMeters,
+  bodyRadiusMeters,
+  handedness,
+) {
+  return (
+    handednessDirection(handedness) *
+    spinDegrees(progress, turns, radiusMeters, bodyRadiusMeters)
+  );
 }
 
 /** Which number of turns makes the walk last `duration` at `targetSpeedMps`. */

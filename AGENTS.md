@@ -1514,6 +1514,13 @@ directly to `master` and push.
 - **Self-rotation like a planet.** Each dancer spins one full turn per body
   circumference walked (`spinDegrees`, body radius in `state.stage`), so the
   spin follows the distance actually travelled, not the clock.
+- **Chirality is data, not an index.** Each dancer has `handedness`:
+  **dextral** (the majority of snails: clockwise inward, starts on the left) or
+  **sinistral** (the rare one: counterclockwise, starts on the right). The couple
+  is deliberately one of each — **David is the sinistral one** (he is
+  left-handed) — and the self-rotation follows the hand
+  (`signedSpinDegrees`), so they counter-rotate instead of turning in lockstep.
+  Never derive the direction from the array position.
 - **Dancers are emoji heads** (🤵🏽 / 👰🏽) inside their own rotation group, with a
   small "nose" marker so the spin is readable; the name label sits OUTSIDE the
   rotating group so it stays upright.
