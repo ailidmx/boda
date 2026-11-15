@@ -28,6 +28,7 @@ const PATH_TO_TAB = {
   analitica: "analytics",
   proveedores: "providers",
   timeline: "timeline",
+  ceremonia: "ceremonia",
 };
 
 /** Map internal tab IDs to URL path segments. */
@@ -60,6 +61,7 @@ const TABS = [
   { id: "analytics", label: "Analítica", icon: "📈" },
   { id: "providers", label: "Proveedores", icon: "🤝" },
   { id: "timeline", label: "Timeline", icon: "🕐" },
+  { id: "ceremonia", label: "Ceremonia", icon: "🐚" },
 ];
 
 /** The currently active tab id. */
