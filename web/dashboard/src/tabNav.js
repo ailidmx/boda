@@ -45,6 +45,7 @@ const TAB_TO_PATH = {
   analytics: "analitica",
   providers: "proveedores",
   timeline: "timeline",
+  ceremonia: "ceremonia",
 };
 
 /** The tab definitions: id, label, and icon. */
