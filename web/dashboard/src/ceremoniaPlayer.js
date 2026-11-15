@@ -24,21 +24,28 @@ import {
   rescaleChoreography,
   sanitizeChoreography,
   serializeChoreography,
+  walkingKeyframes,
 } from "./ceremonia/schema.js";
 import {
   detectMeetings,
+  pathMetersTotal,
   progressAt,
+  solveTurnsForSpeed,
   spiralPath,
   spiralPoint,
+  spinDegrees,
 } from "./ceremonia/motion.js";
 
-const STORAGE_KEY = "boda:ceremonia-player:v3";
-const PREVIOUS_KEY = "boda:ceremonia-player:v2";
-const LEGACY_KEY = "boda:ceremonia-player:v1";
+const STORAGE_KEY = "boda:ceremonia-player:v4";
+const PREVIOUS_KEYS = [
+  "boda:ceremonia-player:v3",
+  "boda:ceremonia-player:v2",
+  "boda:ceremonia-player:v1",
+];
 const SAMPLES = 360;
 const DANCERS = [
-  { key: "david", label: "David", color: "#3b82f6" },
-  { key: "ayde", label: "Aydé", color: "#d97706" },
+  { key: "david", label: "David", color: "#3b82f6", emoji: "🤵🏽" },
+  { key: "ayde", label: "Aydé", color: "#d97706", emoji: "👰🏽" },
 ];
 
 const esc = (value) =>
@@ -58,23 +65,17 @@ function readStoredState() {
   } catch {
     /* ignore corrupt storage */
   }
-  try {
-    const previous = JSON.parse(localStorage.getItem(PREVIOUS_KEY));
-    if (previous) {
+  for (const key of PREVIOUS_KEYS) {
+    try {
+      const previous = JSON.parse(localStorage.getItem(key));
+      if (!previous) continue;
       needsMigration = true;
-      return sanitizeChoreography(previous);
+      return sanitizeChoreography(
+        key.endsWith(":v1") ? { ...previous, version: 1 } : previous,
+      );
+    } catch {
+      /* ignore corrupt previous storage */
     }
-  } catch {
-    /* ignore corrupt previous storage */
-  }
-  try {
-    const legacy = JSON.parse(localStorage.getItem(LEGACY_KEY));
-    if (legacy) {
-      needsMigration = true;
-      return sanitizeChoreography({ ...legacy, version: 1 });
-    }
-  } catch {
-    /* ignore corrupt legacy storage */
   }
   return sanitizeChoreography(null);
 }
@@ -204,6 +205,23 @@ export function renderCeremoniaPlayer(host) {
         </div>
         <div data-meetings></div>
       </div>
+      <div class="ceremonia__card">
+        <h4>Escala real</h4>
+        <p class="ceremonia__note">
+          El radio real del caracol convierte el recorrido a metros. Dime el
+          espacio del venue y lo ajusto.
+        </p>
+        <div class="ceremonia__bar">
+          <label>Radio (m)
+            <input data-radius type="number" min="0.5" max="60" step="0.1" style="width:74px">
+          </label>
+          <label>Objetivo (m/s)
+            <input data-target-speed type="number" min="0.02" max="2" step="0.01" style="width:74px">
+          </label>
+          <button type="button" class="dashboard-button" data-solve-turns>Ajustar vueltas</button>
+        </div>
+        <p class="ceremonia__note" data-scale-info></p>
+      </div>
     </div>
 
     <h3>Cues</h3>
@@ -213,23 +231,29 @@ export function renderCeremoniaPlayer(host) {
     </div>
     <div data-cues></div>
 
-    <h3>Timelines de movimiento</h3>
-    <p class="ceremonia__note">
-      Progreso normalizado 0 → 1 sobre el caracol, por tiempo de audio. La curva
-      se interpola con la easing del keyframe de llegada.
-    </p>
-    <div class="ceremonia__grid">
-      <div class="ceremonia__card">
-        <h4>🔵 David · ahora <span data-david-now>0%</span></h4>
-        <div data-kf-david></div>
-        <button type="button" class="dashboard-button" data-kf-add="david">+ Keyframe aquí</button>
+    <details class="ceremonia__advanced">
+      <summary>Timelines de movimiento (avanzado)</summary>
+      <p class="ceremonia__note">
+        Por defecto la caminata es de <strong>velocidad lineal constante</strong>:
+        cada tramo de tiempo cubre la misma distancia, así que el caracol “gira
+        más” al acercarse al centro. Editar los keyframes cambia esa coreografía.
+      </p>
+      <div class="ceremonia__grid">
+        <div class="ceremonia__card">
+          <h4>🔵 David · ahora <span data-david-now>0%</span></h4>
+          <div data-kf-david></div>
+          <button type="button" class="dashboard-button" data-kf-add="david">+ Keyframe aquí</button>
+        </div>
+        <div class="ceremonia__card">
+          <h4>🟠 Aydé · ahora <span data-ayde-now>0%</span></h4>
+          <div data-kf-ayde></div>
+          <button type="button" class="dashboard-button" data-kf-add="ayde">+ Keyframe aquí</button>
+        </div>
       </div>
-      <div class="ceremonia__card">
-        <h4>🟠 Aydé · ahora <span data-ayde-now>0%</span></h4>
-        <div data-kf-ayde></div>
-        <button type="button" class="dashboard-button" data-kf-add="ayde">+ Keyframe aquí</button>
-      </div>
-    </div>
+      <button type="button" class="dashboard-button" data-reset-walk>
+        ↺ Recalcular caminata uniforme
+      </button>
+    </details>
 
     <div class="ceremonia__bar">
       <button type="button" class="dashboard-button" data-export>↓ Exportar JSON</button>
@@ -331,25 +355,48 @@ export function renderCeremoniaPlayer(host) {
         ),
       );
       const group = make("g", { transform: "translate(180 172)" }, peopleLayer);
-      make("circle", { r: "9", fill: dancer.color, "fill-opacity": ".22" }, group);
+      // The head (emoji) lives inside a spinning group, plus a small "nose"
+      // marker so the rotation is readable even with a symmetric face.
+      const spin = make("g", { "data-spin": "" }, group);
+      make("circle", { r: "12", fill: dancer.color, "fill-opacity": ".18" }, spin);
+      const head = make(
+        "text",
+        {
+          x: "0",
+          y: "1",
+          "text-anchor": "middle",
+          "dominant-baseline": "central",
+          "font-size": "16",
+        },
+        spin,
+      );
+      head.textContent = dancer.emoji;
       make(
         "circle",
-        { r: "5", fill: dancer.color, stroke: "white", "stroke-width": "1.5" },
-        group,
+        {
+          cx: "0",
+          cy: "-14",
+          r: "2.4",
+          fill: dancer.color,
+          stroke: "white",
+          "stroke-width": ".8",
+        },
+        spin,
       );
       const label = make(
         "text",
         {
-          x: "11",
-          y: "-11",
+          x: "0",
+          y: "25",
+          "text-anchor": "middle",
           fill: dancer.color,
-          "font-size": "12",
+          "font-size": "9",
           "font-weight": "bold",
         },
         group,
       );
       label.textContent = dancer.label;
-      dots.push(group);
+      dots.push({ group, spin });
     });
   }
 
@@ -371,14 +418,20 @@ export function renderCeremoniaPlayer(host) {
       david: progressAt(state.dancers.david.keyframes, t),
       ayde: progressAt(state.dancers.ayde.keyframes, t),
     };
+    const { radiusMeters, bodyRadiusMeters } = state.stage;
 
     DANCERS.forEach((dancer, person) => {
-      const point = spiralPoint(person, progress[dancer.key], state.turns);
-      dots[person]?.setAttribute(
+      const p = progress[dancer.key];
+      const point = spiralPoint(person, p, state.turns);
+      const dot = dots[person];
+      dot?.group.setAttribute(
         "transform",
         `translate(${point.x.toFixed(2)} ${point.y.toFixed(2)})`,
       );
-      traceEls[person]?.setAttribute("d", traceFor(person, progress[dancer.key]));
+      // Self-rotation, like a planet: one turn per body circumference walked.
+      const spin = spinDegrees(p, state.turns, radiusMeters, bodyRadiusMeters) % 360;
+      dot?.spin.setAttribute("transform", `rotate(${spin.toFixed(1)})`);
+      traceEls[person]?.setAttribute("d", traceFor(person, p));
     });
 
     clockEl.textContent = formatClock(t);
@@ -386,6 +439,31 @@ export function renderCeremoniaPlayer(host) {
     if (!scrubbing) scrub.value = String(Math.min(t, Number(scrub.max) || 0));
     davidNow.textContent = `${Math.round(progress.david * 100)}%`;
     aydeNow.textContent = `${Math.round(progress.ayde * 100)}%`;
+  }
+
+  /** Distancia total, velocidad media y giros sobre sí, con la escala real. */
+  function updateScaleInfo() {
+    const { radiusMeters, bodyRadiusMeters } = state.stage;
+    const totalMeters = pathMetersTotal(state.turns, radiusMeters);
+    const speed = state.duration > 0 ? totalMeters / state.duration : 0;
+    const spins = bodyRadiusMeters > 0 ? totalMeters / (2 * Math.PI * bodyRadiusMeters) : 0;
+    q("[data-scale-info]").textContent =
+      `Recorrido ${totalMeters.toFixed(1)} m · ${speed.toFixed(2)} m/s · ` +
+      `${spins.toFixed(0)} giros sobre sí (${state.turns.toFixed(1)} vueltas al caracol).`;
+  }
+
+  /** Both dancers walk the spiral at constant linear speed. */
+  function resetWalking(announce = true) {
+    state.dancers.david.keyframes = walkingKeyframes(state.duration, state.turns);
+    state.dancers.ayde.keyframes = walkingKeyframes(state.duration, state.turns);
+    saveState();
+    renderKeyframes("david");
+    renderKeyframes("ayde");
+    updateScaleInfo();
+    draw();
+    if (announce) {
+      setStatus("Caminata uniforme recalculada: velocidad lineal constante.");
+    }
   }
 
   function setPlayLabel() {
@@ -513,6 +591,7 @@ export function renderCeremoniaPlayer(host) {
       : "Segundos de la timeline de ensayo";
     q("[data-duration-hint]").textContent = formatClock(state.duration);
     scrub.max = String(Math.round(state.duration * 100) / 100);
+    updateScaleInfo();
   }
 
   async function attachAudio(record) {
@@ -775,7 +854,10 @@ export function renderCeremoniaPlayer(host) {
     rateSelect.value = String(nearest);
     q("[data-loop]").checked = state.settings.loop;
     q("[data-turns]").value = String(state.turns);
+    q("[data-radius]").value = String(state.stage.radiusMeters);
+    q("[data-target-speed]").value = String(state.stage.targetSpeedMps);
     updateDurationControl();
+    updateScaleInfo();
     if (hasAudio()) audio.playbackRate = state.settings.rate;
     audio.loop = state.settings.loop;
     renderCues();
@@ -859,12 +941,67 @@ export function renderCeremoniaPlayer(host) {
     (event) => {
       state.turns = Math.max(1, Math.min(Number(event.target.value) || 1, 20));
       event.target.value = String(state.turns);
-      saveState();
       buildStage();
+      resetWalking(false);
+      setStatus(
+        `Vueltas ajustadas a ${state.turns}. Caminata recalculada a velocidad lineal constante.`,
+      );
+    },
+    listens,
+  );
+
+  q("[data-radius]").addEventListener(
+    "change",
+    (event) => {
+      state.stage.radiusMeters = Math.min(
+        60,
+        Math.max(0.5, Number(event.target.value) || 4),
+      );
+      event.target.value = String(state.stage.radiusMeters);
+      saveState();
+      updateScaleInfo();
       draw();
     },
     listens,
   );
+
+  q("[data-target-speed]").addEventListener(
+    "change",
+    (event) => {
+      state.stage.targetSpeedMps = Math.min(
+        2,
+        Math.max(0.02, Number(event.target.value) || 0.35),
+      );
+      event.target.value = String(state.stage.targetSpeedMps);
+      saveState();
+    },
+    listens,
+  );
+
+  q("[data-solve-turns]").addEventListener(
+    "click",
+    () => {
+      const turns = solveTurnsForSpeed({
+        duration: state.duration,
+        radiusMeters: state.stage.radiusMeters,
+        targetSpeedMps: state.stage.targetSpeedMps,
+      });
+      if (!turns) {
+        setStatus("No se pudo calcular: revisa el radio y la velocidad objetivo.");
+        return;
+      }
+      state.turns = turns;
+      q("[data-turns]").value = String(turns);
+      buildStage();
+      resetWalking(false);
+      setStatus(
+        `Vueltas ajustadas a ${turns} para caminar a ${state.stage.targetSpeedMps} m/s.`,
+      );
+    },
+    listens,
+  );
+
+  q("[data-reset-walk]").addEventListener("click", () => resetWalking(true), listens);
 
   q("[data-duration]").addEventListener(
     "change",
@@ -1058,8 +1195,7 @@ export function renderCeremoniaPlayer(host) {
     // not need to migrate again, and drop the stale copies.
     saveState();
     try {
-      localStorage.removeItem(PREVIOUS_KEY);
-      localStorage.removeItem(LEGACY_KEY);
+      PREVIOUS_KEYS.forEach((key) => localStorage.removeItem(key));
     } catch {
       /* storage may be blocked; the state is still migrated in memory */
     }

@@ -10,7 +10,9 @@
  * exported JSON never contains music.
  */
 
-export const SCHEMA_VERSION = 3;
+import { uniformSpeedKeyframes } from "./motion.js";
+
+export const SCHEMA_VERSION = 4;
 
 /** Fallback timeline length when there is no audio file yet (704 s = 11:44). */
 export const DEFAULT_DURATION = 704;
@@ -20,9 +22,6 @@ export const DEFAULT_TURNS = 5.8;
 
 /** The user-provided reference marker: 01:44. Its musical meaning is unknown. */
 export const USER_REFERENCE_SEC = 104;
-
-/** v2 shipped this artificial hold before Aydé started moving (8% of the track). */
-const LEGACY_AYDE_HOLD = 0.08;
 
 /** v2 shipped this timeline length; v3 replaces it with the real track length. */
 const LEGACY_DEFAULT_DURATION = 630;
@@ -73,6 +72,14 @@ export function defaultKeyframes(duration = DEFAULT_DURATION, delay = 0) {
   return frames;
 }
 
+/**
+ * Default timeline: constant LINEAR speed along the caracol (equal time slices
+ * cover equal distance). Stored as keyframes so it stays editable.
+ */
+export function walkingKeyframes(duration, turns) {
+  return uniformSpeedKeyframes(duration, turns, 20);
+}
+
 export function defaultCues() {
   return [
     {
@@ -97,13 +104,15 @@ export function createDefaults(duration = DEFAULT_DURATION) {
     duration,
     turns: DEFAULT_TURNS,
     dancers: {
-      david: { keyframes: defaultKeyframes(duration, 0) },
-      ayde: { keyframes: defaultKeyframes(duration, 0) },
+      david: { keyframes: walkingKeyframes(duration, DEFAULT_TURNS) },
+      ayde: { keyframes: walkingKeyframes(duration, DEFAULT_TURNS) },
     },
     cues: defaultCues(),
     settings: { rate: 1, loop: false, tolerancePx: 14 },
+    stage: { radiusMeters: 4, bodyRadiusMeters: 0.28, targetSpeedMps: 0.35 },
   };
 }
+
 
 function sanitizeCue(raw, duration, index) {
   if (!raw || typeof raw !== "object") return null;
@@ -142,26 +151,27 @@ function sanitizeKeyframes(raw, duration, fallback) {
 }
 
 /**
- * v2 shipped an artificial 8 % hold on Aydé's timeline, which made her look
- * frozen for the first ~56 s of an 11:43 track. Recognise that exact default
- * and replace it with the neutral one (both dancers start together).
+ * v2/v3 shipped artificial holds on Aydé's timeline and linear (constant-angle)
+ * defaults. Recognise a *default-looking* timeline (2-3 frames from 0/0 to
+ * duration/1) so the v4 migration can replace it with the uniform walk, while
+ * leaving a hand-edited choreography untouched.
  */
-function isLegacyAydeHold(keyframes, duration) {
-  if (!Array.isArray(keyframes) || keyframes.length !== 3) return false;
-  const [first, hold, last] = keyframes;
-  const expected = Math.round(duration * LEGACY_AYDE_HOLD * 100) / 100;
+function looksLikeDefaultTimeline(keyframes, duration) {
+  if (!Array.isArray(keyframes) || keyframes.length === 0 || keyframes.length > 3) {
+    return false;
+  }
+  const first = keyframes[0];
+  const last = keyframes[keyframes.length - 1];
   return (
     first?.t === 0 &&
     first?.p === 0 &&
-    Math.abs(hold?.t - expected) <= 0.06 &&
-    hold?.p === 0 &&
     Math.abs(last?.t - duration) <= 0.06 &&
     last?.p === 1
   );
 }
 
 /**
- * Accepts ANY stored/imported payload (v1, v2, v3, garbage) and returns a valid
+ * Accepts ANY stored/imported payload (v1…v4, garbage) and returns a valid
  * current-version choreography. Never throws, never returns null.
  */
 export function sanitizeChoreography(raw) {
@@ -169,34 +179,35 @@ export function sanitizeChoreography(raw) {
   const sourceVersion = Number.isFinite(Number(source.version))
     ? Number(source.version)
     : 1;
-  const migrateLegacy = sourceVersion < SCHEMA_VERSION;
+  // v2 → v3 replaced the 10:30 placeholder; it must not touch a v3 timeline the
+  // human chose on purpose.
+  const migrateDuration = sourceVersion < 3;
+  // v3 → v4 replaced constant-angle defaults with the uniform walk.
+  const migrateMotion = sourceVersion < 4;
 
   let duration = clamp(
     finite(source.duration, DEFAULT_DURATION),
     1,
     LIMITS.duration,
   );
+  const originalDuration = duration;
+  const turns = clamp(finite(source.turns, DEFAULT_TURNS), 1, 20);
   const defaults = createDefaults(duration);
 
   const trackSource =
     source.track && typeof source.track === "object" ? source.track : {};
   const settingsSource =
     source.settings && typeof source.settings === "object" ? source.settings : {};
+  const stageSource =
+    source.stage && typeof source.stage === "object" ? source.stage : {};
   const dancersSource =
     source.dancers && typeof source.dancers === "object" ? source.dancers : {};
 
+  const walking = walkingKeyframes(duration, turns);
+  const davidSource = dancersSource.david?.keyframes;
   const aydeSource = dancersSource.ayde?.keyframes;
-  let aydeKeyframes;
-  if (migrateLegacy && isLegacyAydeHold(aydeSource, duration)) {
-    aydeKeyframes = defaultKeyframes(duration, 0);
-  } else {
-    aydeKeyframes = sanitizeKeyframes(aydeSource, duration, defaultKeyframes(duration, 0));
-  }
-  let davidKeyframes = sanitizeKeyframes(
-    dancersSource.david?.keyframes,
-    duration,
-    defaultKeyframes(duration, 0),
-  );
+  let davidKeyframes = sanitizeKeyframes(davidSource, duration, walking);
+  let aydeKeyframes = sanitizeKeyframes(aydeSource, duration, walking);
 
   const cuesSource = Array.isArray(source.cues)
     ? source.cues
@@ -211,12 +222,23 @@ export function sanitizeChoreography(raw) {
 
   // v2 → v3: the built-in 10:30 timeline was a placeholder. Rescale it to the
   // real track length once, so an old localStorage does not keep showing 10:30.
-  if (migrateLegacy && Math.abs(duration - LEGACY_DEFAULT_DURATION) <= 0.5) {
+  if (migrateDuration && Math.abs(duration - LEGACY_DEFAULT_DURATION) <= 0.5) {
     const ratio = DEFAULT_DURATION / duration;
     davidKeyframes = scaleKeyframes(davidKeyframes, ratio);
     aydeKeyframes = scaleKeyframes(aydeKeyframes, ratio);
     duration = DEFAULT_DURATION;
     cues = cues.map((cue) => ({ ...cue, t: Math.min(cue.t, duration) }));
+  }
+
+  // v3 → v4: replace the old constant-ANGLE defaults with the uniform walk
+  // (constant linear speed). Hand-edited timelines are left alone.
+  if (migrateMotion) {
+    if (looksLikeDefaultTimeline(davidSource, originalDuration)) {
+      davidKeyframes = walkingKeyframes(duration, turns);
+    }
+    if (looksLikeDefaultTimeline(aydeSource, originalDuration)) {
+      aydeKeyframes = walkingKeyframes(duration, turns);
+    }
   }
 
   return {
@@ -233,7 +255,7 @@ export function sanitizeChoreography(raw) {
       ),
     },
     duration,
-    turns: clamp(finite(source.turns, DEFAULT_TURNS), 1, 20),
+    turns,
     dancers: {
       david: {
         keyframes: davidKeyframes,
@@ -255,6 +277,11 @@ export function sanitizeChoreography(raw) {
         LIMITS.tolerance[0],
         LIMITS.tolerance[1],
       ),
+    },
+    stage: {
+      radiusMeters: clamp(finite(stageSource.radiusMeters, 4), 0.5, 60),
+      bodyRadiusMeters: clamp(finite(stageSource.bodyRadiusMeters, 0.28), 0.1, 1.2),
+      targetSpeedMps: clamp(finite(stageSource.targetSpeedMps, 0.35), 0.02, 2),
     },
   };
 }

@@ -16,9 +16,15 @@ import {
 import {
   dancersAt,
   detectMeetings,
+  pathMetersTotal,
   progressAt,
+  progressForArcFraction,
+  arcLengthPx,
+  solveTurnsForSpeed,
   sortKeyframes,
   spiralPoint,
+  spinDegrees,
+  uniformSpeedKeyframes,
 } from "../src/ceremonia/motion.js";
 
 const flat = (p) => [
@@ -132,14 +138,14 @@ test("a stored v2 state with the 10:30 placeholder is migrated to 11:44", () => 
   assert.equal(state.duration, 704);
   assert.equal(formatClock(state.duration), "11:44");
   assert.equal(state.dancers.david.keyframes.at(-1).t, 704);
-  assert.equal(state.dancers.ayde.keyframes.length, 2);
+  assert.ok(state.dancers.ayde.keyframes.length >= 20);
   assert.equal(state.dancers.ayde.keyframes.at(-1).t, 704);
   assert.equal(state.cues[0].t, 104);
 });
 
 test("a v3 state keeps a duration the human chose on purpose", () => {
   const state = sanitizeChoreography({
-    version: SCHEMA_VERSION,
+    version: 3,
     duration: 630,
     dancers: {
       david: { keyframes: [{ t: 0, p: 0 }, { t: 630, p: 1 }] },
@@ -152,18 +158,19 @@ test("a v3 state keeps a duration the human chose on purpose", () => {
       },
     },
   });
-  assert.equal(state.duration, 630);
-  assert.equal(state.dancers.ayde.keyframes.length, 3, "v3 holds are intentional");
+  assert.equal(state.duration, 630, "v3 duration is respected");
+  assert.ok(state.dancers.ayde.keyframes.length >= 20, "motion upgraded to uniform");
 });
 
 test("both dancers start moving from the first seconds", () => {
   const state = sanitizeChoreography(null);
-  assert.ok(progressAt(state.dancers.david.keyframes, 10) > 0);
-  assert.ok(
-    progressAt(state.dancers.ayde.keyframes, 10) > 0,
-    "Aydé must not be frozen at the start",
-  );
-  assert.ok(progressAt(state.dancers.ayde.keyframes, 60) > 0.05);
+  const david = (t) => progressAt(state.dancers.david.keyframes, t);
+  const ayde = (t) => progressAt(state.dancers.ayde.keyframes, t);
+  for (const at of [david, ayde]) {
+    assert.ok(at(10) > 0, "must move within the first 10 s");
+    assert.ok(at(60) > at(10), "progress must keep growing");
+    assert.ok(at(704) === 1, "must reach the center at the end");
+  }
 });
 
 test("the v2 artificial 8% hold on Aydé is repaired", () => {
@@ -182,7 +189,7 @@ test("the v2 artificial 8% hold on Aydé is repaired", () => {
     },
   };
   const state = sanitizeChoreography(legacy);
-  assert.equal(state.dancers.ayde.keyframes.length, 2);
+  assert.ok(state.dancers.ayde.keyframes.length >= 20, "uniform walk replaces it");
   assert.ok(progressAt(state.dancers.ayde.keyframes, 10) > 0);
 });
 
@@ -315,4 +322,79 @@ test("dancersAt follows only the audio time it is given", () => {
 test("meeting detection is a no-op without a duration", () => {
   assert.deepEqual(detectMeetings({ duration: 0 }), []);
 });
+
+// ── Constant linear speed (arc length) ───────────────────────────────────
+const TURNS = 5.8;
+
+test("arc length is monotonic and its inverse round-trips", () => {
+  let previous = -1;
+  for (let i = 0; i <= 20; i += 1) {
+    const length = arcLengthPx(i / 20, TURNS);
+    assert.ok(length >= previous, "arc length must not decrease");
+    previous = length;
+  }
+  for (const fraction of [0, 0.25, 0.5, 0.75, 1]) {
+    const p = progressForArcFraction(fraction, TURNS);
+    const back = arcLengthPx(p, TURNS) / arcLengthPx(1, TURNS);
+    assert.ok(Math.abs(back - fraction) < 1e-3, `${fraction} → ${back}`);
+  }
+});
+
+test("the default walk covers equal distance in equal time", () => {
+  const keyframes = uniformSpeedKeyframes(704, TURNS, 20);
+  const total = arcLengthPx(1, TURNS);
+  const steps = [];
+  for (let i = 1; i < keyframes.length; i += 1) {
+    steps.push(arcLengthPx(keyframes[i].p, TURNS) - arcLengthPx(keyframes[i - 1].p, TURNS));
+  }
+  const expected = total / (keyframes.length - 1);
+  for (const step of steps) {
+    assert.ok(
+      Math.abs(step - expected) / expected < 0.02,
+      `step ${step.toFixed(2)} vs ${expected.toFixed(2)}`,
+    );
+  }
+});
+
+test("near the center the angular speed rises while the linear speed holds", () => {
+  const keyframes = uniformSpeedKeyframes(704, TURNS, 20);
+  const at = (t) => progressAt(keyframes, t);
+  const speed = (t1, t2) => arcLengthPx(at(t2), TURNS) - arcLengthPx(at(t1), TURNS);
+  const outer = speed(0, 35.2);
+  const inner = speed(668.8, 704);
+  // Equal distance in equal time, even though the radius collapsed.
+  assert.ok(Math.abs(outer - inner) / outer < 0.03, `${outer} vs ${inner}`);
+});
+
+test("real scale: meters scale linearly with the radius", () => {
+  const four = pathMetersTotal(TURNS, 4);
+  const eight = pathMetersTotal(TURNS, 8);
+  assert.ok(Math.abs(eight - 2 * four) < 1e-6);
+  const speed = four / 704;
+  assert.ok(speed > 0 && speed < 1, `speed ${speed}`);
+});
+
+test("self-rotation: one full turn per body circumference walked", () => {
+  const bodyRadius = 0.28;
+  const circumference = 2 * Math.PI * bodyRadius;
+  // Find the progress whose walked distance equals one circumference.
+  const totalPx = arcLengthPx(1, TURNS);
+  const pxPerMeter = totalPx / pathMetersTotal(TURNS, 4);
+  const targetPx = circumference * pxPerMeter;
+  const p = progressForArcFraction(targetPx / totalPx, TURNS);
+  const degrees = spinDegrees(p, TURNS, 4, bodyRadius);
+  assert.ok(Math.abs(degrees - 360) < 2, `spin ${degrees}`);
+});
+
+test("solving turns for a target speed lands within 5%", () => {
+  const turns = solveTurnsForSpeed({
+    duration: 704,
+    radiusMeters: 4,
+    targetSpeedMps: 0.35,
+  });
+  assert.ok(turns >= 1 && turns <= 20, `turns ${turns}`);
+  const speed = pathMetersTotal(turns, 4) / 704;
+  assert.ok(Math.abs(speed - 0.35) / 0.35 < 0.05, `speed ${speed}`);
+});
+
 

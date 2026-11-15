@@ -1505,9 +1505,26 @@ directly to `master` and push.
   meetings are suggestions that become cues only when a human clicks "→ cue".
 - **01:44 (104 s) is a user-provided reference, not a section boundary or a
   track duration.** It ships as a `user-reference` cue and must stay editable.
+- **Humans walk at a CONSTANT LINEAR speed.** The spiral shrinks, so a constant
+  angle per second would make them crawl near the center (`v = ω·r → 0`). The
+  motion is parametrized by **arc length**: equal time slices cover equal
+  distance (`ceremonia/motion.js` → `arcLengthPx` / `progressForArcFraction` /
+  `uniformSpeedKeyframes`). Near the center the angular speed rises, like a
+  planet on an eccentric orbit. Do not go back to a linear `p(t)`.
+- **Self-rotation like a planet.** Each dancer spins one full turn per body
+  circumference walked (`spinDegrees`, body radius in `state.stage`), so the
+  spin follows the distance actually travelled, not the clock.
+- **Dancers are emoji heads** (🤵🏽 / 👰🏽) inside their own rotation group, with a
+  small "nose" marker so the spin is readable; the name label sits OUTSIDE the
+  rotating group so it stays upright.
+- **Real scale:** `stage.radiusMeters` converts the path to meters and
+  `stage.targetSpeedMps` drives "Ajustar vueltas" (`solveTurnsForSpeed`). At
+  4 m / 5.8 turns / 11:44 the walk is ~0.11 m/s, which is very slow: raise the
+  radius (or solve for 0.3–0.4 m/s) when the couple gives the real space.
 - **Two independent motion timelines** (David / Aydé) with keyframes
-  `{t, p, ease}`; `p` is normalized progress along the caracol (0 → 1) and the
-  easing of the segment's END keyframe shapes the curve.
+  `{t, p, ease}`; `p` is normalized progress along the caracol (0 → 1). The
+  default is the uniform walk; editing a keyframe is a deliberate choreography
+  change, and "Recalcular caminata uniforme" restores constant speed.
 - **Both dancers start moving at t=0 by default.** Do not add silent holds to
   the defaults: the old 8 % hold made Aydé look frozen for the first ~56 s of an
   11:44 track. A hold must be an explicit keyframe the couple adds.
@@ -1517,8 +1534,9 @@ directly to `master` and push.
   `duration` wins and the field is disabled.
 - **Schema versioning is load-bearing.** v3 migrates the v2 placeholder
   (10:30 + Aydé's 8 % hold) once, on read, and rewrites localStorage under
-  `boda:ceremonia-player:v3`. Never re-apply a migration to a current-version
-  payload: a v3 hold or a human-chosen duration must be respected.
+  `boda:ceremonia-player:v4`. v4 also replaces the constant-angle defaults with
+  the uniform walk. Never re-apply a migration to a current-version payload: a
+  v4 hold or a human-chosen duration must be respected.
 - **Persistence is per browser**: cues/keyframes/settings in `localStorage`
   (`boda:ceremonia-player:v2`), audio in IndexedDB. Never claim cross-device
   sync; JSON export is the backup.
