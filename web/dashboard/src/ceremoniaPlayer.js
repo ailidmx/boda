@@ -88,6 +88,9 @@ export function renderCeremoniaPlayer(host) {
     <p class="ceremonia__note">
       Dos caracoles independientes sincronizados al audio real. Las trayectorias son
       provisionales: los "encuentros" son sugerencias de ensayo, no cruces verificados.
+      <br>
+      Orientación: <strong>la torre apunta al este</strong>, así que arriba en el
+      dibujo es ESTE (N a la izquierda, S a la derecha, O abajo).
     </p>
 
     <div class="ceremonia__bar">
@@ -107,13 +110,21 @@ export function renderCeremoniaPlayer(host) {
     </p>
 
     <svg class="ceremonia__stage" data-stage viewBox="0 0 360 340" role="img"
-         aria-label="Trayectorias animadas de David y Aydé">
-      <text x="180" y="23" text-anchor="middle" fill="#475569" font-size="12">TORRE · LAGO DE CHAPALA</text>
+         aria-label="Trayectorias animadas de David y Aydé. La torre apunta al este: arriba es este, derecha sur, abajo oeste, izquierda norte.">
+      <text x="180" y="23" text-anchor="middle" fill="#475569" font-size="12">TORRE · LAGO DE CHAPALA · apunta al ESTE ↑</text>
       <path d="M73 49 Q5 102 20 252" stroke="#3b82f6" stroke-width="29" opacity=".2" fill="none"/>
       <path d="M287 49 Q355 102 340 252" stroke="#16a34a" stroke-width="29" opacity=".2" fill="none"/>
       <text x="26" y="65" fill="#2563eb" font-size="12">FR</text>
       <text x="320" y="65" fill="#15803d" font-size="12">ES</text>
       <circle cx="180" cy="172" r="125" stroke="#94a3b8" stroke-dasharray="4 5" fill="none"/>
+      <g data-compass transform="translate(30 296)" fill="#64748b" font-size="9" text-anchor="middle">
+        <circle r="11" fill="none" stroke="#cbd5e1" stroke-dasharray="2 3"/>
+        <path d="M0 -7 L2.6 0 L0 7 L-2.6 0 Z" fill="#0f766e"/>
+        <text x="0" y="-15" fill="#0f766e" font-weight="bold">E</text>
+        <text x="18" y="3">S</text>
+        <text x="0" y="22">O</text>
+        <text x="-18" y="3">N</text>
+      </g>
       <g data-paths></g>
       <g data-traces></g>
       <g data-people></g>
