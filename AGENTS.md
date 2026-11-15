@@ -1477,6 +1477,115 @@ directly to `master` and push.
 
 *(Add new spatial-editor lessons here as you discover them.)*
 
+---
+
+## 10. Ceremonia Player (audio-synced rehearsal) — ALWAYS follow
+
+> Admin-only panel at `/dashboard/ceremonia`. It exists to rehearse the ceremony
+> choreography against the real track, not to publish audio.
+
+- **The audio element is the clock.** `ceremoniaPlayer.js` never advances its own
+  time while audio is loaded: every frame reads `audio.currentTime` and asks
+  `ceremonia/motion.js` where the dancers are. Do not reintroduce a
+  `requestAnimationFrame` accumulator with a "speed" multiplier — that was the
+  prototype bug (drift after pause/seek/rate change). The synthetic clock is a
+  clearly-labelled fallback used only when no file is imported.
+- **No copyrighted audio in the repo or in Hosting.** The admin imports a local
+  file; it is stored in **IndexedDB** (`ceremonia/audioStore.js`), never in
+  `public/`, never in Firestore, never in the exported JSON. `npm run
+  audio:extract -- --input <local file> --execute` converts a file the couple
+  already owns with ffmpeg into `tmp/ceremony-audio/` (gitignored); it refuses to
+  write inside `web/` on purpose.
+- **Three pure modules, tested in Node** (`web/dashboard/tests/ceremonia.test.mjs`):
+  `ceremonia/schema.js` (v2 schema, sanitizing, v1 → v2 cue migration),
+  `ceremonia/motion.js` (keyframe interpolation, spiral geometry, meeting
+  detection) and the panel itself. Keep DOM and storage out of those two.
+- **Meetings are provisional.** A meeting means *both dancers within the
+  tolerance at the same time*; a path crossing is NOT a meeting. Detected
+  meetings are suggestions that become cues only when a human clicks "→ cue".
+- **01:44 (104 s) is a user-provided reference, not a section boundary or a
+  track duration.** It ships as a `user-reference` cue and must stay editable.
+- **Humans walk at a CONSTANT LINEAR speed.** The spiral shrinks, so a constant
+  angle per second would make them crawl near the center (`v = ω·r → 0`). The
+  motion is parametrized by **arc length**: equal time slices cover equal
+  distance (`ceremonia/motion.js` → `arcLengthPx` / `progressForArcFraction` /
+  `uniformSpeedKeyframes`). Near the center the angular speed rises, like a
+  planet on an eccentric orbit. Do not go back to a linear `p(t)`.
+- **Self-rotation like a planet.** Each dancer spins one full turn per body
+  circumference walked (`spinDegrees`, body radius in `state.stage`), so the
+  spin follows the distance actually travelled, not the clock.
+- **Chirality is data, not an index.** Each dancer has `handedness`:
+  **dextral** (the majority of snails: clockwise inward, starts on the left) or
+  **sinistral** (the rare one: counterclockwise, starts on the right). The couple
+  is deliberately one of each — **David is the sinistral one** (he is
+  left-handed) — and the self-rotation follows the hand
+  (`signedSpinDegrees`), so they counter-rotate instead of turning in lockstep.
+  Never derive the direction from the array position.
+- **Dancers are emoji heads** (🤵🏽 / 👰🏽) inside their own rotation group, with a
+  small "nose" marker so the spin is readable; the name label sits OUTSIDE the
+  rotating group so it stays upright.
+- **Real scale:** `stage.radiusMeters` converts the path to meters and
+  `stage.targetSpeedMps` drives "Ajustar vueltas" (`solveTurnsForSpeed`). At
+  4 m / 5.8 turns / 11:44 the walk is ~0.11 m/s, which is very slow: raise the
+  radius (or solve for 0.3–0.4 m/s) when the couple gives the real space.
+- **Two independent motion timelines** (David / Aydé) with keyframes
+  `{t, p, ease}`; `p` is normalized progress along the caracol (0 → 1). The
+  default is the uniform walk; editing a keyframe is a deliberate choreography
+  change, and "Recalcular caminata uniforme" restores constant speed.
+- **Both dancers start moving at t=0 by default.** Do not add silent holds to
+  the defaults: the old 8 % hold made Aydé look frozen for the first ~56 s of an
+  11:44 track. A hold must be an explicit keyframe the couple adds.
+- **Timeline length:** `DEFAULT_DURATION` is the real track length (**11:44 =
+  704 s**). Without audio the "Duración total" field is editable and rescales
+  keyframes proportionally (`rescaleChoreography`); with audio the element's
+  `duration` wins and the field is disabled.
+- **Schema versioning is load-bearing.** v3 migrates the v2 placeholder
+  (10:30 + Aydé's 8 % hold) once, on read, and rewrites localStorage under
+  `boda:ceremonia-player:v4`. v4 also replaces the constant-angle defaults with
+  the uniform walk. Never re-apply a migration to a current-version payload: a
+  v4 hold or a human-chosen duration must be respected.
+- **Persistence is per browser**: cues/keyframes/settings in `localStorage`
+  (`boda:ceremonia-player:v2`), audio in IndexedDB. Never claim cross-device
+  sync; JSON export is the backup.
+- `renderCeremoniaPlayer(host)` keeps its single-argument signature so
+  `dashboard.js` only needs the `[data-ceremonia-player]` panel and one call.
+  The panel pauses playback when the user switches to another dashboard tab and
+  exposes `host._ceremoniaCleanup` for teardown.
+
+---
+
+## 11. Plaza / aforo y flujo (venue planner) — ALWAYS follow
+
+> Admin-only panel at `/dashboard/plaza`. It answers "how many fit, how many can
+> sit on the muret, and how long does the portón take" with the couple's own
+> measurements.
+
+- **The math is pure and tested** (`web/dashboard/src/venue/capacity.js`,
+  `tests/venue.test.mjs`): standing density (0.5 / 0.7 / 1.0 m² per person),
+  chair rows (seat width, row pitch, aisle), wall seats (0.55 m per person, one
+  or both sides), gate flow (one by one vs two abreast, seconds per group) and a
+  queue check against the arrival window. The panel only renders.
+- **Two abreast needs 2 × 0.45 m + 0.1 m of clear width** (~1.0 m); below that
+  the panel says it does not fit instead of pretending.
+- **The default time per group is an assumption, not a measurement**: 5 s per
+  person and 7 s per couple (40 % longer). Change it with the couple's real
+  greeting ritual.
+- **Satellite scale:** 50 ft = 15.24 m. On the El Faro capture that bar spans
+  ~210 px, so **1 m ≈ 13.8 px**; the "Escala del mapa" card converts any measured
+  span. Prefer Google Maps' own distance tool over pixel guesses.
+- **Storage is local** (`boda:venue-plan:v1`, plain config) and resetable; the
+  diagram is generated to scale from the same numbers (no hardcoded areas).
+- **Reception flow (Kiki):** `venue/flow.js` simulates the gate with greeters in
+  parallel, uniform arrivals over the window, and splits guests **left = francés**
+  / **right = español** by `frenchPercent`. The queue is deterministic
+  (`ceil(wait / service)` groups ahead), so "one Kiki vs two", "one by one vs
+  pairs" and "arrive over 10 or 30 minutes" are comparable. It is a model, not a
+  measurement: tune `secondsPerGroup` with the real greeting ritual.
+- **The ceremony radius follows the plaza:** if the caracol fills the ~16 m
+  width, `stage.radiusMeters` = 8 (path ≈ 154 m at 5.8 turns → 0.22 m/s over
+  11:44). Change it when the real space is measured.
+
+
 
 
 

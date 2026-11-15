@@ -38,3 +38,6 @@ users.json
 _inspect-*.mjs
 scripts/_inspect-*.mjs
 web/invitation/_inspect-*.mjs
+
+# Local ceremony audio extracted with ffmpeg (never published)
+tmp/ceremony-audio/

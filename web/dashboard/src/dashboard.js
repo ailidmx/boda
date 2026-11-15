@@ -95,13 +95,15 @@ import { renderGuestManager as renderGuestManagerTable } from "./guestTable.js";
 import { openGuestEditor as openGuestEditorModal, openCreateGuestModal as openCreateGuestModalModule } from "./guestFormModal.js";
 import { openDeleteConfirm as openDeleteConfirmModule, openSendInviteModal as openSendInviteModalModule } from "./guestModals.js";
 
-import { renderSummary } from "./summary.js";
+import { renderSummary, summaryVisibleForTab } from "./summary.js";
 import { renderCabinAssignments as renderCabinAssignmentsPanel } from "./cabinsPanel.js";
 import { renderThanksPanel as renderThanksPanelModule } from "./thanksPanel.js";
 import { renderChartsPanel as renderChartsPanelModule } from "./chartsPanel.js";
 import { renderProvidersPanel as renderProvidersPanelModule } from "./providersPanel.js";
 import { renderBudgetPanel as renderBudgetPanelModule } from "./budgetPanel.js";
 import { renderTimelinePanel as renderTimelinePanelModule } from "./timelinePanel.js";
+import { renderCeremoniaPlayer } from "./ceremoniaPlayer.js";
+import { renderVenuePanel } from "./venuePanel.js";
 
 import {
   getTabFromPath,
@@ -574,9 +576,20 @@ function computeSeatingStats() {
 }
 
 // Render the summary cards for the ACTIVE tab: the Mesas editor shows seating
-// stats; every other tab shows the default invitations + day cards.
+// stats, INVITADOS shows invitations + day cards, and every other tab hides the
+// summary entirely (those numbers belong to the guest list, not to Ceremonia,
+// Plaza, Presupuesto, etc.).
 function renderSummaryForTab() {
-  if (getActiveTab() === "tables") {
+  const tab = getActiveTab();
+  const summary = document.querySelector("[data-dashboard-summary]");
+  const visible = summaryVisibleForTab(tab);
+  if (summary) {
+    summary.classList.toggle("dashboard-summary--hidden", !visible);
+    if (!visible) summary.replaceChildren();
+  }
+  if (!visible) return;
+
+  if (tab === "tables") {
     renderSummary({ seating: computeSeatingStats() });
     return;
   }
@@ -1817,6 +1830,16 @@ function renderDashboard(app) {
         </div>
       </section>
 
+      <!-- ── Panel: Ceremonia Player (admin only) ── -->
+      <section class="dashboard-panel" data-dashboard-panel="ceremonia">
+        <div class="dashboard-section" data-ceremonia-player></div>
+      </section>
+
+      <!-- ── Panel: Plaza / aforo y flujo (admin only) ── -->
+      <section class="dashboard-panel" data-dashboard-panel="plaza">
+        <div class="dashboard-section" data-venue-plan></div>
+      </section>
+
       <!-- ── Panel: Analytics ── -->
       <section class="dashboard-panel" data-dashboard-panel="analytics">
         <div class="dashboard-section">
@@ -1997,6 +2020,8 @@ function renderDashboard(app) {
   renderBudgetPanel();
   renderProvidersPanel();
   renderTimelinePanel();
+  renderCeremoniaPlayer(app.querySelector("[data-ceremonia-player]"));
+  renderVenuePanel(app.querySelector("[data-venue-plan]"));
   renderCardVotesPanel();
   renderGuisoRankingsPanel();
   renderSongRequestsPanel();

@@ -182,6 +182,12 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
+
+  // The summary belongs to INVITADOS and MESAS only. `display: grid` above
+  // would override the HTML `hidden` attribute, hence this explicit class.
+  &--hidden {
+    display: none;
+  }
 }
 
 .dashboard-summary-card,
