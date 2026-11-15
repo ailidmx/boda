@@ -102,6 +102,7 @@ import { renderChartsPanel as renderChartsPanelModule } from "./chartsPanel.js";
 import { renderProvidersPanel as renderProvidersPanelModule } from "./providersPanel.js";
 import { renderBudgetPanel as renderBudgetPanelModule } from "./budgetPanel.js";
 import { renderTimelinePanel as renderTimelinePanelModule } from "./timelinePanel.js";
+import { renderCeremoniaPlayer } from "./ceremoniaPlayer.js";
 
 import {
   getTabFromPath,
@@ -1817,6 +1818,11 @@ function renderDashboard(app) {
         </div>
       </section>
 
+      <!-- ── Panel: Ceremonia Player (admin only) ── -->
+      <section class="dashboard-panel" data-dashboard-panel="ceremonia">
+        <div class="dashboard-section" data-ceremonia-player></div>
+      </section>
+
       <!-- ── Panel: Analytics ── -->
       <section class="dashboard-panel" data-dashboard-panel="analytics">
         <div class="dashboard-section">
@@ -1997,6 +2003,7 @@ function renderDashboard(app) {
   renderBudgetPanel();
   renderProvidersPanel();
   renderTimelinePanel();
+  renderCeremoniaPlayer(app.querySelector("[data-ceremonia-player]"));
   renderCardVotesPanel();
   renderGuisoRankingsPanel();
   renderSongRequestsPanel();
