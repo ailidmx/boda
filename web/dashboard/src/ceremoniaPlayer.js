@@ -42,6 +42,15 @@ const PREVIOUS_KEYS = [
   "boda:ceremonia-player:v2",
   "boda:ceremonia-player:v1",
 ];
+
+// The couple's own copy of the ceremony track, shipped with the dashboard so
+// the panel already has the real audio (and the real duration) on first open.
+// An imported file always wins and is stored per browser in IndexedDB.
+const DEFAULT_AUDIO = {
+  src: "audio/ceremonia.mp3",
+  name: "CEREMONIA.mp3 · incluido",
+};
+
 const SAMPLES = 360;
 const DANCERS = [
   { key: "david", label: "David", color: "#3b82f6", emoji: "🤵🏽" },
@@ -86,6 +95,7 @@ export function renderCeremoniaPlayer(host) {
 
   let state = readStoredState();
   let objectUrl = null;
+  let importedAudio = false;
   let syntheticTime = 0;
   let syntheticLast = 0;
   let playing = false;
@@ -117,14 +127,15 @@ export function renderCeremoniaPlayer(host) {
         <input data-file type="file" accept="audio/*,.mp3,.wav,.m4a,.aac,.ogg" hidden>
       </label>
       <button type="button" class="dashboard-button ceremonia__danger" data-remove-audio>
-        Quitar audio
+        Quitar audio importado
       </button>
       <span class="ceremonia__badge" data-mode>Sin audio · reloj de ensayo</span>
       <span data-audio-name></span>
     </div>
     <p class="ceremonia__note">
-      Usa un archivo que ya tengas legalmente (MP3/WAV/M4A). No se descarga de Spotify
-      ni de YouTube y no se sube a Firebase: se guarda solo en este navegador.
+      El panel abre con el <strong>audio de la ceremonia incluido</strong>. Si quieres
+      usar otro archivo (o el mismo en tu teléfono), impórtalo: se guarda solo en ese
+      navegador y tiene prioridad sobre el incluido. No se sube a Firebase.
     </p>
 
     <svg class="ceremonia__stage" data-stage viewBox="0 0 360 340" role="img"
@@ -322,9 +333,11 @@ export function renderCeremoniaPlayer(host) {
 
   function setMode() {
     const withAudio = hasAudio();
-    modeBadge.textContent = withAudio
-      ? "Audio local · reloj real"
-      : "Sin audio · reloj de ensayo";
+    modeBadge.textContent = !withAudio
+      ? "Sin audio · reloj de ensayo"
+      : importedAudio
+        ? "Audio importado · reloj real"
+        : "Audio de la ceremonia · reloj real";
     modeBadge.classList.toggle("ceremonia__badge--warn", !withAudio);
   }
 
@@ -620,10 +633,26 @@ export function renderCeremoniaPlayer(host) {
   async function attachAudio(record) {
     if (objectUrl) URL.revokeObjectURL(objectUrl);
     objectUrl = URL.createObjectURL(record.blob);
+    importedAudio = true;
     audio.src = objectUrl;
     audio.playbackRate = state.settings.rate;
     audio.loop = state.settings.loop;
     audioNameEl.textContent = `${record.name} · ${formatClock(record.duration || 0)}`;
+    setMode();
+    updateDurationControl();
+  }
+
+  /** Fall back to the track shipped with the dashboard (no IndexedDB needed). */
+  function attachDefaultAudio() {
+    if (objectUrl) {
+      URL.revokeObjectURL(objectUrl);
+      objectUrl = null;
+    }
+    importedAudio = false;
+    audio.src = DEFAULT_AUDIO.src;
+    audio.playbackRate = state.settings.rate;
+    audio.loop = state.settings.loop;
+    audioNameEl.textContent = DEFAULT_AUDIO.name;
     setMode();
     updateDurationControl();
   }
@@ -661,18 +690,17 @@ export function renderCeremoniaPlayer(host) {
   async function removeAudio() {
     stop();
     audio.pause();
-    audio.removeAttribute("src");
-    audio.load();
     if (objectUrl) {
       URL.revokeObjectURL(objectUrl);
       objectUrl = null;
     }
     await clearAudio();
-    audioNameEl.textContent = "";
-    setMode();
-    updateDurationControl();
+    // Revert to the track that ships with the dashboard instead of silence.
+    attachDefaultAudio();
     draw();
-    setStatus("Audio quitado de este navegador. Los cues y keyframes se conservan.");
+    setStatus(
+      "Audio importado quitado. Se usa el audio de la ceremonia incluido; los cues y keyframes se conservan.",
+    );
   }
 
   // ── Cues ────────────────────────────────────────────────────────────────
@@ -1221,7 +1249,15 @@ export function renderCeremoniaPlayer(host) {
     "error",
     () => {
       if (!hasAudio()) return;
-      setStatus("No se pudo cargar el archivo de audio importado.");
+      if (importedAudio) {
+        setStatus("No se pudo cargar el audio importado.");
+      } else {
+        audioNameEl.textContent = "";
+        audio.removeAttribute("src");
+        setStatus("No se pudo cargar el audio incluido de la ceremonia.");
+        setMode();
+        updateDurationControl();
+      }
       stop();
     },
     listens,
@@ -1252,6 +1288,9 @@ export function renderCeremoniaPlayer(host) {
   setMode();
   setPlayLabel();
 
+  // Attach the bundled track immediately so the panel never opens silent; an
+  // imported file (IndexedDB) replaces it if this browser has one.
+  attachDefaultAudio();
   loadAudio()
     .then(async (record) => {
       if (!record?.blob) return;
@@ -1261,7 +1300,7 @@ export function renderCeremoniaPlayer(host) {
       setStatus(`Audio restaurado en este navegador: ${record.name}.`);
     })
     .catch(() => {
-      setStatus("No se pudo restaurar el audio guardado en este navegador.");
+      /* no imported file available: the bundled track stays */
     });
 
   host._ceremoniaCleanup = () => {
