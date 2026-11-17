@@ -36,6 +36,15 @@ import {
   spiralPath,
   spiralPoint,
 } from "./ceremonia/motion.js";
+import {
+  MAPS_AREA_M2,
+  MAPS_PERIMETER_M,
+  TERRACE_POLYGON,
+  TOWER_DIAMETER_M,
+  fitTransform,
+  polygonCentroid,
+} from "./ceremonia/space.js";
+
 
 const STORAGE_KEY = "boda:ceremonia-player:v4";
 const PREVIOUS_KEYS = [
@@ -158,10 +167,28 @@ export function renderCeremoniaPlayer(host) {
       <g data-paths></g>
       <g data-traces></g>
       <g data-people></g>
-      <text x="180" y="328" text-anchor="middle" fill="#64748b" font-size="10">
+      <line x1="180" y1="172" x2="290" y2="172" stroke="#0f766e" stroke-width="1"
+            stroke-dasharray="3 3" aria-hidden="true"/>
+      <text x="235" y="168" text-anchor="middle" fill="#0f766e" font-size="9">R 5 m</text>
+      <g data-stage-scale transform="translate(228 320)" fill="#334155" font-size="8">
+        <line x1="0" y1="0" x2="110" y2="0" stroke="#334155" stroke-width="1.4"/>
+        <line x1="0" y1="-3" x2="0" y2="3" stroke="#334155" stroke-width="1.4"/>
+        <line x1="110" y1="-3" x2="110" y2="3" stroke="#334155" stroke-width="1.4"/>
+        <text x="55" y="-4" text-anchor="middle">5 m</text>
+      </g>
+      <text x="8" y="328" text-anchor="start" fill="#64748b" font-size="10">
         Invitados alrededor · Pierre en el sector FR
       </text>
     </svg>
+
+    <h3>Plano del espacio · medido en Google Maps</h3>
+    <p class="ceremonia__note">
+      Polígono real de la terraza: <strong>182.8 m²</strong> y <strong>51.2 m</strong> de
+      perímetro. El círculo de baile mide <strong>10 m de diámetro</strong> (radio 5 m);
+      su centro es provisional hasta que marquemos el punto exacto en el suelo.
+    </p>
+    <svg class="ceremonia__stage" data-space viewBox="0 0 360 300" role="img"
+         aria-label="Plano a escala de la terraza de El Faro, el círculo de baile de 10 metros y la torre"></svg>
 
     <div class="ceremonia__bar ceremonia__bar--between">
       <span>🔵 David · 🟠 Aydé</span>
@@ -433,6 +460,172 @@ export function renderCeremoniaPlayer(host) {
       label.textContent = dancer.label;
       dots.push({ group, spin });
     });
+
+    drawSpacePlan();
+  }
+
+  /** To-scale plan of the measured terrace, the dance circle and the tower. */
+  function drawSpacePlan() {
+    const svg = q("[data-space]");
+    if (!svg) return;
+    const W = 360;
+    const H = 300;
+    const pad = 34;
+    const fit = fitTransform(TERRACE_POLYGON, W, H, pad);
+    const toX = (u) => u * fit.scale + fit.offsetX;
+    const toY = (v) => v * fit.scale + fit.offsetY;
+    const center = polygonCentroid(TERRACE_POLYGON);
+    const cx = toX(center.x);
+    const cy = toY(center.y);
+    const radiusPx = state.stage.radiusMeters * fit.scale;
+
+    const ns = "http://www.w3.org/2000/svg";
+    const make = (tag, attrs, parent = svg) => {
+      const node = document.createElementNS(ns, tag);
+      Object.entries(attrs).forEach(([key, value]) => node.setAttribute(key, value));
+      parent.appendChild(node);
+      return node;
+    };
+    const label = (x, y, value, attrs = {}) => {
+      const node = make("text", { x, y, "font-size": "8", fill: "#475569", ...attrs });
+      node.textContent = value;
+      return node;
+    };
+
+    svg.replaceChildren();
+
+    // Measured terrace.
+    make("polygon", {
+      points: TERRACE_POLYGON.map(
+        ([u, v]) => `${toX(u).toFixed(1)},${toY(v).toFixed(1)}`,
+      ).join(" "),
+      fill: "#f3efe7",
+      stroke: "#94a3b8",
+      "stroke-width": "1.4",
+    });
+
+    // Dance circle (the radius actually configured in the panel).
+    make("circle", {
+      cx,
+      cy,
+      r: radiusPx,
+      fill: "#ffffff",
+      "fill-opacity": "0.4",
+      stroke: "#0f766e",
+      "stroke-width": "1.2",
+      "stroke-dasharray": "4 4",
+    });
+
+    // The real spiral, scaled to the circle.
+    const spiralScale = radiusPx / 110;
+    const spiral = make("g", {
+      transform:
+        `translate(${cx.toFixed(1)} ${cy.toFixed(1)}) ` +
+        `scale(${spiralScale.toFixed(4)}) translate(-180 -172)`,
+      fill: "none",
+    });
+    DANCERS.forEach((dancer, person) => {
+      make(
+        "path",
+        {
+          d: spiralPath(person, state.turns, 240, state.dancers[dancer.key].handedness),
+          stroke: dancer.color,
+          "stroke-width": (1.3 / spiralScale).toFixed(2),
+          "stroke-opacity": "0.5",
+        },
+        spiral,
+      );
+    });
+
+    // Tower at its measured position (0, 0) → up = east.
+    const towerX = toX(0);
+    const towerY = toY(0);
+    make("circle", {
+      cx: towerX,
+      cy: towerY,
+      r: (TOWER_DIAMETER_M / 2) * fit.scale,
+      fill: "#1f2937",
+    });
+    label(towerX + (TOWER_DIAMETER_M / 2) * fit.scale + 4, towerY + 3, "TORRE", {
+      "font-size": "9",
+      fill: "#1f2937",
+      "font-weight": "bold",
+    });
+
+    // FR / ES sectors around the circle.
+    label(cx - radiusPx - 5, cy + 3, "FR", {
+      "text-anchor": "end",
+      "font-size": "10",
+      fill: "#2563eb",
+      "font-weight": "bold",
+    });
+    label(cx + radiusPx + 5, cy + 3, "ES", {
+      "font-size": "10",
+      fill: "#15803d",
+      "font-weight": "bold",
+    });
+
+    // Width dimension (top).
+    const xs = TERRACE_POLYGON.map(([u]) => u);
+    const ys = TERRACE_POLYGON.map(([, v]) => v);
+    const minX = Math.min(...xs);
+    const maxX = Math.max(...xs);
+    const minY = Math.min(...ys);
+    const maxY = Math.max(...ys);
+    const dimY = toY(minY) - 10;
+    make("line", {
+      x1: toX(minX),
+      y1: dimY,
+      x2: toX(maxX),
+      y2: dimY,
+      stroke: "#94a3b8",
+      "stroke-width": "0.8",
+    });
+    make("line", { x1: toX(minX), y1: dimY - 3, x2: toX(minX), y2: dimY + 3, stroke: "#94a3b8" });
+    make("line", { x1: toX(maxX), y1: dimY - 3, x2: toX(maxX), y2: dimY + 3, stroke: "#94a3b8" });
+    label((toX(minX) + toX(maxX)) / 2, dimY - 3, `${(maxX - minX).toFixed(1)} m`, {
+      "text-anchor": "middle",
+    });
+
+    // Height dimension (right).
+    const dimX = toX(maxX) + 10;
+    make("line", {
+      x1: dimX,
+      y1: toY(minY),
+      x2: dimX,
+      y2: toY(maxY),
+      stroke: "#94a3b8",
+      "stroke-width": "0.8",
+    });
+    const heightLabel = label(dimX + 2, (toY(minY) + toY(maxY)) / 2, `${(maxY - minY).toFixed(1)} m`, {
+      "font-size": "8",
+    });
+    heightLabel.setAttribute("transform", `rotate(-90 ${dimX + 8} ${(toY(minY) + toY(maxY)) / 2})`);
+
+    // Metrics + scale bar.
+    label(
+      8,
+      16,
+      `${MAPS_AREA_M2.toFixed(1)} m² · perímetro ${MAPS_PERIMETER_M.toFixed(1)} m`,
+      { "font-size": "9", fill: "#334155" },
+    );
+    label(cx, cy + radiusPx + 14, `círculo Ø ${(state.stage.radiusMeters * 2).toFixed(1)} m`, {
+      "text-anchor": "middle",
+      "font-size": "8",
+      fill: "#0f766e",
+    });
+
+    const bar = make("g", { transform: `translate(20 ${H - 16})`, fill: "#334155" });
+    make("line", { x1: 0, y1: 0, x2: 5 * fit.scale, y2: 0, stroke: "#334155", "stroke-width": "1.4" }, bar);
+    make("line", { x1: 0, y1: -3, x2: 0, y2: 3, stroke: "#334155", "stroke-width": "1.4" }, bar);
+    make(
+      "line",
+      { x1: 5 * fit.scale, y1: -3, x2: 5 * fit.scale, y2: 3, stroke: "#334155", "stroke-width": "1.4" },
+      bar,
+    );
+    const barLabel = make("text", { x: (5 * fit.scale) / 2, y: -4, "font-size": "8", fill: "#334155", "text-anchor": "middle" }, bar);
+    barLabel.textContent = "5 m";
+    label(W - 8, H - 16, "E ↑", { "text-anchor": "end", "font-size": "9" });
   }
 
   function traceFor(person, progress) {
@@ -1052,6 +1245,7 @@ export function renderCeremoniaPlayer(host) {
       event.target.value = String(state.stage.radiusMeters);
       saveState();
       updateScaleInfo();
+      drawSpacePlan();
       draw();
     },
     listens,

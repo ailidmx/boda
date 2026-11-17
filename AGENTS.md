@@ -1533,6 +1533,11 @@ directly to `master` and push.
   and hold at the centre while the rest of the music plays. `solveWalkSeconds`
   fits the window to a target speed (96 m ÷ 0.35 m/s ≈ 4:35). Never stretch the
   walk over the full song "because the audio is long".
+- **The measured space lives in `ceremonia/space.js`.** `TERRACE_POLYGON` is the
+  couple's Google Maps polygon (1,967.99 ft² = **182.83 m²**, **51.24 m** of
+  perimeter), rotated so the tower is up (east). The plan SVG draws it to scale
+  with the dance circle, the tower footprint, FR/ES sectors, dimensions and a
+  5 m bar; the tests recompute area/perimeter and must stay within 2 % of Maps.
 - **Two independent motion timelines** (David / Aydé) with keyframes
   `{t, p, ease}`; `p` is normalized progress along the caracol (0 → 1). The
   default is the uniform walk; editing a keyframe is a deliberate choreography
