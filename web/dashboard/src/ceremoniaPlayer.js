@@ -30,6 +30,7 @@ import {
   detectMeetings,
   pathMetersTotal,
   progressAt,
+  ringMetrics,
   signedSpinDegrees,
   solveTurnsForSpeed,
   solveWalkSeconds,
@@ -167,9 +168,11 @@ export function renderCeremoniaPlayer(host) {
       <g data-paths></g>
       <g data-traces></g>
       <g data-people></g>
-      <line x1="180" y1="172" x2="290" y2="172" stroke="#0f766e" stroke-width="1"
+      <line x1="70" y1="172" x2="290" y2="172" stroke="#0f766e" stroke-width="1"
             stroke-dasharray="3 3" aria-hidden="true"/>
-      <text x="235" y="168" text-anchor="middle" fill="#0f766e" font-size="9">R 5 m</text>
+      <line x1="70" y1="168" x2="70" y2="176" stroke="#0f766e" stroke-width="1" aria-hidden="true"/>
+      <line x1="290" y1="168" x2="290" y2="176" stroke="#0f766e" stroke-width="1" aria-hidden="true"/>
+      <text x="180" y="60" text-anchor="middle" fill="#0f766e" font-size="9">Ø 10 m</text>
       <g data-stage-scale transform="translate(228 320)" fill="#334155" font-size="8">
         <line x1="0" y1="0" x2="110" y2="0" stroke="#334155" stroke-width="1.4"/>
         <line x1="0" y1="-3" x2="0" y2="3" stroke="#334155" stroke-width="1.4"/>
@@ -189,6 +192,13 @@ export function renderCeremoniaPlayer(host) {
     </p>
     <svg class="ceremonia__stage" data-space viewBox="0 0 360 300" role="img"
          aria-label="Plano a escala de la terraza de El Faro, el círculo de baile de 10 metros y la torre"></svg>
+
+    <h3>Vueltas del caracol · metros por vuelta</h3>
+    <p class="ceremonia__note">
+      Cada vuelta es más corta que la anterior. El <strong>paso</strong> es la
+      diferencia de radio con la vuelta siguiente.
+    </p>
+    <div data-rings class="ceremonia__rings"></div>
 
     <div class="ceremonia__bar ceremonia__bar--between">
       <span>🔵 David · 🟠 Aydé</span>
@@ -260,6 +270,9 @@ export function renderCeremoniaPlayer(host) {
           </label>
           <label>Caminata (s)
             <input data-walk type="number" min="10" max="3600" step="5" style="width:80px">
+          </label>
+          <label>Inicio (s)
+            <input data-start type="number" min="0" max="3600" step="5" style="width:80px">
           </label>
           <span class="ceremonia__cue-kind" data-walk-hint></span>
         </div>
@@ -462,6 +475,7 @@ export function renderCeremoniaPlayer(host) {
     });
 
     drawSpacePlan();
+    renderRings();
   }
 
   /** To-scale plan of the measured terrace, the dance circle and the tower. */
@@ -628,6 +642,36 @@ export function renderCeremoniaPlayer(host) {
     label(W - 8, H - 16, "E ↑", { "text-anchor": "end", "font-size": "9" });
   }
 
+  /** Table: meters walked on each lap and the radial gap to the next ring. */
+  function renderRings() {
+    const rows = ringMetrics(state.turns, state.stage.radiusMeters);
+    const box = q("[data-rings]");
+    if (!box) return;
+    const total = rows.reduce((sum, row) => sum + row.meters, 0);
+    box.innerHTML = `
+      <table class="ceremonia__table">
+        <thead>
+          <tr><th>Vuelta</th><th>Radio (m)</th><th>Metros a caminar</th><th>Paso (m)</th></tr>
+        </thead>
+        <tbody>
+          ${rows
+            .map(
+              (row) => `<tr>
+                <td>${row.lap}</td>
+                <td>${row.fromM.toFixed(1)} → ${row.toM.toFixed(1)}</td>
+                <td>${row.meters.toFixed(1)}</td>
+                <td>${row.stepM.toFixed(2)}</td>
+              </tr>`,
+            )
+            .join("")}
+        </tbody>
+        <tfoot>
+          <tr><td colspan="2">Total del caracol</td><td>${total.toFixed(1)} m</td><td></td></tr>
+        </tfoot>
+      </table>
+    `;
+  }
+
   function traceFor(person, progress) {
     const points = spiralPoints[person];
     if (!points.length) return "";
@@ -682,7 +726,8 @@ export function renderCeremoniaPlayer(host) {
   /** Distancia, velocidad media y giros sobre sí, dentro de la ventana de caminata. */
   function updateScaleInfo() {
     const { radiusMeters, bodyRadiusMeters } = state.stage;
-    const windowSeconds = Math.max(1, Math.min(state.stage.walkSeconds, state.duration));
+    const start = Math.max(0, Math.min(state.stage.startSeconds, state.duration - 1));
+    const windowSeconds = Math.max(1, Math.min(state.stage.walkSeconds, state.duration - start));
     const totalMeters = pathMetersTotal(state.turns, radiusMeters);
     const speed = totalMeters / windowSeconds;
     const spins = bodyRadiusMeters > 0 ? totalMeters / (2 * Math.PI * bodyRadiusMeters) : 0;
@@ -693,15 +738,18 @@ export function renderCeremoniaPlayer(host) {
           ? " · demasiado rápido: alarga la caminata"
           : " · paso humano";
     q("[data-scale-info]").textContent =
-      `Recorrido ${totalMeters.toFixed(1)} m en ${formatClock(windowSeconds)} · ` +
-      `${speed.toFixed(2)} m/s · ${spins.toFixed(0)} giros sobre sí` +
-      ` (${state.turns.toFixed(1)} vueltas)${verdict}`;
+      `Recorrido ${totalMeters.toFixed(1)} m de ${formatClock(start)} a ` +
+      `${formatClock(start + windowSeconds)} · ${speed.toFixed(2)} m/s · ` +
+      `${spins.toFixed(0)} giros sobre sí (${state.turns.toFixed(1)} vueltas)${verdict}`;
   }
 
   function updateWalkControl() {
-    const walk = Math.max(1, Math.min(state.stage.walkSeconds, state.duration));
+    const start = Math.max(0, Math.min(state.stage.startSeconds, state.duration - 1));
+    const walk = Math.max(1, Math.min(state.stage.walkSeconds, state.duration - start));
     q("[data-walk]").value = String(Math.round(walk));
-    q("[data-walk-hint]").textContent = `${formatClock(walk)} de ${formatClock(state.duration)}`;
+    q("[data-start]").value = String(Math.round(start));
+    q("[data-walk-hint]").textContent =
+      `${formatClock(start)} → ${formatClock(start + walk)} de ${formatClock(state.duration)}`;
   }
 
   /** Both dancers walk the spiral at constant linear speed, inside the window. */
@@ -710,11 +758,13 @@ export function renderCeremoniaPlayer(host) {
       state.duration,
       state.turns,
       state.stage.walkSeconds,
+      state.stage.startSeconds,
     );
     state.dancers.ayde.keyframes = walkingKeyframes(
       state.duration,
       state.turns,
       state.stage.walkSeconds,
+      state.stage.startSeconds,
     );
     saveState();
     renderKeyframes("david");
@@ -836,7 +886,11 @@ export function renderCeremoniaPlayer(host) {
         `Duración real del audio: ${formatClock(state.duration)}. La timeline se reescaló proporcionalmente.`,
       );
     }
-    state.stage.walkSeconds = Math.min(state.stage.walkSeconds, state.duration);
+    state.stage.startSeconds = Math.min(state.stage.startSeconds, state.duration - 1);
+    state.stage.walkSeconds = Math.min(
+      state.stage.walkSeconds,
+      state.duration - state.stage.startSeconds,
+    );
     updateDurationControl();
     updateWalkControl();
     q("[data-total]").textContent = formatClock(state.duration);
@@ -1246,6 +1300,7 @@ export function renderCeremoniaPlayer(host) {
       saveState();
       updateScaleInfo();
       drawSpacePlan();
+      renderRings();
       draw();
     },
     listens,
@@ -1295,11 +1350,36 @@ export function renderCeremoniaPlayer(host) {
       const value = Number(event.target.value);
       state.stage.walkSeconds = Math.max(
         10,
-        Math.min(Number.isFinite(value) ? value : 270, state.duration),
+        Math.min(
+          Number.isFinite(value) ? value : 270,
+          state.duration - state.stage.startSeconds,
+        ),
       );
       resetWalking(false);
       setStatus(
-        `Ventana de caminata: ${formatClock(state.stage.walkSeconds)} (de ${formatClock(state.duration)}).`,
+        `Ventana de caminata: ${formatClock(state.stage.walkSeconds)} ` +
+          `desde ${formatClock(state.stage.startSeconds)}.`,
+      );
+    },
+    listens,
+  );
+
+  q("[data-start]").addEventListener(
+    "change",
+    (event) => {
+      const value = Number(event.target.value);
+      state.stage.startSeconds = Math.max(
+        0,
+        Math.min(Number.isFinite(value) ? value : 255, state.duration - 10),
+      );
+      state.stage.walkSeconds = Math.min(
+        state.stage.walkSeconds,
+        state.duration - state.stage.startSeconds,
+      );
+      resetWalking(false);
+      setStatus(
+        `Empiezan a caminar a las ${formatClock(state.stage.startSeconds)} ` +
+          `(quietos antes).`,
       );
     },
     listens,
@@ -1317,7 +1397,10 @@ export function renderCeremoniaPlayer(host) {
         setStatus("No se pudo calcular: revisa radio y velocidad objetivo.");
         return;
       }
-      state.stage.walkSeconds = Math.max(10, Math.min(seconds, state.duration));
+      state.stage.walkSeconds = Math.max(
+        10,
+        Math.min(seconds, state.duration - state.stage.startSeconds),
+      );
       resetWalking(false);
       setStatus(
         `Caminata ajustada a ${formatClock(state.stage.walkSeconds)} para ${state.stage.targetSpeedMps} m/s.`,

@@ -20,6 +20,7 @@ import {
   progressAt,
   progressForArcFraction,
   arcLengthPx,
+  ringMetrics,
   solveTurnsForSpeed,
   solveWalkSeconds,
   sortKeyframes,
@@ -164,14 +165,15 @@ test("a v3 state keeps a duration the human chose on purpose", () => {
   assert.ok(state.dancers.ayde.keyframes.length >= 20, "motion upgraded to uniform");
 });
 
-test("both dancers start moving from the first seconds", () => {
+test("they stand still until 4:15 and then walk", () => {
   const state = sanitizeChoreography(null);
   const david = (t) => progressAt(state.dancers.david.keyframes, t);
   const ayde = (t) => progressAt(state.dancers.ayde.keyframes, t);
   for (const at of [david, ayde]) {
-    assert.ok(at(10) > 0, "must move within the first 10 s");
-    assert.ok(at(60) > at(10), "progress must keep growing");
-    assert.ok(at(704) === 1, "must reach the center at the end");
+    assert.equal(at(0), 0);
+    assert.equal(at(254), 0, "still before the start");
+    assert.ok(at(300) > 0, "moving after 4:15");
+    assert.equal(at(704), 1, "reaches the centre");
   }
 });
 
@@ -192,7 +194,7 @@ test("the v2 artificial 8% hold on Aydé is repaired", () => {
   };
   const state = sanitizeChoreography(legacy);
   assert.ok(state.dancers.ayde.keyframes.length >= 20, "uniform walk replaces it");
-  assert.ok(progressAt(state.dancers.ayde.keyframes, 10) > 0);
+  assert.ok(progressAt(state.dancers.ayde.keyframes, 300) > 0);
 });
 
 test("rescale keeps the shape and clamps cues to the new end", () => {
@@ -460,16 +462,19 @@ test("solveWalkSeconds finds the window for a target speed", () => {
   assert.ok(Math.abs(seconds - 274) < 5, `seconds ${seconds}`);
 });
 
-test("defaults: 5 m radius and a 4:30 walk, holding at the centre", () => {
+test("defaults: 5 m radius, a 4:15 start and a 4:30 walk", () => {
   const state = sanitizeChoreography(null);
   assert.equal(state.stage.radiusMeters, 5);
+  assert.equal(state.stage.startSeconds, 255);
   assert.equal(state.stage.walkSeconds, 270);
   const frames = state.dancers.david.keyframes;
-  assert.ok(frames.at(-1).t >= 703, "a hold keyframe reaches the end of the track");
+  assert.ok(
+    frames.some((f) => Math.abs(f.t - 255) < 0.01 && f.p === 0),
+    "a hold at 4:15",
+  );
+  assert.ok(Math.abs(frames[frames.length - 2].t - 525) < 1, "walk ends at 8:45");
+  assert.equal(frames.at(-1).t, 704);
   assert.equal(frames.at(-1).p, 1);
-  // The walk itself finishes at the window, not at 11:44.
-  const beforeHold = frames[frames.length - 2];
-  assert.ok(beforeHold.t <= 271, `walk ends at ${beforeHold.t}`);
 });
 
 test("a v4 timeline generated over the whole track migrates to the window", () => {
@@ -483,9 +488,19 @@ test("a v4 timeline generated over the whole track migrates to the window", () =
     dancers: { david: { keyframes: frames }, ayde: { keyframes: frames } },
   });
   assert.equal(state.version, SCHEMA_VERSION);
-  assert.equal(state.stage.walkSeconds, 270);
-  assert.ok(state.dancers.david.keyframes.at(-2).t <= 271);
+  assert.equal(state.stage.startSeconds, 255);
+  assert.ok(Math.abs(state.dancers.david.keyframes.at(-2).t - 525) < 1);
   assert.equal(state.dancers.david.keyframes.at(-1).t, 704);
+});
+
+test("each lap reports its meters and the radial gap to the next", () => {
+  const rows = ringMetrics(5.8, 5);
+  assert.equal(rows.length, 6);
+  const total = rows.reduce((sum, row) => sum + row.meters, 0);
+  assert.ok(Math.abs(total - 96.3) < 1, `total ${total}`);
+  assert.ok(rows.every((row) => row.meters > 0));
+  assert.ok(rows.every((row) => row.stepM > 0), "the rings get closer together");
+  assert.ok(rows[0].fromM > rows[0].toM);
 });
 
 

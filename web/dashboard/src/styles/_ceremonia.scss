@@ -123,6 +123,37 @@
   color: #991b1b;
 }
 
+// Lap table (meters per circle + radial gap).
+.ceremonia__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+  margin: 0.3rem 0 0.8rem;
+}
+
+.ceremonia__table th,
+.ceremonia__table td {
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0.25rem 0.4rem;
+  text-align: right;
+}
+
+.ceremonia__table th:first-child,
+.ceremonia__table td:first-child {
+  text-align: left;
+}
+
+.ceremonia__table thead th {
+  color: #475569;
+  font-weight: 600;
+  background: #f8fafc;
+}
+
+.ceremonia__table tfoot td {
+  font-weight: 600;
+  color: #0f172a;
+}
+
 // The shared .dashboard-button is roomy for a toolbar; inside this panel the
 // controls sit in dense rows, so keep them compact.
 .ceremonia .dashboard-button {

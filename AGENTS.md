@@ -1528,11 +1528,15 @@ directly to `master` and push.
   `stage.targetSpeedMps` drives "Ajustar vueltas" (`solveTurnsForSpeed`). The
   El Faro circle measures **10 m across → radius 5 m**, so the caracol is ~96 m
   at 5.8 turns: **11:44 at that distance would be 0.14 m/s**, a crawl.
-- **The walk is a window, not the whole track.** `stage.walkSeconds` (default
-  **270 s = 4:30**) sets how long the spiral walk lasts; the keyframes end there
-  and hold at the centre while the rest of the music plays. `solveWalkSeconds`
-  fits the window to a target speed (96 m ÷ 0.35 m/s ≈ 4:35). Never stretch the
-  walk over the full song "because the audio is long".
+- **The walk is a window with a start.** `stage.startSeconds` (default
+  **255 s = 4:15**) keeps both dancers still at the outer start; then
+  `stage.walkSeconds` (default **270 s = 4:30**, so 4:15 → 8:45) shapes the
+  keyframes, and they hold at the centre for the rest of the track.
+  `solveWalkSeconds` fits the window to a target speed (96 m ÷ 0.35 m/s ≈ 4:35).
+  Never stretch the walk over the full song "because the audio is long".
+- **Per-lap table.** `ringMetrics(turns, radius)` returns, for each turn, the
+  meters walked on that ring and the radial gap to the next one; the panel shows
+  it under the plan so the couple can see how the circles shrink.
 - **The measured space lives in `ceremonia/space.js`.** `TERRACE_POLYGON` is the
   couple's Google Maps polygon (1,967.99 ft² = **182.83 m²**, **51.24 m** of
   perimeter), rotated so the tower is up (east). The plan SVG draws it to scale

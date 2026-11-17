@@ -12,13 +12,16 @@
 
 import { HANDEDNESS, uniformSpeedKeyframes } from "./motion.js";
 
-export const SCHEMA_VERSION = 5;
+export const SCHEMA_VERSION = 6;
 
 /** Fallback timeline length when there is no audio file yet (704 s = 11:44). */
 export const DEFAULT_DURATION = 704;
 
 /** Default walk window: the caracol cannot fill 11:44 at a human pace. */
 export const DEFAULT_WALK_SECONDS = 270;
+
+/** Default start: the couple stands still until 4:15, then walks. */
+export const DEFAULT_START_SECONDS = 255;
 
 /** Spiral density (turns per caracol). Geometry, not a playback speed. */
 export const DEFAULT_TURNS = 5.8;
@@ -76,15 +79,26 @@ export function defaultKeyframes(duration = DEFAULT_DURATION, delay = 0) {
 }
 
 /**
- * Default timeline: constant LINEAR speed along the caracol (equal time slices
- * cover equal distance), over a walk window; after it the dancers hold at the
- * center while the music continues.
+ * Default timeline: stand still until `startSeconds`, walk at constant LINEAR
+ * speed for `walkSeconds`, then hold at the centre while the music continues.
  */
-export function walkingKeyframes(duration, turns, walkSeconds = DEFAULT_WALK_SECONDS) {
+export function walkingKeyframes(
+  duration,
+  turns,
+  walkSeconds = DEFAULT_WALK_SECONDS,
+  startSeconds = DEFAULT_START_SECONDS,
+) {
   const end = clamp(finite(duration, DEFAULT_DURATION), 1, LIMITS.duration);
-  const window = clamp(finite(walkSeconds, DEFAULT_WALK_SECONDS), 1, end);
-  const frames = uniformSpeedKeyframes(0, window, turns, 20);
-  if (window < end - 0.5) {
+  const start = clamp(finite(startSeconds, DEFAULT_START_SECONDS), 0, end);
+  const window = clamp(finite(walkSeconds, DEFAULT_WALK_SECONDS), 1, end - start);
+  const finish = clamp(start + window, start + 1, end);
+
+  const frames = [{ t: 0, p: 0, ease: "linear" }];
+  if (start > 0.05) frames.push({ t: Math.round(start * 100) / 100, p: 0, ease: "linear" });
+  // Skip the first sampled frame: it duplicates the hold at `start`.
+  const walk = uniformSpeedKeyframes(start, finish, turns, 20);
+  frames.push(...walk.slice(1));
+  if (finish < end - 0.5) {
     frames.push({ t: Math.round(end * 100) / 100, p: 1, ease: "linear" });
   }
   return frames;
@@ -124,6 +138,7 @@ export function createDefaults(duration = DEFAULT_DURATION) {
       bodyRadiusMeters: 0.28,
       targetSpeedMps: 0.35,
       walkSeconds: Math.min(DEFAULT_WALK_SECONDS, duration),
+      startSeconds: Math.min(DEFAULT_START_SECONDS, duration),
     },
   };
 }
@@ -201,6 +216,8 @@ export function sanitizeChoreography(raw) {
   const migrateMotion = sourceVersion < 4;
   // v4 → v5 introduced the walk window (the caracol cannot fill 11:44).
   const migrateWalk = sourceVersion < 5;
+  // v5 → v6 added the start (the couple stands still until 4:15).
+  const migrateStart = sourceVersion < 6;
 
   let duration = clamp(
     finite(source.duration, DEFAULT_DURATION),
@@ -225,7 +242,12 @@ export function sanitizeChoreography(raw) {
     1,
     duration,
   );
-  const walking = walkingKeyframes(duration, turns, walkSeconds);
+  let startSeconds = clamp(
+    finite(stageSource.startSeconds, Math.min(DEFAULT_START_SECONDS, duration)),
+    0,
+    duration,
+  );
+  const walking = walkingKeyframes(duration, turns, walkSeconds, startSeconds);
   const davidSource = dancersSource.david?.keyframes;
   const aydeSource = dancersSource.ayde?.keyframes;
   let davidKeyframes = sanitizeKeyframes(davidSource, duration, walking);
@@ -256,10 +278,10 @@ export function sanitizeChoreography(raw) {
   // (constant linear speed). Hand-edited timelines are left alone.
   if (migrateMotion) {
     if (looksLikeDefaultTimeline(davidSource, originalDuration)) {
-      davidKeyframes = walkingKeyframes(duration, turns, walkSeconds);
+      davidKeyframes = walkingKeyframes(duration, turns, walkSeconds, startSeconds);
     }
     if (looksLikeDefaultTimeline(aydeSource, originalDuration)) {
-      aydeKeyframes = walkingKeyframes(duration, turns, walkSeconds);
+      aydeKeyframes = walkingKeyframes(duration, turns, walkSeconds, startSeconds);
     }
   }
 
@@ -274,10 +296,28 @@ export function sanitizeChoreography(raw) {
       Math.abs(keyframes[keyframes.length - 1]?.t - duration) <= 0.06 &&
       keyframes[keyframes.length - 1]?.p === 1;
     if (generated(davidSource)) {
-      davidKeyframes = walkingKeyframes(duration, turns, walkSeconds);
+      davidKeyframes = walkingKeyframes(duration, turns, walkSeconds, startSeconds);
     }
     if (generated(aydeSource)) {
-      aydeKeyframes = walkingKeyframes(duration, turns, walkSeconds);
+      aydeKeyframes = walkingKeyframes(duration, turns, walkSeconds, startSeconds);
+    }
+  }
+
+  // v5 → v6: the walk started at 0; now it starts at `startSeconds` (4:15).
+  // Regenerate a generated timeline; hand-edited ones are respected.
+  if (migrateStart) {
+    const generated = (keyframes) =>
+      Array.isArray(keyframes) &&
+      keyframes.length >= 20 &&
+      keyframes[0]?.t === 0 &&
+      keyframes[0]?.p === 0 &&
+      Math.abs(keyframes[keyframes.length - 1]?.t - duration) <= 0.06 &&
+      keyframes[keyframes.length - 1]?.p === 1;
+    if (generated(davidSource)) {
+      davidKeyframes = walkingKeyframes(duration, turns, walkSeconds, startSeconds);
+    }
+    if (generated(aydeSource)) {
+      aydeKeyframes = walkingKeyframes(duration, turns, walkSeconds, startSeconds);
     }
   }
 
@@ -329,6 +369,7 @@ export function sanitizeChoreography(raw) {
       bodyRadiusMeters: clamp(finite(stageSource.bodyRadiusMeters, 0.28), 0.1, 1.2),
       targetSpeedMps: clamp(finite(stageSource.targetSpeedMps, 0.35), 0.02, 2),
       walkSeconds: clamp(walkSeconds, 1, duration),
+      startSeconds: clamp(startSeconds, 0, Math.max(0, duration - 1)),
     },
   };
 }

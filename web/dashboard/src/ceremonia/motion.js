@@ -282,6 +282,37 @@ export function solveWalkSeconds({ turns, radiusMeters, targetSpeedMps }) {
   return Math.round((path / target) * 10) / 10;
 }
 
+/**
+ * One row per lap of the caracol, for the "how far per circle" table:
+ * the meters walked on that ring and the radial gap to the next one
+ * (difference of radius).
+ */
+export function ringMetrics(turns, radiusMeters) {
+  const radius = Number(radiusMeters);
+  const totalTurns = Number(turns);
+  if (!(radius > 0) || !(totalTurns > 0)) return [];
+  const laps = Math.max(1, Math.ceil(totalTurns));
+  const rows = [];
+  for (let k = 0; k < laps; k += 1) {
+    const p0 = k / totalTurns;
+    if (p0 >= 1) break;
+    const p1 = Math.min(1, (k + 1) / totalTurns);
+    const meters =
+      ((arcLengthPx(p1, totalTurns) - arcLengthPx(p0, totalTurns)) * radius) /
+      STAGE.radius;
+    const fromM = radius * (1 - p0) ** 0.9;
+    const toM = radius * (1 - p1) ** 0.9;
+    rows.push({
+      lap: k + 1,
+      fromM: Math.round(fromM * 100) / 100,
+      toM: Math.round(toM * 100) / 100,
+      meters: Math.round(meters * 10) / 10,
+      stepM: Math.round((fromM - toM) * 100) / 100,
+    });
+  }
+  return rows;
+}
+
 /** Distance walked in real meters, given the real outer radius. */
 export function pathMetersAt(progress, turns, radiusMeters) {
   const radius = Number(radiusMeters);
