@@ -255,22 +255,31 @@ export function progressForArcFraction(fraction, turns) {
 }
 
 /**
- * Keyframes that produce a constant linear speed: equal time slices cover
- * equal arc length. The panel stores them like any other timeline, so the
- * couple can still edit (and lose the uniformity on purpose).
+ * Keyframes that produce a constant linear speed between `startSeconds` and
+ * `endSeconds`: equal time slices cover equal arc length.
  */
-export function uniformSpeedKeyframes(duration, turns, count = 20) {
-  const end = Math.max(1, Number(duration) || 1);
+export function uniformSpeedKeyframes(startSeconds, endSeconds, turns, count = 20) {
+  const start = Math.max(0, Number(startSeconds) || 0);
+  const end = Math.max(start + 1, Number(endSeconds) || start + 1);
   const steps = Math.max(4, Math.min(80, Math.round(count)));
   const frames = [];
   for (let k = 0; k <= steps; k += 1) {
     frames.push({
-      t: Math.round(((end * k) / steps) * 100) / 100,
+      t: Math.round((start + ((end - start) * k) / steps) * 100) / 100,
       p: Math.round(progressForArcFraction(k / steps, turns) * 10000) / 10000,
       ease: "linear",
     });
   }
   return frames;
+}
+
+/** Walk length (seconds) that makes `turns` last exactly at `targetSpeedMps`. */
+export function solveWalkSeconds({ turns, radiusMeters, targetSpeedMps }) {
+  const target = Number(targetSpeedMps);
+  if (!(target > 0)) return null;
+  const path = pathMetersTotal(turns, radiusMeters);
+  if (!(path > 0)) return null;
+  return Math.round((path / target) * 10) / 10;
 }
 
 /** Distance walked in real meters, given the real outer radius. */

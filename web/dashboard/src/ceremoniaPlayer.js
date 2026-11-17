@@ -32,6 +32,7 @@ import {
   progressAt,
   signedSpinDegrees,
   solveTurnsForSpeed,
+  solveWalkSeconds,
   spiralPath,
   spiralPoint,
 } from "./ceremonia/motion.js";
@@ -219,8 +220,9 @@ export function renderCeremoniaPlayer(host) {
       <div class="ceremonia__card">
         <h4>Escala real</h4>
         <p class="ceremonia__note">
-          Si el caracol ocupa el ancho de la plaza (≈16 m), el radio es <strong>8 m</strong>.
-          El radio real convierte el recorrido a metros; dime el espacio del venue y lo ajusto.
+          Diámetro medido en el mapa: <strong>10 m → radio 5 m</strong>. Con 11:44 de
+          música el caracol no se puede recorrer a paso humano: la caminata dura una
+          ventana y después se quedan en el centro.
         </p>
         <div class="ceremonia__bar">
           <label>Radio (m)
@@ -229,6 +231,13 @@ export function renderCeremoniaPlayer(host) {
           <label>Objetivo (m/s)
             <input data-target-speed type="number" min="0.02" max="2" step="0.01" style="width:74px">
           </label>
+          <label>Caminata (s)
+            <input data-walk type="number" min="10" max="3600" step="5" style="width:80px">
+          </label>
+          <span class="ceremonia__cue-kind" data-walk-hint></span>
+        </div>
+        <div class="ceremonia__bar">
+          <button type="button" class="dashboard-button" data-fit-walk>Ajustar caminata a la velocidad</button>
           <button type="button" class="dashboard-button" data-solve-turns>Ajustar vueltas</button>
         </div>
         <p class="ceremonia__note" data-scale-info></p>
@@ -477,28 +486,53 @@ export function renderCeremoniaPlayer(host) {
     });
   }
 
-  /** Distancia total, velocidad media y giros sobre sí, con la escala real. */
+  /** Distancia, velocidad media y giros sobre sí, dentro de la ventana de caminata. */
   function updateScaleInfo() {
     const { radiusMeters, bodyRadiusMeters } = state.stage;
+    const windowSeconds = Math.max(1, Math.min(state.stage.walkSeconds, state.duration));
     const totalMeters = pathMetersTotal(state.turns, radiusMeters);
-    const speed = state.duration > 0 ? totalMeters / state.duration : 0;
+    const speed = totalMeters / windowSeconds;
     const spins = bodyRadiusMeters > 0 ? totalMeters / (2 * Math.PI * bodyRadiusMeters) : 0;
+    const verdict =
+      speed < 0.2
+        ? " · demasiado lento: acorta la caminata"
+        : speed > 0.6
+          ? " · demasiado rápido: alarga la caminata"
+          : " · paso humano";
     q("[data-scale-info]").textContent =
-      `Recorrido ${totalMeters.toFixed(1)} m · ${speed.toFixed(2)} m/s · ` +
-      `${spins.toFixed(0)} giros sobre sí (${state.turns.toFixed(1)} vueltas al caracol).`;
+      `Recorrido ${totalMeters.toFixed(1)} m en ${formatClock(windowSeconds)} · ` +
+      `${speed.toFixed(2)} m/s · ${spins.toFixed(0)} giros sobre sí` +
+      ` (${state.turns.toFixed(1)} vueltas)${verdict}`;
   }
 
-  /** Both dancers walk the spiral at constant linear speed. */
+  function updateWalkControl() {
+    const walk = Math.max(1, Math.min(state.stage.walkSeconds, state.duration));
+    q("[data-walk]").value = String(Math.round(walk));
+    q("[data-walk-hint]").textContent = `${formatClock(walk)} de ${formatClock(state.duration)}`;
+  }
+
+  /** Both dancers walk the spiral at constant linear speed, inside the window. */
   function resetWalking(announce = true) {
-    state.dancers.david.keyframes = walkingKeyframes(state.duration, state.turns);
-    state.dancers.ayde.keyframes = walkingKeyframes(state.duration, state.turns);
+    state.dancers.david.keyframes = walkingKeyframes(
+      state.duration,
+      state.turns,
+      state.stage.walkSeconds,
+    );
+    state.dancers.ayde.keyframes = walkingKeyframes(
+      state.duration,
+      state.turns,
+      state.stage.walkSeconds,
+    );
     saveState();
     renderKeyframes("david");
     renderKeyframes("ayde");
     updateScaleInfo();
+    updateWalkControl();
     draw();
     if (announce) {
-      setStatus("Caminata uniforme recalculada: velocidad lineal constante.");
+      setStatus(
+        `Caminata recalculada: ${formatClock(state.stage.walkSeconds)} a velocidad lineal constante.`,
+      );
     }
   }
 
@@ -609,7 +643,9 @@ export function renderCeremoniaPlayer(host) {
         `Duración real del audio: ${formatClock(state.duration)}. La timeline se reescaló proporcionalmente.`,
       );
     }
+    state.stage.walkSeconds = Math.min(state.stage.walkSeconds, state.duration);
     updateDurationControl();
+    updateWalkControl();
     q("[data-total]").textContent = formatClock(state.duration);
     draw();
   }
@@ -912,6 +948,7 @@ export function renderCeremoniaPlayer(host) {
     });
     updateHandLabels();
     updateDurationControl();
+    updateWalkControl();
     updateScaleInfo();
     if (hasAudio()) audio.playbackRate = state.settings.rate;
     audio.loop = state.settings.loop;
@@ -1037,7 +1074,7 @@ export function renderCeremoniaPlayer(host) {
     "click",
     () => {
       const turns = solveTurnsForSpeed({
-        duration: state.duration,
+        duration: Math.min(state.stage.walkSeconds, state.duration),
         radiusMeters: state.stage.radiusMeters,
         targetSpeedMps: state.stage.targetSpeedMps,
       });
@@ -1057,6 +1094,43 @@ export function renderCeremoniaPlayer(host) {
   );
 
   q("[data-reset-walk]").addEventListener("click", () => resetWalking(true), listens);
+
+  q("[data-walk]").addEventListener(
+    "change",
+    (event) => {
+      const value = Number(event.target.value);
+      state.stage.walkSeconds = Math.max(
+        10,
+        Math.min(Number.isFinite(value) ? value : 270, state.duration),
+      );
+      resetWalking(false);
+      setStatus(
+        `Ventana de caminata: ${formatClock(state.stage.walkSeconds)} (de ${formatClock(state.duration)}).`,
+      );
+    },
+    listens,
+  );
+
+  q("[data-fit-walk]").addEventListener(
+    "click",
+    () => {
+      const seconds = solveWalkSeconds({
+        turns: state.turns,
+        radiusMeters: state.stage.radiusMeters,
+        targetSpeedMps: state.stage.targetSpeedMps,
+      });
+      if (!seconds) {
+        setStatus("No se pudo calcular: revisa radio y velocidad objetivo.");
+        return;
+      }
+      state.stage.walkSeconds = Math.max(10, Math.min(seconds, state.duration));
+      resetWalking(false);
+      setStatus(
+        `Caminata ajustada a ${formatClock(state.stage.walkSeconds)} para ${state.stage.targetSpeedMps} m/s.`,
+      );
+    },
+    listens,
+  );
 
   host.querySelectorAll("[data-hand]").forEach((select) => {
     select.addEventListener(

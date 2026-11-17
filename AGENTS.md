@@ -1525,9 +1525,14 @@ directly to `master` and push.
   small "nose" marker so the spin is readable; the name label sits OUTSIDE the
   rotating group so it stays upright.
 - **Real scale:** `stage.radiusMeters` converts the path to meters and
-  `stage.targetSpeedMps` drives "Ajustar vueltas" (`solveTurnsForSpeed`). At
-  4 m / 5.8 turns / 11:44 the walk is ~0.11 m/s, which is very slow: raise the
-  radius (or solve for 0.3–0.4 m/s) when the couple gives the real space.
+  `stage.targetSpeedMps` drives "Ajustar vueltas" (`solveTurnsForSpeed`). The
+  El Faro circle measures **10 m across → radius 5 m**, so the caracol is ~96 m
+  at 5.8 turns: **11:44 at that distance would be 0.14 m/s**, a crawl.
+- **The walk is a window, not the whole track.** `stage.walkSeconds` (default
+  **270 s = 4:30**) sets how long the spiral walk lasts; the keyframes end there
+  and hold at the centre while the rest of the music plays. `solveWalkSeconds`
+  fits the window to a target speed (96 m ÷ 0.35 m/s ≈ 4:35). Never stretch the
+  walk over the full song "because the audio is long".
 - **Two independent motion timelines** (David / Aydé) with keyframes
   `{t, p, ease}`; `p` is normalized progress along the caracol (0 → 1). The
   default is the uniform walk; editing a keyframe is a deliberate choreography

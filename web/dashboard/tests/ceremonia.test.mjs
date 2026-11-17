@@ -21,6 +21,7 @@ import {
   progressForArcFraction,
   arcLengthPx,
   solveTurnsForSpeed,
+  solveWalkSeconds,
   sortKeyframes,
   signedSpinDegrees,
   spiralPoint,
@@ -381,7 +382,7 @@ test("arc length is monotonic and its inverse round-trips", () => {
 });
 
 test("the default walk covers equal distance in equal time", () => {
-  const keyframes = uniformSpeedKeyframes(704, TURNS, 20);
+  const keyframes = uniformSpeedKeyframes(0, 704, TURNS, 20);
   const total = arcLengthPx(1, TURNS);
   const steps = [];
   for (let i = 1; i < keyframes.length; i += 1) {
@@ -397,7 +398,7 @@ test("the default walk covers equal distance in equal time", () => {
 });
 
 test("near the center the angular speed rises while the linear speed holds", () => {
-  const keyframes = uniformSpeedKeyframes(704, TURNS, 20);
+  const keyframes = uniformSpeedKeyframes(0, 704, TURNS, 20);
   const at = (t) => progressAt(keyframes, t);
   const speed = (t1, t2) => arcLengthPx(at(t2), TURNS) - arcLengthPx(at(t1), TURNS);
   const outer = speed(0, 35.2);
@@ -436,5 +437,56 @@ test("solving turns for a target speed lands within 5%", () => {
   const speed = pathMetersTotal(turns, 4) / 704;
   assert.ok(Math.abs(speed - 0.35) / 0.35 < 0.05, `speed ${speed}`);
 });
+
+// ── Walk window (the 10 m circle cannot fill 11:44) ──────────────────────
+test("the 10 m circle gives ~96 m and 11:44 would be 0.14 m/s", () => {
+  const path = pathMetersTotal(5.8, 5);
+  assert.ok(Math.abs(path - 95.9) < 1, `path ${path}`);
+  assert.ok(path / 704 < 0.15, "filling the whole track is a crawl");
+});
+
+test("a 4:30 walk window lands at a human pace", () => {
+  const path = pathMetersTotal(5.8, 5);
+  const speed = path / 270;
+  assert.ok(speed > 0.3 && speed < 0.4, `speed ${speed}`);
+});
+
+test("solveWalkSeconds finds the window for a target speed", () => {
+  const seconds = solveWalkSeconds({
+    turns: 5.8,
+    radiusMeters: 5,
+    targetSpeedMps: 0.35,
+  });
+  assert.ok(Math.abs(seconds - 274) < 5, `seconds ${seconds}`);
+});
+
+test("defaults: 5 m radius and a 4:30 walk, holding at the centre", () => {
+  const state = sanitizeChoreography(null);
+  assert.equal(state.stage.radiusMeters, 5);
+  assert.equal(state.stage.walkSeconds, 270);
+  const frames = state.dancers.david.keyframes;
+  assert.ok(frames.at(-1).t >= 703, "a hold keyframe reaches the end of the track");
+  assert.equal(frames.at(-1).p, 1);
+  // The walk itself finishes at the window, not at 11:44.
+  const beforeHold = frames[frames.length - 2];
+  assert.ok(beforeHold.t <= 271, `walk ends at ${beforeHold.t}`);
+});
+
+test("a v4 timeline generated over the whole track migrates to the window", () => {
+  const frames = [];
+  for (let i = 0; i <= 20; i += 1) {
+    frames.push({ t: Math.round((704 * i) / 20), p: i / 20, ease: "linear" });
+  }
+  const state = sanitizeChoreography({
+    version: 4,
+    duration: 704,
+    dancers: { david: { keyframes: frames }, ayde: { keyframes: frames } },
+  });
+  assert.equal(state.version, SCHEMA_VERSION);
+  assert.equal(state.stage.walkSeconds, 270);
+  assert.ok(state.dancers.david.keyframes.at(-2).t <= 271);
+  assert.equal(state.dancers.david.keyframes.at(-1).t, 704);
+});
+
 
 

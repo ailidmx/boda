@@ -62,10 +62,11 @@ Constraints:
    inside its own rotation group, with a small marker so the spin is visible;
    the head spins one turn per body circumference walked (`spinDegrees`), i.e.
    it rolls without slipping. The name label stays outside the rotation.
-9. **Real scale is data, not pixels.** `stage.radiusMeters` (default 4 m, to be
-   replaced with the venue measurement) converts the path to meters;
-   `stage.targetSpeedMps` feeds `solveTurnsForSpeed` so the couple can ask "walk
-   at 0.35 m/s" and get the number of turns that fills the track.
+9. **Real scale is data, not pixels.** `stage.radiusMeters` (the measured El Faro
+   circle is 10 m across → **5 m**) converts the path to meters;
+   `stage.targetSpeedMps` feeds `solveTurnsForSpeed`, and `stage.walkSeconds`
+   (default **270 s**) is the walk window — a ~96 m caracol cannot fill 11:44 at
+   a human pace, so the dancers hold at the centre afterwards.
 
 ## Consequences
 
