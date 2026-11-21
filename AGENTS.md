@@ -1589,6 +1589,13 @@ directly to `master` and push.
   span. Prefer Google Maps' own distance tool over pixel guesses.
 - **Storage is local** (`boda:venue-plan:v1`, plain config) and resetable; the
   diagram is generated to scale from the same numbers (no hardcoded areas).
+- **Grids grow with their rows.** All AG Grid tables use
+  `domLayout: "autoHeight"` (`data-grid/gridDefaults.js`) and the container has no
+  fixed height (`styles/_grid.scss`): the PAGE scrolls, never an inner ~60vh
+  viewport. If a table ever really needs a fixed viewport, pass
+  `overrides: { domLayout: "normal" }` and set the container height yourself.
+  Do not reintroduce `height: 100%` / `overflow: hidden` on
+  `.dashboard-data-grid` — it clips the rows.
 - **Reception flow (Kiki):** `venue/flow.js` simulates the gate with greeters in
   parallel, uniform arrivals over the window, and splits guests **left = francés**
   / **right = español** by `frenchPercent`. The queue is deterministic

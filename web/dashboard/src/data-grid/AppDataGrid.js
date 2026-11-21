@@ -58,9 +58,15 @@ export function createAppDataGrid({
   // element, plus our own sizing hook. Apply it once (idempotent).
   GRID_THEME_CLASS.split(/\s+/).forEach((cls) => container.classList.add(cls));
 
-  // AG Grid requires an explicit height (the container must be non-zero when
-  // the grid initialises). We take the container's current height if set.
-  if (!container.style.height) {
+  // AG Grid requires a non-zero container, but with the shared `autoHeight`
+  // layout it sizes itself to the rows. Only a caller that explicitly asks for
+  // a fixed viewport (`overrides.domLayout = "normal"`) gets the default height.
+  const domLayout = overrides.domLayout ?? "autoHeight";
+  if (domLayout === "autoHeight") {
+    container.style.height = "";
+    container.style.maxHeight = "none";
+    container.style.overflow = "visible";
+  } else if (!container.style.height) {
     container.style.height = getDefaultHeight();
   }
 
@@ -69,6 +75,7 @@ export function createAppDataGrid({
     ...base,
     columnDefs,
     rowData,
+    domLayout,
     ...(getRowId ? { getRowId } : {}),
     ...(onCellValueChanged ? { onCellValueChanged } : {}),
     ...overrides,

@@ -30,11 +30,16 @@
   --ag-row-height: 42px;
   --ag-header-height: 40px;
 
-  height: 100%;
+  // The grids grow with their rows: the PAGE scrolls, not an inner viewport.
+  // AG Grid runs with `domLayout: "autoHeight"` (see data-grid/gridDefaults.js),
+  // so no fixed height and no `overflow: hidden` here — otherwise the table is
+  // clipped to a viewport instead of showing every row.
+  height: auto;
+  max-height: none;
+  overflow: visible;
   width: 100%;
   border: 1px solid tokens.$border-light;
   border-radius: 0.5rem;
-  overflow: hidden;
 
   // Headers: clear, legible, subtly branded.
   .ag-header-cell-text {
@@ -68,10 +73,11 @@
   }
 
   // Empty-state overlay matches the dashboard empty text.
-  &.ag-overlay-no-rows-wrapper {
+  .ag-overlay-no-rows-wrapper {
     align-items: center;
     display: flex;
     justify-content: center;
+    min-height: 4rem;
     color: tokens.$ink-muted;
   }
 }

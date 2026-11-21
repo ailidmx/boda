@@ -41,7 +41,10 @@ export function baseGridOptions() {
   return {
     // Use the legacy CSS theme (see GRID_THEME_CLASS).
     theme: "legacy",
-    domLayout: "normal",
+    // Grow with the rows: the page scrolls, never an inner 60vh viewport.
+    // A caller that really wants a fixed viewport can pass domLayout: "normal"
+    // and set the container height itself.
+    domLayout: "autoHeight",
     suppressContextMenu: true,
     animateRows: false,
     // Header buttons / menus are Community-only by default; we keep the native
