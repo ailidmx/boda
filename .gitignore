@@ -41,3 +41,6 @@ web/invitation/_inspect-*.mjs
 
 # Local ceremony audio extracted with ffmpeg (never published)
 tmp/ceremony-audio/
+
+# Guest exports (personal data, never committed)
+tmp/guest-export/

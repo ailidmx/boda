@@ -6,6 +6,7 @@
   "scripts": {
     "build:all": "node scripts/build-all.mjs",
     "audio:extract": "node scripts/extract-ceremony-audio.mjs",
+    "guests:export": "node scripts/export-guests-csv.mjs",
     "dev:invitation": "npm --prefix web/invitation run dev",
     "dev:dashboard": "npm --prefix web/dashboard run dev",
     "dev:invitation:network": "npm --prefix web/invitation run dev:network",
@@ -34,6 +35,7 @@
     "eslint": "^9.39.5",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
+    "firebase-admin": "^14.2.0",
     "globals": "^15.15.0"
   }
 }
