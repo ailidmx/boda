@@ -6,6 +6,9 @@
  * (`gcloud auth application-default login`) or
  * `GOOGLE_APPLICATION_CREDENTIALS=/path/to/service-account.json`.
  *
+ * The flattening/CSV logic is shared with the dashboard button
+ * (`web/shared/guest-export.js`), so both produce the same columns.
+ *
  * Usage:
  *   node scripts/export-guests-csv.mjs                  # dry run: count + columns
  *   node scripts/export-guests-csv.mjs --execute        # writes tmp/guest-export/guests-*.csv
@@ -21,40 +24,14 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 
+import {
+  buildGuestCsv,
+  buildGuestTable,
+  guestCsvFileName,
+} from "../web/shared/guest-export.js";
+
 const PROJECT_ID = "boda-500805";
 const DATABASE_ID = "boda-us-central1";
-
-/** Columns that must appear first when present (the rest go alphabetically). */
-const PREFERRED = [
-  "docId",
-  "identity.firstName",
-  "identity.middleName",
-  "identity.lastName",
-  "identity.maternalLastName",
-  "identity.phone",
-  "identity.age",
-  "identity.gender",
-  "identity.isAdult",
-  "identity.lang",
-  "tagGroup",
-  "invitationGroup",
-  "table",
-  "hosting.cabin",
-  "hosting.room",
-  "hosting.xtraCabin",
-  "hosting.xtraRoom",
-  "rsvp.confirmCabin",
-  "rsvp.petanca",
-  "rsvp.needBalls",
-  "travelsByPlane",
-  "invitationSent",
-  "sent",
-  "isAdmin",
-  "messageAuthor",
-  "message",
-  "guestId",
-  "firebaseEmail",
-];
 
 function parseArgs(argv) {
   const args = { execute: false, collection: "guests" };
@@ -79,60 +56,6 @@ function parseArgs(argv) {
 function fail(message) {
   console.error(`\n✖ ${message}\n`);
   process.exit(1);
-}
-
-/** Firestore/JS values → a single flat string (never "[object Object]"). */
-function flatValue(value) {
-  if (value === null || value === undefined) return "";
-  if (typeof value === "string") return value;
-  if (typeof value === "number" || typeof value === "boolean") return String(value);
-  if (value instanceof Date) return value.toISOString();
-  if (typeof value.toDate === "function") {
-    try {
-      return value.toDate().toISOString();
-    } catch {
-      return "";
-    }
-  }
-  if (typeof value.latitude === "number" && typeof value.longitude === "number") {
-    return `${value.latitude},${value.longitude}`;
-  }
-  if (typeof value.path === "string") return value.path;
-  if (Array.isArray(value)) {
-    if (value.every((item) => item === null || typeof item !== "object")) {
-      return value.map((item) => flatValue(item)).join(" | ");
-    }
-    return JSON.stringify(value);
-  }
-  return JSON.stringify(value);
-}
-
-/** Nested objects become dotted columns: `rsvp.answers.friday`. */
-function flatten(value, prefix, out) {
-  if (value === null || value === undefined) return;
-  if (typeof value === "object" && !Array.isArray(value) && !value.toDate && !value.path) {
-    const entries = Object.entries(value);
-    if (!entries.length) {
-      out[prefix] = "";
-      return;
-    }
-    for (const [key, child] of entries) {
-      flatten(child, prefix ? `${prefix}.${key}` : key, out);
-    }
-    return;
-  }
-  out[prefix] = flatValue(value);
-}
-
-function csvCell(value) {
-  const text = value === undefined || value === null ? "" : String(value);
-  return /[",\n\r;]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
-}
-
-function orderColumns(keys) {
-  const preferred = PREFERRED.filter((key) => keys.includes(key));
-  const rest = keys.filter((key) => !preferred.includes(key)).sort((a, b) => a.localeCompare(b));
-  return [...preferred, ...rest];
 }
 
 async function main() {
@@ -162,35 +85,10 @@ async function main() {
     );
   }
 
-  const rows = [];
-  const keys = new Set();
-  snapshot.forEach((doc) => {
-    const row = { docId: doc.id };
-    const flat = {};
-    flatten(doc.data(), "", flat);
-    for (const [key, value] of Object.entries(flat)) {
-      // `id` is a real field in some documents; the Firestore doc id is `docId`.
-      row[key] = value;
-      keys.add(key);
-    }
-    keys.add("docId");
-    rows.push(row);
-  });
+  const records = [];
+  snapshot.forEach((doc) => records.push({ docId: doc.id, ...doc.data() }));
 
-  const columns = orderColumns([...keys]);
-  rows.sort((a, b) => {
-    const last = String(a["identity.lastName"] ?? "").localeCompare(
-      String(b["identity.lastName"] ?? ""),
-      "es",
-    );
-    if (last) return last;
-    const first = String(a["identity.firstName"] ?? "").localeCompare(
-      String(b["identity.firstName"] ?? ""),
-      "es",
-    );
-    return first || String(a.docId).localeCompare(String(b.docId));
-  });
-
+  const { rows, columns } = buildGuestTable(records);
   console.log(`\n📋 ${args.collection}: ${rows.length} documentos · ${columns.length} columnas`);
   console.log(
     `   primeras columnas: ${columns.slice(0, 12).join(", ")}${columns.length > 12 ? ", …" : ""}`,
@@ -201,26 +99,15 @@ async function main() {
     process.exit(0);
   }
 
-  const stamp = new Date()
-    .toISOString()
-    .replace(/[-:]/g, "")
-    .replace("T", "-")
-    .slice(0, 13);
   const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), "..");
   const outPath = args.out
     ? isAbsolute(args.out)
       ? args.out
       : join(repoRoot, args.out)
-    : join(repoRoot, "tmp", "guest-export", `guests-${stamp}.csv`);
+    : join(repoRoot, "tmp", "guest-export", guestCsvFileName());
 
   mkdirSync(dirname(outPath), { recursive: true });
-
-  const lines = [columns.map(csvCell).join(",")];
-  for (const row of rows) {
-    lines.push(columns.map((column) => csvCell(row[column])).join(","));
-  }
-  // BOM + CRLF: Excel and Google Sheets both read it correctly.
-  const csv = `\uFEFF${lines.join("\r\n")}\r\n`;
+  const csv = buildGuestCsv(records);
   writeFileSync(outPath, csv, "utf8");
 
   const kb = (Buffer.byteLength(csv, "utf8") / 1024).toFixed(0);

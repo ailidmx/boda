@@ -27,6 +27,7 @@ import { renderSpatialEditor, getSeatingAssignments, subscribeSeating } from "./
 import { computeSeatingIntegrity } from "./spatial/integrity.js";
 import { createMatrixLoader } from "./matrixLoader.js";
 import { collections } from "../../shared/firestore-paths.js";
+import { buildGuestCsv, guestCsvFileName } from "../../shared/guest-export.js";
 import {
   RSVP_CONFIRMED_MIN_LEVEL,
   DEFAULT_AUTH_EMAIL_DOMAIN,
@@ -1177,6 +1178,22 @@ function renderChartsPanel() {
 
 // ── Guest Manager (flat, live, inline editable) ────────────────────────
 
+// Download a flat CSV of every active guest (same columns as the Node script).
+function exportGuestsCsv() {
+  const records = state.liveGuests.filter((guest) => !guest._deleted);
+  if (!records.length) return;
+  const csv = buildGuestCsv(records);
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = guestCsvFileName();
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 function renderGuestManager() {
 
   const container = document.querySelector("[data-guest-manager]");
@@ -1185,6 +1202,7 @@ function renderGuestManager() {
     container,
     state,
     getActiveGuests,
+    exportGuestsCsv,
     getGuest,
     getFilteredGuests,
     getUniqueGuestGroups,

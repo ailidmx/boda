@@ -783,6 +783,7 @@ export function renderGuestManager(ctx) {
       <div class="dashboard-filter-count">
         <strong>${rows.length}</strong> de <strong>${getActiveGuests().length}</strong> invitados
       </div>
+      <button class="dashboard-button" type="button" data-export-csv title="Descargar todos los invitados en CSV (para Google Sheets)">↓ Exportar CSV</button>
       <button class="dashboard-button" type="button" data-add-guest title="Agregar un nuevo invitado">+ Agregar invitado</button>
     </div>
 
@@ -949,6 +950,10 @@ function wireToolbar(toolbarEl, container, ctx) {
       }
       renderGuestManager(ctx);
     });
+  });
+
+  toolbarEl.querySelector("[data-export-csv]")?.addEventListener("click", () => {
+    ctx.exportGuestsCsv();
   });
 
   toolbarEl.querySelector("[data-add-guest]")?.addEventListener("click", () => {
